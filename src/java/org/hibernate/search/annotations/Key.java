@@ -1,0 +1,25 @@
+//$Id$
+package org.hibernate.search.annotations;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Documented;
+
+/**
+ * Marks a method as a key constructor for a given type.
+ * A key is an object that uniquely identify a given object type and a given set of parameters
+ *
+ * The key object must implement equals / hashcode so that 2 keys are equals iif
+ * the given target object types are the same, the set of parameters are the same.
+ *
+ * @Factory currently works for @FullTextFilterDef.impl classes
+ *
+ * @author Emmanuel Bernard
+ */
+@Retention( RetentionPolicy.RUNTIME )
+@Target( ElementType.METHOD )
+@Documented
+public @interface Key {
+}

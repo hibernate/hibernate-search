@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Aspect  Deployer
+-->
+<deployment xmlns="urn:jboss:bean-deployer:2.0">
+   <!-- Aspect Deployment -->
+   <bean name="AspectDeployer" class="org.jboss.aop.deployers.AspectDeployer">
+      <install bean="MainDeployer" method="addDeployer">
+         <parameter><this/></parameter>
+      </install>
+      <uninstall bean="MainDeployer" method="removeDeployer">
+         <parameter><this/></parameter>
+      </uninstall>
+   </bean>
+</deployment>
