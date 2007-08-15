@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  $Id$ -->
+<chapter id="search-mapping" revision="3">
+  <title>Mapping entities to the index structure</title>
+
+  <para>All the metadata information needed to index entities is described
+  through some Java annotations. There is no need for xml mapping files nor a
+  list of indexed entities. The list is discovered at startup time scanning
+  the Hibernate mapped entities.</para>
+
+  <section id="search-mapping-entity" revision="3">
+    <title>Mapping an entity</title>
+
+    <section>
+      <title>Basic mapping</title>
+
+      <para>First, we must declare a persistent class as indexable. This is
+      done by annotating the class with <literal>@Indexed</literal> (all
+      entities not annotated with <literal>@Indexed</literal> will be ignored
+      by the indexing process):</para>
+
+      <programlisting>@Entity
+<emphasis role="bold">@Indexed(index="indexes/essays")</emphasis>
+public class Essay {
+    ...
+}</programlisting>
+
+      <para>The <literal>index</literal> attribute tells Hibernate what the
+      Lucene directory name is (usually a directory on your file system). If
+      you wish to define a base directory for all Lucene indexes, you can use
+      the <literal>hibernate.search.default.indexBase</literal> property in
+      your configuration file. Each entity instance will be represented by a
+      Lucene <classname>Document</classname> inside the given index (aka
+      Directory).</para>
+
+      <para>For each property (or attribute) of your entity, you have the
+      ability to describe how it will be indexed. The default (ie no
+      annotation) means that the property is completly ignored by the indexing
+      process. <literal>@Field</literal> does declare a property as indexed.
+      When indexing an element to a Lucene document you can specify how it is
+      indexed:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><literal>name</literal> : describe under which name, the
+          property should be stored in the Lucene Document. The default value
+          is the property name (following the JavaBeans convention)</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>store</literal> : describe whether or not the
+          property is stored in the Lucene index. You can store the value
+          <literal>Store.YES</literal> (comsuming more space in the index but
+          allowing projection, see <xref linkend="projections" /> for more
+          information), store it in a compressed way
+          <literal>Store.COMPRESS</literal> (this does consume more CPU), or
+          avoid any storage <literal>Store.NO</literal> (this is the default
+          value). When a property is stored, you can retrieve it from the
+          Lucene Document (note that this is not related to whether the
+          element is indexed or not).</para>
+        </listitem>
+
+        <listitem>
+          <para>index: describe how the element is indexed (ie the process
+          used to index the property and the type of information store). The
+          different values are <literal>Index.NO</literal> (no indexing, ie
+          cannot be found by a query), <literal>Index.TOKENIZED</literal> (use
+          an analyzer to process the property),
+          <literal>Index.UN_TOKENISED</literal> (no analyzer pre processing),
+          <literal>Index.NO_NORM</literal> (do not store the normalization
+          data).</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>These attributes are part of the <literal>@Field</literal>
+      annotation.</para>
+
+      <para>Whether or not you want to store the data depends on how you wish
+      to use the index query result. For a regular Hibernate Search usage,
+      storing is not necessary. However you might want to store some fields to
+      subsequently project them (see <xref linkend="projections" /> for more
+      information).</para>
+
+      <para>Whether or not you want to tokenize a property depends on whether
+      you wish to search the element as is, or by the words it contains. It
+      make sense to tokenize a text field, but it does not to do it for a date
+      field (or an id field). Note that fields used for sorting must not be
+      tokenized.</para>
+
+      <para>Finally, the id property of an entity is a special property used
+      by Hibernate Search to ensure index unicity of a given entity. By
+      design, an id has to be stored and must not be tokenized. To mark a
+      property as index id, use the <literal>@DocumentId</literal>
+      annotation.</para>
+
+      <programlisting>@Entity
+@Indexed(index="indexes/essays")
+public class Essay {
+    ...
+
+    @Id
+    <emphasis role="bold">@DocumentId</emphasis>
+    public Long getId() { return id; }
+
+    <emphasis role="bold">@Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES)</emphasis>
+    public String getSummary() { return summary; }
+
+    @Lob
+    <emphasis role="bold">@Field(index=Index.TOKENIZED)</emphasis>
+    public String getText() { return text; }
+}</programlisting>
+
+      <para>These annotations define an index with three fields:
+      <literal>id</literal> , <literal>Abstract</literal> and
+      <literal>text</literal> . Note that by default the field name is
+      decapitalized, following the JavaBean specification.</para>
+
+      <note>
+        <para>You <emphasis>must</emphasis> specify
+        <literal>@DocumentId</literal> on the identifier property of your
+        entity class.</para>
+      </note>
+    </section>
+
+    <section>
+      <title>Mapping properties multiple times</title>
+
+      <para>It is sometimes needed to map a property multiple times per index,
+      with slightly different indexing strategies. Especially, sorting a query
+      by field requires the field to be <literal>UN_TOKENIZED</literal>. If
+      one want to search by words in this property and still sort it, one need
+      to index it twice, once tokenized, once untokenized. @Fields allows to
+      achieve this goal.</para>
+
+      <programlisting>@Entity
+@Indexed(index = "Book" )
+public class Book {
+    @Fields( {
+            @Field(index = Index.TOKENIZED),
+            @Field(name = "summary_forSort", index = Index.UN_TOKENIZED, store = Store.YES)
+            } )
+    public String getSummary() {
+        return summary;
+    }
+
+    ...
+}</programlisting>
+
+      <para>The field summary is indexed twice, once as
+      <literal>summary</literal> in a tokenized way, and once as
+      <literal>summary_forSort</literal> in an untokenized way. @Field
+      supports 2 attributes useful when @Fields is used:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>analyzer: defines a @Analyzer annotation per field rather than
+          per property</para>
+        </listitem>
+
+        <listitem>
+          <para>bridge: defines a @FieldBridge annotation per field rather
+          than per property</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>See below for more information about analyzers and field
+      bridges.</para>
+    </section>
+
+    <section>
+      <title>Embedded and associated objects</title>
+
+      <para>Associated objects as well as embedded objects can be indexed as
+      part of the root entity index.</para>
+
+      <programlisting>@Entity
+@Indexed
+public class Place {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field( index = Index.TOKENIZED )
+    private String name;
+
+    @OneToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+    <emphasis role="bold">@IndexedEmbedded</emphasis>
+    private Address address;
+    ....
+}
+
+@Entity
+@Indexed
+public class Address {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field(index=Index.TOKENIZED)
+    private String street;
+
+    @Field(index=Index.TOKENIZED)
+    private String city;
+
+    <emphasis role="bold">@ContainedIn</emphasis>
+    @OneToMany(mappedBy="address")
+    private Set&lt;Place&gt; places;
+    ...
+}</programlisting>
+
+      <para>In this example, the place fields will be indexed in the
+      <literal>Place</literal> index. The <literal>Place</literal> index
+      documents will also contain the fields <literal>address.id</literal>,
+      <literal>address.street</literal>, and <literal>address.city</literal>
+      which you will be able to query. This is enabled by the
+      <literal>@IndexedEmbedded</literal> annotation.</para>
+
+      <para><literal>@ContainedIn</literal> is useful on embedded objects that
+      are also entities (like <literal>Address</literal> in this example): it
+      basically means that when an address entity is updated, the index
+      document of the associated <literal>Place</literal>(s), also have to be
+      updated.</para>
+
+      <para>Let's make our example a bit more complex:</para>
+
+      <programlisting>@Entity
+@Indexed
+public class Place {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field( index = Index.TOKENIZED )
+    private String name;
+
+    @OneToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+    <emphasis role="bold">@IndexedEmbedded</emphasis>
+    private Address address;
+    ....
+}
+
+@Entity
+@Indexed
+public class Address {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field(index=Index.TOKENIZED)
+    private String street;
+
+    @Field(index=Index.TOKENIZED)
+    private String city;
+
+    <emphasis role="bold">@IndexedEmbedded(depth = 1, prefix = "ownedBy_")</emphasis>
+    private Owner ownedBy;
+
+    <emphasis role="bold">@ContainedIn</emphasis>
+    @OneToMany(mappedBy="address")
+    private Set&lt;Place&gt; places;
+    ...
+}
+
+@Embeddable
+public class Owner {
+    @Field(index = Index.TOKENIZED)
+    private String name;
+   ...
+}</programlisting>
+
+      <para>Any <literal>@*ToOne</literal> and <literal>@Embedded</literal>
+      attribute can be annotated with <literal>@IndexedEmbedded</literal>. The
+      attributes of the associated class will then be added to the main entity
+      index. In the previous example, the index will contain the following
+      fields</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>id</para>
+        </listitem>
+
+        <listitem>
+          <para>name</para>
+        </listitem>
+
+        <listitem>
+          <para>address.street</para>
+        </listitem>
+
+        <listitem>
+          <para>address.city</para>
+        </listitem>
+
+        <listitem>
+          <para>addess.ownedBy_name</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>The default prefix is <literal>propertyName.</literal>, following
+      the traditional object navigation convention. You can override it using
+      the <literal>prefix</literal> attribute as it is shown on the
+      <literal>ownedBy</literal> property.</para>
+
+      <para><literal>depth</literal> is necessary when the object graph
+      contains a cyclic dependency of classes (not instances). For example, if
+      <classname>Owner</classname> points to <classname>Place</classname>.
+      Hibernate Search will stop including Indexed embedded atttributes after
+      reaching the expected depth (or the object graph boundaries are
+      reached). A class having a self reference is an example of cyclic
+      dependency. In our example, because <literal>depth</literal> is set to
+      1, any <literal>@IndexedEmbedded</literal> attribute in Owner (if any)
+      will be ignored.</para>
+
+      <para>Such a feature (<literal>@IndexedEmbedded</literal>) is very
+      useful to express queries refering to associated objects, such
+      as:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Return places where name contains JBoss and where address city
+          is Atlanta. In Lucene query this would be</para>
+
+          <programlisting>+name:jboss +address.city:atlanta  </programlisting>
+        </listitem>
+
+        <listitem>
+          <para>Return places where name contains JBoss and where owner's name
+          contain Joe. In Lucene query this would be</para>
+
+          <programlisting>+name:jboss +address.orderBy_name:joe  </programlisting>
+        </listitem>
+      </itemizedlist>
+
+      <para>In a way it mimics the relational join operation in a more
+      efficient way (at the cost of data duplication). Remember that, out of
+      the box, Lucene indexes have no notion of association, the join
+      operation is simply non-existent. It might help to keep the relational
+      model normalzed while benefiting from the full text index speed and
+      feature richness.</para>
+
+      <para><note>
+          <para>An associated object can itself be (but don't have to)
+          <literal>@Indexed</literal></para>
+        </note></para>
+
+      <para>When @IndexedEmbedded points to an entity, the association has to
+      be directional and the other side has to be annotated
+      <literal>@ContainedIn</literal> (as see in the previous example). If
+      not, Hibernate Search has no way to update the root index when the
+      associated entity is updated (in ou example, a <literal>Place</literal>
+      index document has to be updated when the associated
+      <classname>Address</classname> instance is updated.</para>
+
+      <note>
+        <para><literal>@IndexedEmbedded</literal> is supported on collections
+        too (ie to index associated object included in collections). But the
+        support is only partially implemented. It will depend on how you
+        update collections (Check HSEARCH-56 in JIRA for more informations).
+        The workaround is to manually index the object
+        (session.index())</para>
+      </note>
+    </section>
+
+    <section>
+      <title>Boost factor</title>
+
+      <para>Lucene has the notion of <emphasis>boost factor</emphasis> . It's
+      a way to give more weigth to a field or to an indexed element over an
+      other during the indexation process. You can use
+      <literal>@Boost</literal> at the field or the class level.</para>
+
+      <programlisting>@Entity
+@Indexed(index="indexes/essays")
+<emphasis role="bold">@Boost(2)</emphasis>
+public class Essay {
+    ...
+
+    @Id
+    @DocumentId
+    public Long getId() { return id; }
+
+    @Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES)
+    <emphasis role="bold">@Boost(2.5f)</emphasis>
+    public String getSummary() { return summary; }
+
+    @Lob
+    @Field(index=Index.TOKENIZED)
+    public String getText() { return text; }
+}        </programlisting>
+
+      <para>In our example, Essay's probability to reach the top of the search
+      list will be multiplied by 2 and the summary field will be 2.5 more
+      important than the test field. Note that this explaination is actually
+      wrong, but it is simple and close enought to the reality. Please check
+      the Lucene documentation or the excellent <citetitle>Lucene In Action
+      </citetitle> from Otis Gospodnetic and Erik Hatcher.</para>
+    </section>
+
+    <section>
+      <title>Analyser</title>
+
+      <para>The default analyzer class used to index the elements is
+      configurable through the <literal>hibernate.search.analyzer</literal>
+      property. If none defined,
+      <classname>org.apache.lucene.analysis.standard.StandardAnalyzer</classname>
+      is used as the default.</para>
+
+      <para>You can also define the analyzer class per entity, per property
+      and even per @Field (useful when multiple fields are indexed from a
+      single proeprty).</para>
+
+      <programlisting>@Entity
+@Indexed
+@Analyzer(impl = EntityAnalyzer.class)
+public class MyEntity {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Integer id;
+
+    @Field(index = Index.TOKENIZED)
+    private String name;
+
+    @Field(index = Index.TOKENIZED)
+    @Analyzer(impl = PropertyAnalyzer.class)
+    private String summary;
+
+    @Field(index = Index.TOKENIZED, analyzer = @Analyzer(impl = FieldAnalyzer.class)
+    private String body;
+
+    ...
+}</programlisting>
+
+      <para>In this example, <classname>EntityAnalyzer</classname> is used
+      index all tokenized properties (eg. <literal>name</literal>), except for
+      <literal>summary</literal> and <literal>body</literal> which are indexed
+      with <classname>PropertyAnalyzer</classname> and
+      <classname>FieldAnalyzer</classname> respectively.</para>
+
+      <caution>
+        <para>Mixing different analyzers in the same entity is most of the
+        time a bad practice. It makes query building more complex and results
+        less predictable (for the novice), especially if you are using a
+        QueryParser (which uses the same analyzer for the whole query). As a
+        thumb rule, the same analyzer should be used for both the indexing and
+        the query for a given field.</para>
+      </caution>
+    </section>
+  </section>
+
+  <section id="search-mapping-bridge">
+    <title>Property/Field Bridge</title>
+
+    <para>In Lucene all index fields have to be represented as
+    Strings. For this reason all entity properties annotated with <literal>@Field</literal> 
+    have to be indexed in a String form. For
+    most of your properties, Hibernate Search does the translation job for you
+    thanks to a built-in set of bridges. In some cases, though you need a more fine
+    grain control over the translation process.</para>
+
+    <section>
+      <title>Built-in bridges</title>
+
+      <para><literal>Hibernate Search</literal> comes bundled with a set of
+      built-in bridges between a Java property type and its full text
+      representation.</para>
+
+      <para><literal>Null</literal> elements are not indexed (Lucene does not
+      support null elements and it does not make much sense either)</para>
+
+      <variablelist>
+        <varlistentry>
+          <term>null</term>
+
+          <listitem>
+            <para>null elements are not indexed. Lucene does not support null
+            elements and this does not make much sense either.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>java.lang.String</term>
+
+          <listitem>
+            <para>String are indexed as is</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>short, Short, integer, Integer, long, Long, float, Float,
+          double, Double, BigInteger, BigDecimal</term>
+
+          <listitem>
+            <para>Numbers are converted in their String representation. Note
+            that numbers cannot be compared by Lucene (ie used in ranged
+            queries) out of the box: they have to be padded <footnote>
+                <para>Using a Range query is debatable and has drawbacks, an
+                alternative approach is to use a Filter query which will
+                filter the result query to the appropriate range.</para>
+
+                <para>Hibernate Search will support a padding mechanism</para>
+              </footnote></para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>java.util.Date</term>
+
+          <listitem>
+            <para>Dates are stored as yyyyMMddHHmmssSSS in GMT time
+            (200611072203012 for Nov 7th of 2006 4:03PM and 12ms EST). You
+            shouldn't really bother with the internal format. What is
+            important is that when using a DateRange Query, you should know
+            that the dates have to be expressed in GMT time.</para>
+
+            <para>Usually, storing the date up to the milisecond is not
+            necessary. <literal>@DateBridge</literal> defines the appropriate
+            resolution you are willing to store in the index ( <literal>
+            <literal>@DateBridge(resolution=Resolution.DAY)</literal>
+            </literal> ). The date pattern will then be truncated
+            accordingly.</para>
+
+            <programlisting>@Entity 
+@Indexed
+public class Meeting {
+    @Field(index=Index.UN_TOKENIZED)
+    <emphasis role="bold">@DateBridge(resolution=Resolution.MINUTE)</emphasis>
+    private Date date;
+    ...                 </programlisting>
+
+            <warning>
+              <para>A Date whose resolution is lower than
+              <literal>MILLISECOND</literal> cannot be a
+              <literal>@DocumentId</literal></para>
+            </warning>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>Custom Bridge</title>
+
+      <para>It can happen that the built-in bridges of Hibernate Search do
+      not cover some of your property types, or that the String representation
+      used is not what you expect. The following paragraphs sveral solutions for this
+      problem.</para>
+
+      <section>
+        <title>StringBridge</title>
+
+        <para>The simpliest custom solution is to give <productname>Hibernate
+        Search </productname> an implementation of your expected
+        <emphasis>object to String</emphasis> bridge. To do so you need to
+        implements the
+        <literal>org.hibernate.search.bridge.StringBridge</literal>
+        interface</para>
+
+        <programlisting>/**
+ * Padding Integer bridge.
+ * All numbers will be padded with 0 to match 5 digits
+ *
+ * @author Emmanuel Bernard
+ */
+public class PaddedIntegerBridge implements <emphasis role="bold">StringBridge</emphasis> {
+
+    private int PADDING = 5;
+
+    <emphasis role="bold">public String objectToString(Object object)</emphasis> {
+        String rawInteger = ( (Integer) object ).toString();
+        if (rawInteger.length() &gt; PADDING) 
+            throw new IllegalArgumentException( "Try to pad on a number too big" );
+        StringBuilder paddedInteger = new StringBuilder( );
+        for ( int padIndex = rawInteger.length() ; padIndex &lt; PADDING ; padIndex++ ) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append( rawInteger ).toString();
+    }
+}                </programlisting>
+
+        <para>Then any property or field can use this bridge thanks to the
+        <literal>@FieldBridge</literal> annotation</para>
+
+        <programlisting><emphasis role="bold">@FieldBridge(impl = PaddedIntegerBridge.class)</emphasis>
+private Integer length;                </programlisting>
+
+        <para>Parameters can be passed to the Bridge implementation making it
+        more flexible. The Bridge implementation implements a
+        <classname>ParameterizedBridge</classname> interface, and the
+        parameters are passed through the <literal>@FieldBridge</literal>
+        annotation.</para>
+
+        <programlisting>public class PaddedIntegerBridge implements StringBridge, <emphasis
+            role="bold">ParameterizedBridge</emphasis> {
+
+    public static String PADDING_PROPERTY = "padding";
+    private int padding = 5; //default
+
+    <emphasis role="bold">public void setParameterValues(Map parameters)</emphasis> {
+        Object padding = parameters.get( PADDING_PROPERTY );
+        if (padding != null) this.padding = (Integer) padding;
+    }
+
+    public String objectToString(Object object) {
+        String rawInteger = ( (Integer) object ).toString();
+        if (rawInteger.length() &gt; padding) 
+            throw new IllegalArgumentException( "Try to pad on a number too big" );
+        StringBuilder paddedInteger = new StringBuilder( );
+        for ( int padIndex = rawInteger.length() ; padIndex &lt; padding ; padIndex++ ) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append( rawInteger ).toString();
+    }
+}
+
+
+//property
+@FieldBridge(impl = PaddedIntegerBridge.class,
+             <emphasis role="bold">params = @Parameter(name="padding", value="10")</emphasis>
+            )
+private Integer length;                </programlisting>
+
+        <para>The <classname>ParameterizedBridge</classname> interface can be
+        implemented by <classname>StringBridge</classname> ,
+        <classname>TwoWayStringBridge</classname> ,
+        <classname>FieldBridge</classname> implementations (see
+        bellow).</para>
+
+        <para>If you expect to use your bridge implementation on for an id
+        property (ie annotated with <literal>@DocumentId</literal> ), you need
+        to use a slightly extended version of <literal>StringBridge</literal>
+        named <classname>TwoWayStringBridge</classname> . <literal>Hibernate
+        Search </literal> needs to read the string representation of the
+        identifier and generate the object out of it. There is not difference
+        in the way the <literal>@FieldBridge</literal> annotation is
+        used.</para>
+
+        <programlisting>public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
+
+    public static String PADDING_PROPERTY = "padding";
+    private int padding = 5; //default
+
+    public void setParameterValues(Map parameters) {
+        Object padding = parameters.get( PADDING_PROPERTY );
+        if (padding != null) this.padding = (Integer) padding;
+    }
+
+    public String objectToString(Object object) {
+        String rawInteger = ( (Integer) object ).toString();
+        if (rawInteger.length() &gt; padding) 
+            throw new IllegalArgumentException( "Try to pad on a number too big" );
+        StringBuilder paddedInteger = new StringBuilder( );
+        for ( int padIndex = rawInteger.length() ; padIndex &lt; padding ; padIndex++ ) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append( rawInteger ).toString();
+    }
+
+    <emphasis role="bold">public Object stringToObject(String stringValue)</emphasis> {
+        return new Integer(stringValue);
+    }
+}
+
+
+//id property
+@DocumentId
+@FieldBridge(impl = PaddedIntegerBridge.class,
+             params = @Parameter(name="padding", value="10") 
+private Integer id;
+                </programlisting>
+
+        <para>It is critically important for the two-way process to be
+        idempotent (ie object = stringToObject( objectToString( object ) )
+        ).</para>
+      </section>
+
+      <section>
+        <title>FieldBridge</title>
+
+        <para>Some usecase requires more than a simple object to string
+        translation when mapping a property to a Lucene index. To give you
+        most of the flexibility you can also implement a bridge as a
+        <classname>FieldBridge</classname> . This interface give you a
+        property value and let you map it the way you want in your Lucene
+        <classname>Document</classname> .This interface is very similar in its
+        concept to the <productname>Hibernate</productname>
+        <classname>UserType</classname> .</para>
+
+        <para>You can for example store a given property in two different
+        document fields</para>
+
+        <programlisting>/**
+ * Store the date in 3 different field year, month, day
+ * to ease Range Query per year, month or day
+ * (eg get all the elements of december for the last 5 years)
+ *
+ * @author Emmanuel Bernard
+ */
+public class DateSplitBridge implements FieldBridge {
+    private final static TimeZone GMT = TimeZone.getTimeZone("GMT");
+
+    <emphasis role="bold">public void set(String name, Object value, Document document, Field.Store
+            store, Field.Index index, Float boost) {
+                    </emphasis>
+        Date date = (Date) value;
+        Calendar cal = GregorianCalendar.getInstance( GMT );
+        cal.setTime( date );
+        int year = cal.get( Calendar.YEAR );
+        int month = cal.get( Calendar.MONTH ) + 1;
+        int day = cal.get( Calendar.DAY_OF_MONTH );
+        //set year
+        Field field = new Field( name + ".year", String.valueOf(year), store, index );
+        if ( boost != null ) field.setBoost( boost );
+        document.add( field );
+        //set month and pad it if needed
+        field = new Field( name + ".month", month &lt; 10 ? "0" : "" + String.valueOf(month), store, index);
+        if ( boost != null ) field.setBoost( boost );
+        document.add( field );
+        //set day and pad it if needed
+        field = new Field( name + ".day", day &lt; 10 ? "0" : "" + String.valueOf(day), store, index );
+        if ( boost != null ) field.setBoost( boost );
+        document.add( field );
+    }
+}
+
+
+//property
+<emphasis role="bold">@FieldBridge(impl = DateSplitBridge.class)</emphasis>
+private Integer length;                </programlisting>
+
+        <para></para>
+      </section>
+    </section>
+  </section>
+</chapter>

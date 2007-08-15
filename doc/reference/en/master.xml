@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  $Id$ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3CR3//EN"
+"../../../../../Hibernate3/doc/reference/support/docbook-dtd/docbookx.dtd" [
+<!ENTITY getting-started SYSTEM "modules/getting-started.xml">
+<!ENTITY architecture SYSTEM "modules/architecture.xml">
+<!ENTITY configuration SYSTEM "modules/configuration.xml">
+<!ENTITY mapping SYSTEM "modules/mapping.xml">
+<!ENTITY query SYSTEM "modules/query.xml">
+<!ENTITY batchindex SYSTEM "modules/batchindex.xml">
+<!ENTITY optimize SYSTEM "modules/optimize.xml">
+<!ENTITY lucene-native SYSTEM "modules/lucene-native.xml">
+]>
+<book lang="en">
+  <bookinfo>
+    <title>Hibernate Search</title>
+
+    <subtitle>Apache <trademark>Lucene</trademark> Integration</subtitle>
+
+    <subtitle>Reference Guide</subtitle>
+
+    <releaseinfo>3.0.0.Beta4</releaseinfo>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/hibernate_logo_a.png" format="PNG" />
+      </imageobject>
+    </mediaobject>
+  </bookinfo>
+
+  <toc></toc>
+
+  <preface id="preface" revision="2">
+    <title>Preface</title>
+
+    <para>Full text search engines like <productname>Apache
+    Lucene</productname> are very powerful technologies to add efficient free
+    text search capabilities to applications. However, they suffer several mismatches when
+    dealing with object domain models. Amongst other things indexes have to be kept up to date and
+    mismatches between index structure and domain model as well as query mismatches 
+    have to be avoided. <sbr/>
+    Hibernate Search indexes your domain model thanks to a few annotations,
+    takes care of database/index synchronization and brings you back
+    regular managed objects from free text queries. To achieve this Hibernate Search
+    is combining the power of <ulink url="http://www.hibernate.org">Hibernate</ulink> and  
+    <ulink url="http://lucene.apache.org">Apache Lucene</ulink>.
+    </para>
+
+    <important>Hibernate Search is a work in progress and new features are cooking
+    in this area. So expect some compatibility changes in subsequent
+    versions.</important>
+  </preface>
+
+  &getting-started; 
+
+  &architecture;
+
+  &configuration;
+
+  &mapping;
+
+  &query;
+
+  &batchindex;
+
+  &optimize;
+
+  &lucene-native;
+</book>

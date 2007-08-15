@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  $Id$ -->
+<chapter id="search-architecture">
+  <title>Architecture</title>
+  <section>
+    <title>Overview</title>
+    
+  <para>Hibernate Search consists of an indexing and an index search
+  engine. Both are backed by Apache Lucene.</para>
+
+  <para>When an entity is inserted, updated or removed in the database,
+  Hibernate Search keeps track of this event (through the Hibernate event
+  system) and schedules an index update. All the index updates are handled for
+  you without you having to use the Apache Lucene APIs 
+  (see <xref linkend="search-configuration-event"/>).
+  </para>
+
+  <para>To interact with Apache Lucene indexes, Hibernate Search has the
+  notion of <classname>DirectoryProvider</classname>s. A directory provider
+  will manage a given Lucene <classname>Directory</classname> type. You can
+  configure directory providers to adjust the directory target
+  (see <xref linkend="search-configuration-directory"/>).</para>
+
+  <para>Hibernate Search can also use a Lucene index to search an entity and
+  return a list of managed entities saving you the tedious object to
+  Lucene document mapping. The same persistence
+  context is shared between Hibernate and Hibernate Search; as a matter of
+  fact, the Search Session is built on top of the Hibernate Session. The
+  application code use the unified <classname>org.hibernate.Query</classname>
+  or <classname>javax.persistence.Query</classname> APIs exactly the way a
+  HQL, JPA-QL or native queries would do.</para>
+
+  <para>To be more efficient, Hibernate Search batches the write interactions
+  with the Lucene index. There is currently two types of batching depending
+  on the expected scope.</para>
+
+  <para>Outside an transaction, the index update operation is executed
+  right after the actual database operation. This scope is really a no
+  scoping, and no batching is performed.</para>
+
+  <para>It is however recommended, for both your database and Hibernate
+  Search, to execute your operation in a transaction be it JDBC or
+  JTA. When in a transaction, the index update operation is scheduled for
+  the transaction commit (and discarded in case of transaction rollback).
+  The batching scope is the transaction. There are two immediate
+  benefits:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Performance: Lucene indexing works better when operation are
+      executed in batch.</para>
+    </listitem>
+
+    <listitem>
+      <para>ACIDity: The work executed has the same scoping as the one
+      executed by the database transaction and is executed if and only if
+      the transaction is committed.</para>
+
+      <note>
+        <para>Disclaimer, the work in not ACID in the strict sense of it,
+        but ACID behavior is rarely useful for full text search indexes
+        since they can be rebuilt from the source at any time.</para>
+      </note>
+    </listitem>
+  </itemizedlist>
+
+  <para>You can think of those two scopes (no scope vs transactional) as the
+  equivalent of the (infamous) autocommit vs transactional behavior. From a
+  performance perspective, the <emphasis>in transaction</emphasis> mode is
+  recommended. The scoping choice is made transparently: Hibernate Search
+  detects the presence of a transaction and adjust the scoping.</para>
+
+  <note>Hibernate Search works perfectly fine in the Hibernate /
+  EntityManager long conversation pattern aka. atomic conversation.</note>
+
+  <note>Depending on user demand, additional scoping will be considered, the
+  pluggability mechanism being already in place.</note>
+  </section>
+
+  <section>
+    <title>Back end</title>
+
+    <para>Hibernate Search offers the ability to let the scoped work being
+    processed by different back ends. Two back ends are provided out of the
+    box for two different scenarios.</para>
+
+    <section>
+      <title>Lucene</title>
+
+      <para>In this mode, all index update operations applied on a given node
+      (JVM) will be executed to the Lucene directories (through the directory
+      providers) by the same node. This mode is typically used in non
+      clustered environment or in clustered environments where the directory store is
+      shared.</para>
+
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center"
+                     fileref="../shared/images/lucene-backend.png"
+                     format="PNG" />
+        </imageobject>
+
+        <imageobject role="fo">
+          <imagedata align="center" fileref="images/lucene-backend.png"
+                     format="PNG" />
+        </imageobject>
+      </mediaobject>
+
+      <para>This mode targets non clustered applications, or clustered
+      applications where the Directory is taking care of the locking
+      strategy.</para>
+
+      <para>The main advantage is simplicity and immediate visibility of the
+      changes in Lucene queries (a requirement is some applications).</para>
+    </section>
+
+    <section>
+      <title>JMS</title>
+
+      <para>All index update operations applied on a given node are sent to a
+      JMS queue. A unique reader will then process the queue and update the
+      master Lucene index. The master index is then replicated on a regular
+      basis to the slave copies. This is known as the master / slaves pattern.
+      The master is the sole responsible for updating the Lucene index. The
+      slaves can accept read as well as write operations. However, they only
+      process the read operation on their local index copy and delegate the update 
+      operations to the master.</para>
+
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center" fileref="../shared/images/jms-backend.png"
+                     format="PNG" />
+        </imageobject>
+
+        <imageobject role="fo">
+          <imagedata align="center" fileref="images/jms-backend.png"
+                     format="PNG" />
+        </imageobject>
+      </mediaobject>
+
+      <para>This mode targets clustered environments where throughput is
+      critical, and index update delays are affordable. Reliability is ensured
+      by the JMS provider and by having the slaves working on a local copy of
+      the index.</para>
+    </section>
+
+    <note>Hibernate Search is an extensible architecture. While not yet part
+    of the public API, plugging a third party back end is possible. Feel
+    free to drop ideas to
+    <literal>hibernate-dev@lists.jboss.org</literal>.</note>
+  </section>
+
+  <section>
+    <title>Work execution</title>
+
+    <para>The indexing work (done by the back end) can be executed
+    synchronously with the transaction commit (or update operation if out of
+    transaction), or asynchronously.</para>
+
+    <section>
+      <title>Synchronous</title>
+
+      <para>This is the safe mode where the back end work is executed in
+      concert with the transaction commit. Under highly concurrent
+      environment, this can lead to throughput limitation (due to the Apache
+      Lucene lock mechanism). It can increase the system response time too if
+      the backend is significantly slower than the transactional process and
+      if a lot of IO operations are involved.</para>
+    </section>
+
+    <section>
+      <title>Asynchronous</title>
+
+      <para>This mode delegates the work done by the back end to a different
+      thread. That way, throughput and response time are (to a certain extend)
+      decorrelated from the back end performance. The drawback is that a small
+      delay appears between the transaction commit and the index update and a
+      small overhead is introduced to deal with thread management.</para>
+
+      <para>It is recommended to use synchronous execution first and evaluate
+      asynchronous if performance problems occur and after having set up a
+      proper benchmark (ie not a lonely cowboy hitting the system in a
+      completely unrealistic way).</para>
+    </section>
+  </section>
+
+  <section id="search-architecture-readerstrategy" xreflabel="Reader strategy">
+    <title>Reader strategy</title>
+
+    <para>When executing a query, Hibernate Search interacts with the Apache
+    Lucene indexes through a reader strategy. chosing a reader strategy will
+    depend on the profile of the application (frequent updates, read mostly,
+    asynchronous index update etc). See also <xref linkend="configuration-reader-strategy"/></para>
+
+    <section>
+      <title>Shared</title>
+
+      <para>With this strategy, Hibernate Search will share the same
+      IndexReader, for a given Lucene index, across multiple queries and
+      threads provided that the IndexReader is still up-to-date. If the
+      IndexReader is not up-to-date, an new one is opened and provided.
+      Generally speaking, this strategy provides much better performances than
+      the <literal>not-shared</literal> strategy. It is especially true if the
+      number of updates is much lower than the reads. This strategy is the
+      default.</para>
+    </section>
+
+    <section>
+      <title>Not-shared</title>
+
+      <para>Every time a query is executed, a Lucene IndexReader is opened.
+      This strategy is not the most efficient: opening and warming up an
+      IndexReader can be a relatively expensive operation.</para>
+    </section>
+
+    <section>
+      <title>Custom</title>
+
+      <para>You can write your own reader strategy that suits your application
+      needs by implementing
+      <classname>org.hibernate.search.reader.ReaderProvider</classname>. The
+      implementation must be thread safe.</para>
+
+      <note>
+        <para>Some additional strategies are planned in future versions of
+        Hibernate Search</para>
+      </note>
+    </section>
+  </section>
+</chapter>

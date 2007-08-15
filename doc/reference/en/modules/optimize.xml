@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  $Id$ -->
+<chapter id="search-optimize">
+  <title>Index Optimization</title>
+
+  <para>From time to time, the Lucene index needs to be optimized. The process
+  is essentially a defragmentation: until the optimization occurs, deleted
+  documents are just marked as such, no physical deletion is applied, the
+  optimization can also adjust the number of files in the Lucene
+  Directory.</para>
+
+  <para>The optimization speeds up searches but in no way speeds up indexation
+  (update). During an optimization, searches can be performed (but will most
+  likely be slowed down), and all index updates will be stopped. Prefer
+  optimizing:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>on an idle system or when the searches are less frequent</para>
+    </listitem>
+
+    <listitem>
+      <para>after a lot of index modifications (doing so before will not speed
+      up the indexation process)</para>
+    </listitem>
+  </itemizedlist>
+
+  <section>
+    <title>Automatic optimization</title>
+
+    <para>Hibernate Search can optimize automatically an index after:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>a certain amount of operations have been applied (insertion,
+        deletion)</para>
+      </listitem>
+
+      <listitem>
+        <para>or a certain amout of transactions have been applied</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The configuration can be global or defined at the index
+    level:</para>
+
+    <programlisting>hibernate.search.default.optimizer.operation_limit.max = 1000
+hibernate.search.default.optimizer.transaction_limit.max = 100
+
+hibernate.search.Animal.optimizer.transaction_limit.max = 50</programlisting>
+
+    <para>An optimization will be triggered to the <literal>Animal</literal>
+    index as soon as either:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>the number of addition and deletion reaches 1000</para>
+      </listitem>
+
+      <listitem>
+        <para>the number of transactions reaches 50
+        (<constant>hibernate.search.Animal.optimizer.transaction_limit.max</constant>
+        having priority over
+        <constant>hibernate.search.default.optimizer.transaction_limit.max</constant>)</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>If none of these parameters are defined, not optimization is
+    processed automatically.</para>
+  </section>
+
+  <section>
+    <title>Manual optimization</title>
+
+    <para>You can programmatically optimize (defragment) a Lucene index from
+    Hibernate Search through the <classname>SearchFactory</classname></para>
+
+    <programlisting>searchFactory.optimize(Order.class);
+
+searchFactory.optimize();</programlisting>
+
+    <para>The first example reindex the Lucene index holding
+    <classname>Order</classname>s, the second, optimize all indexes.</para>
+
+    <para>The <classname>SearchFactory</classname> can be accessed from a
+    <classname>FullTextSession</classname>:</para>
+
+    <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(regularSession);
+SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
+
+    <para>Note that <literal>searchFactory.optimize()</literal> has no effect
+    on a JMS backend. You must apply the optimize operation on the Master
+    node.</para>
+  </section>
+
+  <section>
+    <title>Adjusting optimization</title>
+
+    <para>Apache Lucene has a few parameters to influence how optimization is
+    performed. Hibernate Search expose those parameters.</para>
+
+    <para>Further index optimisation parameters include
+    <literal>hibernate.search.[default|&lt;indexname&gt;].merge_factor</literal>,
+    <literal>hibernate.search.[default|&lt;indexname&gt;].max_merge_docs</literal>
+    and
+    <literal>hibernate.search.[default|&lt;indexname&gt;].max_buffered_docs</literal>
+    - see <xref linkend="lucene-indexing-performance" /> for more
+    details.</para>
+  </section>
+</chapter>

@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  $Id$ -->
+<chapter id="search-configuration">
+  <title>Configuration</title>
+
+  <section id="search-configuration-directory" revision="1">
+    <title>Directory configuration</title>
+
+    <para>Apache Lucene has a notion of <literal>Directory</literal> to store the index files.
+    The Directory implementation can be customized, but Lucene comes bundled
+    with a file system (<literal>FSDirectoryProvider</literal>) and a in
+    memory (<literal>RAMDirectoryProvider</literal>) implementation. Hibernate Search has the
+    notion of <literal>DirectoryProvider</literal> that handles the
+    configuration and the initialization of the Lucene Directory.</para>
+
+    <table>
+      <title>List of built-in Directory Providers</title>
+
+      <tgroup cols="3">
+        <thead>
+          <row>
+            <entry align="center">Class</entry>
+
+            <entry align="center">Description</entry>
+
+            <entry align="center">Properties</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>org.hibernate.search.store.FSDirectoryProvider</entry>
+
+            <entry>File system based directory. The directory used will be
+            &lt;indexBase&gt;/&lt; <literal>@Indexed.name</literal>
+            &gt;</entry>
+
+            <entry><para><literal>indexBase</literal> : Base
+            directory</para><para><literal>indexName</literal>: override
+            @Index.name (useful for sharded indexes)</para></entry>
+          </row>
+
+          <row>
+            <entry>org.hibernate.search.store.FSMasterDirectoryProvider</entry>
+
+            <entry><para>File system based directory. Like
+            FSDirectoryProvider. It also copies the index to a source directory
+            (aka copy directory) on a regular basis. </para><para>The
+            recommended value for the refresh period is (at least) 50% higher
+            that the time to copy the information (default 3600 seconds - 60
+            minutes).</para><para>Note that the copy is based on an
+            incremental copy mechanism reducing the average copy
+            time.</para><para>DirectoryProvider typically used on the master
+            node in a JMS back end cluster.</para>DirectoryProvider typically
+            used on slave nodes using a JMS back end.</entry>
+
+            <entry><para><literal>indexBase</literal>: Base
+            directory</para><para><literal>indexName</literal>: override
+            @Index.name (useful for sharded
+            indexes)</para><para><literal>sourceBase</literal>: Source (copy)
+            base directory.</para><para><literal>source</literal>: Source
+            directory suffix (default to <literal>@Indexed.name</literal>).
+            The actual source directory name being
+            <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
+            </para><para>refresh: refresh period in second (the copy will take
+            place every refresh seconds).</para></entry>
+          </row>
+
+          <row>
+            <entry>org.hibernate.search.store.FSSlaveDirectoryProvider</entry>
+
+            <entry><para>File system based directory. Like
+            FSDirectoryProvider, but retrieves a master version (source) on a
+            regular basis. To avoid locking and inconsistent search results, 2
+            local copies are kept. </para><para>The recommended value for the
+            refresh period is (at least) 50% higher that the time to copy the
+            information (default 3600 seconds - 60 minutes).</para><para>Note
+            that the copy is based on an incremental copy mechanism reducing
+            the average copy time.</para><para>DirectoryProvider typically
+            used on slave nodes using a JMS back end.</para></entry>
+
+            <entry><para><literal>indexBase</literal>: Base
+            directory</para><para><literal>indexName</literal>: override
+            @Index.name (useful for sharded
+            indexes)</para><para><literal>sourceBase</literal>: Source (copy)
+            base directory.</para><para><literal>source</literal>: Source
+            directory suffix (default to <literal>@Indexed.name</literal>).
+            The actual source directory name being
+            <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
+            </para><para>refresh: refresh period in second (the copy will take
+            place every refresh seconds).</para></entry>
+          </row>
+
+          <row>
+            <entry>org.hibernate.search.store.RAMDirectoryProvider</entry>
+
+            <entry>Memory based directory, the directory will be uniquely
+            identified (in the same deployment unit) by the
+            <literal>@Indexed.name</literal> element</entry>
+
+            <entry>none</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <para>If the built-in directory providers does not fit your needs, you can
+    write your own directory provider by implementing the
+    <classname>org.hibernate.store.DirectoryProvider</classname>
+    interface</para>
+
+    <para>Each indexed entity is associated to a Lucene index (an index can be
+    shared by several entities but this is not usually the case). You can
+    configure the index through properties prefixed by
+    <constant>hibernate.search.</constant>
+    <replaceable>indexname</replaceable> . Default properties inherited to all
+    indexes can be defined using the prefix
+    <constant>hibernate.search.default.</constant></para>
+
+    <para>To define the directory provider of a given index, you use the
+    <constant>hibernate.search. <replaceable>indexname</replaceable>
+    .directory_provider </constant></para>
+
+    <programlisting>hibernate.search.default.directory_provider org.hibernate.search.store.FSDirectoryProvider
+hibernate.search.default.indexBase=/usr/lucene/indexes
+
+hibernate.search.Rules.directory_provider org.hibernate.search.store.RAMDirectoryProvider        </programlisting>
+
+    <para>applied on</para>
+
+    <programlisting>@Indexed(name="Status")
+public class Status { ... }
+
+@Indexed(name="Rules")
+public class Rule { ... }</programlisting>
+
+    <para>will create a file system directory in
+    <filename>/usr/lucene/indexes/Status</filename> where the Status entities
+    will be indexed, and use an in memory directory named
+    <literal>Rules</literal> where Rule entities will be indexed.</para>
+
+    <para>You can easily define common rules like the directory provider
+    and base directory, and overide those default later on on a per index
+    basis.</para>
+
+    <para>Writing your own <classname>DirectoryProvider</classname>, you can
+    utilize this configuration mechanism as well.</para>
+    </section>
+
+    <section id="search-configuration-directory-sharding" revision="1">
+      <title>Index sharding</title>
+
+      <para>In some extreme cases involving huge indexes (in size), it is
+      necessary to split (shard) the indexing data of a given entity type into
+      several Lucene indexes. This solution is not recommended until you reach
+      significant index sizes and important index updates are slowing down. The main
+      drawback of index sharding is that searches will end up being slower since more files have to
+      be opend for a single search. In other words don't do it until you have problems :)</para>
+
+      <para>Despite this strong warning, Hibernate Search allows you to index
+      a given entity type into several sub indexes. Data is sharded into the
+      different sub indexes thanks to an
+      <classname>IndexShardingStrategy</classname>. By default, no sharding
+      strategy is enabled, unless the number of shards is configured. To
+      configure the number of shards use the following property</para>
+
+      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards 5</programlisting>
+
+      <para>This will use 5 different shards.</para>
+
+      <para>The default sharding strategy, when shards are set up, splits the
+      data according to the hash value of the id string representation
+      (generated by the Field Bridge). This ensures a fairly balanced
+      sharding. You can replace the strategy by implementing
+      <literal>IndexShardingStrategy</literal> and by setting the following
+      property</para>
+
+      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy.Implementation</programlisting>
+
+      <para>Each shard has an independent directory provider configuration as
+      described in <xref linkend="search-configuration-directory" />. The
+      DirectoryProvider default name for the previous example are
+      <literal>&lt;indexName&gt;.0</literal> to
+      <literal>&lt;indexName&gt;.4</literal>. In other words, each shard has
+      the name of it's owning index followed by <constant>.</constant> (dot)
+      and its index number.</para>
+
+      <programlisting>hibernate.search.default.indexBase /usr/lucene/indexes
+
+hibernate.search.Animal.sharding_strategy.nbr_of_shards 5
+hibernate.search.Animal.directory_provider org.hibernate.search.store.FSDirectoryProvider
+hibernate.search.Animal.0.indexName Animal00
+hibernate.search.Animal.3.indexBase /usr/lucene/sharded
+hibernate.search.Animal.3.indexName Animal03</programlisting>
+
+      <para>This configuration uses the default id string hashing strategy and
+      shards the Animal index intp 5 subindexes. All subindexes are
+      FSDirectoryProvider instances and the directory where each subindex is
+      stored is as followed:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>for subindex 0: /usr/lucene/indexes/Animal00 (shared indexBase
+          but overridden indexName)</para>
+        </listitem>
+
+        <listitem>
+          <para>for subindex 1: /usr/lucene/indexes/Animal.1 (shared
+          indexBase, default indexName)</para>
+        </listitem>
+
+        <listitem>
+          <para>for subindex 2: /usr/lucene/indexes/Animal.2 (shared
+          indexBase, default indexName)</para>
+        </listitem>
+
+        <listitem>
+          <para>for subindex 3: /usr/lucene/shared/Animal03 (overridden
+          indexBase, overridden indexName)</para>
+        </listitem>
+
+        <listitem>
+          <para>for subindex 4: /usr/lucene/indexes/Animal.4 (shared
+          indexBase, default indexName)</para>
+        </listitem>
+      </itemizedlist>
+  </section>
+
+  <section>
+    <title>Worker configuration</title>
+
+    <para>Hibernate Search works done by a worker you can configure. The
+    default (and only) worker today use transactional scoping.</para>
+
+    <para>You can define the worker configuration using the following
+    properties</para>
+
+    <table>
+      <title>worker configuration</title>
+
+      <tgroup cols="2">
+        <colspec align="center" />
+
+        <tbody>
+          <row>
+            <entry>Property</entry>
+
+            <entry>Description</entry>
+          </row>
+
+          <row>
+            <entry><literal>org.hibernate.worker.backend</literal></entry>
+
+            <entry>Out of the box support for the Apache Lucene back end and
+            the JMS back end. Default to <literal>lucene</literal>. Supports
+            also <literal>jms</literal>.</entry>
+          </row>
+
+          <row>
+            <entry><literal>org.hibernate.worker.execution</literal></entry>
+
+            <entry>Supports synchronous and asynchrounous execution. Default
+            to <literal><literal>sync</literal></literal>. Supports also
+            <literal>async</literal>.</entry>
+          </row>
+
+          <row>
+            <entry><literal>org.hibernate.worker.thread_pool.size</literal></entry>
+
+            <entry>Defines the number of threads in the pool. useful only
+            for asynchrounous execution. Default to 1.</entry>
+          </row>
+
+          <row>
+            <entry><literal>org.hibernate.worker.buffer_queue.max</literal></entry>
+
+            <entry>Defines the maximal number of work queue if the thread
+            poll is starved. Useful only for asynchrounous execution.
+            Default to infinite. If the limit is reached, the work is done
+            by the main thread.</entry>
+          </row>
+
+          <row>
+            <entry><literal>org.hibernate.worker.jndi.*</literal></entry>
+
+            <entry>Defines the JNDI properties to initiate the
+            InitialContext (if needed). JNDI is only used by the JMS back
+            end.</entry>
+          </row>
+
+          <row>
+            <entry><literal>
+            org.hibernate.worker.jms.connection_factory</literal></entry>
+
+            <entry>Mandatory for the JMS back end. Defines the JNDI name to
+            lookup the JMS connection factory from
+            (<literal>java:/ConnectionFactory</literal> by default in JBoss
+            AS)</entry>
+          </row>
+
+          <row>
+            <entry><literal>
+            org.hibernate.worker.jms.queue</literal></entry>
+
+            <entry>Mandatory for the JMS back end. Defines the JNDI name to
+            lookup the JMS queue from. The queue will be used to post work
+            messages.</entry>
+          </row>
+
+          <row>
+            <entry><literal>
+            org.hibernate.worker.batch_size</literal></entry>
+
+            <entry>Defines the maximum number of elements indexed before
+            flushing the transaction-bound queue. Default to 0 (ie no
+            limit). See <xref linkend="search-batchindex" /> for more
+            information.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+
+    <section id="jms-backend">
+      <title>JMS Master/Slave configuration</title>
+
+      <para>This section describes in greater detail how to configure the
+      Master / Slaves Hibernate Search architecture.</para>
+
+      <section>
+        <title>Slave nodes</title>
+
+        <para>Every index update operation is sent to a JMS queue. Index
+        quering operations are executed on a local index copy.</para>
+
+        <programlisting>### slave configuration
+
+## DirectoryProvider
+# (remote) master location
+hibernate.search.default.sourceBase = /mnt/mastervolume/lucenedirs/mastercopy
+
+# local copy location
+hibernate.search.default.indexBase = /Users/prod/lucenedirs
+
+# refresh every half hour
+hibernate.search.default.refresh = 1800
+
+# appropriate directory provider
+hibernate.search.default.directory_provider = org.hibernate.search.store.FSSlaveDirectoryProvider
+
+## Backend configuration
+hibernate.search.worker.backend = jms
+hibernate.search.worker.jms.connection_factory = java:/ConnectionFactory
+hibernate.search.worker.jms.queue = queue/hibernatesearch
+#optional jndi configuration (check your JMS provider for more information)
+
+## Optional asynchronous execution strategy
+# org.hibernate.worker.execution = async
+# org.hibernate.worker.thread_pool.size = 2
+# org.hibernate.worker.buffer_queue.max = 50</programlisting>
+
+        <para>A file system local copy is recommended for faster search
+        results.</para>
+
+        <para>The refresh period should be higher that the expected time
+        copy.</para>
+      </section>
+
+      <section>
+        <title>Master node</title>
+
+        <para>Every index update operation is taken from a JMS queue and
+        executed. The master index(es) is(are) copied on a regular
+        basis.</para>
+
+        <programlisting>### master configuration
+
+## DirectoryProvider
+# (remote) master location where information is copied to
+hibernate.search.default.sourceBase = /mnt/mastervolume/lucenedirs/mastercopy
+
+# local master location
+hibernate.search.default.indexBase = /Users/prod/lucenedirs
+
+# refresh every half hour
+hibernate.search.default.refresh = 1800
+
+# appropriate directory provider
+hibernate.search.default.directory_provider = org.hibernate.search.store.FSMasterDirectoryProvider
+
+## Backend configuration
+#Backend is the default lucene one</programlisting>
+
+        <para>The refresh period should be higher that the expected time
+        copy.</para>
+
+        <para>In addition to the Hibernate Search framework configuration, a
+        Message Driven Bean should be written and set up to process index
+        works queue through JMS.</para>
+
+        <programlisting>@MessageDriven(activationConfig = {
+      @ActivationConfigProperty(propertyName="destinationType", propertyValue="javax.jms.Queue"),
+      @ActivationConfigProperty(propertyName="destination", propertyValue="queue/hiebrnatesearch"),
+      @ActivationConfigProperty(propertyName="DLQMaxResent", propertyValue="1")
+   } )
+public class MDBSearchController extends AbstractJMSHibernateSearchController implements MessageListener {
+    @PersistenceContext EntityManager em;
+    
+    //method retrieving the appropriate session
+    protected Session getSession() {
+        return (Session) em.getDelegate();
+    }
+
+    //potentially close the session opened in #getSession(), not needed here
+    protected void cleanSessionIfNeeded(Session session) 
+    }
+}</programlisting>
+
+        <para>This example inherit the abstract JMS controller class available
+        and implements a JavaEE 5 MDB. This implementation is given as an
+        example and, while most likely more complex, can be adjusted to make
+        use of non Java EE Message Driven Beans. For more information about
+        the <methodname>getSession()</methodname> and
+        <methodname>cleanSessionIfNeeded()</methodname>, please check
+        <classname>AbstractJMSHibernateSearchController</classname>'s
+        javadoc.</para>
+
+        <note>Hibernate Search test suite makes use of JBoss Embedded to
+        test the JMS integration. It allows the unit test to run both the MDB
+        container and JBoss Messaging (JMS provider) in a standalone way
+        (marketed by some as "lightweight").</note>
+    </section>
+  </section>
+
+  <section id="configuration-reader-strategy">
+    <title>Reader strategy configuration</title>
+
+    <para>The different reader strategies are described in <xref
+    linkend="search-architecture-readerstrategy" />. The default reader
+    strategy is <literal>shared</literal>. This can be adjusted:</para>
+
+    <programlisting>hibernate.search.reader.strategy = not-shared</programlisting>
+
+    <para>Adding this property switch to the <literal>non shared</literal>
+    strategy.</para>
+
+    <para>Or if you have a custom reader strategy:</para>
+
+    <programlisting>hibernate.search.reader.strategy = my.corp.myapp.CustomReaderProvider</programlisting>
+
+    <para>where <classname>my.corp.myapp.CustomReaderProvider</classname> is
+    the custom strategy implementation</para>
+  </section>
+
+  <section id="search-configuration-event" revision="2">
+    <title>Automatic indexing</title>
+
+    <para>Automatic indexing is enabled out of the box when using Hibernate
+    Annotations or Hibernate EntityManager. If, for some reason you need to
+    disable that, set
+    <literal>hibernate.search.autoregister_listeners</literal> to false. Note
+    that there is no performance runtime when the listeners are enabled while
+    no entity is indexable.</para>
+
+    <para>To enable automatic indexing in Hibernate Core, add the
+    <literal>SearchEventListener</literal> for the three Hibernate events that
+    occur after changes are executed to the database. Once again, such a
+    configuration is not useful with Hibernate Annotations or Hibernate
+    EntityManager.</para>
+
+    <programlisting>&lt;hibernate-configuration&gt;
+     &lt;session-factory&gt;
+        ...
+        &lt;event type="post-update"
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-insert"
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-delete"
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+    &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;</programlisting>
+
+    <para>Be sure to add the appropriate jar files in your classpath. Check
+    <literal>lib/README.TXT</literal> for the list of third party libraries. A
+    typical installation on top of Hibernate Annotations will add:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><filename>hibernate-search.jar</filename>: the core
+        engine</para>
+      </listitem>
+
+      <listitem>
+        <para><filename>lucene-core-*.jar</filename>: Lucene core
+        engine</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section id="lucene-indexing-performance" revision="1">
+    <title>Tuning Lucene indexing performance</title>
+
+    <para>Hibernate Search allows you to tune the Lucene indexing performance
+    by specifying a set of parameters which are passed through to underlying
+    Lucene <literal>IndexWriter</literal> as <literal>mergeFactor</literal>,
+    <literal>maxMergeDocs</literal> and <literal>maxBufferedDocs</literal>.
+    You can specify these parameters either as default values applying for all
+    indexes or on a per index basis.</para>
+
+    <para>There are two sets of parameters allowing for different performance
+    settings depending on the use case. During indexing operations triggered
+    by database modifications:
+    <itemizedlist>
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</literal>
+      </listitem>
+      <listitem>	
+    	<literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_merge_docs</literal>
+      </listitem>
+      <listitem>
+          <literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</literal>
+      </listitem> 
+     </itemizedlist>    
+     are used. The corresponding properties:
+     <itemizedlist>
+	    <listitem>
+	    	<literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal>
+	    </listitem>
+	    <listitem>
+	    	<literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</literal>
+	    </listitem>
+	    <listitem>
+	    	<literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal>
+	    </listitem>
+    </itemizedlist>
+    are applied when indexing occurs via <literal>FullTextSession.index()</literal> (see <xref
+    linkend="search-batchindex" />).</para>
+
+    <para>Unless the corresponding <literal>.batch</literal> property is
+    explicitly set, the value will default to the
+    <literal>.transaction</literal> property.</para>
+
+    <para>For more information about Lucene indexing performances, please
+    refer to the Lucene documentation.</para>
+
+    <table>
+      <title>List of indexing performance properties</title>
+
+      <tgroup cols="3">
+        <thead>
+          <row>
+            <entry align="center">Property</entry>
+
+            <entry align="center">Description</entry>
+
+            <entry align="center">Default Value</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</literal></entry>
+
+            <entry><para>Controls segment merge frequency and size. </para>
+            <para>Determines how often segment indices are merged when
+            insertion occurs. With smaller values, less RAM is used while
+            indexing, and searches on unoptimized indices are faster, but
+            indexing speed is slower. With larger values, more RAM is used
+            during indexing, and while searches on unoptimized indices are
+            slower, indexing is faster. Thus larger values (&gt; 10) are best
+            for batch index creation, and smaller values (&lt; 10) for indices
+            that are interactively maintained. The value must no be lower than
+            2.</para> <para>Used by Hibernate Search during index update
+            operations as part of database modifications.</para></entry>
+
+            <entry>10</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_merge_docs</literal></entry>
+
+            <entry><para>Defines the largest number of documents allowed in a
+            segment.</para> <para>Used by Hibernate Search during index update
+            operations as part of database modifications.</para></entry>
+
+            <entry>Unlimited (Integer.MAX_VALUE)</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</literal></entry>
+
+            <entry><para>Controls the amount of documents buffered in memory
+            during indexing. The bigger the more RAM is consumed.</para>
+            <para>Used by Hibernate Search during index update operations as
+            part of database modifications.</para></entry>
+
+            <entry>10</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal></entry>
+
+            <entry><para>Controls segment merge frequency and size.</para>
+            <para>Determines how often segment indices are merged when
+            insertion occurs. With smaller values, less RAM is used while
+            indexing, and searches on unoptimized indices are faster, but
+            indexing speed is slower. With larger values, more RAM is used
+            during indexing, and while searches on unoptimized indices are
+            slower, indexing is faster. Thus larger values (&gt; 10) are best
+            for batch index creation, and smaller values (&lt; 10) for indices
+            that are interactively maintained. The value must no be lower than
+            2.</para> <para>Used during indexing via
+            <literal>FullTextSession.index()</literal></para></entry>
+
+            <entry>10</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</literal></entry>
+
+            <entry><para>Defines the largest number of documents allowed in a
+            segment.</para> <para>Used during indexing via
+            <literal>FullTextSession.index()</literal></para></entry>
+
+            <entry>Unlimited (Integer.MAX_VALUE)</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal></entry>
+
+            <entry><para>Controls the amount of documents buffered in memory
+            during indexing. The bigger the more RAM is consumed.</para>
+            <para>Used during indexing via
+            <literal>FullTextSession.index()</literal></para></entry>
+
+            <entry>10</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+</chapter>

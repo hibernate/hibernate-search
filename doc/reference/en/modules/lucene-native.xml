@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  $Id$ -->
+<chapter id="search-lucene-native">
+  <title>Accessing Lucene natively</title>
+
+  <section>
+    <title>SearchFactory</title>
+
+    <para>The <classname>SearchFactory</classname> object keeps track of the
+    underlying Lucene resources for Hibernate Search, it's also a convenient
+    way to access Lucene natively. The <classname>SearchFactory</classname>
+    can be accessed from a <classname>FullTextSession</classname>:</para>
+
+    <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(regularSession);
+SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
+  </section>
+
+  <section>
+    <title>Accessing a Lucene Directory</title>
+
+    <para>You can always access the Lucene directories through plain Lucene,
+    the Directory structure is in no way different with or without Hibernate
+    Search. However there are some more convenient ways to access a given
+    Directory. The <classname>SearchFactory</classname> keeps track of the
+    <classname>DirectoryProvider</classname>s per indexed class. One directory
+    provider can be shared amongst several indexed classes if the classes
+    share the same underlying index directory. While usually not the case, a
+    given entity can have several <classname>DirectoryProvider</classname>s is
+    the index is sharded (see <xref
+    linkend="search-configuration-directory-sharding" />).</para>
+
+    <programlisting>DirectoryProvider[] provider = searchFactory.getDirectoryProviders(Order.class);
+org.apache.lucene.store.Directory directory = provider[0].getDirectory();</programlisting>
+
+    <para>In this example, directory points to the lucene index storing
+    <classname>Order</classname>s information. Note that the obtained Lucene
+    directory must not be closed (this is Hibernate Search
+    responsibility).</para>
+  </section>
+
+  <section>
+    <title>Using an IndexReader</title>
+
+    <para>Queries in Lucene are executed on an <literal>IndexReader</literal>.
+    Hibernate Search caches such index readers to maximize performances. Your
+    code can access such cached / shared resources. You will just have to
+    follow some "good citizen" rules.</para>
+
+    <programlisting>DirectoryProvider orderProvider = searchFactory.getDirectoryProviders(Order.class)[0];
+DirectoryProvider clientProvider = searchFactory.getDirectoryProviders(Client.class)[0];
+
+ReaderProvider readerProvider = searchFactory.getReaderProvider();
+IndexReader reader = readerProvider.openReader(orderProvider, clientProvider);
+
+try {
+    //do read-only operations on the reader
+}
+finally {
+    readerProvider.closeReader(reader);
+}</programlisting>
+
+    <para>The ReaderProvider (described in <xref
+    linkend="search-architecture-readerstrategy" />), will open an IndexReader
+    on top of the index(es) referenced by the directory providers. This
+    IndexReader being shared amongst several clients, you must adhere to the
+    following rules:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Never call indexReader.close(), but always call
+        readerProvider.closeReader(reader); (a finally block is the best
+        area).</para>
+      </listitem>
+
+      <listitem>
+        <para>This indexReader must not be used for modification operations
+        (especially delete), if you want to use an read/write index reader,
+        open one from the Lucene Directory object.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Aside from those rules, you can use the IndexReader freely,
+    especially to do native queries. Using the shared
+    <literal>IndexReader</literal>s will make most queries more
+    efficient.</para>
+  </section>
+</chapter>
