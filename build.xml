@@ -23,7 +23,7 @@
 	<property name="javac.source" value="1.5"/>
 	<property name="javac.target" value="1.5"/>
     <property name="jdbc.dir" value="jdbc"/>
-    <property name="common.dir" value="${basedir}/../common"/>
+    <property name="common.dir" value="${basedir}"/>
 
     <!-- property name="jpa-api.jar" value="${basedir}/../jpa-api/build/ejb3-persistence.jar"/>
 	<property name="annotations.jar"
