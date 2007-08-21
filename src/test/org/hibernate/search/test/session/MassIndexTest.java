@@ -2,6 +2,7 @@
 package org.hibernate.search.test.session;
 
 import java.util.List;
+import java.util.Iterator;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.index.Term;
@@ -143,6 +144,22 @@ public class MassIndexTest extends SearchTestCase {
 		ent = (Entite) s.get( Entite.class, ent.getId() );
 		session = Search.createFullTextSession( s );
 		session.index( ent );
+		s.close();
+
+		s = openSession();
+		session = Search.createFullTextSession( s );
+		luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
+		result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
+		assertEquals( "test lazy loading and indexing", 1, result.size() );
+		s.close();
+
+		s = openSession();
+		Iterator it = s.createQuery( "from Entite where id = :id").setParameter( "id", ent.getId() ).iterate();
+		session = Search.createFullTextSession( s );
+		while ( it.hasNext() ) {
+			ent = (Entite) it.next();
+			session.index( ent );
+		}
 		s.close();
 
 		s = openSession();

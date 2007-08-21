@@ -504,7 +504,7 @@ public class DocumentBuilder<T> {
 
 	public Document getDocument(T instance, Serializable id) {
 		Document doc = new Document();
-		XClass instanceClass = reflectionManager.toXClass( instance.getClass() );
+		XClass instanceClass = reflectionManager.toXClass( Hibernate.getClass( instance ) );
 		if ( rootPropertiesMetadata.boost != null ) {
 			doc.setBoost( rootPropertiesMetadata.boost );
 		}
@@ -590,6 +590,7 @@ public class DocumentBuilder<T> {
 	private Object unproxy(Object value) {
 		//FIXME this service should be part of Core?
 		if ( value instanceof HibernateProxy ) {
+			// .getImplementation() initializes the data by side effect
 			value = ( (HibernateProxy) value ).getHibernateLazyInitializer()
 					.getImplementation();
 		}
