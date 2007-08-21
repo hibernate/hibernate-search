@@ -39,31 +39,49 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	private Timer timer;
 	private SearchFactoryImplementor searchFactory;
 
+	//variables needed between initialize and start
+	private String source;
+	private File indexDir;
+	private String directoryProviderName;
+	private Properties properties;
+
+
 	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
+		this.properties = properties;
+		this.directoryProviderName = directoryProviderName;
 		//source guessing
-		String source = DirectoryProviderHelper.getSourceDirectory( "sourceBase", "source", directoryProviderName, properties );
+		source = DirectoryProviderHelper.getSourceDirectory( "sourceBase", "source", directoryProviderName, properties );
 		if ( source == null)
 			throw new IllegalStateException("FSMasterDirectoryProvider requires a viable source directory");
 		log.debug( "Source directory: " + source );
-		File indexDir = DirectoryProviderHelper.determineIndexDir( directoryProviderName, properties );
+		indexDir = DirectoryProviderHelper.determineIndexDir( directoryProviderName, properties );
 		log.debug( "Index directory: " + indexDir );
-		String refreshPeriod = properties.getProperty( "refresh", "3600" );
-		long period = Long.parseLong( refreshPeriod );
-		log.debug("Refresh period " + period + " seconds");
-		period *= 1000; //per second
 		try {
 			boolean create = !indexDir.exists();
-			indexName = indexDir.getCanonicalPath();
 			if (create) {
 				log.debug( "Index directory '" + indexName + "' will be initialized");
 				indexDir.mkdir();
 			}
+			indexName = indexDir.getCanonicalPath();
 			directory = FSDirectory.getDirectory( indexName);
 			if ( create ) {
 				IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), create );
 				iw.close();
 			}
+		}
+		catch (IOException e) {
+			throw new HibernateException( "Unable to initialize index: " + directoryProviderName, e );
+		}
+		this.searchFactory = searchFactoryImplementor;
+	}
 
+	public void start() {
+		//source guessing
+		String refreshPeriod = properties.getProperty( "refresh", "3600" );
+		long period = Long.parseLong( refreshPeriod );
+		log.debug("Refresh period " + period + " seconds");
+		period *= 1000; //per second
+		try {
 			//copy to source
 			if ( new File( source, "current1").exists() ) {
 				current = 2;
@@ -90,7 +108,6 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		timer = new Timer(true); //daemon thread, the copy algorithm is robust
 		TimerTask task = new FSMasterDirectoryProvider.TriggerTask(indexName, source, this );
 		timer.scheduleAtFixedRate( task, period, period );
-		this.searchFactory = searchFactoryImplementor;
 	}
 
 	public FSDirectory getDirectory() {

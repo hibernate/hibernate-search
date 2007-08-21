@@ -118,6 +118,12 @@ public class DirectoryProviderFactory {
 		return new DirectoryProviders( shardingStrategy, providers );
 	}
 
+	public void startDirectoryProviders() {
+		for ( DirectoryProvider provider : providers ) {
+			provider.start();
+		}
+	}
+
 	private DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps, SearchFactoryImplementor searchFactoryImplementor) {
 		String className = indexProps.getProperty( "directory_provider" );
 		if ( StringHelper.isEmpty( className ) ) {

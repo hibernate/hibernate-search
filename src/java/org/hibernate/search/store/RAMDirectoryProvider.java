@@ -23,6 +23,9 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 
 	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
 		indexName = directoryProviderName;
+	}
+
+	public void start() {
 		directory = new RAMDirectory();
 		try {
 			IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), true );
@@ -32,6 +35,7 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 			throw new HibernateException( "Unable to initialize index: " + indexName, e );
 		}
 	}
+
 
 	public RAMDirectory getDirectory() {
 		return directory;

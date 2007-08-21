@@ -39,21 +39,25 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 	private String indexName;
 	private Timer timer;
 
+	//variables needed between initialize and start
+	private String source;
+	private File indexDir;
+	private String directoryProviderName;
+	private Properties properties;
+
 	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
+		this.properties = properties;
+		this.directoryProviderName = directoryProviderName;
 		//source guessing
-		String source = DirectoryProviderHelper.getSourceDirectory( "sourceBase", "source", directoryProviderName, properties );
+		source = DirectoryProviderHelper.getSourceDirectory( "sourceBase", "source", directoryProviderName, properties );
 		if (source == null)
 			throw new IllegalStateException("FSSlaveDirectoryProvider requires a viable source directory");
 		if ( ! new File(source, "current1").exists() && ! new File(source, "current2").exists() ) {
 			throw new IllegalStateException("No current marker in source directory");
 		}
 		log.debug( "Source directory: " + source );
-		File indexDir = DirectoryProviderHelper.determineIndexDir( directoryProviderName, properties );
+		indexDir = DirectoryProviderHelper.determineIndexDir( directoryProviderName, properties );
 		log.debug( "Index directory: " + indexDir.getPath() );
-		String refreshPeriod = properties.getProperty( "refresh", "3600" );
-		long period = Long.parseLong( refreshPeriod );
-		log.debug("Refresh period " + period + " seconds");
-		period *= 1000; //per second
 		try {
 			boolean create = !indexDir.exists();
 			indexName = indexDir.getCanonicalPath();
@@ -61,6 +65,20 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 				indexDir.mkdir();
 				log.debug("Initializing index directory " + indexName);
 			}
+		}
+		catch (IOException e) {
+			throw new HibernateException( "Unable to initialize index: " + directoryProviderName, e );
+		}
+	}
+
+	public void start() {
+		//source guessing
+		String refreshPeriod = properties.getProperty( "refresh", "3600" );
+		long period = Long.parseLong( refreshPeriod );
+		log.debug("Refresh period " + period + " seconds");
+		period *= 1000; //per second
+		try {
+			boolean create;
 
 			File subDir = new File( indexName, "1" );
 			create = ! subDir.exists();

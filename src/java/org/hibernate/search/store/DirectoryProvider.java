@@ -20,9 +20,17 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  */
 public interface DirectoryProvider<TDirectory extends Directory> {
 	/**
-	 * get the information to initialize the directory and build its hashCode
+	 * get the information to initialize the directory and build its hashCode/equals method
 	 */
 	void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor);
+
+	/**
+	 * Executed after initialize, this method set up the heavy process of starting up the DirectoryProvider
+	 * IO processing as well as backgroup processing are expected to be set up here
+	 *
+	 * TODO stop() method, for now use finalize() 
+	 */
+	void start();
 
 	/**
 	 * Returns an initialized Lucene Directory. This method call <b>must</b> be threadsafe

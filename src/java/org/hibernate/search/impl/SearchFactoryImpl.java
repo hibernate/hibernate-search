@@ -271,6 +271,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				}
 			}
 		}
+		factory.startDirectoryProviders();
 	}
 
 	/**

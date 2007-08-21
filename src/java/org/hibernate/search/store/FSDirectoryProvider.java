@@ -30,6 +30,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 			boolean create = !indexDir.exists();
 			indexName = indexDir.getCanonicalPath();
 			directory = FSDirectory.getDirectory( indexName );
+			//this is cheap so it's not done in start()
 			if ( create ) {
 				IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), create );
 				iw.close();
@@ -38,6 +39,10 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 		catch (IOException e) {
 			throw new HibernateException( "Unable to initialize index: " + directoryProviderName, e );
 		}
+	}
+
+	public void start() {
+		//all the process is done in initialize
 	}
 
 	public FSDirectory getDirectory() {
