@@ -97,7 +97,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	}
 
 	public void add(Object entity, Serializable id, WorkType workType, WorkQueue workQueue) {
-		//don't check for builder it's done in performWorks
+		//don't check for builder it's done in prepareWork
 		Work work = new Work(entity, id, workType);
 		workQueue.add( work );
 		if ( batchSize > 0 && workQueue.size() >= batchSize ) {

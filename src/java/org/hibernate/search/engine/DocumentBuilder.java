@@ -202,23 +202,41 @@ public class DocumentBuilder<T> {
 		}
 
 		DocumentId documentIdAnn = member.getAnnotation( DocumentId.class );
-		if ( isRoot && documentIdAnn != null ) {
-			if ( idKeywordName != null ) {
-				throw new AssertionFailure( "Two document id assigned: "
-						+ idKeywordName + " and " + BinderHelper.getAttributeName( member, documentIdAnn.name() ) );
-			}
-			idKeywordName = prefix + BinderHelper.getAttributeName( member, documentIdAnn.name() );
-			FieldBridge fieldBridge = BridgeFactory.guessType( null, member );
-			if ( fieldBridge instanceof TwoWayFieldBridge ) {
-				idBridge = (TwoWayFieldBridge) fieldBridge;
+		if ( documentIdAnn != null ) {
+			if ( isRoot ) {
+				if ( idKeywordName != null ) {
+					throw new AssertionFailure( "Two document id assigned: "
+							+ idKeywordName + " and " + BinderHelper.getAttributeName( member, documentIdAnn.name() ) );
+				}
+				idKeywordName = prefix + BinderHelper.getAttributeName( member, documentIdAnn.name() );
+				FieldBridge fieldBridge = BridgeFactory.guessType( null, member );
+				if ( fieldBridge instanceof TwoWayFieldBridge ) {
+					idBridge = (TwoWayFieldBridge) fieldBridge;
+				}
+				else {
+					throw new SearchException(
+							"Bridge for document id does not implement IdFieldBridge: " + member.getName() );
+				}
+				idBoost = getBoost( member );
+				setAccessible( member );
+				idGetter = member;
 			}
 			else {
-				throw new SearchException(
-						"Bridge for document id does not implement IdFieldBridge: " + member.getName() );
+				//component should index their document id
+				setAccessible( member );
+				propertiesMetadata.fieldGetters.add( member );
+				String fieldName = prefix + BinderHelper.getAttributeName( member, documentIdAnn.name() );
+				propertiesMetadata.fieldNames.add( fieldName );
+				propertiesMetadata.fieldStore.add( getStore( Store.YES ) );
+				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
+				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member ) );
+				// Field > property > entity analyzer
+				Analyzer analyzer = null; //no field analyzer
+				if ( analyzer == null ) analyzer = getAnalyzer( member );
+				if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
+				if ( analyzer == null ) throw new AssertionFailure( "Analizer should not be undefined" );
+				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 			}
-			idBoost = getBoost( member );
-			setAccessible( member );
-			idGetter = member;
 		}
 		{
 			org.hibernate.search.annotations.Field fieldAnn =
