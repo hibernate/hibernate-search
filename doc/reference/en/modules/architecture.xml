@@ -21,7 +21,7 @@
   configure directory providers to adjust the directory target
   (see <xref linkend="search-configuration-directory"/>).</para>
 
-  <para>Hibernate Search can also use a Lucene index to search an entity and
+  <para>Next to the index updates Hibernate Search can also use the Lucene index to search an entity and
   return a list of managed entities saving you the tedious object to
   Lucene document mapping. The same persistence
   context is shared between Hibernate and Hibernate Search; as a matter of
@@ -36,12 +36,12 @@
 
   <para>Outside an transaction, the index update operation is executed
   right after the actual database operation. This scope is really a no
-  scoping, and no batching is performed.</para>
+  scoping setup and no batching is performed.</para>
 
   <para>It is however recommended, for both your database and Hibernate
   Search, to execute your operation in a transaction be it JDBC or
   JTA. When in a transaction, the index update operation is scheduled for
-  the transaction commit (and discarded in case of transaction rollback).
+  the transaction commit and discarded in case of transaction rollback.
   The batching scope is the transaction. There are two immediate
   benefits:</para>
 
@@ -162,8 +162,8 @@
 
       <para>This is the safe mode where the back end work is executed in
       concert with the transaction commit. Under highly concurrent
-      environment, this can lead to throughput limitation (due to the Apache
-      Lucene lock mechanism). It can increase the system response time too if
+      environment, this can lead to throughput limitations (due to the Apache
+      Lucene lock mechanism) and it can increase the system response time if
       the backend is significantly slower than the transactional process and
       if a lot of IO operations are involved.</para>
     </section>
@@ -178,7 +178,7 @@
       small overhead is introduced to deal with thread management.</para>
 
       <para>It is recommended to use synchronous execution first and evaluate
-      asynchronous if performance problems occur and after having set up a
+      asynchronous execution if performance problems occur and after having set up a
       proper benchmark (ie not a lonely cowboy hitting the system in a
       completely unrealistic way).</para>
     </section>
@@ -198,7 +198,7 @@
       <para>With this strategy, Hibernate Search will share the same
       IndexReader, for a given Lucene index, across multiple queries and
       threads provided that the IndexReader is still up-to-date. If the
-      IndexReader is not up-to-date, an new one is opened and provided.
+      IndexReader is not up-to-date, a new one is opened and provided.
       Generally speaking, this strategy provides much better performances than
       the <literal>not-shared</literal> strategy. It is especially true if the
       number of updates is much lower than the reads. This strategy is the
@@ -209,7 +209,7 @@
       <title>Not-shared</title>
 
       <para>Every time a query is executed, a Lucene IndexReader is opened.
-      This strategy is not the most efficient: opening and warming up an
+      This strategy is not the most efficient since opening and warming up an
       IndexReader can be a relatively expensive operation.</para>
     </section>
 
