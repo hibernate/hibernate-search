@@ -40,6 +40,7 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.WorkType;
+import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -396,14 +397,18 @@ public class DocumentBuilder<T> {
 		return value;
 	}
 
-	public void addWorkToQueue(T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
-		Class entityClass = Hibernate.getClass( entity );
+	//TODO could we use T instead of EntityClass?
+	public void addWorkToQueue(Class entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
 		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition 
 		for (LuceneWork luceneWork : queue) {
-			//whatever the actual work, we should ignore
+			//any work on the same entity should be ignored
 			if ( luceneWork.getEntityClass() == entityClass
-					&& luceneWork.getId().equals( id ) ) {//find a way to use Type.equals(x,y)
-				return;
+					 ) {
+				Serializable currentId = luceneWork.getId();
+				if ( currentId != null  && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
+					return;
+				}
+				//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
 			}
 
 		}
@@ -414,8 +419,11 @@ public class DocumentBuilder<T> {
 			queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
 			searchForContainers = true;
 		}
-		else if ( workType == WorkType.DELETE ) {
+		else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
+		}
+		else if ( workType == WorkType.PURGE_ALL ) {
+			queue.add( new PurgeAllLuceneWork( entityClass ) );
 		}
 		else if ( workType == WorkType.UPDATE ) {
 			Document doc = getDocument( entity, id );
@@ -499,7 +507,7 @@ public class DocumentBuilder<T> {
 	private void processContainedInValue(Object value, List<LuceneWork> queue, Class valueClass,
 										 DocumentBuilder builder, SearchFactoryImplementor searchFactoryImplementor) {
 		Serializable id = (Serializable) builder.getMemberValue( value, builder.idGetter );
-		builder.addWorkToQueue( value, id, WorkType.UPDATE, queue, searchFactoryImplementor );
+		builder.addWorkToQueue( valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor );
 	}
 
 	public Document getDocument(T instance, Serializable id) {

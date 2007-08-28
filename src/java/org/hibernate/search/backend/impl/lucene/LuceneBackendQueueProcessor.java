@@ -13,6 +13,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.store.DirectoryProvider;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.common.AssertionFailure;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author John Griffin
  */
 public class LuceneBackendQueueProcessor implements Runnable {
 	
@@ -51,7 +53,17 @@ public class LuceneBackendQueueProcessor implements Runnable {
 				DocumentBuilder documentBuilder = searchFactoryImplementor.getDocumentBuilders().get( work.getEntityClass() );
 				IndexShardingStrategy shardingStrategy = documentBuilder.getDirectoryProviderSelectionStrategy();
 
-				if ( AddLuceneWork.class.isAssignableFrom( work.getClass() ) ) {
+				if ( PurgeAllLuceneWork.class.isAssignableFrom( work.getClass() ) ) {
+					DirectoryProvider[] providers = shardingStrategy.getDirectoryProvidersForDeletion(
+							work.getEntityClass(),
+							work.getId(),
+							work.getIdInString()
+					);
+					for (DirectoryProvider provider : providers) {
+						queueWithFlatDPs.add( new LuceneWorker.WorkWithPayload( work, provider ) );
+					}
+				}
+				else if ( AddLuceneWork.class.isAssignableFrom( work.getClass() ) ) {
 					DirectoryProvider provider = shardingStrategy.getDirectoryProviderForAddition(
 							work.getEntityClass(),
 							work.getId(),

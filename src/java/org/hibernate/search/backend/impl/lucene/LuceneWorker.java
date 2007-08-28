@@ -18,6 +18,7 @@ import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.store.DirectoryProvider;
 
@@ -26,6 +27,7 @@ import org.hibernate.search.store.DirectoryProvider;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author John Griffin
  */
 public class LuceneWorker {
 	private Workspace workspace;
@@ -45,6 +47,8 @@ public class LuceneWorker {
 		}
 		else if ( OptimizeLuceneWork.class.isAssignableFrom( workClass ) ) {
 			performWork( (OptimizeLuceneWork) luceneWork.getWork(), luceneWork.getProvider() );
+		}else if ( PurgeAllLuceneWork.class.isAssignableFrom( workClass ) ) {
+			performWork( (PurgeAllLuceneWork) luceneWork.getWork(), luceneWork.getProvider() );
 		}
 		else {
 			throw new AssertionFailure( "Unknown work type: " + workClass );
@@ -126,6 +130,20 @@ public class LuceneWorker {
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to optimize Lucene index: " + entity, e );
+		}
+	}
+
+	public void performWork(PurgeAllLuceneWork work, DirectoryProvider provider) {
+		Class entity = work.getEntityClass();
+		if ( log.isTraceEnabled() )
+			log.trace( "purgeAll Lucene index: " + entity );
+		IndexReader reader = workspace.getIndexReader( provider, entity );
+		try {
+			Term term = new Term( DocumentBuilder.CLASS_FIELDNAME, entity.getName() );
+			reader.deleteDocuments( term );
+		}
+		catch (Exception e) {
+			throw new SearchException( "Unable to purge all from Lucene index: " + entity, e );
 		}
 	}
 

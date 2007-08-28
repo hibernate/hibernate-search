@@ -44,6 +44,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.WorkType;
+import org.hibernate.search.backend.Work;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.FullTextQueryImpl;
@@ -55,6 +56,7 @@ import org.hibernate.type.Type;
  * Lucene full text search aware session.
  *
  * @author Emmanuel Bernard
+ * @author John Griffin
  */
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 	private final Session session;
@@ -70,12 +72,51 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	/**
 	 * Execute a Lucene query and retrieve managed objects of type entities (or their indexed subclasses)
-     * If entities is empty, include all indexed entities
-     * 
+	 * If entities is empty, include all indexed entities
+	 *
 	 * @param entities must be immutable for the lifetime of the query object
 	 */
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class... entities) {
 		return new FullTextQueryImpl( luceneQuery, entities, sessionImplementor, new ParameterMetadata(null, null) );
+	}
+
+	/**
+	 * Remove all entities from a particular class of an index.
+	 *
+	 * @param entityType
+	 */
+	public void purge(Class entityType) {
+		purge( entityType, null );
+	}
+
+	/**
+	 * Remove a particular entity from a particular class of an index.
+	 *
+	 * @param entityType
+	 * @param id
+	 */
+	public void purge(Class entityType, Serializable id) {
+		if ( entityType == null ) return;
+		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
+		// not strictly necessary but a small optimization plus let's make sure the
+		// client didn't mess something up.
+		Map<Class, DocumentBuilder<Object>> builders = searchFactoryImplementor.getDocumentBuilders();
+		DocumentBuilder<Object> builder = builders.get( entityType );
+
+		if ( builder == null ) {
+			throw new IllegalArgumentException( entityType.getName() + " is not a mapped entity (don't forget to add @Indexed)" );
+		}
+		else {
+			WorkType type;
+			if ( id == null ) {
+				type = WorkType.PURGE_ALL;
+			}
+			else {
+				type = WorkType.PURGE;
+			}
+			Work work = new Work(entityType, id, type);
+			searchFactoryImplementor.getWorker().performWork( work, eventSource );
+		}
 	}
 
 	/**
@@ -94,7 +135,8 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( clazz );
 		if ( builder != null ) {
 			Serializable id = session.getIdentifier( entity );
-			searchFactoryImplementor.getWorker().performWork( entity, id, WorkType.INDEX, eventSource );
+			Work work = new Work(entity, id, WorkType.INDEX);
+			searchFactoryImplementor.getWorker().performWork( work, eventSource );
 		}
 		//TODO
 		//need to add elements in a queue kept at the Session level

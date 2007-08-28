@@ -20,7 +20,7 @@ public interface QueueingProcessor {
 	 * Add a work
 	 * TODO move that womewhere else, it does not really fit here
 	 */
-	void add(Object entity, Serializable id, WorkType workType, WorkQueue workQueue);
+	void add(Work work, WorkQueue workQueue);
 
 	/**
 	 * prepare resources for a later performWorks call

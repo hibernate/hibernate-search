@@ -32,8 +32,8 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 		this.queuePerTransaction = queuePerTransaction;
 	}
 
-	public void add(Object entity, Serializable id, WorkType workType) {
-		queueingProcessor.add( entity, id, workType, queue );
+	public void add(Work work) {
+		queueingProcessor.add( work, queue );
 	}
 
 	public boolean isConsumed() {

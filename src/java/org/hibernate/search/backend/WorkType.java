@@ -7,11 +7,22 @@ package org.hibernate.search.backend;
  * 
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author John Griffin
  */
 public enum WorkType {
 	ADD,
 	UPDATE,
 	DELETE,
+	/**
+	 * Used to remove a specific instance
+	 * of a class from an index.
+	 */
+	PURGE,
+	/**
+	 * Used to remove all instances of a
+	 * class from an index.
+	 */
+	PURGE_ALL,
 	
 	/**
 	 * This type is used for batch indexing.

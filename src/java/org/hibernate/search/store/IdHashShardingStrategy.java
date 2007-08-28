@@ -26,6 +26,7 @@ public class IdHashShardingStrategy implements IndexShardingStrategy {
 	}
 
 	public DirectoryProvider[] getDirectoryProvidersForDeletion(Class entity, Serializable id, String idInString) {
+		if ( idInString == null ) return providers;
 		return new DirectoryProvider[] { providers[ hashKey(idInString) ] };
 	}
 

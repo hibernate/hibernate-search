@@ -96,9 +96,8 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		searchFactoryImplementor.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
 	}
 
-	public void add(Object entity, Serializable id, WorkType workType, WorkQueue workQueue) {
+	public void add(Work work, WorkQueue workQueue) {
 		//don't check for builder it's done in prepareWork
-		Work work = new Work(entity, id, workType);
 		workQueue.add( work );
 		if ( batchSize > 0 && workQueue.size() >= batchSize ) {
 			WorkQueue subQueue = workQueue.splitQueue();
@@ -115,10 +114,12 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		for ( int i = 0 ; i < initialSize ; i++ ) {
 			Work work = queue.get( i );
 			queue.set( i, null ); // help GC and avoid 2 loaded queues in memory
-			Class entityClass = Hibernate.getClass( work.getEntity() );
+			Class entityClass = work.getEntityClass() != null ?
+						work.getEntityClass() :
+						Hibernate.getClass( work.getEntity() );
 			DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entityClass );
 			if ( builder == null ) return; //or exception?
-			builder.addWorkToQueue(work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor );
+			builder.addWorkToQueue(entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor );
 		}
 		workQueue.setSealedQueue( luceneQueue );
 	}

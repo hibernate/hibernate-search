@@ -12,7 +12,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * @author Emmanuel Bernard
  */
 public interface Worker {
-	void performWork(Object entity, Serializable id, WorkType workType, EventSource session);
+	void performWork(Work work, EventSource session);
 
 	void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor);
 }

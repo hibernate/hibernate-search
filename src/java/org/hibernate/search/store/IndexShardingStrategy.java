@@ -29,6 +29,7 @@ public interface IndexShardingStrategy {
 	DirectoryProvider getDirectoryProviderForAddition(Class entity, Serializable id, String idInString, Document document);
 	/**
 	 * return the DirectoryProvider(s) where the given entity is stored and where the deletion operation needs to be applied
+	 * id and idInString can be null. If null, all the directory providers containing entity types should be returned
 	 */
 	DirectoryProvider[] getDirectoryProvidersForDeletion(Class entity, Serializable id, String idInString);
 }

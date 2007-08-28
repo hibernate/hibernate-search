@@ -1,6 +1,8 @@
 //$Id$
 package org.hibernate.search;
 
+import java.io.Serializable;
+
 import org.hibernate.classic.Session;
 
 /**
@@ -26,4 +28,19 @@ public interface FullTextSession extends Session {
 	 * return the SearchFactory
 	 */
 	SearchFactory getSearchFactory();
+
+	/**
+	 * Remove a particular entity from a particular class of an index.
+	 *
+	 * @param entityType
+	 * @param id
+	 */
+	public void purge(Class entityType, Serializable id);
+
+	/**
+	 * Remove all entities from a particular class of an index.
+	 *
+	 * @param entityType
+	 */
+	public void purge(Class entityType);
 }

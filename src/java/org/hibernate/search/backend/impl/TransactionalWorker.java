@@ -8,6 +8,7 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.WorkQueue;
+import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.util.WeakIdentityHashMap;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -28,7 +29,7 @@ public class TransactionalWorker implements Worker {
 	protected WeakIdentityHashMap synchronizationPerTransaction = new WeakIdentityHashMap();
 	private QueueingProcessor queueingProcessor;
 
-	public void performWork(Object entity, Serializable id, WorkType workType, EventSource session) {
+	public void performWork(Work work, EventSource session) {
 		if ( session.isTransactionInProgress() ) {
 			Transaction transaction = session.getTransaction();
 			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
@@ -38,11 +39,11 @@ public class TransactionalWorker implements Worker {
 				transaction.registerSynchronization( txSync );
 				synchronizationPerTransaction.put(transaction, txSync);
 			}
-			txSync.add( entity, id, workType );
+			txSync.add( work );
 		}
 		else {
 			WorkQueue queue = new WorkQueue(2); //one work can be split
-			queueingProcessor.add( entity, id, workType, queue );
+			queueingProcessor.add( work, queue );
 			queueingProcessor.prepareWorks( queue );
 			queueingProcessor.performWorks( queue );
 		}

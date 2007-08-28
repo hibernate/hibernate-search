@@ -12,6 +12,7 @@ import org.hibernate.annotations.common.reflection.XMember;
  */
 public class Work {
 	private Object entity;
+	private Class entityClass;
 	private Serializable id;
 	private XMember idGetter;
 	private WorkType type;
@@ -23,11 +24,20 @@ public class Work {
 		this.type = type;
 	}
 
+	public Work(Class entityType, Serializable id, WorkType type) {
+		this.entityClass = entityType;
+		this.id = id;
+		this.type = type;
+	}
 
 	public Work(Object entity, XMember idGetter, WorkType type) {
 		this.entity = entity;
 		this.idGetter = idGetter;
 		this.type = type;
+	}
+	
+	public Class getEntityClass() {
+		return entityClass;
 	}
 
 	public Object getEntity() {
