@@ -131,7 +131,8 @@ public class FilterTest extends SearchTestCase {
 
 	protected Class[] getMappings() {
 		return new Class[] {
-				Driver.class
+				Driver.class,
+				Soap.class
 		};
 	}
 }

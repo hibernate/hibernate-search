@@ -67,7 +67,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private Worker worker;
 	private ReaderProvider readerProvider;
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
-	private Map<String, FilterDef> filterDefinitions;
+	private Map<String, FilterDef> filterDefinitions = new HashMap<String, FilterDef>();
 	private FilterCachingStrategy filterCachingStrategy;
 
 	/**
@@ -103,7 +103,6 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	private void bindFilterDefs(XClass mappedXClass) {
-		filterDefinitions = new HashMap<String, FilterDef>();
 		FullTextFilterDef defAnn = mappedXClass.getAnnotation( FullTextFilterDef.class );
 		if ( defAnn != null ) {
 			bindFilterDef( defAnn, mappedXClass );
