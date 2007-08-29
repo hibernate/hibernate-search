@@ -12,6 +12,12 @@ public final class Environment {
 	public static final String AUTOREGISTER_LISTENERS = "hibernate.search.autoregister_listeners";
 
 	/**
+	 * Defines the indexing strategy, default <code>event</code>
+	 * Other options <code>manual</code>
+	 */
+	public static final String INDEXING_STRATEGY = "hibernate.search.indexing_strategy";
+
+	/**
 	 * Lucene analyser
 	 */
 	public static final String ANALYZER_CLASS = "hibernate.search.analyzer";
