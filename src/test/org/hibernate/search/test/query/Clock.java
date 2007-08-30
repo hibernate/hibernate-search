@@ -4,9 +4,11 @@ package org.hibernate.search.test.query;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Text;
-import org.hibernate.search.annotations.Keyword;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Emmanuel Bernard
@@ -25,7 +27,8 @@ public class Clock {
 		this.brand = brand;
 	}
 
-	@Text public String getBrand() {
+	@Field(index= Index.TOKENIZED, store= Store.YES)
+	public String getBrand() {
 		return brand;
 	}
 
@@ -33,7 +36,7 @@ public class Clock {
 		this.brand = brand;
 	}
 
-	@Id @Keyword(id=true)
+	@Id @DocumentId
 	public Integer getId() {
 		return id;
 	}

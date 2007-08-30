@@ -15,6 +15,8 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * 
  * This class must be thread safe regarding <code>getDirectory()</code> calls
  *
+ * To to implementors: a stop() method will be added in te future, for now use finalize() to free resources (we know)
+ *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
  */

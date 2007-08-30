@@ -3,18 +3,17 @@ package org.hibernate.search.test.bridge;
 
 import java.util.Date;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Keyword;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Text;
 import org.hibernate.search.annotations.DateBridge;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -46,7 +45,7 @@ public class Cloud {
 	private CloudType type;
 	private boolean storm;
 
-	@Text
+	@Field(index=Index.TOKENIZED, store=Store.YES)
     @FieldBridge(impl = TruncateFieldBridge.class)
     public String getCustomFieldBridge() {
         return customFieldBridge;
@@ -67,8 +66,8 @@ public class Cloud {
         this.customStringBridge = customStringBridge;
     }
 
-    @Id @GeneratedValue @Keyword(id=true)
-    public int getId() {
+    @Id @GeneratedValue @DocumentId
+	public int getId() {
         return id;
     }
 
@@ -76,7 +75,7 @@ public class Cloud {
         this.id = id;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public Long getLong1() {
         return long1;
     }
@@ -85,7 +84,7 @@ public class Cloud {
         this.long1 = long1;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public long getLong2() {
         return long2;
     }
@@ -94,7 +93,7 @@ public class Cloud {
         this.long2 = long2;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public Integer getInt1() {
         return int1;
     }
@@ -103,7 +102,7 @@ public class Cloud {
         this.int1 = int1;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public int getInt2() {
         return int2;
     }
@@ -112,7 +111,7 @@ public class Cloud {
         this.int2 = int2;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public Double getDouble1() {
         return double1;
     }
@@ -121,7 +120,7 @@ public class Cloud {
         this.double1 = double1;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public double getDouble2() {
         return double2;
     }
@@ -130,7 +129,7 @@ public class Cloud {
         this.double2 = double2;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public Float getFloat1() {
         return float1;
     }
@@ -139,7 +138,7 @@ public class Cloud {
         this.float1 = float1;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public float getFloat2() {
         return float2;
     }
@@ -148,7 +147,7 @@ public class Cloud {
         this.float2 = float2;
     }
 
-    @Text
+    @Field(index=Index.TOKENIZED, store=Store.YES)
 	public String getString() {
         return string;
     }
@@ -157,7 +156,7 @@ public class Cloud {
         this.string = string;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public Date getDate() {
         return date;
     }
@@ -166,7 +165,7 @@ public class Cloud {
         this.date = date;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @DateBridge( resolution = Resolution.YEAR )
     public Date getDateYear() {
         return dateYear;
@@ -176,7 +175,7 @@ public class Cloud {
         this.dateYear = dateYear;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @DateBridge( resolution = Resolution.MONTH )
     public Date getDateMonth() {
         return dateMonth;
@@ -186,7 +185,7 @@ public class Cloud {
         this.dateMonth = dateMonth;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @DateBridge( resolution = Resolution.DAY )
     public Date getDateDay() {
         return dateDay;
@@ -196,7 +195,7 @@ public class Cloud {
         this.dateDay = dateDay;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @DateBridge( resolution = Resolution.HOUR )
     public Date getDateHour() {
         return dateHour;
@@ -207,7 +206,7 @@ public class Cloud {
     }
 
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @DateBridge( resolution = Resolution.MINUTE )
     public Date getDateMinute() {
         return dateMinute;
@@ -217,7 +216,7 @@ public class Cloud {
         this.dateMinute = dateMinute;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @DateBridge( resolution = Resolution.SECOND )
     public Date getDateSecond() {
         return dateSecond;
@@ -227,7 +226,7 @@ public class Cloud {
         this.dateSecond = dateSecond;
     }
 
-    @Keyword
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
 	@DateBridge( resolution = Resolution.MILLISECOND )
     public Date getDateMillisecond() {
         return dateMillisecond;

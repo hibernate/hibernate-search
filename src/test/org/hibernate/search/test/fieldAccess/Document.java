@@ -1,18 +1,17 @@
 //$Id$
 package org.hibernate.search.test.fieldAccess;
 
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Lob;
 
-import org.hibernate.search.annotations.Unstored;
-import org.hibernate.search.annotations.Text;
-import org.hibernate.search.annotations.Keyword;
 import org.hibernate.search.annotations.Boost;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Richard Hallier
@@ -22,18 +21,18 @@ import org.hibernate.search.annotations.Index;
 public class Document {
 	@Id
     @GeneratedValue
-    @Keyword(id = true)
+    @DocumentId
 	private Long id;
 
 	@Field(index = Index.TOKENIZED)
 	@Boost(2)
 	private String title;
 
-	@Unstored(name = "Abstract")
+	@Field(name="Abstract", index=Index.TOKENIZED, store= Store.NO)
 	private String summary;
 
 	@Lob
-    @Unstored
+    @Field(index=Index.TOKENIZED, store=Store.NO)
 	private String text;
 
 	Document() {

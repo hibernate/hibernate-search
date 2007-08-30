@@ -1,13 +1,15 @@
 //$Id$
 package org.hibernate.search.test.inheritance;
 
-import org.hibernate.search.annotations.Keyword;
-import org.hibernate.search.annotations.Text;
-import org.hibernate.search.annotations.Indexed;
-
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Emmanuel Bernard
@@ -18,8 +20,8 @@ public class Animal {
     private Long id;
     private String name;
 
-    @Id @GeneratedValue @Keyword(id=true) 
-    public Long getId() {
+    @Id @GeneratedValue @DocumentId
+	public Long getId() {
         return id;
     }
 
@@ -27,7 +29,7 @@ public class Animal {
         this.id = id;
     }
 
-    @Text
+    @Field(index= Index.TOKENIZED, store= Store.YES)
     public String getName() {
         return name;
     }

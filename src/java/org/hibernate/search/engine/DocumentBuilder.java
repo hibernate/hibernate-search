@@ -32,15 +32,12 @@ import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Keyword;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.Text;
-import org.hibernate.search.annotations.Unstored;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -161,46 +158,6 @@ public class DocumentBuilder<T> {
 
 	private void initializeMember(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
 								  String prefix, Set<XClass> processedClasses) {
-		Keyword keywordAnn = member.getAnnotation( Keyword.class );
-		if ( keywordAnn != null ) {
-			String name = prefix + BinderHelper.getAttributeName( member, keywordAnn.name() );
-			if ( isRoot && keywordAnn.id() ) {
-				idKeywordName = name;
-				idBoost = getBoost( member );
-				FieldBridge fieldBridge = BridgeFactory.guessType( null, member );
-				if ( fieldBridge instanceof TwoWayFieldBridge ) {
-					idBridge = (TwoWayFieldBridge) fieldBridge;
-				}
-				else {
-					throw new SearchException(
-							"Bridge for document id does not implement IdFieldBridge: " + member.getName() );
-				}
-				setAccessible( member );
-				idGetter = member;
-			}
-			else {
-				setAccessible( member );
-				propertiesMetadata.keywordGetters.add( member );
-				propertiesMetadata.keywordNames.add( name );
-				propertiesMetadata.keywordBridges.add( BridgeFactory.guessType( null, member ) );
-			}
-		}
-
-		Unstored unstoredAnn = member.getAnnotation( Unstored.class );
-		if ( unstoredAnn != null ) {
-			setAccessible( member );
-			propertiesMetadata.unstoredGetters.add( member );
-			propertiesMetadata.unstoredNames.add( prefix + BinderHelper.getAttributeName( member, unstoredAnn.name() ) );
-			propertiesMetadata.unstoredBridges.add( BridgeFactory.guessType( null, member ) );
-		}
-
-		Text textAnn = member.getAnnotation( Text.class );
-		if ( textAnn != null ) {
-			setAccessible( member );
-			propertiesMetadata.textGetters.add( member );
-			propertiesMetadata.textNames.add( prefix + BinderHelper.getAttributeName( member, textAnn.name() ) );
-			propertiesMetadata.textBridges.add( BridgeFactory.guessType( null, member ) );
-		}
 
 		DocumentId documentIdAnn = member.getAnnotation( DocumentId.class );
 		if ( documentIdAnn != null ) {

@@ -1,25 +1,23 @@
 //$Id$
 package org.hibernate.search.test.query;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Text;
-import org.hibernate.search.annotations.Keyword;
-import org.hibernate.search.annotations.Unstored;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Fields;
-import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Fields;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Emmanuel Bernard
@@ -73,7 +71,7 @@ public class Book {
 		this.body = body;
 	}
 
-	@Id @Keyword(id=true)
+	@Id @DocumentId
 	public Integer getId() {
 		return id;
 	}
