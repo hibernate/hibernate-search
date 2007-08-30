@@ -19,7 +19,7 @@
 
     <subtitle>Reference Guide</subtitle>
 
-    <releaseinfo>3.0.0.Beta4</releaseinfo>
+    <releaseinfo>3.0.0.CR1</releaseinfo>
 
     <mediaobject>
       <imageobject>
@@ -38,7 +38,9 @@
     text search capabilities to applications. However, they suffer several mismatches when
     dealing with object domain models. Amongst other things indexes have to be kept up to date and
     mismatches between index structure and domain model as well as query mismatches 
-    have to be avoided. <sbr/>
+    have to be avoided.
+    </para>
+    <para>
     Hibernate Search indexes your domain model with the help of a few annotations,
     takes care of database/index synchronization and brings back
     regular managed objects from free text queries. To achieve this Hibernate Search
