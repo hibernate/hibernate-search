@@ -1,6 +1,27 @@
 Hibernate Search Changelog
 ==========================
 
+3.0.0.CR1 (4-09-2007)
+---------------------
+
+** Bug
+    * [HSEARCH-108] - id of embedded object is not indexed when using @IndexedEmbedded
+    * [HSEARCH-109] - Lazy loaded entity could not be indexed
+    * [HSEARCH-110] - ScrollableResults does not obey out of bounds rules (John Griffin)
+    * [HSEARCH-112] - Unkown @FullTextFilter  when attempting to associate a filter
+
+** Deprecation
+    * [HSEARCH-113] - Remove @Text, @Keyword and @Unstored (old mapping annotations)
+
+** Improvement
+    * [HSEARCH-107] - DirectoryProvider should have a start() method
+
+** New Feature
+    * [HSEARCH-14] - introduce fetch_size for Hibernate Search scrollable resultsets (John Griffin)
+    * [HSEARCH-69] - Ability to purge an index by class (John Griffin)
+    * [HSEARCH-111] - Ability to disable event based indexing (for read only or batch based indexing)
+
+
 3.0.0.Beta4 (1-08-2007)
 -----------------------
 
