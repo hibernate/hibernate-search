@@ -85,10 +85,10 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
         <programlisting>FullTextSession fullTextSession = Search.createFullTextSession( session );
 org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );</programlisting>
 
-        <para>If not specified otherwise, the query will be executed against all indexed entities,
-        potentially returning all types of indexed classes. It is advised,
-        from a performance point of view, to restrict the returned
-        types:</para>
+        <para>If not specified otherwise, the query will be executed against
+        all indexed entities, potentially returning all types of indexed
+        classes. It is advised, from a performance point of view, to restrict
+        the returned types:</para>
 
         <programlisting>org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
 //or
@@ -280,11 +280,18 @@ String authorName = firstResult[3];</programlisting>
       Search has to process all Lucene Hits elements (within the pagination)
       when using <methodname>list()</methodname> ,
       <methodname>uniqueResult()</methodname> and
-      <methodname>iterate()</methodname>. If you wish to minimize Lucene
-      document loading, <methodname>scroll()</methodname> is more appropriate,
-      Don't forget to close the <classname>ScrollableResults</classname>
-      object when you're done, since it keeps Lucene resources. Pagination is
-      a preferred method over scrolling though.</para>
+      <methodname>iterate()</methodname>. </para>
+
+      <para>If you wish to minimize Lucene document loading,
+      <methodname>scroll()</methodname> is more appropriate. Don't forget to
+      close the <classname>ScrollableResults</classname> object when you're
+      done, since it keeps Lucene resources. If you expect to use
+      <methodname>scroll</methodname> but wish to load objects in batch, you
+      can use <methodname>query.setFetchSize()</methodname>: When an object is
+      accessed, and if not already loaded, Hibernate Search will load the next
+      <literal>fetchSize</literal> objects in one pass. </para>
+
+      <para>Pagination is a preferred method over scrolling though.</para>
     </section>
 
     <section>
@@ -445,7 +452,7 @@ public class BestDriversFilterFactory {
 fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParameter( "level", 5 )</emphasis>;</programlisting>
 
     <para>Each parameter name should have an associated setter on either the
-    filter or filter factory of the targeted named filter definition. </para>
+    filter or filter factory of the targeted named filter definition.</para>
 
     <programlisting>public class SecurityFilterFactory {
     private Integer level;
@@ -498,8 +505,8 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     implementation to each of the parameters equals and hashcode
     methods.</para>
 
-    <para>Why should filters be cached? There are two area where filter caching
-    shines:</para>
+    <para>Why should filters be cached? There are two area where filter
+    caching shines:</para>
 
     <itemizedlist>
       <listitem>
