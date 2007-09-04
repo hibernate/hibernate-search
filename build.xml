@@ -327,6 +327,11 @@
                 <include name="**/*.*"/>
             </fileset>
         </copy>
+        <copy todir="${dist.dir}/ivy" failonerror="false">
+            <fileset dir="${ivy.jar.dir}">
+                <include name="**/*.*"/>
+            </fileset>
+        </copy>
 
         <!-- copy dependencies -->
         <copy todir="${dist.lib.dir}" failonerror="false">
