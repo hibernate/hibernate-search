@@ -94,12 +94,18 @@ tx.commit(); //index are written at commit time    </programlisting>
 
     <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
-<emphasis role="bold">fullTextSession.purge( Customer.class );</emphasis>
+<emphasis role="bold">fullTextSession.purgeAll( Customer.class );</emphasis>
 //optionally optimize the index
 //fullTextSession.getSearchFactory().optimize( Customer.class );
 tx.commit(); //index are written at commit time    </programlisting>
 
     <para>It is recommended to optimize the index after such an
     operation.</para>
+
+    <note>
+      <para>Methods <methodname>index</methodname>,
+      <methodname>purge</methodname> and <methodname>purgeAll</methodname> are
+      available on <classname>FullTextEntityManager</classname> as well</para>
+    </note>
   </section>
 </chapter>
