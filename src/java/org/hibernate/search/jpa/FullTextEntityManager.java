@@ -1,6 +1,7 @@
 //$Id$
 package org.hibernate.search.jpa;
 
+import java.io.Serializable;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.SearchFactory;
@@ -28,5 +29,19 @@ public interface FullTextEntityManager extends EntityManager {
 	 * return the SearchFactory
 	 */
 	SearchFactory getSearchFactory();
+	/**
+	 * Remove a particular entity from a particular class of an index.
+	 *
+	 * @param entityType
+	 * @param id
+	 */
+	public void purge(Class entityType, Serializable id);
+
+	/**
+	 * Remove all entities from a particular class of an index.
+	 *
+	 * @param entityType
+	 */
+	public void purgeAll(Class entityType);
 
 }

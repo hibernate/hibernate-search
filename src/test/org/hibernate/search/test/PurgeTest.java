@@ -82,7 +82,7 @@ public class PurgeTest extends SearchTestCase {
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "brand", new StopAnalyzer() );
 		                     tx = s.beginTransaction();
-		s.purge( Clock.class);
+		s.purgeAll( Clock.class);
 
 		tx.commit();
 

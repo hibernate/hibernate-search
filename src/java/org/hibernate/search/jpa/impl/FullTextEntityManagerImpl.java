@@ -1,6 +1,7 @@
 //$Id$
 package org.hibernate.search.jpa.impl;
 
+import java.io.Serializable;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
@@ -59,6 +60,14 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager {
 
 	public SearchFactory getSearchFactory() {
 		return ftSession.getSearchFactory();
+	}
+
+	public void purge(Class entityType, Serializable id) {
+		ftSession.purge( entityType, id );
+	}
+
+	public void purgeAll(Class entityType) {
+		ftSession.purgeAll( entityType );
 	}
 
 

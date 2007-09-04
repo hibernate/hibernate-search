@@ -85,7 +85,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 *
 	 * @param entityType
 	 */
-	public void purge(Class entityType) {
+	public void purgeAll(Class entityType) {
 		purge( entityType, null );
 	}
 
