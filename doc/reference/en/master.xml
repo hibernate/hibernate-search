@@ -48,9 +48,6 @@
     <ulink url="http://lucene.apache.org">Apache Lucene</ulink>.
     </para>
 
-    <important>Hibernate Search is a work in progress and new features are cooking
-    in this area. So expect some compatibility changes in subsequent
-    versions.</important>
   </preface>
 
   &getting-started; 
