@@ -25,49 +25,56 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager {
 
 	public FullTextEntityManagerImpl(EntityManager em) {
 		this.em = em;
-		Object delegate = em.getDelegate();
-		if ( delegate == null ) {
-			throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)");
-		}
-		else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
-			ftSession = Search.createFullTextSession( (Session) delegate );
-		}
-		else if ( EntityManager.class.isAssignableFrom( delegate.getClass() ) ) {
-			//Some app servers wrap the EM twice
-			delegate = ( (EntityManager) delegate).getDelegate();
+	}
+
+	private FullTextSession getFullTextSession() {
+		if ( ftSession == null ) {
+			Object delegate = em.getDelegate();
 			if ( delegate == null ) {
 				throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)");
 			}
 			else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
 				ftSession = Search.createFullTextSession( (Session) delegate );
 			}
+			else if ( EntityManager.class.isAssignableFrom( delegate.getClass() ) ) {
+				//Some app servers wrap the EM twice
+				delegate = ( (EntityManager) delegate).getDelegate();
+				if ( delegate == null ) {
+					throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)");
+				}
+				else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
+					ftSession = Search.createFullTextSession( (Session) delegate );
+				}
+				else {
+					throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager: " + delegate.getClass() );
+				}
+			}
 			else {
 				throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager: " + delegate.getClass() );
 			}
 		}
-		else {
-			throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager: " + delegate.getClass() );
-		}
+		return ftSession;
 	}
 
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class... entities) {
+		FullTextSession ftSession = getFullTextSession();
 		return new FullTextQueryImpl( ftSession.createFullTextQuery( luceneQuery, entities ), ftSession );
 	}
 
 	public void index(Object entity) {
-		ftSession.index( entity );
+		getFullTextSession().index( entity );
 	}
 
 	public SearchFactory getSearchFactory() {
-		return ftSession.getSearchFactory();
+		return getFullTextSession().getSearchFactory();
 	}
 
 	public void purge(Class entityType, Serializable id) {
-		ftSession.purge( entityType, id );
+		getFullTextSession().purge( entityType, id );
 	}
 
 	public void purgeAll(Class entityType) {
-		ftSession.purgeAll( entityType );
+		getFullTextSession().purgeAll( entityType );
 	}
 
 
