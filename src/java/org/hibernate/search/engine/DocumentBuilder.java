@@ -487,30 +487,6 @@ public class DocumentBuilder<T> {
 		if ( instance == null ) return;
 		//needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance );
-		for (int i = 0; i < propertiesMetadata.keywordNames.size(); i++) {
-			XMember member = propertiesMetadata.keywordGetters.get( i );
-			Object value = getMemberValue( unproxiedInstance, member );
-			propertiesMetadata.keywordBridges.get( i ).set(
-					propertiesMetadata.keywordNames.get( i ), value, doc, Field.Store.YES,
-					Field.Index.UN_TOKENIZED, getBoost( member )
-			);
-		}
-		for (int i = 0; i < propertiesMetadata.textNames.size(); i++) {
-			XMember member = propertiesMetadata.textGetters.get( i );
-			Object value = getMemberValue( unproxiedInstance, member );
-			propertiesMetadata.textBridges.get( i ).set(
-					propertiesMetadata.textNames.get( i ), value, doc, Field.Store.YES,
-					Field.Index.TOKENIZED, getBoost( member )
-			);
-		}
-		for (int i = 0; i < propertiesMetadata.unstoredNames.size(); i++) {
-			XMember member = propertiesMetadata.unstoredGetters.get( i );
-			Object value = getMemberValue( unproxiedInstance, member );
-			propertiesMetadata.unstoredBridges.get( i ).set(
-					propertiesMetadata.unstoredNames.get( i ), value, doc, Field.Store.NO,
-					Field.Index.TOKENIZED, getBoost( member )
-			);
-		}
 		for (int i = 0; i < propertiesMetadata.fieldNames.size(); i++) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			Object value = getMemberValue( unproxiedInstance, member );
@@ -692,15 +668,6 @@ public class DocumentBuilder<T> {
 	private static class PropertiesMetadata {
 		public Float boost;
 		public Analyzer analyzer;
-		public final List<XMember> keywordGetters = new ArrayList<XMember>();
-		public final List<String> keywordNames = new ArrayList<String>();
-		public final List<FieldBridge> keywordBridges = new ArrayList<FieldBridge>();
-		public final List<XMember> unstoredGetters = new ArrayList<XMember>();
-		public final List<String> unstoredNames = new ArrayList<String>();
-		public final List<FieldBridge> unstoredBridges = new ArrayList<FieldBridge>();
-		public final List<XMember> textGetters = new ArrayList<XMember>();
-		public final List<String> textNames = new ArrayList<String>();
-		public final List<FieldBridge> textBridges = new ArrayList<FieldBridge>();
 		public final List<String> fieldNames = new ArrayList<String>();
 		public final List<XMember> fieldGetters = new ArrayList<XMember>();
 		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
