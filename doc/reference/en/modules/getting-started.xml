@@ -64,6 +64,54 @@
   </section>
 
   <section>
+    <title>Maven</title>
+
+    <para>Instead of managing all dependencies yourself maven users have the
+    possibility to use the <ulink
+    url="http://repository.jboss.com/maven2">JBoss maven repository</ulink>.
+    Just add the JBoss repository url to the <emphasis>repositories</emphasis>
+    section of your <filename>pom.xml</filename> or
+    <filename>settgins.xml</filename>:</para>
+
+    <programlisting>
+&lt;repository&gt;
+  &lt;id&gt;repository.jboss.org&lt;/id&gt;
+  &lt;name&gt;JBoss Maven Repository&lt;/name&gt;
+  &lt;url&gt;http://repository.jboss.org/maven2&lt;/url&gt;
+  &lt;layout&gt;default&lt;/layout&gt;
+&lt;/repository&gt;
+      </programlisting>
+
+    <para>Then add the following dependencies to your pom.xml:</para>
+
+    <programlisting>
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
+   &lt;version&gt;3.0.0.CR1&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-annotations&lt;/artifactId&gt;
+   &lt;version&gt;3.3.0.ga&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
+   &lt;version&gt;3.3.1.ga&lt;/version&gt;
+&lt;/dependency&gt;
+      </programlisting>
+
+    <para>Not all three dependencies are required.
+    <emphasis>hibernate-search</emphasis> alone contains everything needed to
+    use Hibernate Search. <emphasis>hibernate-annotations</emphasis> is only
+    needed if you use non Hibernate Search annotations like we do in the
+    examples of this tutorial. Last but not least,
+    <emphasis>hibernate-entitymanager</emphasis> is only required if you use
+    Hibernate Search in conjunction with JPA.</para>
+  </section>
+
+  <section>
     <title>Configuration</title>
 
     <para>Once you have downloaded and added all required dependencies to your
