@@ -33,6 +33,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -138,6 +139,11 @@ public class DocumentBuilder<T> {
 			Analyzer analyzer = getAnalyzer( currClass );
 			if ( analyzer != null ) {
 				propertiesMetadata.analyzer = analyzer;
+			}
+			// Check for any ClassBridge style of annotations.
+			ClassBridge classBridgeAnn = currClass.getAnnotation(ClassBridge.class);
+			if (classBridgeAnn != null) {
+				bindClassAnnotation(prefix, propertiesMetadata, classBridgeAnn);
 			}
 			//rejecting non properties because the object is loaded from Hibernate, so indexing a non property does not make sense
 			List<XProperty> methods = currClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
@@ -277,6 +283,21 @@ public class DocumentBuilder<T> {
 			setAccessible( member );
 			propertiesMetadata.containedInGetters.add( member );
 		}
+	}
+
+	private void bindClassAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann) {
+		//FIXME name should be prefixed
+		String fieldName = prefix + ann.name();
+		propertiesMetadata.classNames.add( fieldName );
+		propertiesMetadata.classStores.add( getStore( ann.store() ) );
+		propertiesMetadata.classIndexes.add( getIndex( ann.index() ) );
+		propertiesMetadata.classBridges.add( BridgeFactory.extractType( ann ) );
+		propertiesMetadata.classBoosts.add( ann.boost().value() );
+
+		Analyzer analyzer = getAnalyzer( ann.analyzer() );
+		if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
+		if ( analyzer == null ) throw new AssertionFailure( "Analyzer should not be undefined" );
+		this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 	}
 
 	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn) {
@@ -487,6 +508,16 @@ public class DocumentBuilder<T> {
 		if ( instance == null ) return;
 		//needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance );
+		for (int i = 0; i < propertiesMetadata.classBridges.size(); i++) {
+			FieldBridge fb = propertiesMetadata.classBridges.get( i );
+
+			fb.set( propertiesMetadata.classNames.get(i),
+					unproxiedInstance,
+					doc,
+					propertiesMetadata.classStores.get(i),
+					propertiesMetadata.classIndexes.get(i),
+					propertiesMetadata.classBoosts.get(i));
+		}
 		for (int i = 0; i < propertiesMetadata.fieldNames.size(); i++) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			Object value = getMemberValue( unproxiedInstance, member );
@@ -677,6 +708,11 @@ public class DocumentBuilder<T> {
 		public final List<PropertiesMetadata> embeddedPropertiesMetadata = new ArrayList<PropertiesMetadata>();
 		public final List<Container> embeddedContainers = new ArrayList<Container>();
 		public final List<XMember> containedInGetters = new ArrayList<XMember>();
+		public final List<String> classNames = new ArrayList<String>();
+		public final List<Field.Store> classStores = new ArrayList<Field.Store>();
+		public final List<Field.Index> classIndexes = new ArrayList<Field.Index>();
+		public final List<FieldBridge> classBridges = new ArrayList<FieldBridge>();
+		public final List<Float> classBoosts = new ArrayList<Float>();
 
 		public enum Container {
 			OBJECT,

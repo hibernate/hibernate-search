@@ -23,6 +23,7 @@ import org.hibernate.search.bridge.builtin.BooleanBridge;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.BinderHelper;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -30,6 +31,7 @@ import org.hibernate.annotations.common.reflection.XMember;
 
 /**
  * @author Emmanuel Bernard
+ * @author John Griffin
  */
 public class BridgeFactory {
 	private static Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
@@ -82,6 +84,44 @@ public class BridgeFactory {
 		builtInBridges.put( boolean.class.getName(), BOOLEAN );
 
 		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
+	}
+	
+	/**
+	 * This extracts and instantiates the implementation class from a ClassBridge
+	 * annotation.
+	 *
+	 * @param cb the ClassBridge
+	 * @return FieldBridge
+	 */
+	public static FieldBridge extractType(ClassBridge cb)
+	{
+		FieldBridge bridge = null;
+
+		if ( cb != null ) {
+			Class impl = cb.impl();
+
+			if (impl != null) {
+				try {
+					Object instance = impl.newInstance();
+					if ( FieldBridge.class.isAssignableFrom( impl ) ) {
+						bridge = (FieldBridge) instance;
+					}
+					if ( cb.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
+						Map params = new HashMap( cb.params().length );
+						for ( Parameter param : cb.params() ) {
+							params.put( param.name(), param.value() );
+						}
+						( (ParameterizedBridge) instance ).setParameterValues( params );
+					}
+				}
+				catch (Exception e) {
+					throw new HibernateException( "Unable to instantiate FieldBridge for " + ClassBridge.class.getName(), e );
+				}
+			}
+		}
+		if ( bridge == null ) throw new SearchException( "Unable to guess FieldBridge for " + ClassBridge.class.getName() );
+
+		return bridge;
 	}
 
 	public static FieldBridge guessType(Field field, XMember member) {

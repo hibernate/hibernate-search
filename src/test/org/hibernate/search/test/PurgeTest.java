@@ -88,10 +88,15 @@ public class PurgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		Query query = parser.parse( "brand:Festina or brand:Seiko" );
+		Query query = parser.parse( "brand:Festina or brand:Seiko or brand:Longine or brand:Rolex" );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
 		List results = hibQuery.list();
-		assertEquals("incorrect test record count", 0, results.size());
+		assertEquals("class not completely purged", 0, results.size());
+
+		query = parser.parse( "summary:Festina or summary:gloire" );
+		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		results = hibQuery.list();
+		assertEquals("incorrect class purged", 2, results.size());
 
 		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
 		tx.commit();
