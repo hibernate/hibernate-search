@@ -172,6 +172,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "id incorrect", 1001, projection[0] );
 		assertEquals( "last name incorrect", "Jackson", projection[1] );
 		assertEquals( "dept incorrect", "Accounting", projection[2] );
+		assertEquals( "THIS incorrect", "Jackson", ( (Employee) projection[3] ).getLastname() );
 		assertEquals( "THIS incorrect", projection[3], s.get(Employee.class, (Serializable) projection[0]) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
 		assertEquals( "BOOST incorrect", 1.0F, projection[5] );
