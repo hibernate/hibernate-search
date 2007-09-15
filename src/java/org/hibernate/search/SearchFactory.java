@@ -16,8 +16,11 @@ public interface SearchFactory {
 	ReaderProvider getReaderProvider();
 
 	/**
-	 * Provide access to the DirectoryProvider (hence the Lucene Directory)
+	 * Provide access to the DirectoryProviders (hence the Lucene Directories)
 	 * for a given entity
+	 * In most cases, the returned type will be a one element array.
+	 * But if the given entity is configured to use sharded indexes, then multiple
+	 * elements will be returned. In this case all of them should be considered.
 	 */
 	DirectoryProvider[] getDirectoryProviders(Class entity);
 
