@@ -1,4 +1,4 @@
-//$Id$
+// $Id$
 package org.hibernate.search.engine;
 
 import java.lang.reflect.InvocationTargetException;

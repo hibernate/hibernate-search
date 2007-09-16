@@ -1,4 +1,4 @@
-//$Id$
+// $Id$
 package org.hibernate.search.query;
 
 import java.util.Map;

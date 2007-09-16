@@ -1,4 +1,4 @@
-//$Id$
+// $Id$
 package org.hibernate.search.jpa;
 
 import javax.persistence.EntityManager;

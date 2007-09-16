@@ -1,4 +1,4 @@
-//$Id$
+// $Id$
 package org.hibernate.search.store.optimization;
 
 import java.util.Properties;
