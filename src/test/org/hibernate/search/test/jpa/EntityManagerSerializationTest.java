@@ -38,7 +38,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 		
 		File tmpFile = File.createTempFile("entityManager", "ser", null);
 		serializeEM(em, tmpFile);
-		em = deserializeEM(em, tmpFile);
+		em = deserializeEM(tmpFile);
 		
 		indexSearchAssert(em);
 		
@@ -48,8 +48,8 @@ public class EntityManagerSerializationTest extends JPATestCase {
 		tmpFile.delete();
 	}
 
-	private FullTextEntityManager deserializeEM(FullTextEntityManager em,
-			File tmpFile) throws ClassNotFoundException {
+	private FullTextEntityManager deserializeEM(File tmpFile) throws ClassNotFoundException {
+		FullTextEntityManager em = null;
 		FileInputStream fis = null;
 		ObjectInputStream in = null;
 		try {
@@ -60,11 +60,12 @@ public class EntityManagerSerializationTest extends JPATestCase {
 		}
 		catch (IOException ex) {
 			ex.printStackTrace();
+			fail();
 		}
 		return em;
 	}
 
-	private File serializeEM(FullTextEntityManager em, File tmpFile) {
+	private void serializeEM(FullTextEntityManager em, File tmpFile) {
 		FileOutputStream fos = null;
 		ObjectOutputStream out = null;
 		try {
@@ -76,7 +77,6 @@ public class EntityManagerSerializationTest extends JPATestCase {
 			ex.printStackTrace();
 			fail();
 		}
-		return tmpFile;
 	}
 
 	public Class[] getAnnotatedClasses() {
