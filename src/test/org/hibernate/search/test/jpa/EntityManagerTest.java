@@ -50,7 +50,7 @@ public class EntityManagerTest extends JPATestCase {
 		em.getTransaction().commit();
 		em.clear();
 
-		//Not really a unit test but a test that shows the method call wiouth failing
+		//Not really a unit test but a test that shows the method call without failing
 		//FIXME port the index test
 		em.getTransaction().begin();
 		em.index( em.find( Bretzel.class, bretzel.getId() ) );

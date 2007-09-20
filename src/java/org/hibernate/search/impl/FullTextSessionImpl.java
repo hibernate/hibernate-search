@@ -22,9 +22,9 @@ import org.hibernate.ReplicationMode;
 import org.hibernate.SQLQuery;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
-import org.hibernate.classic.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.classic.Session;
 import org.hibernate.collection.PersistentCollection;
 import org.hibernate.engine.EntityKey;
 import org.hibernate.engine.PersistenceContext;
@@ -40,11 +40,11 @@ import org.hibernate.jdbc.Batcher;
 import org.hibernate.jdbc.JDBCContext;
 import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.Work;
+import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.FullTextQueryImpl;
@@ -57,12 +57,13 @@ import org.hibernate.type.Type;
  *
  * @author Emmanuel Bernard
  * @author John Griffin
+ * @author Hardy Ferentschik
  */
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 	private final Session session;
 	private final EventSource eventSource;
 	private final SessionImplementor sessionImplementor;
-	private SearchFactoryImplementor searchFactory;
+	private transient SearchFactoryImplementor searchFactory;
 
 	public FullTextSessionImpl(org.hibernate.Session session) {
 		this.session = (Session) session;

@@ -19,7 +19,7 @@ import org.hibernate.Session;
 /**
  * @author Emmanuel Bernard
  */
-public class FullTextEntityManagerImpl implements FullTextEntityManager {
+public class FullTextEntityManagerImpl implements FullTextEntityManager, Serializable {
 	private EntityManager em;
 	private FullTextSession ftSession;
 
