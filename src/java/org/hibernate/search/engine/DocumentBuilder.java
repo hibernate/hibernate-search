@@ -34,6 +34,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -140,11 +141,21 @@ public class DocumentBuilder<T> {
 			if ( analyzer != null ) {
 				propertiesMetadata.analyzer = analyzer;
 			}
+			// Check for any ClassBridges annotation.
+			ClassBridges classBridgesAnn = currClass.getAnnotation( ClassBridges.class);
+			if (classBridgesAnn != null) {
+				ClassBridge[] cbs = classBridgesAnn.value();
+				for (ClassBridge cb : cbs) {
+					bindClassAnnotation(prefix, propertiesMetadata, cb);
+				}
+ 			}
+
 			// Check for any ClassBridge style of annotations.
 			ClassBridge classBridgeAnn = currClass.getAnnotation(ClassBridge.class);
 			if (classBridgeAnn != null) {
 				bindClassAnnotation(prefix, propertiesMetadata, classBridgeAnn);
 			}
+
 			//rejecting non properties because the object is loaded from Hibernate, so indexing a non property does not make sense
 			List<XProperty> methods = currClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 			for (XProperty method : methods) {

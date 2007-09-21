@@ -1,21 +1,161 @@
 package org.hibernate.search.test.bridge;
 
 import java.util.List;
+import java.io.Serializable;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.document.Document;
 import org.hibernate.Transaction;
+import org.hibernate.ScrollableResults;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.query.Employee;
 
 /**
  * @author John Griffin
  */
 public class ClassBridgeTest extends SearchTestCase {
+	/**
+	 * This tests that a field created by a user-supplied
+	 * EquipmentType class has been created and is a translation
+	 * from an identifier to a manufacturer name.
+	 *
+	 * @throws Exception
+	 */
+	public void testClassBridges() throws Exception {
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( getDepts1() );
+		s.persist( getDepts2() );
+		s.persist( getDepts3() );
+		s.persist( getDepts4() );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.createFullTextSession( s );
+
+		// The equipment field is the manufacturer field  in the
+		// Departments entity after being massaged by passing it
+		// through the EquipmentType class. This field is in
+		// the Lucene document but not in the Department entity itself.
+		QueryParser parser = new QueryParser( "equipment", new SimpleAnalyzer() );
+
+		// Check the second ClassBridge annotation
+		Query query = parser.parse( "equiptype:Cisco" );
+		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Departments.class );
+		List<Departments> result = hibQuery.list();
+		assertNotNull( result );
+		assertEquals( "incorrect number of results returned", 2, result.size() );
+		for (Departments d : result) {
+			assertEquals("incorrect manufacturer", "C", d.getManufacturer());
+		}
+
+		// No data cross-ups.
+		query = parser.parse( "branchnetwork:Kent Lewin" );
+		hibQuery = session.createFullTextQuery( query, Departments.class );
+		result = hibQuery.list();
+		assertNotNull( result );
+		assertTrue( "problem with field cross-ups", result.size() == 0 );
+
+		// Non-ClassBridge field.
+		parser = new QueryParser( "branchHead", new SimpleAnalyzer() );
+		query = parser.parse( "branchHead:Kent Lewin" );
+		hibQuery = session.createFullTextQuery( query, Departments.class );
+		result = hibQuery.list();
+		assertNotNull( result );
+		assertTrue( "incorrect entity returned, wrong branch head", result.size() == 1 );
+		assertEquals("incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead());
+
+		// Check other ClassBridge annotation.
+		parser = new QueryParser( "branchnetwork", new SimpleAnalyzer() );
+		query = parser.parse( "branchnetwork:st. george 1D" );
+		hibQuery = session.createFullTextQuery( query, Departments.class );
+		result = hibQuery.list();
+		assertNotNull( result );
+		assertEquals( "incorrect entity returned, wrong network", "1D", ( result.get( 0 ) ).getNetwork() );
+		assertEquals( "incorrect entity returned, wrong branch", "St. George", ( result.get( 0 ) ).getBranch() );
+		assertEquals( "incorrect number of results returned", 1, result.size() );
+
+		//cleanup
+		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) s.delete( element );
+		tx.commit();
+		s.close();
+	}
+
+	/**
+	 * This is the same test as above with a projection query
+	 * to show the presence of the ClassBridge impl built fields
+	 * just in case you don't believe us.
+	 *
+	 * @throws Exception
+	 */
+	public void testClassBridgesWithProjection() throws Exception {
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( getDepts1() );
+		s.persist( getDepts2() );
+		s.persist( getDepts3() );
+		s.persist( getDepts4() );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.createFullTextSession( s );
+
+		// The equipment field is the manufacturer field  in the
+		// Departments entity after being massaged by passing it
+		// through the EquipmentType class. This field is in
+		// the Lucene document but not in the Department entity itself.
+		QueryParser parser = new QueryParser( "equipment", new SimpleAnalyzer() );
+
+		// Check the second ClassBridge annotation
+		Query query = parser.parse( "equiptype:Cisco" );
+		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Departments.class );
+
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.DOCUMENT );
+
+		ScrollableResults projections = hibQuery.scroll();
+		assertNotNull( projections );
+
+		projections.beforeFirst();
+		projections.next();
+		Object[] projection = projections.get();
+
+		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Departments );
+		assertEquals( "id incorrect", 1, ((Departments)projection[0]).getId() );
+		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
+		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
+		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getField("equiptype") );
+		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getField("equiptype" ).stringValue() );
+		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getField("branchnetwork") );
+		assertEquals( "branchnetwork incorrect", "Salt Lake City 1A", ( (Document) projection[1] ).getField("branchnetwork" ).stringValue() );
+
+		projections.next();
+		projection = projections.get();
+
+		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Departments );
+		assertEquals( "id incorrect", 4, ((Departments)projection[0]).getId() );
+		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
+		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
+		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getField("equiptype") );
+		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getField("equiptype" ).stringValue() );
+		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getField("branchnetwork") );
+		assertEquals( "branchnetwork incorrect", "St. George 1D", ( (Document) projection[1] ).getField("branchnetwork" ).stringValue() );
+
+		assertTrue("incorrect result count returned", projections.isLast());
+		//cleanup
+		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) s.delete( element );
+		tx.commit();
+		s.close();
+	}
+
 	/**
 	 * This test checks for two fields being concatentated by the user-supplied
 	 * CatFieldsClassBridge class which is specified as the implementation class
@@ -83,19 +223,16 @@ public class ClassBridgeTest extends SearchTestCase {
 	private Department getDept1() {
 		Department dept = new Department();
 
-//		dept.setId( 1000 );
 		dept.setBranch( "Salt Lake City" );
 		dept.setBranchHead( "Kent Lewin" );
 		dept.setMaxEmployees( 100 );
 		dept.setNetwork( "1A" );
-
 		return dept;
 	}
 
 	private Department getDept2() {
 		Department dept = new Department();
 
-//		dept.setId( 1001 );
 		dept.setBranch( "Layton" );
 		dept.setBranchHead( "Terry Poperszky" );
 		dept.setMaxEmployees( 20 );
@@ -107,7 +244,6 @@ public class ClassBridgeTest extends SearchTestCase {
 	private Department getDept3() {
 		Department dept = new Department();
 
-//		dept.setId( 1002 );
 		dept.setBranch( "West Valley" );
 		dept.setBranchHead( "Pat Kelley" );
 		dept.setMaxEmployees( 15 );
@@ -116,9 +252,57 @@ public class ClassBridgeTest extends SearchTestCase {
 		return dept;
 	}
 
+	private Departments getDepts1() {
+		Departments depts = new Departments();
+
+		depts.setBranch( "Salt Lake City" );
+		depts.setBranchHead( "Kent Lewin" );
+		depts.setMaxEmployees( 100 );
+		depts.setNetwork( "1A" );
+		depts.setManufacturer( "C" );
+
+		return depts;
+	}
+
+	private Departments getDepts2() {
+		Departments depts = new Departments();
+
+		depts.setBranch( "Layton" );
+		depts.setBranchHead( "Terry Poperszky" );
+		depts.setMaxEmployees( 20 );
+		depts.setNetwork( "2B" );
+		depts.setManufacturer( "3" );
+
+		return depts;
+	}
+
+	private Departments getDepts3() {
+		Departments depts = new Departments();
+
+		depts.setBranch( "West Valley" );
+		depts.setBranchHead( "Pat Kelley" );
+		depts.setMaxEmployees( 15 );
+		depts.setNetwork( "3C" );
+		depts.setManufacturer( "D" );
+
+		return depts;
+	}
+
+	private Departments getDepts4() {
+		Departments depts = new Departments();
+
+		depts.setBranch( "St. George" );
+		depts.setBranchHead( "Spencer Stajskal" );
+		depts.setMaxEmployees( 10 );
+		depts.setNetwork( "1D" );
+		depts.setManufacturer( "C" );
+		return depts;
+	}
+
 	protected Class[] getMappings() {
 		return new Class[] {
-				Department.class
+				Department.class,
+				Departments.class
 		};
 	}
 
