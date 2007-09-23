@@ -1,6 +1,27 @@
 Hibernate Search Changelog
 ==========================
 
+3.0.0.GA (23-09-2007)
+---------------------
+
+** Bug
+    * [HSEARCH-116] - FullTextEntityManager acessing getDelegate() in the constructor leads to NPE in JBoss AS + Seam
+    * [HSEARCH-117] - FullTextEntityManagerImpl and others should implement Serializable
+
+** Deprecation
+    * [HSEARCH-122] - Remove query.setIndexProjection (replaced by query.setProjection)
+
+** Improvement
+    * [HSEARCH-118] - Add ClassBridges (plural) functionality
+
+** New Feature
+    * [HSEARCH-81] - Create a @ClassBridge Annotation (John Griffin)
+
+
+** Task
+    * [HSEARCH-98] - Add a Getting started section to the reference documentation
+
+
 3.0.0.CR1 (4-09-2007)
 ---------------------
 
