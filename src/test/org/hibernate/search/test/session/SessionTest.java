@@ -2,11 +2,14 @@
 package org.hibernate.search.test.session;
 
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.Session;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.DetachedCriteria;
 
 /**
  * @author Emmanuel Bernard
@@ -36,6 +39,20 @@ public class SessionTest extends SearchTestCase {
 			fail(e.toString());
 		}
 		wrapped.close();
+	}
+
+	public void testDetachedCriteria() throws Exception {
+		FullTextSession s = Search.createFullTextSession( openSession( ) );
+		DetachedCriteria dc = DetachedCriteria.forClass( Email.class );
+		try {
+			Criteria c = dc.getExecutableCriteria( s ).setMaxResults( 10 );
+			List results = c.list();
+		}
+		catch( ClassCastException e ) {
+			e.printStackTrace( );
+			fail(e.toString());
+		}
+		s.close();
 	}
 
 	protected Class[] getMappings() {
