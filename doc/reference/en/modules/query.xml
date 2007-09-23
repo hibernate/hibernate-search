@@ -11,7 +11,7 @@
 
   <para>To access the <productname>Hibernate Search</productname> querying
   facilities, you have to use an Hibernate
-  <classname>FullTextSession</classname> . A Search Session wrap an regular
+  <classname>FullTextSession</classname> . A Search Session wraps a regular
   <classname>org.hibernate.Session</classname> to provide query and indexing
   capabilities.</para>
 
@@ -74,7 +74,7 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
     </section>
 
     <section>
-      <title>Building an Hibernate Search query</title>
+      <title>Building a Hibernate Search query</title>
 
       <section>
         <title>Generality</title>
@@ -280,7 +280,7 @@ String authorName = firstResult[3];</programlisting>
       Search has to process all Lucene Hits elements (within the pagination)
       when using <methodname>list()</methodname> ,
       <methodname>uniqueResult()</methodname> and
-      <methodname>iterate()</methodname>. </para>
+      <methodname>iterate()</methodname>.</para>
 
       <para>If you wish to minimize Lucene document loading,
       <methodname>scroll()</methodname> is more appropriate. Don't forget to
@@ -289,7 +289,7 @@ String authorName = firstResult[3];</programlisting>
       <methodname>scroll</methodname> but wish to load objects in batch, you
       can use <methodname>query.setFetchSize()</methodname>: When an object is
       accessed, and if not already loaded, Hibernate Search will load the next
-      <literal>fetchSize</literal> objects in one pass. </para>
+      <literal>fetchSize</literal> objects in one pass.</para>
 
       <para>Pagination is a preferred method over scrolling though.</para>
     </section>
@@ -345,7 +345,7 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return 
     <para>Apache Lucene has a powerful feature that allows to filters results
     from a query according to a custom filtering process. This is a very
     powerful way to apply some data restrictions after a query, especially
-    since filters can be cached and reused. Some interesting usecase
+    since filters can be cached and reused. Some interesting usecases
     are:</para>
 
     <itemizedlist>
@@ -413,11 +413,12 @@ public class Driver { ... }</programlisting>
     score is 5. The filters must have a no-arg constructor when referenced in
     a <literal>FulltextFilterDef.impl</literal>.</para>
 
-    <para>The cache flag defaulted to true, tells Hibernate Search to search
-    the filter in its internal cache and reuse it if found.</para>
+    <para>The <literal>cache</literal> flag, defaulted to
+    <literal>true</literal>, tells Hibernate Search to search the filter in
+    its internal cache and reuses it if found.</para>
 
     <para>Note that, usually, filter using the
-    <classname>IndexReader</classname> are usually wrapped in a Lucene
+    <classname>IndexReader</classname> are wrapped in a Lucene
     <classname>CachingWrapperFilter</classname> to benefit from some caching
     speed improvement. If your Filter creation requires additional steps or if
     the filter you are willing to use does not have a no-arg constructor, you
@@ -515,7 +516,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
       </listitem>
 
       <listitem>
-        <para>the Filter BitSet is expenseve to consume (compared to the time
+        <para>the Filter BitSet is expensive to compute (compared to the time
         spent to execute the query)</para>
       </listitem>
     </itemizedlist>

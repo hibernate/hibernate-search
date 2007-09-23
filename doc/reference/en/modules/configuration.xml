@@ -113,14 +113,13 @@
     <para>Each indexed entity is associated to a Lucene index (an index can be
     shared by several entities but this is not usually the case). You can
     configure the index through properties prefixed by
-    <constant>hibernate.search.</constant>
-    <replaceable>indexname</replaceable> . Default properties inherited to all
-    indexes can be defined using the prefix
-    <constant>hibernate.search.default.</constant></para>
+    <constant>hibernate.search.</constant><replaceable>indexname</replaceable>
+    . Default properties inherited to all indexes can be defined using the
+    prefix <constant>hibernate.search.default.</constant></para>
 
     <para>To define the directory provider of a given index, you use the
-    <constant>hibernate.search. <replaceable>indexname</replaceable>
-    .directory_provider </constant></para>
+    <constant>hibernate.search.<replaceable>indexname</replaceable>.directory_provider
+    </constant></para>
 
     <programlisting>hibernate.search.default.directory_provider org.hibernate.search.store.FSDirectoryProvider
 hibernate.search.default.indexBase=/usr/lucene/indexes
@@ -154,10 +153,10 @@ public class Rule { ... }</programlisting>
     <para>In some extreme cases involving huge indexes (in size), it is
     necessary to split (shard) the indexing data of a given entity type into
     several Lucene indexes. This solution is not recommended until you reach
-    significant index sizes and important index updates are slowing down. The
-    main drawback of index sharding is that searches will end up being slower
-    since more files have to be opend for a single search. In other words
-    don't do it until you have problems :)</para>
+    significant index sizes and index update time are slowing down. The main
+    drawback of index sharding is that searches will end up being slower since
+    more files have to be opend for a single search. In other words don't do
+    it until you have problems :)</para>
 
     <para>Despite this strong warning, Hibernate Search allows you to index a
     given entity type into several sub indexes. Data is sharded into the
@@ -196,7 +195,7 @@ hibernate.search.Animal.3.indexBase /usr/lucene/sharded
 hibernate.search.Animal.3.indexName Animal03</programlisting>
 
     <para>This configuration uses the default id string hashing strategy and
-    shards the Animal index intp 5 subindexes. All subindexes are
+    shards the Animal index into 5 subindexes. All subindexes are
     FSDirectoryProvider instances and the directory where each subindex is
     stored is as followed:</para>
 
@@ -231,8 +230,11 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
   <section>
     <title>Worker configuration</title>
 
-    <para>Hibernate Search works done by a worker you can configure. The
-    default (and only) worker today use transactional scoping.</para>
+    <para>It is possible to refine how Hibernate Search interacts with Lucene
+    through the worker configuration. The work can be exected to the Lucene
+    directory or sent to a JMS queue for later processing. When processed to
+    the Lucene directory, the work can be processed synchronously or
+    asynchronously to the transaction commit.</para>
 
     <para>You can define the worker configuration using the following
     properties</para>
@@ -455,12 +457,6 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
   <section id="search-configuration-event" revision="2">
     <title>Enabling Hibernate Search and automatic indexing</title>
 
-    <para>Hibernate Search is enabled out of the box when using Hibernate
-    Annotations or Hibernate EntityManager. If, for some reason you need to
-    disable it, set <literal>hibernate.search.autoregister_listeners</literal>
-    to false. Note that there is no performance runtime when the listeners are
-    enabled while no entity is indexable.</para>
-
     <section>
       <title>Enabling Hibernate Search</title>
 
@@ -536,14 +532,15 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
 
     <para>Hibernate Search allows you to tune the Lucene indexing performance
     by specifying a set of parameters which are passed through to underlying
-    Lucene <literal>IndexWriter</literal> as <literal>mergeFactor</literal>,
-    <literal>maxMergeDocs</literal> and <literal>maxBufferedDocs</literal>.
-    You can specify these parameters either as default values applying for all
-    indexes or on a per index basis.</para>
+    Lucene <literal>IndexWriter</literal> such as
+    <literal>mergeFactor</literal>, <literal>maxMergeDocs</literal> and
+    <literal>maxBufferedDocs</literal>. You can specify these parameters
+    either as default values applying for all indexes or on a per index
+    basis.</para>
 
     <para>There are two sets of parameters allowing for different performance
     settings depending on the use case. During indexing operations triggered
-    by database modifications: <itemizedlist>
+    by database modifications, the following ones are used: <itemizedlist>
         <listitem>
           <literal>hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</literal>
         </listitem>
@@ -555,7 +552,10 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         <listitem>
           <literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</literal>
         </listitem>
-      </itemizedlist> are used. The corresponding properties: <itemizedlist>
+      </itemizedlist>When indexing occurs via
+    <literal>FullTextSession.index()</literal> (see <xref
+    linkend="search-batchindex" />), the following properties are used:
+    <itemizedlist>
         <listitem>
           <literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal>
         </listitem>
@@ -567,9 +567,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         <listitem>
           <literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal>
         </listitem>
-      </itemizedlist> are applied when indexing occurs via
-    <literal>FullTextSession.index()</literal> (see <xref
-    linkend="search-batchindex" />).</para>
+      </itemizedlist></para>
 
     <para>Unless the corresponding <literal>.batch</literal> property is
     explicitly set, the value will default to the

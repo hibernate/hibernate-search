@@ -6,10 +6,10 @@
   <section id="search-batchindex-indexing">
     <title>Indexing</title>
 
-    <para>It is sometimes useful to index an object event if this object is
-    not inserted nor updated to the database. This is especially true when you
-    want to build your index the first time. You can achieve that goal using
-    the <classname>FullTextSession</classname> .</para>
+    <para>It is sometimes useful to index an object even if this object is not
+    inserted nor updated to the database. This is especially true when you
+    want to build your index for the first time. You can achieve that goal
+    using the <classname>FullTextSession</classname>.</para>
 
     <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
@@ -18,15 +18,15 @@ for (Customer customer : customers) {
 }
 tx.commit(); //index are written at commit time    </programlisting>
 
-    <para>For maximum efficiency, Hibernate Search batch index operations
-    which and execute them at commit time (Note: you don't need to use
+    <para>For maximum efficiency, Hibernate Search batches index operations
+    and executse them at commit time (Note: you don't need to use
     <classname>org.hibernate.Transaction</classname> in a JTA
     environment).</para>
 
     <para>If you expect to index a lot of data, you need to be careful about
     memory consumption: since all documents are kept in a queue until the
     transaction commit, you can potentially face an
-    OutOfMemoryException.</para>
+    <classname>OutOfMemoryException</classname>.</para>
 
     <para>To avoid that, you can set up the
     <literal>hibernate.search.worker.batch_size</literal> property to a
@@ -40,7 +40,7 @@ tx.commit(); //index are written at commit time    </programlisting>
     <literal>session.index()</literal> is used). That's why a sensitive
     <literal>batch_size</literal> value is expected.</para>
 
-    <para>Other parameters which also can effect indexing time and memory
+    <para>Other parameters which also can affect indexing time and memory
     consumption are
     <literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal>
     ,
@@ -55,6 +55,7 @@ tx.commit(); //index are written at commit time    </programlisting>
     for index (re)initialization):</para>
 
     <programlisting>fullTextSession.setFlushMode(FlushMode.MANUAL);
+fullTextSession.setCacheMode(CacheMode.IGNORE);
 transaction = fullTextSession.beginTransaction();
 //Scrollable results will avoid loading too many objects in memory
 ScrollableResults results = fullTextSession.createCriteria( Email.class ).scroll( ScrollMode.FORWARD_ONLY );

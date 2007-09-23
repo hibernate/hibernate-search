@@ -68,7 +68,7 @@ public class Essay {
           an analyzer to process the property),
           <literal>Index.UN_TOKENISED</literal> (no analyzer pre processing),
           <literal>Index.NO_NORM</literal> (do not store the normalization
-          data).</para>
+          data). The default value is <literal>TOKENIZED</literal>.</para>
         </listitem>
       </itemizedlist>
 
@@ -171,7 +171,8 @@ public class Book {
       <title>Embedded and associated objects</title>
 
       <para>Associated objects as well as embedded objects can be indexed as
-      part of the root entity index.</para>
+      part of the root entity index. It is necessary if you expect to search a
+      given entity based on properties of the associated object(s).</para>
 
       <programlisting>@Entity
 @Indexed
@@ -220,7 +221,7 @@ public class Address {
       <para><literal>@ContainedIn</literal> is useful on embedded objects that
       are also entities (like <literal>Address</literal> in this example): it
       basically means that when an address entity is updated, the index
-      document of the associated <literal>Place</literal>(s), also have to be
+      document of the associated <literal>Place</literal>(s), also has to be
       updated.</para>
 
       <para>Let's make our example a bit more complex:</para>
@@ -405,13 +406,13 @@ public class Essay {
 
       <para>The default analyzer class used to index the elements is
       configurable through the <literal>hibernate.search.analyzer</literal>
-      property. If none defined,
+      property. If none is defined,
       <classname>org.apache.lucene.analysis.standard.StandardAnalyzer</classname>
       is used as the default.</para>
 
       <para>You can also define the analyzer class per entity, per property
       and even per @Field (useful when multiple fields are indexed from a
-      single proeprty).</para>
+      single property).</para>
 
       <programlisting>@Entity
 @Indexed
@@ -455,12 +456,12 @@ public class MyEntity {
   <section id="search-mapping-bridge">
     <title>Property/Field Bridge</title>
 
-    <para>In Lucene all index fields have to be represented as
-    Strings. For this reason all entity properties annotated with <literal>@Field</literal> 
-    have to be indexed in a String form. For
-    most of your properties, Hibernate Search does the translation job for you
-    thanks to a built-in set of bridges. In some cases, though you need a more fine
-    grain control over the translation process.</para>
+    <para>In Lucene all index fields have to be represented as Strings. For
+    this reason all entity properties annotated with <literal>@Field</literal>
+    have to be indexed in a String form. For most of your properties,
+    Hibernate Search does the translation job for you thanks to a built-in set
+    of bridges. In some cases, though you need a more fine grain control over
+    the translation process.</para>
 
     <section>
       <title>Built-in bridges</title>
@@ -468,9 +469,6 @@ public class MyEntity {
       <para><literal>Hibernate Search</literal> comes bundled with a set of
       built-in bridges between a Java property type and its full text
       representation.</para>
-
-      <para><literal>Null</literal> elements are not indexed (Lucene does not
-      support null elements and it does not make much sense either)</para>
 
       <variablelist>
         <varlistentry>
@@ -547,10 +545,10 @@ public class Meeting {
     <section>
       <title>Custom Bridge</title>
 
-      <para>It can happen that the built-in bridges of Hibernate Search do
-      not cover some of your property types, or that the String representation
-      used is not what you expect. The following paragraphs sveral solutions for this
-      problem.</para>
+      <para>It can happen that the built-in bridges of Hibernate Search do not
+      cover some of your property types, or that the String representation
+      used is not what you expect. The following paragraphs sveral solutions
+      for this problem.</para>
 
       <section>
         <title>StringBridge</title>
@@ -735,6 +733,72 @@ public class DateSplitBridge implements FieldBridge {
 private Integer length;                </programlisting>
 
         <para></para>
+      </section>
+
+      <section>
+        <title>@ClassBridge</title>
+
+        <para>It is sometimes useful to combine more than one property of a
+        given entity and index this combination in a specific way into the
+        Lucene index. The <classname>@ClassBridge</classname> and
+        <classname>@ClassBridges</classname> annotations can be defined at the
+        class level (as opposed to the property level). In this case the
+        custom field bridge implementation receives the entity instance as the
+        value parameter instead of a particular property.</para>
+
+        <programlisting>@Entity
+@Indexed
+<emphasis role="bold">@ClassBridge</emphasis>(name="branchnetwork",
+             index=Index.TOKENIZED,
+             store=Store.YES,
+             impl = <emphasis role="bold">CatFieldsClassBridge.class</emphasis>,
+             params = @Parameter( name="sepChar", value=" " ) )
+public class Department {
+    private int id;
+    private String network;
+    private String branchHead;
+    private String branch;
+    private Integer maxEmployees;
+    ...
+}
+
+public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
+
+    private String sepChar;
+
+    public void setParameterValues(Map parameters) {
+        this.sepChar = (String) parameters.get( "sepChar" );
+    }
+
+    public void set(String name, 
+                Object value, //the department instance (entity) in this case
+                Document document, //the Lucene document 
+                Field.Store store, Field.Index index, Float boost) {
+        // In this particular class the name of the new field was passed
+        // from the name field of the ClassBridge Annotation. This is not
+        // a requirement. It just works that way in this instance. The
+        // actual name could be supplied by hard coding it below.
+        Department dep = (Department) value;
+        String fieldValue1 = dep.getBranch();
+        if ( fieldValue1 == null ) {
+            fieldValue1 = "";
+        }
+        String fieldValue2 = dep.getNetwork();
+        if ( fieldValue2 == null ) {
+            fieldValue2 = "";
+        }
+        String fieldValue = fieldValue1 + sepChar + fieldValue2;
+        Field field = new Field( name, fieldValue, store, index );
+        if ( boost != null ) field.setBoost( boost );
+        document.add( field );
+    }
+}</programlisting>
+
+        <para>In this example, the particular
+        <classname>CatFieldsClassBridge</classname> is applied to the
+        <literal>department</literal> instance, the field bridge then
+        concatenate both branch and network and index the
+        concatenation.</para>
       </section>
     </section>
   </section>
