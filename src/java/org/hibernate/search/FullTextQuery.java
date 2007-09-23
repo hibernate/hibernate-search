@@ -67,12 +67,6 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery setProjection(String... fields);
 
 	/**
-	 * Will be removed in the near future
-	 * @deprecated Use #setProjection
-	 */
-	FullTextQuery setIndexProjection(String... fields);
-
-	/**
 	 * Enable a given filter by its name. Returns a FullTextFilter object that allows filter parameter injection
 	 */
 	FullTextFilter enableFullTextFilter(String name);

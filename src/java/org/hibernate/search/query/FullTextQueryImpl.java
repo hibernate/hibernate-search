@@ -505,10 +505,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
-	public FullTextQuery setIndexProjection(String... fields) {
-		return setProjection( fields );
-	}
-
 	public FullTextQuery setFirstResult(int firstResult) {
 		if (firstResult < 0) {
 			throw new IllegalArgumentException("'first' pagination parameter less than 0");
