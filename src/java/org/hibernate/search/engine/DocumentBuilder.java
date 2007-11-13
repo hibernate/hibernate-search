@@ -190,7 +190,7 @@ public class DocumentBuilder<T> {
 				}
 				else {
 					throw new SearchException(
-							"Bridge for document id does not implement IdFieldBridge: " + member.getName() );
+							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName() );
 				}
 				idBoost = getBoost( member );
 				setAccessible( member );
