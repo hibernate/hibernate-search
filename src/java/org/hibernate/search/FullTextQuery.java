@@ -5,6 +5,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.transform.ResultTransformer;
 
 /**
  * The base interface for lucene powered searches.
@@ -90,5 +91,10 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Defines scrollable result fetch size as well as the JDBC fetch size
 	 */
 	FullTextQuery setFetchSize(int i);
+
+	/**
+	 * defines a result transformer used during projection, the Aliases provided are the projection aliases.
+	 */
+	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
 }

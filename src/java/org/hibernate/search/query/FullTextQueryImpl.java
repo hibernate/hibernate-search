@@ -2,6 +2,7 @@
 package org.hibernate.search.query;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,6 +51,7 @@ import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.ContextHelper;
+import org.hibernate.transform.ResultTransformer;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}
@@ -71,6 +72,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private Filter filter;
 	private Criteria criteria;
 	private String[] indexProjection;
+	private ResultTransformer resultTransformer;
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Map<String, FullTextFilterImpl> filterDefinitions;
 	private int fetchSize = 1;
@@ -150,7 +152,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private Loader getLoader(Session session, SearchFactoryImplementor searchFactoryImplementor) {
 		if ( indexProjection != null ) {
 			ProjectionLoader loader = new ProjectionLoader();
-			loader.init( session, searchFactoryImplementor );
+			loader.init( session, searchFactoryImplementor, resultTransformer, indexProjection );
 			return loader;
 		}
 		if ( criteria != null ) {
@@ -241,7 +243,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				infos.add( extractor.extract( hits, index ) );
 			}
 			Loader loader = getLoader( sess, searchFactoryImplementor );
-			return loader.load( infos.toArray( new EntityInfo[infos.size()] ) );
+			List list = loader.load( infos.toArray( new EntityInfo[infos.size()] ) );
+			if ( resultTransformer == null || loader instanceof ProjectionLoader) {
+				//stay consistent with transformTuple which can only be executed during a projection
+				return list;
+			}
+			else {
+				return resultTransformer.transformList( list );
+			}
 		}
 		catch (IOException e) {
 			throw new HibernateException( "Unable to query Lucene index", e );
@@ -527,6 +536,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			throw new IllegalArgumentException( "'fetch size' parameter less than or equals to 0" );
 		}
 		this.fetchSize = fetchSize;
+		return this;
+	}
+
+	@Override
+	public FullTextQuery setResultTransformer(ResultTransformer transformer) {
+		super.setResultTransformer( transformer );
+		this.resultTransformer = transformer;
 		return this;
 	}
 

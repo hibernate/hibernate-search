@@ -6,6 +6,7 @@ import javax.persistence.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Filter;
 import org.hibernate.Criteria;
+import org.hibernate.transform.ResultTransformer;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.FullTextFilter;
 
@@ -81,4 +82,11 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Disable a given filter by its name
 	 */
 	void disableFullTextFilter(String name);
+
+	/**
+	 *
+	 * defines a result transformer used during projection
+	 *
+	 */
+	FullTextQuery setResultTransformer(ResultTransformer transformer);
 }

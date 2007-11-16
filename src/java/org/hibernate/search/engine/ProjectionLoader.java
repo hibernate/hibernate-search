@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.transform.ResultTransformer;
 
 /**
  * @author Emmanuel Bernard
@@ -14,10 +15,18 @@ public class ProjectionLoader implements Loader {
 	private Session session;
 	private ObjectLoader objectLoader;
 	private Boolean projectThis;
+	private ResultTransformer transformer;
+	private String[] aliases;
 
 	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;
+	}
+
+	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, ResultTransformer transformer, String[] aliases) {
+		init( session, searchFactoryImplementor );
+		this.transformer = transformer;
+		this.aliases =  aliases;
 	}
 
 	public Object load(EntityInfo entityInfo) {
@@ -27,7 +36,12 @@ public class ProjectionLoader implements Loader {
 				entityInfo.projection[index] = objectLoader.load( entityInfo );
 			}
 		}
-		return entityInfo.projection;
+		if ( transformer != null ) {
+			return transformer.transformTuple( entityInfo.projection, aliases );
+		}
+		else {
+			return entityInfo.projection;
+		}
 	}
 
 	private void initThisProjectionFlag(EntityInfo entityInfo) {
@@ -56,7 +70,12 @@ public class ProjectionLoader implements Loader {
 			}
 		}
 		for (EntityInfo entityInfo : entityInfos) {
-			results.add( entityInfo.projection );
+			if ( transformer != null) {
+				results.add( transformer.transformTuple( entityInfo.projection, aliases ) );
+			}
+			else {
+				results.add( entityInfo.projection );
+			}
 		}
 
 		return results;

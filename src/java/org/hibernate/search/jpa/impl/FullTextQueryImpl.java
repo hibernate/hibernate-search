@@ -1,40 +1,41 @@
 // $Id$
 package org.hibernate.search.jpa.impl;
 
-import java.util.List;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.Set;
-import java.util.HashSet;
 import java.io.Serializable;
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.FlushModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
-import javax.persistence.PersistenceException;
-import javax.persistence.EntityExistsException;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
-import org.hibernate.search.jpa.FullTextQuery;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.FullTextFilter;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Sort;
 import org.hibernate.Criteria;
-import org.hibernate.TypeMismatchException;
-import org.hibernate.HibernateException;
-import org.hibernate.StaleStateException;
-import org.hibernate.ObjectNotFoundException;
-import org.hibernate.UnresolvableObjectException;
-import org.hibernate.QueryException;
-import org.hibernate.TransientObjectException;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.Session;
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.QueryException;
+import org.hibernate.Session;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.StaleStateException;
+import org.hibernate.TransientObjectException;
+import org.hibernate.TypeMismatchException;
+import org.hibernate.UnresolvableObjectException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.hql.QueryExecutionRequestException;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.Filter;
+import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.transform.ResultTransformer;
 
 /**
  * @author Emmanuel Bernard
@@ -78,6 +79,11 @@ public class FullTextQueryImpl implements FullTextQuery {
 
 	public void disableFullTextFilter(String name) {
 		query.disableFullTextFilter( name );
+	}
+
+	public FullTextQuery setResultTransformer(ResultTransformer transformer) {
+		query.setResultTransformer( transformer );
+		return this;
 	}
 
 	public List getResultList() {
