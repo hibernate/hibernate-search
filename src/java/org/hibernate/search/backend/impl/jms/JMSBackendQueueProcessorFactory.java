@@ -99,7 +99,7 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 			String prop = (String) iter.next();
 			if ( prop.indexOf( JNDI_PREFIX ) > -1 && !specialProps.contains( prop ) ) {
 				result.setProperty(
-						prop.substring( JNDI_PREFIX.length() + 1 ),
+						prop.substring( JNDI_PREFIX.length() ),
 						properties.getProperty( prop )
 				);
 			}
