@@ -3,6 +3,7 @@ package org.hibernate.search.test;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -20,6 +21,7 @@ import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.Environment;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.FSDirectoryProvider;
+import org.hibernate.search.util.DirectoryProviderHelper;
 
 /**
  * @author Gavin King
@@ -54,7 +56,7 @@ public class FSDirectoryTest extends SearchTestCase {
 
 	private void delete(File sub) {
 		if ( sub.isDirectory() ) {
-			for ( File file : sub.listFiles() ) {
+			for (File file : sub.listFiles()) {
 				delete( file );
 			}
 			sub.delete();
@@ -62,6 +64,46 @@ public class FSDirectoryTest extends SearchTestCase {
 		else {
 			sub.delete();
 		}
+	}
+
+	private void recursiveDelete(File f) {
+		for (File file : f.listFiles()) {
+			if ( file.isDirectory() ) {
+				recursiveDelete( file );
+			}
+		}
+		f.delete();
+	}
+
+	public void testDirectoryProviderHelperMkdirsGetSource() throws Exception {
+		String root = "./testDir";
+		String relative = "dir1/dir2/dir3";
+
+		Properties properties = new Properties();
+		properties.put( "root", root );
+		properties.put( "relative", relative );
+
+		String rel = DirectoryProviderHelper.getSourceDirectory( "root", "relative", "name", properties );
+
+		File f = new File( rel );
+		assertTrue( f.exists() );
+
+		recursiveDelete( new File( root ) );
+	}
+
+	public void testDirectoryProviderHelperMkdirsDetermineIndex() throws Exception {
+		String root = "./testDir/dir1/dir2";
+		String relative = "dir3";
+
+		Properties properties = new Properties();
+		properties.put( "indexBase", root );
+		properties.put( "indexName", relative );
+
+		File f = DirectoryProviderHelper.determineIndexDir( "name", properties );
+
+		assertTrue( new File( root ).exists() );
+
+		recursiveDelete( new File( "./testDir" ) );
 	}
 
 	public void testEventIntegration() throws Exception {
@@ -167,7 +209,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		s = getSessions().openSession();
 		s.getTransaction().begin();
 		List list = s.createQuery( "from Document" ).list();
-		for ( Document document : (List<Document>) list ) {
+		for (Document document : (List<Document>) list) {
 			s.delete( document );
 		}
 		s.getTransaction().commit();
@@ -175,7 +217,7 @@ public class FSDirectoryTest extends SearchTestCase {
 	}
 
 	protected Class[] getMappings() {
-		return new Class[]{
+		return new Class[] {
 				Document.class
 		};
 	}
@@ -187,9 +229,9 @@ public class FSDirectoryTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		FullTextIndexEventListener del = new FullTextIndexEventListener();
-		cfg.getEventListeners().setPostDeleteEventListeners( new PostDeleteEventListener[]{del} );
-		cfg.getEventListeners().setPostUpdateEventListeners( new PostUpdateEventListener[]{del} );
-		cfg.getEventListeners().setPostInsertEventListeners( new PostInsertEventListener[]{del} );
+		cfg.getEventListeners().setPostDeleteEventListeners( new PostDeleteEventListener[] { del } );
+		cfg.getEventListeners().setPostUpdateEventListeners( new PostUpdateEventListener[] { del } );
+		cfg.getEventListeners().setPostInsertEventListeners( new PostInsertEventListener[] { del } );
 	}
 
 }

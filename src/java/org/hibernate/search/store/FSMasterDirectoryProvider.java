@@ -60,7 +60,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			boolean create = !indexDir.exists();
 			if (create) {
 				log.debug( "Index directory '" + indexName + "' will be initialized");
-				indexDir.mkdir();
+				indexDir.mkdirs();
 			}
 			indexName = indexDir.getCanonicalPath();
 			directory = FSDirectory.getDirectory( indexName);

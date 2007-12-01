@@ -62,7 +62,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			boolean create = !indexDir.exists();
 			indexName = indexDir.getCanonicalPath();
 			if (create) {
-				indexDir.mkdir();
+				indexDir.mkdirs();
 				log.debug("Initializing index directory " + indexName);
 			}
 		}

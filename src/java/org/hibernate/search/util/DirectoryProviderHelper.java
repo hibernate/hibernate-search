@@ -46,7 +46,7 @@ public class DirectoryProviderHelper {
 		else {
 			File rootDir = new File(root);
 			if ( ! rootDir.exists() ) {
-				rootDir.mkdir();
+				rootDir.mkdirs();
 			}
 			else if ( ! rootDir.isDirectory() ) {
 				throw new SearchException(rootPropertyName + " is not a directory");
@@ -54,7 +54,7 @@ public class DirectoryProviderHelper {
 			//test it again in case mkdir failed for wrong reasons
 			if ( rootDir.exists() ) {
 				File sourceFile = new File(root, relative);
-				if (! sourceFile.exists() ) sourceFile.mkdir();
+				if (! sourceFile.exists() ) sourceFile.mkdirs();
 				log.debug( "Get directory from root + relative");
 				try {
 					relative = sourceFile.getCanonicalPath();
@@ -77,7 +77,7 @@ public class DirectoryProviderHelper {
 		if ( ! indexDir.exists() ) {
 			//if the base directory does not exists, create it
 			//we do not fear concurrent creation since mkdir does not raise exceptions
-			indexDir.mkdir();
+			indexDir.mkdirs();
 		}
 		else if ( ! indexDir.isDirectory() ) {
 			throw new SearchException( MessageFormat.format( "Index directory is not a directory: {0}", indexBase ) );
