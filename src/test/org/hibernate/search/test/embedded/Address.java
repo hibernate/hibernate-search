@@ -1,20 +1,21 @@
 //$Id$
 package org.hibernate.search.test.embedded;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
-import javax.persistence.OneToOne;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.CascadeType;
 
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.ContainedIn;
 
 /**
  * @author Emmanuel Bernard
@@ -37,6 +38,18 @@ public class Address {
 	@OneToMany(mappedBy = "address")
 	@ContainedIn
 	private Set<Tower> towers = new HashSet<Tower>();
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	@ManyToOne(cascade = { CascadeType.PERSIST })
+	@IndexedEmbedded
+	private Country country;
 
 
 	public Long getId() {

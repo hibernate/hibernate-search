@@ -31,6 +31,9 @@ public class EmbeddedTest extends SearchTestCase {
 		o.setName( "Atlanta Renting corp" );
 		a.setOwnedBy( o );
 		o.setAddress( a );
+		Country c = new Country();
+		c.setName( "France" );
+		a.setCountry( c );
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -54,6 +57,10 @@ public class EmbeddedTest extends SearchTestCase {
 		query = parser.parse( "address.id:" + a.getId().toString() );
 		result = session.createFullTextQuery( query, Tower.class ).list();
 		assertEquals( "unable to find property by id of embedded", 1, result.size() );
+
+		query = parser.parse( "address.country.name:" + a.getCountry().getName() );
+		result = session.createFullTextQuery( query, Tower.class ).list();
+		assertEquals( "unable to find property with 2 levels of embedded", 1, result.size() );
 
 		s.clear();
 
@@ -230,7 +237,8 @@ public class EmbeddedTest extends SearchTestCase {
 				Address.class,
 				Product.class,
 				Order.class,
-				Author.class
+				Author.class,
+				Country.class
 		};
 	}
 }

@@ -233,7 +233,11 @@ public class DocumentBuilder<T> {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
 			int oldMaxLevel = maxLevel;
-			maxLevel = embeddedAnn.depth() + level > maxLevel ? maxLevel : embeddedAnn.depth() + level;
+			int potentialLevel = embeddedAnn.depth() + level;
+			if ( potentialLevel < 0 ) {
+				potentialLevel = Integer.MAX_VALUE;
+			}
+			maxLevel = potentialLevel > maxLevel ? maxLevel : potentialLevel;
 			level++;
 
 			XClass elementClass = member.getElementClass();
