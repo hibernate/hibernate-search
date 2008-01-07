@@ -7,9 +7,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
-import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
-import org.hibernate.search.engine.EntityInfo;
 
 /**
  * @author Emmanuel Bernard
@@ -28,10 +26,15 @@ public class ObjectLoader implements Loader {
 		try {
 			Hibernate.initialize( maybeProxy );
 		}
-		catch (ObjectNotFoundException e) {
-			log.debug( "Object found in Search index but not in database: "
-					+ e.getEntityName() + " wih id " + e.getIdentifier() );
-			maybeProxy = null;
+		catch (RuntimeException e) {
+			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
+				log.debug( "Object found in Search index but not in database: "
+						+ entityInfo.clazz + " wih id " + entityInfo.id );
+				maybeProxy = null;
+			}
+			else {
+				throw e;
+			}
 		}
 		return maybeProxy;
 	}
@@ -42,16 +45,21 @@ public class ObjectLoader implements Loader {
 		for (EntityInfo entityInfo : entityInfos) {
 			session.load( entityInfo.clazz, entityInfo.id );
 		}
-		List result = new ArrayList(entityInfos.length);
+		List result = new ArrayList( entityInfos.length );
 		for (EntityInfo entityInfo : entityInfos) {
 			try {
 				Object entity = session.load( entityInfo.clazz, entityInfo.id );
 				Hibernate.initialize( entity );
 				result.add( entity );
 			}
-			catch (ObjectNotFoundException e) {
-				log.debug( "Object found in Search index but not in database: "
-						+ e.getEntityName() + " wih id " + e.getIdentifier() );
+			catch (RuntimeException e) {
+				if ( LoaderHelper.isObjectNotFoundException( e ) ) {
+					log.debug( "Object found in Search index but not in database: "
+							+ entityInfo.clazz + " wih id " + entityInfo.id );
+				}
+				else {
+					throw e;
+				}
 			}
 		}
 		return result;
