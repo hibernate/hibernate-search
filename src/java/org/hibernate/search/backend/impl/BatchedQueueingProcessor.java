@@ -145,7 +145,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		super.finalize();
 		//gracefully stop
 		//TODO move to the SF close lifecycle
-		if ( executorService != null && !executorService.isShutdown() ) executorService.shutdown();
+		if ( executorService != null && !executorService.isShutdown() ) {
+			executorService.shutdown();
+			executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS );
+		}
 	}
 
 }
