@@ -28,6 +28,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.util.BinderHelper;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.annotations.common.reflection.ReflectionManager;
 
 /**
  * @author Emmanuel Bernard
@@ -124,7 +125,7 @@ public class BridgeFactory {
 		return bridge;
 	}
 
-	public static FieldBridge guessType(Field field, XMember member) {
+	public static FieldBridge guessType(Field field, XMember member, ReflectionManager reflectionManager) {
 		FieldBridge bridge = null;
 		org.hibernate.search.annotations.FieldBridge bridgeAnn;
 		//@Field bridge has priority over @FieldBridge
@@ -172,7 +173,7 @@ public class BridgeFactory {
 			bridge = builtInBridges.get( returnType.getName() );
 			if ( bridge == null && returnType.isEnum() ) {
 				bridge = new TwoWayString2FieldBridgeAdaptor(
-						new EnumBridge( (Class<? extends Enum>) returnType.getClass() )
+						new EnumBridge( (Class<? extends Enum>) reflectionManager.toClass( returnType ) )
 				);
 			}
 		}

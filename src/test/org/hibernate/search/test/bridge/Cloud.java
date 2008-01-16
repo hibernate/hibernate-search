@@ -236,7 +236,7 @@ public class Cloud {
         this.dateMillisecond = dateMillisecond;
     }
 
-	@Field(index = Index.TOKENIZED )
+	@Field(index = Index.TOKENIZED, store = Store.YES)
 	public CloudType getType() {
 		return type;
 	}

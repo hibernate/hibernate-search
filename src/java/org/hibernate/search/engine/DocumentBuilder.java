@@ -184,7 +184,7 @@ public class DocumentBuilder<T> {
 							+ idKeywordName + " and " + BinderHelper.getAttributeName( member, documentIdAnn.name() ) );
 				}
 				idKeywordName = prefix + BinderHelper.getAttributeName( member, documentIdAnn.name() );
-				FieldBridge fieldBridge = BridgeFactory.guessType( null, member );
+				FieldBridge fieldBridge = BridgeFactory.guessType( null, member, reflectionManager );
 				if ( fieldBridge instanceof TwoWayFieldBridge ) {
 					idBridge = (TwoWayFieldBridge) fieldBridge;
 				}
@@ -204,7 +204,7 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.fieldNames.add( fieldName );
 				propertiesMetadata.fieldStore.add( getStore( Store.YES ) );
 				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
-				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member ) );
+				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
 				// Field > property > entity analyzer
 				Analyzer analyzer = null; //no field analyzer
 				if ( analyzer == null ) analyzer = getAnalyzer( member );
@@ -322,7 +322,7 @@ public class DocumentBuilder<T> {
 		propertiesMetadata.fieldNames.add( fieldName );
 		propertiesMetadata.fieldStore.add( getStore( fieldAnn.store() ) );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
-		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, member ) );
+		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, member, reflectionManager ) );
 		// Field > property > entity analyzer
 		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer() );
 		if ( analyzer == null ) analyzer = getAnalyzer( member );

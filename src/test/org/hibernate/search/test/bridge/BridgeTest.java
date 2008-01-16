@@ -59,7 +59,11 @@ public class BridgeTest extends SearchTestCase {
         result = session.createFullTextQuery(query).list();
         assertEquals( "null elements should not be stored", 0, result.size() ); //the query is dumb because restrictive
 
-        s.delete( s.get( Cloud.class, cloud.getId() ) );
+		query = parser.parse("type:dog");
+        result = session.createFullTextQuery(query).setProjection( "type" ).list();
+        assertEquals( "Enum projection works", 1, result.size() ); //the query is dumb because restrictive
+
+		s.delete( s.get( Cloud.class, cloud.getId() ) );
         tx.commit();
         s.close();
 
