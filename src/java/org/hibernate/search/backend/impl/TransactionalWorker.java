@@ -2,18 +2,15 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.Properties;
-import java.io.Serializable;
 
-import org.hibernate.search.backend.Worker;
-import org.hibernate.search.backend.QueueingProcessor;
-import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.backend.WorkQueue;
-import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
-import org.hibernate.search.util.WeakIdentityHashMap;
-import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.event.EventSource;
 import org.hibernate.Transaction;
+import org.hibernate.event.EventSource;
+import org.hibernate.search.backend.QueueingProcessor;
+import org.hibernate.search.backend.Work;
+import org.hibernate.search.backend.WorkQueue;
+import org.hibernate.search.backend.Worker;
+import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.util.WeakIdentityHashMap;
 
 /**
  * Queue works per transaction.
