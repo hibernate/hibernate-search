@@ -3,9 +3,8 @@ package org.hibernate.search.backend;
 
 import java.util.Properties;
 
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.event.EventSource;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
  * Perform work for a given session. This implementation has to be multi threaded
