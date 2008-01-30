@@ -35,10 +35,8 @@ import org.hibernate.search.SearchException;
 public class FullTextIndexEventListener implements PostDeleteEventListener, PostInsertEventListener,
 		PostUpdateEventListener, Initializable {
 
-	private static final Log log = LogFactory.getLog( FullTextIndexEventListener.class );
-	private boolean used;
-
-	private SearchFactoryImplementor searchFactoryImplementor;
+	protected boolean used;
+	protected SearchFactoryImplementor searchFactoryImplementor;
 
 	public void initialize(Configuration cfg) {
 		searchFactoryImplementor = SearchFactoryImpl.getSearchFactory( cfg );
@@ -88,7 +86,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener, Post
 		}
 	}
 
-	private void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event) {
+	protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event) {
 		Work work = new Work(entity, id, workType);
 		searchFactoryImplementor.getWorker().performWork( work, event.getSession() );
 	}

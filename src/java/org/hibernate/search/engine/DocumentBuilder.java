@@ -392,7 +392,7 @@ public class DocumentBuilder<T> {
 
 	//TODO could we use T instead of EntityClass?
 	public void addWorkToQueue(Class entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
-		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition 
+		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition
 		for (LuceneWork luceneWork : queue) {
 			//any work on the same entity should be ignored
 			if ( luceneWork.getEntityClass() == entityClass
@@ -418,7 +418,7 @@ public class DocumentBuilder<T> {
 		else if ( workType == WorkType.PURGE_ALL ) {
 			queue.add( new PurgeAllLuceneWork( entityClass ) );
 		}
-		else if ( workType == WorkType.UPDATE ) {
+		else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
 			Document doc = getDocument( entity, id );
 			/**
 			 * even with Lucene 2.1, use of indexWriter to update is not an option

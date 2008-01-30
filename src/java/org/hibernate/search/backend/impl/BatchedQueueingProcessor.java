@@ -98,6 +98,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	public void add(Work work, WorkQueue workQueue) {
 		//don't check for builder it's done in prepareWork
+		//FIXME WorkType.COLLECTION does not play well with batchSize
 		workQueue.add( work );
 		if ( batchSize > 0 && workQueue.size() >= batchSize ) {
 			WorkQueue subQueue = workQueue.splitQueue();
@@ -111,17 +112,33 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		List<Work> queue = workQueue.getQueue();
 		int initialSize = queue.size();
 		List<LuceneWork> luceneQueue = new ArrayList<LuceneWork>( initialSize ); //TODO load factor for containedIn
+		/**
+		 * Collection work type are process second, so if the owner entity has already been processed for whatever reason
+		 * the work will be ignored.
+		 * However if the owner entity has not been processed, an "UPDATE" work is executed
+		 *
+		 * Processing collection works last is mandatory to avoid reindexing a object to be deleted
+		 */
+		processWorkByLayer( queue, initialSize, luceneQueue, Layer.FIRST );
+		processWorkByLayer( queue, initialSize, luceneQueue, Layer.SECOND );
+		workQueue.setSealedQueue( luceneQueue );
+	}
+
+	private void processWorkByLayer(List<Work> queue, int initialSize, List<LuceneWork> luceneQueue, Layer layer) {
 		for ( int i = 0 ; i < initialSize ; i++ ) {
 			Work work = queue.get( i );
-			queue.set( i, null ); // help GC and avoid 2 loaded queues in memory
-			Class entityClass = work.getEntityClass() != null ?
-						work.getEntityClass() :
-						Hibernate.getClass( work.getEntity() );
-			DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entityClass );
-			if ( builder == null ) return; //or exception?
-			builder.addWorkToQueue(entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor );
+			if ( work != null) {
+				if ( layer.isRightLayer( work.getType() ) ) {
+					queue.set( i, null ); // help GC and avoid 2 loaded queues in memory
+					Class entityClass = work.getEntityClass() != null ?
+								work.getEntityClass() :
+								Hibernate.getClass( work.getEntity() );
+					DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entityClass );
+					if ( builder == null ) continue; //or exception?
+					builder.addWorkToQueue(entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor );
+				}
+			}
 		}
-		workQueue.setSealedQueue( luceneQueue );
 	}
 
 	//TODO implements parallel batchWorkers (one per Directory)
@@ -148,6 +165,17 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		if ( executorService != null && !executorService.isShutdown() ) {
 			executorService.shutdown();
 			executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS );
+		}
+	}
+
+	private static enum Layer {
+	    FIRST,
+		SECOND;
+
+		public boolean isRightLayer(WorkType type) {
+			if (this == FIRST && type != WorkType.COLLECTION) return true;
+			if (this == SECOND && type == WorkType.COLLECTION) return true;
+			return false;
 		}
 	}
 

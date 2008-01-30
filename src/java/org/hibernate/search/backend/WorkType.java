@@ -13,6 +13,7 @@ public enum WorkType {
 	ADD,
 	UPDATE,
 	DELETE,
+	COLLECTION,
 	/**
 	 * Used to remove a specific instance
 	 * of a class from an index.
