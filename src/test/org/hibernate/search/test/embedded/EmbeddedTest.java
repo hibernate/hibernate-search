@@ -152,7 +152,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 	}
 
-	public void testIndexedEmbeddedAndCollectionsFailureExpected() throws Exception {
+	public void testIndexedEmbeddedAndCollections() throws Exception {
 		Author a = new Author();
 		a.setName( "Voltaire" );
 		Author a2 = new Author();
@@ -238,9 +238,9 @@ public class EmbeddedTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		FullTextIndexCollectionEventListener del = new FullTextIndexCollectionEventListener();
-		cfg.getEventListeners().setPostCollectionRecreateEventListeners( new PostCollectionRecreateEventListener[]{del} );
-		cfg.getEventListeners().setPostCollectionUpdateEventListeners( new PostCollectionUpdateEventListener[]{del} );
-		cfg.getEventListeners().setPostCollectionRemoveEventListeners( new PostCollectionRemoveEventListener[]{del} );
+		//cfg.getEventListeners().setPostCollectionRecreateEventListeners( new PostCollectionRecreateEventListener[]{del} );
+		//cfg.getEventListeners().setPostCollectionUpdateEventListeners( new PostCollectionUpdateEventListener[]{del} );
+		//cfg.getEventListeners().setPostCollectionRemoveEventListeners( new PostCollectionRemoveEventListener[]{del} );
 	}
 
 	protected Class[] getMappings() {
