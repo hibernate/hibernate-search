@@ -21,18 +21,20 @@ public abstract class ReaderProviderHelper {
 			try {
 				return new MultiReader( readers );
 			}
-			catch (IOException e) {
+			catch (Exception e) {
+				//Lucene 2.2 used to through IOExceptions here
 				clean( new SearchException( "Unable to open a MultiReader", e ), readers );
-				return null; //never happen, but please the compiler
+				return null; //never happens, but please the compiler
 			}
 		}
 		else {
 			try {
 				return new MultiReader( readers );
 			}
-			catch (IOException e) {
+			catch (Exception e) {
+				//Lucene 2.2 used to through IOExceptions here
 				clean( new SearchException( "Unable to open a MultiReader", e ), readers );
-				return null; //never happen, but please the compiler
+				return null; //never happens, but please the compiler
 			}
 		}
 	}
