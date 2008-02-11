@@ -59,12 +59,13 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		try {
 			boolean create = !indexDir.exists();
 			if (create) {
-				log.debug( "Index directory '" + indexName + "' will be initialized");
+				log.debug( "index directory not found, creating: '" + indexDir.getAbsolutePath() + "'" );
 				indexDir.mkdirs();
 			}
 			indexName = indexDir.getCanonicalPath();
 			directory = FSDirectory.getDirectory( indexName);
 			if ( create ) {
+				log.debug( "Initialize index: '" + indexName + "'" );
 				IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), create );
 				iw.close();
 			}

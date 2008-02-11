@@ -60,11 +60,11 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		log.debug( "Index directory: " + indexDir.getPath() );
 		try {
 			boolean create = !indexDir.exists();
-			indexName = indexDir.getCanonicalPath();
 			if (create) {
+				log.debug( "index directory not found, creating: '" + indexDir.getAbsolutePath() + "'" );
 				indexDir.mkdirs();
-				log.debug("Initializing index directory " + indexName);
 			}
+			indexName = indexDir.getCanonicalPath();
 		}
 		catch (IOException e) {
 			throw new HibernateException( "Unable to initialize index: " + directoryProviderName, e );
@@ -84,6 +84,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			create = ! subDir.exists();
 			directory1 = FSDirectory.getDirectory( subDir.getCanonicalPath());
 			if ( create ) {
+				log.debug( "Initialize index: '" + subDir.getAbsolutePath() + "'" );
 				IndexWriter iw = new IndexWriter( directory1, new StandardAnalyzer(), create );
 				iw.close();
 			}
@@ -92,6 +93,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			create = ! subDir.exists();
 			directory2 = FSDirectory.getDirectory( subDir.getCanonicalPath());
 			if ( create ) {
+				log.debug( "Initialize index: '" + subDir.getAbsolutePath() + "'" );
 				IndexWriter iw = new IndexWriter( directory2, new StandardAnalyzer(), create );
 				iw.close();
 			}
