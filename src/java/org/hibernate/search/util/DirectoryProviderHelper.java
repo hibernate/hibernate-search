@@ -75,7 +75,7 @@ public class DirectoryProviderHelper {
 		String indexName = properties.getProperty( "indexName", directoryProviderName );
 		File indexDir = new File( indexBase );
 		if ( ! indexDir.exists() ) {
-			//if the base directory does not exists, create it
+			//if the base directory does not exist, create it
 			//we do not fear concurrent creation since mkdir does not raise exceptions
 			indexDir.mkdirs();
 		}
@@ -83,7 +83,8 @@ public class DirectoryProviderHelper {
 			throw new SearchException( MessageFormat.format( "Index directory is not a directory: {0}", indexBase ) );
 		}
 		if ( !indexDir.canWrite() ) {
-			throw new SearchException( "Cannot write into index directory: " + indexBase );
+			throw new SearchException( "Cannot write into index directory: "
+					+ ( indexDir.isAbsolute() ? indexBase : indexDir.getAbsolutePath() ) );
 		}
 
 		indexDir = new File( indexDir, indexName );
