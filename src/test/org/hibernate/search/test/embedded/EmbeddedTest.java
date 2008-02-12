@@ -31,7 +31,7 @@ public class EmbeddedTest extends SearchTestCase {
 		a.setStreet( "Tower place" );
 		a.getTowers().add( tower );
 		tower.setAddress( a );
-		Owner o = new Owner();
+		Person o = new Owner();
 		o.setName( "Atlanta Renting corp" );
 		a.setOwnedBy( o );
 		o.setAddress( a );
@@ -99,7 +99,7 @@ public class EmbeddedTest extends SearchTestCase {
 		a.setStreet( "Tower place" );
 		a.getTowers().add( tower );
 		tower.setAddress( a );
-		Owner o = new Owner();
+		Person o = new Owner();
 		o.setName( "Atlanta Renting corp" );
 		a.setOwnedBy( o );
 		o.setAddress( a );

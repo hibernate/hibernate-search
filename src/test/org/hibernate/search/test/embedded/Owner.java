@@ -12,7 +12,7 @@ import org.hibernate.annotations.Parent;
  * @author Emmanuel Bernard
  */
 @Embeddable
-public class Owner {
+public class Owner implements Person {
 	@Field(index = Index.TOKENIZED)
 	private String name;
 

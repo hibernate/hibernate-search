@@ -28,4 +28,9 @@ public @interface IndexedEmbedded {
 	 * Default: infinite (an exception will be raised in case of class circular reference when infinite is chosen)
 	 */
 	int depth() default Integer.MAX_VALUE;
+
+	/**
+	 * Overrides the type of an association. If a collection, overrides the type of the collection generics
+	 */
+	Class targetElement() default void.class;
 }

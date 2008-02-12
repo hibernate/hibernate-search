@@ -240,7 +240,13 @@ public class DocumentBuilder<T> {
 			maxLevel = potentialLevel > maxLevel ? maxLevel : potentialLevel;
 			level++;
 
-			XClass elementClass = member.getElementClass();
+			XClass elementClass;
+			if ( void.class == embeddedAnn.targetElement() ) {
+				elementClass = member.getElementClass();
+			}
+			else {
+				elementClass = reflectionManager.toXClass( embeddedAnn.targetElement() );
+			}
 			if ( maxLevel == Integer.MAX_VALUE //infinite
 					&& processedClasses.contains( elementClass ) ) {
 				throw new SearchException(

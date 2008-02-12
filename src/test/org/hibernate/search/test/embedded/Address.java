@@ -16,6 +16,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.annotations.Target;
 
 /**
  * @author Emmanuel Bernard
@@ -32,8 +33,9 @@ public class Address {
 	@Field(index= Index.TOKENIZED)
 	private String street;
 
-	@IndexedEmbedded(depth = 1, prefix = "ownedBy_")
-	private Owner ownedBy;
+	@IndexedEmbedded(depth = 1, prefix = "ownedBy_", targetElement = Owner.class)
+	@Target(Owner.class)
+	private Person ownedBy;
 
 	@OneToMany(mappedBy = "address")
 	@ContainedIn
@@ -68,11 +70,11 @@ public class Address {
 		this.street = street;
 	}
 
-	public Owner getOwnedBy() {
+	public Person getOwnedBy() {
 		return ownedBy;
 	}
 
-	public void setOwnedBy(Owner ownedBy) {
+	public void setOwnedBy(Person ownedBy) {
 		this.ownedBy = ownedBy;
 	}
 
