@@ -185,7 +185,8 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST, FullTextQuery.DOCUMENT, FullTextQuery.ID );
+		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST,
+				FullTextQuery.DOCUMENT, FullTextQuery.ID );
 
 		int counter = 0;
 
@@ -219,7 +220,8 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:Accounting" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST, FullTextQuery.DOCUMENT, FullTextQuery.ID );
+		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST,
+				FullTextQuery.DOCUMENT, FullTextQuery.ID, FullTextQuery.DOCUMENT_ID );
 
 		List result = hibQuery.list();
 		assertNotNull( result );
@@ -236,9 +238,11 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertTrue( "DOCUMENT incorrect", projection[6] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[6] ).getFields().size() );
 		assertEquals( "ID incorrect", 1001, projection[7] );
+		assertNotNull( "Lucene internal doc id", projection[8] );
 
 		// Change the projection order and null one
-		hibQuery.setProjection( FullTextQuery.DOCUMENT, FullTextQuery.THIS, FullTextQuery.SCORE, null, FullTextQuery.ID, "id", "lastname", "dept" );
+		hibQuery.setProjection( FullTextQuery.DOCUMENT, FullTextQuery.THIS, FullTextQuery.SCORE, null, FullTextQuery.ID,
+				"id", "lastname", "dept", FullTextQuery.DOCUMENT_ID );
 
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -255,6 +259,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "id incorrect", 1001, projection[5] );
 		assertEquals( "last name incorrect", "Jackson", projection[6] );
 		assertEquals( "dept incorrect", "Accounting", projection[7] );
+		assertNotNull( "Lucene internal doc id", projection[8] );
 
 		//cleanup
 		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );

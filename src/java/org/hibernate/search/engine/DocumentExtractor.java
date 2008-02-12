@@ -51,6 +51,9 @@ public class DocumentExtractor {
 				else if ( ProjectionConstants.DOCUMENT.equals( projection[x] ) ) {
 					eip[x] = doc;
 				}
+				else if ( ProjectionConstants.DOCUMENT_ID.equals( projection[x] ) ) {
+					eip[x] = hits.id( index );
+				}
 				else if ( ProjectionConstants.BOOST.equals( projection[x] ) ) {
 					eip[x] = doc.getBoost();
 				}
