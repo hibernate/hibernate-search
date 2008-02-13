@@ -21,7 +21,8 @@ import org.hibernate.search.annotations.FullTextFilterDefs;
 @Indexed
 @FullTextFilterDefs( {
 		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class), //actual Filter implementation
-		@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class) //Filter factory with parameters
+		@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class), //Filter factory with parameters
+		@FullTextFilterDef(name = "cachetest", impl = ExcludeAllFilterFactory.class, cache = true) //Filter factory with parameters
 })
 public class Driver {
 	@Id

@@ -19,7 +19,7 @@ public abstract class ReaderProviderHelper {
 			//everything should be the same so wrap in an MultiReader
 			//return readers[0];
 			try {
-				return new MultiReader( readers );
+				return new CacheableMultiReader( readers );
 			}
 			catch (Exception e) {
 				//Lucene 2.2 used to through IOExceptions here
@@ -29,7 +29,7 @@ public abstract class ReaderProviderHelper {
 		}
 		else {
 			try {
-				return new MultiReader( readers );
+				return new CacheableMultiReader( readers );
 			}
 			catch (Exception e) {
 				//Lucene 2.2 used to through IOExceptions here

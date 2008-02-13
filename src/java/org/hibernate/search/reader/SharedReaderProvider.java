@@ -206,6 +206,7 @@ public class SharedReaderProvider implements ReaderProvider {
 		boolean trace = log.isTraceEnabled();
 		if ( reader == null ) return;
 		IndexReader[] readers;
+		//TODO should it be CacheableMultiReader? Probably no
 		if ( reader instanceof MultiReader ) {
 			try {
 				readers = (IndexReader[]) subReadersField.get( reader );

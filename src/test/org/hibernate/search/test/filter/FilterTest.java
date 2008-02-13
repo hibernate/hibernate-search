@@ -55,6 +55,35 @@ public class FilterTest extends SearchTestCase {
 		deleteData();
 	}
 
+	public void testCache() {
+		createData();
+		FullTextSession s = Search.createFullTextSession( openSession( ) );
+		s.getTransaction().begin();
+		BooleanQuery query = new BooleanQuery();
+		query.add( new TermQuery( new Term("teacher", "andre") ), BooleanClause.Occur.SHOULD );
+		query.add( new TermQuery( new Term("teacher", "max") ), BooleanClause.Occur.SHOULD );
+		query.add( new TermQuery( new Term("teacher", "aaron") ), BooleanClause.Occur.SHOULD );
+		FullTextQuery ftQuery = s.createFullTextQuery( query, Driver.class );
+		assertEquals("No filter should happen", 3, ftQuery.getResultSize() );
+
+		ftQuery = s.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cachetest");
+		assertEquals("Should filter out all", 0, ftQuery.getResultSize() );
+
+		ftQuery = s.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cachetest");
+		try {
+			ftQuery.getResultSize();
+		}
+		catch (IllegalStateException e) {
+			fail("Cache does not work");
+		}
+
+		s.getTransaction().commit();
+		s.close();
+		deleteData();
+	}
+
 	public void testStraightFilters() {
 		createData();
 		FullTextSession s = Search.createFullTextSession( openSession( ) );
