@@ -29,6 +29,8 @@ public interface ProjectionConstants {
 	public String ID = "__HSearch_id";
 	/**
 	 * Lucene Document id
+	 * Experimental: If you use this feature, please speak up in the forum
+	 *  
 	 * Expert: Lucene document id can change overtime between 2 different IndexReader opening.
 	 */
 	public String DOCUMENT_ID = "__HSearch_DocumentId";
