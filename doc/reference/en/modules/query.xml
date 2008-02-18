@@ -173,7 +173,7 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
 
         <para>For some use cases, returning the domain object (graph) is
         overkill. Only a small subset of the properties is necessary.
-        Hibernate Search allows you to return only some properties:</para>
+        Hibernate Search allows you to return a subset of properties:</para>
 
         <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
 query.<emphasis role="bold">setProjection( "id", "summary", "body", "mainAuthor.name" )</emphasis>;
@@ -252,6 +252,12 @@ String authorName = firstResult[3];</programlisting>
           <listitem>
             <para>FullTextQuery.ID: the id property value of the projected
             object</para>
+          </listitem>
+
+          <listitem>
+            <para>FullTextQuery.DOCUMENT_ID: the Lucene document id. Careful,
+            Lucene document id can change overtime between two different
+            IndexReader opening (this feature is experimental)</para>
           </listitem>
         </itemizedlist>
       </section>
@@ -336,6 +342,30 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return 
         is not fully up-to-date with the database (asynchronous cluster for
         example).</para>
       </note>
+    </section>
+
+    <section>
+      <title>ResultTransformer</title>
+
+      <para>Especially when using projection, the data structure returned by a
+      query (an object array in this case), is not always matching the
+      application needs. It is possible to apply a
+      <classname>ResultTransformer</classname> operation post query to match
+      the targeted data structure:</para>
+
+      <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+query.setProjection( "title", "mainAuthor.name" );
+
+<emphasis role="bold">query.setResultTransformer( 
+    new StaticAliasToBeanResultTransformer( BookView.class, "title", "author" ) 
+);</emphasis>
+List&lt;BookView&gt; results = (List&lt;BookView&gt;) query.list();
+for(BookView view : results) {
+    log.info( "Book: " + view.getTitle() + ", " + view.getAuthor() );
+}</programlisting>
+
+      <para>Examples of <classname>ResultTransformer</classname>
+      implementations can be found in the Hibernate Core codebase.</para>
     </section>
   </section>
 

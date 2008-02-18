@@ -172,7 +172,10 @@ public class Book {
 
       <para>Associated objects as well as embedded objects can be indexed as
       part of the root entity index. It is necessary if you expect to search a
-      given entity based on properties of the associated object(s).</para>
+      given entity based on properties of the associated object(s). In the
+      following example, the use case is to return the places whose city is
+      Atlanta (In the Lucene query parser language, it would translate into
+      <code>address.city:Atlanta</code>).</para>
 
       <programlisting>@Entity
 @Indexed
@@ -218,11 +221,17 @@ public class Address {
       which you will be able to query. This is enabled by the
       <literal>@IndexedEmbedded</literal> annotation.</para>
 
-      <para><literal>@ContainedIn</literal> is useful on embedded objects that
-      are also entities (like <literal>Address</literal> in this example): it
-      basically means that when an address entity is updated, the index
-      document of the associated <literal>Place</literal>(s), also has to be
-      updated.</para>
+      <para>Be careful. Because the data is denormalized in the Lucene index
+      when using the <classname>@IndexedEmbedded</classname> technique,
+      Hibernate Search needs to be aware of any change in the Place object and
+      any change in the Address object to keep the index up to date. To make
+      sure the Place Lucene document is updated when it's Address changes, you
+      need to mark the other side of the birirectional relationship with
+      <classname>@ContainedIn</classname>.</para>
+
+      <para><literal>@ContainedIn</literal> is only useful on associations
+      pointing to entities as opposed to embedded (collection of)
+      objects.</para>
 
       <para>Let's make our example a bit more complex:</para>
 
@@ -356,14 +365,34 @@ public class Owner {
       index document has to be updated when the associated
       <classname>Address</classname> instance is updated.</para>
 
-      <note>
-        <para><literal>@IndexedEmbedded</literal> is supported on collections
-        too (ie to index associated object included in collections). But the
-        support is only partially implemented. It will depend on how you
-        update collections (Check HSEARCH-56 in JIRA for more informations).
-        The workaround is to manually index the object
-        (session.index())</para>
-      </note>
+      <para>Sometimes, the object type annotated by
+      <classname>@IndexedEmbedded</classname> is not the object type targeted
+      by Hibernate and Hibernate Search especially when interface are used in
+      lieu of their implementation. You can override the object type targeted
+      by Hibernate Search using the <methodname>targetElement</methodname>
+      parameter.</para>
+
+      <programlisting>@Entity
+@Indexed
+public class Address {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field(index= Index.TOKENIZED)
+    private String street;
+
+    @IndexedEmbedded(depth = 1, prefix = "ownedBy_", <emphasis role="bold">targetElement = Owner.class</emphasis>)
+    @Target(Owner.class)
+    private Person ownedBy;
+
+
+    ...
+}
+
+@Embeddable
+public class Owner implements Person { ... }</programlisting>
     </section>
 
     <section>
