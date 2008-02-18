@@ -1,8 +1,11 @@
 //$
 package org.hibernate.search.reader;
 
+import java.io.IOException;
+
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
+import org.hibernate.search.SearchException;
 
 /**
  * MultiReader ensuring equals returns true if the underlying readers are the same (and in the same order)
@@ -11,14 +14,20 @@ import org.apache.lucene.index.MultiReader;
  * @author Emmanuel Bernard
  */
 public class CacheableMultiReader extends MultiReader {
+	private IndexReader[] subReaders;
 
-	public CacheableMultiReader(IndexReader[] subReaders) {
+	public CacheableMultiReader(IndexReader[] subReaders) throws IOException {
 		super( subReaders );
+		this.subReaders = subReaders;
 	}
 
+	/** only available since 2.3 */
+	/*
 	public CacheableMultiReader(IndexReader[] subReaders, boolean closeSubReaders) {
 		super( subReaders, closeSubReaders );
+		this.subReaders = subReaders;
 	}
+	 */
 
 	@Override
 	public boolean equals(Object obj) {
