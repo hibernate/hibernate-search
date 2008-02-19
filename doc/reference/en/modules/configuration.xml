@@ -503,6 +503,35 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
           engine</para>
         </listitem>
       </itemizedlist>
+
+      <section>
+        <title>Hibernate Core 3.2.6 and beyond</title>
+
+        <para>If you use Hibernate Core 3.2.6 and beyond, make sure to add
+        three additional event listeners that cope with collection
+        events</para>
+
+        <programlisting>&lt;hibernate-configuration&gt;
+     &lt;session-factory&gt;
+        ...
+        &lt;event type="post-collection-recreate"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-collection-remove"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-collection-update"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
+        &lt;/event&gt;
+    &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;</programlisting>
+
+        <para>Those additional event listeners have been introduced in
+        Hibernate 3.2.6. note the
+        <classname>FullTextIndexCollectionEventListener</classname> usage. You
+        need to explicitly reference those event listeners unless you use
+        Hibernate Annotations 3.3.1 and above.</para>
+      </section>
     </section>
 
     <section>
@@ -542,30 +571,30 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     settings depending on the use case. During indexing operations triggered
     by database modifications, the following ones are used: <itemizedlist>
         <listitem>
-          <literal>hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</literal>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</literal></para>
         </listitem>
 
         <listitem>
-          <literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_merge_docs</literal>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_merge_docs</literal></para>
         </listitem>
 
         <listitem>
-          <literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</literal>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</literal></para>
         </listitem>
       </itemizedlist>When indexing occurs via
     <literal>FullTextSession.index()</literal> (see <xref
     linkend="search-batchindex" />), the following properties are used:
     <itemizedlist>
         <listitem>
-          <literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal></para>
         </listitem>
 
         <listitem>
-          <literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</literal>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</literal></para>
         </listitem>
 
         <listitem>
-          <literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal></para>
         </listitem>
       </itemizedlist></para>
 
