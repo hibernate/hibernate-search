@@ -1,6 +1,37 @@
 Hibernate Search Changelog
 ==========================
 
+3.0.1.GA (20-02-2008)
+---------------------
+
+** Bug
+    * [HSEARCH-56] - Updating a collection does not reindex
+    * [HSEARCH-123] - Use mkdirs instead of mkdir to create necessary parent directory in the DirectoryProviderHelper
+    * [HSEARCH-128] - Indexing embedded children's child
+    * [HSEARCH-136] - CachingWrapperFilter does not cache
+    * [HSEARCH-137] - Wrong class name in Exception when a FieldBridge does not implement TwoWayFieldBridge for a document id property
+    * [HSEARCH-138] - JNDI Property names have first character cut off
+    * [HSEARCH-140] - @IndexedEmbedded default depth is effectively 1 due to integer overflow
+    * [HSEARCH-146] - ObjectLoader doesn't catch javax.persistence.EntityNotFoundException
+    * [HSEARCH-149] - Default FieldBridge for enums passing wrong class to EnumBridge constructor
+
+
+** Improvement
+    * [HSEARCH-125] - Add support for fields declared by interface or unmapped superclass
+    * [HSEARCH-127] - Wrong prefix for worker configurations
+    * [HSEARCH-129] - IndexedEmbedded for Collections Documentation
+    * [HSEARCH-130] - Should provide better log infos (on the indexBase parameter for the FSDirectoryProvider)
+    * [HSEARCH-144] - Keep indexer running till finished on VM shutdown
+    * [HSEARCH-147] - Allow projection of Lucene DocId
+
+** New Feature
+    * [HSEARCH-114] - Introduce ResultTransformer to the query API
+    * [HSEARCH-150] - Migrate to Lucene 2.3
+
+** Patch
+    * [HSEARCH-126] - Better diagnostic when Search index directory cannot be opened (Ian)
+
+
 3.0.0.GA (23-09-2007)
 ---------------------
 

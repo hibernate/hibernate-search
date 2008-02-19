@@ -238,9 +238,10 @@ public class EmbeddedTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		FullTextIndexCollectionEventListener del = new FullTextIndexCollectionEventListener();
-		//cfg.getEventListeners().setPostCollectionRecreateEventListeners( new PostCollectionRecreateEventListener[]{del} );
-		//cfg.getEventListeners().setPostCollectionUpdateEventListeners( new PostCollectionUpdateEventListener[]{del} );
-		//cfg.getEventListeners().setPostCollectionRemoveEventListeners( new PostCollectionRemoveEventListener[]{del} );
+		//FIXME remove when depending on Annotations 3.3.1
+		cfg.getEventListeners().setPostCollectionRecreateEventListeners( new PostCollectionRecreateEventListener[]{del} );
+		cfg.getEventListeners().setPostCollectionUpdateEventListeners( new PostCollectionUpdateEventListener[]{del} );
+		cfg.getEventListeners().setPostCollectionRemoveEventListeners( new PostCollectionRemoveEventListener[]{del} );
 	}
 
 	protected Class[] getMappings() {

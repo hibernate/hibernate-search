@@ -15,6 +15,6 @@
 		<dependency name="jpa-api" rev="1.0.0.GA" conf="core->default"/>
         <dependency name="commons-annotations" rev="3.0.0.GA" conf="core->core"/>
         <dependency name="entitymanager" rev="3.3.1.GA" conf="test->core"/>
-        <dependency name="annotations" rev="latest" conf="test->core"/>
+        <dependency name="annotations" rev="3.3.0.GA" conf="test->core"/>
     </dependencies>
 </ivy-module>
