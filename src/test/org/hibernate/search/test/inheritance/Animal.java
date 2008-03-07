@@ -16,7 +16,7 @@ import org.hibernate.search.annotations.Store;
  */
 @Entity
 @Indexed
-public class Animal {
+public class Animal extends Being {
     private Long id;
     private String name;
 

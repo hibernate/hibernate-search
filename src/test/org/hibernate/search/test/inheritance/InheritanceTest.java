@@ -8,6 +8,9 @@ import org.hibernate.Transaction;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.RangeQuery;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.index.Term;
 
 import java.util.List;
 
@@ -25,7 +28,8 @@ public class InheritanceTest extends SearchTestCase {
         Mammal m = new Mammal();
         m.setMammalNbr(2);
         m.setName("Elephant Jr");
-        s.save(m);
+		m.setWeight( 400 );
+		s.save(m);
 		tx.commit();//post commit events for lucene
 		s.clear();
 		tx = s.beginTransaction();
@@ -51,7 +55,14 @@ public class InheritanceTest extends SearchTestCase {
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query filtering on superclass return mapped subclasses", 2, result.size() );
-        for (Object managedEntity : result) {
+
+		query = new RangeQuery( new Term( "weight", "00200" ), null, true);
+		hibQuery = s.createFullTextQuery( query, Animal.class );
+		result = hibQuery.list();
+		assertNotNull( result );
+		assertEquals( "Query on non @Indexed superclass property", 1, result.size() );
+
+		for (Object managedEntity : result) {
             s.delete(managedEntity);
         }
         tx.commit();
