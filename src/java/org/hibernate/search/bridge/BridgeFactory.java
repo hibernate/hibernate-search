@@ -137,6 +137,8 @@ public class BridgeFactory {
 		}
 		if ( bridgeAnn != null ) {
 			Class impl = bridgeAnn.impl();
+			if (impl == void.class)
+				throw new SearchException("@FieldBridge with no implementation class defined in: " + member.getName() );
 			try {
 				Object instance = impl.newInstance();
 				if ( FieldBridge.class.isAssignableFrom( impl ) ) {
@@ -148,6 +150,10 @@ public class BridgeFactory {
 				}
 				else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
 					bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
+				}
+				else {
+					throw new SearchException("@FieldBridge implementation implements none of the field bridge interfaces: "
+							+ impl + " in " + member.getName() );
 				}
 				if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
 					Map params = new HashMap( bridgeAnn.params().length );
