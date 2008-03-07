@@ -156,7 +156,8 @@ public class DocumentBuilder<T> {
 				bindClassAnnotation(prefix, propertiesMetadata, classBridgeAnn);
 			}
 
-			//rejecting non properties because the object is loaded from Hibernate, so indexing a non property does not make sense
+			//rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
+			// so indexing a non property does not make sense
 			List<XProperty> methods = currClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 			for (XProperty method : methods) {
 				initializeMember( method, propertiesMetadata, isRoot, prefix, processedClasses );
