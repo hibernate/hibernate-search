@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.net.URI;
+import java.net.URL;
 
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -15,9 +17,13 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.index.Term;
 
 /**
  * @author Emmanuel Bernard
@@ -37,6 +43,9 @@ public class BridgeTest extends SearchTestCase {
         cloud.setString(null);
 		cloud.setType( CloudType.DOG );
 		cloud.setStorm( false );
+		cloud.setClazz( Cloud.class );
+		cloud.setUri( new URI("http://www.hibernate.org") );
+		cloud.setUrl( new URL("http://www.hibernate.org") );
 		org.hibernate.Session s = openSession();
         Transaction tx = s.beginTransaction();
         s.persist(cloud);
@@ -62,6 +71,18 @@ public class BridgeTest extends SearchTestCase {
 		query = parser.parse("type:dog");
         result = session.createFullTextQuery(query).setProjection( "type" ).list();
         assertEquals( "Enum projection works", 1, result.size() ); //the query is dumb because restrictive
+
+		query = new TermQuery( new Term("clazz", Cloud.class.getName() ) );
+        result = session.createFullTextQuery(query).setProjection( "clazz" ).list();
+        assertEquals( "Clazz projection works", 1, result.size() );
+		assertEquals( "Clazz projection works", Cloud.class.getName(), ( (Class) ((Object[])result.get(0))[0] ).getName() );
+
+		BooleanQuery bQuery = new BooleanQuery();
+		bQuery.add( new TermQuery( new Term("uri", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST );
+		bQuery.add( new TermQuery( new Term("url", "http://www.hibernate.org" ) ), BooleanClause.Occur.MUST );
+
+		result = session.createFullTextQuery(bQuery).setProjection( "clazz" ).list();
+        assertEquals( "Clazz projection works", 1, result.size() );
 
 		s.delete( s.get( Cloud.class, cloud.getId() ) );
         tx.commit();

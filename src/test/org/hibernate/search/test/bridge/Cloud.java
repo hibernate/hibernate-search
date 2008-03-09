@@ -2,6 +2,8 @@
 package org.hibernate.search.test.bridge;
 
 import java.util.Date;
+import java.net.URL;
+import java.net.URI;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -44,6 +46,36 @@ public class Cloud {
     private String customStringBridge;
 	private CloudType type;
 	private boolean storm;
+	private Class clazz;
+	private URL url;
+	private URI uri;
+
+	@Field(index=Index.UN_TOKENIZED, store=Store.YES)
+	public URL getUrl() {
+		return url;
+	}
+
+	public void setUrl(URL url) {
+		this.url = url;
+	}
+
+	@Field(index=Index.UN_TOKENIZED, store=Store.YES)
+	public URI getUri() {
+		return uri;
+	}
+
+	public void setUri(URI uri) {
+		this.uri = uri;
+	}
+
+	@Field(index=Index.UN_TOKENIZED, store=Store.YES)
+	public Class getClazz() {
+		return clazz;
+	}
+
+	public void setClazz(Class clazz) {
+		this.clazz = clazz;
+	}
 
 	@Field(index=Index.TOKENIZED, store=Store.YES)
     @FieldBridge(impl = TruncateFieldBridge.class)

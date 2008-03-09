@@ -6,6 +6,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.net.URL;
+import java.net.URI;
 
 import org.hibernate.HibernateException;
 import org.hibernate.AssertionFailure;
@@ -20,6 +22,8 @@ import org.hibernate.search.bridge.builtin.DoubleBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
 import org.hibernate.search.bridge.builtin.EnumBridge;
 import org.hibernate.search.bridge.builtin.BooleanBridge;
+import org.hibernate.search.bridge.builtin.UrlBridge;
+import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Field;
@@ -58,6 +62,12 @@ public class BridgeFactory {
 
 	public static final TwoWayFieldBridge BOOLEAN = new TwoWayString2FieldBridgeAdaptor( new BooleanBridge() );
 
+	public static final TwoWayFieldBridge CLAZZ = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge() );
+
+	public static final TwoWayFieldBridge Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
+
+	public static final TwoWayFieldBridge Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
+
 	public static final FieldBridge DATE_YEAR = new String2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
 	public static final FieldBridge DATE_MONTH = new String2FieldBridgeAdaptor( DateBridge.DATE_MONTH );
 	public static final FieldBridge DATE_DAY = new String2FieldBridgeAdaptor( DateBridge.DATE_DAY );
@@ -83,6 +93,9 @@ public class BridgeFactory {
 		builtInBridges.put( String.class.getName(), STRING );
 		builtInBridges.put( Boolean.class.getName(), BOOLEAN );
 		builtInBridges.put( boolean.class.getName(), BOOLEAN );
+		builtInBridges.put( Class.class.getName(), CLAZZ );
+		builtInBridges.put( URL.class.getName(), Url );
+		builtInBridges.put( URI.class.getName(), Uri );
 
 		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
 	}
