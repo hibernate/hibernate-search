@@ -89,6 +89,12 @@ public class QueryLoader implements Loader {
 				//the other ones are missing ones
 				result.add( element );
 			}
+			else {
+				if ( log.isDebugEnabled() ) {
+					log.debug( "Object found in Search index but not in database: "
+						+ entityInfo.clazz + " wih id " + entityInfo.id );
+				}
+			}
 		}
 		return result;
 	}
