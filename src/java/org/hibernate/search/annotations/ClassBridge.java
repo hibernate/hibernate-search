@@ -42,6 +42,12 @@ public @interface ClassBridge {
 	Index index() default Index.TOKENIZED;
 
 	/**
+	 * Define term vector storage requirements,
+	 * default to NO.
+	 */
+	TermVector termVector() default TermVector.NO;
+
+	/**
 	 * A float value of the amount of lucene defined
 	 * boost to apply to a field.
 	 */

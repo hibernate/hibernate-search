@@ -28,13 +28,14 @@ import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Boost;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.ClassBridge;
-import org.hibernate.search.annotations.ClassBridges;
+import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -142,18 +143,18 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.analyzer = analyzer;
 			}
 			// Check for any ClassBridges annotation.
-			ClassBridges classBridgesAnn = currClass.getAnnotation( ClassBridges.class);
-			if (classBridgesAnn != null) {
+			ClassBridges classBridgesAnn = currClass.getAnnotation( ClassBridges.class );
+			if ( classBridgesAnn != null ) {
 				ClassBridge[] cbs = classBridgesAnn.value();
 				for (ClassBridge cb : cbs) {
-					bindClassAnnotation(prefix, propertiesMetadata, cb);
+					bindClassAnnotation( prefix, propertiesMetadata, cb );
 				}
- 			}
+			}
 
 			// Check for any ClassBridge style of annotations.
-			ClassBridge classBridgeAnn = currClass.getAnnotation(ClassBridge.class);
-			if (classBridgeAnn != null) {
-				bindClassAnnotation(prefix, propertiesMetadata, classBridgeAnn);
+			ClassBridge classBridgeAnn = currClass.getAnnotation( ClassBridge.class );
+			if ( classBridgeAnn != null ) {
+				bindClassAnnotation( prefix, propertiesMetadata, classBridgeAnn );
 			}
 
 			//rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
@@ -205,6 +206,7 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.fieldNames.add( fieldName );
 				propertiesMetadata.fieldStore.add( getStore( Store.YES ) );
 				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
+				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
 				// Field > property > entity analyzer
 				Analyzer analyzer = null; //no field analyzer
@@ -313,6 +315,7 @@ public class DocumentBuilder<T> {
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( getStore( ann.store() ) );
 		propertiesMetadata.classIndexes.add( getIndex( ann.index() ) );
+		propertiesMetadata.classTermVectors.add( getTermVector( ann.termVector() ) );
 		propertiesMetadata.classBridges.add( BridgeFactory.extractType( ann ) );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
 
@@ -329,7 +332,9 @@ public class DocumentBuilder<T> {
 		propertiesMetadata.fieldNames.add( fieldName );
 		propertiesMetadata.fieldStore.add( getStore( fieldAnn.store() ) );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
+		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
 		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, member, reflectionManager ) );
+
 		// Field > property > entity analyzer
 		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer() );
 		if ( analyzer == null ) analyzer = getAnalyzer( member );
@@ -360,6 +365,23 @@ public class DocumentBuilder<T> {
 				return Field.Store.COMPRESS;
 			default:
 				throw new AssertionFailure( "Unexpected Store: " + store );
+		}
+	}
+
+	private Field.TermVector getTermVector(TermVector vector) {
+		switch ( vector ) {
+			case NO:
+				return Field.TermVector.NO;
+			case YES:
+				return Field.TermVector.YES;
+			case WITH_OFFSETS:
+				return Field.TermVector.WITH_OFFSETS;
+			case WITH_POSITIONS:
+				return Field.TermVector.WITH_POSITIONS;
+			case WITH_POSITION_OFFSETS:
+				return Field.TermVector.WITH_POSITIONS_OFFSETS;
+			default:
+				throw new AssertionFailure( "Unexpected TermVector: " + vector );
 		}
 	}
 
@@ -403,9 +425,9 @@ public class DocumentBuilder<T> {
 		for (LuceneWork luceneWork : queue) {
 			//any work on the same entity should be ignored
 			if ( luceneWork.getEntityClass() == entityClass
-					 ) {
+					) {
 				Serializable currentId = luceneWork.getId();
-				if ( currentId != null  && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
+				if ( currentId != null && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
 					return;
 				}
 				//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
@@ -518,9 +540,9 @@ public class DocumentBuilder<T> {
 		}
 		{
 			Field classField =
-					new Field( CLASS_FIELDNAME, instanceClass.getName(), Field.Store.YES, Field.Index.UN_TOKENIZED );
+					new Field( CLASS_FIELDNAME, instanceClass.getName(), Field.Store.YES, Field.Index.UN_TOKENIZED, Field.TermVector.NO );
 			doc.add( classField );
-			idBridge.set( idKeywordName, id, doc, Field.Store.YES, Field.Index.UN_TOKENIZED, idBoost );
+			idBridge.set( idKeywordName, id, doc, Field.Store.YES, Field.Index.UN_TOKENIZED, Field.TermVector.NO, idBoost );
 		}
 		buildDocumentFields( instance, doc, rootPropertiesMetadata );
 		return doc;
@@ -533,19 +555,24 @@ public class DocumentBuilder<T> {
 		for (int i = 0; i < propertiesMetadata.classBridges.size(); i++) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
 
-			fb.set( propertiesMetadata.classNames.get(i),
+			fb.set( propertiesMetadata.classNames.get( i ),
 					unproxiedInstance,
 					doc,
-					propertiesMetadata.classStores.get(i),
-					propertiesMetadata.classIndexes.get(i),
-					propertiesMetadata.classBoosts.get(i));
+					propertiesMetadata.classStores.get( i ),
+					propertiesMetadata.classIndexes.get( i ),
+					propertiesMetadata.classTermVectors.get( i ),
+					propertiesMetadata.classBoosts.get( i ) );
 		}
 		for (int i = 0; i < propertiesMetadata.fieldNames.size(); i++) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			Object value = getMemberValue( unproxiedInstance, member );
 			propertiesMetadata.fieldBridges.get( i ).set(
-					propertiesMetadata.fieldNames.get( i ), value, doc, propertiesMetadata.fieldStore.get( i ),
-					propertiesMetadata.fieldIndex.get( i ), getBoost( member )
+					propertiesMetadata.fieldNames.get( i ),
+					value, doc,
+					propertiesMetadata.fieldStore.get( i ),
+					propertiesMetadata.fieldIndex.get( i ),
+					propertiesMetadata.fieldTermVectors.get( i ),
+					getBoost( member )
 			);
 		}
 		for (int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++) {
@@ -726,6 +753,7 @@ public class DocumentBuilder<T> {
 		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
 		public final List<Field.Store> fieldStore = new ArrayList<Field.Store>();
 		public final List<Field.Index> fieldIndex = new ArrayList<Field.Index>();
+		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
 		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
 		public final List<PropertiesMetadata> embeddedPropertiesMetadata = new ArrayList<PropertiesMetadata>();
 		public final List<Container> embeddedContainers = new ArrayList<Container>();
@@ -734,6 +762,7 @@ public class DocumentBuilder<T> {
 		public final List<Field.Store> classStores = new ArrayList<Field.Store>();
 		public final List<Field.Index> classIndexes = new ArrayList<Field.Index>();
 		public final List<FieldBridge> classBridges = new ArrayList<FieldBridge>();
+		public final List<Field.TermVector> classTermVectors = new ArrayList<Field.TermVector>();
 		public final List<Float> classBoosts = new ArrayList<Float>();
 
 		public enum Container {

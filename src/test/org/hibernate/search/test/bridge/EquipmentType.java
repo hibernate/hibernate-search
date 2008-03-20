@@ -10,7 +10,7 @@ import org.hibernate.search.bridge.ParameterizedBridge;
 /**
  * @author John Griffin
  */
-public class EquipmentType  implements FieldBridge, ParameterizedBridge {
+public class EquipmentType implements FieldBridge, ParameterizedBridge {
 	private Map equips;
 
 	public void setParameterValues(Map parameters) {
@@ -18,7 +18,7 @@ public class EquipmentType  implements FieldBridge, ParameterizedBridge {
 		this.equips = parameters;
 	}
 
-	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Float boost) {
+	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost) {
 		// In this particular class the name of the new field was passed
 		// from the name field of the ClassBridge Annotation. This is not
 		// a requirement. It just works that way in this instance. The
@@ -31,8 +31,8 @@ public class EquipmentType  implements FieldBridge, ParameterizedBridge {
 			fieldValue1 = "";
 		}
 		else {
-			String fieldValue = (String)equips.get( fieldValue1);
-			field = new Field( name, fieldValue, store, index );
+			String fieldValue = (String) equips.get( fieldValue1 );
+			field = new Field( name, fieldValue, store, index, termVector );
 			if ( boost != null ) field.setBoost( boost );
 		}
 		document.add( field );

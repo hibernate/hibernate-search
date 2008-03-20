@@ -2,12 +2,10 @@ package org.hibernate.search.test.bridge;
 
 import java.util.Map;
 
-import org.hibernate.search.bridge.StringBridge;
-import org.hibernate.search.bridge.ParameterizedBridge;
-import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.util.StringHelper;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.ParameterizedBridge;
 
 /**
  * @author John Griffin
@@ -20,7 +18,7 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
 		this.sepChar = (String) parameters.get( "sepChar" );
 	}
 
-	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Float boost) {
+	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost) {
 		// In this particular class the name of the new field was passed
 		// from the name field of the ClassBridge Annotation. This is not
 		// a requirement. It just works that way in this instance. The
@@ -35,7 +33,7 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
 			fieldValue2 = "";
 		}
 		String fieldValue = fieldValue1 + sepChar + fieldValue2;
-		Field field = new Field( name, fieldValue, store, index );
+		Field field = new Field( name, fieldValue, store, index, termVector );
 		if ( boost != null ) field.setBoost( boost );
 		document.add( field );
 	}

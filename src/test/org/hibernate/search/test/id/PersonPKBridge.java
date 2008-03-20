@@ -26,12 +26,12 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 		return sb.toString();
 	}
 
-	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Float boost) {
+	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost) {
 		PersonPK id = (PersonPK) value;
-		Field field = new Field( name + ".firstName", id.getFirstName(), store, index );
+		Field field = new Field( name + ".firstName", id.getFirstName(), store, index, termVector );
 		if ( boost != null ) field.setBoost( boost );
 		document.add( field );
-		field = new Field( name + ".lastName", id.getLastName(), store, index );
+		field = new Field( name + ".lastName", id.getLastName(), store, index, termVector );
 		if ( boost != null ) field.setBoost( boost );
 		document.add( field );
 	}

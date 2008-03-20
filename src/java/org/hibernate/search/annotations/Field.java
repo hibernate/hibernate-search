@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( {ElementType.METHOD, ElementType.FIELD} )
+@Target( { ElementType.METHOD, ElementType.FIELD } )
 @Documented
 public @interface Field {
 	/**
@@ -36,6 +36,12 @@ public @interface Field {
 	 * defaults to tokenized
 	 */
 	Index index() default Index.TOKENIZED;
+
+	/**
+	 * Define term vector storage requirements,
+	 * default to NO.
+	 */
+	TermVector termVector() default TermVector.NO;
 
 	/**
 	 * Define an analyzer for the field, default to

@@ -17,12 +17,12 @@ public class String2FieldBridgeAdaptor implements FieldBridge {
 		this.stringBridge = stringBridge;
 	}
 
-	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Float boost) {
+	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost) {
 		String indexedString = stringBridge.objectToString( value );
 		//Do not add fields on empty strings, seems a sensible default in most situations
 		//TODO if Store, probably also save empty ones
 		if ( StringHelper.isNotEmpty( indexedString ) ) {
-			Field field = new Field( name, indexedString, store, index );
+			Field field = new Field( name, indexedString, store, index, termVector );
 			if ( boost != null ) field.setBoost( boost );
 			document.add( field );
 		}

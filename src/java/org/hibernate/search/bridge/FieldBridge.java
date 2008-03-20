@@ -19,5 +19,5 @@ public interface FieldBridge {
 	 * the parameters (<code>store</code>, <code>index</code>, <code>boost</code>) if the
 	 * <code>value</code> is not null
 	 */
-	void set(String name, Object value, Document document, Field.Store store, Field.Index index, Float boost);
+	void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost);
 }
