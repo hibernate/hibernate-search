@@ -18,9 +18,14 @@ public final class Environment {
 	public static final String INDEXING_STRATEGY = "hibernate.search.indexing_strategy";
 
 	/**
-	 * Lucene analyser
+	 * Default Lucene analyser
 	 */
 	public static final String ANALYZER_CLASS = "hibernate.search.analyzer";
+
+	/**
+	 * Default Lucene similarity
+	 */
+	public static final String SIMILARITY_CLASS = "hibernate.search.similarity";
 
 	public static final String WORKER_PREFIX = "hibernate.search.worker.";
 	public static final String WORKER_SCOPE = WORKER_PREFIX + "scope";

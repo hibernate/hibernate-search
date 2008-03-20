@@ -2,9 +2,13 @@
 package org.hibernate.search.reader;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.MultiReader;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MultiSearcher;
+import org.apache.lucene.search.Searchable;
 import org.hibernate.search.SearchException;
 
 /**
@@ -51,5 +55,49 @@ public abstract class ReaderProviderHelper {
 			}
 		}
 		throw e;
+	}
+
+	/**
+	 * Find the underlying IndexReaders for the given searchable
+	 *
+	 * @param searchable The searchable to find the IndexReaders for
+	 * @return A list of all base IndexReaders used within this searchable
+	 */
+	public static Set<IndexReader> getIndexReaders(Searchable searchable) {
+		Set<IndexReader> readers = new HashSet<IndexReader>();
+		getIndexReadersInternal( readers, searchable );
+		return readers;
+	}
+
+	/**
+	 * Find the underlying IndexReaders for the given reader
+	 *
+	 * @param reader The reader to find the IndexReaders for
+	 * @return A list of all base IndexReaders used within this searchable
+	 */
+	public static Set<IndexReader> getIndexReaders(IndexReader reader) {
+		Set<IndexReader> readers = new HashSet<IndexReader>();
+		getIndexReadersInternal( readers, reader );
+		return readers;
+	}
+
+	/**
+	 * Recursive method should identify all underlying readers for any nested structure of Lucene Searchable or IndexReader
+	 *
+	 * @param readers The working list of all readers found
+	 * @param obj	 The object to find the readers within
+	 */
+	private static void getIndexReadersInternal(Set<IndexReader> readers, Object obj) {
+		if ( obj instanceof MultiSearcher ) {
+			for (Searchable s : ( (MultiSearcher) obj ).getSearchables()) {
+				getIndexReadersInternal( readers, s );
+			}
+		}
+		else if ( obj instanceof IndexSearcher ) {
+			getIndexReadersInternal( readers, ( (IndexSearcher) obj ).getIndexReader() );
+		}
+		else if ( obj instanceof IndexReader ) {
+			readers.add( (IndexReader) obj );
+		}
 	}
 }

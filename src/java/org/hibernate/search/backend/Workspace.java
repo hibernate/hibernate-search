@@ -112,10 +112,12 @@ public class Workspace {
 		lockProvider( provider );
 		if ( modificationOperation ) dpStatistics.get( provider ).operations++;
 		try {
+			DocumentBuilder documentBuilder = searchFactoryImplementor.getDocumentBuilders().get( entity );
 			Analyzer analyzer = entity != null ?
-					searchFactoryImplementor.getDocumentBuilders().get( entity ).getAnalyzer() :
+					documentBuilder.getAnalyzer() :
 					new SimpleAnalyzer(); //never used
 			writer = new IndexWriter( provider.getDirectory(), analyzer, false ); //has been created at init time
+			writer.setSimilarity( documentBuilder.getSimilarity() );
 
 			LuceneIndexingParameters indexingParams = searchFactoryImplementor.getIndexingParameters( provider );
 			if ( isBatch ) {

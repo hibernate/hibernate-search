@@ -17,6 +17,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Similarity;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -75,9 +76,10 @@ public class DocumentBuilder<T> {
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
 	private ScopedAnalyzer analyzer;
+	private Similarity similarity;
 
 
-	public DocumentBuilder(XClass clazz, Analyzer defaultAnalyzer, DirectoryProvider[] directoryProviders,
+	public DocumentBuilder(XClass clazz, Analyzer defaultAnalyzer, Similarity defaultSimilarity, DirectoryProvider[] directoryProviders,
 						   IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
 		this.analyzer = new ScopedAnalyzer();
 		this.beanClass = clazz;
@@ -85,8 +87,9 @@ public class DocumentBuilder<T> {
 		this.shardingStrategy = shardingStrategy;
 		//FIXME get rid of it when boost is stored?
 		this.reflectionManager = reflectionManager;
+		this.similarity = defaultSimilarity;
 
-		if ( clazz == null ) throw new AssertionFailure( "Unable to build a DocumemntBuilder with a null class" );
+		if ( clazz == null ) throw new AssertionFailure( "Unable to build a DocumentBuilder with a null class" );
 		rootPropertiesMetadata = new PropertiesMetadata();
 		rootPropertiesMetadata.boost = getBoost( clazz );
 		rootPropertiesMetadata.analyzer = defaultAnalyzer;
@@ -132,6 +135,7 @@ public class DocumentBuilder<T> {
 		for (XClass currClass = clazz; currClass != null; currClass = currClass.getSuperclass()) {
 			hierarchy.add( currClass );
 		}
+		Class similarityClass = null;
 		for (int index = hierarchy.size() - 1; index >= 0; index--) {
 			XClass currClass = hierarchy.get( index );
 			/**
@@ -157,6 +161,18 @@ public class DocumentBuilder<T> {
 				bindClassAnnotation( prefix, propertiesMetadata, classBridgeAnn );
 			}
 
+			//Get similarity
+			//TODO: similarity form @IndexedEmbedded are not taken care of. Exception??
+			if ( isRoot ) {
+				org.hibernate.search.annotations.Similarity similarityAnn = currClass.getAnnotation( org.hibernate.search.annotations.Similarity.class );
+				if ( similarityAnn != null ) {
+					if ( similarityClass != null ) {
+						throw new SearchException( "Multiple Similarities defined in the same class hierarchy: " + beanClass.getName() );
+					}
+					similarityClass = similarityAnn.impl();
+				}
+			}
+
 			//rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
 			// so indexing a non property does not make sense
 			List<XProperty> methods = currClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
@@ -169,10 +185,23 @@ public class DocumentBuilder<T> {
 				initializeMember( field, propertiesMetadata, isRoot, prefix, processedClasses );
 			}
 		}
+		if ( isRoot && similarityClass != null ) {
+			try {
+				similarity = (Similarity) similarityClass.newInstance();
+			}
+			catch (Exception e) {
+				log.error( "Exception attempting to instantiate Similarity '" + similarityClass.getName()
+						+ "' set for " + beanClass.getName() );
+			}
+		}
 	}
 
 	public String getIdentifierName() {
 		return idGetter.getName();
+	}
+
+	public Similarity getSimilarity() {
+		return similarity;
 	}
 
 	private void initializeMember(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
