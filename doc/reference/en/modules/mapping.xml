@@ -72,6 +72,67 @@ public class Essay {
         </listitem>
       </itemizedlist>
 
+      <itemizedlist>
+        <listitem>
+          <para>termVector: describes collections of term-frequency pairs. To
+          utilize Term Vectors this attribute enables their being stored
+          during indexing so they are stored with documents. The default value
+          is Field.TermVector.NO. </para>
+
+          <para>The different values of this attribute are </para>
+
+          <informaltable align="left" width="">
+            <tgroup cols="2">
+              <colspec align="center" />
+
+              <thead>
+                <row>
+                  <entry align="center">Value</entry>
+
+                  <entry align="center">Definition</entry>
+                </row>
+              </thead>
+
+              <tbody>
+                <row>
+                  <entry align="left">Field.TermVector.YES</entry>
+
+                  <entry>Store the term vectors of each document.</entry>
+                </row>
+
+                <row>
+                  <entry align="left">Field.TermVector.NO</entry>
+
+                  <entry>Do not store term vectors.</entry>
+                </row>
+
+                <row>
+                  <entry align="left">Field.TermVector.WITH_OFFSETS</entry>
+
+                  <entry>Store the term vector and token offset
+                  information</entry>
+                </row>
+
+                <row>
+                  <entry align="left">Field.TermVector.WITH_POSITIONS</entry>
+
+                  <entry>Store the term vector and token position
+                  information</entry>
+                </row>
+
+                <row>
+                  <entry
+                  align="left">Field.TermVector.WITH_POSITIONS_OFFSETS</entry>
+
+                  <entry>Store the term vector, token position and offset
+                  information</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+        </listitem>
+      </itemizedlist>
+
       <para>These attributes are part of the <literal>@Field</literal>
       annotation.</para>
 
@@ -773,7 +834,9 @@ private Integer length;                </programlisting>
         <classname>@ClassBridges</classname> annotations can be defined at the
         class level (as opposed to the property level). In this case the
         custom field bridge implementation receives the entity instance as the
-        value parameter instead of a particular property.</para>
+        value parameter instead of a particular property. Though not shown in
+        this example, <classname>@ClassBridge</classname> supports the
+        <methodname>termVector</methodname> attribute discussed previously.</para>
 
         <programlisting>@Entity
 @Indexed
