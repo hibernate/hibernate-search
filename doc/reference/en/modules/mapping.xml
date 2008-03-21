@@ -644,8 +644,8 @@ public class Meeting {
       <section>
         <title>StringBridge</title>
 
-        <para>The simpliest custom solution is to give <productname>Hibernate
-        Search </productname> an implementation of your expected
+        <para>The simpliest custom solution is to give Hibernate
+        Search an implementation of your expected
         <emphasis>object to String</emphasis> bridge. To do so you need to
         implements the
         <literal>org.hibernate.search.bridge.StringBridge</literal>
