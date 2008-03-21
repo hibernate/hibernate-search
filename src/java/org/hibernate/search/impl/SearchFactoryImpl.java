@@ -1,20 +1,21 @@
 //$Id$
 package org.hibernate.search.impl;
 
+import java.beans.Introspector;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
-import java.lang.reflect.Method;
-import java.beans.Introspector;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -24,13 +25,11 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
-import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.filter.MRUFilterCachingStrategy;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Factory;
-import org.hibernate.search.annotations.Key;
+import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Key;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.LuceneWork;
@@ -38,8 +37,10 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.engine.DocumentBuilder;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.engine.FilterDef;
+import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
@@ -89,9 +90,11 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public SearchFactoryImpl(Configuration cfg) {
 		//yuk
 		ReflectionManager reflectionManager = getReflectionManager( cfg );
-
+		//InitContext context = new InitContext();
+		//Analyzer analyzer = initAnalyzer(cfg, context);
 		Analyzer analyzer = initAnalyzer(cfg);
-		initDocumentBuilders(cfg, reflectionManager, analyzer);
+		Similarity similarity = initSimilarity(cfg);
+		initDocumentBuilders(cfg, reflectionManager, analyzer, similarity);
 
 		Set<Class> indexedClasses = documentBuilders.keySet();
 		for (DocumentBuilder builder : documentBuilders.values()) {
@@ -247,9 +250,13 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		getBackendQueueProcessorFactory().getProcessor( queue ).run();
 	}
 
-	private void initDocumentBuilders(Configuration cfg, ReflectionManager reflectionManager, Analyzer analyzer) {
+	private void initDocumentBuilders(Configuration cfg, ReflectionManager reflectionManager, Analyzer analyzer, Similarity similarity) {
 		Iterator iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
+		//Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
+		
+		//cfg.getClass().getAnnotation( AnalyzerDef.class );
+		//TODO SOlr.......
 		while (iter.hasNext()) {
 			PersistentClass clazz = (PersistentClass) iter.next();
 			Class<?> mappedClass = clazz.getMappedClass();
@@ -260,7 +267,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 						DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders( mappedXClass, cfg, this );
 
 						final DocumentBuilder<Object> documentBuilder = new DocumentBuilder<Object>(
-								mappedXClass, analyzer, providers.getProviders(), providers.getSelectionStrategy(),
+								mappedXClass, analyzer, similarity, providers.getProviders(), providers.getSelectionStrategy(),
 								reflectionManager
 						);
 
@@ -304,6 +311,42 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			throw new SearchException("Failed to instantiate lucene analyzer with type " + analyzerClassName, e);
 		}
 		return defaultAnalyzer;
+	}
+
+	/**
+	 * Initilises the Lucene similarity to use
+	 */
+	private Similarity initSimilarity(Configuration cfg) {
+		Class similarityClass;
+		String similarityClassName = cfg.getProperty(Environment.SIMILARITY_CLASS);
+		if (similarityClassName != null) {
+			try {
+				similarityClass = ReflectHelper.classForName(similarityClassName);
+			} catch (Exception e) {
+				throw new SearchException("Lucene Similarity class '" + similarityClassName + "' defined in property '"
+						+ Environment.SIMILARITY_CLASS + "' could not be found.", e);
+			}
+		}
+		else {
+			similarityClass = null;
+		}
+
+		// Initialize similarity
+		if ( similarityClass == null ) {
+			return Similarity.getDefault();
+		}
+		else {
+			Similarity defaultSimilarity;
+			try {
+				defaultSimilarity = (Similarity) similarityClass.newInstance();
+			} catch (ClassCastException e) {
+				throw new SearchException("Lucene similarity does not extend " + Similarity.class.getName() + ": "
+						+ similarityClassName, e);
+			} catch (Exception e) {
+				throw new SearchException("Failed to instantiate lucene similarity with type " + similarityClassName, e);
+			}
+			return defaultSimilarity;
+		}
 	}
 
 	private void buildFilterCachingStrategy(Properties properties) {
