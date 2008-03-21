@@ -635,10 +635,11 @@ public class Meeting {
     <section>
       <title>Custom Bridge</title>
 
-      <para>It can happen that the built-in bridges of Hibernate Search do not
-      cover some of your property types, or that the String representation
-      used is not what you expect. The following paragraphs sveral solutions
-      for this problem.</para>
+      <para>Sometimes, the built-in bridges of Hibernate Search do not
+      cover some of your property types, or  the String representation
+      used by the bridge does not meet your requirements.
+      The following paragraphs describe several solutions
+      to this problem.</para>
 
       <section>
         <title>StringBridge</title>
