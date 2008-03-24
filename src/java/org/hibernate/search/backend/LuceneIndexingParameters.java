@@ -1,94 +1,108 @@
 //$Id$
 package org.hibernate.search.backend;
 
+import java.io.Serializable;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.index.IndexWriter;
+
 /**
- * Wrapper class around the Lucene indexing parameters <i>mergeFactor</i>, <i>maxMergeDocs</i> and
- * <i>maxBufferedDocs</i>.
+ * Wrapper class around the Lucene indexing parameters <i>mergeFactor</i>, <i>maxMergeDocs</i>,
+ * <i>maxBufferedDocs</i>, <i>termIndexInterval</i>, <i>RAMBufferSizeMB</i>.
  * <p>
  * There are two sets of these parameters. One is for regular indexing the other is for batch indexing
  * triggered by <code>FullTextSessoin.index(Object entity)</code>
  * 
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  *
  */
-public class LuceneIndexingParameters {
+public class LuceneIndexingParameters implements Serializable {
+
+	private static final Log log = LogFactory.getLog( LuceneIndexingParameters.class );
 	
-	private int transactionMergeFactor = 10;
-	
-	private int transactionMaxMergeDocs = Integer.MAX_VALUE;
-	
-	private int transactionMaxBufferedDocs = 10;
-	
-	private int batchMergeFactor = 10;
-	
-	private int batchMaxMergeDocs = Integer.MAX_VALUE;
-	
-	private int batchMaxBufferedDocs = 10;
-	
-	// the defaults settings
-	private static final int DEFAULT_MERGE_FACTOR = 10;
-	
-	private static final int DEFAULT_MAX_MERGE_DOCS = Integer.MAX_VALUE;
-	
-	private static final int DEFAULT_MAX_BUFFERED_DOCS = 10;
+	private final ParameterSet transactionIndexParameters = new ParameterSet();
+	private final ParameterSet batchIndexParameters = new ParameterSet();
 	
 	/**
-	 * Constructor which instantiates a new parameter object with the the default values.
+	 * Constructor which instantiates new parameter objects with the the default values.
 	 */
 	public LuceneIndexingParameters() {
-		transactionMergeFactor = DEFAULT_MERGE_FACTOR;
-		batchMergeFactor = DEFAULT_MERGE_FACTOR;
-		transactionMaxMergeDocs = DEFAULT_MAX_MERGE_DOCS;
-		batchMaxMergeDocs = DEFAULT_MAX_MERGE_DOCS;
-		transactionMaxBufferedDocs = DEFAULT_MAX_BUFFERED_DOCS;
-		batchMaxBufferedDocs = DEFAULT_MAX_BUFFERED_DOCS;
+		//FIXME: I would recommend setting the following parameters as defaults for batch indexing:
+		//batchIndexParameters.setMaxBufferedDocs(null);
+		//batchIndexParameters.setRamBufferSizeMB(64);
+
 	}
 	
-	public int getTransactionMaxMergeDocs() {
-		return transactionMaxMergeDocs;
+	public ParameterSet getTransactionIndexParameters() {
+		return transactionIndexParameters;
 	}
 
-	public void setTransactionMaxMergeDocs(int transactionMaxMergeDocs) {
-		this.transactionMaxMergeDocs = transactionMaxMergeDocs;
+	public ParameterSet getBatchIndexParameters() {
+		return batchIndexParameters;
 	}
 
-	public int getTransactionMergeFactor() {
-		return transactionMergeFactor;
-	}
+	public class ParameterSet implements Serializable {
 
-	public void setTransactionMergeFactor(int transactionMergeFactor) {
-		this.transactionMergeFactor = transactionMergeFactor;
-	}
+		private Integer mergeFactor = null;
+		private Integer maxMergeDocs = null;
+		private Integer maxBufferedDocs = null;
+		private Integer termIndexInterval = null;
+		private Integer ramBufferSizeMB = null;
 
-	public int getBatchMaxMergeDocs() {
-		return batchMaxMergeDocs;
-	}
+		public Integer getMergeFactor() {
+			return mergeFactor;
+		}
+		public void setMergeFactor(Integer mergeFactor) {
+			this.mergeFactor = mergeFactor;
+		}
+		public Integer getMaxMergeDocs() {
+			return maxMergeDocs;
+		}
+		public void setMaxMergeDocs(Integer maxMergeDocs) {
+			this.maxMergeDocs = maxMergeDocs;
+		}
+		public Integer getMaxBufferedDocs() {
+			return maxBufferedDocs;
+		}
+		public void setMaxBufferedDocs(Integer maxBufferedDocs) {
+			this.maxBufferedDocs = maxBufferedDocs;
+		}
+		public Integer getRamBufferSizeMB() {
+			return ramBufferSizeMB;
+		}
+		public void setRamBufferSizeMB(Integer ramBufferSizeMB) {
+			this.ramBufferSizeMB = ramBufferSizeMB;
+		}
+		public Integer getTermIndexInterval() {
+			return termIndexInterval;
+		}
+		public void setTermIndexInterval(Integer termIndexInterval) {
+			this.termIndexInterval = termIndexInterval;
+		}
 
-	public void setBatchMaxMergeDocs(int batchMaxMergeDocs) {
-		this.batchMaxMergeDocs = batchMaxMergeDocs;
-	}
+		/**
+		 * Applies the parameters represented by this to a writer.
+		 * Undefined parameters are not set, leaving the lucene default.
+		 * @param writer the IndexWriter whereto the parameters will be applied.
+		 */
+		void applyToWriter(IndexWriter writer){
+			try {
+			if (mergeFactor!=null)
+				writer.setMergeFactor(mergeFactor);
+			if (maxMergeDocs!=null)
+				writer.setMaxMergeDocs(maxMergeDocs);
+			if (maxBufferedDocs!=null)
+				writer.setMaxBufferedDocs(maxBufferedDocs);
+			if (ramBufferSizeMB!=null)
+				writer.setRAMBufferSizeMB(ramBufferSizeMB);
+			if (termIndexInterval!=null)
+				writer.setTermIndexInterval(termIndexInterval);
+			}catch (IllegalArgumentException e) {
+				log.error("Illegal IndexWriter setting"+e.getMessage()+". Will use default settings!");
+			}
+		}
 
-	public int getBatchMergeFactor() {
-		return batchMergeFactor;
-	}
-
-	public void setBatchMergeFactor(int batchMergeFactor) {
-		this.batchMergeFactor = batchMergeFactor;
-	}
-
-	public int getBatchMaxBufferedDocs() {
-		return batchMaxBufferedDocs;
-	}
-
-	public void setBatchMaxBufferedDocs(int batchMaxBufferedDocs) {
-		this.batchMaxBufferedDocs = batchMaxBufferedDocs;
-	}
-
-	public int getTransactionMaxBufferedDocs() {
-		return transactionMaxBufferedDocs;
-	}
-
-	public void setTransactionMaxBufferedDocs(int transactionMaxBufferedDocs) {
-		this.transactionMaxBufferedDocs = transactionMaxBufferedDocs;
-	}
+ 	}
 }

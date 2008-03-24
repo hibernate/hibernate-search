@@ -53,6 +53,8 @@ public class DirectoryProviderFactory {
 	private static final String MERGE_FACTOR = "merge_factor";
 	private static final String MAX_MERGE_DOCS = "max_merge_docs";
 	private static final String MAX_BUFFERED_DOCS = "max_buffered_docs";
+	private static final String RAM_BUFFER_SIZE = "ram_buffer_size";
+	
 	private static final String BATCH = "batch.";
 	private static final String TRANSACTION = "transaction.";
 
@@ -183,75 +185,98 @@ public class DirectoryProviderFactory {
 	 * NOTE:</br>
 	 * If a non  batch value is set in the configuration apply it also to the
      * batch mode. This covers the case where users only specify 
-	 * paramters for the non batch mode. In this case the same parameters apply for 
+	 * parameters for the non batch mode. In this case the same parameters apply for 
 	 * batch indexing.
 	 * </p>
 	 * 
 	 * @param searchFactoryImplementor the search factory.
 	 * @param indexProps The properties extracted from the configuration.
-	 * @param provider The direcotry provider for which to configure the indexing parameters.
+	 * @param provider The directory provider for which to configure the indexing parameters.
 	 */
 	private void configureIndexingParameters(SearchFactoryImplementor searchFactoryImplementor, Properties indexProps, DirectoryProvider<?> provider) {
 		
 		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters();
-		String s = indexProps.getProperty(TRANSACTION + MERGE_FACTOR);
 		
-		if (!StringHelper.isEmpty( s )) {
-			try{
-				indexingParams.setTransactionMergeFactor(Integer.valueOf(s));
-				indexingParams.setBatchMergeFactor(Integer.valueOf(s));
-			} catch (NumberFormatException ne) {
-				throw new SearchException("Invalid value for " + TRANSACTION + MERGE_FACTOR + ": " + s);
+		{
+			Integer val = getIntegerProperty(indexProps, TRANSACTION + MERGE_FACTOR);
+			if (val!=null) {
+				indexingParams.getTransactionIndexParameters().setMergeFactor(val);
+				indexingParams.getBatchIndexParameters().setMergeFactor(val);
+			}
+		}
+		
+		{
+			Integer val = getIntegerProperty(indexProps, TRANSACTION + MAX_MERGE_DOCS);
+			if (val!=null) {
+				indexingParams.getTransactionIndexParameters().setMaxMergeDocs(val);
+				indexingParams.getBatchIndexParameters().setMaxMergeDocs(val);
 			}
 		}
 
-		s = indexProps.getProperty(TRANSACTION + MAX_MERGE_DOCS);
-		if (!StringHelper.isEmpty( s )) {
-			try{
-				indexingParams.setTransactionMaxMergeDocs(Integer.valueOf(s));
-				indexingParams.setBatchMaxMergeDocs(Integer.valueOf(s));
-			} catch (NumberFormatException ne) {
-				throw new SearchException("Invalid value for " + TRANSACTION + MAX_MERGE_DOCS + ": " + s);
+		{
+			Integer val = getIntegerProperty(indexProps, TRANSACTION + MAX_BUFFERED_DOCS);
+			if (val!=null) {
+				indexingParams.getTransactionIndexParameters().setMaxBufferedDocs(val);
+				indexingParams.getBatchIndexParameters().setMaxBufferedDocs(val);
 			}
 		}
 		
-		s = indexProps.getProperty(TRANSACTION + MAX_BUFFERED_DOCS);
-		if (!StringHelper.isEmpty( s )) {
-			try{
-				indexingParams.setTransactionMaxBufferedDocs(Integer.valueOf(s));
-				indexingParams.setBatchMaxBufferedDocs(Integer.valueOf(s));
-			} catch (NumberFormatException ne) {
-				throw new SearchException("Invalid value for " + TRANSACTION + MAX_BUFFERED_DOCS + ": " + s);
-			}
-		}		
-				
-		s = indexProps.getProperty(BATCH + MERGE_FACTOR);
-		if (!StringHelper.isEmpty( s )) {
-			try{
-				indexingParams.setBatchMergeFactor(Integer.valueOf(s));
-			} catch (NumberFormatException ne) {
-				throw new SearchException("Invalid value for " + BATCH + MERGE_FACTOR + ": " + s);
+		{
+			Integer val = getIntegerProperty(indexProps, TRANSACTION + RAM_BUFFER_SIZE);
+			if (val!=null) {
+				indexingParams.getTransactionIndexParameters().setRamBufferSizeMB(val);
+				indexingParams.getBatchIndexParameters().setRamBufferSizeMB(val);
 			}
 		}
 		
-		s = indexProps.getProperty(BATCH + MAX_MERGE_DOCS);
-		if (!StringHelper.isEmpty( s )) {
-			try{
-				indexingParams.setBatchMaxMergeDocs(Integer.valueOf(s));
-			} catch (NumberFormatException ne) {
-				throw new SearchException("Invalid value for " + BATCH + MAX_MERGE_DOCS + ": " + s);
+		{
+			Integer val = getIntegerProperty(indexProps, BATCH + MERGE_FACTOR);
+			if (val!=null) {
+				indexingParams.getBatchIndexParameters().setMergeFactor(val);
 			}
 		}
 		
-		s = indexProps.getProperty(BATCH + MAX_BUFFERED_DOCS);
-		if (!StringHelper.isEmpty( s )) {
-			try{
-				indexingParams.setBatchMaxBufferedDocs(Integer.valueOf(s));
-			} catch (NumberFormatException ne) {
-				throw new SearchException("Invalid value for " + BATCH + MAX_BUFFERED_DOCS + ": " + s);
+		{
+			Integer val = getIntegerProperty(indexProps, BATCH + MAX_MERGE_DOCS);
+			if (val!=null) {
+				indexingParams.getBatchIndexParameters().setMaxMergeDocs(val);
 			}
-		}	
+		}
+		
+		{
+			Integer val = getIntegerProperty(indexProps, BATCH + MAX_BUFFERED_DOCS);
+			if (val!=null) {
+				indexingParams.getBatchIndexParameters().setMaxBufferedDocs(val);
+			}
+		}
+		
+		{
+			Integer val = getIntegerProperty(indexProps, BATCH + RAM_BUFFER_SIZE);
+			if (val!=null) {
+				indexingParams.getBatchIndexParameters().setRamBufferSizeMB(val);
+			}
+		}
+		
 		searchFactoryImplementor.addIndexingParmeters(provider, indexingParams);
+	}
+
+	/**
+	 * @param indexProps The properties to look into for the value.
+	 * @param propertyName The value key.
+	 * @return null if the property is not defined, the parse value otherwise.
+	 * @throws SearchException if the property is defined but not in an integer format.
+	 */
+	private Integer getIntegerProperty(Properties indexProps, String propertyName) {
+		String propertyValue = indexProps.getProperty(propertyName);
+		Integer i = null;
+		if (StringHelper.isNotEmpty( propertyValue )) {
+			try{
+				i = Integer.valueOf(propertyValue);
+			} catch (NumberFormatException ne) {
+				throw new SearchException("Invalid value for " + propertyName + ": " + propertyValue);
+			}
+		}
+		return i;
 	}
 
 	/**

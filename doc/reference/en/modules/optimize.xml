@@ -100,10 +100,11 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlistin
     performed. Hibernate Search expose those parameters.</para>
 
     <para>Further index optimisation parameters include
-    <literal>hibernate.search.[default|&lt;indexname&gt;].merge_factor</literal>,
-    <literal>hibernate.search.[default|&lt;indexname&gt;].max_merge_docs</literal>
+    <literal>hibernate.search.[default|&lt;indexname&gt;].[batch|transaction].merge_factor</literal>,
+    <literal>hibernate.search.[default|&lt;indexname&gt;].[batch|transaction].max_merge_docs</literal>,
+    <literal>hibernate.search.[default|&lt;indexname&gt;].[batch|transaction].max_buffered_docs</literal>
     and
-    <literal>hibernate.search.[default|&lt;indexname&gt;].max_buffered_docs</literal>
+    <literal>hibernate.search.[default|&lt;indexname&gt;].[batch|transaction].ram_buffer_size</literal>
     - see <xref linkend="lucene-indexing-performance" /> for more
     details.</para>
   </section>

@@ -121,14 +121,10 @@ public class Workspace {
 
 			LuceneIndexingParameters indexingParams = searchFactoryImplementor.getIndexingParameters( provider );
 			if ( isBatch ) {
-				writer.setMergeFactor( indexingParams.getBatchMergeFactor() );
-				writer.setMaxMergeDocs( indexingParams.getBatchMaxMergeDocs() );
-				writer.setMaxBufferedDocs( indexingParams.getBatchMaxBufferedDocs() );
+				indexingParams.getBatchIndexParameters().applyToWriter(writer);
 			}
 			else {
-				writer.setMergeFactor( indexingParams.getTransactionMergeFactor() );
-				writer.setMaxMergeDocs( indexingParams.getTransactionMaxMergeDocs() );
-				writer.setMaxBufferedDocs( indexingParams.getTransactionMaxBufferedDocs() );
+				indexingParams.getTransactionIndexParameters().applyToWriter(writer);
 			}
 
 			writers.put( provider, writer );

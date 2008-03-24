@@ -556,7 +556,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     </section>
   </section>
 
-  <section id="lucene-indexing-performance" revision="1">
+  <section id="lucene-indexing-performance" revision="2">
     <title>Tuning Lucene indexing performance</title>
 
     <para>Hibernate Search allows you to tune the Lucene indexing performance
@@ -581,6 +581,10 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         <listitem>
           <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</literal></para>
         </listitem>
+        
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.ram_buffer_size</literal></para>
+        </listitem>
       </itemizedlist>When indexing occurs via
     <literal>FullTextSession.index()</literal> (see <xref
     linkend="search-batchindex" />), the following properties are used:
@@ -595,6 +599,10 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
 
         <listitem>
           <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal></para>
+        </listitem>
+        
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.ram_buffer_size</literal></para>
         </listitem>
       </itemizedlist></para>
 
@@ -658,6 +666,19 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
 
             <entry>10</entry>
           </row>
+          
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.ram_buffer_size</literal></entry>
+
+            <entry><para>Controls the amount of RAM in MB dedicated to document buffers.
+            When used together max_buffered_docs a flush occurs for whichever event happens first.</para>
+            <para>Generally for faster indexing performance it's best to flush by RAM usage instead of document
+   			count and use as large a RAM buffer as you can.</para>
+            <para>Used by Hibernate Search during index update operations as
+            part of database modifications.</para></entry>
+
+            <entry>16 MB</entry>
+          </row>
 
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal></entry>
@@ -696,6 +717,19 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
             <literal>FullTextSession.index()</literal></para></entry>
 
             <entry>10</entry>
+          </row>
+          
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.ram_buffer_size</literal></entry>
+
+            <entry><para>Controls the amount of RAM in MB dedicated to document buffers.
+            When used together max_buffered_docs a flush occurs for whichever event happens first.</para>
+            <para>Generally for faster indexing performance it's best to flush by RAM usage instead of document
+   			count and use as large a RAM buffer as you can.</para>
+            <para>Used during indexing via
+            <literal>FullTextSession.index()</literal></para></entry>
+
+            <entry>16 MB</entry>
           </row>
         </tbody>
       </tgroup>
