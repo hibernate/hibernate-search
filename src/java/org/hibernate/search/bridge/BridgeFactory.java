@@ -120,6 +120,17 @@ public class BridgeFactory {
 					if ( FieldBridge.class.isAssignableFrom( impl ) ) {
 						bridge = (FieldBridge) instance;
 					}
+					else if ( org.hibernate.search.bridge.TwoWayStringBridge.class.isAssignableFrom( impl ) ) {
+						bridge = new TwoWayString2FieldBridgeAdaptor(
+								(org.hibernate.search.bridge.TwoWayStringBridge) instance );
+					}
+					else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
+						bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
+					}
+					else {
+						throw new SearchException("@ClassBridge implementation implements none of the field bridge interfaces: "
+								+ impl );
+					}
 					if ( cb.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
 						Map params = new HashMap( cb.params().length );
 						for ( Parameter param : cb.params() ) {
@@ -175,7 +186,7 @@ public class BridgeFactory {
 					}
 					( (ParameterizedBridge) instance ).setParameterValues( params );
 				}
-				throw new SearchException("@FieldBridge bridge does not implement any of the expected interfaces: " + member.getName() );
+
 			}
 			catch (Exception e) {
 				//TODO add classname
