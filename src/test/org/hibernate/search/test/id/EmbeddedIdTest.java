@@ -30,6 +30,16 @@ public class EmbeddedIdTest extends SearchTestCase {
 		List results = Search.createFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term("id.lastName", "Bernard" ) ) ).list();
 		assertEquals( 1, results.size() );
+		emm = (Person) results.get(0);
+		emm.setFavoriteColor( "Red" );
+		tx.commit();
+		s.clear();
+		tx = s.beginTransaction();
+		results = Search.createFullTextSession( s ).createFullTextQuery(
+				new TermQuery( new Term("id.lastName", "Bernard" ) ) ).list();
+		assertEquals( 1, results.size() );
+		emm = (Person) results.get(0);
+		assertEquals( "Red", emm.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();
 		s.close();
