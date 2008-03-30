@@ -113,7 +113,7 @@ public class BridgeFactory {
 
 		if ( cb != null ) {
 			Class impl = cb.impl();
-
+			//TODO better error information ( see guessType() )
 			if (impl != null) {
 				try {
 					Object instance = impl.newInstance();
@@ -175,6 +175,7 @@ public class BridgeFactory {
 					}
 					( (ParameterizedBridge) instance ).setParameterValues( params );
 				}
+				throw new SearchException("@FieldBridge bridge does not implement any of the expected interfaces: " + member.getName() );
 			}
 			catch (Exception e) {
 				//TODO add classname
