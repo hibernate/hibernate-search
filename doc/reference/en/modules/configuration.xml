@@ -610,7 +610,12 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     explicitly set, the value will default to the
     <literal>.transaction</literal> property.</para>
 
-    <para>For more information about Lucene indexing performances, please
+    <para>
+    The default for all values is to leave them at Lucene's own default,
+    so the listed values in the following table actually depend on the
+    version of Lucene you are using;
+    values shown are relative to version <literal>2.3</literal>.
+    For more information about Lucene indexing performances, please
     refer to the Lucene documentation.</para>
 
     <table>
@@ -664,7 +669,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
             <para>Used by Hibernate Search during index update operations as
             part of database modifications.</para></entry>
 
-            <entry>10</entry>
+            <entry>Disabled (not set)</entry>
           </row>
           
           <row>
@@ -716,7 +721,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
             <para>Used during indexing via
             <literal>FullTextSession.index()</literal></para></entry>
 
-            <entry>10</entry>
+            <entry>Disabled (not set)</entry>
           </row>
           
           <row>

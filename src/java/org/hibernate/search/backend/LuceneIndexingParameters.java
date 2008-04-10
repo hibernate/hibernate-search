@@ -2,10 +2,14 @@
 package org.hibernate.search.backend;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.backend.configuration.IndexWriterSetting;
 
 /**
  * Wrapper class around the Lucene indexing parameters <i>mergeFactor</i>, <i>maxMergeDocs</i>,
@@ -16,25 +20,39 @@ import org.apache.lucene.index.IndexWriter;
  * 
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
- *
  */
 public class LuceneIndexingParameters implements Serializable {
 
 	private static final Log log = LogFactory.getLog( LuceneIndexingParameters.class );
-	
-	private final ParameterSet transactionIndexParameters = new ParameterSet();
-	private final ParameterSet batchIndexParameters = new ParameterSet();
-	
-	/**
-	 * Constructor which instantiates new parameter objects with the the default values.
-	 */
-	public LuceneIndexingParameters() {
-		//FIXME: I would recommend setting the following parameters as defaults for batch indexing:
-		//batchIndexParameters.setMaxBufferedDocs(null);
-		//batchIndexParameters.setRamBufferSizeMB(64);
 
-	}
+	// value keyword
+	public static final String EXPLICIT_DEFAULT_VALUE = "default"; 
+	// property path keywords
+	public static final String BATCH = "batch.";
+	public static final String TRANSACTION = "transaction.";
 	
+	private final ParameterSet transactionIndexParameters;
+	private final ParameterSet batchIndexParameters;
+	
+	public LuceneIndexingParameters( Properties sourceProps ) {
+		Properties transactionProps = new Properties();
+		Properties batchProps = new Properties( transactionProps ); // transaction settings is the default for batch
+		//don't iterate on property entries we know all the keys:
+		for ( IndexWriterSetting t : IndexWriterSetting.values() ) {
+			String key = t.getKey();
+			String trxValue = sourceProps.getProperty( TRANSACTION + key );
+			if (trxValue != null) {
+				transactionProps.setProperty( key, trxValue );
+			}
+			String batchValue = sourceProps.getProperty( BATCH + key );
+			if (batchValue != null) {
+				batchProps.setProperty( key, batchValue );
+			}
+		}
+		transactionIndexParameters = new ParameterSet(transactionProps);
+		batchIndexParameters = new ParameterSet(batchProps);
+	}
+
 	public ParameterSet getTransactionIndexParameters() {
 		return transactionIndexParameters;
 	}
@@ -44,65 +62,47 @@ public class LuceneIndexingParameters implements Serializable {
 	}
 
 	public class ParameterSet implements Serializable {
-
-		private Integer mergeFactor = null;
-		private Integer maxMergeDocs = null;
-		private Integer maxBufferedDocs = null;
-		private Integer termIndexInterval = null;
-		private Integer ramBufferSizeMB = null;
-
-		public Integer getMergeFactor() {
-			return mergeFactor;
+		
+		final Map<IndexWriterSetting, Integer> parameters = new HashMap<IndexWriterSetting, Integer>();
+		
+		public ParameterSet(Properties prop) {
+			for ( IndexWriterSetting t : IndexWriterSetting.values() ) {
+				String value = prop.getProperty( t.getKey() );
+				if ( ! (value==null || EXPLICIT_DEFAULT_VALUE.equals(value) ) ) {
+					parameters.put( t, t.parseVal(value) );
+				}
+			}
 		}
-		public void setMergeFactor(Integer mergeFactor) {
-			this.mergeFactor = mergeFactor;
-		}
-		public Integer getMaxMergeDocs() {
-			return maxMergeDocs;
-		}
-		public void setMaxMergeDocs(Integer maxMergeDocs) {
-			this.maxMergeDocs = maxMergeDocs;
-		}
-		public Integer getMaxBufferedDocs() {
-			return maxBufferedDocs;
-		}
-		public void setMaxBufferedDocs(Integer maxBufferedDocs) {
-			this.maxBufferedDocs = maxBufferedDocs;
-		}
-		public Integer getRamBufferSizeMB() {
-			return ramBufferSizeMB;
-		}
-		public void setRamBufferSizeMB(Integer ramBufferSizeMB) {
-			this.ramBufferSizeMB = ramBufferSizeMB;
-		}
-		public Integer getTermIndexInterval() {
-			return termIndexInterval;
-		}
-		public void setTermIndexInterval(Integer termIndexInterval) {
-			this.termIndexInterval = termIndexInterval;
-		}
-
+		
 		/**
 		 * Applies the parameters represented by this to a writer.
 		 * Undefined parameters are not set, leaving the lucene default.
 		 * @param writer the IndexWriter whereto the parameters will be applied.
 		 */
-		void applyToWriter(IndexWriter writer){
+		public void applyToWriter(IndexWriter writer) {
 			try {
-			if (mergeFactor!=null)
-				writer.setMergeFactor(mergeFactor);
-			if (maxMergeDocs!=null)
-				writer.setMaxMergeDocs(maxMergeDocs);
-			if (maxBufferedDocs!=null)
-				writer.setMaxBufferedDocs(maxBufferedDocs);
-			if (ramBufferSizeMB!=null)
-				writer.setRAMBufferSizeMB(ramBufferSizeMB);
-			if (termIndexInterval!=null)
-				writer.setTermIndexInterval(termIndexInterval);
-			}catch (IllegalArgumentException e) {
-				log.error("Illegal IndexWriter setting"+e.getMessage()+". Will use default settings!");
+				for ( Map.Entry<IndexWriterSetting,Integer> entry : parameters.entrySet() ) {
+					entry.getKey().applySetting( writer, entry.getValue() );
+				}
+			} catch (IllegalArgumentException e) {
+				//FIXME shouldn't we raise an exception instead
+				log.error( "Illegal IndexWriter setting" + e.getMessage()
+						+ ". Will use default settings." );
+			}
+		}
+		
+		public Integer getCurrentValueFor(IndexWriterSetting ws){
+			return parameters.get(ws);
+		}
+		
+		public void setCurrentValueFor(IndexWriterSetting ws, Integer newValue){
+			if (newValue==null){
+				parameters.remove(ws);
+			} else {
+				parameters.put(ws, newValue);
 			}
 		}
 
  	}
+	
 }

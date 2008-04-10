@@ -1,34 +1,31 @@
 package org.hibernate.search.test.configuration;
 
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.backend.LuceneIndexingParameters;
-import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
+import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_BUFFERED_DOCS;
+import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_MERGE_DOCS;
+import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERGE_FACTOR;
+import static org.hibernate.search.backend.configuration.IndexWriterSetting.RAM_BUFFER_SIZE;
+import static org.hibernate.search.test.configuration.ConfigurationReadTestCase.TransactionType.TRANSACTION;
+import static org.hibernate.search.test.configuration.ConfigurationReadTestCase.TransactionType.BATCH;
 
 /**
  * @author Sanne Grinovero
  */
-public class LuceneIndexingParametersTest extends SearchTestCase {
+public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		
-		//super sets:
-		//cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
-		//cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
-		
 		cfg.setProperty( "hibernate.search.default.batch.ram_buffer_size", "1" );
+//set by super : cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
 		
 		cfg.setProperty( "hibernate.search.default.transaction.ram_buffer_size", "2" );
 		cfg.setProperty( "hibernate.search.default.transaction.max_merge_docs", "9" );
-		cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "10" );
+//set by super : cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
 		cfg.setProperty( "hibernate.search.default.transaction.max_buffered_docs", "11" );
 		
-		cfg.setProperty( "hibernate.search.Book.batch.ram_buffer_size", "3" );
 		cfg.setProperty( "hibernate.search.Book.batch.max_merge_docs", "12" );
 		cfg.setProperty( "hibernate.search.Book.batch.merge_factor", "13" );
 		cfg.setProperty( "hibernate.search.Book.batch.max_buffered_docs", "14" );
@@ -38,63 +35,55 @@ public class LuceneIndexingParametersTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.Book.transaction.merge_factor", "16" );
 		cfg.setProperty( "hibernate.search.Book.transaction.max_buffered_docs", "17" );
 		
-		cfg.setProperty( "hibernate.search.Documents.ram_buffer_size", "4" );
+		cfg.setProperty( "hibernate.search.Documents.transaction.ram_buffer_size", "default" );
+		cfg.setProperty( "hibernate.search.Documents.transaction.max_merge_docs", "5" );
+		cfg.setProperty( "hibernate.search.Documents.transaction.merge_factor", "6" );
+		cfg.setProperty( "hibernate.search.Documents.transaction.max_buffered_docs", "7" );
+		cfg.setProperty( "hibernate.search.Documents.batch.max_merge_docs", "9" );
 		
 	}
 	
+	public void testDefaultIndexProviderParameters() throws Exception {
+		assertValueIsSet( Author.class, TRANSACTION, RAM_BUFFER_SIZE, 2 );
+		assertValueIsSet( Author.class, TRANSACTION, MAX_MERGE_DOCS, 9 );
+		assertValueIsSet( Author.class, TRANSACTION, MAX_BUFFERED_DOCS,  11 );
+		assertValueIsSet( Author.class, TRANSACTION, MERGE_FACTOR,  100 );
+	}
+	
+	public void testBatchParametersGlobals() throws Exception {
+		assertValueIsSet( Author.class, BATCH, RAM_BUFFER_SIZE, 1 );
+		assertValueIsSet( Author.class, BATCH, MAX_MERGE_DOCS, 9 );
+		assertValueIsSet( Author.class, BATCH, MAX_BUFFERED_DOCS, 1000 );
+		assertValueIsSet( Author.class, BATCH, MERGE_FACTOR, 100 );
+	}
+	
 	public void testUnsetBatchValueTakesTransaction() throws Exception {
-		FullTextSession fullTextSession = Search.createFullTextSession( openSession() );
-		SearchFactoryImpl searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
-		LuceneIndexingParameters indexingParameters = searchFactory.getIndexingParameters(searchFactory.getDirectoryProviders(Document.class)[0]);
-		assertEquals(10, (int)indexingParameters.getBatchIndexParameters().getMergeFactor());
-		assertEquals(1000, (int)indexingParameters.getBatchIndexParameters().getMaxBufferedDocs());
-		fullTextSession.close();
+		assertValueIsSet( Document.class, BATCH, MERGE_FACTOR, 6 );
+		assertValueIsSet( Document.class, BATCH, MAX_BUFFERED_DOCS, 7 );
 	}
 	
-	public void testBatchParametersDefault() throws Exception {
-		FullTextSession fullTextSession = Search.createFullTextSession( openSession() );
-		SearchFactoryImpl searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
-		LuceneIndexingParameters indexingParameters = searchFactory.getIndexingParameters(searchFactory.getDirectoryProviders(Author.class)[0]);
-		assertEquals(1, (int)indexingParameters.getBatchIndexParameters().getRamBufferSizeMB());
-		assertEquals(9, (int)indexingParameters.getBatchIndexParameters().getMaxMergeDocs());
-		assertEquals(1000, (int)indexingParameters.getBatchIndexParameters().getMaxBufferedDocs());
-		assertEquals(10, (int)indexingParameters.getBatchIndexParameters().getMergeFactor());
-		fullTextSession.close();
+	public void testExplicitBatchParameters() throws Exception {
+		assertValueIsSet( Book.class, BATCH, MAX_MERGE_DOCS, 12 );
+		assertValueIsSet( Book.class, BATCH, MAX_BUFFERED_DOCS, 14 );
+		assertValueIsSet( Book.class, BATCH, MERGE_FACTOR, 13 );
 	}
 	
-	public void testTransactionParametersDefault() throws Exception {
-		FullTextSession fullTextSession = Search.createFullTextSession( openSession() );
-		SearchFactoryImpl searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
-		LuceneIndexingParameters indexingParameters = searchFactory.getIndexingParameters(searchFactory.getDirectoryProviders(Author.class)[0]);
-		assertEquals(2, (int)indexingParameters.getTransactionIndexParameters().getRamBufferSizeMB());
-		assertEquals(9, (int)indexingParameters.getTransactionIndexParameters().getMaxMergeDocs());
-		assertEquals(11, (int)indexingParameters.getTransactionIndexParameters().getMaxBufferedDocs());
-		assertEquals(10, (int)indexingParameters.getTransactionIndexParameters().getMergeFactor());
-		fullTextSession.close();
-	}
-	
-	public void testBatchParameters() throws Exception {
-		FullTextSession fullTextSession = Search.createFullTextSession( openSession() );
-		SearchFactoryImpl searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
-		LuceneIndexingParameters indexingParameters = searchFactory.getIndexingParameters(searchFactory.getDirectoryProviders(Book.class)[0]);
-		assertEquals(3, (int)indexingParameters.getBatchIndexParameters().getRamBufferSizeMB());
-		assertEquals(12, (int)indexingParameters.getBatchIndexParameters().getMaxMergeDocs());
-		assertEquals(14, (int)indexingParameters.getBatchIndexParameters().getMaxBufferedDocs());
-		assertEquals(13, (int)indexingParameters.getBatchIndexParameters().getMergeFactor());
-		fullTextSession.close();
+	public void testInheritedBatchParametersFromTranscation() throws Exception {
+		assertValueIsSet( Book.class, BATCH, RAM_BUFFER_SIZE, 4 );
 	}
 	
 	public void testTransactionParameters() throws Exception {
-		FullTextSession fullTextSession = Search.createFullTextSession( openSession() );
-		SearchFactoryImpl searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
-		LuceneIndexingParameters indexingParameters = searchFactory.getIndexingParameters(searchFactory.getDirectoryProviders(Book.class)[0]);
-		assertEquals(4, (int)indexingParameters.getTransactionIndexParameters().getRamBufferSizeMB());
-		assertEquals(15, (int)indexingParameters.getTransactionIndexParameters().getMaxMergeDocs());
-		assertEquals(17, (int)indexingParameters.getTransactionIndexParameters().getMaxBufferedDocs());
-		assertEquals(16, (int)indexingParameters.getTransactionIndexParameters().getMergeFactor());
-		fullTextSession.close();
+		assertValueIsSet( Book.class, TRANSACTION, RAM_BUFFER_SIZE, 4 );
+		assertValueIsSet( Book.class, TRANSACTION, MAX_MERGE_DOCS, 15 );
+		assertValueIsSet( Book.class, TRANSACTION, MAX_BUFFERED_DOCS, 17 );
+		assertValueIsSet( Book.class, TRANSACTION, MERGE_FACTOR, 16 );
 	}
-
+	
+	public void testDefaultKeywordOverwritesInherited() throws Exception {
+		assertValueIsDefault( Document.class, TRANSACTION, RAM_BUFFER_SIZE );
+		assertValueIsDefault( Document.class, TRANSACTION, RAM_BUFFER_SIZE );
+	}
+	
 	protected Class[] getMappings() {
 		return new Class[] {
 				Book.class,
@@ -102,5 +91,5 @@ public class LuceneIndexingParametersTest extends SearchTestCase {
 				Document.class
 		};
 	}
-
+	
 }

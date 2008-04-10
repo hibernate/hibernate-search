@@ -2,24 +2,25 @@
 package org.hibernate.search.store;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.HibernateException;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.LuceneIndexingParameters;
-import org.hibernate.search.impl.SearchFactoryImpl;
-import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
-import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;
-import org.hibernate.search.SearchException;
-import org.hibernate.mapping.PersistentClass;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.backend.LuceneIndexingParameters;
+import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.impl.SearchFactoryImpl;
+import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
+import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;
+import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.util.ReflectHelper;
 import org.hibernate.util.StringHelper;
 
@@ -49,15 +50,6 @@ public class DirectoryProviderFactory {
 	private static String LUCENE_DEFAULT = LUCENE_PREFIX + "default.";
 	private static String DEFAULT_DIRECTORY_PROVIDER = FSDirectoryProvider.class.getName();
 	
-	// Lucene index performance parameters
-	private static final String MERGE_FACTOR = "merge_factor";
-	private static final String MAX_MERGE_DOCS = "max_merge_docs";
-	private static final String MAX_BUFFERED_DOCS = "max_buffered_docs";
-	private static final String RAM_BUFFER_SIZE = "ram_buffer_size";
-	
-	private static final String BATCH = "batch.";
-	private static final String TRANSACTION = "transaction.";
-
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 
@@ -80,11 +72,15 @@ public class DirectoryProviderFactory {
 		//define sharding strategy
 		IndexShardingStrategy shardingStrategy;
 		Properties shardingProperties = new Properties();
-		for (Map.Entry entry : indexProps[0].entrySet()) {
-			if ( ( (String) entry.getKey() ).startsWith( SHARDING_STRATEGY ) ) {
-				shardingProperties.put( entry.getKey(), entry.getValue() );
+		//we use an enumeration to get the keys from defaultProperties as well
+		Enumeration<String> allProps = (Enumeration<String>) indexProps[0].propertyNames();
+		while ( allProps.hasMoreElements() ){
+			String key = allProps.nextElement();
+			if ( key.startsWith( SHARDING_STRATEGY ) ) {
+				shardingProperties.put( key, indexProps[0].getProperty( key ) );
 			}
 		}
+
 		String shardingStrategyName = shardingProperties.getProperty( SHARDING_STRATEGY );
 		if ( shardingStrategyName == null) {
 			if ( indexProps.length == 1 ) {
@@ -183,7 +179,7 @@ public class DirectoryProviderFactory {
 	 * If there are no matching properties in the configuration default values will be applied.
 	 * <p>
 	 * NOTE:</br>
-	 * If a non  batch value is set in the configuration apply it also to the
+	 * If a non batch value is set in the configuration apply it also to the
      * batch mode. This covers the case where users only specify 
 	 * parameters for the non batch mode. In this case the same parameters apply for 
 	 * batch indexing.
@@ -194,176 +190,79 @@ public class DirectoryProviderFactory {
 	 * @param provider The directory provider for which to configure the indexing parameters.
 	 */
 	private void configureIndexingParameters(SearchFactoryImplementor searchFactoryImplementor, Properties indexProps, DirectoryProvider<?> provider) {
-		
-		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters();
-		
-		{
-			Integer val = getIntegerProperty(indexProps, TRANSACTION + MERGE_FACTOR);
-			if (val!=null) {
-				indexingParams.getTransactionIndexParameters().setMergeFactor(val);
-				indexingParams.getBatchIndexParameters().setMergeFactor(val);
-			}
-		}
-		
-		{
-			Integer val = getIntegerProperty(indexProps, TRANSACTION + MAX_MERGE_DOCS);
-			if (val!=null) {
-				indexingParams.getTransactionIndexParameters().setMaxMergeDocs(val);
-				indexingParams.getBatchIndexParameters().setMaxMergeDocs(val);
-			}
-		}
-
-		{
-			Integer val = getIntegerProperty(indexProps, TRANSACTION + MAX_BUFFERED_DOCS);
-			if (val!=null) {
-				indexingParams.getTransactionIndexParameters().setMaxBufferedDocs(val);
-				indexingParams.getBatchIndexParameters().setMaxBufferedDocs(val);
-			}
-		}
-		
-		{
-			Integer val = getIntegerProperty(indexProps, TRANSACTION + RAM_BUFFER_SIZE);
-			if (val!=null) {
-				indexingParams.getTransactionIndexParameters().setRamBufferSizeMB(val);
-				indexingParams.getBatchIndexParameters().setRamBufferSizeMB(val);
-			}
-		}
-		
-		{
-			Integer val = getIntegerProperty(indexProps, BATCH + MERGE_FACTOR);
-			if (val!=null) {
-				indexingParams.getBatchIndexParameters().setMergeFactor(val);
-			}
-		}
-		
-		{
-			Integer val = getIntegerProperty(indexProps, BATCH + MAX_MERGE_DOCS);
-			if (val!=null) {
-				indexingParams.getBatchIndexParameters().setMaxMergeDocs(val);
-			}
-		}
-		
-		{
-			Integer val = getIntegerProperty(indexProps, BATCH + MAX_BUFFERED_DOCS);
-			if (val!=null) {
-				indexingParams.getBatchIndexParameters().setMaxBufferedDocs(val);
-			}
-		}
-		
-		{
-			Integer val = getIntegerProperty(indexProps, BATCH + RAM_BUFFER_SIZE);
-			if (val!=null) {
-				indexingParams.getBatchIndexParameters().setRamBufferSizeMB(val);
-			}
-		}
-		
-		searchFactoryImplementor.addIndexingParmeters(provider, indexingParams);
-	}
-
-	/**
-	 * @param indexProps The properties to look into for the value.
-	 * @param propertyName The value key.
-	 * @return null if the property is not defined, the parse value otherwise.
-	 * @throws SearchException if the property is defined but not in an integer format.
-	 */
-	private Integer getIntegerProperty(Properties indexProps, String propertyName) {
-		String propertyValue = indexProps.getProperty(propertyName);
-		Integer i = null;
-		if (StringHelper.isNotEmpty( propertyValue )) {
-			try{
-				i = Integer.valueOf(propertyValue);
-			} catch (NumberFormatException ne) {
-				throw new SearchException("Invalid value for " + propertyName + ": " + propertyValue);
-			}
-		}
-		return i;
+		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters( indexProps );
+		searchFactoryImplementor.addIndexingParmeters( provider, indexingParams );
 	}
 
 	/**
 	 * Returns an array of directory properties
-	 * Properties are defaulted. For a given proeprty name,
+	 * Properties are defaulted. For a given property name,
 	 * hibernate.search.indexname.n has priority over hibernate.search.indexname which has priority over hibernate.search
 	 * If the Index is not sharded, a single Properties is returned
 	 * If the index is sharded, the Properties index matches the shard index
-	 */
+	 */	
 	private static Properties[] getDirectoryProperties(Configuration cfg, String directoryProviderName) {
-		Properties props = cfg.getProperties();
-		String indexName = LUCENE_PREFIX + directoryProviderName;
-		//indexSpecificProperties[i] >> indexSpecificDefaultproperties >> defaultProperties
-		Properties defaultProperties = new Properties();
-		ArrayList<Properties> indexSpecificProps = new ArrayList<Properties>();
-		Properties indexSpecificDefaultProps = new Properties(defaultProperties);
-		for ( Map.Entry entry : props.entrySet() ) {
-			String key = (String) entry.getKey();
+		Properties cfgAndImplicitProperties = new Properties();
+		// fcg has no defaults, so we may use keySet iteration
+		//FIXME not so sure about that cfg.setProperties()?
+		for ( Map.Entry entry : cfg.getProperties().entrySet() ) {
+			String key = entry.getKey().toString();// casting to String
+			if ( key.startsWith( LUCENE_PREFIX ) ) {
+				//put regular properties and add an explicit batch property when a transaction property is set
+				cfgAndImplicitProperties.put( key, entry.getValue() );
+				if ( key.contains( LuceneIndexingParameters.TRANSACTION ) ) {
+					//FIXME fix that transaction can appear in the index name
+					//I imagine checking the last '.transaction.' is safe.
+					String additionalKey = key.replaceFirst(LuceneIndexingParameters.TRANSACTION, LuceneIndexingParameters.BATCH);
+					if ( cfg.getProperty(additionalKey) == null ){
+						cfgAndImplicitProperties.put(additionalKey, cfg.getProperty(key) );
+					}
+				}
+			}
+		}
+		Properties globalProperties = new Properties();
+		Properties directoryLocalProperties = new Properties( globalProperties );
+		String directoryLocalPrefix = LUCENE_PREFIX + directoryProviderName + ".";
+		for ( Map.Entry entry : cfgAndImplicitProperties.entrySet() ) {
+			String key = entry.getKey().toString();// casting to String
 			if ( key.startsWith( LUCENE_DEFAULT ) ) {
-				defaultProperties.setProperty( key.substring( LUCENE_DEFAULT.length() ), (String) entry.getValue() );
+				globalProperties.put( key.substring( LUCENE_DEFAULT.length() ), entry.getValue() );
 			}
-			else if ( key.startsWith( indexName ) ) {
-				String suffixedKey = key.substring( indexName.length() + 1 );
-				int nextDoc = suffixedKey.indexOf( '.' );
-				int index = -1;
-				if ( nextDoc != -1 ) {
-				    String potentialNbr = suffixedKey.substring( 0, nextDoc );
-					try {
-						index = Integer.parseInt( potentialNbr );
+			else if ( key.startsWith( directoryLocalPrefix ) ) {
+				directoryLocalProperties.put( key.substring( directoryLocalPrefix.length() ),entry.getValue() );
+			}
+		}
+		final String shardsCountValue = directoryLocalProperties.getProperty(NBR_OF_SHARDS);
+		if (shardsCountValue == null) {
+			// no shards: finished.
+			return new Properties[] { directoryLocalProperties };
+		} else {
+			// count shards
+			int shardsCount = -1;
+			{
+				try {
+					shardsCount = Integer.parseInt( shardsCountValue );
+				} catch (NumberFormatException e) {
+					if ( cfgAndImplicitProperties.getProperty(directoryLocalPrefix + NBR_OF_SHARDS ) != null)
+						throw new SearchException( shardsCountValue + " is not a number", e);
+				}
+			}
+			// create shard-specific Props
+			Properties[] shardLocalProperties = new Properties[shardsCount];
+			for ( int i = 0; i < shardsCount; i++ ) {
+				String currentShardPrefix = i + ".";
+				Properties currentProp = new Properties( directoryLocalProperties );
+				//Enumerations are ugly but otherwise we can't get the property defaults:
+				Enumeration<String> localProps = (Enumeration<String>) directoryLocalProperties.propertyNames();
+				while ( localProps.hasMoreElements() ){
+					String key = localProps.nextElement();
+					if ( key.startsWith( currentShardPrefix ) ) {
+						currentProp.setProperty( key.substring( currentShardPrefix.length() ), directoryLocalProperties.getProperty( key ) );
 					}
-					catch ( Exception e ) {
-						//just not a number
-						index = -1;
-					}
 				}
-				if (index == -1) {
-					indexSpecificDefaultProps.setProperty( suffixedKey, (String) entry.getValue() );
-				}
-				else {
-					String finalKeyName = suffixedKey.substring( nextDoc + 1 );
-					//ignore sharding strategy properties
-					if ( ! finalKeyName.startsWith( SHARDING_STRATEGY ) ) {
-						ensureListSize( indexSpecificProps, index + 1 );
-						Properties propertiesforIndex = indexSpecificProps.get( index );
-						if ( propertiesforIndex == null ) {
-							propertiesforIndex = new Properties( indexSpecificDefaultProps );
-							indexSpecificProps.set( index, propertiesforIndex );
-						}
-						propertiesforIndex.setProperty( finalKeyName, (String) entry.getValue() );
-					}
-				}
+				shardLocalProperties[i] = currentProp;
 			}
-		}
-		String nbrOfShardsString = indexSpecificDefaultProps.getProperty( NBR_OF_SHARDS );
-		int nbrOfShards = -1;
-		if ( nbrOfShardsString != null ) {
-			try {
-				nbrOfShards = Integer.parseInt( nbrOfShardsString );
-			}
-			catch (NumberFormatException e) {
-				throw new SearchException(indexName + "." + NBR_OF_SHARDS + " is not a number", e);
-			}
-		}
-		if ( nbrOfShards <= 0 && indexSpecificProps.size() == 0 ) {
-			//no shard (a shareded subindex has to have at least one property
-			return new Properties[] { indexSpecificDefaultProps };
-		}
-		else {
-			//sharded
-			nbrOfShards = nbrOfShards >= indexSpecificDefaultProps.size() ?
-					nbrOfShards :
-					indexSpecificDefaultProps.size();
-			ensureListSize( indexSpecificProps, nbrOfShards );
-			for ( int index = 0 ; index < nbrOfShards ; index++ ) {
-				if ( indexSpecificProps.get( index ) == null ) {
-					indexSpecificProps.set( index, new Properties( indexSpecificDefaultProps ) );
-				}
-			}
-			return indexSpecificProps.toArray( new Properties[ indexSpecificProps.size() ] );
-		}
-	}
-
-	private static void ensureListSize(ArrayList<Properties> indexSpecificProps, int size) {
-		//ensure the index exists
-		indexSpecificProps.ensureCapacity( size );
-		while ( indexSpecificProps.size() < size ) {
-			indexSpecificProps.add(null);
+			return shardLocalProperties;
 		}
 	}
 
