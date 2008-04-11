@@ -77,9 +77,9 @@ public class Essay {
           <para>termVector: describes collections of term-frequency pairs. To
           utilize Term Vectors this attribute enables their being stored
           during indexing so they are stored with documents. The default value
-          is Field.TermVector.NO. </para>
+          is Field.TermVector.NO.</para>
 
-          <para>The different values of this attribute are </para>
+          <para>The different values of this attribute are</para>
 
           <informaltable align="left" width="">
             <tgroup cols="2">
@@ -97,7 +97,9 @@ public class Essay {
                 <row>
                   <entry align="left">Field.TermVector.YES</entry>
 
-                  <entry>Store the term vectors of each document.</entry>
+                  <entry>Store the term vectors of each document. This
+                  produces two synchronized arrays, one contains document
+                  terms and the other contains the term's frequency.</entry>
                 </row>
 
                 <row>
@@ -109,15 +111,19 @@ public class Essay {
                 <row>
                   <entry align="left">Field.TermVector.WITH_OFFSETS</entry>
 
-                  <entry>Store the term vector and token offset
-                  information</entry>
+                  <entry>Store the term vector and token offset information.
+                  This is the same as Field.TermVector.YES plus this contains
+                  the starting and ending offset position information for the
+                  terms</entry>
                 </row>
 
                 <row>
                   <entry align="left">Field.TermVector.WITH_POSITIONS</entry>
 
-                  <entry>Store the term vector and token position
-                  information</entry>
+                  <entry>Store the term vector and token position information.
+                  This is the same as Field.TermVector.YES plus this contains
+                  the ordinal positions of each occurrence of a term in a
+                  document.</entry>
                 </row>
 
                 <row>
@@ -125,7 +131,8 @@ public class Essay {
                   align="left">Field.TermVector.WITH_POSITIONS_OFFSETS</entry>
 
                   <entry>Store the term vector, token position and offset
-                  information</entry>
+                  information. This is a combination of the YES, WITH_OFFSETS
+                  and WITH_POSITIONS.</entry>
                 </row>
               </tbody>
             </tgroup>
@@ -635,19 +642,17 @@ public class Meeting {
     <section>
       <title>Custom Bridge</title>
 
-      <para>Sometimes, the built-in bridges of Hibernate Search do not
-      cover some of your property types, or  the String representation
-      used by the bridge does not meet your requirements.
-      The following paragraphs describe several solutions
-      to this problem.</para>
+      <para>Sometimes, the built-in bridges of Hibernate Search do not cover
+      some of your property types, or the String representation used by the
+      bridge does not meet your requirements. The following paragraphs
+      describe several solutions to this problem.</para>
 
       <section>
         <title>StringBridge</title>
 
-        <para>The simpliest custom solution is to give Hibernate
-        Search an implementation of your expected
-        <emphasis>object to String</emphasis> bridge. To do so you need to
-        implements the
+        <para>The simpliest custom solution is to give Hibernate Search an
+        implementation of your expected <emphasis>object to String</emphasis>
+        bridge. To do so you need to implements the
         <literal>org.hibernate.search.bridge.StringBridge</literal>
         interface</para>
 
@@ -837,7 +842,8 @@ private Integer length;                </programlisting>
         custom field bridge implementation receives the entity instance as the
         value parameter instead of a particular property. Though not shown in
         this example, <classname>@ClassBridge</classname> supports the
-        <methodname>termVector</methodname> attribute discussed previously.</para>
+        <methodname>termVector</methodname> attribute discussed
+        previously.</para>
 
         <programlisting>@Entity
 @Indexed
