@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Pattern;
 
 import org.hibernate.HibernateException;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -52,6 +53,7 @@ public class DirectoryProviderFactory {
 	
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
+	private static Pattern dotPattern = Pattern.compile( "\\." );
 
 
 	public DirectoryProviders createDirectoryProviders(XClass entity, Configuration cfg, SearchFactoryImplementor searchFactoryImplementor) {
@@ -202,18 +204,27 @@ public class DirectoryProviderFactory {
 	 * If the index is sharded, the Properties index matches the shard index
 	 */	
 	private static Properties[] getDirectoryProperties(Configuration cfg, String directoryProviderName) {
+
 		Properties cfgAndImplicitProperties = new Properties();
-		// fcg has no defaults, so we may use keySet iteration
+		// cfg has no defaults, so we may use keySet iteration
 		//FIXME not so sure about that cfg.setProperties()?
 		for ( Map.Entry entry : cfg.getProperties().entrySet() ) {
 			String key = entry.getKey().toString();// casting to String
 			if ( key.startsWith( LUCENE_PREFIX ) ) {
 				//put regular properties and add an explicit batch property when a transaction property is set
 				cfgAndImplicitProperties.put( key, entry.getValue() );
-				if ( key.contains( LuceneIndexingParameters.TRANSACTION ) ) {
-					//FIXME fix that transaction can appear in the index name
-					//I imagine checking the last '.transaction.' is safe.
-					String additionalKey = key.replaceFirst(LuceneIndexingParameters.TRANSACTION, LuceneIndexingParameters.BATCH);
+				//be careful to replace only the intended ".transaction." with ".batch.":
+				String[] splitKey = dotPattern.split( key );
+				//TODO this code is vulnerable to properties with dot in the name. This is not a problem today though
+				if ( splitKey.length > 2 && splitKey[ splitKey.length - 2 ]
+				                                      .equals( LuceneIndexingParameters.TRANSACTION ) ) {
+					splitKey[ splitKey.length - 2 ] = LuceneIndexingParameters.BATCH;
+					StringBuilder missingKeyBuilder = new StringBuilder( splitKey[0] );
+					for (int i = 1; i < splitKey.length; i++) {
+						missingKeyBuilder.append( "." );
+						missingKeyBuilder.append( splitKey[i] );
+					}
+					String additionalKey = missingKeyBuilder.toString();
 					if ( cfg.getProperty(additionalKey) == null ){
 						cfgAndImplicitProperties.put(additionalKey, cfg.getProperty(key) );
 					}

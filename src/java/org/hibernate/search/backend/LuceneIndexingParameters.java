@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
 
 /**
@@ -28,8 +29,8 @@ public class LuceneIndexingParameters implements Serializable {
 	// value keyword
 	public static final String EXPLICIT_DEFAULT_VALUE = "default"; 
 	// property path keywords
-	public static final String BATCH = "batch.";
-	public static final String TRANSACTION = "transaction.";
+	public static final String BATCH = "batch";
+	public static final String TRANSACTION = "transaction";
 	
 	private final ParameterSet transactionIndexParameters;
 	private final ParameterSet batchIndexParameters;
@@ -40,11 +41,11 @@ public class LuceneIndexingParameters implements Serializable {
 		//don't iterate on property entries we know all the keys:
 		for ( IndexWriterSetting t : IndexWriterSetting.values() ) {
 			String key = t.getKey();
-			String trxValue = sourceProps.getProperty( TRANSACTION + key );
+			String trxValue = sourceProps.getProperty( TRANSACTION + "." + key );
 			if (trxValue != null) {
 				transactionProps.setProperty( key, trxValue );
 			}
-			String batchValue = sourceProps.getProperty( BATCH + key );
+			String batchValue = sourceProps.getProperty( BATCH + "." + key );
 			if (batchValue != null) {
 				batchProps.setProperty( key, batchValue );
 			}
@@ -80,14 +81,14 @@ public class LuceneIndexingParameters implements Serializable {
 		 * @param writer the IndexWriter whereto the parameters will be applied.
 		 */
 		public void applyToWriter(IndexWriter writer) {
-			try {
-				for ( Map.Entry<IndexWriterSetting,Integer> entry : parameters.entrySet() ) {
+			for ( Map.Entry<IndexWriterSetting,Integer> entry : parameters.entrySet() ) {
+				try {
 					entry.getKey().applySetting( writer, entry.getValue() );
+				} catch ( IllegalArgumentException e ) {
+					//TODO if DirectoryProvider had getDirectoryName() exceptions could tell better
+					throw new SearchException( "Illegal IndexWriter setting "
+							+ entry.getKey().getKey() + " "+ e.getMessage(), e );
 				}
-			} catch (IllegalArgumentException e) {
-				//FIXME shouldn't we raise an exception instead
-				log.error( "Illegal IndexWriter setting" + e.getMessage()
-						+ ". Will use default settings." );
 			}
 		}
 		
