@@ -1,5 +1,7 @@
 package org.hibernate.search.test.configuration;
 
+import java.io.File;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
@@ -14,6 +16,8 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Sanne Grinovero
  */
 public abstract class ConfigurationReadTestCase extends SearchTestCase {
+	
+	private static final File INDEX_DIR = new File( new File("."), "indextemp" );
 
 	private SearchFactoryImplementor searchFactory;
 
@@ -27,6 +31,8 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 		FullTextSession fullTextSession = Search.createFullTextSession( openSession() );
 		searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
 		fullTextSession.close();
+		remove(INDEX_DIR);
+		INDEX_DIR.mkdirs();
 	}
 
 	protected final void assertValueIsDefault(Class testEntity, TransactionType parmGroup, IndexWriterSetting setting) {
@@ -67,6 +73,28 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 		else {
 			return searchFactory.getIndexingParameters( searchFactory.getDirectoryProviders( testEntity )[shard] )
 															.getTransactionIndexParameters().getCurrentValueFor( setting );
+		}
+	}
+	
+	protected void configure(org.hibernate.cfg.Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( "hibernate.search.default.indexBase", INDEX_DIR.getAbsolutePath() );
+	}
+	
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		remove(INDEX_DIR);
+	}
+	
+	private void remove(File indexDir) {
+		if (indexDir.exists()) {
+			File[] containing = indexDir.listFiles();
+			if ( containing != null ) { //is a directory
+				for (int i=0; i<containing.length; i++ ){
+					remove(containing[i]);
+				}
+			}
+			indexDir.delete();
 		}
 	}
 
