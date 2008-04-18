@@ -49,9 +49,14 @@
             <entry>Hibernate Annotations</entry>
 
             <entry>Even though Hibernate Search can be used without Hibernate
-            Annotations the following instructions will use them for ease of
-            use. The tutorial is tested against version 3.3.x of Hibernate
-            Annotations.</entry>
+            Annotations the following instructions will use them for basic
+            entity configuration (<emphasis>@Entity, @Id,
+            @OneToMany,...</emphasis>). This part of the configuration could
+            also be expressed in xml or code. However, Hibernate Search itself
+            has its own set of annotations (<emphasis>@Indexed, @DocumentId,
+            @Field,...</emphasis>) for which there exists so far no
+            alternative configuration. The tutorial is tested against version
+            3.3.x of Hibernate Annotations. </entry>
           </row>
         </tbody>
       </tgroup>
@@ -89,7 +94,7 @@
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
-   &lt;version&gt;3.0.0.ga&lt;/version&gt;
+   &lt;version&gt;3.0.1.GA&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;

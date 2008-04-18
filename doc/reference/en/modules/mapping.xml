@@ -350,11 +350,11 @@ public class Owner {
    ...
 }</programlisting>
 
-      <para>Any <literal>@*ToOne</literal> and <literal>@Embedded</literal>
-      attribute can be annotated with <literal>@IndexedEmbedded</literal>. The
-      attributes of the associated class will then be added to the main entity
-      index. In the previous example, the index will contain the following
-      fields</para>
+      <para>Any <literal>@ManyToMany, @*ToOne</literal> and
+      <literal>@Embedded</literal> attribute can be annotated with
+      <literal>@IndexedEmbedded</literal>. The attributes of the associated
+      class will then be added to the main entity index. In the previous
+      example, the index will contain the following fields</para>
 
       <itemizedlist>
         <listitem>
