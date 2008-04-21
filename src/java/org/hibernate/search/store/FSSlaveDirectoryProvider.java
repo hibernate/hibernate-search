@@ -21,7 +21,7 @@ import org.hibernate.search.util.DirectoryProviderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
- * File based directory provider that takes care of geting a version of the index
+ * File based directory provider that takes care of getting a version of the index
  * from a given source
  * The base directory is represented by hibernate.search.<index>.indexBase
  * The index is created in <base directory>/<index name>
