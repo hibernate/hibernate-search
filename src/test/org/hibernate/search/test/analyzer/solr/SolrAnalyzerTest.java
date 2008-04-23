@@ -13,7 +13,8 @@ import org.apache.lucene.index.Term;
 public class SolrAnalyzerTest extends SearchTestCase {
 	public void testAnalyzerDef() throws Exception {
 		Team team = new Team();
-		team.setDescription( "This is a Dˆscription" );
+		System.out.println("ˆ = \u00E0");
+		team.setDescription( "This is a D\u00E0scription" );
 		team.setLocation( "Atlanta" );
 		team.setName( "ATL team" );
 		FullTextSession fts = Search.createFullTextSession( openSession() );
@@ -22,7 +23,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		tx.commit();
 		fts.clear();
 		tx = fts.beginTransaction();
-		TermQuery query = new TermQuery( new Term("description", "Dˆscription") );
+		TermQuery query = new TermQuery( new Term("description", "D\u00E0scription") );
 		assertEquals( "iso latin filter should work", 0, fts.createFullTextQuery( query ).list().size() );
 		query = new TermQuery( new Term("description", "is") );
 		assertEquals( "stop word filter should work", 0, fts.createFullTextQuery( query ).list().size() );
