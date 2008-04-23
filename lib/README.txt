@@ -8,6 +8,7 @@ hibernate3.jar: required
 hibernate core dependencies: required (see Hibernate Core for more information)
 lucene-core-*.jar: required (used version 2.3.0)
 jms.jar: optional (needed for JMS based clustering strategy, usually available with your application server)
+apache-solr-*.jar: optional (used version 1.2.0), needed if @AnalyzerDef is used
 
 Test
 ====

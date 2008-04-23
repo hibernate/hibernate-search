@@ -8,12 +8,15 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Documented;
 
 /**
- * Define an Analizer for a given entity, method, field or Field
+ * Define an Analyzer for a given entity, method, field or Field
  * The order of precedence is as such:
  *  - @Field
  *  - field / method
  *  - entity
  *  - default
+ *
+ * Either describe an explicit implementation through the <code>impl</code> parameter
+ * or use an external @AnalyzerDef definition through the <code>def</code> parameter
  *
  * @author Emmanuel Bernard
  */
@@ -23,4 +26,5 @@ import java.lang.annotation.Documented;
 
 public @interface Analyzer {
 	Class impl() default void.class;
+	String definition() default "";
 }

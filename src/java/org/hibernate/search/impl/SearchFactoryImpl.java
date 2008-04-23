@@ -13,9 +13,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -46,7 +43,6 @@ import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.util.ReflectHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -90,11 +86,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public SearchFactoryImpl(Configuration cfg) {
 		//yuk
 		ReflectionManager reflectionManager = getReflectionManager( cfg );
-		//InitContext context = new InitContext();
-		//Analyzer analyzer = initAnalyzer(cfg, context);
-		Analyzer analyzer = initAnalyzer(cfg);
-		Similarity similarity = initSimilarity(cfg);
-		initDocumentBuilders(cfg, reflectionManager, analyzer, similarity);
+		InitContext context = new InitContext(cfg);
+		initDocumentBuilders(cfg, reflectionManager, context );
 
 		Set<Class> indexedClasses = documentBuilders.keySet();
 		for (DocumentBuilder builder : documentBuilders.values()) {
@@ -250,13 +243,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		getBackendQueueProcessorFactory().getProcessor( queue ).run();
 	}
 
-	private void initDocumentBuilders(Configuration cfg, ReflectionManager reflectionManager, Analyzer analyzer, Similarity similarity) {
+	private void initDocumentBuilders(Configuration cfg, ReflectionManager reflectionManager, InitContext context) {
 		Iterator iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
-		//Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
-		
-		//cfg.getClass().getAnnotation( AnalyzerDef.class );
-		//TODO SOlr.......
+
 		while (iter.hasNext()) {
 			PersistentClass clazz = (PersistentClass) iter.next();
 			Class<?> mappedClass = clazz.getMappedClass();
@@ -267,86 +257,19 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 						DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders( mappedXClass, cfg, this );
 
 						final DocumentBuilder<Object> documentBuilder = new DocumentBuilder<Object>(
-								mappedXClass, analyzer, similarity, providers.getProviders(), providers.getSelectionStrategy(),
+								mappedXClass, context, providers.getProviders(), providers.getSelectionStrategy(),
 								reflectionManager
 						);
 
 						documentBuilders.put( mappedClass, documentBuilder );
 					}
 					bindFilterDefs(mappedXClass);
+					//TODO should analyzer def for classes at tyher sqme level???
 				}
 			}
 		}
+		context.initLazyAnalyzers();
 		factory.startDirectoryProviders();
-	}
-
-	/**
-	 * Initilises the Lucene analyzer to use by reading the analyzer class from the configuration and instantiating it.
-	 *
-	 * @param cfg
-	 *            The current configuration.
-	 * @return The Lucene analyzer to use for tokenisation.
-	 */
-	private Analyzer initAnalyzer(Configuration cfg) {
-		Class analyzerClass;
-		String analyzerClassName = cfg.getProperty(Environment.ANALYZER_CLASS);
-		if (analyzerClassName != null) {
-			try {
-				analyzerClass = ReflectHelper.classForName(analyzerClassName);
-			} catch (Exception e) {
-				throw new SearchException("Lucene analyzer class '" + analyzerClassName + "' defined in property '"
-						+ Environment.ANALYZER_CLASS + "' could not be found.", e);
-			}
-		} else {
-			analyzerClass = StandardAnalyzer.class;
-		}
-		// Initialize analyzer
-		Analyzer defaultAnalyzer;
-		try {
-			defaultAnalyzer = (Analyzer) analyzerClass.newInstance();
-		} catch (ClassCastException e) {
-			throw new SearchException("Lucene analyzer does not implement " + Analyzer.class.getName() + ": "
-					+ analyzerClassName, e);
-		} catch (Exception e) {
-			throw new SearchException("Failed to instantiate lucene analyzer with type " + analyzerClassName, e);
-		}
-		return defaultAnalyzer;
-	}
-
-	/**
-	 * Initilises the Lucene similarity to use
-	 */
-	private Similarity initSimilarity(Configuration cfg) {
-		Class similarityClass;
-		String similarityClassName = cfg.getProperty(Environment.SIMILARITY_CLASS);
-		if (similarityClassName != null) {
-			try {
-				similarityClass = ReflectHelper.classForName(similarityClassName);
-			} catch (Exception e) {
-				throw new SearchException("Lucene Similarity class '" + similarityClassName + "' defined in property '"
-						+ Environment.SIMILARITY_CLASS + "' could not be found.", e);
-			}
-		}
-		else {
-			similarityClass = null;
-		}
-
-		// Initialize similarity
-		if ( similarityClass == null ) {
-			return Similarity.getDefault();
-		}
-		else {
-			Similarity defaultSimilarity;
-			try {
-				defaultSimilarity = (Similarity) similarityClass.newInstance();
-			} catch (ClassCastException e) {
-				throw new SearchException("Lucene similarity does not extend " + Similarity.class.getName() + ": "
-						+ similarityClassName, e);
-			} catch (Exception e) {
-				throw new SearchException("Failed to instantiate lucene similarity with type " + similarityClassName, e);
-			}
-			return defaultSimilarity;
-		}
 	}
 
 	private void buildFilterCachingStrategy(Properties properties) {
@@ -363,10 +286,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				throw new SearchException( "Unable to find filterCachingStrategy class: " + impl, e );
 			}
 			catch (IllegalAccessException e) {
-				throw new SearchException( "Unable to instanciate filterCachingStrategy class: " + impl, e );
+				throw new SearchException( "Unable to instantiate filterCachingStrategy class: " + impl, e );
 			}
 			catch (InstantiationException e) {
-				throw new SearchException( "Unable to instanciate filterCachingStrategy class: " + impl, e );
+				throw new SearchException( "Unable to instantiate filterCachingStrategy class: " + impl, e );
 			}
 		}
 		filterCachingStrategy.initialize( properties );

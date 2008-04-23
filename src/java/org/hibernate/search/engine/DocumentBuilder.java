@@ -26,8 +26,10 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.impl.InitContext;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
@@ -37,6 +39,8 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -79,7 +83,7 @@ public class DocumentBuilder<T> {
 	private Similarity similarity;
 
 
-	public DocumentBuilder(XClass clazz, Analyzer defaultAnalyzer, Similarity defaultSimilarity, DirectoryProvider[] directoryProviders,
+	public DocumentBuilder(XClass clazz, InitContext context, DirectoryProvider[] directoryProviders,
 						   IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
 		this.analyzer = new ScopedAnalyzer();
 		this.beanClass = clazz;
@@ -87,15 +91,15 @@ public class DocumentBuilder<T> {
 		this.shardingStrategy = shardingStrategy;
 		//FIXME get rid of it when boost is stored?
 		this.reflectionManager = reflectionManager;
-		this.similarity = defaultSimilarity;
+		this.similarity = context.getDefaultSimilarity();
 
 		if ( clazz == null ) throw new AssertionFailure( "Unable to build a DocumentBuilder with a null class" );
 		rootPropertiesMetadata = new PropertiesMetadata();
 		rootPropertiesMetadata.boost = getBoost( clazz );
-		rootPropertiesMetadata.analyzer = defaultAnalyzer;
+		rootPropertiesMetadata.analyzer = context.getDefaultAnalyzer();
 		Set<XClass> processedClasses = new HashSet<XClass>();
 		processedClasses.add( clazz );
-		initializeMembers( clazz, rootPropertiesMetadata, true, "", processedClasses );
+		initializeMembers( clazz, rootPropertiesMetadata, true, "", processedClasses, context );
 		//processedClasses.remove( clazz ); for the sake of completness
 		this.analyzer.setGlobalAnalyzer( rootPropertiesMetadata.analyzer );
 		if ( idKeywordName == null ) {
@@ -103,16 +107,23 @@ public class DocumentBuilder<T> {
 		}
 	}
 
-	private Analyzer getAnalyzer(XAnnotatedElement annotatedElement) {
+	private Analyzer getAnalyzer(XAnnotatedElement annotatedElement, InitContext context) {
 		org.hibernate.search.annotations.Analyzer analyzerAnn =
 				annotatedElement.getAnnotation( org.hibernate.search.annotations.Analyzer.class );
-		return getAnalyzer( analyzerAnn );
+		return getAnalyzer( analyzerAnn, context );
 	}
 
-	private Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn) {
+	private Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, InitContext context) {
 		Class analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
 		if ( analyzerClass == void.class ) {
-			return null;
+			String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
+			if ( StringHelper.isEmpty( definition ) ) {
+				return null;
+			}
+			else {
+
+				return context.buildLazyAnalyzer( definition );
+			}
 		}
 		else {
 			try {
@@ -130,7 +141,7 @@ public class DocumentBuilder<T> {
 	}
 
 	private void initializeMembers(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
-								   Set<XClass> processedClasses) {
+								   Set<XClass> processedClasses, InitContext context) {
 		List<XClass> hierarchy = new ArrayList<XClass>();
 		for (XClass currClass = clazz; currClass != null; currClass = currClass.getSuperclass()) {
 			hierarchy.add( currClass );
@@ -142,23 +153,25 @@ public class DocumentBuilder<T> {
 			 * Override the default analyzer for the properties if the class hold one
 			 * That's the reason we go down the hierarchy
 			 */
-			Analyzer analyzer = getAnalyzer( currClass );
+			Analyzer analyzer = getAnalyzer( currClass, context );
+
 			if ( analyzer != null ) {
 				propertiesMetadata.analyzer = analyzer;
 			}
+			getAnalyzerDefs(currClass, context);
 			// Check for any ClassBridges annotation.
 			ClassBridges classBridgesAnn = currClass.getAnnotation( ClassBridges.class );
 			if ( classBridgesAnn != null ) {
 				ClassBridge[] cbs = classBridgesAnn.value();
 				for (ClassBridge cb : cbs) {
-					bindClassAnnotation( prefix, propertiesMetadata, cb );
+					bindClassAnnotation( prefix, propertiesMetadata, cb, context );
 				}
 			}
 
 			// Check for any ClassBridge style of annotations.
 			ClassBridge classBridgeAnn = currClass.getAnnotation( ClassBridge.class );
 			if ( classBridgeAnn != null ) {
-				bindClassAnnotation( prefix, propertiesMetadata, classBridgeAnn );
+				bindClassAnnotation( prefix, propertiesMetadata, classBridgeAnn, context );
 			}
 
 			//Get similarity
@@ -177,12 +190,12 @@ public class DocumentBuilder<T> {
 			// so indexing a non property does not make sense
 			List<XProperty> methods = currClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 			for (XProperty method : methods) {
-				initializeMember( method, propertiesMetadata, isRoot, prefix, processedClasses );
+				initializeMember( method, propertiesMetadata, isRoot, prefix, processedClasses, context );
 			}
 
 			List<XProperty> fields = currClass.getDeclaredProperties( XClass.ACCESS_FIELD );
 			for (XProperty field : fields) {
-				initializeMember( field, propertiesMetadata, isRoot, prefix, processedClasses );
+				initializeMember( field, propertiesMetadata, isRoot, prefix, processedClasses, context );
 			}
 		}
 		if ( isRoot && similarityClass != null ) {
@@ -196,6 +209,17 @@ public class DocumentBuilder<T> {
 		}
 	}
 
+	private void getAnalyzerDefs(XAnnotatedElement annotatedElement, InitContext context) {
+		AnalyzerDefs defs = annotatedElement.getAnnotation( AnalyzerDefs.class );
+		if ( defs != null ) {
+			for (AnalyzerDef def : defs.value()) {
+				context.addAnalyzerDef( def );
+			}
+		}
+		AnalyzerDef def = annotatedElement.getAnnotation( AnalyzerDef.class );
+		context.addAnalyzerDef( def );
+	}
+
 	public String getIdentifierName() {
 		return idGetter.getName();
 	}
@@ -205,7 +229,7 @@ public class DocumentBuilder<T> {
 	}
 
 	private void initializeMember(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
-								  String prefix, Set<XClass> processedClasses) {
+								  String prefix, Set<XClass> processedClasses, InitContext context) {
 
 		DocumentId documentIdAnn = member.getAnnotation( DocumentId.class );
 		if ( documentIdAnn != null ) {
@@ -239,7 +263,7 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
 				// Field > property > entity analyzer
 				Analyzer analyzer = null; //no field analyzer
-				if ( analyzer == null ) analyzer = getAnalyzer( member );
+				if ( analyzer == null ) analyzer = getAnalyzer( member, context );
 				if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
 				if ( analyzer == null ) throw new AssertionFailure( "Analizer should not be undefined" );
 				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
@@ -249,7 +273,7 @@ public class DocumentBuilder<T> {
 			org.hibernate.search.annotations.Field fieldAnn =
 					member.getAnnotation( org.hibernate.search.annotations.Field.class );
 			if ( fieldAnn != null ) {
-				bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn );
+				bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, context );
 			}
 		}
 		{
@@ -257,10 +281,11 @@ public class DocumentBuilder<T> {
 					member.getAnnotation( org.hibernate.search.annotations.Fields.class );
 			if ( fieldsAnn != null ) {
 				for (org.hibernate.search.annotations.Field fieldAnn : fieldsAnn.value()) {
-					bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn );
+					bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, context );
 				}
 			}
 		}
+		getAnalyzerDefs( member, context );
 
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
@@ -297,10 +322,10 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.embeddedPropertiesMetadata.add( metadata );
 				metadata.boost = getBoost( member );
 				//property > entity analyzer
-				Analyzer analyzer = getAnalyzer( member );
+				Analyzer analyzer = getAnalyzer( member, context );
 				metadata.analyzer = analyzer != null ? analyzer : propertiesMetadata.analyzer;
 				String localPrefix = buildEmbeddedPrefix( prefix, embeddedAnn, member );
-				initializeMembers( elementClass, metadata, false, localPrefix, processedClasses );
+				initializeMembers( elementClass, metadata, false, localPrefix, processedClasses, context );
 				/**
 				 * We will only index the "expected" type but that's OK, HQL cannot do downcasting either
 				 */
@@ -338,7 +363,7 @@ public class DocumentBuilder<T> {
 		}
 	}
 
-	private void bindClassAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann) {
+	private void bindClassAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, InitContext context) {
 		//FIXME name should be prefixed
 		String fieldName = prefix + ann.name();
 		propertiesMetadata.classNames.add( fieldName );
@@ -348,13 +373,13 @@ public class DocumentBuilder<T> {
 		propertiesMetadata.classBridges.add( BridgeFactory.extractType( ann ) );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
 
-		Analyzer analyzer = getAnalyzer( ann.analyzer() );
+		Analyzer analyzer = getAnalyzer( ann.analyzer(), context );
 		if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
 		if ( analyzer == null ) throw new AssertionFailure( "Analyzer should not be undefined" );
 		this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 	}
 
-	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn) {
+	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, InitContext context) {
 		setAccessible( member );
 		propertiesMetadata.fieldGetters.add( member );
 		String fieldName = prefix + BinderHelper.getAttributeName( member, fieldAnn.name() );
@@ -365,8 +390,8 @@ public class DocumentBuilder<T> {
 		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, member, reflectionManager ) );
 
 		// Field > property > entity analyzer
-		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer() );
-		if ( analyzer == null ) analyzer = getAnalyzer( member );
+		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer(), context );
+		if ( analyzer == null ) analyzer = getAnalyzer( member, context );
 		if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
 		if ( analyzer == null ) throw new AssertionFailure( "Analizer should not be undefined" );
 		this.analyzer.addScopedAnalyzer( fieldName, analyzer );
