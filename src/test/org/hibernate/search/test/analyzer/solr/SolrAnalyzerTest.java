@@ -13,7 +13,6 @@ import org.apache.lucene.index.Term;
 public class SolrAnalyzerTest extends SearchTestCase {
 	public void testAnalyzerDef() throws Exception {
 		Team team = new Team();
-		System.out.println("ˆ = \u00E0");
 		team.setDescription( "This is a D\u00E0scription" );
 		team.setLocation( "Atlanta" );
 		team.setName( "ATL team" );
