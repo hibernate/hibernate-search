@@ -10,14 +10,11 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
 import org.hibernate.AssertionFailure;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
-import org.hibernate.search.util.DirectoryProviderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
@@ -30,9 +27,12 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * A copy is triggered every refresh seconds
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> {
+	
 	private static Log log = LogFactory.getLog( FSSlaveDirectoryProvider.class );
+	
 	private FSDirectory directory1;
 	private FSDirectory directory2;
 	private int current;
@@ -40,7 +40,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 	private Timer timer;
 
 	//variables needed between initialize and start
-	private String source;
+	private File sourceIndexDir;
 	private File indexDir;
 	private String directoryProviderName;
 	private Properties properties;
@@ -49,58 +49,33 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		this.properties = properties;
 		this.directoryProviderName = directoryProviderName;
 		//source guessing
-		source = DirectoryProviderHelper.getSourceDirectory( "sourceBase", "source", directoryProviderName, properties );
-		if (source == null)
-			throw new IllegalStateException("FSSlaveDirectoryProvider requires a viable source directory");
-		if ( ! new File(source, "current1").exists() && ! new File(source, "current2").exists() ) {
-			throw new IllegalStateException("No current marker in source directory");
+		sourceIndexDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, false );
+		if ( ! new File( sourceIndexDir, "current1" ).exists() && ! new File( sourceIndexDir, "current2" ).exists() ) {
+			throw new IllegalStateException( "No current marker in source directory" );
 		}
-		log.debug( "Source directory: " + source );
-		indexDir = DirectoryProviderHelper.determineIndexDir( directoryProviderName, properties );
+		log.debug( "Source directory: " + sourceIndexDir.getPath() );
+		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
 		log.debug( "Index directory: " + indexDir.getPath() );
 		try {
-			boolean create = !indexDir.exists();
-			if (create) {
-				log.debug( "index directory not found, creating: '" + indexDir.getAbsolutePath() + "'" );
-				indexDir.mkdirs();
-			}
 			indexName = indexDir.getCanonicalPath();
 		}
 		catch (IOException e) {
-			throw new HibernateException( "Unable to initialize index: " + directoryProviderName, e );
+			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 	}
 
 	public void start() {
-		//source guessing
-		String refreshPeriod = properties.getProperty( "refresh", "3600" );
-		long period = Long.parseLong( refreshPeriod );
-		log.debug("Refresh period " + period + " seconds");
-		period *= 1000; //per second
+		long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
 		try {
-			boolean create;
-
-			File subDir = new File( indexName, "1" );
-			create = ! subDir.exists();
-			directory1 = FSDirectory.getDirectory( subDir.getCanonicalPath());
-			if ( create ) {
-				log.debug( "Initialize index: '" + subDir.getAbsolutePath() + "'" );
-				IndexWriter iw = new IndexWriter( directory1, new StandardAnalyzer(), create );
-				iw.close();
-			}
-
-			subDir = new File( indexName, "2" );
-			create = ! subDir.exists();
-			directory2 = FSDirectory.getDirectory( subDir.getCanonicalPath());
-			if ( create ) {
-				log.debug( "Initialize index: '" + subDir.getAbsolutePath() + "'" );
-				IndexWriter iw = new IndexWriter( directory2, new StandardAnalyzer(), create );
-				iw.close();
-			}
-			File currentMarker = new File(indexName, "current1");
-			File current2Marker = new File(indexName, "current2");
+			directory1 = DirectoryProviderHelper.createFSIndex( new File(indexDir, "1") );
+			directory2 = DirectoryProviderHelper.createFSIndex( new File(indexDir, "2") );
+			File currentMarker = new File( indexDir, "current1" );
+			File current2Marker = new File( indexDir, "current2" );
 			if ( currentMarker.exists() ) {
 				current = 1;
+				if ( current2Marker.exists() ) {
+					current2Marker.delete(); //TODO or throw an exception?
+				}
 			}
 			else if ( current2Marker.exists() ) {
 				current = 2;
@@ -109,38 +84,38 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 				//no default
 				log.debug( "Setting directory 1 as current");
 				current = 1;
-				File sourceFile = new File(source);
-				File destinationFile = new File(indexName, Integer.valueOf(current).toString() );
+				File destinationFile = new File( indexDir, Integer.valueOf( current ).toString() );
 				int sourceCurrent;
-				if ( new File(sourceFile, "current1").exists() ) {
+				if ( new File( sourceIndexDir, "current1").exists() ) {
 					sourceCurrent = 1;
 				}
-				else if ( new File(sourceFile, "current2").exists() ) {
+				else if ( new File( sourceIndexDir, "current2").exists() ) {
 					sourceCurrent = 2;
 				}
 				else {
-					throw new AssertionFailure("No current file marker found in source directory: " + source);
+					throw new AssertionFailure( "No current file marker found in source directory: " + sourceIndexDir.getPath() );
 				}
 				try {
-					FileHelper.synchronize( new File(sourceFile, String.valueOf(sourceCurrent) ), destinationFile, true);
+					FileHelper.synchronize( new File( sourceIndexDir, String.valueOf(sourceCurrent) ), destinationFile, true);
 				}
 				catch (IOException e) {
-					throw new HibernateException("Umable to synchonize directory: " + indexName, e);
+					throw new SearchException( "Unable to synchronize directory: " + indexName, e );
 				}
 				if (! currentMarker.createNewFile() ) {
-					throw new HibernateException("Unable to create the directory marker file: " + indexName);
+					throw new SearchException( "Unable to create the directory marker file: " + indexName );
 				}
 			}
 			log.debug( "Current directory: " + current);
 		}
 		catch (IOException e) {
-			throw new HibernateException( "Unable to initialize index: " + directoryProviderName, e );
+			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		timer = new Timer(true); //daemon thread, the copy algorithm is robust
-		TimerTask task = new TriggerTask(source, indexName);
+		TimerTask task = new TriggerTask( sourceIndexDir, indexDir );
 		timer.scheduleAtFixedRate( task, period, period );
 	}
 
+	//FIXME this is Thread-Unsafe! A memory barrier is missing.
 	public FSDirectory getDirectory() {
 		if (current == 1) {
 			return directory1;
@@ -149,7 +124,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			return directory2;
 		}
 		else {
-			throw new AssertionFailure("Illegal current directory: " + current);
+			throw new AssertionFailure( "Illegal current directory: " + current );
 		}
 	}
 
@@ -174,12 +149,12 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 
 	class TriggerTask extends TimerTask {
 
-		private ExecutorService executor;
-		private CopyDirectory copyTask;
+		private final ExecutorService executor;
+		private final CopyDirectory copyTask;
 
-		public TriggerTask(String source, String destination) {
+		public TriggerTask(File sourceIndexDir, File destination) {
 			executor = Executors.newSingleThreadExecutor();
-			copyTask = new CopyDirectory( source, destination  );
+			copyTask = new CopyDirectory( sourceIndexDir, destination  );
 		}
 
 		public void run() {
@@ -193,12 +168,12 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 	}
 
 	class CopyDirectory implements Runnable {
-		private String source;
-		private String destination;
+		private final File source;
+		private final File destination;
 		private volatile boolean inProgress;
 
-		public CopyDirectory(String source, String destination) {
-			this.source = source;
+		public CopyDirectory(File sourceIndexDir, File destination) {
+			this.source = sourceIndexDir;
 			this.destination = destination;
 		}
 
@@ -216,16 +191,16 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 					sourceFile = new File(source, "2");
 				}
 				else {
-					log.error("Unable to determine current in source directory");
+					log.error( "Unable to determine current in source directory" );
 					inProgress = false;
 					return;
 				}
 
-				File destinationFile = new File(destination, Integer.valueOf(index).toString() );
+				File destinationFile = new File( destination, Integer.valueOf( index ).toString() );
 				//TODO make smart a parameter
 				try {
-					log.trace("Copying " + sourceFile + " into " + destinationFile);
-					FileHelper.synchronize( sourceFile, destinationFile, true);
+					log.trace( "Copying " + sourceFile + " into " + destinationFile );
+					FileHelper.synchronize( sourceFile, destinationFile, true );
 					current = index;
 				}
 				catch (IOException e) {
@@ -234,11 +209,11 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 					inProgress = false;
 					return;
 				}
-				if ( ! new File(indexName, "current" + oldIndex).delete() ) {
+				if ( ! new File( indexName, "current" + oldIndex ).delete() ) {
 					log.warn( "Unable to remove previous marker file in " + indexName );
 				}
 				try {
-					new File(indexName, "current" + index).createNewFile();
+					new File( indexName, "current" + index ).createNewFile();
 				}
 				catch( IOException e ) {
 					log.warn( "Unable to create current marker file in " + indexName, e );
@@ -247,7 +222,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			finally {
 				inProgress = false;
 			}
-			log.trace( "Copy for " + indexName + " took " + (System.currentTimeMillis() - start) + " ms");
+			log.trace( "Copy for " + indexName + " took " + (System.currentTimeMillis() - start) + " ms" );
 		}
 	}
 

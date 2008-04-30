@@ -40,4 +40,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider);
 
 	void addIndexingParmeters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams);
+
+	public String getIndexingStrategy();
 }

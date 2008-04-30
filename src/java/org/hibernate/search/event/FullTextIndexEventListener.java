@@ -40,15 +40,12 @@ public class FullTextIndexEventListener implements PostDeleteEventListener, Post
 
 	public void initialize(Configuration cfg) {
 		searchFactoryImplementor = SearchFactoryImpl.getSearchFactory( cfg );
-		String indexingStrategy = cfg.getProperties().getProperty( Environment.INDEXING_STRATEGY, "event" );
+		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
 		if ( "event".equals( indexingStrategy ) ) {
 			used = searchFactoryImplementor.getDocumentBuilders().size() != 0;
 		}
 		else if ( "manual".equals( indexingStrategy ) ) {
 			used = false;
-		}
-		else {
-			throw new SearchException(Environment.INDEXING_STRATEGY + " unknown: " + indexingStrategy);
 		}
 	}
 

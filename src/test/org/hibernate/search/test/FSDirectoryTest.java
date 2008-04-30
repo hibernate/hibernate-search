@@ -14,20 +14,21 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.Environment;
 import org.hibernate.search.event.FullTextIndexEventListener;
+import org.hibernate.search.store.DirectoryProviderHelper;
 import org.hibernate.search.store.FSDirectoryProvider;
-import org.hibernate.search.util.DirectoryProviderHelper;
+import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Gavin King
  */
 public class FSDirectoryTest extends SearchTestCase {
-
 
 	protected void setUp() throws Exception {
 		File sub = getBaseIndexDir();
@@ -35,7 +36,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		File[] files = sub.listFiles();
 		for (File file : files) {
 			if ( file.isDirectory() ) {
-				delete( file );
+				FileHelper.delete( file );
 			}
 		}
 		//super.setUp(); //we need a fresh session factory each time for index set up
@@ -51,28 +52,7 @@ public class FSDirectoryTest extends SearchTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
-		delete( sub );
-	}
-
-	private void delete(File sub) {
-		if ( sub.isDirectory() ) {
-			for (File file : sub.listFiles()) {
-				delete( file );
-			}
-			sub.delete();
-		}
-		else {
-			sub.delete();
-		}
-	}
-
-	private void recursiveDelete(File f) {
-		for (File file : f.listFiles()) {
-			if ( file.isDirectory() ) {
-				recursiveDelete( file );
-			}
-		}
-		f.delete();
+		FileHelper.delete( sub );
 	}
 
 	public void testDirectoryProviderHelperMkdirsGetSource() throws Exception {
@@ -80,15 +60,14 @@ public class FSDirectoryTest extends SearchTestCase {
 		String relative = "dir1/dir2/dir3";
 
 		Properties properties = new Properties();
-		properties.put( "root", root );
-		properties.put( "relative", relative );
+		properties.put( "sourceBase", root );
+		properties.put( "source", relative );
 
-		String rel = DirectoryProviderHelper.getSourceDirectory( "root", "relative", "name", properties );
+		File rel = DirectoryProviderHelper.getSourceDirectory( "name", properties, true );
 
-		File f = new File( rel );
-		assertTrue( f.exists() );
+		assertTrue( rel.exists() );
 
-		recursiveDelete( new File( root ) );
+		FileHelper.delete( new File( root ) );
 	}
 
 	public void testDirectoryProviderHelperMkdirsDetermineIndex() throws Exception {
@@ -99,15 +78,14 @@ public class FSDirectoryTest extends SearchTestCase {
 		properties.put( "indexBase", root );
 		properties.put( "indexName", relative );
 
-		File f = DirectoryProviderHelper.determineIndexDir( "name", properties );
+		File f = DirectoryProviderHelper.getVerifiedIndexDir( "name", properties, true );
 
 		assertTrue( new File( root ).exists() );
 
-		recursiveDelete( new File( "./testDir" ) );
+		FileHelper.delete( new File( "./testDir" ) );
 	}
 
 	public void testEventIntegration() throws Exception {
-
 
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
@@ -205,7 +183,6 @@ public class FSDirectoryTest extends SearchTestCase {
 			searcher.close();
 		}
 
-
 		s = getSessions().openSession();
 		s.getTransaction().begin();
 		List list = s.createQuery( "from Document" ).list();
@@ -214,6 +191,24 @@ public class FSDirectoryTest extends SearchTestCase {
 		}
 		s.getTransaction().commit();
 		s.close();
+	}
+
+	public void testSearchOnDeletedIndex() throws Exception {
+		Session s = getSessions().openSession();
+		s.getTransaction().begin();
+		s.persist( new Document( "Hibernate Search in Action", "", "") );
+		s.getTransaction().commit();
+		s.close();
+		
+		IndexSearcher searcher = new IndexSearcher( new File( getBaseIndexDir(), "Documents" ).getCanonicalPath() );
+		// deleting before search, but after IndexSearcher creation:
+		// ( fails when deleting -concurrently- to IndexSearcher initialization! )
+		FileHelper.delete(getBaseIndexDir());
+		TermQuery query = new TermQuery( new Term("title","action") );
+		Hits hits = searcher.search( query );
+		assertEquals( 1, hits.length() );
+		assertEquals( "Hibernate Search in Action", hits.doc( 0 ).get( "title" ) );
+		searcher.close();
 	}
 
 	protected Class[] getMappings() {

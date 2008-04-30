@@ -5,13 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.hibernate.HibernateException;
-import org.hibernate.search.util.DirectoryProviderHelper;
+import org.hibernate.search.Environment;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
@@ -21,31 +17,24 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
+ * @author Sanne Grinovero
  */
 public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
-	private static Log log = LogFactory.getLog( FSDirectoryProvider.class );
+	
 	private FSDirectory directory;
 	private String indexName;
 
 	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
-		File indexDir = DirectoryProviderHelper.determineIndexDir( directoryProviderName, properties );
+		// on "manual" indexing skip read-write check on index directory
+		boolean manual = searchFactoryImplementor.getIndexingStrategy().equals( "manual" );
+		File indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, ! manual );
 		try {
-			boolean create = !indexDir.exists();
-			if (create) {
-				log.debug( "index directory not found, creating: '" + indexDir.getAbsolutePath() + "'" );
-				indexDir.mkdirs();
-			}
 			indexName = indexDir.getCanonicalPath();
-			directory = FSDirectory.getDirectory( indexName );
 			//this is cheap so it's not done in start()
-			if ( create ) {
-				log.debug( "Initialize index: '" + indexName + "'" );
-				IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), create );
-				iw.close();
-			}
+			directory = DirectoryProviderHelper.createFSIndex( indexDir );
 		}
 		catch (IOException e) {
-			throw new HibernateException( "Unable to initialize index: " + directoryProviderName, e );
+			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 	}
 

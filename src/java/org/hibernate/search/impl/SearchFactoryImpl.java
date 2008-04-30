@@ -66,6 +66,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
 	private Map<String, FilterDef> filterDefinitions = new HashMap<String, FilterDef>();
 	private FilterCachingStrategy filterCachingStrategy;
+	private String indexingStrategy;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -86,6 +87,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public SearchFactoryImpl(Configuration cfg) {
 		//yuk
 		ReflectionManager reflectionManager = getReflectionManager( cfg );
+		setIndexingStrategy(cfg); //need to be done before the document builds
 		InitContext context = new InitContext(cfg);
 		initDocumentBuilders(cfg, reflectionManager, context );
 
@@ -96,6 +98,17 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		worker = WorkerFactory.createWorker( cfg, this );
 		readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		buildFilterCachingStrategy( cfg.getProperties() );
+	}
+
+	private void setIndexingStrategy(Configuration cfg) {
+		indexingStrategy = cfg.getProperties().getProperty( Environment.INDEXING_STRATEGY, "event" );
+		if ( ! ("event".equals( indexingStrategy ) || "manual".equals( indexingStrategy ) ) ) {
+			throw new SearchException(Environment.INDEXING_STRATEGY + " unknown: " + indexingStrategy);
+		}
+	}
+
+	public String getIndexingStrategy() {
+		return indexingStrategy;
 	}
 
 	private void bindFilterDefs(XClass mappedXClass) {
