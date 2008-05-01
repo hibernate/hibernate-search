@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -43,6 +45,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentBuilder;
@@ -679,6 +682,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public void setReadOnly(Object entity, boolean readOnly) {
 		session.setReadOnly( entity, readOnly );
+	}
+
+	public void doWork(org.hibernate.jdbc.Work work) throws HibernateException {
+		session.doWork( work );
 	}
 
 	public void update(String entityName, Object object) throws HibernateException {

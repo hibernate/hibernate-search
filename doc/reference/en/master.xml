@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--  $Id$ -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3CR3//EN"
-"../../../../core/doc/reference/support/docbook-dtd/docbookx.dtd" [
+"../support/docbook-dtd/docbookx.dtd" [
 <!ENTITY getting-started SYSTEM "modules/getting-started.xml">
 <!ENTITY architecture SYSTEM "modules/architecture.xml">
 <!ENTITY configuration SYSTEM "modules/configuration.xml">

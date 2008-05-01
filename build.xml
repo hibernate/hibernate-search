@@ -17,7 +17,7 @@
 	<!-- Name of project and version, used to create filenames -->
 	<property name="Name" value="Hibernate Search"/>
 	<property name="name" value="hibernate-search"/>
-	<property name="version" value="3.1.x"/>
+	<property name="version" value="3.1.0.CR1"/>
 	<property name="javadoc.packagenames" value="org.hibernate.search.*"/>
 	<property name="copy.test" value="true"/>
 	<property name="javac.source" value="1.5"/>
@@ -62,8 +62,7 @@
     </path>
     <!-- override order for JBossXB to bootstrap properly -->
     <path id="lib.class.path">
-    	<path location="${hibernate-core.jar}"></path>
-        <fileset dir="${hibernate-core.lib.dir}">
+        <fileset dir="${ivy.dep.dir}/core">
             <include name="*.jar"/>
             <exclude name="xml-apis.jar"/>
             <exclude name="xerces*.jar"/>
@@ -79,9 +78,9 @@
     <path id="lib.moduleclass.path">
 		<!-- pathelement location="${jpa-api.jar}"/>
 		<pathelement location="${commons-annotations.jar}"/ -->
-        <fileset dir="${ivy.dep.dir}/core">
+        <!-- fileset dir="${ivy.dep.dir}/core">
 			<include name="*.jar"/>
-		</fileset>
+		</fileset -->
     </path>
 	<path id="junit.moduleclasspath">
         <!-- order matters for JBoss XB proper bootstrap -->
@@ -141,8 +140,8 @@
 	</target -->
 
     <target name="get.deps.core" depends="init" description="retrieve the core dependencies">
-        <ivy:resolve conf="core" />
-        <ivy:retrieve pattern="${ivy.dep.dir}/core/[artifact].[ext]" conf="core" />
+        <ivy:resolve conf="default" />
+        <ivy:retrieve pattern="${ivy.dep.dir}/core/[artifact].[ext]" conf="default" />
     </target>
 
     <target name="compile" depends="init,get.deps.core" description="Compile the Java source code">
@@ -291,7 +290,7 @@
             <attribute name="Implementation-URL" value="http://search.hibernate.org"/>
 		</manifest>
 		<antcall target="common-build.jar"/>
-        <ivy:resolve conf="core"/>
+        <ivy:resolve conf="default"/>
         <ivy:publish artifactspattern="${dist.dir}/[artifact].[ext]"
             resolver="local"
             pubrevision="latest"
@@ -349,6 +348,11 @@
         </copy>
         <copy todir="${dist.lib.dir}/test" failonerror="false">
 			<fileset file="${lib.dir}/test/*.jar"/>
+        </copy>
+
+        <mkdir dir="${dist.lib.dir}/build"/>
+        <copy todir="${dist.lib.dir}/build" failonerror="false">
+			<fileset file="${lib.dir}/build/*.jar"/>
         </copy>
 
         <copy file="${basedir}/build.properties.dist" tofile="${dist.dir}/build.properties" failonerror="false">

@@ -29,8 +29,20 @@ public class UnresolvedBridgeTest extends TestCase {
 			cfg.buildSessionFactory( /*new TestInterceptor()*/ );
 			fail("Undefined bridge went through");
 		}
-		catch( SearchException e ) {
-			//success
+		catch( Exception e ) {
+			Throwable ee = e;
+			boolean hasSearchException = false;
+			for (;;) {
+				if (ee == null) {
+					break;
+				}
+				else if (ee instanceof SearchException) {
+					hasSearchException = true;
+					break;
+				}
+				ee = ee.getCause();
+			}
+			assertTrue( hasSearchException );
 		}
 	}
 
