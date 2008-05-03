@@ -21,6 +21,9 @@ public interface FullTextSession extends Session {
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
 	 * Indexation is batched per transaction
+	 * Non indexable entities are ignored
+	 *
+	 * @param entity The entity to index - must not be <code>null</code>.
 	 */
 	void index(Object entity);
 

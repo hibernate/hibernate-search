@@ -128,7 +128,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 * Non indexable entities are ignored
 	 * The entity must be associated with the session
 	 *
-	 * @param entity The neity to index - must not be <code>null</code>.
+	 * @param entity The entity to index - must not be <code>null</code>.
 	 */
 	public void index(Object entity) {
 		if (entity == null) return;
