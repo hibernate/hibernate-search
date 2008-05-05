@@ -43,6 +43,7 @@ import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.apache.lucene.analysis.Analyzer;
 
 /**
  * @author Emmanuel Bernard
@@ -66,13 +67,14 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
 	private Map<String, FilterDef> filterDefinitions = new HashMap<String, FilterDef>();
 	private FilterCachingStrategy filterCachingStrategy;
-	private String indexingStrategy;
+	private Map<String, Analyzer> analyzers;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
 	 */
 	private Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams =
 		new HashMap<DirectoryProvider, LuceneIndexingParameters>();
+	private String indexingStrategy;
 
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
@@ -256,6 +258,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		getBackendQueueProcessorFactory().getProcessor( queue ).run();
 	}
 
+	public Analyzer getAnalyzer(String name) {
+		final Analyzer analyzer = analyzers.get( name );
+		if ( analyzer == null) throw new SearchException( "Unknown Analyzer definition: " + name);
+		return analyzer;
+	}
+
 	private void initDocumentBuilders(Configuration cfg, ReflectionManager reflectionManager, InitContext context) {
 		Iterator iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
@@ -281,7 +289,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				}
 			}
 		}
-		context.initLazyAnalyzers();
+		analyzers = context.initLazyAnalyzers();
 		factory.startDirectoryProviders();
 	}
 

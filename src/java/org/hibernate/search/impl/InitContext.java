@@ -134,26 +134,34 @@ public class InitContext {
 		return defaultSimilarity;
 	}
 
-	public void initLazyAnalyzers() {
-		Map<String, Analyzer> initializedAnalizers = new HashMap<String, Analyzer>( analyzerDefs.size() );
+	public Map<String, Analyzer> initLazyAnalyzers() {
+		Map<String, Analyzer> initializedAnalyzers = new HashMap<String, Analyzer>( analyzerDefs.size() );
 
 		for (DelegateNamedAnalyzer namedAnalyzer : lazyAnalyzers) {
 			String name = namedAnalyzer.getName();
-			if ( initializedAnalizers.containsKey( name ) ) {
-				namedAnalyzer.setDelegate( initializedAnalizers.get( name ) );
+			if ( initializedAnalyzers.containsKey( name ) ) {
+				namedAnalyzer.setDelegate( initializedAnalyzers.get( name ) );
 			}
 			else {
 				if ( analyzerDefs.containsKey( name ) ) {
 					final Analyzer analyzer = buildAnalyzer( analyzerDefs.get( name ) );
 					namedAnalyzer.setDelegate( analyzer );
-					initializedAnalizers.put( name, analyzer );
+					initializedAnalyzers.put( name, analyzer );
 				}
 				else {
-					//exception
 					throw new SearchException("Analyzer found with an unknown definition: " + name);
 				}
 			}
 		}
+
+		//initialize the remaining definitions
+		for ( Map.Entry<String, AnalyzerDef> entry : analyzerDefs.entrySet() ) {
+			if ( ! initializedAnalyzers.containsKey( entry.getKey() ) ) {
+				final Analyzer analyzer = buildAnalyzer( entry.getValue() );
+				initializedAnalyzers.put( entry.getKey(), analyzer );
+			}
+		}
+		return Collections.unmodifiableMap( initializedAnalyzers );
 	}
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {

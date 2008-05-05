@@ -1,8 +1,11 @@
-//$Id: $
+//$Id$
 package org.hibernate.search;
+
+import java.util.Map;
 
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
+import org.apache.lucene.analysis.Analyzer;
 
 /**
  * Provide application wide operations as well as access to the underlying Lucene resources.
@@ -33,4 +36,12 @@ public interface SearchFactory {
 	 * Optimize the index holding <code>entityType</code>
 	 */
 	void optimize(Class entityType);
+
+	/**
+	 * Experimental API
+	 * retrieve an analyzer instance by its definition name
+	 * 
+	 * @throws SearchException if the definition name is unknown
+	 */
+	Analyzer getAnalyzer(String name);
 }
