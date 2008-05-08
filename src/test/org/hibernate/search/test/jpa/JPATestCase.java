@@ -4,7 +4,7 @@ package org.hibernate.search.test.jpa;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.ArrayList;
+import java.util.ArrayList;import java.util.Arrays;
 import java.io.InputStream;
 import java.io.IOException;
 import javax.persistence.EntityManagerFactory;
@@ -77,9 +77,7 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 		Map config = loadProperties();
 		ArrayList<Class> classes = new ArrayList<Class>();
 
-		for ( Class clazz : getAnnotatedClasses() ) {
-			classes.add( clazz );
-		}
+		classes.addAll( Arrays.asList( getAnnotatedClasses() ) );
 		config.put( HibernatePersistence.LOADED_CLASSES, classes );
 		for ( Map.Entry<Class, String> entry : getCachedClasses().entrySet() ) {
 			config.put(
@@ -95,9 +93,7 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 		}
 		if ( getEjb3DD().length > 0 ) {
 			ArrayList<String> dds = new ArrayList<String>();
-			for ( String dd : getEjb3DD() ) {
-				dds.add( dd );
-			}
+			dds.addAll( Arrays.asList( getEjb3DD() ) );
 			config.put( HibernatePersistence.XML_FILE_NAMES, dds );
 		}
 

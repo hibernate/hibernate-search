@@ -174,9 +174,8 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 		public boolean isRightLayer(WorkType type) {
 			if (this == FIRST && type != WorkType.COLLECTION) return true;
-			if (this == SECOND && type == WorkType.COLLECTION) return true;
-			return false;
-		}
+			return this == SECOND && type == WorkType.COLLECTION;
+			}
 	}
 
 }

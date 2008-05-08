@@ -46,7 +46,7 @@ import org.hibernate.util.StringHelper;
  * @author Hardy Ferentschik
  */
 public class DirectoryProviderFactory {
-	public List<DirectoryProvider<?>> providers = new ArrayList<DirectoryProvider<?>>();
+	private List<DirectoryProvider<?>> providers = new ArrayList<DirectoryProvider<?>>();
 	private static String LUCENE_PREFIX = "hibernate.search.";
 	private static String LUCENE_DEFAULT = LUCENE_PREFIX + "default.";
 	private static String DEFAULT_DIRECTORY_PROVIDER = FSDirectoryProvider.class.getName();

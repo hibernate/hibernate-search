@@ -150,7 +150,7 @@ public class BridgeFactory {
 	}
 
 	public static FieldBridge guessType(Field field, XMember member, ReflectionManager reflectionManager) {
-		FieldBridge bridge = null;
+		FieldBridge bridge;
 		org.hibernate.search.annotations.FieldBridge bridgeAnn;
 		//@Field bridge has priority over @FieldBridge
 		if ( field != null && void.class != field.bridge().impl() ) {

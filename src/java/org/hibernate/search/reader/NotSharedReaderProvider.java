@@ -17,6 +17,7 @@ import org.hibernate.search.store.DirectoryProvider;
  * @author Emmanuel Bernard
  */
 public class NotSharedReaderProvider implements ReaderProvider {
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	public IndexReader openReader(DirectoryProvider[] directoryProviders) {
 		final int length = directoryProviders.length;
 		IndexReader[] readers = new IndexReader[length];
@@ -33,6 +34,7 @@ public class NotSharedReaderProvider implements ReaderProvider {
 	}
 
 
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	public void closeReader(IndexReader reader) {
 		try {
 			reader.close();

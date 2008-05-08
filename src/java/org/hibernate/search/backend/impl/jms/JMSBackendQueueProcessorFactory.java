@@ -87,7 +87,7 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 		}
 	}
 
-	public static Properties getJndiProperties(Properties properties) {
+	private static Properties getJndiProperties(Properties properties) {
 
 		HashSet specialProps = new HashSet();
 		specialProps.add( JNDI_PREFIX + "class" );

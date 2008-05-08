@@ -68,6 +68,7 @@ public class Workspace {
 	 * retrieve a read write IndexReader
 	 * For a given DirectoryProvider, An IndexReader must be used before an IndexWriter
 	 */
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	public IndexReader getIndexReader(DirectoryProvider provider, Class entity) {
 		//one cannot access a reader for update after a writer has been accessed
 		if ( writers.containsKey( provider ) )
@@ -95,6 +96,7 @@ public class Workspace {
 	 * retrieve a read write IndexWriter
 	 * For a given DirectoryProvider, An IndexReader must be used before an IndexWriter
 	 */
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	public IndexWriter getIndexWriter(DirectoryProvider provider, Class entity, boolean modificationOperation) {
 		//one has to close a reader for update before a writer is accessed
 		IndexReader reader = readers.get( provider );

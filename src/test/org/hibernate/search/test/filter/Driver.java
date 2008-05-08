@@ -88,10 +88,9 @@ public class Driver {
 		if ( score != driver.score ) return false;
 		if ( delivery != null ? !delivery.equals( driver.delivery ) : driver.delivery != null ) return false;
 		if ( name != null ? !name.equals( driver.name ) : driver.name != null ) return false;
-		if ( teacher != null ? !teacher.equals( driver.teacher ) : driver.teacher != null ) return false;
+		return !( teacher != null ? !teacher.equals( driver.teacher ) : driver.teacher != null );
 
-		return true;
-	}
+		}
 
 	public int hashCode() {
 		int result;

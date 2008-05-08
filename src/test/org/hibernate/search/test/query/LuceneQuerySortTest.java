@@ -116,7 +116,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 	private void createTestBooks(FullTextSession s) {
 		Transaction tx = s.beginTransaction();
 		Calendar cal = Calendar.getInstance( );
-		cal.set( 2007, 07, 25, 11, 20, 30);
+		cal.set( 2007, 7, 25, 11, 20, 30);
 		Book book = new Book(1, "Hibernate & Lucene", "This is a test book.");
 		book.setPublicationDate( cal.getTime() );
 		s.save(book);

@@ -15,6 +15,7 @@ import org.hibernate.search.SearchException;
  * @author Emmanuel Bernard
  */
 public abstract class ReaderProviderHelper {
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	public static IndexReader buildMultiReader(int length, IndexReader[] readers) {
 		if ( length == 0 ) {
 			return null;

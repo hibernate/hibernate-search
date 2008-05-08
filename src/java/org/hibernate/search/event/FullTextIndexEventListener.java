@@ -35,6 +35,7 @@ import org.hibernate.search.SearchException;
 public class FullTextIndexEventListener implements PostDeleteEventListener, PostInsertEventListener,
 		PostUpdateEventListener, Initializable {
 
+	@SuppressWarnings( { "WeakerAccess" } )
 	protected boolean used;
 	protected SearchFactoryImplementor searchFactoryImplementor;
 
@@ -83,6 +84,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener, Post
 		}
 	}
 
+	@SuppressWarnings( { "WeakerAccess" } )
 	protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event) {
 		Work work = new Work(entity, id, workType);
 		searchFactoryImplementor.getWorker().performWork( work, event.getSession() );

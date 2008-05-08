@@ -487,7 +487,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private void closeSearcher(Searcher searcher, ReaderProvider readerProvider) {
-		boolean trace = log.isTraceEnabled();
 		Set<IndexReader> indexReaders = getIndexReaders( searcher );
 
 		for (IndexReader indexReader : indexReaders) {

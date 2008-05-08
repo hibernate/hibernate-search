@@ -196,9 +196,8 @@ public class Address implements Serializable {
 		if ( ! equals(this.getCounty(), that.getCounty() ) ) return false;
 		if ( ! equals(this.getTown(), that.getTown() ) ) return false;
 		if ( ! equals(this.getPostcode(), that.getPostcode() ) ) return false;
-		if ( ! equals(this.getContact(), that.getContact() ) ) return false;
-		return true;
-//		EqualsBuilder equalsBuilder = new EqualsBuilder();
+		return equals( this.getContact(), that.getContact() );
+		//		EqualsBuilder equalsBuilder = new EqualsBuilder();
 //		return equalsBuilder.append(new Object[]{this.getAddress1(), this.getAddress2(), this.getCounty(), this.getTown(), this.getPostcode(), this.contact}, new Object[]{address.getAddress1(), address.getAddress2(), address.getCounty(), address.getTown(), address.getPostcode(), address.getContact()}).isEquals();
 	}
 

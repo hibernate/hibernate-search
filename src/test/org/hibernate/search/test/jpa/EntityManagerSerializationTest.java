@@ -81,7 +81,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 
 	public Class[] getAnnotatedClasses() {
 		return new Class[] { Bretzel.class };
-	};
+	}
 
 	/**
 	 * Helper method for testing the entity manager before and after

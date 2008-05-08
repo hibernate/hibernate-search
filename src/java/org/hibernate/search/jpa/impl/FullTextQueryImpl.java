@@ -105,6 +105,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	//TODO mutualize this code with the EM this will fix the rollback issues
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	private void throwPersistenceException(Exception e) {
 		if ( e instanceof StaleStateException ) {
 			PersistenceException pe = wrapStaleStateException( (StaleStateException) e );
@@ -135,14 +136,15 @@ public class FullTextQueryImpl implements FullTextQuery {
 		}
 	}
 
-	public void throwPersistenceException(PersistenceException e) {
+	void throwPersistenceException(PersistenceException e) {
 		if ( ! ( e instanceof NoResultException || e instanceof NonUniqueResultException ) ) {
 			//FIXME rollback
 		}
 		throw e;
 	}
 
-	public PersistenceException wrapStaleStateException(StaleStateException e) {
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
+	PersistenceException wrapStaleStateException(StaleStateException e) {
 		PersistenceException pe;
 		if ( e instanceof StaleObjectStateException ) {
 			StaleObjectStateException sose = (StaleObjectStateException) e;
@@ -167,6 +169,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return pe;
 	}
 
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	public Object getSingleResult() {
 		try {
 			List result = query.list();

@@ -38,8 +38,8 @@ public class DirectoryProviderHelper {
 		File sourceDirectory;
 		if ( log.isTraceEnabled() ) {
 			log.trace(
-					"Guess source directory from " + ROOTINDEX_PROP_NAME + " " + root != null ? root : "<null>"
-							+ " and " + RELATIVEINDEX_PROP_NAME + " " + relative != null ? relative : "<null>"
+					"Guess source directory from " + ROOTINDEX_PROP_NAME + " " + ( root != null ? root : "<null>" )
+							+ " and " + RELATIVEINDEX_PROP_NAME + " " + (relative != null ? relative : "<null>")
 			);
 		}
 		if ( relative == null ) relative = directoryProviderName;

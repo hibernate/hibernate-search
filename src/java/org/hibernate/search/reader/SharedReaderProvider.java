@@ -121,6 +121,7 @@ public class SharedReaderProvider implements ReaderProvider {
 		return buildMultiReader( length, readers );
 	}
 
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	private IndexReader replaceActiveReader(IndexReader outOfDateReader, Lock directoryProviderLock, DirectoryProvider directoryProvider, IndexReader[] readers) {
 		boolean trace = log.isTraceEnabled();
 		IndexReader oldReader;

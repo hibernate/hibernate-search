@@ -261,9 +261,8 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
 				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
-				// Field > property > entity analyzer
-				Analyzer analyzer = null; //no field analyzer
-				if ( analyzer == null ) analyzer = getAnalyzer( member, context );
+				// property > entity analyzer (no field analyzer)
+				Analyzer analyzer = getAnalyzer( member, context );
 				if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
 				if ( analyzer == null ) throw new AssertionFailure( "Analizer should not be undefined" );
 				this.analyzer.addScopedAnalyzer( fieldName, analyzer );

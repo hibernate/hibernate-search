@@ -20,7 +20,7 @@ public class BooleanBridge implements TwoWayStringBridge {
 	public String objectToString(Object object) {
 		return object == null ?
 				null :
-				( (Boolean) object ).toString();
+				object.toString();
 	}
 }
 

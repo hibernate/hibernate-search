@@ -37,6 +37,7 @@ public class OptimizerTestCase extends SearchTestCase {
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
 	}
 
+	@SuppressWarnings( { "UnnecessaryLocalVariable" } )
 	private File getBaseIndexDir() {
 		File current = new File( "." );
 		File sub = new File( current, "indextemp" );

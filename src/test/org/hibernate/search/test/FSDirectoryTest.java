@@ -45,8 +45,7 @@ public class FSDirectoryTest extends SearchTestCase {
 
 	private File getBaseIndexDir() {
 		File current = new File( "." );
-		File sub = new File( current, "indextemp" );
-		return sub;
+		return new File( current, "indextemp" );
 	}
 
 	protected void tearDown() throws Exception {

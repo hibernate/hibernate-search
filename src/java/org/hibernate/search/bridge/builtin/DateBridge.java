@@ -43,7 +43,7 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 	public static final TwoWayStringBridge DATE_SECOND = new DateBridge( Resolution.SECOND );
 	public static final TwoWayStringBridge DATE_MILLISECOND = new DateBridge( Resolution.MILLISECOND );
 
-	DateTools.Resolution resolution;
+	private DateTools.Resolution resolution;
 
 	public DateBridge() {
 	}

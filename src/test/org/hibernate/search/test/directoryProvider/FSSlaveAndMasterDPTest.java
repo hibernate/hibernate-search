@@ -22,6 +22,7 @@ import org.hibernate.search.util.FileHelper;
  */
 public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
+	@SuppressWarnings( { "PointlessArithmeticExpression" } )
 	public void testProperCopy() throws Exception {
 		Session s1 = getSessionFactories()[0].openSession( );
 		SnowStorm sn = new SnowStorm();
