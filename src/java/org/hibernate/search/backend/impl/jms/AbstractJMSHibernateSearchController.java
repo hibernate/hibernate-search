@@ -9,12 +9,12 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implement the Hibernate Search controller responsible for processing the
@@ -26,7 +26,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * @author Emmanuel Bernard
  */
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
-	private static Log log = LogFactory.getLog( AbstractJMSHibernateSearchController.class );
+	private static Logger log = LoggerFactory.getLogger( AbstractJMSHibernateSearchController.class );
 
 	/**
 	 * return the current or give a new session
@@ -62,7 +62,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	 */
 	public void onMessage(Message message) {
 		if ( !( message instanceof ObjectMessage ) ) {
-			log.error( "Incorrect message type: " + message.getClass() );
+			log.error( "Incorrect message type: {}", message.getClass() );
 			return;
 		}
 		ObjectMessage objectMessage = (ObjectMessage) message;

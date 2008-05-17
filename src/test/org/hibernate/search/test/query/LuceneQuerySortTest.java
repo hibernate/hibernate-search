@@ -4,8 +4,6 @@ package org.hibernate.search.test.query;
 import java.util.List;
 import java.util.Calendar;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
@@ -14,7 +12,6 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.Version;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -23,11 +20,6 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Hardy Ferentschik
  */
 public class LuceneQuerySortTest extends SearchTestCase {
-
-	/**
-	 * Class logger.
-	 */
-	private static Log log = LogFactory.getLog( Version.class );
 
 	/**
 	 * Test that we can change the default sort order of the lucene search result.

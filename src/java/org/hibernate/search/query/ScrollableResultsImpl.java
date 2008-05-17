@@ -15,8 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.hibernate.HibernateException;
@@ -27,6 +25,8 @@ import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.Loader;
 import org.hibernate.type.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements scollable and paginated resultsets.
@@ -50,7 +50,7 @@ import org.hibernate.type.Type;
  * @author John Griffin
  */
 public class ScrollableResultsImpl implements ScrollableResults {
-	private static Log log = LogFactory.getLog( ScrollableResultsImpl.class );
+	private static Logger log = LoggerFactory.getLogger( ScrollableResultsImpl.class );
 	private final IndexSearcher searcher;
 	private final SearchFactory searchFactory;
 	private final Hits hits;

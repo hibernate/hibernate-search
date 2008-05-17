@@ -10,8 +10,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.SearchException;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Optimization strategy triggered after a certain amount of operations
@@ -24,7 +24,7 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 	private long operations = 0;
 	private long transactions = 0;
 	private DirectoryProvider directoryProvider;
-	private Log log = LogFactory.getLog( IncrementalOptimizerStrategy.class );
+	private final Logger log = LoggerFactory.getLogger( IncrementalOptimizerStrategy.class );
 
 	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, SearchFactoryImplementor searchFactoryImplementor) {
 		this.directoryProvider = directoryProvider;
@@ -56,11 +56,8 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 
 	public void optimize(Workspace workspace) {
 		if ( needOptimization() ) {
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Optimize "
-				 	+ directoryProvider.getDirectory().toString()
-					+" after " + operations + " operations and " + transactions + " transactions");
-			}
+			log.debug( "Optimize {} after {} operations and {} transactions",
+				new Object[] { directoryProvider.getDirectory(), operations, transactions });
 			IndexWriter writer = workspace.getIndexWriter( directoryProvider );
 			try {
 				writer.optimize();

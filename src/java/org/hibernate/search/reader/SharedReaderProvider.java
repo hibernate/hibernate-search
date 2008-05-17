@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.hibernate.annotations.common.AssertionFailure;
@@ -21,6 +19,8 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import static org.hibernate.search.reader.ReaderProviderHelper.buildMultiReader;
 import static org.hibernate.search.reader.ReaderProviderHelper.clean;
 import org.hibernate.search.store.DirectoryProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Share readers per SearchFactory, reusing them iff they are still valid.
@@ -29,7 +29,7 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 public class SharedReaderProvider implements ReaderProvider {
 	private static Field subReadersField;
-	private static Log log = LogFactory.getLog( SharedReaderProvider.class );
+	private final Logger log = LoggerFactory.getLogger ( SharedReaderProvider.class );
 	/**
 	 * nonfair lock. Need to be acquired on indexReader acquisition or release (semaphore)
 	 */
@@ -58,13 +58,13 @@ public class SharedReaderProvider implements ReaderProvider {
 		boolean trace = log.isTraceEnabled();
 		int length = directoryProviders.length;
 		IndexReader[] readers = new IndexReader[length];
-		if ( trace ) log.trace( "Opening IndexReader for directoryProviders: " + length );
+		if ( trace ) log.trace( "Opening IndexReader for directoryProviders: {}", length );
 
 		for (int index = 0; index < length; index++) {
 			DirectoryProvider directoryProvider = directoryProviders[index];
 			IndexReader reader;
 			Lock directoryProviderLock = perDirectoryProviderManipulationLocks.get( directoryProvider );
-			if ( trace ) log.trace( "Opening IndexReader from " + directoryProvider.getDirectory().toString() );
+			if ( trace ) log.trace( "Opening IndexReader from {}", directoryProvider.getDirectory() );
 			directoryProviderLock.lock(); //needed for same problem as the double-checked locking
 			try {
 				reader = activeSearchIndexReaders.get( directoryProvider );
@@ -74,7 +74,7 @@ public class SharedReaderProvider implements ReaderProvider {
 			}
 			if ( reader == null ) {
 				if ( trace )
-					log.trace( "No shared IndexReader, opening a new one: " + directoryProvider.getDirectory().toString() );
+					log.trace( "No shared IndexReader, opening a new one: {}", directoryProvider.getDirectory() );
 				reader = replaceActiveReader( null, directoryProviderLock, directoryProvider, readers );
 			}
 			else {
@@ -86,14 +86,16 @@ public class SharedReaderProvider implements ReaderProvider {
 					throw new SearchException( "Unable to read current status of Lucene IndexReader", e );
 				}
 				if ( !isCurrent ) {
-					if ( trace )
-						log.trace( "Out of date shared IndexReader found, opening a new one: " + directoryProvider.getDirectory().toString() );
+					if ( trace ) {
+						log.trace( "Out of date shared IndexReader found, opening a new one: {}",
+								directoryProvider.getDirectory() );
+					}
 					IndexReader outOfDateReader = reader;
 					reader = replaceActiveReader( outOfDateReader, directoryProviderLock, directoryProvider, readers );
 				}
 				else {
 					if ( trace )
-						log.trace( "Valid shared IndexReader: " + directoryProvider.getDirectory().toString() );
+						log.trace( "Valid shared IndexReader: {}" + directoryProvider.getDirectory() );
 					directoryProviderLock.lock();
 					try {
 						//read the latest active one, the current one could be out of date and closed already
@@ -105,7 +107,7 @@ public class SharedReaderProvider implements ReaderProvider {
 							//TODO if readerData is null????
 							readerData.semaphore++;
 							searchIndexReaderSemaphores.put( reader, readerData ); //not necessary
-							if ( trace ) log.trace( "Semaphore increased: " + readerData.semaphore + " for " + reader );
+							if ( trace ) log.trace( "Semaphore increased: {} for {}", readerData.semaphore, reader );
 						}
 						finally {
 							semaphoreIndexReaderLock.unlock();
@@ -145,7 +147,7 @@ public class SharedReaderProvider implements ReaderProvider {
 			semaphoreIndexReaderLock.lock();
 			try {
 				searchIndexReaderSemaphores.put( reader, new ReaderData( 1, directoryProvider ) );
-				if ( trace ) log.trace( "Semaphore: 1 for " + reader );
+				if ( trace ) log.trace( "Semaphore: 1 for {}", reader );
 				if ( outOfDateReader != null ) {
 					ReaderData readerData = searchIndexReaderSemaphores.get( outOfDateReader );
 					if ( readerData == null ) {
@@ -183,7 +185,7 @@ public class SharedReaderProvider implements ReaderProvider {
 			directoryProviderLock.unlock();
 		}
 		if ( closeOutOfDateReader ) {
-			if ( trace ) log.trace( "Closing out of date IndexReader " + outOfDateReader );
+			if ( trace ) log.trace( "Closing out of date IndexReader {}", outOfDateReader );
 			try {
 				outOfDateReader.close();
 			}
@@ -192,7 +194,7 @@ public class SharedReaderProvider implements ReaderProvider {
 			}
 		}
 		if ( closeOldReader ) {
-			if ( trace ) log.trace( "Closing old IndexReader " + oldReader );
+			if ( trace ) log.trace( "Closing old IndexReader {}", oldReader );
 			try {
 				oldReader.close();
 			}
@@ -215,7 +217,7 @@ public class SharedReaderProvider implements ReaderProvider {
 			catch (IllegalAccessException e) {
 				throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not accessible", e );
 			}
-			if ( trace ) log.trace( "Closing MultiReader: " + reader );
+			if ( trace ) log.trace( "Closing MultiReader: {}", reader );
 		}
 		else {
 			throw new AssertionFailure( "Everything should be wrapped in a MultiReader" );
@@ -233,7 +235,7 @@ public class SharedReaderProvider implements ReaderProvider {
 			}
 
 			if ( readerData == null ) {
-				log.error( "Trying to close a Lucene IndexReader not present: " + subReader.directory().toString() );
+				log.error( "Trying to close a Lucene IndexReader not present: {}", subReader.directory() );
 				//TODO should we try to close?
 				continue;
 			}
@@ -245,19 +247,19 @@ public class SharedReaderProvider implements ReaderProvider {
 			try {
 				boolean isActive;
 				isActive = activeSearchIndexReaders.get( readerData.provider ) == subReader;
-				if ( trace ) log.trace( "Indexreader not active: " + subReader );
+				if ( trace ) log.trace( "Indexreader not active: {}", subReader );
 				semaphoreIndexReaderLock.lock();
 				try {
 					readerData = searchIndexReaderSemaphores.get( subReader );
 					if ( readerData == null ) {
-						log.error( "Trying to close a Lucene IndexReader not present: " + subReader.directory().toString() );
+						log.error( "Trying to close a Lucene IndexReader not present: {}" + subReader.directory() );
 						//TODO should we try to close?
 						continue;
 					}
 					readerData.semaphore--;
-					if ( trace ) log.trace( "Semaphore decreased to: " + readerData.semaphore + " for " + subReader );
+					if ( trace ) log.trace( "Semaphore decreased to: {} for {}", readerData.semaphore, subReader );
 					if ( readerData.semaphore < 0 )
-						log.error( "Semaphore negative: " + subReader.directory().toString() );
+						log.error( "Semaphore negative: {}", subReader.directory() );
 					if ( ( !isActive ) && readerData.semaphore == 0 ) {
 						searchIndexReaderSemaphores.remove( subReader );
 						closeReader = true;
@@ -275,7 +277,7 @@ public class SharedReaderProvider implements ReaderProvider {
 			}
 
 			if ( closeReader ) {
-				if ( trace ) log.trace( "Closing IndexReader: " + subReader );
+				if ( trace ) log.trace( "Closing IndexReader: {}", subReader );
 				try {
 					subReader.close();
 				}

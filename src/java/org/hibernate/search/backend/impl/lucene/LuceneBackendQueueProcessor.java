@@ -6,8 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
@@ -19,6 +17,8 @@ import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.annotations.common.AssertionFailure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Apply the operations to Lucene directories avoiding deadlocks.
@@ -32,7 +32,7 @@ public class LuceneBackendQueueProcessor implements Runnable {
 	/**
 	 * Class logger.
 	 */
-	private static Log log = LogFactory.getLog( LuceneBackendQueueProcessor.class );
+	private static Logger log = LoggerFactory.getLogger( LuceneBackendQueueProcessor.class );
 	
 	private List<LuceneWork> queue;
 	private SearchFactoryImplementor searchFactoryImplementor;

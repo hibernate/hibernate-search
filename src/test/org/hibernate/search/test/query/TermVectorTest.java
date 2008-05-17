@@ -1,7 +1,5 @@
 package org.hibernate.search.test.query;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.TermPositionVector;
 import org.apache.lucene.index.TermVectorOffsetInfo;
@@ -17,8 +15,7 @@ import org.hibernate.search.test.SearchTestCase;
  * @author John Griffin
  */
 public class TermVectorTest extends SearchTestCase {
-   private static Log log = LogFactory.getLog(TermVectorTest.class);
-
+   
    public void testPositionOffsets() throws Exception {
       FullTextSession s = Search.createFullTextSession(openSession());
       createIndex(s);

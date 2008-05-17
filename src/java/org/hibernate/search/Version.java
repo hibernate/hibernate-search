@@ -3,18 +3,19 @@ package org.hibernate.search;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * @author Emmanuel Bernard
  */
 public class Version {
 	public static final String VERSION = "3.1.x." + new Date();
-	private static Log log = LogFactory.getLog( Version.class );
+	private static Logger log = LoggerFactory.getLogger( Version.class );
 
 	static {
-		log.info( "Hibernate Search " + VERSION );
+		log.info( "Hibernate Search {}", VERSION );
 	}
 
 	public static void touch() {

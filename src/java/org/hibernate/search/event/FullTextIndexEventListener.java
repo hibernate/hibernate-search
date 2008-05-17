@@ -3,8 +3,6 @@ package org.hibernate.search.event;
 
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.event.AbstractEvent;
 import org.hibernate.event.Initializable;

@@ -4,8 +4,6 @@ package org.hibernate.search.backend.impl.lucene;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -21,6 +19,8 @@ import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.store.DirectoryProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Stateless implementation that performs a unit of work.
@@ -31,7 +31,7 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 public class LuceneWorker {
 	private Workspace workspace;
-	private static Log log = LogFactory.getLog( LuceneWorker.class );
+	private static final Logger log = LoggerFactory.getLogger( LuceneWorker.class );
 
 	public LuceneWorker(Workspace workspace) {
 		this.workspace = workspace;
@@ -63,8 +63,7 @@ public class LuceneWorker {
 	}
 
 	private void add(Class entity, Serializable id, Document document, DirectoryProvider provider) {
-		if ( log.isTraceEnabled() )
-			log.trace( "add to Lucene index: " + entity + "#" + id + ": " + document );
+		log.trace( "add to Lucene index: {}#{}:{}", new Object[] { entity, id, document } );
 		IndexWriter writer = workspace.getIndexWriter( provider, entity, true );
 		try {
 			writer.addDocument( document );
@@ -86,7 +85,7 @@ public class LuceneWorker {
 		 * We can only delete by term, and the index doesn't have a termt that
 		 * uniquely identify the entry. See logic below
 		 */
-		log.trace( "remove from Lucene index: " + entity + "#" + id );
+		log.trace( "remove from Lucene index: {}#{}", entity, id );
 		DocumentBuilder builder = workspace.getDocumentBuilder( entity );
 		Term term = builder.getTerm( id );
 		IndexReader reader = workspace.getIndexReader( provider, entity );
@@ -121,8 +120,7 @@ public class LuceneWorker {
 
 	public void performWork(OptimizeLuceneWork work, DirectoryProvider provider) {
 		Class entity = work.getEntityClass();
-		if ( log.isTraceEnabled() )
-			log.trace( "optimize Lucene index: " + entity );
+		log.trace( "optimize Lucene index: {}", entity );
 		IndexWriter writer = workspace.getIndexWriter( provider, entity, false );
 		try {
 			writer.optimize();
@@ -135,8 +133,7 @@ public class LuceneWorker {
 
 	public void performWork(PurgeAllLuceneWork work, DirectoryProvider provider) {
 		Class entity = work.getEntityClass();
-		if ( log.isTraceEnabled() )
-			log.trace( "purgeAll Lucene index: " + entity );
+		log.trace( "purgeAll Lucene index: {}", entity );
 		IndexReader reader = workspace.getIndexReader( provider, entity );
 		try {
 			Term term = new Term( DocumentBuilder.CLASS_FIELDNAME, entity.getName() );

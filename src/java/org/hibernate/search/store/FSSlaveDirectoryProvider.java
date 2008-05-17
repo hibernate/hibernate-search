@@ -10,12 +10,12 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.store.FSDirectory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * File based directory provider that takes care of getting a version of the index
@@ -31,7 +31,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  */
 public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	
-	private static Log log = LogFactory.getLog( FSSlaveDirectoryProvider.class );
+	private final Logger log = LoggerFactory.getLogger( FSSlaveDirectoryProvider.class );
 	
 	private FSDirectory directory1;
 	private FSDirectory directory2;
@@ -53,9 +53,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		if ( ! new File( sourceIndexDir, "current1" ).exists() && ! new File( sourceIndexDir, "current2" ).exists() ) {
 			throw new IllegalStateException( "No current marker in source directory" );
 		}
-		log.debug( "Source directory: " + sourceIndexDir.getPath() );
+		log.debug( "Source directory: {}", sourceIndexDir.getPath() );
 		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
-		log.debug( "Index directory: " + indexDir.getPath() );
+		log.debug( "Index directory: {}", indexDir.getPath() );
 		try {
 			indexName = indexDir.getCanonicalPath();
 		}
@@ -105,7 +105,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 					throw new SearchException( "Unable to create the directory marker file: " + indexName );
 				}
 			}
-			log.debug( "Current directory: " + current);
+			log.debug( "Current directory: {}", current);
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
@@ -162,7 +162,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 				executor.execute( copyTask );
 			}
 			else {
-				log.trace( "Skipping directory synchronization, previous work still in progress: " + indexName);
+				log.trace( "Skipping directory synchronization, previous work still in progress: {}", indexName);
 			}
 		}
 	}
@@ -199,7 +199,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 				File destinationFile = new File( destination, Integer.valueOf( index ).toString() );
 				//TODO make smart a parameter
 				try {
-					log.trace( "Copying " + sourceFile + " into " + destinationFile );
+					log.trace( "Copying {} into {}", sourceFile, destinationFile );
 					FileHelper.synchronize( sourceFile, destinationFile, true );
 					current = index;
 				}
@@ -222,7 +222,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			finally {
 				inProgress = false;
 			}
-			log.trace( "Copy for " + indexName + " took " + (System.currentTimeMillis() - start) + " ms" );
+			log.trace( "Copy for {} took {} ms", indexName, (System.currentTimeMillis() - start) );
 		}
 	}
 

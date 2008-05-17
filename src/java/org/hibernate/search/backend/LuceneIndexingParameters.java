@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper class around the Lucene indexing parameters <i>mergeFactor</i>, <i>maxMergeDocs</i>,
@@ -23,8 +23,6 @@ import org.hibernate.search.backend.configuration.IndexWriterSetting;
  * @author Sanne Grinovero
  */
 public class LuceneIndexingParameters implements Serializable {
-
-	private static final Log log = LogFactory.getLog( LuceneIndexingParameters.class );
 
 	// value keyword
 	public static final String EXPLICIT_DEFAULT_VALUE = "default"; 

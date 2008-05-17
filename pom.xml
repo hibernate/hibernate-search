@@ -28,10 +28,10 @@
             <version>2.3.1</version>
         </dependency>
         <dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.0.4</version>
-		</dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.4.2</version>
+        </dependency>
         <dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>jta</artifactId>

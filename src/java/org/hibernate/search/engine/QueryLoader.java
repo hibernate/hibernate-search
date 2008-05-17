@@ -4,14 +4,14 @@ package org.hibernate.search.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -19,7 +19,7 @@ import org.hibernate.criterion.Restrictions;
 public class QueryLoader implements Loader {
 	private static final int MAX_IN_CLAUSE = 500;
 	private static final List EMPTY_LIST = new ArrayList( 0 );
-	private static Log log = LogFactory.getLog( QueryLoader.class );
+	private final Logger log = LoggerFactory.getLogger( QueryLoader.class );
 
 	private Session session;
 	private Class entityType;
@@ -44,8 +44,8 @@ public class QueryLoader implements Loader {
 		}
 		catch (RuntimeException e) {
 			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
-				log.debug( "Object found in Search index but not in database: "
-						+ entityInfo.clazz + " wih id " + entityInfo.id );
+				log.debug( "Object found in Search index but not in database: {} with id {}",
+						entityInfo.clazz, entityInfo.id );
 				maybeProxy = null;
 			}
 			else {
@@ -91,8 +91,8 @@ public class QueryLoader implements Loader {
 			}
 			else {
 				if ( log.isDebugEnabled() ) {
-					log.debug( "Object found in Search index but not in database: "
-						+ entityInfo.clazz + " wih id " + entityInfo.id );
+					log.debug( "Object found in Search index but not in database: {} with {}",
+						entityInfo.clazz, entityInfo.id );
 				}
 			}
 		}

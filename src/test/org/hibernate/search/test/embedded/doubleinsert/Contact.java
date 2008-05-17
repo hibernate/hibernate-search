@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -22,8 +21,6 @@ import javax.persistence.Table;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
@@ -39,8 +36,6 @@ import org.hibernate.search.annotations.Store;
 @DiscriminatorColumn(name="contactType",discriminatorType=javax.persistence.DiscriminatorType.STRING)
 @Indexed
 public class Contact  implements Serializable {
-
-	private static Log logger = LogFactory.getLog(Contact.class);
 
     private static final long serialVersionUID = 1L;
 

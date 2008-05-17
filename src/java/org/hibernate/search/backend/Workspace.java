@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexReader;
@@ -20,6 +18,8 @@ import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Lucene workspace.
@@ -43,7 +43,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  */
 //TODO introduce the notion of read only IndexReader? We cannot enforce it because Lucene use abstract classes, not interfaces
 public class Workspace {
-	private static Log log = LogFactory.getLog( Workspace.class );
+	private final Logger log = LoggerFactory.getLogger( Workspace.class );
 	private Map<DirectoryProvider, IndexReader> readers = new HashMap<DirectoryProvider, IndexReader>();
 	private Map<DirectoryProvider, IndexWriter> writers = new HashMap<DirectoryProvider, IndexWriter>();
 	private List<DirectoryProvider> lockedProviders = new ArrayList<DirectoryProvider>();

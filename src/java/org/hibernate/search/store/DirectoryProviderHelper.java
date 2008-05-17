@@ -7,12 +7,12 @@ import java.io.IOException;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.annotations.common.util.StringHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Bernard
@@ -20,7 +20,7 @@ import org.apache.lucene.store.FSDirectory;
  */
 public class DirectoryProviderHelper {
 	
-	private static final Log log = LogFactory.getLog( DirectoryProviderHelper.class );
+	private static final Logger log = LoggerFactory.getLogger( DirectoryProviderHelper.class );
 	private static final String ROOTINDEX_PROP_NAME = "sourceBase";
 	private static final String RELATIVEINDEX_PROP_NAME = "source";
 
@@ -38,8 +38,11 @@ public class DirectoryProviderHelper {
 		File sourceDirectory;
 		if ( log.isTraceEnabled() ) {
 			log.trace(
-					"Guess source directory from " + ROOTINDEX_PROP_NAME + " " + ( root != null ? root : "<null>" )
-							+ " and " + RELATIVEINDEX_PROP_NAME + " " + (relative != null ? relative : "<null>")
+					"Guess source directory from {} {} and {} {}", new Object[] {
+						ROOTINDEX_PROP_NAME,
+						( root != null ? root : "<null>" ),
+						RELATIVEINDEX_PROP_NAME,
+					(relative != null ? relative : "<null>") }
 			);
 		}
 		if ( relative == null ) relative = directoryProviderName;
@@ -70,7 +73,7 @@ public class DirectoryProviderHelper {
 	public static FSDirectory createFSIndex(File indexDir) throws IOException {
 		FSDirectory fsDirectory = FSDirectory.getDirectory( indexDir );
 		if ( ! IndexReader.indexExists( fsDirectory ) ) {
-			log.debug( "Initialize index: '" + indexDir.getAbsolutePath() + "'" );
+			log.debug( "Initialize index: '{}'", indexDir.getAbsolutePath() );
 			IndexWriter iw = new IndexWriter( fsDirectory, new StandardAnalyzer(), true );
 			iw.close();
 		}
@@ -136,7 +139,7 @@ public class DirectoryProviderHelper {
 		} catch (NumberFormatException nfe) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName +"; refresh period is not numeric.", nfe );
 		}
-		log.debug( "Refresh period " + period + " seconds" );
+		log.debug( "Refresh period: {} seconds", period );
 		return period * 1000; //per second
 	}
 	

@@ -9,12 +9,11 @@ import org.hibernate.event.PostCollectionUpdateEventListener;
 import org.hibernate.event.PostCollectionRecreateEvent;
 import org.hibernate.event.PostCollectionRemoveEvent;
 import org.hibernate.event.PostCollectionUpdateEvent;
-import org.hibernate.event.AbstractEvent;
 import org.hibernate.event.AbstractCollectionEvent;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.engine.EntityEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Support collection event listening (starts from hibernate core 3.2.6)
@@ -26,7 +25,7 @@ public class FullTextIndexCollectionEventListener extends FullTextIndexEventList
 		implements PostCollectionRecreateEventListener,
 		PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener {
-	private static Log log = LogFactory.getLog( FullTextIndexCollectionEventListener.class );
+	private final Logger log = LoggerFactory.getLogger( FullTextIndexCollectionEventListener.class );
 
 	public void onPostRecreateCollection(PostCollectionRecreateEvent event) {
 		processCollectionEvent( event );
@@ -43,7 +42,10 @@ public class FullTextIndexCollectionEventListener extends FullTextIndexEventList
 		if ( used && searchFactoryImplementor.getDocumentBuilders().containsKey( entity.getClass() ) ) {
 			Serializable id = getId( entity, event );
 			if (id == null) {
-				log.warn( "Unable to reindex entity on collection change, id cannot be extracted: " + event.getAffectedOwnerEntityName() );
+				log.warn(
+						"Unable to reindex entity on collection change, id cannot be extracted: {}",
+						event.getAffectedOwnerEntityName()
+				);
 				return;
 			}
 			processWork( entity, id, WorkType.COLLECTION, event );

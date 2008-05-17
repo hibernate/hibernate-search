@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -56,6 +54,8 @@ import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.transform.ResultTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}
@@ -65,7 +65,7 @@ import org.hibernate.transform.ResultTransformer;
  */
 //TODO implements setParameter()
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
-	private static final Log log = LogFactory.getLog( FullTextQueryImpl.class );
+	private final Logger log = LoggerFactory.getLogger( FullTextQueryImpl.class );
 	private org.apache.lucene.search.Query luceneQuery;
 	private Class[] classes;
 	private Set<Class> classesAndSubclasses;

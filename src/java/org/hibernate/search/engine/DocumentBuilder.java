@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -53,6 +51,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.BinderHelper;
 import org.hibernate.search.util.ScopedAnalyzer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Set up and provide a manager for indexes classes
@@ -64,7 +64,7 @@ import org.hibernate.search.util.ScopedAnalyzer;
  * @author Hardy Ferentschik
  */
 public class DocumentBuilder<T> {
-	private static final Log log = LogFactory.getLog( DocumentBuilder.class );
+	private static final Logger log = LoggerFactory.getLogger( DocumentBuilder.class );
 
 	private final PropertiesMetadata rootPropertiesMetadata;
 	private final XClass beanClass;
@@ -203,8 +203,8 @@ public class DocumentBuilder<T> {
 				similarity = (Similarity) similarityClass.newInstance();
 			}
 			catch (Exception e) {
-				log.error( "Exception attempting to instantiate Similarity '" + similarityClass.getName()
-						+ "' set for " + beanClass.getName() );
+				log.error( "Exception attempting to instantiate Similarity '{}' set for {}",
+						similarityClass.getName(), beanClass.getName() );
 			}
 		}
 	}
@@ -348,7 +348,7 @@ public class DocumentBuilder<T> {
 			}
 			else if ( log.isTraceEnabled() ) {
 				String localPrefix = buildEmbeddedPrefix( prefix, embeddedAnn, member );
-				log.trace( "depth reached, ignoring " + localPrefix );
+				log.trace( "depth reached, ignoring {}", localPrefix );
 			}
 
 			level--;
@@ -760,7 +760,7 @@ public class DocumentBuilder<T> {
 			if ( store != Field.Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 				result[matchingPosition] = ( (TwoWayFieldBridge) fieldBridge ).get( fieldName, document );
 				if ( log.isTraceEnabled() ) {
-					log.trace( "Field " + fieldName + " projected as " + result[matchingPosition] );
+					log.trace( "Field {} projected as {}", fieldName, result[matchingPosition] );
 				}
 			}
 			else {

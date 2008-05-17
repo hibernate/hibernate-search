@@ -11,11 +11,11 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.store.FSDirectory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * File based DirectoryProvider that takes care of index copy
@@ -31,7 +31,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 //TODO rename copy?
 public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	
-	private static Log log = LogFactory.getLog( FSMasterDirectoryProvider.class );
+	private final Logger log = LoggerFactory.getLogger( FSMasterDirectoryProvider.class );
 	
 	private FSDirectory directory;
 	private int current;
@@ -50,9 +50,9 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		this.directoryProviderName = directoryProviderName;
 		//source guessing
 		sourceDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, true );
-		log.debug( "Source directory: " + sourceDir.getPath() );
+		log.debug( "Source directory: {}", sourceDir.getPath() );
 		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
-		log.debug( "Index directory: " + indexDir.getPath() );
+		log.debug( "Index directory: {}", indexDir.getPath() );
 		try {
 			indexName = indexDir.getCanonicalPath();
 			directory = DirectoryProviderHelper.createFSIndex( indexDir );
@@ -74,7 +74,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				current = 1;
 			}
 			else {
-				log.debug( "Source directory for '" + indexName + "' will be initialized");
+				log.debug( "Source directory for '{}' will be initialized", indexName);
 				current = 1;
 			}
 			String currentString = Integer.valueOf( current ).toString();
@@ -84,7 +84,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			new File( sourceDir, "current2" ).delete();
 			//TODO small hole, no file can be found here
 			new File( sourceDir, "current" + currentString ).createNewFile();
-			log.debug( "Current directory: " + current );
+			log.debug( "Current directory: {}", current );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
@@ -132,7 +132,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				executor.execute( copyTask );
 			}
 			else {
-				log.info( "Skipping directory synchronization, previous work still in progress: " + indexName );
+				log.info( "Skipping directory synchronization, previous work still in progress: {}", indexName );
 			}
 		}
 	}
@@ -167,7 +167,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				File destinationFile = new File(destination, Integer.valueOf(index).toString() );
 				//TODO make smart a parameter
 				try {
-					log.trace( "Copying " + source + " into " + destinationFile );
+					log.trace( "Copying {} into {}", source, destinationFile );
 					FileHelper.synchronize( source, destinationFile, true );
 					current = index;
 				}
@@ -178,7 +178,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 					return;
 				}
 				if ( ! new File( destination, "current" + oldIndex ).delete() ) {
-					log.warn( "Unable to remove previous marker file from source of " + indexName );
+					log.warn( "Unable to remove previous marker file from source of {}", indexName );
 				}
 				try {
 					new File( destination, "current" + index ).createNewFile();
@@ -191,7 +191,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				directoryProviderLock.unlock();
 				inProgress = false;
 			}
-			log.trace( "Copy for " + indexName + " took " + (System.currentTimeMillis() - start) + " ms" );
+			log.trace( "Copy for {} took {} ms", indexName, (System.currentTimeMillis() - start) );
 		}
 	}
 

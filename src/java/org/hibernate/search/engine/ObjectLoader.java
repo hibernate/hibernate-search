@@ -4,16 +4,16 @@ package org.hibernate.search.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public class ObjectLoader implements Loader {
-	private static final Log log = LogFactory.getLog( ObjectLoader.class );
+	private static final Logger log = LoggerFactory.getLogger( ObjectLoader.class );
 	private Session session;
 
 	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
@@ -28,8 +28,8 @@ public class ObjectLoader implements Loader {
 		}
 		catch (RuntimeException e) {
 			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
-				log.debug( "Object found in Search index but not in database: "
-						+ entityInfo.clazz + " wih id " + entityInfo.id );
+				log.debug( "Object found in Search index but not in database: {} with id {}",
+						entityInfo.clazz, entityInfo.id );
 				maybeProxy = null;
 			}
 			else {
@@ -54,8 +54,8 @@ public class ObjectLoader implements Loader {
 			}
 			catch (RuntimeException e) {
 				if ( LoaderHelper.isObjectNotFoundException( e ) ) {
-					log.debug( "Object found in Search index but not in database: "
-							+ entityInfo.clazz + " wih id " + entityInfo.id );
+					log.debug( "Object found in Search index but not in database: {} with id {}",
+							entityInfo.clazz, entityInfo.id );
 				}
 				else {
 					throw e;
