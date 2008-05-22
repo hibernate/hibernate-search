@@ -44,6 +44,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.apache.lucene.analysis.Analyzer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -55,6 +57,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	static {
 		Version.touch();
 	}
+
+	private final Logger log = LoggerFactory.getLogger( SearchFactoryImpl.class );
 
 	private Map<Class, DocumentBuilder<Object>> documentBuilders = new HashMap<Class, DocumentBuilder<Object>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
@@ -68,6 +72,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private Map<String, FilterDef> filterDefinitions = new HashMap<String, FilterDef>();
 	private FilterCachingStrategy filterCachingStrategy;
 	private Map<String, Analyzer> analyzers;
+	private boolean stopped = false;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -111,6 +116,27 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	public String getIndexingStrategy() {
 		return indexingStrategy;
+	}
+
+	public void close() {
+		if (!stopped) {
+			stopped = true;
+			try {
+				worker.close();
+			}
+			catch (Exception e) {
+				log.error( "Worker raises an exception on close()", e );
+			}
+			//TODO move to DirectoryProviderFactory for cleaner
+			for (DirectoryProvider dp : lockableDirectoryProviders.keySet() ) {
+				try {
+					dp.stop();
+				}
+				catch (Exception e) {
+					log.error( "DirectoryProvider raises an exception on stop() ", e );
+				}
+			}
+		}
 	}
 
 	private void bindFilterDefs(XClass mappedXClass) {

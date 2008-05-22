@@ -36,4 +36,10 @@ public interface QueueingProcessor {
 	 * Rollback works
 	 */
 	void cancelWorks(WorkQueue workQueue);
+
+	/**
+	 * clean resources
+	 * This method should log errors rather than raise an exception
+	 */
+	void close();
 }

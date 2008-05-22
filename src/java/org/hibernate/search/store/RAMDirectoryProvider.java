@@ -41,6 +41,8 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 		return directory;
 	}
 
+	public void stop() {}
+
 	@Override
 	public boolean equals(Object obj) {
 		// this code is actually broken since the value change after initialize call

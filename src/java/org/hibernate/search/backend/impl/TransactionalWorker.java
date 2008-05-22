@@ -49,4 +49,9 @@ public class TransactionalWorker implements Worker {
 	public void initialize(Properties props, SearchFactoryImplementor searchFactory) {
 		this.queueingProcessor = new BatchedQueueingProcessor( searchFactory, props );
 	}
+
+	public void close() {
+		queueingProcessor.close();
+	}
+
 }

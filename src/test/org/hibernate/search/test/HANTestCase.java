@@ -61,7 +61,7 @@ public abstract class HANTestCase extends junit.framework.TestCase {
 	}
 
 	protected void setUp() throws Exception {
-		if ( getSessions() == null || lastTestClass != getClass() ) {
+		if ( getSessions() == null || getSessions().isClosed() || lastTestClass != getClass() ) {
 			buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
 			lastTestClass = getClass();
 		}

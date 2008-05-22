@@ -77,6 +77,7 @@ public class WorkerTestCase extends SearchTestCase {
 		while ( work.count < iteration - 1 ) {
 			Thread.sleep( 20 );
 		}
+		getSessions().close();
 		System.out.println( iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: " + ( System
 				.currentTimeMillis() - start ) );
 	}

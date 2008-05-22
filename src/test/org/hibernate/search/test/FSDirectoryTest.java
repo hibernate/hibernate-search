@@ -190,6 +190,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		}
 		s.getTransaction().commit();
 		s.close();
+		getSessions().close(); //run the searchfactory.close() operations
 	}
 
 	public void testSearchOnDeletedIndex() throws Exception {

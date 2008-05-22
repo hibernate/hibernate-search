@@ -9,6 +9,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Use a Lucene FSDirectory
@@ -20,6 +22,8 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * @author Sanne Grinovero
  */
 public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
+
+	private final Logger log = LoggerFactory.getLogger( FSDirectoryProvider.class );
 	
 	private FSDirectory directory;
 	private String indexName;
@@ -40,6 +44,15 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 
 	public void start() {
 		//all the process is done in initialize
+	}
+
+	public void stop() {
+		try {
+			directory.close();
+		}
+		catch (Exception e) {
+			log.error( "Unable to property close Lucene directory {}" + directory.getFile(), e );
+		}
 	}
 
 	public FSDirectory getDirectory() {

@@ -25,6 +25,8 @@ import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Batch work until #performWorks is called.
@@ -33,6 +35,9 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * @author Emmanuel Bernard
  */
 public class BatchedQueueingProcessor implements QueueingProcessor {
+
+	private static final Logger log = LoggerFactory.getLogger( BatchedQueueingProcessor.class );
+
 	private boolean sync;
 	private int batchSize;
 	private ExecutorService executorService;
@@ -157,14 +162,16 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		workQueue.clear();
 	}
 
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
+	public void close() {
 		//gracefully stop
-		//TODO move to the SF close lifecycle
 		if ( executorService != null && !executorService.isShutdown() ) {
 			executorService.shutdown();
-			executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS );
+			try {
+				executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS );
+			}
+			catch (InterruptedException e) {
+				log.error("Unable to property shut down asynchronous indexing work", e);
+			}
 		}
 	}
 

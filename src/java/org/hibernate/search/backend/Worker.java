@@ -16,4 +16,10 @@ public interface Worker {
 	void performWork(Work work, EventSource session);
 
 	void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor);
+
+	/**
+	 * clean resources
+	 * This method can return exceptions
+	 */
+	void close();
 }

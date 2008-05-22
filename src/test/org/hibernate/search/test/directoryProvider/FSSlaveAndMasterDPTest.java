@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEventListener;
@@ -87,6 +88,10 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		assertEquals("Third copy did not work out", 1, result.size() );
 
 		fts2.close();
+		//run the searchfactory.close() operations
+		for ( SessionFactory sf : getSessionFactories() ) {
+			sf.close();
+		}
 	}
 
 
@@ -102,7 +107,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 		File slave = new File(root, "slave");
 		slave.mkdir();
-
+		                                                                            
 		super.setUp();
 	}
 

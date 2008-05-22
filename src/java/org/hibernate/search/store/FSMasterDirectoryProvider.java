@@ -117,6 +117,18 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		return 37 * hash + indexName.hashCode();
 	}
 
+
+
+	public void stop() {
+		timer.cancel();
+		try {
+			directory.close();
+		}
+		catch (Exception e) {
+			log.error( "Unable to property close Lucene directory {}" + directory.getFile(), e );
+		}
+	}
+
 	class TriggerTask extends TimerTask {
 
 		private final ExecutorService executor;
@@ -193,11 +205,5 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			}
 			log.trace( "Copy for {} took {} ms", indexName, (System.currentTimeMillis() - start) );
 		}
-	}
-
-	public void finalize() throws Throwable {
-		super.finalize();
-		timer.cancel();
-		//TODO find a better cycle from Hibernate core
 	}
 }

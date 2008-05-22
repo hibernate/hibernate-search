@@ -12,6 +12,7 @@ import org.hibernate.event.PostInsertEvent;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.event.Destructible;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.engine.DocumentBuilder;
@@ -31,7 +32,7 @@ import org.hibernate.search.SearchException;
 //TODO work on sharing the same indexWriters and readers across a single post operation...
 //TODO implement and use a LockableDirectoryProvider that wraps a DP to handle the lock inside the LDP
 public class FullTextIndexEventListener implements PostDeleteEventListener, PostInsertEventListener,
-		PostUpdateEventListener, Initializable {
+		PostUpdateEventListener, Initializable, Destructible {
 
 	@SuppressWarnings( { "WeakerAccess" } )
 	protected boolean used;
@@ -86,5 +87,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener, Post
 	protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event) {
 		Work work = new Work(entity, id, workType);
 		searchFactoryImplementor.getWorker().performWork( work, event.getSession() );
+	}
+
+	public void cleanup() {
+		searchFactoryImplementor.close();
 	}
 }

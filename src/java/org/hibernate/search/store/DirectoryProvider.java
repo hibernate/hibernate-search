@@ -30,9 +30,15 @@ public interface DirectoryProvider<TDirectory extends Directory> {
 	 * Executed after initialize, this method set up the heavy process of starting up the DirectoryProvider
 	 * IO processing as well as backgroup processing are expected to be set up here
 	 *
-	 * TODO stop() method, for now use finalize() 
 	 */
 	void start();
+
+	/**
+	 * Executed when the search factory is closed. This method should stop any background process as well as
+	 * releasing any resource.
+	 * This method should avoid raising exceptions and log potential errors instead
+	 */
+	void stop();
 
 	/**
 	 * Returns an initialized Lucene Directory. This method call <b>must</b> be threadsafe

@@ -226,9 +226,19 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		}
 	}
 
-	public void finalize() throws Throwable {
-		super.finalize();
+	public void stop() {
 		timer.cancel();
-		//TODO find a better cycle from Hibernate core
+		try {
+			directory1.close();
+		}
+		catch (Exception e) {
+			log.error( "Unable to property close Lucene directory {}" + directory1.getFile(), e );
+		}
+		try {
+			directory2.close();
+		}
+		catch (Exception e) {
+			log.error( "Unable to property close Lucene directory {}" + directory2.getFile(), e );
+		}
 	}
 }
