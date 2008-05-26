@@ -400,7 +400,7 @@ hibernate.search.default.directory_provider = org.hibernate.search.store.FSMaste
 
       <programlisting>@MessageDriven(activationConfig = {
       @ActivationConfigProperty(propertyName="destinationType", propertyValue="javax.jms.Queue"),
-      @ActivationConfigProperty(propertyName="destination", propertyValue="queue/hiebrnatesearch"),
+      @ActivationConfigProperty(propertyName="destination", propertyValue="queue/hibernatesearch"),
       @ActivationConfigProperty(propertyName="DLQMaxResent", propertyValue="1")
    } )
 public class MDBSearchController extends AbstractJMSHibernateSearchController implements MessageListener {
@@ -556,7 +556,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     </section>
   </section>
 
-  <section id="lucene-indexing-performance" revision="2">
+  <section id="lucene-indexing-performance" revision="3">
     <title>Tuning Lucene indexing performance</title>
 
     <para>Hibernate Search allows you to tune the Lucene indexing performance
@@ -564,54 +564,41 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     Lucene <literal>IndexWriter</literal> such as
     <literal>mergeFactor</literal>, <literal>maxMergeDocs</literal> and
     <literal>maxBufferedDocs</literal>. You can specify these parameters
-    either as default values applying for all indexes or on a per index
-    basis.</para>
+    either as default values applying for all indexes, on a per index
+    basis, or even per shard.</para>
 
     <para>There are two sets of parameters allowing for different performance
     settings depending on the use case. During indexing operations triggered
-    by database modifications, the following ones are used: <itemizedlist>
-        <listitem>
-          <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</literal></para>
-        </listitem>
-
-        <listitem>
-          <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_merge_docs</literal></para>
-        </listitem>
-
-        <listitem>
-          <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</literal></para>
-        </listitem>
-        
-        <listitem>
-          <para><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.ram_buffer_size</literal></para>
-        </listitem>
-      </itemizedlist>When indexing occurs via
-    <literal>FullTextSession.index()</literal> (see <xref
-    linkend="search-batchindex" />), the following properties are used:
-    <itemizedlist>
-        <listitem>
-          <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal></para>
-        </listitem>
-
-        <listitem>
-          <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</literal></para>
-        </listitem>
-
-        <listitem>
-          <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal></para>
-        </listitem>
-        
-        <listitem>
-          <para><literal>hibernate.search.[default|&lt;indexname&gt;].batch.ram_buffer_size</literal></para>
-        </listitem>
-      </itemizedlist></para>
+    by database modifications, the parameters are grouped by the
+    <literal>transaction</literal> keyword:
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.transaction.&lt;parameter_name&gt;</programlisting>
+    When indexing occurs via <literal>FullTextSession.index()</literal> (see <xref
+    linkend="search-batchindex" />), the used properties are those grouped under the <literal>batch</literal> keyword:
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting>
+    </para>
 
     <para>Unless the corresponding <literal>.batch</literal> property is
     explicitly set, the value will default to the
-    <literal>.transaction</literal> property.</para>
+    <literal>.transaction</literal> property.
+    If no value is set for a <literal>.batch</literal> value in a specific shard configuration,
+    Hibernate Search will look at the index section, then at the default section and after that
+    it will look for a <literal>.transaction</literal> in the same order:
+    <programlisting>
+    hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
+    hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
+    hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
+    This configuration will result in these settings applied to the second shard of Animals index:
+    <itemizedlist>
+    	<listitem><literal>transaction.max_merge_docs</literal> = 10</listitem>
+        <listitem><literal>batch.max_merge_docs</literal> = 100</listitem>
+        <listitem><literal>transaction.merge_factor</literal> = 20</listitem>
+        <listitem><literal>batch.merge_factor</literal> = 20</listitem>
+    </itemizedlist>
+    All other values will use the defaults defined in Lucene.
+    </para>
 
     <para>
-    The default for all values is to leave them at Lucene's own default,
+    The default for all values is to leave them at Lucene&#39;s own default,
     so the listed values in the following table actually depend on the
     version of Lucene you are using;
     values shown are relative to version <literal>2.3</literal>.
@@ -633,8 +620,58 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         </thead>
 
         <tbody>
+        
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_delete_terms</literal></entry>
+
+            <entry><para>Determines the minimal number of delete terms required before the buffered
+			in-memory delete terms are applied and flushed. If there are documents
+			buffered in memory at the time, they are merged and a new segment is
+   			created.</para></entry>
+
+            <entry>Disabled (flushes by RAM usage)</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_docs</literal></entry>
+
+            <entry><para>Controls the amount of documents buffered in memory
+            during indexing. The bigger the more RAM is consumed.</para>
+           </entry>
+
+            <entry>Disabled (flushes by RAM usage)</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_field_length</literal></entry>
+
+            <entry><para>The maximum number of terms that will be indexed for a single field.
+            This limits the amount of memory required for indexing so that very large data will not crash the indexing process by
+			running out of memory. This setting refers to the number of running terms,
+			not to the number of different terms.</para>
+			<para>This silently truncates large documents, excluding from the index all terms that occur further in the document.
+			If you know your source documents are large, be sure to set this value high enough to accomodate the expected size. 
+			If you set it to Integer.MAX_VALUE, then the only limit is your memory, but you should anticipate an OutOfMemoryError.
+			</para>
+			<para>If setting this value in <literal>batch</literal> differently than in <literal>transaction</literal>
+			you may get different data (and results) in your index depending on the indexing mode.</para>
+           </entry>
+
+            <entry>10000</entry>
+          </row>
+          
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_merge_docs</literal></entry>
+
+            <entry><para>Defines the largest number of documents allowed in a segment.
+            Larger values are best for batched indexing and speedier searches.
+            Small values are best for transaction indexing.</para></entry>
+
+            <entry>Unlimited (Integer.MAX_VALUE)</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].merge_factor</literal></entry>
 
             <entry><para>Controls segment merge frequency and size. </para>
             <para>Determines how often segment indices are merged when
@@ -645,97 +682,34 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
             slower, indexing is faster. Thus larger values (&gt; 10) are best
             for batch index creation, and smaller values (&lt; 10) for indices
             that are interactively maintained. The value must no be lower than
-            2.</para> <para>Used by Hibernate Search during index update
-            operations as part of database modifications.</para></entry>
+            2.</para></entry>
 
             <entry>10</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_merge_docs</literal></entry>
-
-            <entry><para>Defines the largest number of documents allowed in a
-            segment.</para> <para>Used by Hibernate Search during index update
-            operations as part of database modifications.</para></entry>
-
-            <entry>Unlimited (Integer.MAX_VALUE)</entry>
-          </row>
-
-          <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</literal></entry>
-
-            <entry><para>Controls the amount of documents buffered in memory
-            during indexing. The bigger the more RAM is consumed.</para>
-            <para>Used by Hibernate Search during index update operations as
-            part of database modifications.</para></entry>
-
-            <entry>Disabled (not set)</entry>
-          </row>
-          
-          <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].transaction.ram_buffer_size</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].ram_buffer_size</literal></entry>
 
             <entry><para>Controls the amount of RAM in MB dedicated to document buffers.
             When used together max_buffered_docs a flush occurs for whichever event happens first.</para>
             <para>Generally for faster indexing performance it's best to flush by RAM usage instead of document
    			count and use as large a RAM buffer as you can.</para>
-            <para>Used by Hibernate Search during index update operations as
-            part of database modifications.</para></entry>
+            </entry>
 
             <entry>16 MB</entry>
           </row>
-
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].term_index_interval</literal></entry>
 
-            <entry><para>Controls segment merge frequency and size.</para>
-            <para>Determines how often segment indices are merged when
-            insertion occurs. With smaller values, less RAM is used while
-            indexing, and searches on unoptimized indices are faster, but
-            indexing speed is slower. With larger values, more RAM is used
-            during indexing, and while searches on unoptimized indices are
-            slower, indexing is faster. Thus larger values (&gt; 10) are best
-            for batch index creation, and smaller values (&lt; 10) for indices
-            that are interactively maintained. The value must no be lower than
-            2.</para> <para>Used during indexing via
-            <literal>FullTextSession.index()</literal></para></entry>
+            <entry><para>Expert: Set the interval between indexed terms.</para>
+            <para>Large values cause less memory to be used by IndexReader, but slow random-access to terms.
+            Small values cause more memory to be used by an IndexReader, and speed
+   			random-access to terms. See Lucene documentation for more details.</para>
+            </entry>
 
-            <entry>10</entry>
+            <entry>128</entry>
           </row>
 
-          <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</literal></entry>
-
-            <entry><para>Defines the largest number of documents allowed in a
-            segment.</para> <para>Used during indexing via
-            <literal>FullTextSession.index()</literal></para></entry>
-
-            <entry>Unlimited (Integer.MAX_VALUE)</entry>
-          </row>
-
-          <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal></entry>
-
-            <entry><para>Controls the amount of documents buffered in memory
-            during indexing. The bigger the more RAM is consumed.</para>
-            <para>Used during indexing via
-            <literal>FullTextSession.index()</literal></para></entry>
-
-            <entry>Disabled (not set)</entry>
-          </row>
-          
-          <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].batch.ram_buffer_size</literal></entry>
-
-            <entry><para>Controls the amount of RAM in MB dedicated to document buffers.
-            When used together max_buffered_docs a flush occurs for whichever event happens first.</para>
-            <para>Generally for faster indexing performance it's best to flush by RAM usage instead of document
-   			count and use as large a RAM buffer as you can.</para>
-            <para>Used during indexing via
-            <literal>FullTextSession.index()</literal></para></entry>
-
-            <entry>16 MB</entry>
-          </row>
         </tbody>
       </tgroup>
     </table>

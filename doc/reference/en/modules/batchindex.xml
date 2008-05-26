@@ -42,13 +42,17 @@ tx.commit(); //index are written at commit time    </programlisting>
 
     <para>Other parameters which also can affect indexing time and memory
     consumption are
-    <literal>hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</literal>
+    <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_buffered_docs</literal>
     ,
-    <literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</literal>
+    <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_field_length</literal>
     ,
-    <literal>hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</literal>
+    <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_merge_docs</literal>
+    ,
+    <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.merge_factor</literal>
+    ,
+    <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.ram_buffer_size</literal>
     and
-    <literal>hibernate.search.[default|&lt;indexname&gt;].batch.ram_buffer_size</literal>
+    <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.term_index_interval</literal>
     . These parameters are Lucene specific and Hibernate Search is just
     passing these paramters through - see <xref
     linkend="lucene-indexing-performance" /> for more details.</para>
@@ -108,7 +112,7 @@ tx.commit(); //index are written at commit time    </programlisting>
     <note>
       <para>Methods <methodname>index</methodname>,
       <methodname>purge</methodname> and <methodname>purgeAll</methodname> are
-      available on <classname>FullTextEntityManager</classname> as well</para>
+      available on <classname>FullTextEntityManager</classname> as well.</para>
     </note>
   </section>
 </chapter>

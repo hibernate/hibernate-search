@@ -8,6 +8,7 @@ import org.hibernate.search.backend.configuration.IndexWriterSetting;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.FileHelper;
 
 /**
  * Contains some utility methods to simplify coding of
@@ -17,7 +18,7 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public abstract class ConfigurationReadTestCase extends SearchTestCase {
 	
-	private static final File INDEX_DIR = new File( new File("."), "indextemp" );
+	private static final File INDEX_DIR = new File( new File( "." ), "indextemp" );
 
 	private SearchFactoryImplementor searchFactory;
 
@@ -31,7 +32,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 		FullTextSession fullTextSession = Search.createFullTextSession( openSession() );
 		searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
 		fullTextSession.close();
-		remove(INDEX_DIR);
+		FileHelper.delete( INDEX_DIR );
 		INDEX_DIR.mkdirs();
 	}
 
@@ -83,19 +84,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 	
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		remove(INDEX_DIR);
-	}
-	
-	private void remove(File indexDir) {
-		if (indexDir.exists()) {
-			File[] containing = indexDir.listFiles();
-			if ( containing != null ) { //is a directory
-				for (int i=0; i<containing.length; i++ ){
-					remove(containing[i]);
-				}
-			}
-			indexDir.delete();
-		}
+		FileHelper.delete( INDEX_DIR );
 	}
 
 }

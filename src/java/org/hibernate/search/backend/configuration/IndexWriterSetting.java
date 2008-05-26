@@ -5,32 +5,73 @@ import java.io.Serializable;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.SearchException;
 
+/**
+ * Represents possible options to be applied to an
+ * <code>org.apache.lucene.index.IndexWriter</code>
+ * 
+ * @author Sanne Grinovero
+ */
 public enum IndexWriterSetting implements Serializable {
-	
-	MERGE_FACTOR( "merge_factor" ) {
+	/**
+	 * @see org.apache.lucene.index.IndexWriter.setMaxBufferedDeleteTerms(int)
+	 */
+	MAX_BUFFERED_DELETE_TERMS( "max_buffered_delete_terms" ) {
 		public void applySetting(IndexWriter writer, int value) {
-			writer.setMergeFactor( value );
+			writer.setMaxBufferedDeleteTerms( value );
 		}
 	} ,
-	MAX_MERGE_DOCS( "max_merge_docs" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setMaxMergeDocs( value );
-		}
-	} ,
+	/**
+	 * @see org.apache.lucene.index.IndexWriter.setMaxBufferedDocs(int)
+	 */
 	MAX_BUFFERED_DOCS( "max_buffered_docs" ) {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setMaxBufferedDocs( value );
 		}
 	} ,
+	/**
+	 * @see org.apache.lucene.index.IndexWriter.setMaxFieldLength(int)
+	 */
+	MAX_FIELD_LENGTH( "max_field_length" ) {
+		public void applySetting(IndexWriter writer, int value) {
+			writer.setMaxFieldLength( value );
+		}
+	} ,
+	/**
+	 * @see org.apache.lucene.index.IndexWriter.setMaxMergeDocs(int)
+	 */
+	MAX_MERGE_DOCS( "max_merge_docs" ) {
+		public void applySetting(IndexWriter writer, int value) {
+			writer.setMaxMergeDocs( value );
+		}
+	} ,
+	/**
+	 * @see org.apache.lucene.index.IndexWriter.setMergeFactor(int)
+	 */
+	MERGE_FACTOR( "merge_factor" ) {
+		public void applySetting(IndexWriter writer, int value) {
+			writer.setMergeFactor( value );
+		}
+	} ,
+	/**
+	 * @see org.apache.lucene.index.IndexWriter.setRAMBufferSizeMB(int)
+	 */
 	RAM_BUFFER_SIZE( "ram_buffer_size" ) {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setRAMBufferSizeMB( value );
+		}
+	},
+	/**
+	 * @see org.apache.lucene.index.IndexWriter.setTermIndexInterval(int)
+	 */
+	TERM_INDEX_INTERVAL( "term_index_interval" ) {
+		public void applySetting(IndexWriter writer, int value) {
+			writer.setTermIndexInterval( value );
 		}
 	};
 	
 	private final String cfgKey;
 	
-	IndexWriterSetting(String configurationKey){
+	IndexWriterSetting(String configurationKey) {
 		this.cfgKey = configurationKey;
 	}
 	
@@ -39,6 +80,9 @@ public enum IndexWriterSetting implements Serializable {
 	 */
 	public abstract void applySetting(IndexWriter writer, int value);
 
+	/**
+	 * @return The key used in configuration files to select an option.
+	 */
 	public String getKey() {
 		return cfgKey;
 	}

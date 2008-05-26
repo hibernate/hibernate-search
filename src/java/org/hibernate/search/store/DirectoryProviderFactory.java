@@ -2,14 +2,10 @@
 package org.hibernate.search.store;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Pattern;
 
-import org.hibernate.HibernateException;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.cfg.Configuration;
@@ -17,6 +13,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
+import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
@@ -44,17 +41,15 @@ import org.hibernate.util.StringHelper;
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class DirectoryProviderFactory {
+	
 	private List<DirectoryProvider<?>> providers = new ArrayList<DirectoryProvider<?>>();
-	private static String LUCENE_PREFIX = "hibernate.search.";
-	private static String LUCENE_DEFAULT = LUCENE_PREFIX + "default.";
 	private static String DEFAULT_DIRECTORY_PROVIDER = FSDirectoryProvider.class.getName();
 	
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
-	private static Pattern dotPattern = Pattern.compile( "\\." );
-
 
 	public DirectoryProviders createDirectoryProviders(XClass entity, Configuration cfg, SearchFactoryImplementor searchFactoryImplementor) {
 		//get properties
@@ -64,26 +59,17 @@ public class DirectoryProviderFactory {
 		//set up the directories
 		int nbrOfProviders = indexProps.length;
 		DirectoryProvider[] providers = new DirectoryProvider[nbrOfProviders];
-		for (int index = 0 ; index < nbrOfProviders ; index++) {
+		for ( int index = 0 ; index < nbrOfProviders ; index++ ) {
 			String providerName = nbrOfProviders > 1 ?
 					directoryProviderName + "." + index :
 					directoryProviderName;
-			providers[index] = createDirectoryProvider( providerName,indexProps[index], searchFactoryImplementor);
+			providers[index] = createDirectoryProvider( providerName, indexProps[index], searchFactoryImplementor );
 		}
 
 		//define sharding strategy
 		IndexShardingStrategy shardingStrategy;
-		Properties shardingProperties = new Properties();
-		//we use an enumeration to get the keys from defaultProperties as well
-		Enumeration<String> allProps = (Enumeration<String>) indexProps[0].propertyNames();
-		while ( allProps.hasMoreElements() ){
-			String key = allProps.nextElement();
-			if ( key.startsWith( SHARDING_STRATEGY ) ) {
-				shardingProperties.put( key, indexProps[0].getProperty( key ) );
-			}
-		}
-
-		String shardingStrategyName = shardingProperties.getProperty( SHARDING_STRATEGY );
+		//any indexProperty will do, the indexProps[0] surely exists.
+		String shardingStrategyName = indexProps[0].getProperty( SHARDING_STRATEGY );
 		if ( shardingStrategyName == null) {
 			if ( indexProps.length == 1 ) {
 				shardingStrategy = new NotShardedStrategy();
@@ -113,8 +99,8 @@ public class DirectoryProviderFactory {
 						+ shardingStrategyName, e);
 			}
 		}
-		shardingStrategy.initialize( shardingProperties, providers );
-
+		shardingStrategy.initialize(
+				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers );
 		return new DirectoryProviders( shardingStrategy, providers );
 	}
 
@@ -138,13 +124,13 @@ public class DirectoryProviderFactory {
 			provider = directoryClass.newInstance();
 		}
 		catch (Exception e) {
-			throw new HibernateException( "Unable to instanciate directory provider: " + className, e );
+			throw new SearchException( "Unable to instantiate directory provider: " + className, e );
 		}
 		try {
 			provider.initialize( directoryProviderName, indexProps, searchFactoryImplementor );
 		}
 		catch (Exception e) {
-			throw new HibernateException( "Unable to initialize: " + directoryProviderName, e);
+			throw new SearchException( "Unable to initialize: " + directoryProviderName, e );
 		}
 		int index = providers.indexOf( provider );
 		if ( index != -1 ) {
@@ -152,8 +138,8 @@ public class DirectoryProviderFactory {
 			return providers.get( index );
 		}
 		else {
-			configureOptimizerStrategy(searchFactoryImplementor, indexProps, provider);
-			configureIndexingParameters(searchFactoryImplementor, indexProps, provider);
+			configureOptimizerStrategy( searchFactoryImplementor, indexProps, provider );
+			configureIndexingParameters( searchFactoryImplementor, indexProps, provider );
 			providers.add( provider );
 			if ( !searchFactoryImplementor.getLockableDirectoryProviders().containsKey( provider ) ) {
 				searchFactoryImplementor.getLockableDirectoryProviders().put( provider, new ReentrantLock() );
@@ -168,12 +154,12 @@ public class DirectoryProviderFactory {
 		OptimizerStrategy optimizerStrategy;
 		if (incremental) {
 			optimizerStrategy = new IncrementalOptimizerStrategy();
-			optimizerStrategy.initialize( provider, indexProps, searchFactoryImplementor);
+			optimizerStrategy.initialize( provider, indexProps, searchFactoryImplementor );
 		}
 		else {
 			optimizerStrategy = new NoOpOptimizerStrategy();
 		}
-		searchFactoryImplementor.addOptimizerStrategy(provider, optimizerStrategy);
+		searchFactoryImplementor.addOptimizerStrategy( provider, optimizerStrategy );
 	}
 	
 	/**
@@ -184,94 +170,50 @@ public class DirectoryProviderFactory {
 	 * If a non batch value is set in the configuration apply it also to the
      * batch mode. This covers the case where users only specify 
 	 * parameters for the non batch mode. In this case the same parameters apply for 
-	 * batch indexing.
+	 * batch indexing. Parameters are found "depth-first": if a batch parameter is set
+	 * in a global scope it will take priority on local transaction parameters.
 	 * </p>
 	 * 
 	 * @param searchFactoryImplementor the search factory.
-	 * @param indexProps The properties extracted from the configuration.
+	 * @param directoryProperties The properties extracted from the configuration.
 	 * @param provider The directory provider for which to configure the indexing parameters.
 	 */
-	private void configureIndexingParameters(SearchFactoryImplementor searchFactoryImplementor, Properties indexProps, DirectoryProvider<?> provider) {
-		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters( indexProps );
+	private void configureIndexingParameters(SearchFactoryImplementor searchFactoryImplementor,
+			Properties directoryProperties, DirectoryProvider<?> provider) {
+		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters( directoryProperties );
 		searchFactoryImplementor.addIndexingParmeters( provider, indexingParams );
 	}
 
 	/**
 	 * Returns an array of directory properties
 	 * Properties are defaulted. For a given property name,
-	 * hibernate.search.indexname.n has priority over hibernate.search.indexname which has priority over hibernate.search
+	 * hibernate.search.indexname.n has priority over hibernate.search.indexname which has priority over hibernate.search.default
 	 * If the Index is not sharded, a single Properties is returned
 	 * If the index is sharded, the Properties index matches the shard index
 	 */	
 	private static Properties[] getDirectoryProperties(Configuration cfg, String directoryProviderName) {
-
-		Properties cfgAndImplicitProperties = new Properties();
-		// cfg has no defaults, so we may use keySet iteration
-		//FIXME not so sure about that cfg.setProperties()?
-		for ( Map.Entry entry : cfg.getProperties().entrySet() ) {
-			String key = entry.getKey().toString();// casting to String
-			if ( key.startsWith( LUCENE_PREFIX ) ) {
-				//put regular properties and add an explicit batch property when a transaction property is set
-				cfgAndImplicitProperties.put( key, entry.getValue() );
-				//be careful to replace only the intended ".transaction." with ".batch.":
-				String[] splitKey = dotPattern.split( key );
-				//TODO this code is vulnerable to properties with dot in the name. This is not a problem today though
-				if ( splitKey.length > 2 && splitKey[ splitKey.length - 2 ]
-				                                      .equals( LuceneIndexingParameters.TRANSACTION ) ) {
-					splitKey[ splitKey.length - 2 ] = LuceneIndexingParameters.BATCH;
-					StringBuilder missingKeyBuilder = new StringBuilder( splitKey[0] );
-					for (int i = 1; i < splitKey.length; i++) {
-						missingKeyBuilder.append( "." );
-						missingKeyBuilder.append( splitKey[i] );
-					}
-					String additionalKey = missingKeyBuilder.toString();
-					if ( cfg.getProperty(additionalKey) == null ){
-						cfgAndImplicitProperties.put(additionalKey, cfg.getProperty(key) );
-					}
-				}
-			}
-		}
-		Properties globalProperties = new Properties();
-		Properties directoryLocalProperties = new Properties( globalProperties );
-		String directoryLocalPrefix = LUCENE_PREFIX + directoryProviderName + ".";
-		for ( Map.Entry entry : cfgAndImplicitProperties.entrySet() ) {
-			String key = entry.getKey().toString();// casting to String
-			if ( key.startsWith( LUCENE_DEFAULT ) ) {
-				globalProperties.put( key.substring( LUCENE_DEFAULT.length() ), entry.getValue() );
-			}
-			else if ( key.startsWith( directoryLocalPrefix ) ) {
-				directoryLocalProperties.put( key.substring( directoryLocalPrefix.length() ),entry.getValue() );
-			}
-		}
-		final String shardsCountValue = directoryLocalProperties.getProperty(NBR_OF_SHARDS);
-		if (shardsCountValue == null) {
+		Properties rootCfg = new MaskedProperty( cfg.getProperties(), "hibernate.search" );
+		Properties globalProperties = new MaskedProperty( rootCfg, "default" );
+		Properties directoryLocalProperties = new MaskedProperty( rootCfg, directoryProviderName, globalProperties );
+		final String shardsCountValue = directoryLocalProperties.getProperty( NBR_OF_SHARDS );
+		if ( shardsCountValue == null ) {
 			// no shards: finished.
 			return new Properties[] { directoryLocalProperties };
 		} else {
 			// count shards
-			int shardsCount = -1;
+			int shardsCount;
 			{
 				try {
 					shardsCount = Integer.parseInt( shardsCountValue );
 				} catch (NumberFormatException e) {
-					if ( cfgAndImplicitProperties.getProperty(directoryLocalPrefix + NBR_OF_SHARDS ) != null)
 						throw new SearchException( shardsCountValue + " is not a number", e);
 				}
 			}
 			// create shard-specific Props
 			Properties[] shardLocalProperties = new Properties[shardsCount];
 			for ( int i = 0; i < shardsCount; i++ ) {
-				String currentShardPrefix = i + ".";
-				Properties currentProp = new Properties( directoryLocalProperties );
-				//Enumerations are ugly but otherwise we can't get the property defaults:
-				Enumeration<String> localProps = (Enumeration<String>) directoryLocalProperties.propertyNames();
-				while ( localProps.hasMoreElements() ){
-					String key = localProps.nextElement();
-					if ( key.startsWith( currentShardPrefix ) ) {
-						currentProp.setProperty( key.substring( currentShardPrefix.length() ), directoryLocalProperties.getProperty( key ) );
-					}
-				}
-				shardLocalProperties[i] = currentProp;
+				shardLocalProperties[i] = new MaskedProperty(
+						directoryLocalProperties, Integer.toString(i), directoryLocalProperties );
 			}
 			return shardLocalProperties;
 		}
@@ -304,7 +246,7 @@ public class DirectoryProviderFactory {
 			return rootIndex.getName();
 		}
 		else {
-			throw new HibernateException(
+			throw new SearchException(
 					"Trying to extract the index name from a non @Indexed class: " + clazz.getName() );
 		}
 	}
@@ -313,12 +255,10 @@ public class DirectoryProviderFactory {
 		private IndexShardingStrategy shardingStrategy;
 		private DirectoryProvider[] providers;
 
-
 		public DirectoryProviders(IndexShardingStrategy shardingStrategy, DirectoryProvider[] providers) {
 			this.shardingStrategy = shardingStrategy;
 			this.providers = providers;
 		}
-
 
 		public IndexShardingStrategy getSelectionStrategy() {
 			return shardingStrategy;
@@ -328,4 +268,5 @@ public class DirectoryProviderFactory {
 			return providers;
 		}
 	}
+
 }

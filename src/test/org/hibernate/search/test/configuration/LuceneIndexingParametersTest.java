@@ -28,9 +28,10 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		
 		cfg.setProperty( "hibernate.search.Book.batch.max_merge_docs", "12" );
 		cfg.setProperty( "hibernate.search.Book.batch.merge_factor", "13" );
-		cfg.setProperty( "hibernate.search.Book.batch.max_buffered_docs", "14" );
+		// new keyword "indexwriter" is also supported to group parameters:
+		cfg.setProperty( "hibernate.search.Book.indexwriter.batch.max_buffered_docs", "14" );
 		
-		cfg.setProperty( "hibernate.search.Book.transaction.ram_buffer_size", "4" );
+		cfg.setProperty( "hibernate.search.Book.indexwriter.transaction.ram_buffer_size", "4" );
 		cfg.setProperty( "hibernate.search.Book.transaction.max_merge_docs", "15" );
 		cfg.setProperty( "hibernate.search.Book.transaction.merge_factor", "16" );
 		cfg.setProperty( "hibernate.search.Book.transaction.max_buffered_docs", "17" );
@@ -59,7 +60,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 	
 	public void testUnsetBatchValueTakesTransaction() throws Exception {
 		assertValueIsSet( Document.class, BATCH, MERGE_FACTOR, 6 );
-		assertValueIsSet( Document.class, BATCH, MAX_BUFFERED_DOCS, 7 );
+		assertValueIsSet( Document.class, BATCH, MAX_BUFFERED_DOCS, 1000 );
 	}
 	
 	public void testExplicitBatchParameters() throws Exception {
@@ -69,7 +70,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 	}
 	
 	public void testInheritedBatchParametersFromTranscation() throws Exception {
-		assertValueIsSet( Book.class, BATCH, RAM_BUFFER_SIZE, 4 );
+		assertValueIsSet( Book.class, BATCH, RAM_BUFFER_SIZE, 1 );
 	}
 	
 	public void testTransactionParameters() throws Exception {
