@@ -115,7 +115,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized void load(InputStream inStream) throws IOException {
+	public void load(InputStream inStream) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -123,7 +123,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized void loadFromXML(InputStream in) throws IOException,
+	public void loadFromXML(InputStream in) throws IOException,
 			InvalidPropertiesFormatException {
 		throw new UnsupportedOperationException();
 	}
@@ -140,7 +140,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized void save(OutputStream out, String comments) {
+	public void save(OutputStream out, String comments) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -148,7 +148,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized Object setProperty(String key, String value) {
+	public Object setProperty(String key, String value) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -156,7 +156,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized void store(OutputStream out, String comments)
+	public void store(OutputStream out, String comments)
 			throws IOException {
 		throw new UnsupportedOperationException();
 	}
@@ -165,7 +165,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized void storeToXML(OutputStream os, String comment,
+	public void storeToXML(OutputStream os, String comment,
 			String encoding) throws IOException {
 		throw new UnsupportedOperationException();
 	}
@@ -174,7 +174,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized void storeToXML(OutputStream os, String comment)
+	public void storeToXML(OutputStream os, String comment)
 			throws IOException {
 		throw new UnsupportedOperationException();
 	}
@@ -183,7 +183,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized void clear() {
+	public void clear() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -191,7 +191,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized Object clone() {
+	public Object clone() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -199,7 +199,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized boolean contains(Object value) {
+	public boolean contains(Object value) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -215,7 +215,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized Enumeration<Object> elements() {
+	public Enumeration<Object> elements() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -231,12 +231,12 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized Object get(Object key) {
+	public Object get(Object key) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public synchronized boolean isEmpty() {
+	public boolean isEmpty() {
 		if ( fallBack==null ) {
 			return masked.isEmpty();
 		}
@@ -249,7 +249,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized Enumeration<Object> keys() {
+	public Enumeration<Object> keys() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -265,7 +265,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized Object put(Object key, Object value) {
+	public Object put(Object key, Object value) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -273,7 +273,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized void putAll(Map<? extends Object, ? extends Object> t) {
+	public void putAll(Map<? extends Object, ? extends Object> t) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -289,7 +289,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized Object remove(Object key) {
+	public Object remove(Object key) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -297,12 +297,12 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public synchronized int size() {
+	public int size() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public synchronized String toString() {
+	public String toString() {
 		return masked.toString();
 	}
 
@@ -327,6 +327,8 @@ public class MaskedProperty extends Properties implements Serializable {
 	public boolean equals(Object obj) {
 		if ( this == obj )
 			return true;
+		if ( obj == null )
+			return false;
 		if ( getClass() != obj.getClass() )
 			return false;
 		final MaskedProperty other = (MaskedProperty) obj;

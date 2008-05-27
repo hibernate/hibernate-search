@@ -181,7 +181,7 @@ public class DirectoryProviderFactory {
 	private void configureIndexingParameters(SearchFactoryImplementor searchFactoryImplementor,
 			Properties directoryProperties, DirectoryProvider<?> provider) {
 		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters( directoryProperties );
-		searchFactoryImplementor.addIndexingParmeters( provider, indexingParams );
+		searchFactoryImplementor.addIndexingParameters( provider, indexingParams );
 	}
 
 	/**

@@ -39,8 +39,7 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider);
 
-	//FIXME spelling error in method name:
-	void addIndexingParmeters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams);
+	void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams);
 
 	public String getIndexingStrategy();
 

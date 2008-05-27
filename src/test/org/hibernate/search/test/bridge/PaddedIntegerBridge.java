@@ -1,15 +1,10 @@
 //$Id$
 package org.hibernate.search.test.bridge;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.HashMap;
 
-import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.annotations.Parameter;
 
 /**
  * Padding Integer bridge.
@@ -19,7 +14,7 @@ import org.hibernate.annotations.Parameter;
  */
 public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
 
-	public static String PADDING_PROPERTY = "padding";
+	public static final String PADDING_PROPERTY = "padding";
 
 	private int padding = 5; //default
 

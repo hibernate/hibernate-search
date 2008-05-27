@@ -230,7 +230,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		dirProviderOptimizerStrategies.put( provider, optimizerStrategy );
 	}
 
-	public void addIndexingParmeters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
+	public void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
 		dirProviderIndexingParams.put( provider, indexingParams );
 	}
 
