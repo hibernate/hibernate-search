@@ -2,6 +2,7 @@
 package org.hibernate.search.engine;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
  */
 public class QueryLoader implements Loader {
 	private static final int MAX_IN_CLAUSE = 500;
-	private static final List EMPTY_LIST = new ArrayList( 0 );
 	private final Logger log = LoggerFactory.getLogger( QueryLoader.class );
 
 	private Session session;
@@ -34,7 +34,6 @@ public class QueryLoader implements Loader {
 	public void setEntityType(Class entityType) {
 		this.entityType = entityType;
 	}
-
 
 	public Object load(EntityInfo entityInfo) {
 		//be sure to get an initialized object
@@ -57,7 +56,7 @@ public class QueryLoader implements Loader {
 
 	public List load(EntityInfo... entityInfos) {
 		final int maxResults = entityInfos.length;
-		if ( maxResults == 0 ) return EMPTY_LIST;
+		if ( maxResults == 0 ) return Collections.EMPTY_LIST;
 		if ( entityType == null ) throw new AssertionFailure( "EntityType not defined" );
 		if ( criteria == null ) criteria = session.createCriteria( entityType );
 
