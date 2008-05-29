@@ -4,9 +4,10 @@
   <title>Mapping entities to the index structure</title>
 
   <para>All the metadata information needed to index entities is described
-  through some Java annotations. There is no need for xml mapping files nor a
-  list of indexed entities. The list is discovered at startup time scanning
-  the Hibernate mapped entities.</para>
+  through some Java annotations. There is no need for xml mapping files (in
+  fact there exists currently no xml configuration option) nor a list of
+  indexed entities. The list is discovered at startup time scanning the
+  Hibernate mapped entities.</para>
 
   <section id="search-mapping-entity" revision="3">
     <title>Mapping an entity</title>
@@ -70,14 +71,12 @@ public class Essay {
           <literal>Index.NO_NORM</literal> (do not store the normalization
           data). The default value is <literal>TOKENIZED</literal>.</para>
         </listitem>
-      </itemizedlist>
 
-      <itemizedlist>
         <listitem>
-          <para>termVector: describes collections of term-frequency pairs. To
-          utilize Term Vectors this attribute enables their being stored
-          during indexing so they are stored with documents. The default value
-          is Field.TermVector.NO.</para>
+          <para>termVector: describes collections of term-frequency pairs.
+          This attribute enables term vectors being stored during indexing so
+          they are available within documents. The default value is
+          TermVector.NO.</para>
 
           <para>The different values of this attribute are</para>
 
@@ -95,7 +94,7 @@ public class Essay {
 
               <tbody>
                 <row>
-                  <entry align="left">Field.TermVector.YES</entry>
+                  <entry align="left">TermVector.YES</entry>
 
                   <entry>Store the term vectors of each document. This
                   produces two synchronized arrays, one contains document
@@ -103,32 +102,32 @@ public class Essay {
                 </row>
 
                 <row>
-                  <entry align="left">Field.TermVector.NO</entry>
+                  <entry align="left">TermVector.NO</entry>
 
                   <entry>Do not store term vectors.</entry>
                 </row>
 
                 <row>
-                  <entry align="left">Field.TermVector.WITH_OFFSETS</entry>
+                  <entry align="left">TermVector.WITH_OFFSETS</entry>
 
                   <entry>Store the term vector and token offset information.
-                  This is the same as Field.TermVector.YES plus this contains
-                  the starting and ending offset position information for the
-                  terms</entry>
+                  This is the same as TermVector.YES plus it contains the
+                  starting and ending offset position information for the
+                  terms.</entry>
                 </row>
 
                 <row>
-                  <entry align="left">Field.TermVector.WITH_POSITIONS</entry>
+                  <entry align="left">TermVector.WITH_POSITIONS</entry>
 
                   <entry>Store the term vector and token position information.
-                  This is the same as Field.TermVector.YES plus this contains
-                  the ordinal positions of each occurrence of a term in a
+                  This is the same as TermVector.YES plus it contains the
+                  ordinal positions of each occurrence of a term in a
                   document.</entry>
                 </row>
 
                 <row>
                   <entry
-                  align="left">Field.TermVector.WITH_POSITIONS_OFFSETS</entry>
+                  align="left">TermVector.WITH_POSITIONS_OFFSETS</entry>
 
                   <entry>Store the term vector, token position and offset
                   information. This is a combination of the YES, WITH_OFFSETS
