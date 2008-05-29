@@ -1,7 +1,6 @@
 //$Id$
 package org.hibernate.search.backend.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -148,7 +147,6 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	//TODO implements parallel batchWorkers (one per Directory)
 	public void performWorks(WorkQueue workQueue) {
-
 		Runnable processor = backendQueueProcessorFactory.getProcessor( workQueue.getSealedQueue() );
 		if ( sync ) {
 			processor.run();
@@ -167,10 +165,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		if ( executorService != null && !executorService.isShutdown() ) {
 			executorService.shutdown();
 			try {
-				executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS );
+				executorService.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
 			}
 			catch (InterruptedException e) {
-				log.error("Unable to property shut down asynchronous indexing work", e);
+				log.error( "Unable to properly shut down asynchronous indexing work", e );
 			}
 		}
 	}

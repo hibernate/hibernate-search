@@ -51,25 +51,25 @@ import org.slf4j.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class SearchFactoryImpl implements SearchFactoryImplementor {
-	private static ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>> contexts =
+	private static final ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>> contexts =
 			new ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>>();
 
 	static {
 		Version.touch();
 	}
 
-	private final Logger log = LoggerFactory.getLogger( SearchFactoryImpl.class );
+	private static final Logger log = LoggerFactory.getLogger( SearchFactoryImpl.class );
 
-	private Map<Class, DocumentBuilder<Object>> documentBuilders = new HashMap<Class, DocumentBuilder<Object>>();
+	private final Map<Class, DocumentBuilder<Object>> documentBuilders = new HashMap<Class, DocumentBuilder<Object>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
-	private Map<DirectoryProvider, ReentrantLock> lockableDirectoryProviders =
+	private final Map<DirectoryProvider, ReentrantLock> lockableDirectoryProviders =
 			new HashMap<DirectoryProvider, ReentrantLock>();
-	private Map<DirectoryProvider, OptimizerStrategy> dirProviderOptimizerStrategies =
+	private final Map<DirectoryProvider, OptimizerStrategy> dirProviderOptimizerStrategies =
 			new HashMap<DirectoryProvider, OptimizerStrategy>();
 	private Worker worker;
 	private ReaderProvider readerProvider;
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
-	private Map<String, FilterDef> filterDefinitions = new HashMap<String, FilterDef>();
+	private final Map<String, FilterDef> filterDefinitions = new HashMap<String, FilterDef>();
 	private FilterCachingStrategy filterCachingStrategy;
 	private Map<String, Analyzer> analyzers;
 	private boolean stopped = false;

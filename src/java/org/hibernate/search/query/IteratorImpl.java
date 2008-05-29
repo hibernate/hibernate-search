@@ -19,7 +19,7 @@ public class IteratorImpl implements Iterator {
 	private final int size;
 	private Object next;
 	private int nextObjectIndex = -1;
-	private Loader loader;
+	private final Loader loader;
 
 	public IteratorImpl(List<EntityInfo> entityInfos, Loader loader) {
 		this.entityInfos = entityInfos;
@@ -58,7 +58,7 @@ public class IteratorImpl implements Iterator {
 	}
 
 	public void remove() {
-		//TODO this is theorically doable
+		//TODO this is theoretically doable
 		throw new UnsupportedOperationException( "Cannot remove from a lucene query iterator" );
 	}
 }

@@ -10,14 +10,14 @@ import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.util.WeakIdentityHashMap;
 
 /**
- * Execute some work inside a transaction sychronization
+ * Execute some work inside a transaction synchronization
  *
  * @author Emmanuel Bernard
  */
 public class PostTransactionWorkQueueSynchronization implements Synchronization {
-	private QueueingProcessor queueingProcessor;
+	private final QueueingProcessor queueingProcessor;
 	private boolean consumed;
-	private WeakIdentityHashMap queuePerTransaction;
+	private final WeakIdentityHashMap queuePerTransaction;
 	private WorkQueue queue = new WorkQueue();
 
 	/**

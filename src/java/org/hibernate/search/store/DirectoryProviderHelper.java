@@ -59,7 +59,7 @@ public class DirectoryProviderHelper {
 			makeSanityCheckedDirectory( rootDir, directoryProviderName, needWritePermissions );
 			sourceDirectory = new File( root, relative );
 			makeSanityCheckedDirectory( sourceDirectory, directoryProviderName, needWritePermissions );
-			log.debug( "Get directory from root + relative" );
+			log.debug( "Got directory from root + relative" );
 		}
 		return sourceDirectory;
 	}

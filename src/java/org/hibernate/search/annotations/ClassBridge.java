@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation allows a user to apply an implementation
  * class to a Lucene document to manipulate it in any way
- * the usersees fit.
+ * the user sees fit.
  *
  * @author John Griffin
  */
@@ -48,7 +48,7 @@ public @interface ClassBridge {
 	TermVector termVector() default TermVector.NO;
 
 	/**
-	 * A float value of the amount of lucene defined
+	 * A float value of the amount of Lucene defined
 	 * boost to apply to a field.
 	 */
 	Boost boost() default @Boost(value=1.0F);
@@ -60,7 +60,7 @@ public @interface ClassBridge {
 	public Class impl() default void.class;
 
 	/**
-	 * Array of fields to work with. The imnpl class
+	 * Array of fields to work with. The impl class
 	 * above will work on these fields.
 	 */
 	public Parameter[] params() default {};

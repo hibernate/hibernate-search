@@ -12,7 +12,7 @@ import org.apache.lucene.document.Field;
 //TODO use Generics to avoid double declaration of stringBridge 
 public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor implements TwoWayFieldBridge {
 
-	private TwoWayStringBridge stringBridge;
+	private final TwoWayStringBridge stringBridge;
 
 	public TwoWayString2FieldBridgeAdaptor(TwoWayStringBridge stringBridge) {
 		super( stringBridge );

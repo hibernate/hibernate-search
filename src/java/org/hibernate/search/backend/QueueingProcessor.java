@@ -1,11 +1,6 @@
 //$Id$
 package org.hibernate.search.backend;
 
-import java.util.List;
-import java.io.Serializable;
-
-import org.hibernate.search.backend.LuceneWork;
-
 /**
  * Pile work operations
  * No thread safety has to be implemented, the queue being scoped already
@@ -18,7 +13,7 @@ import org.hibernate.search.backend.LuceneWork;
 public interface QueueingProcessor {
 	/**
 	 * Add a work
-	 * TODO move that womewhere else, it does not really fit here
+	 * TODO move that somewhere else, it does not really fit here
 	 */
 	void add(Work work, WorkQueue workQueue);
 

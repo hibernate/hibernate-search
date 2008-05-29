@@ -16,7 +16,7 @@ public class CacheableMultiReader extends MultiReader {
 
 	// This is package private as the intention of the Lucene team seems to be to not 
 	// expose this publically (it's a protected member in Lucene 2.3)
-	IndexReader[] subReaders;
+	final IndexReader[] subReaders;
 
 	public CacheableMultiReader(IndexReader[] subReaders) throws IOException {
 		super( subReaders );

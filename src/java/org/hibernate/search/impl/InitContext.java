@@ -27,8 +27,8 @@ import org.apache.solr.analysis.TokenFilterFactory;
  * @author Emmanuel Bernard
  */
 public class InitContext {
-	private Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
-	private List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
+	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
+	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
 	private final Similarity defaultSimilarity;
 
@@ -57,7 +57,7 @@ public class InitContext {
 	}
 
 	/**
-	 * Initilises the Lucene analyzer to use by reading the analyzer class from the configuration and instantiating it.
+	 * Initializes the Lucene analyzer to use by reading the analyzer class from the configuration and instantiating it.
 	 *
 	 * @param cfg
 	 *            The current configuration.
@@ -91,7 +91,7 @@ public class InitContext {
 	}
 
 	/**
-	 * Initilises the Lucene similarity to use
+	 * Initializes the Lucene similarity to use
 	 */
 	private Similarity initSimilarity(Configuration cfg) {
 		Class similarityClass;

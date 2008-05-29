@@ -10,7 +10,7 @@ import org.hibernate.search.FullTextFilter;
  * @author Emmanuel Bernard
  */
 public class FullTextFilterImpl implements FullTextFilter {
-	private Map<String, Object> parameters = new HashMap<String, Object>();
+	private final Map<String, Object> parameters = new HashMap<String, Object>();
 	private String name;
 
 	public void setName(String name) {

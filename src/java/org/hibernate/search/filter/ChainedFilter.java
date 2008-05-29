@@ -14,8 +14,9 @@ import org.hibernate.annotations.common.AssertionFailure;
  * @author Emmanuel Bernard
  */
 public class ChainedFilter extends Filter {
-	private List<Filter> chainedFilters = new ArrayList<Filter>();
-
+	private static final long serialVersionUID = -6153052295766531920L;
+	
+	private final List<Filter> chainedFilters = new ArrayList<Filter>();
 
 	public void addFilter(Filter filter) {
 		this.chainedFilters.add( filter );
@@ -31,7 +32,6 @@ public class ChainedFilter extends Filter {
 		}
 		return result;
 	}
-
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder("ChainedFilter [");

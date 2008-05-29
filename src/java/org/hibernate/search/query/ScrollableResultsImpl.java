@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author John Griffin
  */
 public class ScrollableResultsImpl implements ScrollableResults {
-	private static Logger log = LoggerFactory.getLogger( ScrollableResultsImpl.class );
+	private static final Logger log = LoggerFactory.getLogger( ScrollableResultsImpl.class );
 	private final IndexSearcher searcher;
 	private final SearchFactory searchFactory;
 	private final Hits hits;
@@ -58,10 +58,10 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	private final int max;
 	private final int fetchSize;
 	private int current;
-	private EntityInfo[] entityInfos;
-	private Loader loader;
-	private DocumentExtractor documentExtractor;
-	private Map<EntityInfo, Object[]> resultContext;
+	private final EntityInfo[] entityInfos;
+	private final Loader loader;
+	private final DocumentExtractor documentExtractor;
+	private final Map<EntityInfo, Object[]> resultContext;
 
 	public ScrollableResultsImpl(
 			IndexSearcher searcher, Hits hits, int first, int max, int fetchSize, DocumentExtractor extractor,

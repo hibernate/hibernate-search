@@ -1,14 +1,12 @@
 //$Id$
 package org.hibernate.search.engine;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.hibernate.search.engine.EntityInfo;
-import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.ProjectionConstants;
 
 /**
@@ -16,8 +14,8 @@ import org.hibernate.search.ProjectionConstants;
  * @author John Griffin
  */
 public class DocumentExtractor {
-	private SearchFactoryImplementor searchFactoryImplementor;
-	private String[] projection;
+	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final String[] projection;
 
 	public DocumentExtractor(SearchFactoryImplementor searchFactoryImplementor, String... projection) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
@@ -25,18 +23,19 @@ public class DocumentExtractor {
 	}
 
 	private EntityInfo extract(Document document) {
-		EntityInfo entityInfo = new EntityInfo();
-		entityInfo.clazz = DocumentBuilder.getDocumentClass( document );
-		entityInfo.id = DocumentBuilder.getDocumentId( searchFactoryImplementor, entityInfo.clazz, document );
+		Class clazz = DocumentBuilder.getDocumentClass( document );
+		Serializable id = DocumentBuilder.getDocumentId( searchFactoryImplementor, clazz, document );
+		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
-			entityInfo.projection = DocumentBuilder.getDocumentFields( searchFactoryImplementor, entityInfo.clazz, document, projection );
+			projected = DocumentBuilder.getDocumentFields( searchFactoryImplementor, clazz, document, projection );
 		}
+		EntityInfo entityInfo = new EntityInfo( clazz, id, projected );
 		return entityInfo;
 	}
 
 	public EntityInfo extract(Hits hits, int index) throws IOException {
 		Document doc = hits.doc( index );
-		//TODO if we are lonly looking for score (unlikely), avoid accessing doc (lazy load)
+		//TODO if we are only looking for score (unlikely), avoid accessing doc (lazy load)
 		EntityInfo entityInfo = extract( doc );
 		Object[] eip = entityInfo.projection;
 
@@ -60,9 +59,6 @@ public class DocumentExtractor {
 				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 					//THIS could be projected more than once
 					//THIS loading delayed to the Loader phase
-					if (entityInfo.indexesOfThis == null) {
-						entityInfo.indexesOfThis = new ArrayList<Integer>(1);
-					}
 					entityInfo.indexesOfThis.add(x);
 				}
 			}

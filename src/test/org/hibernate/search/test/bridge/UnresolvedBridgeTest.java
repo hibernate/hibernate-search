@@ -1,18 +1,10 @@
 //$Id$
 package org.hibernate.search.test.bridge;
 
-import java.io.InputStream;
-
-import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.RAMDirectoryProvider;
-import org.hibernate.Session;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Environment;
-import org.hibernate.cfg.Configuration;
 import junit.framework.TestCase;
-
 
 /**
  * @author Emmanuel Bernard

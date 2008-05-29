@@ -27,7 +27,8 @@ import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_
 public class LuceneIndexingParameters implements Serializable {
 
 	private static final long serialVersionUID = 5424606407623591663L;
-	private static Logger log = LoggerFactory.getLogger( LuceneIndexingParameters.class );
+	
+	private final Logger log = LoggerFactory.getLogger( LuceneIndexingParameters.class );
 	
 	// value keyword
 	public static final String EXPLICIT_DEFAULT_VALUE = "default";

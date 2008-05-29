@@ -23,7 +23,7 @@ import org.hibernate.search.util.WeakIdentityHashMap;
  */
 public class TransactionalWorker implements Worker {
 	//not a synchronized map since for a given transaction, we have not concurrent access
-	protected WeakIdentityHashMap synchronizationPerTransaction = new WeakIdentityHashMap();
+	protected final WeakIdentityHashMap synchronizationPerTransaction = new WeakIdentityHashMap();
 	private QueueingProcessor queueingProcessor;
 
 	public void performWork(Work work, EventSource session) {

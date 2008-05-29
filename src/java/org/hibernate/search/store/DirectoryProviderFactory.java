@@ -45,7 +45,7 @@ import org.hibernate.util.StringHelper;
  */
 public class DirectoryProviderFactory {
 	
-	private List<DirectoryProvider<?>> providers = new ArrayList<DirectoryProvider<?>>();
+	private final List<DirectoryProvider<?>> providers = new ArrayList<DirectoryProvider<?>>();
 	private static String DEFAULT_DIRECTORY_PROVIDER = FSDirectoryProvider.class.getName();
 	
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
@@ -252,8 +252,8 @@ public class DirectoryProviderFactory {
 	}
 
 	public class DirectoryProviders {
-		private IndexShardingStrategy shardingStrategy;
-		private DirectoryProvider[] providers;
+		private final IndexShardingStrategy shardingStrategy;
+		private final DirectoryProvider[] providers;
 
 		public DirectoryProviders(IndexShardingStrategy shardingStrategy, DirectoryProvider[] providers) {
 			this.shardingStrategy = shardingStrategy;

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author John Griffin
  */
 public class LuceneWorker {
-	private Workspace workspace;
+	private final Workspace workspace;
 	private static final Logger log = LoggerFactory.getLogger( LuceneWorker.class );
 
 	public LuceneWorker(Workspace workspace) {
@@ -145,15 +145,13 @@ public class LuceneWorker {
 	}
 
 	public static class WorkWithPayload {
-		private LuceneWork work;
-		private DirectoryProvider provider;
-
+		private final LuceneWork work;
+		private final DirectoryProvider provider;
 
 		public WorkWithPayload(LuceneWork work, DirectoryProvider provider) {
 			this.work = work;
 			this.provider = provider;
 		}
-
 
 		public LuceneWork getWork() {
 			return work;

@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
 public class MaskedProperty extends Properties implements Serializable {
 	
 	private static final long serialVersionUID = -593307257383085113L;
-	private static Logger log = LoggerFactory.getLogger( MaskedProperty.class );
 	
+	private final Logger log = LoggerFactory.getLogger( MaskedProperty.class );
 	private final Properties masked;
 	private final Properties fallBack;
 	private final String radix;

@@ -1,10 +1,6 @@
 // $Id$
 package org.hibernate.search.filter;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -16,7 +12,7 @@ import java.util.ArrayList;
  * @author Emmanuel Bernard
  */
 public class StandardFilterKey extends FilterKey {
-	private List parameters = new ArrayList();
+	private final List parameters = new ArrayList();
 	private boolean implSet;
 
 

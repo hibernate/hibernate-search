@@ -32,10 +32,10 @@ public class LuceneBackendQueueProcessor implements Runnable {
 	/**
 	 * Class logger.
 	 */
-	private static Logger log = LoggerFactory.getLogger( LuceneBackendQueueProcessor.class );
+	private static final Logger log = LoggerFactory.getLogger( LuceneBackendQueueProcessor.class );
 	
-	private List<LuceneWork> queue;
-	private SearchFactoryImplementor searchFactoryImplementor;
+	private final List<LuceneWork> queue;
+	private final SearchFactoryImplementor searchFactoryImplementor;
 
 	public LuceneBackendQueueProcessor(List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
 		this.queue = queue;
@@ -70,7 +70,7 @@ public class LuceneBackendQueueProcessor implements Runnable {
 							work.getIdInString(),
 							work.getDocument()
 					);
-					queueWithFlatDPs.add( new LuceneWorker.WorkWithPayload(work, provider) );
+					queueWithFlatDPs.add( new LuceneWorker.WorkWithPayload( work, provider ) );
 				}
 				else if ( DeleteLuceneWork.class.isAssignableFrom( work.getClass() ) ) {
 					DirectoryProvider[] providers = shardingStrategy.getDirectoryProvidersForDeletion(
@@ -79,20 +79,20 @@ public class LuceneBackendQueueProcessor implements Runnable {
 							work.getIdInString()
 					);
 					for (DirectoryProvider provider : providers) {
-						queueWithFlatDPs.add( new LuceneWorker.WorkWithPayload(work, provider) );
+						queueWithFlatDPs.add( new LuceneWorker.WorkWithPayload( work, provider ) );
 					}
 				}
 				else if ( OptimizeLuceneWork.class.isAssignableFrom( work.getClass() ) ) {
 					DirectoryProvider[] providers = shardingStrategy.getDirectoryProvidersForAllShards();
 					for (DirectoryProvider provider : providers) {
-						queueWithFlatDPs.add( new LuceneWorker.WorkWithPayload(work, provider) );
+						queueWithFlatDPs.add( new LuceneWorker.WorkWithPayload( work, provider ) );
 					}
 				}
 				else {
 					throw new AssertionFailure( "Unknown work type: " + work.getClass() );
 				}
 			}
-			deadlockFreeQueue(queueWithFlatDPs, searchFactoryImplementor);
+			deadlockFreeQueue( queueWithFlatDPs, searchFactoryImplementor );
 			checkForBatchIndexing(workspace);		
 			for ( LuceneWorker.WorkWithPayload luceneWork : queueWithFlatDPs ) {
 				worker.performWork( luceneWork );
@@ -107,9 +107,9 @@ public class LuceneBackendQueueProcessor implements Runnable {
 	private void checkForBatchIndexing(Workspace workspace) {
 		for ( LuceneWork luceneWork : queue ) {
 			// if there is at least a single batch index job we put the work space into batch indexing mode.
-			if(luceneWork.isBatch()){
-				log.trace("Setting batch indexing mode.");
-				workspace.setBatch(true);
+			if( luceneWork.isBatch() ){
+				log.trace( "Setting batch indexing mode." );
+				workspace.setBatch( true );
 				break;
 			}
 		}

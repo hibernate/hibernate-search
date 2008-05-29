@@ -9,11 +9,8 @@ import java.util.Map;
 import org.apache.lucene.document.DateTools;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
-import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
-import org.hibernate.search.bridge.String2FieldBridgeAdaptor;
 import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.util.StringHelper;
 

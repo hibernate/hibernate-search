@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
-	private static Logger log = LoggerFactory.getLogger( AbstractJMSHibernateSearchController.class );
+	private static final Logger log = LoggerFactory.getLogger( AbstractJMSHibernateSearchController.class );
 
 	/**
 	 * return the current or give a new session
@@ -83,7 +83,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	}
 
 	private Runnable getWorker(List<LuceneWork> queue) {
-		//FIXME casting sucks becasue we do not control what get session from
+		//FIXME casting sucks because we do not control what get session from
 		Session session = getSession();
 		Runnable processor = null;
 

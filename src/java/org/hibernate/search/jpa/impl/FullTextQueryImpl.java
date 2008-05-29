@@ -42,7 +42,7 @@ import org.hibernate.transform.ResultTransformer;
  */
 public class FullTextQueryImpl implements FullTextQuery {
 	private final org.hibernate.search.FullTextQuery query;
-	private Session session;
+	private final Session session;
 
 	public FullTextQueryImpl(org.hibernate.search.FullTextQuery query, Session session) {
 		this.query = query;
@@ -91,11 +91,11 @@ public class FullTextQueryImpl implements FullTextQuery {
 			return query.list();
 		}
 		catch (QueryExecutionRequestException he) {
-			//TODO when an illegal state exceptio should be raised?
+			//TODO when an illegal state exception should be raised?
 			throw new IllegalStateException(he);
 		}
 		catch( TypeMismatchException e ) {
-			//TODO when an illegal arg exceptio should be raised?
+			//TODO when an illegal arg exception should be raised?
 			throw new IllegalArgumentException(e);
 		}
 		catch (SearchException he) {

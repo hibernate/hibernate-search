@@ -18,8 +18,6 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
-import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
 
 /**
  * This listener supports setting a parent directory for all generated index files.
@@ -63,7 +61,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener, Post
 		if (used) {
 			final Object entity = event.getEntity();
 			DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entity.getClass() );
-			//not strictly necessary but a smal optimization
+			//not strictly necessary but a small optimization
 			if ( builder != null ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.ADD, event );
@@ -74,7 +72,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener, Post
 	public void onPostUpdate(PostUpdateEvent event) {
 		if (used) {
 			final Object entity = event.getEntity();
-			//not strictly necessary but a smal optimization
+			//not strictly necessary but a small optimization
 			DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entity.getClass() );
 			if ( builder != null ) {
 				Serializable id = event.getId();

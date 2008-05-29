@@ -11,7 +11,7 @@ import org.hibernate.util.StringHelper;
  * @author Emmanuel Bernard
  */
 public class String2FieldBridgeAdaptor implements FieldBridge {
-	private StringBridge stringBridge;
+	private final StringBridge stringBridge;
 
 	public String2FieldBridgeAdaptor(StringBridge stringBridge) {
 		this.stringBridge = stringBridge;
