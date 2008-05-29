@@ -1,7 +1,6 @@
 //$Id$
 package org.hibernate.search.bridge.builtin;
 
-
 /**
  * Map a string element
  *

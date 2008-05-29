@@ -10,8 +10,6 @@ import org.apache.lucene.document.Field;
  *
  * @author Emmanuel Bernard
  */
-//TODO should show Field or document?
-//document is nice since I can save an object into several fields
 public interface FieldBridge {
 	/**
 	 * Manipulate the document to index the given value.

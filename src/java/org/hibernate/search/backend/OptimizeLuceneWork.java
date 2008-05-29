@@ -1,8 +1,6 @@
 // $Id$
 package org.hibernate.search.backend;
 
-import java.io.Serializable;
-
 /**
  * @author Andrew Hahn
  * @author Emmanuel Bernard

@@ -1,14 +1,10 @@
 //$Id$
 package org.hibernate.search.backend.impl;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.io.Serializable;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.backend.QueueingProcessor;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.util.WeakIdentityHashMap;

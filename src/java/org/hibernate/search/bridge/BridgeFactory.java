@@ -3,38 +3,39 @@ package org.hibernate.search.bridge;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.net.URL;
-import java.net.URI;
 
-import org.hibernate.HibernateException;
 import org.hibernate.AssertionFailure;
-import org.hibernate.search.bridge.builtin.DateBridge;
-import org.hibernate.search.bridge.builtin.FloatBridge;
-import org.hibernate.search.bridge.builtin.LongBridge;
-import org.hibernate.search.bridge.builtin.BigIntegerBridge;
-import org.hibernate.search.bridge.builtin.StringBridge;
-import org.hibernate.search.bridge.builtin.IntegerBridge;
-import org.hibernate.search.bridge.builtin.BigDecimalBridge;
-import org.hibernate.search.bridge.builtin.DoubleBridge;
-import org.hibernate.search.bridge.builtin.ShortBridge;
-import org.hibernate.search.bridge.builtin.EnumBridge;
-import org.hibernate.search.bridge.builtin.BooleanBridge;
-import org.hibernate.search.bridge.builtin.UrlBridge;
-import org.hibernate.search.bridge.builtin.UriBridge;
-import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.ClassBridge;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.util.BinderHelper;
+import org.hibernate.HibernateException;
+import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.builtin.BigDecimalBridge;
+import org.hibernate.search.bridge.builtin.BigIntegerBridge;
+import org.hibernate.search.bridge.builtin.BooleanBridge;
+import org.hibernate.search.bridge.builtin.DateBridge;
+import org.hibernate.search.bridge.builtin.DoubleBridge;
+import org.hibernate.search.bridge.builtin.EnumBridge;
+import org.hibernate.search.bridge.builtin.FloatBridge;
+import org.hibernate.search.bridge.builtin.IntegerBridge;
+import org.hibernate.search.bridge.builtin.LongBridge;
+import org.hibernate.search.bridge.builtin.ShortBridge;
+import org.hibernate.search.bridge.builtin.StringBridge;
+import org.hibernate.search.bridge.builtin.UriBridge;
+import org.hibernate.search.bridge.builtin.UrlBridge;
 
 /**
+ * This factory is responsible for creating and initializing build-in and custom <i>FieldBridges</i>.
+ * 
  * @author Emmanuel Bernard
  * @author John Griffin
  */
