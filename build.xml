@@ -17,7 +17,7 @@
 	<!-- Name of project and version, used to create filenames -->
 	<property name="Name" value="Hibernate Search"/>
 	<property name="name" value="hibernate-search"/>
-	<property name="version" value="3.1.0.CR1"/>
+	<property name="version" value="3.1.0.Beta1"/>
 	<property name="javadoc.packagenames" value="org.hibernate.search.*"/>
 	<property name="copy.test" value="true"/>
 	<property name="javac.source" value="1.5"/>
@@ -354,6 +354,13 @@
         <copy todir="${dist.lib.dir}/build" failonerror="false">
 			<fileset file="${lib.dir}/build/*.jar"/>
         </copy>
+
+        <!-- ivy uses the module name without hibernate- (to mimic the directory names). Revert the situation -->
+        <move file="${dist.lib.dir}/commons-annotations.jar" tofile="${dist.lib.dir}/hibernate-commons-annotations.jar"/>
+        <move file="${dist.lib.dir}/test/commons-annotations.jar" tofile="${dist.lib.dir}/test/hibernate-commons-annotations.jar"/>
+        <move file="${dist.lib.dir}/test/annotations.jar" tofile="${dist.lib.dir}/test/hibernate-annotations.jar"/>
+        <move file="${dist.lib.dir}/test/entitymanager.jar" tofile="${dist.lib.dir}/test/hibernate-entitymanager.jar"/>
+
 
         <copy file="${basedir}/build.properties.dist" tofile="${dist.dir}/build.properties" failonerror="false">
 		</copy>
