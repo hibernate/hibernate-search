@@ -12,16 +12,16 @@ import org.apache.lucene.document.Document;
  * @author Hardy Ferentschik
  */
 public abstract class LuceneWork implements Serializable {
-	//TODO set a serial id
-	private Document document;
-	private Class entityClass;
-	private Serializable id;
+
+	private final Document document;
+	private final Class entityClass;
+	private final Serializable id;
 	
 	/**
 	 * Flag indicating if this lucene work has to be indexed in batch mode.
 	 */
 	private boolean batch = false;
-	private String idInString;
+	private final String idInString;
 
 	public LuceneWork(Serializable id, String idInString, Class entity) {
 		this( id, idInString, entity, null );
@@ -38,6 +38,7 @@ public abstract class LuceneWork implements Serializable {
 		return batch;
 	}
 
+	//TODO move to final field, or enable synchronization?
 	public void setBatch(boolean batch) {
 		this.batch = batch;
 	}
