@@ -129,4 +129,13 @@ public class LuceneIndexingParameters implements Serializable {
 
  	}
 
+	public void applyToWriter(IndexWriter writer, boolean batch) {
+		if ( batch ) {
+			getBatchIndexParameters().applyToWriter( writer );
+		}
+		else {
+			getTransactionIndexParameters().applyToWriter( writer );
+		}
+	}
+
 }

@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
 public class DocumentBuilder<T> {
 	private static final Logger log = LoggerFactory.getLogger( DocumentBuilder.class );
 
-	private final PropertiesMetadata rootPropertiesMetadata;
+	private final PropertiesMetadata rootPropertiesMetadata = new PropertiesMetadata();
 	private final XClass beanClass;
 	private final DirectoryProvider[] directoryProviders;
 	private final IndexShardingStrategy shardingStrategy;
@@ -79,13 +79,12 @@ public class DocumentBuilder<T> {
 	private ReflectionManager reflectionManager;
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
-	private ScopedAnalyzer analyzer;
+	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
 	private Similarity similarity;
 
 
 	public DocumentBuilder(XClass clazz, InitContext context, DirectoryProvider[] directoryProviders,
 						   IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
-		this.analyzer = new ScopedAnalyzer();
 		this.beanClass = clazz;
 		this.directoryProviders = directoryProviders;
 		this.shardingStrategy = shardingStrategy;
@@ -94,7 +93,6 @@ public class DocumentBuilder<T> {
 		this.similarity = context.getDefaultSimilarity();
 
 		if ( clazz == null ) throw new AssertionFailure( "Unable to build a DocumentBuilder with a null class" );
-		rootPropertiesMetadata = new PropertiesMetadata();
 		rootPropertiesMetadata.boost = getBoost( clazz );
 		rootPropertiesMetadata.analyzer = context.getDefaultAnalyzer();
 		Set<XClass> processedClasses = new HashSet<XClass>();
