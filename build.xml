@@ -1,8 +1,8 @@
 <!--
 
-  Hibernate Annotations ANT build script.
+  Hibernate Search ANT build script.
 
-  You need JDK 5.0 installed to build Hibernate Annotations.
+  You need JDK 5.0 installed to build Hibernate Search.
 
 -->
 
@@ -357,7 +357,7 @@
 
         <!-- ivy uses the module name without hibernate- (to mimic the directory names). Revert the situation -->
         <move file="${dist.lib.dir}/commons-annotations.jar" tofile="${dist.lib.dir}/hibernate-commons-annotations.jar"/>
-        <move file="${dist.lib.dir}/test/commons-annotations.jar" tofile="${dist.lib.dir}/test/hibernate-commons-annotations.jar"/>
+        <!--move file="${dist.lib.dir}/test/commons-annotations.jar" tofile="${dist.lib.dir}/test/hibernate-commons-annotations.jar"/-->
         <move file="${dist.lib.dir}/test/annotations.jar" tofile="${dist.lib.dir}/test/hibernate-annotations.jar"/>
         <move file="${dist.lib.dir}/test/entitymanager.jar" tofile="${dist.lib.dir}/test/hibernate-entitymanager.jar"/>
 
