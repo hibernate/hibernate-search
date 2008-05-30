@@ -8,6 +8,13 @@ import org.apache.lucene.document.Document;
 /**
  * Represent a Serializable Lucene unit work
  *
+ * WARNING: This class aims to be serializable and passed in an asynchronous way across VMs
+ *          any non backward compatible serialization change should be done with great care
+ *          and publically announced. Specifically, new versions of Hibernate Search should be
+ *          able to handle changes produced by older versions of Hibernate Search if reasonably possible.
+ *          That is why each subclass susceptible to be pass along have a magic serialization number.
+ *          NOTE: we are relying on Lucene's Document to play nice unfortunately
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */

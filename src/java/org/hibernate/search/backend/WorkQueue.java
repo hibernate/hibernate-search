@@ -10,7 +10,6 @@ import org.hibernate.annotations.common.AssertionFailure;
  * @author Emmanuel Bernard
  */
 public class WorkQueue {
-	//TODO set a serial number
 	private List<Work> queue;
 
 	private List<LuceneWork> sealedQueue;
