@@ -51,7 +51,9 @@ public class DirectoryProviderFactory {
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 
-	public DirectoryProviders createDirectoryProviders(XClass entity, Configuration cfg, SearchFactoryImplementor searchFactoryImplementor) {
+	public DirectoryProviders createDirectoryProviders(XClass entity, Configuration cfg,
+													   SearchFactoryImplementor searchFactoryImplementor,
+													   ReflectionManager reflectionManager) {
 		//get properties
 		String directoryProviderName = getDirectoryProviderName( entity, cfg );
 		Properties[] indexProps = getDirectoryProperties( cfg, directoryProviderName );
@@ -63,7 +65,8 @@ public class DirectoryProviderFactory {
 			String providerName = nbrOfProviders > 1 ?
 					directoryProviderName + "." + index :
 					directoryProviderName;
-			providers[index] = createDirectoryProvider( providerName, indexProps[index], searchFactoryImplementor );
+			providers[index] = createDirectoryProvider( providerName, indexProps[index],
+					reflectionManager.toClass( entity ), searchFactoryImplementor );
 		}
 
 		//define sharding strategy
@@ -110,7 +113,8 @@ public class DirectoryProviderFactory {
 		}
 	}
 
-	private DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps, SearchFactoryImplementor searchFactoryImplementor) {
+	private DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps,
+														 Class entity, SearchFactoryImplementor searchFactoryImplementor) {
 		String className = indexProps.getProperty( "directory_provider" );
 		if ( StringHelper.isEmpty( className ) ) {
 			className = DEFAULT_DIRECTORY_PROVIDER;
@@ -135,12 +139,15 @@ public class DirectoryProviderFactory {
 		int index = providers.indexOf( provider );
 		if ( index != -1 ) {
 			//share the same Directory provider for the same underlying store
-			return providers.get( index );
+			final DirectoryProvider<?> directoryProvider = providers.get( index );
+			searchFactoryImplementor.addClassToDirectoryProvider(entity, directoryProvider);
+			return directoryProvider;
 		}
 		else {
 			configureOptimizerStrategy( searchFactoryImplementor, indexProps, provider );
 			configureIndexingParameters( searchFactoryImplementor, indexProps, provider );
 			providers.add( provider );
+			searchFactoryImplementor.addClassToDirectoryProvider(entity, provider);
 			if ( !searchFactoryImplementor.getLockableDirectoryProviders().containsKey( provider ) ) {
 				searchFactoryImplementor.getLockableDirectoryProviders().put( provider, new ReentrantLock() );
 			}

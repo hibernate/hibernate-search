@@ -2,7 +2,11 @@
 package org.hibernate.search.test;
 
 import org.hibernate.Session;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * @author Emmanuel Bernard
@@ -28,6 +32,11 @@ public class RamDirectoryTest extends SearchTestCase {
 
 		s = getSessions().openSession();
 		s.getTransaction().begin();
+		TermQuery q = new TermQuery(new Term("alt_title", "hibernate"));
+		assertEquals( "does not properly filter", 0,
+				Search.createFullTextSession( s ).createFullTextQuery( q, Document.class ).list().size() );
+		assertEquals( "does not properly filter", 1,
+				Search.createFullTextSession( s ).createFullTextQuery( q, Document.class, AlternateDocument.class ).list().size() );
 		s.delete( s.get( AlternateDocument.class, document.getId() ) );
 		s.getTransaction().commit();
 		s.close();

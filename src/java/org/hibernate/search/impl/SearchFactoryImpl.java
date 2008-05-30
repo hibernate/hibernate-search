@@ -4,7 +4,9 @@ package org.hibernate.search.impl;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -43,7 +46,6 @@ import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.apache.lucene.analysis.Analyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +64,11 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	private final Map<Class, DocumentBuilder<Object>> documentBuilders = new HashMap<Class, DocumentBuilder<Object>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
+	//TODO move the ReentrantLock into DirectoryProviderData.lock, add a getDPLock(DP) and add a Set<DP> getDirectoryProviders() method.
 	private final Map<DirectoryProvider, ReentrantLock> lockableDirectoryProviders =
 			new HashMap<DirectoryProvider, ReentrantLock>();
-	private final Map<DirectoryProvider, OptimizerStrategy> dirProviderOptimizerStrategies =
-			new HashMap<DirectoryProvider, OptimizerStrategy>();
+	private final Map<DirectoryProvider, DirectoryProviderData> dirProviderData =
+			new HashMap<DirectoryProvider, DirectoryProviderData>();
 	private Worker worker;
 	private ReaderProvider readerProvider;
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
@@ -137,6 +140,19 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				}
 			}
 		}
+	}
+
+	public void addClassToDirectoryProvider(Class clazz, DirectoryProvider<?> directoryProvider) {
+		DirectoryProviderData data = dirProviderData.get(directoryProvider);
+		if (data == null) {
+			data = new DirectoryProviderData();
+			dirProviderData.put( directoryProvider, data );
+		}
+		data.classes.add(clazz);
+	}
+
+	public Set<Class> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
+		return Collections.unmodifiableSet( dirProviderData.get(directoryProvider).classes );
 	}
 
 	private void bindFilterDefs(XClass mappedXClass) {
@@ -227,7 +243,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy) {
-		dirProviderOptimizerStrategies.put( provider, optimizerStrategy );
+		DirectoryProviderData data = dirProviderData.get(provider);
+		if (data == null) {
+			data = new DirectoryProviderData();
+			dirProviderData.put( provider, data );
+		}
+		data.optimizerStrategy = optimizerStrategy;
 	}
 
 	public void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
@@ -235,7 +256,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-		return dirProviderOptimizerStrategies.get( provider );
+		return dirProviderData.get( provider ).optimizerStrategy;
 	}
 
 	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider ) {
@@ -301,7 +322,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				XClass mappedXClass = reflectionManager.toXClass(mappedClass);
 				if ( mappedXClass != null) {
 					if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
-						DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders( mappedXClass, cfg, this );
+						DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders( mappedXClass, cfg, this, reflectionManager );
 
 						final DocumentBuilder<Object> documentBuilder = new DocumentBuilder<Object>(
 								mappedXClass, context, providers.getProviders(), providers.getSelectionStrategy(),
@@ -348,5 +369,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	public FilterDef getFilterDefinition(String name) {
 		return filterDefinitions.get( name );
+	}
+
+	private static class DirectoryProviderData {
+		public OptimizerStrategy optimizerStrategy;
+		public Set<Class> classes = new HashSet<Class>(2);
 	}
 }

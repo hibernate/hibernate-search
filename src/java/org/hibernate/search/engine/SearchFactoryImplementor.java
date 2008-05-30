@@ -2,6 +2,7 @@
 package org.hibernate.search.engine;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.SearchFactory;
@@ -44,4 +45,8 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	public String getIndexingStrategy();
 
 	public void close();
+
+	void addClassToDirectoryProvider(Class clazz, DirectoryProvider<?> directoryProvider);
+
+	Set<Class> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider);
 }

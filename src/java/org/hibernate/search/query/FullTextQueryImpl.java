@@ -69,6 +69,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private org.apache.lucene.search.Query luceneQuery;
 	private Class[] classes;
 	private Set<Class> classesAndSubclasses;
+	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
+	private boolean needClassFilterClause;
 	private Integer firstResult;
 	private Integer maxResults;
 	private Integer resultSize;
@@ -384,12 +386,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private org.apache.lucene.search.Query filterQueryByClasses(org.apache.lucene.search.Query luceneQuery) {
-		//A query filter is more practical than a manual class filtering post query (esp on scrollable resultsets)
-		//it also probably minimise the memory footprint
-		if ( classesAndSubclasses == null ) {
+		if ( ! needClassFilterClause ) {
 			return luceneQuery;
 		}
 		else {
+			//A query filter is more practical than a manual class filtering post query (esp on scrollable resultsets)
+			//it also probably minimise the memory footprint	
 			BooleanQuery classFilter = new BooleanQuery();
 			//annihilate the scoring impact of DocumentBuilder.CLASS_FIELDNAME
 			classFilter.setBoost( 0 );
@@ -429,13 +431,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		List<DirectoryProvider> directories = new ArrayList<DirectoryProvider>();
 
 		Similarity searcherSimilarity = null;
-
+		//TODO check if caching this work for the last n list of classes makes a perf boost
 		if ( classes == null || classes.length == 0 ) {
 			//no class means all classes
 			for (DocumentBuilder builder : builders.values()) {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy().getDirectoryProvidersForAllShards();
-				populateDirectories( directories, directoryProviders );
+				populateDirectories( directories, directoryProviders, searchFactoryImplementor );
 			}
 			classesAndSubclasses = null;
 		}
@@ -455,9 +457,28 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy().getDirectoryProvidersForAllShards();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
-				populateDirectories( directories, directoryProviders );
+				populateDirectories( directories, directoryProviders, searchFactoryImplementor );
 			}
 			classesAndSubclasses = involvedClasses;
+		}
+
+		//compute optimization needClassFilterClause
+		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
+		if ( classesAndSubclasses != null) {
+			for (DirectoryProvider dp : directories) {
+				final Set<Class> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider( dp );
+				// if a DP contains only one class, we know for sure it's part of classesAndSubclasses
+				if ( classesInDirectoryProvider.size() > 1 ) {
+					//risk of needClassFilterClause
+					for (Class clazz : classesInDirectoryProvider) {
+						if ( ! classesAndSubclasses.contains( clazz ) ) {
+							this.needClassFilterClause = true;
+							break;
+						}
+					}
+				}
+				if ( this.needClassFilterClause ) break;
+			}
 		}
 
 		//set up the searcher
@@ -467,7 +488,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return is;
 	}
 
-	private void populateDirectories(List<DirectoryProvider> directories, DirectoryProvider[] directoryProviders) {
+	private void populateDirectories(List<DirectoryProvider> directories, DirectoryProvider[] directoryProviders,
+									 SearchFactoryImplementor searchFactoryImplementor) {
 		for (DirectoryProvider provider : directoryProviders) {
 			if ( !directories.contains( provider ) ) {
 				directories.add( provider );
