@@ -14,8 +14,8 @@ import java.lang.annotation.Documented;
  * The key object must implement equals / hashcode so that 2 keys are equals iif
  * the given target object types are the same, the set of parameters are the same.
  *
- * @Factory currently works for @FullTextFilterDef.impl classes
- *
+ * &#64;Factory currently works for &#64;FullTextFilterDef.impl classes
+ * @see org.hibernate.search.annotations.Factory
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )

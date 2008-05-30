@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * Implement the Hibernate Search controller responsible for processing the
  * work send through JMS by the slave nodes.
  *
- * Note the subclass implementation has to implements javax.jms.MessageListener
+ * Note the subclass implementation has to implement javax.jms.MessageListener
  * //TODO Ask Bill why it is required
  *
  * @author Emmanuel Bernard
@@ -29,25 +29,28 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	private static final Logger log = LoggerFactory.getLogger( AbstractJMSHibernateSearchController.class );
 
 	/**
-	 * return the current or give a new session
-	 * This session is not used per se, but is the link to access the Search configuration
-	 *
+	 * Return the current or give a new session
+	 * This session is not used per se, but is the link to access the Search configuration.
+	 * <p>
 	 * A typical EJB 3.0 usecase would be to get the session from the container (injected)
 	 * eg in JBoss EJB 3.0
+	 * <p>
 	 * <code>
-	 * @PersistenceContext private Session session;
-	 *
-	 * protected Session getSession() {
-	 *     return session
-	 * }
-	 *
-	 * eg in any container
+	 * &#64;PersistenceContext private Session session;<br>
+	 * <br>
+	 * protected Session getSession() {<br>
+	 *  &nbsp; &nbsp;return session<br>
+	 * }<br>
+	 * </code>
+	 * <p>
+	 * eg in any container<br>
 	 * <code>
-	 * @PersistenceContext private EntityManager entityManager;
-	 *
-	 * protected Session getSession() {
-	 *     return (Session) entityManager.getdelegate();
-	 * }
+	 * &#64;PersistenceContext private EntityManager entityManager;<br>
+	 * <br>
+	 * protected Session getSession() {<br>
+	 *  &nbsp; &nbsp;return (Session) entityManager.getdelegate();<br>
+	 * }<br>
+	 * </code>
 	 */
 	protected abstract Session getSession();
 

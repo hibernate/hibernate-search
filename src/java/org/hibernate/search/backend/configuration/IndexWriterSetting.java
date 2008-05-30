@@ -13,7 +13,7 @@ import org.hibernate.search.SearchException;
  */
 public enum IndexWriterSetting implements Serializable {
 	/**
-	 * @see org.apache.lucene.index.IndexWriter.setMaxBufferedDeleteTerms(int)
+	 * @see org.apache.lucene.index.IndexWriter#setMaxBufferedDeleteTerms(int)
 	 */
 	MAX_BUFFERED_DELETE_TERMS( "max_buffered_delete_terms" ) {
 		public void applySetting(IndexWriter writer, int value) {
@@ -21,7 +21,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	} ,
 	/**
-	 * @see org.apache.lucene.index.IndexWriter.setMaxBufferedDocs(int)
+	 * @see org.apache.lucene.index.IndexWriter#setMaxBufferedDocs(int)
 	 */
 	MAX_BUFFERED_DOCS( "max_buffered_docs" ) {
 		public void applySetting(IndexWriter writer, int value) {
@@ -29,7 +29,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	} ,
 	/**
-	 * @see org.apache.lucene.index.IndexWriter.setMaxFieldLength(int)
+	 * @see org.apache.lucene.index.IndexWriter#setMaxFieldLength(int)
 	 */
 	MAX_FIELD_LENGTH( "max_field_length" ) {
 		public void applySetting(IndexWriter writer, int value) {
@@ -37,7 +37,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	} ,
 	/**
-	 * @see org.apache.lucene.index.IndexWriter.setMaxMergeDocs(int)
+	 * @see org.apache.lucene.index.IndexWriter#setMaxMergeDocs(int)
 	 */
 	MAX_MERGE_DOCS( "max_merge_docs" ) {
 		public void applySetting(IndexWriter writer, int value) {
@@ -45,7 +45,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	} ,
 	/**
-	 * @see org.apache.lucene.index.IndexWriter.setMergeFactor(int)
+	 * @see org.apache.lucene.index.IndexWriter#setMergeFactor(int)
 	 */
 	MERGE_FACTOR( "merge_factor" ) {
 		public void applySetting(IndexWriter writer, int value) {
@@ -53,7 +53,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	} ,
 	/**
-	 * @see org.apache.lucene.index.IndexWriter.setRAMBufferSizeMB(int)
+	 * @see org.apache.lucene.index.IndexWriter#setRAMBufferSizeMB(double)
 	 */
 	RAM_BUFFER_SIZE( "ram_buffer_size" ) {
 		public void applySetting(IndexWriter writer, int value) {
@@ -61,7 +61,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriter.setTermIndexInterval(int)
+	 * @see org.apache.lucene.index.IndexWriter#setTermIndexInterval(int)
 	 */
 	TERM_INDEX_INTERVAL( "term_index_interval" ) {
 		public void applySetting(IndexWriter writer, int value) {

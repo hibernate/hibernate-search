@@ -30,7 +30,7 @@ public class DirectoryProviderHelper {
 	 * @param directoryProviderName
 	 * @param properties
 	 * @param needWritePermissions when true the directory will be tested for read-write permissions. 
-	 * @return
+	 * @return The file representing the source directory
 	 */
 	public static File getSourceDirectory( String directoryProviderName, Properties properties, boolean needWritePermissions ) {
 		String root = properties.getProperty( ROOTINDEX_PROP_NAME );

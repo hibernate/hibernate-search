@@ -9,28 +9,29 @@ import java.lang.annotation.Documented;
 
 /**
  * Describe the owning entity as being part of the target entity's
- * index (to be more accurate, being part of the indexed object graph)
- *
- * Only necessary when an @Indexed class is used as a @IndexedEmbedded
- * target class. @ContainedIn must mark the property pointing back
- * to the @IndexedEmbedded owning Entity
- *
- * Not necessary if the class is an @Embeddable class.
- *
+ * index (to be more accurate, being part of the indexed object graph).
+ * <p>
+ * Only necessary when an &#64;Indexed class is used as a &#64;IndexedEmbedded
+ * target class. &#64;ContainedIn must mark the property pointing back
+ * to the &#64;IndexedEmbedded owning Entity.
+ * <p>
+ * Not necessary if the class is an &#64;Embeddable class.
+ * <p>
  * <code>
- * @Indexed
- * public class OrderLine {
- *     @IndexedEmbedded
- *     private Order order;
- * }
- *
- * @Indexed
- * public class Order {
- *     @ContainedBy
- *     Set<OrderLine> lines;
- * }
- * </code>
- *
+ * &#64;Indexed<br>
+ * public class OrderLine {<br>
+ *     &#64;IndexedEmbedded<br>
+ *     private Order order;<br>
+ * }<br>
+ *<br>
+ * &#64;Indexed<br>
+ * public class Order {<br>
+ *     &#64;ContainedBy<br>
+ *     Set<OrderLine> lines;<br>
+ * }<br>
+ * </code><br>
+ * @see org.hibernate.search.annotations.Indexed
+ * @see org.hibernate.search.annotations.IndexedEmbedded
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )

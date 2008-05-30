@@ -12,9 +12,9 @@ import java.lang.annotation.Documented;
  * A factory method is called whenever a new instance of a given
  * type is requested.
  * The factory method is used with a higher priority than a plain no-arg constructor when present
- *
- * @Factory currently works for @FullTextFilterDef.impl classes
- *
+ * <br />
+ * <code>&#64;Factory</code> currently works for &#64;FullTextFilterDef.impl classes
+ * @see org.hibernate.search.annotations.Factory
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )
