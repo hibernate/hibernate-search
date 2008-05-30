@@ -252,7 +252,7 @@ public class Workspace {
 		/**
 		 * Gets the currently open IndexWriter, or creates one.
 		 * If a IndexReader was open, it will be closed first.
-		 * @param entity The entity for which the IndexWriter is needed
+		 * @param entity The entity for which the IndexWriter is needed. entity can be null when calling for Optimize
 		 * @param modificationOperation set to true if needed to perform modifications to index
 		 * @return created or existing IndexWriter
 		 */
@@ -275,7 +275,9 @@ public class Workspace {
 						documentBuilder.getAnalyzer() :
 						SIMPLE_ANALYZER; //never used
 				writer = new IndexWriter( directoryProvider.getDirectory(), analyzer, false ); //has been created at init time
-				writer.setSimilarity( documentBuilder.getSimilarity() );
+				if ( entity != null ) {
+					writer.setSimilarity( documentBuilder.getSimilarity() );
+				}
 				LuceneIndexingParameters indexingParams = searchFactoryImplementor.getIndexingParameters( directoryProvider );
 				indexingParams.applyToWriter( writer, isBatch );
 			}
