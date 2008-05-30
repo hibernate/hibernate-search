@@ -39,7 +39,7 @@ public class IndexTestDontRun extends SearchTestCase {
 	}
 
 	public void testPerf() throws Exception {
-		boolean useLucene = true;
+		boolean useLucene = false;
 
 		List<SearcherThread> threads = new ArrayList<SearcherThread>( 100 );
 		IndexSearcher indexsearcher = getNewSearcher();
