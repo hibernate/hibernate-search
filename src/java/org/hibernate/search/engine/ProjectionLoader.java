@@ -46,7 +46,7 @@ public class ProjectionLoader implements Loader {
 
 	private void initThisProjectionFlag(EntityInfo entityInfo) {
 		if ( projectThis == null ) {
-			projectThis = entityInfo.indexesOfThis != null;
+			projectThis = entityInfo.indexesOfThis.size() != 0;
 			if ( projectThis ) {
 				//TODO use QueryLoader when possible
 				objectLoader = new ObjectLoader();
