@@ -3,6 +3,10 @@ package org.hibernate.search.test.perf;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import junit.textui.TestRunner;
 import org.apache.lucene.search.IndexSearcher;
@@ -18,15 +22,16 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Emmanuel Bernard
  */
 public class IndexTestDontRun extends SearchTestCase {
-	private static boolean isLucene;
+	
+	private static final int TOTAL_SEARCHES = 800;
+	private static final int SEARCH_THREADS = 100;
 
 	public static void main(String[] args) {
 		//isLucene = Boolean.parseBoolean( args[0] );
 		TestRunner.run( IndexTestDontRun.class );
-
 	}
 
-	public void NonestInit() throws Exception {
+	public void notestInit() throws Exception {
 		long time = System.currentTimeMillis();
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -37,26 +42,39 @@ public class IndexTestDontRun extends SearchTestCase {
 		s.close();
 		System.out.println( " init time = " + ( System.currentTimeMillis() - time ) );
 	}
+	
+	public void testPerformance() throws Exception {
+		measure(true);//JVM warmup
+		measure(false);//JVM warmup
+		long measureLucene = measure( true );
+		long measureSearch = measure( false );
+		System.out.println( "Totaltime Lucene = " + measureLucene );
+		System.out.println( "Totaltime Search = " + measureSearch );
+	}
 
-	public void testPerf() throws Exception {
-		boolean useLucene = false;
-
-		List<SearcherThread> threads = new ArrayList<SearcherThread>( 100 );
-		IndexSearcher indexsearcher = getNewSearcher();
-		SearcherThread searcherThrea = new SearcherThread( 0, "name:maria OR description:long" + 0, getSessions(), indexsearcher, useLucene );
-		searcherThrea.run();
-		for (int i = 1; i <= 100; i++) {
+	public long measure(boolean plainLucene) throws Exception {
+		ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool( SEARCH_THREADS );
+		threadPool.prestartAllCoreThreads();
+		CountDownLatch startSignal = new CountDownLatch(1);
+		List<SearcherThread> threadsList = new ArrayList<SearcherThread>( TOTAL_SEARCHES );
+		IndexSearcher indexSearcher = getNewSearcher();
+		for (int i = 0; i < TOTAL_SEARCHES; i++) {
 			// Create a thread and invoke it
-			//if ( i % 100 == 0) indexsearcher = getNewSearcher();
-			SearcherThread searcherThread = new SearcherThread( i, "name:maria OR description:long" + i, getSessions(), indexsearcher, useLucene );
-			searcherThread.setDaemon( false );
-			threads.add( searcherThread );
-			searcherThread.start();
+			//if ( i % 100 == 0) indexSearcher = getNewSearcher();
+			SearcherThread searcherThread = new SearcherThread( i, "name:maria OR description:long" + i, getSessions(), indexSearcher, plainLucene, startSignal );
+			threadsList.add( searcherThread );
+			threadPool.execute( searcherThread );
 		}
-		Thread.sleep( 5000 );
+		threadPool.shutdown();//required to enable awaitTermination functionality
+		startSignal.countDown();//start all created threads
+		boolean terminationOk = threadPool.awaitTermination( 60, TimeUnit.SECONDS );
+		if ( terminationOk==false ) {
+			System.out.println( "No enough time to complete the tests!" );
+			return 0;
+		}
 		long totalTime = 0;
-		for (SearcherThread t : threads) totalTime += t.time;
-		System.out.println( "Totaltime=" + totalTime );
+		for (SearcherThread t : threadsList) totalTime += t.getTime();
+		return totalTime;
 	}
 
 	private IndexSearcher getNewSearcher() throws IOException {
@@ -75,7 +93,6 @@ public class IndexTestDontRun extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
-		//cfg.setProperty( "hibernate.search.reader.strategy", DumbSharedReaderProvider.class.getName() );
-
+//		cfg.setProperty( "hibernate.search.reader.strategy", DumbSharedReaderProvider.class.getName() );
 	}
 }
