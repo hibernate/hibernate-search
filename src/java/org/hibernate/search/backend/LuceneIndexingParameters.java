@@ -2,7 +2,7 @@
 package org.hibernate.search.backend;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -81,7 +81,7 @@ public class LuceneIndexingParameters implements Serializable {
 		
 		private static final long serialVersionUID = -6121723702279869524L;
 		
-		final Map<IndexWriterSetting, Integer> parameters = new HashMap<IndexWriterSetting, Integer>();
+		final Map<IndexWriterSetting, Integer> parameters = new EnumMap<IndexWriterSetting, Integer>(IndexWriterSetting.class);
 		
 		public ParameterSet(Properties prop, String paramName) {
 			//don't iterate on property entries as we know all the keys:

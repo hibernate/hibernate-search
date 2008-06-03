@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
 //TODO implements setParameter()
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
 	private final Logger log = LoggerFactory.getLogger( FullTextQueryImpl.class );
-	private org.apache.lucene.search.Query luceneQuery;
+	private final org.apache.lucene.search.Query luceneQuery;
 	private Class[] classes;
 	private Set<Class> classesAndSubclasses;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
@@ -124,7 +124,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
-			return new IteratorImpl( new ArrayList<EntityInfo>( 0 ), noLoader );
+			return new IteratorImpl( Collections.EMPTY_LIST, noLoader );
 		}
 		try {
 			Hits hits = getHits( searcher );
@@ -234,7 +234,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		SearchFactoryImplementor searchFactoryImplementor = ContextHelper.getSearchFactoryBySFI( session );
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
-		if ( searcher == null ) return new ArrayList( 0 );
+		if ( searcher == null ) return Collections.EMPTY_LIST;
 		Hits hits;
 		try {
 			hits = getHits( searcher );
