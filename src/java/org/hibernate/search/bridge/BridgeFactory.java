@@ -69,12 +69,12 @@ public class BridgeFactory {
 
 	public static final TwoWayFieldBridge Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
 
-	public static final FieldBridge DATE_YEAR = new String2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
-	public static final FieldBridge DATE_MONTH = new String2FieldBridgeAdaptor( DateBridge.DATE_MONTH );
-	public static final FieldBridge DATE_DAY = new String2FieldBridgeAdaptor( DateBridge.DATE_DAY );
-	public static final FieldBridge DATE_HOUR = new String2FieldBridgeAdaptor( DateBridge.DATE_HOUR );
-	public static final FieldBridge DATE_MINUTE = new String2FieldBridgeAdaptor( DateBridge.DATE_MINUTE );
-	public static final FieldBridge DATE_SECOND = new String2FieldBridgeAdaptor( DateBridge.DATE_SECOND );
+	public static final FieldBridge DATE_YEAR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
+	public static final FieldBridge DATE_MONTH = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MONTH );
+	public static final FieldBridge DATE_DAY = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_DAY );
+	public static final FieldBridge DATE_HOUR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_HOUR );
+	public static final FieldBridge DATE_MINUTE = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MINUTE );
+	public static final FieldBridge DATE_SECOND = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_SECOND );
 	public static final TwoWayFieldBridge DATE_MILLISECOND =
 			new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MILLISECOND );
 

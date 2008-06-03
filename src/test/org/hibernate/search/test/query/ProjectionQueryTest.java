@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -236,13 +237,13 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
 		assertEquals( "BOOST incorrect", 1.0F, projection[5] );
 		assertTrue( "DOCUMENT incorrect", projection[6] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[6] ).getFields().size() );
+		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[6] ).getFields().size() );
 		assertEquals( "ID incorrect", 1001, projection[7] );
 		assertNotNull( "Lucene internal doc id", projection[8] );
 
 		// Change the projection order and null one
 		hibQuery.setProjection( FullTextQuery.DOCUMENT, FullTextQuery.THIS, FullTextQuery.SCORE, null, FullTextQuery.ID,
-				"id", "lastname", "dept", FullTextQuery.DOCUMENT_ID );
+				"id", "lastname", "dept", "hireDate", FullTextQuery.DOCUMENT_ID );
 
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -251,7 +252,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNotNull( projection );
 
 		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[0] ).getFields().size() );
+		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[0] ).getFields().size() );
 		assertEquals( "THIS incorrect", projection[1], s.get( Employee.class, (Serializable) projection[4] ) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[2] );
 		assertNull( "BOOST not removed", projection[3] );
@@ -259,7 +260,8 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "id incorrect", 1001, projection[5] );
 		assertEquals( "last name incorrect", "Jackson", projection[6] );
 		assertEquals( "dept incorrect", "Accounting", projection[7] );
-		assertNotNull( "Lucene internal doc id", projection[8] );
+		assertNotNull( "Date", projection[8] );
+		assertNotNull( "Lucene internal doc id", projection[9] );
 
 		//cleanup
 		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
@@ -272,6 +274,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		Employee e1 = new Employee( 1000, "Griffin", "ITech" );
 		s.save( e1 );
 		Employee e2 = new Employee( 1001, "Jackson", "Accounting" );
+		e2.setHireDate( new Date() );
 		s.save( e2 );
 		Employee e3 = new Employee( 1002, "Jimenez", "ITech" );
 		s.save( e3 );
