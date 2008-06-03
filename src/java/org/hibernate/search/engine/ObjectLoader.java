@@ -21,7 +21,7 @@ public class ObjectLoader implements Loader {
 	}
 
 	public Object load(EntityInfo entityInfo) {
-		//be sure to get an initialized object
+		//be sure to get an initialized object but save from ONFE and ENFE
 		Object maybeProxy = session.load( entityInfo.clazz, entityInfo.id );
 		try {
 			Hibernate.initialize( maybeProxy );
