@@ -10,16 +10,29 @@ import java.util.HashSet;
 import java.util.Arrays;
 import java.nio.channels.FileChannel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public abstract class FileHelper {
+	
 	private static final int FAT_PRECISION = 2000;
-
+	private static final long DEFAULT_CHUNK_SIZE = 16 * 1024 * 1024; // 16 MB
+	private static final Logger log = LoggerFactory.getLogger( FileHelper.class );
+	
 	public static void synchronize(File source, File destination, boolean smart) throws IOException {
+		synchronize( source, destination, smart, DEFAULT_CHUNK_SIZE );
+	}
+
+	public static void synchronize(File source, File destination, boolean smart, long chunkSize) throws IOException {
 		if ( source.isDirectory() ) {
 			if ( ! destination.exists() ) {
-				destination.mkdirs();
+				if ( ! destination.mkdirs() ){
+					throw new IOException("Could not create path " + destination);
+				}
 			}
 			else if ( ! destination.isDirectory() ) {
 				throw new IOException("Source and Destination not of the same type:"
@@ -39,7 +52,7 @@ public abstract class FileHelper {
 			for (String fileName : sources) {
 				File srcFile = new File(source, fileName);
 				File destFile = new File(destination, fileName);
-				synchronize( srcFile, destFile, smart );
+				synchronize( srcFile, destFile, smart, chunkSize );
 			}
 		}
 		else {
@@ -51,36 +64,61 @@ public abstract class FileHelper {
 				long dts = destination.lastModified() / FAT_PRECISION;
 				//do not copy if smart and same timestamp and same length
 				if ( !smart || sts == 0 || sts != dts || source.length() != destination.length() ) {
-					copyFile(source, destination);
+					copyFile(source, destination, chunkSize);
 				}
 			}
 			else {
-				copyFile(source, destination);
+				copyFile(source, destination, chunkSize);
 			}
 		}
 	}
 
-	private static void copyFile(File srcFile, File destFile) throws IOException {
+	private static void copyFile(File srcFile, File destFile, long chunkSize) throws IOException {
 		FileInputStream is = null;
 		FileOutputStream os = null;
+		long startTime = System.currentTimeMillis();
 		try {
 			is = new FileInputStream(srcFile);
 			FileChannel iChannel = is.getChannel();
 			os = new FileOutputStream( destFile, false );
 			FileChannel oChannel = os.getChannel();
-			oChannel.transferFrom( iChannel, 0, srcFile.length() );
+			long doneBytes = 0L;
+			long todoBytes = srcFile.length();
+			while ( todoBytes != 0L ) {
+				long iterationBytes = Math.min( todoBytes, chunkSize );
+				long transferredLength = oChannel.transferFrom( iChannel, doneBytes, iterationBytes );
+				if ( iterationBytes != transferredLength ) {
+					throw new IOException( "Error during file transfer: expected "
+							+ iterationBytes + " bytes, only "+ transferredLength + " bytes copied." );
+				}
+				doneBytes += transferredLength;
+				todoBytes -= transferredLength;
+			}
 		}
 		finally {
 			if (is != null) is.close();
 			if (os != null) os.close();
 		}
-		destFile.setLastModified( srcFile.lastModified() );
+		long endTime = System.currentTimeMillis() - startTime;
+		System.out.println("copied in "+ endTime + " ms.");
+		boolean successTimestampOp = destFile.setLastModified( srcFile.lastModified() );
+		if ( ! successTimestampOp ) {
+			log.warn( "Could not change timestamp for " + destFile + 
+					". Index synchronization may be slow." );
+		}
 	}
 
 	public static void delete(File file) {
 		if ( file.isDirectory() ) {
-			for ( File subFile : file.listFiles() ) delete( subFile );
+			for ( File subFile : file.listFiles() ) {
+				delete( subFile );
+			}
 		}
-		if ( file.exists() ) file.delete();
+		if ( file.exists() ) {
+			if ( ! file.delete() ) {
+				log.error( "Could not delete " + file );
+			}
+		}
 	}
+	
 }
