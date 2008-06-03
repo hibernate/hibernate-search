@@ -76,7 +76,6 @@ public abstract class FileHelper {
 	private static void copyFile(File srcFile, File destFile, long chunkSize) throws IOException {
 		FileInputStream is = null;
 		FileOutputStream os = null;
-		long startTime = System.currentTimeMillis();
 		try {
 			is = new FileInputStream(srcFile);
 			FileChannel iChannel = is.getChannel();
@@ -99,8 +98,6 @@ public abstract class FileHelper {
 			if (is != null) is.close();
 			if (os != null) os.close();
 		}
-		long endTime = System.currentTimeMillis() - startTime;
-		System.out.println("copied in "+ endTime + " ms.");
 		boolean successTimestampOp = destFile.setLastModified( srcFile.lastModified() );
 		if ( ! successTimestampOp ) {
 			log.warn( "Could not change timestamp for " + destFile + 
