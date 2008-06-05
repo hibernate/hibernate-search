@@ -43,6 +43,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentBuilder;
@@ -85,6 +86,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 * Remove all entities from a particular class of an index.
 	 *
 	 * @param entityType
+	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
 	public void purgeAll(Class entityType) {
 		purge( entityType, null );
@@ -95,6 +97,8 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 *
 	 * @param entityType
 	 * @param id
+	 *
+	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
 	public void purge(Class entityType, Serializable id) {
 		if ( entityType == null ) return;
@@ -107,17 +111,15 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		if ( builder == null ) {
 			throw new IllegalArgumentException( entityType.getName() + " is not a mapped entity (don't forget to add @Indexed)" );
 		}
-		else {
-			WorkType type;
-			if ( id == null ) {
-				type = WorkType.PURGE_ALL;
-			}
-			else {
-				type = WorkType.PURGE;
-			}
-			Work work = new Work(entityType, id, type);
-			searchFactoryImplementor.getWorker().performWork( work, eventSource );
+		WorkType type;
+		if ( id == null ) {
+			type = WorkType.PURGE_ALL;
 		}
+		else {
+			type = WorkType.PURGE;
+		}
+		Work work = new Work(entityType, id, type);
+		searchFactoryImplementor.getWorker().performWork( work, eventSource );
 	}
 
 	/**
@@ -126,19 +128,22 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 * The entity must be associated with the session
 	 *
 	 * @param entity The entity to index - must not be <code>null</code>.
+	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
 	public void index(Object entity) {
-		if (entity == null) return;
+		if (entity == null) throw new IllegalArgumentException("Entity to index should not be null");;
 		Class clazz = Hibernate.getClass( entity );
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//not strictly necessary but a small optimization
 		DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( clazz );
-		if ( builder != null ) {
-			Serializable id = session.getIdentifier( entity );
-			Work work = new Work(entity, id, WorkType.INDEX);
-			searchFactoryImplementor.getWorker().performWork( work, eventSource );
+		if ( builder == null ) {
+			throw new IllegalArgumentException( "Entity to index not an @Indexed entity: " + entity.getClass().getName() );
 		}
+		Serializable id = session.getIdentifier( entity );
+		Work work = new Work(entity, id, WorkType.INDEX);
+		searchFactoryImplementor.getWorker().performWork( work, eventSource );
+
 		//TODO
 		//need to add elements in a queue kept at the Session level
 		//the queue will be processed by a Lucene(Auto)FlushEventListener

@@ -22,6 +22,8 @@ public interface FullTextEntityManager extends EntityManager {
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
 	 * Indexation is batched per transaction
+	 *
+	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
 	void index(Object entity);
 
@@ -34,6 +36,8 @@ public interface FullTextEntityManager extends EntityManager {
 	 *
 	 * @param entityType
 	 * @param id
+	 *
+	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
 	public void purge(Class entityType, Serializable id);
 
@@ -41,6 +45,8 @@ public interface FullTextEntityManager extends EntityManager {
 	 * Remove all entities from a particular class of an index.
 	 *
 	 * @param entityType
+	 *
+	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
 	public void purgeAll(Class entityType);
 

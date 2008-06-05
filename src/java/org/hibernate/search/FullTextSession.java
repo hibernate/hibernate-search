@@ -24,6 +24,7 @@ public interface FullTextSession extends Session {
 	 * Non indexable entities are ignored
 	 *
 	 * @param entity The entity to index - must not be <code>null</code>.
+	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
 	void index(Object entity);
 
@@ -37,6 +38,8 @@ public interface FullTextSession extends Session {
 	 *
 	 * @param entityType
 	 * @param id
+	 *
+	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
 	public void purge(Class entityType, Serializable id);
 
@@ -44,6 +47,7 @@ public interface FullTextSession extends Session {
 	 * Remove all entities from a particular class of an index.
 	 *
 	 * @param entityType
+	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
 	public void purgeAll(Class entityType);
 }
