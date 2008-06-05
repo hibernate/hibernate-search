@@ -33,12 +33,12 @@
             <entry>org.hibernate.search.store.FSDirectoryProvider</entry>
 
             <entry>File system based directory. The directory used will be
-            &lt;indexBase&gt;/&lt; <literal>@Indexed.name</literal>
+            &lt;indexBase&gt;/&lt; <literal>@Indexed.index</literal>
             &gt;</entry>
 
             <entry><para><literal>indexBase</literal> : Base
             directory</para><para><literal>indexName</literal>: override
-            @Index.name (useful for sharded indexes)</para></entry>
+            @Indexed.index (useful for sharded indexes)</para></entry>
           </row>
 
           <row>
@@ -52,19 +52,18 @@
             3600 seconds - 60 minutes).</para><para>Note that the copy is
             based on an incremental copy mechanism reducing the average copy
             time.</para><para>DirectoryProvider typically used on the master
-            node in a JMS back end cluster.</para>DirectoryProvider typically
-            used on slave nodes using a JMS back end.</entry>
+            node in a JMS back end cluster.</para></entry>
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
-            @Index.name (useful for sharded
+            @Indexed.index (useful for sharded
             indexes)</para><para><literal>sourceBase</literal>: Source (copy)
             base directory.</para><para><literal>source</literal>: Source
-            directory suffix (default to <literal>@Indexed.name</literal>).
+            directory suffix (default to <literal>@Indexed.index</literal>).
             The actual source directory name being
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
-            </para><para>refresh: refresh period in second (the copy will take
-            place every refresh seconds).</para></entry>
+            </para><para><literal>refresh</literal>: refresh period in second
+            (the copy will take place every refresh seconds).</para></entry>
           </row>
 
           <row>
@@ -82,14 +81,14 @@
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
-            @Index.name (useful for sharded
+            @Indexed.index (useful for sharded
             indexes)</para><para><literal>sourceBase</literal>: Source (copy)
             base directory.</para><para><literal>source</literal>: Source
-            directory suffix (default to <literal>@Indexed.name</literal>).
+            directory suffix (default to <literal>@Indexed.index</literal>).
             The actual source directory name being
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
-            </para><para>refresh: refresh period in second (the copy will take
-            place every refresh seconds).</para></entry>
+            </para><para><literal>refresh</literal>: refresh period in second
+            (the copy will take place every refresh seconds).</para></entry>
           </row>
 
           <row>
@@ -97,7 +96,7 @@
 
             <entry>Memory based directory, the directory will be uniquely
             identified (in the same deployment unit) by the
-            <literal>@Indexed.name</literal> element</entry>
+            <literal>@Indexed.index</literal> element</entry>
 
             <entry>none</entry>
           </row>
@@ -108,7 +107,7 @@
     <para>If the built-in directory providers does not fit your needs, you can
     write your own directory provider by implementing the
     <classname>org.hibernate.store.DirectoryProvider</classname>
-    interface</para>
+    interface.</para>
 
     <para>Each indexed entity is associated to a Lucene index (an index can be
     shared by several entities but this is not usually the case). You can
@@ -123,15 +122,14 @@
 
     <programlisting>hibernate.search.default.directory_provider org.hibernate.search.store.FSDirectoryProvider
 hibernate.search.default.indexBase=/usr/lucene/indexes
-
-hibernate.search.Rules.directory_provider org.hibernate.search.store.RAMDirectoryProvider        </programlisting>
+hibernate.search.Rules.directory_provider org.hibernate.search.store.RAMDirectoryProvider</programlisting>
 
     <para>applied on</para>
 
-    <programlisting>@Indexed(name="Status")
+    <programlisting>@Indexed(index="Status")
 public class Status { ... }
 
-@Indexed(name="Rules")
+@Indexed(index="Rules")
 public class Rule { ... }</programlisting>
 
     <para>will create a file system directory in
@@ -140,7 +138,7 @@ public class Rule { ... }</programlisting>
     <literal>Rules</literal> where Rule entities will be indexed.</para>
 
     <para>You can easily define common rules like the directory provider and
-    base directory, and overide those default later on on a per index
+    base directory, and override those default later on on a per index
     basis.</para>
 
     <para>Writing your own <classname>DirectoryProvider</classname>, you can
@@ -155,7 +153,7 @@ public class Rule { ... }</programlisting>
     several Lucene indexes. This solution is not recommended until you reach
     significant index sizes and index update time are slowing down. The main
     drawback of index sharding is that searches will end up being slower since
-    more files have to be opend for a single search. In other words don't do
+    more files have to be opened for a single search. In other words don't do
     it until you have problems :)</para>
 
     <para>Despite this strong warning, Hibernate Search allows you to index a
@@ -451,7 +449,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     <programlisting>hibernate.search.reader.strategy = my.corp.myapp.CustomReaderProvider</programlisting>
 
     <para>where <classname>my.corp.myapp.CustomReaderProvider</classname> is
-    the custom strategy implementation</para>
+    the custom strategy implementation.</para>
   </section>
 
   <section id="search-configuration-event" revision="2">
