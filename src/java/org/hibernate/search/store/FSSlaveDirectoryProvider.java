@@ -38,7 +38,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 	private int current;
 	private String indexName;
 	private Timer timer;
-
+	private long copyChunkSize;
+	
 	//variables needed between initialize and start
 	private File sourceIndexDir;
 	private File indexDir;
@@ -62,6 +63,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
+		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
 	}
 
 	public void start() {
@@ -96,7 +98,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 					throw new AssertionFailure( "No current file marker found in source directory: " + sourceIndexDir.getPath() );
 				}
 				try {
-					FileHelper.synchronize( new File( sourceIndexDir, String.valueOf(sourceCurrent) ), destinationFile, true);
+					FileHelper.synchronize( new File( sourceIndexDir, String.valueOf(sourceCurrent) ),
+							destinationFile, true, copyChunkSize );
 				}
 				catch (IOException e) {
 					throw new SearchException( "Unable to synchronize directory: " + indexName, e );
@@ -197,10 +200,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 				}
 
 				File destinationFile = new File( destination, Integer.valueOf( index ).toString() );
-				//TODO make smart a parameter
 				try {
 					log.trace( "Copying {} into {}", sourceFile, destinationFile );
-					FileHelper.synchronize( sourceFile, destinationFile, true );
+					FileHelper.synchronize( sourceFile, destinationFile, true, copyChunkSize );
 					current = index;
 				}
 				catch (IOException e) {

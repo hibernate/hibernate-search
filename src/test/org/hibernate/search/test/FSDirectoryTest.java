@@ -3,7 +3,6 @@ package org.hibernate.search.test;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -21,7 +20,6 @@ import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.Environment;
 import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.search.store.DirectoryProviderHelper;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.util.FileHelper;
 
@@ -52,36 +50,6 @@ public class FSDirectoryTest extends SearchTestCase {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
-	}
-
-	public void testDirectoryProviderHelperMkdirsGetSource() throws Exception {
-		String root = "./testDir";
-		String relative = "dir1/dir2/dir3";
-
-		Properties properties = new Properties();
-		properties.put( "sourceBase", root );
-		properties.put( "source", relative );
-
-		File rel = DirectoryProviderHelper.getSourceDirectory( "name", properties, true );
-
-		assertTrue( rel.exists() );
-
-		FileHelper.delete( new File( root ) );
-	}
-
-	public void testDirectoryProviderHelperMkdirsDetermineIndex() throws Exception {
-		String root = "./testDir/dir1/dir2";
-		String relative = "dir3";
-
-		Properties properties = new Properties();
-		properties.put( "indexBase", root );
-		properties.put( "indexName", relative );
-
-		File f = DirectoryProviderHelper.getVerifiedIndexDir( "name", properties, true );
-
-		assertTrue( new File( root ).exists() );
-
-		FileHelper.delete( new File( "./testDir" ) );
 	}
 
 	public void testEventIntegration() throws Exception {

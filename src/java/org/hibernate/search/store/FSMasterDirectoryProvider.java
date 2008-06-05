@@ -38,6 +38,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	private String indexName;
 	private Timer timer;
 	private SearchFactoryImplementor searchFactory;
+	private long copyChunkSize;
 
 	//variables needed between initialize and start
 	private File sourceDir;
@@ -60,6 +61,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
+		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
 		this.searchFactory = searchFactoryImplementor;
 	}
 
@@ -79,7 +81,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			}
 			String currentString = Integer.valueOf( current ).toString();
 			File subDir = new File( sourceDir, currentString );
-			FileHelper.synchronize( indexDir, subDir, true );
+			FileHelper.synchronize( indexDir, subDir, true, copyChunkSize );
 			new File( sourceDir, "current1 ").delete();
 			new File( sourceDir, "current2" ).delete();
 			//TODO small hole, no file can be found here
@@ -176,11 +178,10 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				int oldIndex = current;
 				int index = current == 1 ? 2 : 1;
 
-				File destinationFile = new File(destination, Integer.valueOf(index).toString() );
-				//TODO make smart a parameter
+				File destinationFile = new File( destination, Integer.valueOf(index).toString() );
 				try {
 					log.trace( "Copying {} into {}", source, destinationFile );
-					FileHelper.synchronize( source, destinationFile, true );
+					FileHelper.synchronize( source, destinationFile, true, copyChunkSize );
 					current = index;
 				}
 				catch (IOException e) {

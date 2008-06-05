@@ -20,14 +20,18 @@ import org.slf4j.LoggerFactory;
 public abstract class FileHelper {
 	
 	private static final int FAT_PRECISION = 2000;
-	private static final long DEFAULT_CHUNK_SIZE = 16 * 1024 * 1024; // 16 MB
+	public static final long DEFAULT_COPY_BUFFER_SIZE = 16 * 1024 * 1024; // 16 MB
 	private static final Logger log = LoggerFactory.getLogger( FileHelper.class );
 	
 	public static void synchronize(File source, File destination, boolean smart) throws IOException {
-		synchronize( source, destination, smart, DEFAULT_CHUNK_SIZE );
+		synchronize( source, destination, smart, DEFAULT_COPY_BUFFER_SIZE );
 	}
 
 	public static void synchronize(File source, File destination, boolean smart, long chunkSize) throws IOException {
+		if ( chunkSize <= 0 ) {
+			log.warn( "Chunk size must be positive: using default value." );
+			chunkSize = DEFAULT_COPY_BUFFER_SIZE;
+		}
 		if ( source.isDirectory() ) {
 			if ( ! destination.exists() ) {
 				if ( ! destination.mkdirs() ){

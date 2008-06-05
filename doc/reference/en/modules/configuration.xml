@@ -52,7 +52,10 @@
             3600 seconds - 60 minutes).</para><para>Note that the copy is
             based on an incremental copy mechanism reducing the average copy
             time.</para><para>DirectoryProvider typically used on the master
-            node in a JMS back end cluster.</para></entry>
+            node in a JMS back end cluster.</para><para>The <literal>
+            buffer_size_on_copy</literal> optimum depends
+            on your operating system and available RAM; most people reported
+            good results using values between 16 and 64MB.</para></entry>
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
@@ -63,7 +66,10 @@
             The actual source directory name being
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
             </para><para><literal>refresh</literal>: refresh period in second
-            (the copy will take place every refresh seconds).</para></entry>
+            (the copy will take place every refresh seconds).</para><para>
+            <literal>buffer_size_on_copy</literal>: The amount of
+            MegaBytes to move in a single low level copy instruction;
+            defaults to 16MB.</para></entry>
           </row>
 
           <row>
@@ -77,7 +83,10 @@
             information (default 3600 seconds - 60 minutes).</para><para>Note
             that the copy is based on an incremental copy mechanism reducing
             the average copy time.</para><para>DirectoryProvider typically
-            used on slave nodes using a JMS back end.</para></entry>
+            used on slave nodes using a JMS back end.</para><para>The <literal>
+            buffer_size_on_copy</literal> optimum depends
+            on your operating system and available RAM; most people reported
+            good results using values between 16 and 64MB.</para></entry>
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
@@ -88,7 +97,10 @@
             The actual source directory name being
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
             </para><para><literal>refresh</literal>: refresh period in second
-            (the copy will take place every refresh seconds).</para></entry>
+            (the copy will take place every refresh seconds).</para><para>
+            <literal>buffer_size_on_copy</literal>: The amount of
+            MegaBytes to move in a single low level copy instruction;
+            defaults to 16MB.</para></entry>
           </row>
 
           <row>

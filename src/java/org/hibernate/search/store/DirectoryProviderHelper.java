@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.util.FileHelper;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
@@ -23,6 +24,7 @@ public class DirectoryProviderHelper {
 	private static final Logger log = LoggerFactory.getLogger( DirectoryProviderHelper.class );
 	private static final String ROOTINDEX_PROP_NAME = "sourceBase";
 	private static final String RELATIVEINDEX_PROP_NAME = "source";
+	public static final String COPYBUFFERSIZE_PROP_NAME = "buffer_size_on_copy";
 
 	/**
 	 * Build a directory name out of a root and relative path, guessing the significant part
@@ -141,6 +143,32 @@ public class DirectoryProviderHelper {
 		}
 		log.debug( "Refresh period: {} seconds", period );
 		return period * 1000; //per second
+	}
+
+	/**
+	 * Users may configure the number of KB to use as
+	 * "chunk size" for large file copy operations performed
+	 * by DirectoryProviders.
+	 * @param directoryProviderName
+	 * @param properties
+	 * @return the number of Bytes to use as "chunk size" in file copy operations.
+	 */
+	public static long getCopyBufferSize(String directoryProviderName, Properties properties) {
+		String value = properties.getProperty( COPYBUFFERSIZE_PROP_NAME );
+		long size = FileHelper.DEFAULT_COPY_BUFFER_SIZE;
+		if ( value != null ) {
+			try {
+				size = Long.parseLong( value ) * 1024 * 1024; //from MB to B.
+			} catch (NumberFormatException nfe) {
+				throw new SearchException( "Unable to initialize index " +
+						directoryProviderName +"; "+ COPYBUFFERSIZE_PROP_NAME + " is not numeric.", nfe );
+			}
+			if ( size <= 0 ) {
+				throw new SearchException( "Unable to initialize index " +
+						directoryProviderName +"; "+ COPYBUFFERSIZE_PROP_NAME + " needs to be greater than zero.");
+			}
+		}
+		return size;
 	}
 	
 }
