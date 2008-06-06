@@ -2,29 +2,26 @@
 package org.hibernate.search.test.reader;
 
 import java.io.File;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.Random;
-import java.util.List;
 
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.Environment;
-import org.hibernate.search.Search;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.search.store.FSDirectoryProvider;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.event.PostDeleteEventListener;
-import org.hibernate.event.PostUpdateEventListener;
-import org.hibernate.event.PostInsertEventListener;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.Search;
+import org.hibernate.search.store.FSDirectoryProvider;
+import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -36,7 +33,7 @@ public class ReaderPerfTestCase extends SearchTestCase {
 		File[] files = sub.listFiles();
 		for ( File file : files ) {
 			if ( file.isDirectory() ) {
-				delete( file );
+				FileHelper.delete( file );
 			}
 		}
 		//super.setUp(); //we need a fresh session factory each time for index set up
@@ -58,19 +55,7 @@ public class ReaderPerfTestCase extends SearchTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
-		delete( sub );
-	}
-
-	private void delete(File sub) {
-		if ( sub.isDirectory() ) {
-			for ( File file : sub.listFiles() ) {
-				delete( file );
-			}
-			sub.delete();
-		}
-		else {
-			sub.delete();
-		}
+		FileHelper.delete( sub );
 	}
 
 	public boolean insert = true;
@@ -238,10 +223,6 @@ public class ReaderPerfTestCase extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.Clock.directory_provider", FSDirectoryProvider.class.getName() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		FullTextIndexEventListener del = new FullTextIndexEventListener();
-		cfg.getEventListeners().setPostDeleteEventListeners( new PostDeleteEventListener[]{del} );
-		cfg.getEventListeners().setPostUpdateEventListeners( new PostUpdateEventListener[]{del} );
-		cfg.getEventListeners().setPostInsertEventListeners( new PostInsertEventListener[]{del} );
 	}
 
 }

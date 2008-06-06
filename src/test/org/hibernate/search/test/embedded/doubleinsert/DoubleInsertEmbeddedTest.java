@@ -2,20 +2,12 @@
 package org.hibernate.search.test.embedded.doubleinsert;
 
 import java.util.Date;
-import java.io.File;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.hibernate.Query;
-import org.hibernate.event.PostDeleteEventListener;
-import org.hibernate.event.PostUpdateEventListener;
-import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.Environment;
-import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**

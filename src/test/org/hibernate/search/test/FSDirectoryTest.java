@@ -15,11 +15,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
-import org.hibernate.event.PostDeleteEventListener;
-import org.hibernate.event.PostInsertEventListener;
-import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.Environment;
-import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.util.FileHelper;
 
@@ -191,10 +187,6 @@ public class FSDirectoryTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		FullTextIndexEventListener del = new FullTextIndexEventListener();
-		cfg.getEventListeners().setPostDeleteEventListeners( new PostDeleteEventListener[] { del } );
-		cfg.getEventListeners().setPostUpdateEventListeners( new PostUpdateEventListener[] { del } );
-		cfg.getEventListeners().setPostInsertEventListeners( new PostInsertEventListener[] { del } );
 	}
 
 }

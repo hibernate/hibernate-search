@@ -4,7 +4,6 @@ package org.hibernate.search.test.optimizer;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.Date;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
@@ -18,6 +17,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -25,12 +25,12 @@ import org.hibernate.search.test.SearchTestCase;
 public class OptimizerTestCase extends SearchTestCase {
 	protected void setUp() throws Exception {
 		File sub = getBaseIndexDir();
-		delete( sub );
+		FileHelper.delete( sub );
 		sub.mkdir();
 		File[] files = sub.listFiles();
 		for (File file : files) {
 			if ( file.isDirectory() ) {
-				delete( file );
+				FileHelper.delete( file );
 			}
 		}
 		//super.setUp(); //we need a fresh session factory each time for index set up
@@ -47,19 +47,7 @@ public class OptimizerTestCase extends SearchTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
-		delete( sub );
-	}
-
-	private void delete(File sub) {
-		if ( sub.isDirectory() ) {
-			for (File file : sub.listFiles()) {
-				delete( file );
-			}
-			sub.delete();
-		}
-		else {
-			sub.delete();
-		}
+		FileHelper.delete( sub );
 	}
 
 	public void testConcurrency() throws Exception {

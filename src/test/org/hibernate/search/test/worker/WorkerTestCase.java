@@ -12,15 +12,12 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.event.PostDeleteEventListener;
-import org.hibernate.event.PostInsertEventListener;
-import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -33,7 +30,7 @@ public class WorkerTestCase extends SearchTestCase {
 		File[] files = sub.listFiles();
 		for ( File file : files ) {
 			if ( file.isDirectory() ) {
-				delete( file );
+				FileHelper.delete( file );
 			}
 		}
 		//super.setUp(); //we need a fresh session factory each time for index set up
@@ -48,19 +45,7 @@ public class WorkerTestCase extends SearchTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
-		delete( sub );
-	}
-
-	private void delete(File sub) {
-		if ( sub.isDirectory() ) {
-			for ( File file : sub.listFiles() ) {
-				delete( file );
-			}
-			sub.delete();
-		}
-		else {
-			sub.delete();
-		}
+		FileHelper.delete( sub );
 	}
 
 	public void testConcurrency() throws Exception {
@@ -192,10 +177,6 @@ public class WorkerTestCase extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.Clock.directory_provider", FSDirectoryProvider.class.getName() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		FullTextIndexEventListener del = new FullTextIndexEventListener();
-		cfg.getEventListeners().setPostDeleteEventListeners( new PostDeleteEventListener[]{del} );
-		cfg.getEventListeners().setPostUpdateEventListeners( new PostUpdateEventListener[]{del} );
-		cfg.getEventListeners().setPostInsertEventListeners( new PostInsertEventListener[]{del} );
 	}
 
 	protected Class[] getMappings() {

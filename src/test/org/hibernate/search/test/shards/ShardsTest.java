@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.List;
 
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.store.IdHashShardingStrategy;
@@ -158,7 +159,7 @@ public class ShardsTest extends SearchTestCase {
 		File[] files = sub.listFiles();
 		for (File file : files) {
 			if ( file.isDirectory() ) {
-				delete( file );
+				FileHelper.delete( file );
 			}
 		}
 		//super.setUp(); //we need a fresh session factory each time for index set up
@@ -173,19 +174,7 @@ public class ShardsTest extends SearchTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
-		delete( sub );
-	}
-
-	private void delete(File sub) {
-		if ( sub.isDirectory() ) {
-			for ( File file : sub.listFiles() ) {
-				delete( file );
-			}
-			sub.delete();
-		}
-		else {
-			sub.delete();
-		}
+		FileHelper.delete( sub );
 	}
 
 	protected Class[] getMappings() {

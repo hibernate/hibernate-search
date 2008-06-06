@@ -4,7 +4,7 @@ package org.hibernate.search.store;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * File based directory provider that takes care of getting a version of the index
- * from a given source
+ * from a given source.
  * The base directory is represented by hibernate.search.<index>.indexBase
  * The index is created in <base directory>/<index name>
  * The source (aka copy) directory is built from <sourceBase>/<index name>
@@ -104,7 +104,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 				catch (IOException e) {
 					throw new SearchException( "Unable to synchronize directory: " + indexName, e );
 				}
-				if (! currentMarker.createNewFile() ) {
+				if ( ! currentMarker.createNewFile() ) {
 					throw new SearchException( "Unable to create the directory marker file: " + indexName );
 				}
 			}
@@ -152,7 +152,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 
 	class TriggerTask extends TimerTask {
 
-		private final ExecutorService executor;
+		private final Executor executor;
 		private final CopyDirectory copyTask;
 
 		public TriggerTask(File sourceIndexDir, File destination) {
@@ -161,7 +161,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		}
 
 		public void run() {
-			if (!copyTask.inProgress) {
+			if ( ! copyTask.inProgress ) {
 				executor.execute( copyTask );
 			}
 			else {
@@ -234,13 +234,13 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			directory1.close();
 		}
 		catch (Exception e) {
-			log.error( "Unable to property close Lucene directory {}" + directory1.getFile(), e );
+			log.error( "Unable to properly close Lucene directory {}" + directory1.getFile(), e );
 		}
 		try {
 			directory2.close();
 		}
 		catch (Exception e) {
-			log.error( "Unable to property close Lucene directory {}" + directory2.getFile(), e );
+			log.error( "Unable to properly close Lucene directory {}" + directory2.getFile(), e );
 		}
 	}
 }

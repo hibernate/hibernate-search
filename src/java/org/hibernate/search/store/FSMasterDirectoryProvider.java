@@ -4,7 +4,7 @@ package org.hibernate.search.store;
 import java.util.Timer;
 import java.util.Properties;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.io.File;
@@ -127,13 +127,13 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			directory.close();
 		}
 		catch (Exception e) {
-			log.error( "Unable to property close Lucene directory {}" + directory.getFile(), e );
+			log.error( "Unable to properly close Lucene directory {}" + directory.getFile(), e );
 		}
 	}
 
 	class TriggerTask extends TimerTask {
 
-		private final ExecutorService executor;
+		private final Executor executor;
 		private final FSMasterDirectoryProvider.CopyDirectory copyTask;
 
 		public TriggerTask(File source, File destination, DirectoryProvider directoryProvider) {
@@ -142,7 +142,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		}
 
 		public void run() {
-			if (!copyTask.inProgress) {
+			if ( ! copyTask.inProgress ) {
 				executor.execute( copyTask );
 			}
 			else {

@@ -3,7 +3,6 @@ package org.hibernate.search.test.worker;
 
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.Session;
-import org.hibernate.annotations.common.AssertionFailure;
 
 /**
  * @author Emmanuel Bernard

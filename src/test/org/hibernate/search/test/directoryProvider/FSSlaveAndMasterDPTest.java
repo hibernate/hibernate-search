@@ -10,12 +10,8 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.event.PostDeleteEventListener;
-import org.hibernate.event.PostInsertEventListener;
-import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.util.FileHelper;
 
 /**
@@ -93,7 +89,6 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 			sf.close();
 		}
 	}
-
 
 	protected void setUp() throws Exception {
 		File base = new File(".");

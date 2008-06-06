@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
-import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 			directory.close();
 		}
 		catch (Exception e) {
-			log.error( "Unable to property close Lucene directory {}" + directory.getFile(), e );
+			log.error( "Unable to properly close Lucene directory {}" + directory.getFile(), e );
 		}
 	}
 
