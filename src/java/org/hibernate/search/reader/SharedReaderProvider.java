@@ -306,7 +306,7 @@ public class SharedReaderProvider implements ReaderProvider {
 		perDirectoryProviderManipulationLocks = Collections.unmodifiableMap( perDirectoryProviderManipulationLocks );
 	}
 
-	private class ReaderData {
+	private static class ReaderData {
 
 		public ReaderData(int semaphore, DirectoryProvider provider) {
 			this.semaphore = semaphore;

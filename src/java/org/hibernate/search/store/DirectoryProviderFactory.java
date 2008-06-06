@@ -258,7 +258,7 @@ public class DirectoryProviderFactory {
 		}
 	}
 
-	public class DirectoryProviders {
+	public static class DirectoryProviders {
 		private final IndexShardingStrategy shardingStrategy;
 		private final DirectoryProvider[] providers;
 

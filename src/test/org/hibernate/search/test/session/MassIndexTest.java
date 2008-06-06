@@ -1,6 +1,7 @@
 //$Id$
 package org.hibernate.search.test.session;
 
+import java.sql.Statement;
 import java.util.List;
 import java.util.Iterator;
 
@@ -29,8 +30,10 @@ public class MassIndexTest extends SearchTestCase {
 		Transaction tx = s.beginTransaction();
 		int loop = 14;
 		for (int i = 0; i < loop; i++) {
-			s.connection().createStatement().executeUpdate( "insert into Email(id, title, body, header) values( + "
+			Statement statmt = s.connection().createStatement();
+			statmt.executeUpdate( "insert into Email(id, title, body, header) values( + "
 					+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope')" );
+			statmt.close();
 		}
 		tx.commit();
 		s.close();
@@ -83,10 +86,14 @@ public class MassIndexTest extends SearchTestCase {
 
 		s = new FullTextSessionImpl( openSession() );
 		s.getTransaction().begin();
-		s.connection().createStatement().executeUpdate( "update Email set body='Meet the guys who write the software'" );
+		Statement stmt = s.connection().createStatement();
+		stmt.executeUpdate( "update Email set body='Meet the guys who write the software'" );
+		stmt.close();
 		//insert an object never indexed
-		s.connection().createStatement().executeUpdate( "insert into Email(id, title, body, header) values( + "
+		stmt = s.connection().createStatement();
+		stmt.executeUpdate( "insert into Email(id, title, body, header) values( + "
 				+ ( loop + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope')" );
+		stmt.close();
 		s.getTransaction().commit();
 		s.close();
 
@@ -109,7 +116,7 @@ public class MassIndexTest extends SearchTestCase {
 		s = Search.createFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		//object never indexed
-		Email email = (Email) s.get( Email.class, new Long( loop + 1 ) );
+		Email email = (Email) s.get( Email.class, Long.valueOf( loop + 1 ) );
 		s.index( email );
 		tx.commit();
 		s.close();

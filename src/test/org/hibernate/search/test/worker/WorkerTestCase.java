@@ -67,7 +67,7 @@ public class WorkerTestCase extends SearchTestCase {
 				.currentTimeMillis() - start ) );
 	}
 
-	protected class Work implements Runnable {
+	protected static class Work implements Runnable {
 		private SessionFactory sf;
 		public volatile int count = 0;
 
@@ -132,7 +132,7 @@ public class WorkerTestCase extends SearchTestCase {
 		}
 	}
 
-	protected class ReverseWork implements Runnable {
+	protected static class ReverseWork implements Runnable {
 		private SessionFactory sf;
 
 		public ReverseWork(SessionFactory sf) {

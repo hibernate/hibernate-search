@@ -165,7 +165,7 @@ public class ReaderPerfTestCase extends SearchTestCase {
 		}
 	}
 
-	protected class ReverseWork implements Runnable {
+	protected static class ReverseWork implements Runnable {
 		private SessionFactory sf;
 		private Random random = new Random();
 

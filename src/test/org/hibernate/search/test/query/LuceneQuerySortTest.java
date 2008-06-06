@@ -41,7 +41,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 		// into the index.
 		int id = 1;
 		for(Book b : result) {
-			assertEquals("Expected another id", new Integer(id), b.getId());
+			assertEquals( "Expected another id", Integer.valueOf( id ), b.getId() );
 			id++;
 		}
 
@@ -55,7 +55,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 		assertEquals( "Wrong number of test results.", 3, result.size() );
 		id = 3;
 		for(Book b : result) {
-			assertEquals("Expected another id", new Integer(id), b.getId());
+			assertEquals("Expected another id", Integer.valueOf( id ), b.getId());
 			id--;
 		}
 

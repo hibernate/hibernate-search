@@ -75,7 +75,7 @@ public class FSDirectoryTest extends SearchTestCase {
 
 		s = getSessions().openSession();
 		s.getTransaction().begin();
-		Document entity = (Document) s.get( Document.class, new Long( 1 ) );
+		Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
 		entity.setSummary( "Object/relational mapping with EJB3" );
 		s.persist( new Document( "Seam in Action", "", "blah blah blah blah" ) );
 		s.getTransaction().commit();

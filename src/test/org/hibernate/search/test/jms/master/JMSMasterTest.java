@@ -2,6 +2,7 @@
 package org.hibernate.search.test.jms.master;
 
 import java.io.Serializable;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jms.ObjectMessage;
@@ -43,9 +44,11 @@ public class JMSMasterTest extends SearchTestCase {
 		//create an object wo trigggering indexing
 		Session s = openSession( );
 		s.getTransaction().begin();
-		s.connection().createStatement().executeUpdate(
+		Statement statement = s.connection().createStatement();
+		statement.executeUpdate(
 				"insert into TShirt_Master(id, logo, size) values( '1', 'JBoss balls', 'large')"
 		);
+		statement.close();
 		TShirt ts = (TShirt) s.get(TShirt.class, 1);
 		s.getTransaction().commit();
 		s.close();
