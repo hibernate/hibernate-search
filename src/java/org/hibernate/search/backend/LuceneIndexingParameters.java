@@ -28,8 +28,6 @@ public class LuceneIndexingParameters implements Serializable {
 
 	private static final long serialVersionUID = 5424606407623591663L;
 	
-	private final Logger log = LoggerFactory.getLogger( LuceneIndexingParameters.class );
-	
 	// value keyword
 	public static final String EXPLICIT_DEFAULT_VALUE = "default";
 	// property path keywords
@@ -47,12 +45,14 @@ public class LuceneIndexingParameters implements Serializable {
 		Properties transactionProps = new MaskedProperty( indexingParameters, TRANSACTION );
 		//get keys for "batch" (defaulting to transaction)
 		Properties batchProps = new MaskedProperty( indexingParameters, BATCH, transactionProps ); //TODO to close HSEARCH-201 just remove 3° parameter
-		transactionIndexParameters = new ParameterSet( transactionProps, TRANSACTION );
-		batchIndexParameters = new ParameterSet( batchProps, BATCH );
-		doSanityChecks( transactionIndexParameters, batchIndexParameters );
+		//logger only used during object construction: (logger not serializable).
+		Logger log = LoggerFactory.getLogger( LuceneIndexingParameters.class );
+		transactionIndexParameters = new ParameterSet( transactionProps, TRANSACTION, log );
+		batchIndexParameters = new ParameterSet( batchProps, BATCH, log );
+		doSanityChecks( transactionIndexParameters, batchIndexParameters, log );
 	}
 
-	private void doSanityChecks(ParameterSet transParams, ParameterSet batchParams) {
+	private void doSanityChecks(ParameterSet transParams, ParameterSet batchParams, Logger log) {
 		if ( log.isWarnEnabled() ) {
 			Integer maxFieldLengthTransaction = transParams.parameters.get( MAX_FIELD_LENGTH );
 			Integer maxFieldLengthBatch = transParams.parameters.get( MAX_FIELD_LENGTH );
@@ -77,13 +77,13 @@ public class LuceneIndexingParameters implements Serializable {
 		return batchIndexParameters;
 	}
 
-	public class ParameterSet implements Serializable {
+	public static class ParameterSet implements Serializable {
 		
 		private static final long serialVersionUID = -6121723702279869524L;
 		
 		final Map<IndexWriterSetting, Integer> parameters = new EnumMap<IndexWriterSetting, Integer>(IndexWriterSetting.class);
 		
-		public ParameterSet(Properties prop, String paramName) {
+		public ParameterSet(Properties prop, String paramName, Logger log) {
 			//don't iterate on property entries as we know all the keys:
 			for ( IndexWriterSetting t : IndexWriterSetting.values() ) {
 				String key = t.getKey();
@@ -127,6 +127,32 @@ public class LuceneIndexingParameters implements Serializable {
 			}
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((parameters == null) ? 0 : parameters.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			final ParameterSet other = (ParameterSet) obj;
+			if (parameters == null) {
+				if (other.parameters != null)
+					return false;
+			} else if (!parameters.equals(other.parameters))
+				return false;
+			return true;
+		}
+		
  	}
 
 	public void applyToWriter(IndexWriter writer, boolean batch) {

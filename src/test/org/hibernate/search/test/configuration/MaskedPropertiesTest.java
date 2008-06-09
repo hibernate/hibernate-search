@@ -1,8 +1,10 @@
 package org.hibernate.search.test.configuration;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.hibernate.search.backend.configuration.MaskedProperty;
+import org.hibernate.search.test.SerializationTestHelper;
 
 /**
  * @author Sanne Grinovero
@@ -35,6 +37,16 @@ public class MaskedPropertiesTest extends junit.framework.TestCase {
 		assertEquals( "7" , newStyleTransaction.getProperty( "max_field_length" ) );
 		assertEquals( "7" , newStyleTransactionInShard2.getProperty( "max_field_length" ) );
 		assertEquals( "5" , transaction.getProperty( "max_merge_docs" ) );
+	}
+	
+	public void testSerializability() throws IOException, ClassNotFoundException {
+		Properties cfg = new Properties();
+		cfg.setProperty( "base.key", "value" );
+		MaskedProperty originalProps = new MaskedProperty( cfg, "base" );
+		MaskedProperty theCopy = (MaskedProperty)
+			SerializationTestHelper.duplicateBySerialization( originalProps );
+		//this is also testing the logger (transient) has been restored:
+		assertEquals( "value", theCopy.getProperty( "key" ) );
 	}
 	
 }

@@ -146,7 +146,7 @@ public class DirectoryProviderHelper {
 	}
 
 	/**
-	 * Users may configure the number of KB to use as
+	 * Users may configure the number of MB to use as
 	 * "chunk size" for large file copy operations performed
 	 * by DirectoryProviders.
 	 * @param directoryProviderName

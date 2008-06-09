@@ -1,6 +1,11 @@
 package org.hibernate.search.test.configuration;
 
+import java.io.IOException;
+import java.util.Properties;
+
+import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.test.Document;
+import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_BUFFERED_DOCS;
@@ -83,6 +88,14 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 	public void testDefaultKeywordOverwritesInherited() throws Exception {
 		assertValueIsDefault( Document.class, TRANSACTION, RAM_BUFFER_SIZE );
 		assertValueIsDefault( Document.class, TRANSACTION, RAM_BUFFER_SIZE );
+	}
+	
+	public void testSerializability() throws IOException, ClassNotFoundException {
+		LuceneIndexingParameters param = new LuceneIndexingParameters( new Properties() );
+		LuceneIndexingParameters paramCopy = (LuceneIndexingParameters)
+			SerializationTestHelper.duplicateBySerialization( param );
+		assertEquals(param.getBatchIndexParameters(), paramCopy.getBatchIndexParameters());
+		assertEquals(param.getTransactionIndexParameters(), paramCopy.getTransactionIndexParameters());
 	}
 	
 	protected Class[] getMappings() {

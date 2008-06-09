@@ -2,6 +2,8 @@ package org.hibernate.search.backend.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -29,7 +31,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	
 	private static final long serialVersionUID = -593307257383085113L;
 	
-	private final Logger log = LoggerFactory.getLogger( MaskedProperty.class );
+	private transient Logger log = LoggerFactory.getLogger( MaskedProperty.class );
 	private final Properties masked;
 	private final Properties fallBack;
 	private final String radix;
@@ -342,6 +344,16 @@ public class MaskedProperty extends Properties implements Serializable {
 		if ( ! radix.equals( other.radix ) )
 			return false;
 		return true;
+	}
+	
+	private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
+		//always perform the default de-serialization first
+		aInputStream.defaultReadObject();
+		log = LoggerFactory.getLogger( MaskedProperty.class );
+	}
+
+	private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
+		aOutputStream.defaultWriteObject();
 	}
 	
 }
