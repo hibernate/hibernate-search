@@ -26,7 +26,7 @@ import org.hibernate.search.util.FileHelper;
 /**
  * @author Emmanuel Bernard
  */
-public class ReaderPerfTestCase extends SearchTestCase {
+public abstract class ReaderPerfTestCase extends SearchTestCase {
 	protected void setUp() throws Exception {
 		File sub = getBaseIndexDir();
 		sub.mkdir();
@@ -221,7 +221,7 @@ public class ReaderPerfTestCase extends SearchTestCase {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
-		cfg.setProperty( "hibernate.search.Clock.directory_provider", FSDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
