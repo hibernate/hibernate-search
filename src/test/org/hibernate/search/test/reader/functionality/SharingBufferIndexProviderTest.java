@@ -1,12 +1,18 @@
 package org.hibernate.search.test.reader.functionality;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.lucene.index.IndexReader;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.reader.functionality.TestableSharingBufferReaderProvider.MockIndexReader;
+import org.hibernate.search.test.reader.functionality.TestableSharingBufferReaderProvider.TestManipulatorPerDP;
 
 import junit.framework.TestCase;
 
@@ -21,24 +27,27 @@ public class SharingBufferIndexProviderTest extends TestCase {
 	private final Runnable changeTask = new ChangeTask();
 	private final AtomicInteger countDoneSearches = new AtomicInteger();
 	private final AtomicInteger countDoneIndexmods = new AtomicInteger();
-	private static final int SEARCHES_NUM = 5000;
+	private static final int SEARCHES_NUM = 50000;
+	private static final Random random = new Random();
 	
 	public void testStressingMock() throws InterruptedException {
+		readerProvider.initialize(null, null);
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( 200 );//much chaos
 		for ( int i = 0; i < SEARCHES_NUM; i++ ) {
 			executor.execute( makeTask( i ) );
 		}
 		executor.shutdown();
 		startSignal.countDown();
-		executor.awaitTermination( 15, TimeUnit.SECONDS );
-		assertTrue( "memory leak: holding a reference to some unused IndexReader", readerProvider.isMapEmpty() );
-		MockIndexReader openReader = readerProvider.fakeOpenReader();
+		executor.awaitTermination( 500, TimeUnit.SECONDS );
+		assertTrue( "memory leak: holding a reference to some unused IndexReader", readerProvider.areAllOldReferencesGone() );
 		for ( MockIndexReader reader : readerProvider.getCreatedIndexReaders() ) {
-			if ( reader != openReader ) {
+			if ( readerProvider.isReaderCurrent( reader ) ) {
+				assertTrue( "the most current reader should be open", ! reader.isClosed() );
+			}
+			else {
 				assertTrue( "an IndexReader is still open", reader.isClosed() );
 			}
 		}
-		assertTrue( "the most current reader should be open", ! openReader.isClosed() );
 		assertEquals( SEARCHES_NUM, countDoneSearches.get() );
 		assertEquals( SEARCHES_NUM/10, countDoneIndexmods.get() );
 	}
@@ -52,6 +61,18 @@ public class SharingBufferIndexProviderTest extends TestCase {
 		}
 	}
 	
+	private DirectoryProvider[] getRandomEvailableDPs() {
+		int arraySize = random.nextInt( readerProvider.manipulators.size() - 1 ) + 1;
+		DirectoryProvider[] array = new DirectoryProvider[arraySize];
+		List<DirectoryProvider> availableDPs = new ArrayList<DirectoryProvider>( readerProvider.manipulators.keySet() );
+		for (int i=0; i<arraySize; i++){
+			int chosenDpIndex = random.nextInt( availableDPs.size() );
+			array[i] = availableDPs.get( chosenDpIndex );
+			availableDPs.remove( array[i] );
+		}
+		return array;
+	}
+	
 	private class SearchTask implements Runnable {
 		public void run() {
 			try {
@@ -60,7 +81,7 @@ public class SharingBufferIndexProviderTest extends TestCase {
 				//manage termination:
 				return;
 			}
-			MockIndexReader fakeOpenReader = readerProvider.fakeOpenReader();
+			IndexReader fakeOpenReader = readerProvider.openReader( getRandomEvailableDPs() );
 			Thread.yield();
 			readerProvider.closeReader( fakeOpenReader );
 			countDoneSearches.incrementAndGet();
@@ -71,7 +92,11 @@ public class SharingBufferIndexProviderTest extends TestCase {
 		public void run() {
 			super.run();
 			Thread.yield();
-			readerProvider.setToDirtyState();
+			DirectoryProvider[] randomEvailableDPs = getRandomEvailableDPs();
+			for ( DirectoryProvider dp : randomEvailableDPs ) {
+				TestManipulatorPerDP testManipulatorPerDP = readerProvider.manipulators.get( dp );
+				testManipulatorPerDP.setIndexChanged();
+			}
 			countDoneIndexmods.incrementAndGet();
 		}
 	}

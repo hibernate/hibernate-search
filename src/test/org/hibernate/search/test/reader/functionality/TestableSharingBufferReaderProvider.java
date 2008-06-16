@@ -2,69 +2,129 @@ package org.hibernate.search.test.reader.functionality;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.index.TermFreqVector;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.reader.ReaderProviderHelper;
 import org.hibernate.search.reader.SharingBufferReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.RAMDirectoryProvider;
 
 /**
  * @author Sanne Grinovero
  */
 public class TestableSharingBufferReaderProvider extends SharingBufferReaderProvider {
 	
-	private final AtomicBoolean isIndexReaderCurrent = new AtomicBoolean( false );//starts at true, see MockIndexReader contructor
-	private final AtomicBoolean factoryCalled = new AtomicBoolean( false );
+	private static final int NUM_DIRECTORY_PROVIDERS = 4;
 	private final Vector<MockIndexReader> createdReadersHistory = new Vector<MockIndexReader>( 500 );
-	private final MockIndexReader firstIndexReader = new MockIndexReader();
+	final Map<DirectoryProvider,TestManipulatorPerDP> manipulators = new ConcurrentHashMap<DirectoryProvider,TestManipulatorPerDP>();
 	
+	public TestableSharingBufferReaderProvider() {
+		for (int i=0; i<NUM_DIRECTORY_PROVIDERS; i++) {
+			TestManipulatorPerDP tm = new TestManipulatorPerDP( i );
+			manipulators.put( tm.dp, tm );
+		}
+	}
+	
+	public static class TestManipulatorPerDP {
+		private final AtomicBoolean isIndexReaderCurrent = new AtomicBoolean( false );//starts at true, see MockIndexReader contructor
+		private final AtomicBoolean isReaderCreated = new AtomicBoolean( false );
+		private final DirectoryProvider dp = new RAMDirectoryProvider();
+		
+		public TestManipulatorPerDP( int seed ) {
+			dp.initialize( "dp" + seed, null, null );
+			dp.start();
+		}
+		
+		public void setIndexChanged() {
+			isIndexReaderCurrent.set( false );
+		}
+		
+	}
+	
+	public boolean isReaderCurrent(MockIndexReader reader) {
+		//avoid usage of allReaders or test would be useless
+		for (PerDirectoryLatestReader latest : super.currentReaders.values() ) {
+			IndexReader latestReader = latest.current.reader;
+			if ( latestReader == reader) {
+				return true;
+			}
+		}
+		return false;
+	}
+		
 	@Override
-	protected IndexReader readerFactory(int length, IndexReader[] readers) {
-		if ( factoryCalled.compareAndSet( false, true) ) {
-			return firstIndexReader;
+	protected IndexReader readerFactory(DirectoryProvider provider) {
+		TestManipulatorPerDP manipulatorPerDP = manipulators.get( provider );
+		if ( ! manipulatorPerDP.isReaderCreated.compareAndSet( false, true ) ) {
+			throw new IllegalStateException( "IndexReader1 created twice" );
 		}
 		else {
-			throw new IllegalStateException( "factory for reader called more than once" );
+			return new MockIndexReader( manipulatorPerDP.isIndexReaderCurrent );
 		}
 	}
 	
-	public void setToDirtyState() {
-		isIndexReaderCurrent.set( false );
+	@Override
+	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
+		Map<DirectoryProvider,PerDirectoryLatestReader> map = new HashMap<DirectoryProvider,PerDirectoryLatestReader>();
+		try {
+			for ( DirectoryProvider dp : manipulators.keySet() ) {
+				map.put( dp, new PerDirectoryLatestReader( dp ) );
+			}
+		} catch (IOException e) {
+			throw new SearchException( "Unable to open Lucene IndexReader", e );
+		}
+		currentReaders = Collections.unmodifiableMap( map );
 	}
 	
-	public boolean isMapEmpty(){
-		return super.oldReaders.isEmpty();
+	public boolean areAllOldReferencesGone() {
+		int numReferencesReaders = super.allReaders.size();
+		int numExpectedActiveReaders = manipulators.size();
+		return numReferencesReaders == numExpectedActiveReaders;
 	}
 	
 	public List<MockIndexReader> getCreatedIndexReaders(){
 		return createdReadersHistory;
 	}
 	
-	public MockIndexReader fakeOpenReader() {
-//		System.out.println( "tracking "+oldReaders.size() + " old readers." );
-		return (MockIndexReader) super.openReader( new DirectoryProvider[0] );
+	public MockIndexReader getCurrentMockReaderPerDP(DirectoryProvider dp) {
+		IndexReader[] indexReaders = ReaderProviderHelper.getSubReadersFromMultiReader( (MultiReader) super.openReader( new DirectoryProvider[]{ dp } ) );
+		if ( indexReaders.length != 1 ){
+			throw new IllegalStateException( "Expecting one reader" );
+		}
+		return (MockIndexReader) indexReaders[0];
 	}
 	
 	public class MockIndexReader extends IndexReader {
 		
 		private final AtomicBoolean closed = new AtomicBoolean( false );
 		private final AtomicBoolean hasAlreadyBeenReOpened = new AtomicBoolean( false );
+		private final AtomicBoolean isIndexReaderCurrent;
 		
-		MockIndexReader(){
-			createdReadersHistory.add( this );
+		MockIndexReader(AtomicBoolean isIndexReaderCurrent) {
+			this.isIndexReaderCurrent = isIndexReaderCurrent;
 			if ( ! isIndexReaderCurrent.compareAndSet(false, true) ) {
 				throw new IllegalStateException( "Unnecessarily reopened" );
 			}
+			createdReadersHistory.add( this );
 		}
 		
 		public final boolean isClosed() {
@@ -73,11 +133,11 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 		
 		@Override
 		protected void doClose() throws IOException {
-			boolean okToClose = closed.compareAndSet(false, true);
+			boolean okToClose = closed.compareAndSet( false, true );
 			if ( ! okToClose ) {
 				throw new IllegalStateException( "Attempt to close a closed IndexReader" );
 			}
-			if ( ! hasAlreadyBeenReOpened.get() ){
+			if ( ! hasAlreadyBeenReOpened.get() ) {
 				throw new IllegalStateException( "Attempt to close the most current IndexReader" );
 			}
 		}
@@ -89,7 +149,7 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 			}
 			else {
 				if ( hasAlreadyBeenReOpened.compareAndSet( false, true) ) {
-					return new MockIndexReader();
+					return new MockIndexReader( isIndexReaderCurrent );
 				}
 				else
 					throw new IllegalStateException( "Attempt to reopen an old IndexReader more than once" );
@@ -153,7 +213,7 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 
 		@Override
 		public boolean hasDeletions() {
-			throw new UnsupportedOperationException();
+			return false;//just something to make MultiReader constructor happy
 		}
 
 		@Override
@@ -163,7 +223,7 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 
 		@Override
 		public int maxDoc() {
-			throw new UnsupportedOperationException();
+			return 10;//just something to make MultiReader constructor happy
 		}
 
 		@Override

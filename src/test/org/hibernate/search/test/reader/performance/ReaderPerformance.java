@@ -31,11 +31,11 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	//more iterations for more reliable measures:
 	private static final int TOTAL_WORK_BATCHES = 1000;
 	//the next 3 define the kind of workload mix to test on:
-	private static final int SEARCHERS_PER_BATCH = 20;
+	private static final int SEARCHERS_PER_BATCH = 10;
 	private static final int UPDATES_PER_BATCH = 2;
 	private static final int INSERTIONS_PER_BATCH = 1;
 
-	private static final int WORKER_THREADS = 20;
+	private static final int WORKER_THREADS = 30;
 	
 	protected void setUp() throws Exception {
 		baseIndexDir.mkdir();
@@ -78,7 +78,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 //		FileHelper.delete( baseIndexDir );
 	}
 	
-	protected final void configure(org.hibernate.cfg.Configuration cfg) {
+	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		cfg.setProperty( "hibernate.search.default.indexBase", baseIndexDir.getAbsolutePath() );
@@ -89,8 +89,8 @@ public abstract class ReaderPerformance extends SearchTestCase {
 
 	protected abstract String getReaderStrategyName();
 	
-	//this test is disabled as it is very slow (and you should read the resulting numbers)
-	public final void no_testPerformance() throws InterruptedException{
+	//this test is disabled as it is very slow (and someone should read the output)
+	public final void disabled_testPerformance() throws InterruptedException{
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		CountDownLatch startSignal = new CountDownLatch(1);
 		InsertActivity insertionTask = new InsertActivity( getSessions(), startSignal );

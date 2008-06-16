@@ -1,17 +1,19 @@
 package org.hibernate.search.reader;
 
-import static org.hibernate.search.reader.ReaderProviderHelper.buildMultiReader;
-import static org.hibernate.search.reader.ReaderProviderHelper.clean;
-
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.MultiReader;
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
@@ -19,182 +21,209 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * As does SharedReaderProvider this also shares IndexReaders as long as they are "current";
+ * main difference with SharedReaderProvider is the way to update the Readers when needed:
+ * this uses IndexReader.reopen() which should improve performance on larger indexes
+ * as it shares buffers with previous IndexReader generation for the segments which didn't change.
+ * Current drawbacks are: need of Lucene > 2.3.0 and less mature (experimental).
+ * 
  * @author Sanne Grinovero
  */
 public class SharingBufferReaderProvider implements ReaderProvider {
 	
-	//contains last updated Reader; protected by lockOnOpenLatest.
-	private volatile ReaderUsagePair current;
+	/**
+	 * contains all Readers (most current per DP and all unclosed old) 
+	 */
+	//TODO ConcurrentHashMap's constructor could benefit from some hints as arguments.
+	protected final Map<IndexReader,ReaderUsagePair> allReaders = new ConcurrentHashMap<IndexReader,ReaderUsagePair>( 100 );
 	
-	private final Lock lockOnOpenLatest = new ReentrantLock();
+	/**
+	 * contains last updated Reader; protected by lockOnOpenLatest (in the values)
+	 */
+	protected Map<DirectoryProvider,PerDirectoryLatestReader> currentReaders;
 	
-	//contains all older Readers:
-	protected final Map<IndexReader,ReaderUsagePair> oldReaders = new ConcurrentHashMap<IndexReader,ReaderUsagePair>();
-	
-	private final Logger log = LoggerFactory.getLogger ( SharingBufferReaderProvider.class );
+	private final Logger log = LoggerFactory.getLogger( SharingBufferReaderProvider.class );
 
-	public void closeReader(IndexReader reader) {
-		if ( reader == current.reader ) {
-			boolean closeit;
-			lockOnOpenLatest.lock();
-			try {
-				if ( reader == current.reader ){
-					current.usageCounter.getAndDecrement();	
-					closeit = false;
-				}
-				else {
-					closeit = true;
-				}
-			}
-			finally {
-				lockOnOpenLatest.unlock();
-			}
-			if ( closeit ) {
-				closeOldReader( reader );
-			}
+	public void closeReader(IndexReader multiReader) {
+		if ( multiReader == null ) return;
+		IndexReader[] readers;
+		if ( multiReader instanceof MultiReader ) {
+			readers = (IndexReader[]) ReaderProviderHelper.getSubReadersFromMultiReader( (MultiReader) multiReader );
 		}
 		else {
-			closeOldReader( reader );
+			throw new AssertionFailure( "Everything should be wrapped in a MultiReader" );
 		}
-		printState();
-	}
-
-	private void closeOldReader(IndexReader reader) {
-		try {
-			ReaderUsagePair pair = oldReaders.get( reader );
-			boolean closed = pair.close(); //also testing "assert pair!=null";
-			if ( closed ) {
-				//not longer needed, so remove references:
-				oldReaders.remove( reader );
-				log.trace( "IndexReader closed." );
-			}
-			else {
-				log.trace( "Closing of IndexReader skipped: still being used." );
-			}
+		log.trace( "Closing MultiReader: {}", multiReader );
+		for ( IndexReader reader : readers ) {
+			ReaderUsagePair container = allReaders.get( reader );
+			container.close();//virtual
 		}
-		catch (IOException e) {
-			log.warn( "Unable to close Lucene IndexReader", e );
-			//remove references anyway:
-			oldReaders.remove( reader );
-		}
+		log.trace( "IndexReader closed." );
 	}
 
 	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
-		//FIXME initialize currentReaderContainer here instead of lazy
+		Map<DirectoryProvider,PerDirectoryLatestReader> map = new HashMap<DirectoryProvider,PerDirectoryLatestReader>();
+		Set<DirectoryProvider> providers = searchFactoryImplementor.getLockableDirectoryProviders().keySet();
+		for ( DirectoryProvider provider : providers ) {
+			try {
+				map.put( provider, new PerDirectoryLatestReader( provider ) );
+			} catch (IOException e) {
+				throw new SearchException( "Unable to open Lucene IndexReader", e );
+			}
+		}
+		//FIXME I'm not convinced this non-final fields are safe without locks, but I may be wrong.
+		currentReaders = Collections.unmodifiableMap( map );
 	}
 
 	public IndexReader openReader(DirectoryProvider... directoryProviders) {
 		boolean trace = log.isTraceEnabled();
-		if ( trace ) log.trace( "Opening IndexReader for directoryProviders: {}", directoryProviders );
-		IndexReader toReturn;
-		lockOnOpenLatest.lock();
-		try {
-			if ( current == null ) { //FIXME move this case to initialize
-				current = initialReaderOpening( directoryProviders );
-				log.trace( "IndexReader initialized." );
-			}
-			else {
-				reopenIndexreader();
-			}
-			toReturn = current.reader; //choose reader before unlock
-		} finally {
-			lockOnOpenLatest.unlock();
-		}
-		printState();
-		return toReturn;
-	}
-	
-	private void reopenIndexreader() {
-		// we own the lock
-		IndexReader before = current.reader;
-		IndexReader updatedReader;
-		try {
-			updatedReader = before.reopen();
-		} catch (IOException e) {
-			throw new SearchException( "Unable to reopen IndexReader", e );
-		}
-		if ( before == updatedReader ) {
-			current.incrementUseCounter();
-		}
-		else { //store the old one for close() functionality.
-			int useCount = current.usageCounter.get();
-			if ( useCount != 0 ) {
-				oldReaders.put( before, current );
-			}
-			else {
-				//or close it if nobody uses.
-				try {
-					current.reader.close();
-				} catch (IOException e) {
-					log.warn( "Unable to close Lucene IndexReader", e );
-				}
-			}
-			current = new ReaderUsagePair( updatedReader );
-		}
-	}
-	
-	public final void printState(){
-		if ( log.isTraceEnabled())
-			log.trace( "Current "+ current + " older:" + oldReaders.values() );
-	}
-
-	private ReaderUsagePair initialReaderOpening(DirectoryProvider[] directoryProviders) {
-		// we own the lock
-		final int length = directoryProviders.length;
+		int length = directoryProviders.length;
 		IndexReader[] readers = new IndexReader[length];
-		try {
-			for (int index = 0; index < length; index++) {
-				readers[index] = IndexReader.open( directoryProviders[index].getDirectory() );
+		if ( trace ) log.trace( "Opening IndexReader for directoryProviders: {}", length );
+		for (int index = 0; index < length; index++) {
+			DirectoryProvider directoryProvider = directoryProviders[index];
+			if ( trace ) log.trace( "Opening IndexReader from {}", directoryProvider.getDirectory() );
+			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directoryProvider );
+			readers[index] = directoryLatestReader.refreshAndGet();
+		}
+		// don't use ReaderProviderHelper.buildMultiReader as we need our own cleanup.
+		if ( length == 0 ) {
+			return null;
+		}
+		else {
+			try {
+				return new CacheableMultiReader( readers );
+			}
+			catch (Exception e) {
+				//Lucene 2.2 used to throw IOExceptions here
+				for ( IndexReader ir : readers ) {
+					ReaderUsagePair readerUsagePair = allReaders.get( ir );
+					readerUsagePair.close();
+				}
+				throw new SearchException( "Unable to open a MultiReader", e );
 			}
 		}
-		catch (IOException e) {
-			//TODO more contextual info
-			clean( new SearchException( "Unable to open one of the Lucene indexes", e ), readers );
-		}
-		IndexReader iR = readerFactory( length, readers );
-		return new ReaderUsagePair( iR );
 	}
 	
 	//overridable method for testability:
-	protected IndexReader readerFactory(int length, IndexReader[] readers) {
-		return buildMultiReader( length, readers );
+	protected IndexReader readerFactory(DirectoryProvider provider) throws IOException {
+		return IndexReader.open( provider.getDirectory() );
 	}
 
-	protected static class ReaderUsagePair {
-		protected final IndexReader reader;
-		protected final AtomicInteger usageCounter;
+	/**
+	 * Container for the couple IndexReader,UsageCounter.
+	 */
+	protected final class ReaderUsagePair {
+		
+		public final IndexReader reader;
+		/**
+		 * When reaching 0 (always test on change) the reader should be really
+		 * closed and then discarded.
+		 * Starts at 2 because:
+		 * first usage token is artificial: means "current" is not to be closed (+1)
+		 * additionally when creating it will be used (+1)
+		 */
+		protected final AtomicInteger usageCounter = new AtomicInteger( 2 );
 		
 		ReaderUsagePair(IndexReader r) {
 			reader = r;
-			usageCounter = new AtomicInteger( 1 );
 		}
 		
-		void incrementUseCounter() {
-			usageCounter.incrementAndGet();
-		}
-		
-		public int getUsageCount(){
-			return usageCounter.get();
-		}
-
 		/**
-		 * @return true when really closing the underlying IndexReader
-		 * @throws IOException
+		 * closes the IndexReader if no other resource is using it;
+		 * in this case the reference to this container will also be removed.
 		 */
-		private boolean close() throws IOException {
-			int count = usageCounter.decrementAndGet();
-			if ( count == 0 ) {
-				reader.close();
-				return true;
+		public void close() {
+			int refCount = usageCounter.decrementAndGet();
+			if ( refCount==0  ) {
+				//TODO I've been experimenting with the idea of an async-close: didn't appear to have an interesting benefit,
+				//so discarded the code. should try with bigger indexes to see if the effect gets more impressive.
+				ReaderUsagePair removed = allReaders.remove( reader );//remove ourself
+				try {
+					reader.close();
+				} catch (IOException e) {
+					log.warn( "Unable to close Lucene IndexReader", e );
+				}
+				assert removed != null;
 			}
-			assert count >= 0;
-			return false;
+			else if ( refCount<0 ) {
+				//doesn't happen with current code, could help spotting future bugs?
+				throw new AssertionFailure( "Closing an IndexReader for which you didn't own a lock-token, or somebody else which didn't own closed already." );
+			}
 		}
 		
 		public String toString(){
-			return "Reader:"+this.hashCode()+" count="+usageCounter.get();
+			return "Reader:" + this.hashCode() + " ref.count=" + usageCounter.get();
 		}
 		
 	}
+	
+	/**
+	 * An instance for each DirectoryProvider,
+	 * establishing the association between "current" ReaderUsagePair
+	 * for a DirectoryProvider and it's lock.
+	 */
+	protected final class PerDirectoryLatestReader {
+		
+		/**
+		 * Reference to the most current IndexReader for a DirectoryProvider;
+		 * guarded by lockOnReplaceCurrent;
+		 */
+		public ReaderUsagePair current; //guarded by lockOnReplaceCurrent 
+		private final Lock lockOnReplaceCurrent = new ReentrantLock();
+		
+		/**
+		 * @param provider The DirectoryProvider for which we manage the IndexReader.
+		 * @throws IOException when the index initialization fails.
+		 */
+		public PerDirectoryLatestReader(DirectoryProvider provider) throws IOException {
+			IndexReader reader = readerFactory( provider );
+			ReaderUsagePair initialPair = new ReaderUsagePair( reader );
+			initialPair.usageCounter.set( 1 );//a token to mark as active (preventing real close).
+			lockOnReplaceCurrent.lock();//no harm, just ensuring safe publishing.
+			current = initialPair;
+			lockOnReplaceCurrent.unlock();
+			allReaders.put( reader, initialPair );
+		}
 
+		/**
+		 * Gets an updated IndexReader for the current DirectoryProvider;
+		 * the index status will be checked.
+		 * @return the current IndexReader if it's in sync with underlying index, a new one otherwise.
+		 */
+		public IndexReader refreshAndGet() {
+			ReaderUsagePair previousCurrent;
+			IndexReader updatedReader;
+			lockOnReplaceCurrent.lock();
+			try {
+				IndexReader beforeUpdateReader = current.reader;
+				try {
+					updatedReader = beforeUpdateReader.reopen();
+				} catch (IOException e) {
+					throw new SearchException( "Unable to reopen IndexReader", e );
+				}
+				if ( beforeUpdateReader == updatedReader ) {
+					previousCurrent = null;
+					current.usageCounter.incrementAndGet();
+				}
+				else {
+					ReaderUsagePair newPair = new ReaderUsagePair( updatedReader );
+					//no need to increment usageCounter in newPair, as it is constructed with correct number 2.
+					assert newPair.usageCounter.get() == 2;
+					previousCurrent = current;
+					current = newPair;
+					allReaders.put( updatedReader, newPair );//unfortunately still needs lock
+				}
+			} finally {
+				lockOnReplaceCurrent.unlock();
+			}
+			// doesn't need lock:
+			if ( previousCurrent != null ) {
+				previousCurrent.close();// release a token as it's not the current any more.
+			}
+			return updatedReader;
+		}
+		
+	}
+	
 }
