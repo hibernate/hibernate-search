@@ -48,7 +48,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		if ( multiReader == null ) return;
 		IndexReader[] readers;
 		if ( multiReader instanceof MultiReader ) {
-			readers = (IndexReader[]) ReaderProviderHelper.getSubReadersFromMultiReader( (MultiReader) multiReader );
+			readers = ReaderProviderHelper.getSubReadersFromMultiReader( (MultiReader) multiReader );
 		}
 		else {
 			throw new AssertionFailure( "Everything should be wrapped in a MultiReader" );
