@@ -2,7 +2,6 @@
 package org.hibernate.search.reader;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class SharedReaderProvider implements ReaderProvider {
-	private static Field subReadersField;
 	private final Logger log = LoggerFactory.getLogger ( SharedReaderProvider.class );
 	/**
 	 * nonfair lock. Need to be acquired on indexReader acquisition or release (semaphore)
@@ -151,7 +149,7 @@ public class SharedReaderProvider implements ReaderProvider {
 				if ( outOfDateReader != null ) {
 					ReaderData readerData = searchIndexReaderSemaphores.get( outOfDateReader );
 					if ( readerData == null ) {
-						closeOutOfDateReader = false; //already removed by another prevous thread
+						closeOutOfDateReader = false; //already removed by another previous thread
 					}
 					else if ( readerData.semaphore == 0 ) {
 						searchIndexReaderSemaphores.remove( outOfDateReader );
@@ -211,12 +209,7 @@ public class SharedReaderProvider implements ReaderProvider {
 		IndexReader[] readers;
 		//TODO should it be CacheableMultiReader? Probably no
 		if ( reader instanceof MultiReader ) {
-			try {
-				readers = (IndexReader[]) subReadersField.get( reader );
-			}
-			catch (IllegalAccessException e) {
-				throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not accessible", e );
-			}
+			readers = ReaderProviderHelper.getSubReadersFromMultiReader( (MultiReader) reader );
 			if ( trace ) log.trace( "Closing MultiReader: {}", reader );
 		}
 		else {
@@ -289,15 +282,6 @@ public class SharedReaderProvider implements ReaderProvider {
 	}
 
 	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
-		if ( subReadersField == null ) {
-			try {
-				subReadersField = MultiReader.class.getDeclaredField( "subReaders" );
-				if ( !subReadersField.isAccessible() ) subReadersField.setAccessible( true );
-			}
-			catch (NoSuchFieldException e) {
-				throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not accessible", e );
-			}
-		}
 		Set<DirectoryProvider> providers = searchFactoryImplementor.getLockableDirectoryProviders().keySet();
 		perDirectoryProviderManipulationLocks = new HashMap<DirectoryProvider, Lock>( providers.size() );
 		for (DirectoryProvider dp : providers) {

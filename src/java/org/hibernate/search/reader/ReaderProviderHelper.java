@@ -2,10 +2,12 @@
 package org.hibernate.search.reader;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.Searchable;
@@ -15,6 +17,28 @@ import org.hibernate.search.SearchException;
  * @author Emmanuel Bernard
  */
 public abstract class ReaderProviderHelper {
+	
+	private static final Field subReadersField = getSubReadersField();
+	
+	private static Field getSubReadersField() {
+		try {
+			Field field = MultiReader.class.getDeclaredField( "subReaders" );
+			if ( ! field.isAccessible() ) field.setAccessible( true );
+			return field;
+		}
+		catch (NoSuchFieldException e) {
+			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not available", e );
+		}
+	}
+	
+	public static IndexReader[] getSubReadersFromMultiReader(MultiReader parentReader) {
+		try {
+			return (IndexReader[]) subReadersField.get( parentReader );
+		} catch (IllegalAccessException e) {
+			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not accessible", e );
+		}
+	}
+	
 	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	public static IndexReader buildMultiReader(int length, IndexReader[] readers) {
 		if ( length == 0 ) {
