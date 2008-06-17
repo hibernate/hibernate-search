@@ -35,7 +35,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	 * contains all Readers (most current per DP and all unclosed old) 
 	 */
 	//TODO ConcurrentHashMap's constructor could benefit from some hints as arguments.
-	protected final Map<IndexReader,ReaderUsagePair> allReaders = new ConcurrentHashMap<IndexReader,ReaderUsagePair>( 100 );
+	protected final Map<IndexReader,ReaderUsagePair> allReaders = new ConcurrentHashMap<IndexReader,ReaderUsagePair>();
 	
 	/**
 	 * contains last updated Reader; protected by lockOnOpenLatest (in the values)
@@ -53,7 +53,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		else {
 			throw new AssertionFailure( "Everything should be wrapped in a MultiReader" );
 		}
-		log.trace( "Closing MultiReader: {}", multiReader );
+		log.debug( "Closing MultiReader: {}", multiReader );
 		for ( IndexReader reader : readers ) {
 			ReaderUsagePair container = allReaders.get( reader );
 			container.close();//virtual
@@ -76,13 +76,14 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	}
 
 	public IndexReader openReader(DirectoryProvider... directoryProviders) {
-		boolean trace = log.isTraceEnabled();
 		int length = directoryProviders.length;
 		IndexReader[] readers = new IndexReader[length];
-		if ( trace ) log.trace( "Opening IndexReader for directoryProviders: {}", length );
-		for (int index = 0; index < length; index++) {
+		log.debug( "Opening IndexReader for directoryProviders: {}", length );
+		for ( int index = 0; index < length; index++ ) {
 			DirectoryProvider directoryProvider = directoryProviders[index];
-			if ( trace ) log.trace( "Opening IndexReader from {}", directoryProvider.getDirectory() );
+			if ( log.isTraceEnabled() ) {
+				log.trace( "Opening IndexReader from {}", directoryProvider.getDirectory() );
+			}
 			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directoryProvider );
 			readers[index] = directoryLatestReader.refreshAndGet();
 		}
