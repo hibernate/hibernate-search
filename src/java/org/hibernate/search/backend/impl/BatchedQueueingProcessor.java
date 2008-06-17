@@ -20,6 +20,7 @@ import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.WorkQueue;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilder;
@@ -50,16 +51,12 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		this.sync = !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
 
 		//default to a simple asynchronous operation
-		int min = Integer.parseInt(
-				properties.getProperty( Environment.WORKER_THREADPOOL_SIZE, "1" ).trim()
-		);
+		int min = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
 		//no queue limit
-		int queueSize = Integer.parseInt(
-				properties.getProperty( Environment.WORKER_WORKQUEUE_SIZE, Integer.toString( Integer.MAX_VALUE ) ).trim()
-		);
-		batchSize = Integer.parseInt(
-				properties.getProperty( Environment.WORKER_BATCHSIZE, "0" ).trim()
-		);
+		int queueSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE );
+
+		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_BATCHSIZE, 0 );
+
 		if ( !sync ) {
 			/**
 			 * choose min = max with a sizable queue to be able to

@@ -94,11 +94,8 @@ public enum IndexWriterSetting implements Serializable {
 	 * @throws SearchException for unrecognized values
 	 */
 	public Integer parseVal(String value) {
-		try {
-			return Integer.valueOf( value );
-		} catch (NumberFormatException ne) {
-			throw new SearchException( "Invalid value for " + cfgKey + ": " + value );
-		}
+		return ConfigurationParseHelper.parseInt( value,
+				"Invalid value for " + cfgKey + ": " + value );
 	}
 	
 }

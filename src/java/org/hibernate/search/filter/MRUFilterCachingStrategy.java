@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import org.apache.lucene.search.Filter;
 import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.util.SoftLimitMRUCache;
 
 /**
@@ -16,23 +16,12 @@ import org.hibernate.util.SoftLimitMRUCache;
  * @author Emmanuel Bernard
  */
 public class MRUFilterCachingStrategy implements FilterCachingStrategy {
-	private static final String DEFAULT_SIZE = "128";
+	private static final int DEFAULT_SIZE = 128;
 	private SoftLimitMRUCache cache;
 	private static final String SIZE = Environment.FILTER_CACHING_STRATEGY + ".size";
 
 	public void initialize(Properties properties) {
-		int size;
-		try {
-			size = Integer.parseInt(
-					properties.getProperty( SIZE, DEFAULT_SIZE )
-			);
-		}
-		catch (NumberFormatException nfe) {
-			throw new SearchException(
-					"Unable to parse " + SIZE + ": " + properties.getProperty( SIZE, DEFAULT_SIZE ), nfe
-			);
-		}
-
+		int size = ConfigurationParseHelper.getIntValue( properties, SIZE, DEFAULT_SIZE );
 		cache = new SoftLimitMRUCache( size );
 	}
 

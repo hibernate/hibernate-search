@@ -6,9 +6,9 @@ import java.io.IOException;
 
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.SearchException;
-import org.hibernate.annotations.common.util.StringHelper;
 import org.apache.lucene.index.IndexWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,15 +28,8 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 
 	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, SearchFactoryImplementor searchFactoryImplementor) {
 		this.directoryProvider = directoryProvider;
-		String maxString = indexProperties.getProperty( "optimizer.operation_limit.max" );
-		if ( StringHelper.isNotEmpty( maxString ) ) {
-			operationMax = Integer.parseInt( maxString );
-		}
-
-		maxString = indexProperties.getProperty( "optimizer.transaction_limit.max" );
-		if ( StringHelper.isNotEmpty( maxString ) ) {
-			transactionMax = Integer.parseInt( maxString );
-		}
+		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
+		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );
 	}
 
 	public void optimizationForced() {

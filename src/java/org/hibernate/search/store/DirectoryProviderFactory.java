@@ -13,6 +13,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
@@ -208,14 +209,7 @@ public class DirectoryProviderFactory {
 			return new Properties[] { directoryLocalProperties };
 		} else {
 			// count shards
-			int shardsCount;
-			{
-				try {
-					shardsCount = Integer.parseInt( shardsCountValue );
-				} catch (NumberFormatException e) {
-						throw new SearchException( shardsCountValue + " is not a number", e);
-				}
-			}
+			int shardsCount = ConfigurationParseHelper.parseInt( shardsCountValue, shardsCountValue + " is not a number" );
 			// create shard-specific Props
 			Properties[] shardLocalProperties = new Properties[shardsCount];
 			for ( int i = 0; i < shardsCount; i++ ) {
