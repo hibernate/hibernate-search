@@ -54,4 +54,15 @@ public class TransactionalWorker implements Worker {
 		queueingProcessor.close();
 	}
 
+	public void flushWorks(EventSource session) {
+		if ( session.isTransactionInProgress() ) {
+			Transaction transaction = session.getTransaction();
+			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
+					synchronizationPerTransaction.get( transaction );
+			if ( txSync != null && ! txSync.isConsumed() ) {
+				txSync.flushWorks();
+			}
+		}
+	}
+
 }

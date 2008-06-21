@@ -32,7 +32,7 @@ public class SessionTest extends SearchTestCase {
 		        wrapper
 			);
 		try {
-			FullTextSession fts = Search.createFullTextSession( wrapped );
+			Search.createFullTextSession( wrapped );
 		}
 		catch( ClassCastException e ) {
 			e.printStackTrace( );
@@ -57,7 +57,8 @@ public class SessionTest extends SearchTestCase {
 
 	protected Class[] getMappings() {
 		return new Class[] {
-				Email.class
+				Email.class,
+				Domain.class
 		};
 	}
 }

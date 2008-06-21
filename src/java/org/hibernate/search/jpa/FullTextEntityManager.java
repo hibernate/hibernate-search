@@ -50,4 +50,10 @@ public interface FullTextEntityManager extends EntityManager {
 	 */
 	public void purgeAll(Class entityType);
 
+	/**
+	 * flush index change
+	 * Force Hibernate Search to apply all changes to the index no waiting for the batch limit
+	 */
+	public void flushToIndexes();
+
 }

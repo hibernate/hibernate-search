@@ -22,4 +22,9 @@ public interface Worker {
 	 * This method can return exceptions
 	 */
 	void close();
+
+	/**
+	 * flush any work queue
+	 */
+	void flushWorks(EventSource session);
 }

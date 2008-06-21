@@ -50,4 +50,10 @@ public interface FullTextSession extends Session {
 	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
 	public void purgeAll(Class entityType);
+
+	/**
+	 * flush full text changes to the index
+	 * Force Hibernate Search to apply all changes to the index no waiting for the batch limit
+	 */
+	public void flushToIndexes();
 }

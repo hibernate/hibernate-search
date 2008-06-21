@@ -84,7 +84,8 @@ public class OptimizeTest extends SearchTestCase {
 
 	protected Class[] getMappings() {
 		return new Class[] {
-				Email.class
+				Email.class,
+				Domain.class
 		};
 	}
 }

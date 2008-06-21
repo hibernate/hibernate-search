@@ -56,4 +56,10 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 			if (queuePerTransaction != null) queuePerTransaction.removeValue( this ); 
 		}
 	}
+
+	public void flushWorks() {
+		WorkQueue subQueue = queue.splitQueue();
+		queueingProcessor.prepareWorks( subQueue );
+		queueingProcessor.performWorks( subQueue );
+	}
 }

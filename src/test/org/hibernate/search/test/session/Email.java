@@ -4,11 +4,14 @@ package org.hibernate.search.test.session;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
  * @author Emmanuel Bernard
@@ -28,6 +31,16 @@ public class Email {
 
 	private String header;
 
+	@IndexedEmbedded @ManyToOne(fetch = FetchType.LAZY)
+	private Domain domain;
+
+	public Domain getDomain() {
+		return domain;
+	}
+
+	public void setDomain(Domain domain) {
+		this.domain = domain;
+	}
 
 	public Long getId() {
 		return id;

@@ -31,8 +31,10 @@ public class MassIndexTest extends SearchTestCase {
 		int loop = 14;
 		for (int i = 0; i < loop; i++) {
 			Statement statmt = s.connection().createStatement();
-			statmt.executeUpdate( "insert into Email(id, title, body, header) values( + "
-					+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope')" );
+			statmt.executeUpdate( "insert into Domain(id, name) values( + "
+					+ ( i + 1 ) + ", 'sponge" + i + "')" );
+			statmt.executeUpdate( "insert into Email(id, title, body, header, domain_id) values( + "
+					+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope', " + ( i + 1 ) +")" );
 			statmt.close();
 		}
 		tx.commit();
@@ -60,6 +62,7 @@ public class MassIndexTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
+
 
 	public void testTransactional() throws Exception {
 		FullTextSession s = Search.createFullTextSession( openSession() );
@@ -192,7 +195,8 @@ public class MassIndexTest extends SearchTestCase {
 		return new Class[] {
 				Email.class,
 				Entite.class,
-				Categorie.class
+				Categorie.class,
+				Domain.class
 		};
 	}
 }

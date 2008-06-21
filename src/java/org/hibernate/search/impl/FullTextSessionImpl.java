@@ -92,6 +92,11 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		purge( entityType, null );
 	}
 
+	public void flushToIndexes() {
+		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
+		searchFactoryImplementor.getWorker().flushWorks(eventSource);
+	}
+
 	/**
 	 * Remove a particular entity from a particular class of an index.
 	 *

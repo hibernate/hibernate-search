@@ -77,6 +77,10 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		getFullTextSession().purgeAll( entityType );
 	}
 
+	public void flushToIndexes() {
+		getFullTextSession().flushToIndexes();
+	}
+
 
 	public void persist(Object entity) {
 		em.persist( entity );
