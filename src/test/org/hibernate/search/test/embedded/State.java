@@ -1,26 +1,23 @@
-//$Id$
+// $Id:$
 package org.hibernate.search.test.embedded;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.DocumentId;
 
 /**
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 @Entity
-public class Author {
+public class State {
 	@Id
 	@GeneratedValue
-	@DocumentId
 	private Integer id;
-	@Field(index= Index.TOKENIZED)
+	
+	@Field
 	private String name;
-
 
 	public Integer getId() {
 		return id;

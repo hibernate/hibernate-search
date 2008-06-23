@@ -1,6 +1,7 @@
 //$Id$
 package org.hibernate.search.test.embedded;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -22,6 +23,7 @@ import org.hibernate.search.test.SearchTestCase;
 /**
  * @author Emmanuel Bernard
  */
+@SuppressWarnings("unchecked")
 public class EmbeddedTest extends SearchTestCase {
 
 	public void testEmbeddedIndexing() throws Exception {
@@ -91,6 +93,38 @@ public class EmbeddedTest extends SearchTestCase {
 		s.close();
 
 	}
+	
+	public void testEmbeddedIndexingOneToMany() throws Exception {
+		Country country = new Country();
+		country.setName("Germany");
+		List states = new ArrayList<State>();
+		State bayern = new State();
+		bayern.setName("Bayern");
+		State hessen = new State();
+		hessen.setName("Hessen");
+		State sachsen = new State();
+		sachsen.setName("Sachsen");
+		states.add(bayern);
+		states.add(hessen);
+		states.add(sachsen);
+		country.setStates(states);
+
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( country );
+		tx.commit();
+
+
+		FullTextSession session = Search.createFullTextSession( s );
+		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		Query query;
+		List result;
+
+		query = parser.parse( "states.name:Hessen" );
+		result = session.createFullTextQuery( query ).list();
+		assertEquals( "unable to find property in embedded", 1, result.size() );
+		s.close();
+	}	
 
 	public void testContainedIn() throws Exception {
 		Tower tower = new Tower();
@@ -251,7 +285,8 @@ public class EmbeddedTest extends SearchTestCase {
 				Product.class,
 				Order.class,
 				Author.class,
-				Country.class
+				Country.class,
+				State.class
 		};
 	}
 }
