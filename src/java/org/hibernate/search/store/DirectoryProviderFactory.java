@@ -47,7 +47,7 @@ import org.hibernate.util.StringHelper;
 public class DirectoryProviderFactory {
 	
 	private final List<DirectoryProvider<?>> providers = new ArrayList<DirectoryProvider<?>>();
-	private static String DEFAULT_DIRECTORY_PROVIDER = FSDirectoryProvider.class.getName();
+	private static final String DEFAULT_DIRECTORY_PROVIDER = FSDirectoryProvider.class.getName();
 	
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
@@ -149,8 +149,8 @@ public class DirectoryProviderFactory {
 			configureIndexingParameters( searchFactoryImplementor, indexProps, provider );
 			providers.add( provider );
 			searchFactoryImplementor.addClassToDirectoryProvider(entity, provider);
-			if ( !searchFactoryImplementor.getLockableDirectoryProviders().containsKey( provider ) ) {
-				searchFactoryImplementor.getLockableDirectoryProviders().put( provider, new ReentrantLock() );
+			if ( ! searchFactoryImplementor.getDirectoryProviders().contains( provider ) ) {
+				searchFactoryImplementor.addDirectoryProvider( provider );
 			}
 			return provider;
 		}

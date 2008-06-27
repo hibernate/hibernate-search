@@ -169,7 +169,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			long start = System.currentTimeMillis();
 			inProgress = true;
 			if ( directoryProviderLock == null ) {
-				directoryProviderLock = searchFactory.getLockableDirectoryProviders().get( directoryProvider );
+				directoryProviderLock = searchFactory.getDirectoryProviderLock( directoryProvider );
 				directoryProvider = null;
 				searchFactory = null; //get rid of any useless link (help hot redeployment?)
 			}

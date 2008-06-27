@@ -4,7 +4,7 @@ package org.hibernate.search.backend;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
@@ -189,7 +189,7 @@ public class Workspace {
 	private class DPWorkspace {
 		
 		private final DirectoryProvider directoryProvider;
-		private final ReentrantLock lock;
+		private final Lock lock;
 		
 		private IndexReader reader;
 		private IndexWriter writer;
@@ -199,7 +199,7 @@ public class Workspace {
 		
 		DPWorkspace(DirectoryProvider dp) {
 			this.directoryProvider = dp;
-			this.lock = searchFactoryImplementor.getLockableDirectoryProviders().get( dp );
+			this.lock = searchFactoryImplementor.getDirectoryProviderLock( dp );
 		}
 		
 		public boolean needsOptimization() {

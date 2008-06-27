@@ -3,7 +3,7 @@ package org.hibernate.search.engine;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
@@ -26,8 +26,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	Map<Class, DocumentBuilder<Object>> getDocumentBuilders();
 
-	Map<DirectoryProvider, ReentrantLock> getLockableDirectoryProviders();
-
 	Worker getWorker();
 
 	void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy);
@@ -49,4 +47,11 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	void addClassToDirectoryProvider(Class clazz, DirectoryProvider<?> directoryProvider);
 
 	Set<Class> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider);
+
+	Set<DirectoryProvider> getDirectoryProviders();
+
+	Lock getDirectoryProviderLock(DirectoryProvider dp);
+
+	void addDirectoryProvider(DirectoryProvider<?> provider);
+	
 }

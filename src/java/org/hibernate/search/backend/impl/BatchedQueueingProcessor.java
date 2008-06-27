@@ -38,14 +38,13 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	private static final Logger log = LoggerFactory.getLogger( BatchedQueueingProcessor.class );
 
-	private boolean sync;
-	private int batchSize;
-	private ExecutorService executorService;
-	private BackendQueueProcessorFactory backendQueueProcessorFactory;
-	private SearchFactoryImplementor searchFactoryImplementor;
+	private final boolean sync;
+	private final int batchSize;
+	private final ExecutorService executorService;
+	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
+	private final SearchFactoryImplementor searchFactoryImplementor;
 
-	public BatchedQueueingProcessor(SearchFactoryImplementor searchFactoryImplementor,
-									Properties properties) {
+	public BatchedQueueingProcessor(SearchFactoryImplementor searchFactoryImplementor, Properties properties) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		//default to sync if none defined
 		this.sync = !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
@@ -70,6 +69,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 					new LinkedBlockingQueue<Runnable>(queueSize),
 					new ThreadPoolExecutor.CallerRunsPolicy()
 			);
+		}
+		else {
+			executorService = null;
 		}
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {

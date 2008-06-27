@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -60,29 +62,25 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		Version.touch();
 	}
 
-	private static final Logger log = LoggerFactory.getLogger( SearchFactoryImpl.class );
+	private final Logger log = LoggerFactory.getLogger( SearchFactoryImpl.class );
 
 	private final Map<Class, DocumentBuilder<Object>> documentBuilders = new HashMap<Class, DocumentBuilder<Object>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
-	//TODO move the ReentrantLock into DirectoryProviderData.lock, add a getDPLock(DP) and add a Set<DP> getDirectoryProviders() method.
-	private final Map<DirectoryProvider, ReentrantLock> lockableDirectoryProviders =
-			new HashMap<DirectoryProvider, ReentrantLock>();
-	private final Map<DirectoryProvider, DirectoryProviderData> dirProviderData =
-			new HashMap<DirectoryProvider, DirectoryProviderData>();
-	private Worker worker;
-	private ReaderProvider readerProvider;
+	private final Map<DirectoryProvider, DirectoryProviderData> dirProviderData = new HashMap<DirectoryProvider, DirectoryProviderData>();
+	private final Worker worker;
+	private final ReaderProvider readerProvider;
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
 	private final Map<String, FilterDef> filterDefinitions = new HashMap<String, FilterDef>();
-	private FilterCachingStrategy filterCachingStrategy;
+	private final FilterCachingStrategy filterCachingStrategy;
 	private Map<String, Analyzer> analyzers;
-	private boolean stopped = false;
+	private final AtomicBoolean stopped = new AtomicBoolean( false );
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
 	 */
 	private Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams =
 		new HashMap<DirectoryProvider, LuceneIndexingParameters>();
-	private String indexingStrategy;
+	private final String indexingStrategy;
 
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
@@ -97,24 +95,24 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public SearchFactoryImpl(Configuration cfg) {
 		//yuk
 		ReflectionManager reflectionManager = getReflectionManager( cfg );
-		setIndexingStrategy(cfg); //need to be done before the document builds
-		InitContext context = new InitContext(cfg);
-		initDocumentBuilders(cfg, reflectionManager, context );
+		this.indexingStrategy = defineIndexingStrategy( cfg ); //need to be done before the document builds
+		initDocumentBuilders( cfg, reflectionManager );
 
 		Set<Class> indexedClasses = documentBuilders.keySet();
 		for (DocumentBuilder builder : documentBuilders.values()) {
 			builder.postInitialize( indexedClasses );
 		}
-		worker = WorkerFactory.createWorker( cfg, this );
-		readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
-		buildFilterCachingStrategy( cfg.getProperties() );
+		this.worker = WorkerFactory.createWorker( cfg, this );
+		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
+		this.filterCachingStrategy = buildFilterCachingStrategy( cfg.getProperties() );
 	}
 
-	private void setIndexingStrategy(Configuration cfg) {
-		indexingStrategy = cfg.getProperties().getProperty( Environment.INDEXING_STRATEGY, "event" );
+	private static String defineIndexingStrategy(Configuration cfg) {
+		String indexingStrategy = cfg.getProperties().getProperty( Environment.INDEXING_STRATEGY, "event" );
 		if ( ! ("event".equals( indexingStrategy ) || "manual".equals( indexingStrategy ) ) ) {
-			throw new SearchException(Environment.INDEXING_STRATEGY + " unknown: " + indexingStrategy);
+			throw new SearchException( Environment.INDEXING_STRATEGY + " unknown: " + indexingStrategy );
 		}
+		return indexingStrategy;
 	}
 
 	public String getIndexingStrategy() {
@@ -122,8 +120,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public void close() {
-		if (!stopped) {
-			stopped = true;
+		if ( stopped.compareAndSet( false, true) ) {
 			try {
 				worker.close();
 			}
@@ -131,7 +128,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				log.error( "Worker raises an exception on close()", e );
 			}
 			//TODO move to DirectoryProviderFactory for cleaner
-			for (DirectoryProvider dp : lockableDirectoryProviders.keySet() ) {
+			for (DirectoryProvider dp : getDirectoryProviders() ) {
 				try {
 					dp.stop();
 				}
@@ -223,7 +220,6 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		SearchFactoryImpl searchFactory = contextMap.get( cfg );
 		if ( searchFactory == null ) {
 			searchFactory = new SearchFactoryImpl( cfg );
-
 			contextMap.put( cfg, searchFactory );
 		}
 		return searchFactory;
@@ -234,8 +230,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return documentBuilders;
 	}
 
-	public Map<DirectoryProvider, ReentrantLock> getLockableDirectoryProviders() {
-		return lockableDirectoryProviders;
+	public Set<DirectoryProvider> getDirectoryProviders() {
+		return this.dirProviderData.keySet();
 	}
 
 	public Worker getWorker() {
@@ -272,7 +268,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		ReflectionManager reflectionManager;
 		try {
 			//TODO introduce a ReflectionManagerHolder interface to avoid reflection
-			//I want to avoid hard link between HAN and Validator for usch a simple need
+			//I want to avoid hard link between HAN and Validator for such a simple need
 			//reuse the existing reflectionManager one when possible
 			reflectionManager =
 					(ReflectionManager) cfg.getClass().getMethod( "getReflectionManager" ).invoke( cfg );
@@ -311,11 +307,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return analyzer;
 	}
 
-	private void initDocumentBuilders(Configuration cfg, ReflectionManager reflectionManager, InitContext context) {
+	private void initDocumentBuilders(Configuration cfg, ReflectionManager reflectionManager) {
+		InitContext context = new InitContext( cfg );
 		Iterator iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
-		while (iter.hasNext()) {
+		while ( iter.hasNext() ) {
 			PersistentClass clazz = (PersistentClass) iter.next();
 			Class<?> mappedClass = clazz.getMappedClass();
 			if (mappedClass != null) {
@@ -340,7 +337,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		factory.startDirectoryProviders();
 	}
 
-	private void buildFilterCachingStrategy(Properties properties) {
+	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {
+		FilterCachingStrategy filterCachingStrategy;
 		String impl = properties.getProperty( Environment.FILTER_CACHING_STRATEGY );
 		if ( StringHelper.isEmpty( impl ) || "mru".equalsIgnoreCase( impl ) ) {
 			filterCachingStrategy = new MRUFilterCachingStrategy();
@@ -361,6 +359,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			}
 		}
 		filterCachingStrategy.initialize( properties );
+		return filterCachingStrategy;
 	}
 
 	public FilterCachingStrategy getFilterCachingStrategy() {
@@ -372,7 +371,17 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	private static class DirectoryProviderData {
+		public final Lock dirLock = new ReentrantLock();
 		public OptimizerStrategy optimizerStrategy;
 		public Set<Class> classes = new HashSet<Class>(2);
 	}
+
+	public Lock getDirectoryProviderLock(DirectoryProvider dp) {
+		return this.dirProviderData.get( dp ).dirLock;
+	}
+
+	public void addDirectoryProvider(DirectoryProvider<?> provider) {
+		this.dirProviderData.put( provider, new DirectoryProviderData() );
+	}
+	
 }

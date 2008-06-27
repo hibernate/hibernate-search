@@ -29,13 +29,15 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	private static final File baseIndexDir = new File( new File( "." ), "indextemp" );
 	
 	//more iterations for more reliable measures:
-	private static final int TOTAL_WORK_BATCHES = 1000;
+	private static final int TOTAL_WORK_BATCHES = 10;
 	//the next 3 define the kind of workload mix to test on:
 	private static final int SEARCHERS_PER_BATCH = 10;
 	private static final int UPDATES_PER_BATCH = 2;
 	private static final int INSERTIONS_PER_BATCH = 1;
 
-	private static final int WORKER_THREADS = 30;
+	private static final int WORKER_THREADS = 20;
+
+	private static final int WARMUP_CYCLES = 6;
 	
 	protected void setUp() throws Exception {
 		baseIndexDir.mkdir();
@@ -44,8 +46,6 @@ public abstract class ReaderPerformance extends SearchTestCase {
 			FileHelper.delete( file );
 		}
 		super.setUp();
-		//enable this line:
-//		buildBigIndex();
 	}
 	
 	public void testFakeTest(){
@@ -53,15 +53,17 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	}
 
 	private void buildBigIndex() throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
+		System.out.println( "Going to create fake index..." );
 		FSDirectory directory = FSDirectory.getDirectory(new File(baseIndexDir, Detective.class.getCanonicalName()));
 		IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
-		for (int batch=0; batch<=100000; batch++){
+		for (int batch=0; batch<=5000000; batch++){
 			executor.execute( filler );
 		}
 		executor.shutdown();
 		executor.awaitTermination( 600, TimeUnit.SECONDS );
+		iw.optimize();
 		iw.close();
 		System.out.println( "Index created." );
 	}
@@ -75,7 +77,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
-//		FileHelper.delete( baseIndexDir );
+		FileHelper.delete( baseIndexDir );
 	}
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
@@ -90,7 +92,14 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	protected abstract String getReaderStrategyName();
 	
 	//this test is disabled as it is very slow (and someone should read the output)
-	public final void disabled_testPerformance() throws InterruptedException{
+	public final void disabled_testPerformance() throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
+		buildBigIndex();
+		for (int i=0; i<WARMUP_CYCLES; i++) {
+			timeMs();
+		}
+	}
+	
+	private final void timeMs() throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		CountDownLatch startSignal = new CountDownLatch(1);
 		InsertActivity insertionTask = new InsertActivity( getSessions(), startSignal );

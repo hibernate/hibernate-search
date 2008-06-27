@@ -63,7 +63,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 
 	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
 		Map<DirectoryProvider,PerDirectoryLatestReader> map = new HashMap<DirectoryProvider,PerDirectoryLatestReader>();
-		Set<DirectoryProvider> providers = searchFactoryImplementor.getLockableDirectoryProviders().keySet();
+		Set<DirectoryProvider> providers = searchFactoryImplementor.getDirectoryProviders();
 		for ( DirectoryProvider provider : providers ) {
 			try {
 				map.put( provider, new PerDirectoryLatestReader( provider ) );

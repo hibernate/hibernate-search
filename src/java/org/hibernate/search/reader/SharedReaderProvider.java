@@ -282,7 +282,7 @@ public class SharedReaderProvider implements ReaderProvider {
 	}
 
 	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
-		Set<DirectoryProvider> providers = searchFactoryImplementor.getLockableDirectoryProviders().keySet();
+		Set<DirectoryProvider> providers = searchFactoryImplementor.getDirectoryProviders();
 		perDirectoryProviderManipulationLocks = new HashMap<DirectoryProvider, Lock>( providers.size() );
 		for (DirectoryProvider dp : providers) {
 			perDirectoryProviderManipulationLocks.put( dp, new ReentrantLock() );

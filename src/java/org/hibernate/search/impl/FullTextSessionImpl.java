@@ -43,7 +43,6 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentBuilder;
@@ -153,9 +152,9 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		//need to add elements in a queue kept at the Session level
 		//the queue will be processed by a Lucene(Auto)FlushEventListener
 		//note that we could keep this queue somewhere in the event listener in the mean time but that requires
-		// a synchronized hashmap holding this queue on a per session basis plus some session house keeping (yuk)
-		//an other solution would be to subclass SessionImpl instead of having this LuceneSession delecation model
-		// this is an open discussion
+		//a synchronized hashmap holding this queue on a per session basis plus some session house keeping (yuk)
+		//another solution would be to subclass SessionImpl instead of having this LuceneSession delegation model
+		//this is an open discussion
 	}
 
 	public SearchFactory getSearchFactory() {
