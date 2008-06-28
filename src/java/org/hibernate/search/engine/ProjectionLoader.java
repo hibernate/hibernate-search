@@ -10,6 +10,7 @@ import org.hibernate.transform.ResultTransformer;
 /**
  * @author Emmanuel Bernard
  */
+//TODO change the underlying ObjectLoader to a MutliClassesQueryLoader
 public class ProjectionLoader implements Loader {
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Session session;

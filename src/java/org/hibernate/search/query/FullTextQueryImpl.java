@@ -43,10 +43,10 @@ import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.Loader;
-import org.hibernate.search.engine.ObjectLoader;
 import org.hibernate.search.engine.ProjectionLoader;
 import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.MultiClassesQueryLoader;
 import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.reader.ReaderProvider;
@@ -185,15 +185,16 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			return loader;
 		}
 		else if ( classes.length == 1 ) {
-			QueryLoader loader = new QueryLoader();
+			final QueryLoader loader = new QueryLoader();
 			loader.init( session, searchFactoryImplementor );
 			loader.setEntityType( classes[0] );
 			return loader;
 		}
 		else {
-			final ObjectLoader objectLoader = new ObjectLoader();
-			objectLoader.init( session, searchFactoryImplementor );
-			return objectLoader;
+			final MultiClassesQueryLoader loader = new MultiClassesQueryLoader();
+			loader.init( session, searchFactoryImplementor );
+			loader.setEntityTypes( classes );
+			return loader;
 		}
 	}
 

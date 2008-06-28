@@ -21,22 +21,7 @@ public class ObjectLoader implements Loader {
 	}
 
 	public Object load(EntityInfo entityInfo) {
-		//be sure to get an initialized object but save from ONFE and ENFE
-		Object maybeProxy = session.load( entityInfo.clazz, entityInfo.id );
-		try {
-			Hibernate.initialize( maybeProxy );
-		}
-		catch (RuntimeException e) {
-			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
-				log.debug( "Object found in Search index but not in database: {} with id {}",
-						entityInfo.clazz, entityInfo.id );
-				maybeProxy = null;
-			}
-			else {
-				throw e;
-			}
-		}
-		return maybeProxy;
+		return ObjectLoaderHelper.load( entityInfo, session );
 	}
 
 	public List load(EntityInfo... entityInfos) {

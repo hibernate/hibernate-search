@@ -47,6 +47,7 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.BinderHelper;
@@ -81,7 +82,13 @@ public class DocumentBuilder<T> {
 	private int maxLevel = Integer.MAX_VALUE;
 	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
 	private Similarity similarity;
+	private boolean isRoot;
+	//if composite id, use of (a, b) in ((1,2), (3,4)) fails on most database
+	private boolean safeFromTupleId;
 
+	public boolean isRoot() {
+		return isRoot;
+	}
 
 	public DocumentBuilder(XClass clazz, InitContext context, DirectoryProvider[] directoryProviders,
 						   IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
@@ -103,6 +110,9 @@ public class DocumentBuilder<T> {
 		if ( idKeywordName == null ) {
 			throw new SearchException( "No document id in: " + clazz.getName() );
 		}
+		//if composite id, use of (a, b) in ((1,2)TwoWayString2FieldBridgeAdaptor, (3,4)) fails on most database
+		//a TwoWayString2FieldBridgeAdaptor is never a composite id  
+		safeFromTupleId = TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
 	}
 
 	private Analyzer getAnalyzer(XAnnotatedElement annotatedElement, InitContext context) {
@@ -788,12 +798,29 @@ public class DocumentBuilder<T> {
 		for (Class currentClass : indexedClasses) {
 			if ( plainClass.isAssignableFrom( currentClass ) ) tempMappedSubclasses.add( currentClass );
 		}
-		mappedSubclasses = Collections.unmodifiableSet( tempMappedSubclasses );
+		this.mappedSubclasses = Collections.unmodifiableSet( tempMappedSubclasses );
+		Class superClass = plainClass.getSuperclass();
+		this.isRoot = true;
+		while ( superClass != null) {
+			if ( indexedClasses.contains( superClass ) ) {
+				this.isRoot = false;
+				break;
+			}
+			superClass = superClass.getSuperclass();
+		}
 	}
 
 
 	public Set<Class> getMappedSubclasses() {
 		return mappedSubclasses;
+	}
+
+	/**
+	 * Make sure to return false if there is a risk of composite id
+	 * if composite id, use of (a, b) in ((1,2), (3,4)) fails on most database
+	 */
+	public boolean isSafeFromTupleId() {
+		return safeFromTupleId;
 	}
 
 	private static class PropertiesMetadata {

@@ -17,7 +17,7 @@ import org.apache.lucene.search.Query;
 /**
  * @author Emmanuel Bernard
  */
-public class ObjectLoaderTest extends SearchTestCase {
+public class MultiClassesQueryLoaderTest extends SearchTestCase {
 
 	public void testObjectNotFound() throws Exception {
 		Session sess = openSession();
