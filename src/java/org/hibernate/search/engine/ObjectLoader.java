@@ -3,6 +3,7 @@ package org.hibernate.search.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
@@ -25,6 +26,18 @@ public class ObjectLoader implements Loader {
 	}
 
 	public List load(EntityInfo... entityInfos) {
+		if ( entityInfos.length == 0 ) return Collections.EMPTY_LIST;
+		if ( entityInfos.length == 1 ) {
+			final Object entity = load( entityInfos[0] );
+			if ( entity == null ) {
+				return Collections.EMPTY_LIST;
+			}
+			else {
+				final List<Object> list = new ArrayList<Object>( 1 );
+				list.add( entity );
+				return list;
+			}
+		}
 		//use load to benefit from the batch-size
 		//we don't face proxy casting issues since the exact class is extracted from the index
 		for (EntityInfo entityInfo : entityInfos) {

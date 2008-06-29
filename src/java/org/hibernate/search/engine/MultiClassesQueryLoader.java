@@ -58,6 +58,18 @@ public class MultiClassesQueryLoader implements Loader {
 
 	public List load(EntityInfo... entityInfos) {
 		if ( entityInfos.length == 0 ) return Collections.EMPTY_LIST;
+		if ( entityInfos.length == 1 ) {
+			final Object entity = load( entityInfos[0] );
+			if ( entity == null ) {
+				return Collections.EMPTY_LIST;
+			}
+			else {
+				final List<Object> list = new ArrayList<Object>( 1 );
+				list.add( entity );
+				return list;
+			}
+		}
+
 		//split EntityInfo per root entity
 		Map<RootEntityMetadata, List<EntityInfo>> entityinfoBuckets =
 				new HashMap<RootEntityMetadata, List<EntityInfo>>( entityMatadata.size());
