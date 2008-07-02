@@ -13,10 +13,11 @@
 
     <property name="src.dir" location="src/java"/>
     <property name="test.dir" location="src/test"/>
-    <property name="lib.dir" location="lib"/>
+	<property name="lib.dir" location="lib"/>
     <property name="build.dir" location="build"/>
     <property name="classes.dir" location="${build.dir}/classes"/>
-    <property name="testclasses.dir" location="${build.dir}/testclasses"/>   
+    <property name="testclasses.dir" location="${build.dir}/testclasses"/> 
+	<property name="testreports.dir" location="${build.dir}/test-reports"/>  
 	<property name="dist.target.dir" location="target"/>
     <property name="dist.dir" location="${dist.target.dir}/${name}"/>
     <property name="instrumenttest.out.dir" value="instrumenttestout"/>
@@ -43,25 +44,23 @@
     <property name="pom.file" value="pom.xml"/>
     <property name="src.jar" value="${build.dir}/src.jar"/>
 
-    <!-- build related properties -->
-    <property name="build.lib.dir" value="${lib.dir}/build"/>
-
-	<taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+	<taskdef name="junit"
+		classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
 		<classpath>
-			<fileset dir="${common-build.basedir}/lib/build"> <!-- ${build.lib.dir} fails in reference doc build -->
-			    <include name="junit-*.jar"/>
-                <include name="ant-junit-*.jar"/>
+			<fileset dir="${common-build.basedir}/lib/build"><!-- ${build.lib.dir} fails in reference doc build -->
+				<include name="junit-*.jar"/>
+				<include name="ant-junit-*.jar"/>
 			</fileset>
 		</classpath>
 	</taskdef>
 
 	<taskdef name="junitreport" classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator">
-        <classpath>
-            <fileset dir="${common-build.basedir}/lib/build"> <!-- ${build.lib.dir} fails in reference doc build -->                 
-                <include name="junit-*.jar"/>
-                <include name="ant-junit-*.jar"/>
-            </fileset>
-        </classpath>
+		<classpath>
+			<fileset dir="${common-build.basedir}/lib/build"><!-- ${build.lib.dir} fails in reference doc build -->
+				<include name="junit-*.jar"/>
+				<include name="ant-junit-*.jar"/>
+			</fileset>
+		</classpath>
 	</taskdef>
 
     <!-- ivy load -->
@@ -82,9 +81,6 @@
     <artifact:remoteRepository id="offline.repository.jboss.org" url="file://${offline.repository.jboss.org}" />
 
     <path id="lib.class.path">
-        <fileset dir="${lib.dir}">
-            <include name="*.jar"/>
-        </fileset>
 		<path refid="lib.moduleclass.path"/>
 		<pathelement path="${clover.jar}"/>
     </path>
@@ -131,9 +127,6 @@
     <taskdef resource="clovertasks"/>   
    
     <path id="junit.classpath">
-           <fileset dir="${lib.dir}">
-                 <include name="*.jar"/>
-           </fileset>
            <pathelement path="${classes.dir}"/>
            <pathelement path="${testclasses.dir}"/>        
            <path refid="lib.class.path"/>
@@ -278,19 +271,19 @@
             </fileset>
         </copy>
     </target>
-
-    <target name="copylib" description="Copy jars to lib dir">
-        <mkdir dir="${dist.lib.dir}"/>
-        <copy todir="${dist.lib.dir}">
-            <fileset dir="${lib.dir}">
-                <include name="*.jar"/>
-                <exclude name="log4j.jar"/>
-                <exclude name="checkstyle*.jar"/>
-                <include name="*.txt"/>
-            </fileset>
-        </copy>
-    </target>
-
+	
+	<target name="copylib" description="Copy jars to lib dir">
+		<mkdir dir="${dist.lib.dir}"/>
+		<copy todir="${dist.lib.dir}" verbose="true">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar"/>
+				<exclude name="log4j.jar"/>
+				<exclude name="checkstyle*.jar"/>
+				<include name="*.txt"/>
+			</fileset>
+		</copy>
+	</target>
+		
 	<target name="copydoc" description="Copy doc to dist dir" if="copy.doc">
         <mkdir dir="${dist.doc.dir}"/>
         <copy todir="${dist.doc.dir}">
@@ -351,7 +344,7 @@
 		</replace>
 	</target>
 
-	<target name="dist" depends="jar,javadoc,copysource,copylib,copydoc,extras" description="Build everything">
+	<target name="dist" depends="jar,javadoc,copysource,copydoc,extras" description="Build everything">
 		<zip zipfile = "${dist.dir}-${version}.zip">
 			<zipfileset prefix="${name}-${version}" dir="${dist.dir}"/>
 		</zip>
@@ -377,12 +370,12 @@
     </target>
 
     <target name="junit" depends="compiletest">
-        <mkdir dir="test_output"/>
+        <mkdir dir="${testreports.dir}"/>
         <junit printsummary="yes" haltonfailure="yes" forkmode="once">
             <classpath refid="junit.classpath"/>
             <formatter type="plain"/>
             <formatter type="xml"/>
-            <batchtest fork="yes" todir="test_output" haltonfailure="no">
+            <batchtest fork="yes" todir="${testreports.dir}" haltonfailure="no">
             	<fileset refid="junit.batchtestset"/>
             </batchtest>
         </junit>
@@ -390,12 +383,12 @@
 
 	<!-- Run a single unit test. -->
 	<target name="junitsingle" depends="compiletest" description="Run a single test suite (requires testname and jdbc.driver properties)">
-		<mkdir dir="test_output"/>
+		<mkdir dir="${testreports.dir}"/>
 		<junit printsummary="yes" fork="yes" haltonfailure="yes">
 			<classpath refid="junit.classpath"/>
 			<formatter type="plain"/>
 			<formatter type="xml"/>
-			<test fork="yes" todir="test_output" haltonfailure="no" name="${testname}"/>
+			<test fork="yes" todir="${testreports.dir}" haltonfailure="no" name="${testname}"/>
 		</junit>
 	</target>
 
@@ -416,11 +409,11 @@
 	</target>
 
     <target name="junitreport" depends="">
-        <junitreport todir="./test_output">
-            <fileset dir="test_output">
+        <junitreport todir="${testreports.dir}">
+            <fileset dir="${testreports.dir}">
                 <include name="TEST-*.xml"/>
             </fileset>
-            <report format="frames" todir="./test_output"/>
+            <report format="frames" todir="${testreports.dir}"/>
         </junitreport>
     </target>
 

@@ -9,9 +9,13 @@
         </chain>
         <chain name="rep-hibernate" returnFirst="true" latest="latest-revision">
             <filesystem name="local">
-                <ivy pattern="../[module]/target/[revision]/ivy.xml"/>
-                <artifact pattern="../[module]/target/[revision]/[artifact].[ext]"/>
+                <ivy pattern="../[module]/target/hibernate-[module]/ivy.xml"/>
+                <artifact pattern="../[module]/target/hibernate-[module]/[artifact].[ext]"/>
             </filesystem>
+            <filesystem name="hudson-local">
+                <ivy pattern="../../[module]/trunk/target/hibernate-[module]/ivy.xml"/>
+                <artifact pattern="../../[module]/trunk/target/hibernate-[module]/[artifact].[ext]"/>
+            </filesystem>            
             <filesystem name="maven-local" m2compatible="true">
                 <artifact pattern="${offline.repository.jboss.org}/[organization]/hibernate-[module]/[revision]/hibernate-[artifact]-[revision].[ext]"/>
             </filesystem>

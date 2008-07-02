@@ -18,7 +18,7 @@ public class UnresolvedBridgeTest extends TestCase {
 		}
 		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
 		try {
-			cfg.buildSessionFactory( /*new TestInterceptor()*/ );
+			cfg.buildSessionFactory();
 			fail("Undefined bridge went through");
 		}
 		catch( Exception e ) {
@@ -38,6 +38,7 @@ public class UnresolvedBridgeTest extends TestCase {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Class[] getMappings() {
 		return new Class[] {
 				Gangster.class

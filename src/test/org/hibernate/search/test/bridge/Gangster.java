@@ -2,12 +2,12 @@
 package org.hibernate.search.test.bridge;
 
 import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
 
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
