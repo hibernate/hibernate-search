@@ -26,7 +26,7 @@ import org.hibernate.stat.Statistics;
 public class LuceneQueryTest extends SearchTestCase {
 
 	public void testList() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );
@@ -81,7 +81,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testResultSize() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );
@@ -117,7 +117,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testFirstMax() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );
@@ -163,7 +163,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testIterator() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );
@@ -209,7 +209,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testScrollableResultSet() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );
@@ -253,7 +253,7 @@ public class LuceneQueryTest extends SearchTestCase {
 
 	// Technically this is checked by other tests but let's do it anyway. J.G.
 	public void testDefaultFetchSize() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();
@@ -279,7 +279,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testFetchSizeLargerThanHits() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();
@@ -304,7 +304,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testFetchSizeDefaultFirstAndMax() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();
@@ -340,7 +340,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testFetchSizeNonDefaultFirstAndMax() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();
@@ -384,7 +384,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testFetchSizeNonDefaultFirstAndMaxNoHits() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();
@@ -410,7 +410,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testCurrent() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();
@@ -462,7 +462,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testMultipleEntityPerIndex() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );
@@ -518,7 +518,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testCriteria() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
 		s.save( book );
@@ -557,7 +557,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testScrollEmptyHits() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();
@@ -588,7 +588,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testListEmptyHits() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();
@@ -611,7 +611,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 	public void testIterateEmptyHits() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		s.clear();

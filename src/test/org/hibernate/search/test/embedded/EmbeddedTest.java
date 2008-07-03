@@ -12,12 +12,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.event.PostCollectionRecreateEventListener;
-import org.hibernate.event.PostCollectionRemoveEventListener;
-import org.hibernate.event.PostCollectionUpdateEventListener;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.event.FullTextIndexCollectionEventListener;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -271,11 +267,6 @@ public class EmbeddedTest extends SearchTestCase {
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		FullTextIndexCollectionEventListener del = new FullTextIndexCollectionEventListener();
-		//FIXME remove when depending on Annotations 3.3.1
-		cfg.getEventListeners().setPostCollectionRecreateEventListeners( new PostCollectionRecreateEventListener[]{del} );
-		cfg.getEventListeners().setPostCollectionUpdateEventListeners( new PostCollectionUpdateEventListener[]{del} );
-		cfg.getEventListeners().setPostCollectionRemoveEventListeners( new PostCollectionRemoveEventListener[]{del} );
 	}
 
 	protected Class[] getMappings() {

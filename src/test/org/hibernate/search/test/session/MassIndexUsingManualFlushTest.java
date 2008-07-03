@@ -19,7 +19,7 @@ import org.apache.lucene.analysis.StopAnalyzer;
  */
 public class MassIndexUsingManualFlushTest extends SearchTestCase {
 	public void testManualIndexFlush() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		int loop = 14;
 		for (int i = 0; i < loop; i++) {

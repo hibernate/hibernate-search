@@ -74,7 +74,7 @@ public class ShardsTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		FullTextSession fts = Search.createFullTextSession( s );
+		FullTextSession fts = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser("id", new StopAnalyzer() );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
@@ -143,7 +143,7 @@ public class ShardsTest extends SearchTestCase {
 		}
 
 		tx = s.beginTransaction();
-		FullTextSession fts = Search.createFullTextSession( s );
+		FullTextSession fts = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser("id", new StopAnalyzer() );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();

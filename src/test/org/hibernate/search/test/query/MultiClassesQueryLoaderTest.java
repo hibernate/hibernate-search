@@ -31,7 +31,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 		Statement statement = sess.connection().createStatement();
 		statement.executeUpdate( "DELETE FROM Author" );
 		statement.close();
-		FullTextSession s = Search.createFullTextSession( sess );
+		FullTextSession s = Search.getFullTextSession( sess );
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "title", new KeywordAnalyzer() );
 		Query query = parser.parse( "name:moo" );

@@ -26,7 +26,7 @@ import org.hibernate.search.test.SearchTestCase;
 public class MassIndexTest extends SearchTestCase {
 
 	public void testBatchSize() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		int loop = 14;
 		for (int i = 0; i < loop; i++) {
@@ -65,7 +65,7 @@ public class MassIndexTest extends SearchTestCase {
 
 
 	public void testTransactional() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		int loop = 4;
 		for (int i = 0; i < loop; i++) {
@@ -116,7 +116,7 @@ public class MassIndexTest extends SearchTestCase {
 		tx.commit(); //do the process
 		s.close();
 
-		s = Search.createFullTextSession( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		//object never indexed
 		Email email = (Email) s.get( Email.class, Long.valueOf( loop + 1 ) );
@@ -144,7 +144,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.close();
 
 		s = openSession();
-		FullTextSession session = Search.createFullTextSession( s );
+		FullTextSession session = Search.getFullTextSession( s );
 		Query luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		List result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
 		assertEquals( 1, result.size() );
@@ -152,12 +152,12 @@ public class MassIndexTest extends SearchTestCase {
 
 		s = openSession();
 		ent = (Entite) s.get( Entite.class, ent.getId() );
-		session = Search.createFullTextSession( s );
+		session = Search.getFullTextSession( s );
 		session.index( ent );
 		s.close();
 
 		s = openSession();
-		session = Search.createFullTextSession( s );
+		session = Search.getFullTextSession( s );
 		luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
 		assertEquals( "test lazy loading and indexing", 1, result.size() );
@@ -165,7 +165,7 @@ public class MassIndexTest extends SearchTestCase {
 
 		s = openSession();
 		Iterator it = s.createQuery( "from Entite where id = :id").setParameter( "id", ent.getId() ).iterate();
-		session = Search.createFullTextSession( s );
+		session = Search.getFullTextSession( s );
 		while ( it.hasNext() ) {
 			ent = (Entite) it.next();
 			session.index( ent );
@@ -173,7 +173,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.close();
 
 		s = openSession();
-		session = Search.createFullTextSession( s );
+		session = Search.getFullTextSession( s );
 		luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
 		assertEquals( "test lazy loading and indexing", 1, result.size() );

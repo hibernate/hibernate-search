@@ -27,7 +27,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 	 * @throws Exception in case the test fails.
 	 */
 	public void testList() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		createTestBooks(s);
 		Transaction tx = s.beginTransaction();
 		QueryParser parser = new QueryParser("title", new StopAnalyzer() );

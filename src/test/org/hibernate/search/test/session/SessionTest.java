@@ -32,7 +32,7 @@ public class SessionTest extends SearchTestCase {
 		        wrapper
 			);
 		try {
-			Search.createFullTextSession( wrapped );
+			Search.getFullTextSession( wrapped );
 		}
 		catch( ClassCastException e ) {
 			e.printStackTrace( );
@@ -42,7 +42,7 @@ public class SessionTest extends SearchTestCase {
 	}
 
 	public void testDetachedCriteria() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession( ) );
+		FullTextSession s = Search.getFullTextSession( openSession( ) );
 		DetachedCriteria dc = DetachedCriteria.forClass( Email.class );
 		try {
 			Criteria c = dc.getExecutableCriteria( s ).setMaxResults( 10 );

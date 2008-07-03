@@ -105,7 +105,7 @@ public class SearcherThread implements Runnable {
 		try {
 			Query q = getQuery();
 			// Search
-			FullTextSession ftSession = Search.createFullTextSession( sf.openSession(  ) );
+			FullTextSession ftSession = Search.getFullTextSession( sf.openSession(  ) );
 			final FullTextQuery textQuery = ftSession.createFullTextQuery( q, Boat.class )
 					.setMaxResults( 100 ).setProjection( "name" );
 			long start = System.currentTimeMillis();

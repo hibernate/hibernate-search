@@ -64,7 +64,7 @@ public class QueryLoaderTest extends SearchTestCase {
 		tx.commit();
 		sess.clear();
 
-		FullTextSession s = Search.createFullTextSession( sess );
+		FullTextSession s = Search.getFullTextSession( sess );
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "title", new KeywordAnalyzer() );
 		Query query = parser.parse( "title:moo" );

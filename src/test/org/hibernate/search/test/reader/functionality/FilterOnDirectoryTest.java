@@ -19,7 +19,7 @@ public class FilterOnDirectoryTest extends SearchTestCase {
 
 	public void testFilteredClasses() throws Exception {
 		createDoeFamily();
-		FullTextSession fts = Search.createFullTextSession( openSession() );
+		FullTextSession fts = Search.getFullTextSession( openSession() );
 		Transaction tx = fts.beginTransaction();
 		Query q = new TermQuery( new Term( "name", "doe" ) );
 		

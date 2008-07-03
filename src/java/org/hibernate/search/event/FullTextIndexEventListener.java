@@ -29,10 +29,10 @@ import org.hibernate.search.impl.SearchFactoryImpl;
  */
 //TODO work on sharing the same indexWriters and readers across a single post operation...
 //TODO implement and use a LockableDirectoryProvider that wraps a DP to handle the lock inside the LDP
+@SuppressWarnings("serial")
 public class FullTextIndexEventListener implements PostDeleteEventListener, PostInsertEventListener,
 		PostUpdateEventListener, Initializable, Destructible {
 
-	@SuppressWarnings( { "WeakerAccess" } )
 	protected boolean used;
 	protected SearchFactoryImplementor searchFactoryImplementor;
 
@@ -81,7 +81,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener, Post
 		}
 	}
 
-	@SuppressWarnings( { "WeakerAccess" } )
 	protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event) {
 		Work work = new Work(entity, id, workType);
 		searchFactoryImplementor.getWorker().performWork( work, event.getSession() );

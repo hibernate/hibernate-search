@@ -20,7 +20,7 @@ import org.hibernate.search.util.FileHelper;
 public class OptimizeTest extends SearchTestCase {
 
 	public void testOptimize() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		int loop = 2000;
 		for (int i = 0; i < loop; i++) {
@@ -33,7 +33,7 @@ public class OptimizeTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 
-		s = Search.createFullTextSession( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		s.getSearchFactory().optimize( Email.class );
 		tx.commit();

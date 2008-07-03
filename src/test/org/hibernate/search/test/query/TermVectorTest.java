@@ -17,7 +17,7 @@ import org.hibernate.search.test.SearchTestCase;
 public class TermVectorTest extends SearchTestCase {
    
    public void testPositionOffsets() throws Exception {
-      FullTextSession s = Search.createFullTextSession(openSession());
+      FullTextSession s = Search.getFullTextSession(openSession());
       createIndex(s);
 
       s.clear();
@@ -58,7 +58,7 @@ public class TermVectorTest extends SearchTestCase {
 
 
    public void testNoTermVector() throws Exception {
-      FullTextSession s = Search.createFullTextSession(openSession());
+      FullTextSession s = Search.getFullTextSession(openSession());
       Transaction tx = s.beginTransaction();
 
       Employee e1 = new Employee(1000, "Griffin", "ITech");

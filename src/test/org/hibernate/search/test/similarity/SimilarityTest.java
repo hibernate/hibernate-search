@@ -39,7 +39,7 @@ public class SimilarityTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		TermQuery tq = new TermQuery( new Term("name", "green") );
-		FullTextSession fts = Search.createFullTextSession( s );
+		FullTextSession fts = Search.getFullTextSession( s );
 		List results = fts.createFullTextQuery( tq, Trash.class ).setProjection( FullTextQuery.SCORE, FullTextQuery.THIS ).list();
 		assertEquals( 2, results.size() );
 		assertEquals( "Similarity not overridden at the class level", ( (Object[]) results.get( 0 ) )[0], ( (Object[]) results.get( 1 ) )[0]);

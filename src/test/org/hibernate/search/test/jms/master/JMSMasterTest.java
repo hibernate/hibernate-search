@@ -87,7 +87,7 @@ public class JMSMasterTest extends SearchTestCase {
 		//wait for the message to be processed
 		Thread.sleep( 1000 );
 
-		FullTextSession ftSess = Search.createFullTextSession( openSession( ) );
+		FullTextSession ftSess = Search.getFullTextSession( openSession( ) );
 		ftSess.getTransaction().begin();
 		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
 		Query luceneQuery = parser.parse( "logo:jboss" );

@@ -79,7 +79,7 @@ public class IndexTestDontRun extends SearchTestCase {
 
 	private IndexSearcher getNewSearcher() throws IOException {
 		final org.hibernate.classic.Session session = getSessions().openSession();
-		Directory d = Search.createFullTextSession( session ).getSearchFactory().getDirectoryProviders( Boat.class )[0].getDirectory();
+		Directory d = Search.getFullTextSession( session ).getSearchFactory().getDirectoryProviders( Boat.class )[0].getDirectory();
 		IndexSearcher indexsearcher = new IndexSearcher( d );
 		return indexsearcher;
 	}

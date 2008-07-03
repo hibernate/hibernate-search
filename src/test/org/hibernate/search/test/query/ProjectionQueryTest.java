@@ -28,7 +28,7 @@ import org.hibernate.search.test.SearchTestCase;
 public class ProjectionQueryTest extends SearchTestCase {
 
 	public void testLuceneObjectsProjectionWithScroll() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		Transaction tx;
@@ -84,7 +84,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 	}
 
 	public void testResultTransformToDelimString() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		Transaction tx;
@@ -110,7 +110,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 	}
 
 	public void testResultTransformMap() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		Transaction tx;
@@ -176,7 +176,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 	}
 
 	public void testLuceneObjectsProjectionWithIterate() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		Transaction tx;
@@ -211,7 +211,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 	}
 
 	public void testLuceneObjectsProjectionWithList() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
 
 		Transaction tx;
@@ -287,7 +287,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 	}
 
 	public void testProjection() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
 		s.save( book );

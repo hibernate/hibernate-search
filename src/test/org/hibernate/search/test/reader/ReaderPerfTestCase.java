@@ -161,7 +161,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			catch (ParseException e) {
 				e.printStackTrace();
 			}
-			return Search.createFullTextSession( s ).createFullTextQuery( luceneQuery );
+			return Search.getFullTextSession( s ).createFullTextQuery( luceneQuery );
 		}
 	}
 
@@ -213,7 +213,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			catch (ParseException e) {
 				e.printStackTrace();
 			}
-			return Search.createFullTextSession( s ).createFullTextQuery( luceneQuery );
+			return Search.getFullTextSession( s ).createFullTextQuery( luceneQuery );
 		}
 	}
 

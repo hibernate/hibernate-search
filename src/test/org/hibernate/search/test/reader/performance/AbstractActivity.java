@@ -47,7 +47,7 @@ public abstract class AbstractActivity implements Runnable {
 		}
 		Session s = sf.openSession();
 		try {
-			FullTextSession fts = Search.createFullTextSession( s );
+			FullTextSession fts = Search.getFullTextSession( s );
 			Transaction tx = s.beginTransaction();
 			boolean ok = false;
 			try {
