@@ -27,7 +27,7 @@ public class EmbeddedIdTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 		tx = s.beginTransaction();
-		List results = Search.createFullTextSession( s ).createFullTextQuery(
+		List results = Search.getFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term("id.lastName", "Bernard" ) ) ).list();
 		assertEquals( 1, results.size() );
 		emm = (Person) results.get(0);
@@ -35,7 +35,7 @@ public class EmbeddedIdTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 		tx = s.beginTransaction();
-		results = Search.createFullTextSession( s ).createFullTextQuery(
+		results = Search.getFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term("id.lastName", "Bernard" ) ) ).list();
 		assertEquals( 1, results.size() );
 		emm = (Person) results.get(0);

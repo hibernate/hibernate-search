@@ -53,7 +53,7 @@ public class BridgeTest extends SearchTestCase {
         tx.commit();
 
         tx = s.beginTransaction();
-        FullTextSession session = Search.createFullTextSession(s);
+        FullTextSession session = Search.getFullTextSession(s);
         QueryParser parser = new QueryParser("id", new StandardAnalyzer() );
         Query query;
         List result;
@@ -101,7 +101,7 @@ public class BridgeTest extends SearchTestCase {
         tx.commit();
 
         tx = s.beginTransaction();
-        FullTextSession session = Search.createFullTextSession(s);
+        FullTextSession session = Search.getFullTextSession(s);
         QueryParser parser = new QueryParser("id", new SimpleAnalyzer() );
         Query query;
         List result;
@@ -143,7 +143,7 @@ public class BridgeTest extends SearchTestCase {
         tx.commit();
 
         tx = s.beginTransaction();
-        FullTextSession session = Search.createFullTextSession(s);
+        FullTextSession session = Search.getFullTextSession(s);
         QueryParser parser = new QueryParser("id", new StandardAnalyzer() );
         Query query;
         List result;

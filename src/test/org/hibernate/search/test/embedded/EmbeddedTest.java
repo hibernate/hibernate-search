@@ -47,7 +47,7 @@ public class EmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 
-		FullTextSession session = Search.createFullTextSession( s );
+		FullTextSession session = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
 		Query query;
 		List result;
@@ -78,7 +78,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 		s.clear();
 
-		session = Search.createFullTextSession( s );
+		session = Search.getFullTextSession( s );
 
 		query = parser.parse( "address.ownedBy_name:buckhead" );
 		result = session.createFullTextQuery( query, Tower.class ).list();
@@ -115,7 +115,7 @@ public class EmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 
-		FullTextSession session = Search.createFullTextSession( s );
+		FullTextSession session = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
 		Query query;
 		List result;
@@ -152,7 +152,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 		s.clear();
 
-		FullTextSession session = Search.createFullTextSession( s );
+		FullTextSession session = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
 		Query query;
 		List result;
@@ -172,7 +172,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 		s.clear();
 
-		session = Search.createFullTextSession( s );
+		session = Search.getFullTextSession( s );
 
 		query = parser.parse( "address.street:peachtree" );
 		result = session.createFullTextQuery( query, Tower.class ).list();
@@ -228,7 +228,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 		s.clear();
 
-		FullTextSession session = Search.createFullTextSession( s );
+		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
 
 		QueryParser parser = new MultiFieldQueryParser( new String[] { "name", "authors.name" }, new StandardAnalyzer() );
@@ -256,7 +256,7 @@ public class EmbeddedTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		session = Search.createFullTextSession( s );
+		session = Search.getFullTextSession( s );
 		query = parser.parse( "Proust" );
 		result = session.createFullTextQuery( query, Product.class ).list();
 		//HSEARCH-56

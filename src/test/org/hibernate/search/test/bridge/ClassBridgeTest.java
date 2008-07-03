@@ -39,7 +39,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		FullTextSession session = Search.createFullTextSession( s );
+		FullTextSession session = Search.getFullTextSession( s );
 
 		// The equipment field is the manufacturer field  in the
 		// Departments entity after being massaged by passing it
@@ -107,7 +107,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		FullTextSession session = Search.createFullTextSession( s );
+		FullTextSession session = Search.getFullTextSession( s );
 
 		// The equipment field is the manufacturer field  in the
 		// Departments entity after being massaged by passing it
@@ -173,7 +173,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		FullTextSession session = Search.createFullTextSession( s );
+		FullTextSession session = Search.getFullTextSession( s );
 
 		// The branchnetwork field is the concatenation of both
 		// the branch field and the network field of the Department

@@ -1,4 +1,4 @@
-//$
+// $Id:$
 package org.hibernate.search.event;
 
 import java.io.Serializable;

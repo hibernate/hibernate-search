@@ -16,7 +16,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		team.setDescription( "This is a D\u00E0scription" );
 		team.setLocation( "Atlanta" );
 		team.setName( "ATL team" );
-		FullTextSession fts = Search.createFullTextSession( openSession() );
+		FullTextSession fts = Search.getFullTextSession( openSession() );
 		Transaction tx = fts.beginTransaction();
 		fts.persist( team );
 		tx.commit();

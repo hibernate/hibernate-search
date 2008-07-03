@@ -21,7 +21,7 @@ public class AnalyzerTest extends SearchTestCase {
 		en.setProperty( "Property" );
 		en.setComponent( new MyComponent() );
 		en.getComponent().setComponentProperty( "component property" );
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		s.persist( en );
 		tx.commit();

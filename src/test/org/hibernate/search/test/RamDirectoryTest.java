@@ -34,9 +34,9 @@ public class RamDirectoryTest extends SearchTestCase {
 		s.getTransaction().begin();
 		TermQuery q = new TermQuery(new Term("alt_title", "hibernate"));
 		assertEquals( "does not properly filter", 0,
-				Search.createFullTextSession( s ).createFullTextQuery( q, Document.class ).list().size() );
+				Search.getFullTextSession( s ).createFullTextQuery( q, Document.class ).list().size() );
 		assertEquals( "does not properly filter", 1,
-				Search.createFullTextSession( s ).createFullTextQuery( q, Document.class, AlternateDocument.class ).list().size() );
+				Search.getFullTextSession( s ).createFullTextQuery( q, Document.class, AlternateDocument.class ).list().size() );
 		s.delete( s.get( AlternateDocument.class, document.getId() ) );
 		s.getTransaction().commit();
 		s.close();

@@ -25,7 +25,7 @@ public class FieldAccessTest extends SearchTestCase {
 
         s.clear();
 
-        FullTextSession session = Search.createFullTextSession(s);
+        FullTextSession session = Search.getFullTextSession(s);
         tx = session.beginTransaction();
         QueryParser p = new QueryParser("id", new StandardAnalyzer( ) );
         List result = session.createFullTextQuery( p.parse( "Abstract:Hibernate" ) ).list();
@@ -49,7 +49,7 @@ public class FieldAccessTest extends SearchTestCase {
 
         s.clear();
 
-        FullTextSession session = Search.createFullTextSession(s);
+        FullTextSession session = Search.getFullTextSession(s);
         tx = session.beginTransaction();
         QueryParser p = new QueryParser("id", new StandardAnalyzer( ) );
         List result = session.createFullTextQuery( p.parse( "title:Action OR Abstract:Action" ) ).list();

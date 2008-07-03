@@ -25,7 +25,7 @@ public class FilterTest extends SearchTestCase {
 
 	public void testNamedFilters() {
 		createData();
-		FullTextSession s = Search.createFullTextSession( openSession( ) );
+		FullTextSession s = Search.getFullTextSession( openSession( ) );
 		s.getTransaction().begin();
 		BooleanQuery query = new BooleanQuery();
 		query.add( new TermQuery( new Term("teacher", "andre") ), BooleanClause.Occur.SHOULD );
@@ -57,7 +57,7 @@ public class FilterTest extends SearchTestCase {
 
 	public void testCache() {
 		createData();
-		FullTextSession s = Search.createFullTextSession( openSession( ) );
+		FullTextSession s = Search.getFullTextSession( openSession( ) );
 		s.getTransaction().begin();
 		BooleanQuery query = new BooleanQuery();
 		query.add( new TermQuery( new Term("teacher", "andre") ), BooleanClause.Occur.SHOULD );
@@ -86,7 +86,7 @@ public class FilterTest extends SearchTestCase {
 
 	public void testStraightFilters() {
 		createData();
-		FullTextSession s = Search.createFullTextSession( openSession( ) );
+		FullTextSession s = Search.getFullTextSession( openSession( ) );
 		s.getTransaction().begin();
 		BooleanQuery query = new BooleanQuery();
 		query.add( new TermQuery( new Term("teacher", "andre") ), BooleanClause.Occur.SHOULD );

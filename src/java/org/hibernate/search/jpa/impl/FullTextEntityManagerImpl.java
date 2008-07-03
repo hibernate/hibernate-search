@@ -34,7 +34,7 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 				throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)");
 			}
 			else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
-				ftSession = Search.createFullTextSession( (Session) delegate );
+				ftSession = Search.getFullTextSession( (Session) delegate );
 			}
 			else if ( EntityManager.class.isAssignableFrom( delegate.getClass() ) ) {
 				//Some app servers wrap the EM twice
@@ -43,7 +43,7 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 					throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)");
 				}
 				else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
-					ftSession = Search.createFullTextSession( (Session) delegate );
+					ftSession = Search.getFullTextSession( (Session) delegate );
 				}
 				else {
 					throw new SearchException("Trying to use Hibernate Search without an Hibernate EntityManager: " + delegate.getClass() );

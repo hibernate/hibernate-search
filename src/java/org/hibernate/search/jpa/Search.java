@@ -9,8 +9,10 @@ import org.hibernate.search.jpa.impl.FullTextEntityManagerImpl;
  * Helper class that should be used when building a FullTextEntityManager
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public final class Search {
+	
 	private Search() {
 	}
 

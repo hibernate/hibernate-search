@@ -26,7 +26,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		sn.setDate( new Date() );
 		sn.setLocation( "Dallas, TX, USA");
 
-		FullTextSession fts2 = Search.createFullTextSession( getSessionFactories()[1].openSession( ) );
+		FullTextSession fts2 = Search.getFullTextSession( getSessionFactories()[1].openSession( ) );
 		QueryParser parser = new QueryParser("id", new StopAnalyzer() );
 		List result = fts2.createFullTextQuery( parser.parse( "location:texas" ) ).list();
 		assertEquals( "No copy yet, fresh index expected", 0, result.size() );
@@ -41,11 +41,11 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		Thread.sleep( waitPeroid );
 
 		//temp test original
-		fts2 = Search.createFullTextSession( getSessionFactories()[0].openSession( ) );
+		fts2 = Search.getFullTextSession( getSessionFactories()[0].openSession( ) );
 		result = fts2.createFullTextQuery( parser.parse( "location:dallas" ) ).list();
 		assertEquals( "Original should get one", 1, result.size() );
 
-		fts2 = Search.createFullTextSession( getSessionFactories()[1].openSession( ) );
+		fts2 = Search.getFullTextSession( getSessionFactories()[1].openSession( ) );
 		result = fts2.createFullTextQuery( parser.parse( "location:dallas" ) ).list();
 		assertEquals("First copy did not work out", 1, result.size() );
 
@@ -62,7 +62,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 		Thread.sleep( waitPeroid ); //wait a bit more than 2 refresh (one master / one slave)
 
-		fts2 = Search.createFullTextSession( getSessionFactories()[1].openSession( ) );
+		fts2 = Search.getFullTextSession( getSessionFactories()[1].openSession( ) );
 		result = fts2.createFullTextQuery( parser.parse( "location:chennai" ) ).list();
 		assertEquals("Second copy did not work out", 1, result.size() );
 
@@ -79,7 +79,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 		Thread.sleep( waitPeroid ); //wait a bit more than 2 refresh (one master / one slave)
 
-		fts2 = Search.createFullTextSession( getSessionFactories()[1].openSession( ) );
+		fts2 = Search.getFullTextSession( getSessionFactories()[1].openSession( ) );
 		result = fts2.createFullTextQuery( parser.parse( "location:melbourne" ) ).list();
 		assertEquals("Third copy did not work out", 1, result.size() );
 

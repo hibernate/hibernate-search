@@ -44,14 +44,14 @@ public class DoubleInsertEmbeddedTest extends SearchTestCase {
 		contact.addAddressToContact( address );
 		contact.addPhoneToContact( phone );
 
-		FullTextSession s = Search.createFullTextSession( openSession( ) );
+		FullTextSession s = Search.getFullTextSession( openSession( ) );
 		s.getTransaction().begin();
 		s.save( contact);
 		s.getTransaction().commit();
 
 		s.close();
 
-		s = Search.createFullTextSession( openSession( ) );
+		s = Search.getFullTextSession( openSession( ) );
 		s.getTransaction().begin();
 		Term term = new Term("county", "county");
 		TermQuery termQuery = new TermQuery( term );

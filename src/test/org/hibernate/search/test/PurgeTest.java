@@ -22,7 +22,7 @@ import org.hibernate.search.test.query.Employee;
 public class PurgeTest extends SearchTestCase {
 
 	public void testPurge() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		org.hibernate.search.test.query.Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );
@@ -62,7 +62,7 @@ public class PurgeTest extends SearchTestCase {
 	}
 
 	public void testPurgeAll() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		org.hibernate.search.test.query.Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );

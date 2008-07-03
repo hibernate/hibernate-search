@@ -20,7 +20,7 @@ import java.util.List;
 public class InheritanceTest extends SearchTestCase {
 
 	public void testInheritance() throws Exception {
-		FullTextSession s = Search.createFullTextSession( openSession() );
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Animal a = new Animal();
         a.setName("Shark Jr");

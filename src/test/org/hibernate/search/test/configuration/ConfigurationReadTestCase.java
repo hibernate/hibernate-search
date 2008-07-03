@@ -29,7 +29,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		FullTextSession fullTextSession = Search.createFullTextSession( openSession() );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
 		fullTextSession.close();
 		FileHelper.delete( INDEX_DIR );
