@@ -4,8 +4,16 @@ package org.hibernate.search.event;
 import java.io.Serializable;
 
 import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.EntityEntry;
+import org.hibernate.event.AbstractCollectionEvent;
 import org.hibernate.event.AbstractEvent;
 import org.hibernate.event.Initializable;
+import org.hibernate.event.PostCollectionRecreateEvent;
+import org.hibernate.event.PostCollectionRecreateEventListener;
+import org.hibernate.event.PostCollectionRemoveEvent;
+import org.hibernate.event.PostCollectionRemoveEventListener;
+import org.hibernate.event.PostCollectionUpdateEvent;
+import org.hibernate.event.PostCollectionUpdateEventListener;
 import org.hibernate.event.PostDeleteEvent;
 import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEvent;
@@ -18,6 +26,8 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This listener supports setting a parent directory for all generated index files.
@@ -30,9 +40,13 @@ import org.hibernate.search.impl.SearchFactoryImpl;
 //TODO work on sharing the same indexWriters and readers across a single post operation...
 //TODO implement and use a LockableDirectoryProvider that wraps a DP to handle the lock inside the LDP
 @SuppressWarnings("serial")
-public class FullTextIndexEventListener implements PostDeleteEventListener, PostInsertEventListener,
-		PostUpdateEventListener, Initializable, Destructible {
+public class FullTextIndexEventListener implements PostDeleteEventListener,
+		PostInsertEventListener, PostUpdateEventListener,
+		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
+		PostCollectionUpdateEventListener, Initializable, Destructible {
 
+	private static final Logger log = LoggerFactory.getLogger(FullTextIndexEventListener.class);
+	
 	protected boolean used;
 	protected SearchFactoryImplementor searchFactoryImplementor;
 
@@ -88,5 +102,48 @@ public class FullTextIndexEventListener implements PostDeleteEventListener, Post
 
 	public void cleanup() {
 		searchFactoryImplementor.close();
+	}
+	
+	public void onPostRecreateCollection(PostCollectionRecreateEvent event) {
+		processCollectionEvent( event );
+	}
+	
+	public void onPostRemoveCollection(PostCollectionRemoveEvent event) {
+		processCollectionEvent( event );
+	}
+
+	public void onPostUpdateCollection(PostCollectionUpdateEvent event) {
+		processCollectionEvent( event );
+	}
+	
+	protected void processCollectionEvent(AbstractCollectionEvent event) {
+		Object entity = event.getAffectedOwnerOrNull();
+		if ( entity == null ) {
+			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
+			// or property-ref is used
+			//Should log really but we don't know if we're interested in this collection for indexing
+			return;
+		}
+		if ( used && searchFactoryImplementor.getDocumentBuilders().containsKey( entity.getClass() ) ) {
+			Serializable id = getId( entity, event );
+			if (id == null) {
+				log.warn(
+						"Unable to reindex entity on collection change, id cannot be extracted: {}",
+						event.getAffectedOwnerEntityName()
+				);
+				return;
+			}
+			processWork( entity, id, WorkType.COLLECTION, event );
+		}
+	}
+
+	private Serializable getId(Object entity, AbstractCollectionEvent event) {
+		Serializable id = event.getAffectedOwnerIdOrNull();
+		if ( id == null ) {
+			//most likely this recovery is unnecessary since Hibernate Core probably try that 
+			EntityEntry entityEntry = event.getSession().getPersistenceContext().getEntry( entity );
+			id = entityEntry == null ? null : entityEntry.getId();
+		}
+		return id;
 	}
 }

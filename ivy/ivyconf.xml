@@ -9,8 +9,8 @@
         </chain>
         <chain name="rep-hibernate" returnFirst="true" latest="latest-revision">
             <filesystem name="local">
-                <ivy pattern="../[module]/target/hibernate-[module]/ivy.xml"/>
-                <artifact pattern="../[module]/target/hibernate-[module]/[artifact].[ext]"/>
+				<ivy pattern="../[module]/target/[revision]/ivy.xml"/>
+                <artifact pattern="../[module]/target/[revision]/[artifact].[ext]"/>
             </filesystem>
             <filesystem name="hudson-local">
                 <ivy pattern="../../[module]/trunk/target/hibernate-[module]/ivy.xml"/>
