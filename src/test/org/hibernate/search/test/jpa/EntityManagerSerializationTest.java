@@ -31,7 +31,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	 *             in case the test fails.
 	 */
 	public void testSerialization() throws Exception {
-		FullTextEntityManager em = Search.createFullTextEntityManager(factory
+		FullTextEntityManager em = Search.getFullTextEntityManager(factory
 				.createEntityManager());
 
 		indexSearchAssert(em);

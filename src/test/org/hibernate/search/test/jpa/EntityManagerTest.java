@@ -17,7 +17,7 @@ import org.apache.lucene.index.Term;
 public class EntityManagerTest extends JPATestCase {
 
 	public void testQuery() throws Exception {
-		FullTextEntityManager em = Search.createFullTextEntityManager( factory.createEntityManager() );
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
 		Bretzel bretzel = new Bretzel( 23, 34 );
 		em.persist( bretzel );
@@ -43,7 +43,7 @@ public class EntityManagerTest extends JPATestCase {
 	}
 
 	public void testIndex() throws Exception {
-		FullTextEntityManager em = Search.createFullTextEntityManager( factory.createEntityManager() );
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
 		Bretzel bretzel = new Bretzel( 23, 34 );
 		em.persist( bretzel );

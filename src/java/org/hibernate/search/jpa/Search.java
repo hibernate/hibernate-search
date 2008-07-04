@@ -20,7 +20,7 @@ public final class Search {
 	 * Build a full text capable EntityManager
 	 * The underlying EM implementation has to be Hibernate EntityManager
 	 */
-	public static FullTextEntityManager createFullTextEntityManager(EntityManager em) {
+	public static FullTextEntityManager getFullTextEntityManager(EntityManager em) {
 		if ( em instanceof FullTextEntityManagerImpl ) {
 			return (FullTextEntityManager) em;
 		}
