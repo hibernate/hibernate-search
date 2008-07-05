@@ -7,6 +7,7 @@ import org.apache.lucene.search.Filter;
 
 /**
  * Defines the caching filter strategy
+ * implementations of getCachedFilter and addCachedFilter must be thread-safe 
  *
  * @author Emmanuel Bernard
  */
