@@ -291,6 +291,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private void buildFilters() {
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		if ( filterDefinitions != null && filterDefinitions.size() > 0 ) {
+			/*
+			 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
+			 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
+			 */
 			ChainedFilter chainedFilter = new ChainedFilter();
 			for (FullTextFilterImpl filterDefinition : filterDefinitions.values()) {
 				FilterDef def = searchFactoryImplementor.getFilterDefinition( filterDefinition.getName() );
@@ -311,6 +315,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				if ( def.isCache() && def.getKeyMethod() == null && filterDefinition.getParameters().size() > 0 ) {
 					throw new SearchException( "Filter with parameters and no @Key method: " + filterDefinition.getName() );
 				}
+
 				FilterKey key = null;
 				if ( def.isCache() ) {
 					if ( def.getKeyMethod() == null ) {
