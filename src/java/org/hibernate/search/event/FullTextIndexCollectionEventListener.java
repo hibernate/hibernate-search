@@ -10,8 +10,10 @@ import org.hibernate.event.PostCollectionUpdateEventListener;
 
 /**
  * @author Emmanuel Bernard
+ * @deprecated As of release 3.1.0, replaced by {@link FullTextIndexEventListener}
  */
 @SuppressWarnings("serial")
+@Deprecated 
 public class FullTextIndexCollectionEventListener extends FullTextIndexEventListener
 		implements PostCollectionRecreateEventListener,
 		PostCollectionRemoveEventListener,
