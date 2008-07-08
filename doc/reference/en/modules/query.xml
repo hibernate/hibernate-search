@@ -214,13 +214,12 @@ String authorName = firstResult[3];</programlisting>
         them:</para>
 
         <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
-query.<emphasis role="bold">setProjection( FullTextQuery.SCORE, FullTextQuery.BOOST, FullTextQuery.THIS, "mainAuthor.name" )</emphasis>;
+query.<emphasis role="bold">setProjection( FullTextQuery.SCORE, FullTextQuery.THIS, "mainAuthor.name" )</emphasis>;
 List results = query.list();
 Object[] firstResult = (Object[]) results.get(0);
 float score = firstResult[0];
-float boost = firstResult[1];
-Book book = firstResult[2];
-String authorName = firstResult[3];</programlisting>
+Book book = firstResult[1];
+String authorName = firstResult[2];</programlisting>
 
         <para>You can mix and match regular fields and special placeholders.
         Here is the list of available placeholders:</para>
@@ -242,11 +241,6 @@ String authorName = firstResult[3];</programlisting>
             highest score is not necessarily equals to 1. Scores are handy to
             compare one result against an other for a given query but are
             useless when comparing the result of different queries.</para>
-          </listitem>
-
-          <listitem>
-            <para>FullTextQuery.BOOST: the boost value of the Lucene
-            Document</para>
           </listitem>
 
           <listitem>
