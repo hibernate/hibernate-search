@@ -1,4 +1,4 @@
-//$
+// $Id:$
 package org.hibernate.search.reader;
 
 import java.io.IOException;

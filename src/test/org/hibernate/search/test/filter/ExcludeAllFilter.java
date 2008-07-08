@@ -1,4 +1,4 @@
-//$
+// $Id:$
 package org.hibernate.search.test.filter;
 
 import java.util.BitSet;
@@ -10,6 +10,7 @@ import org.apache.lucene.index.IndexReader;
 /**
  * @author Emmanuel Bernard
  */
+@SuppressWarnings("serial")
 public class ExcludeAllFilter extends Filter {
 	private static boolean done = false;
 

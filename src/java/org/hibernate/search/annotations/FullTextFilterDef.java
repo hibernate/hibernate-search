@@ -19,7 +19,7 @@ import java.lang.annotation.Documented;
 @Documented
 public @interface FullTextFilterDef {
 	/**
-	 * Filter name. Must be unique accross all mappings for a given persistence unit
+	 * Filter name. Must be unique across all mappings for a given persistence unit
 	 */
 	String name();
 
@@ -31,10 +31,16 @@ public @interface FullTextFilterDef {
 	 * If the filter accept parameters, an @Key method must be present as well
 	 *
 	 */
+	@SuppressWarnings("unchecked")
 	Class impl();
 
 	/**
 	 * Enable caching for this filter (default true).
 	 */
 	boolean cache() default true;
+	
+	/**
+	 * Determines whether the filter should be wrapped around a <code>CachingWrapperFilter</code>.
+	 */	
+	CachingWrapperFilter useCachingWrapperFilter() default CachingWrapperFilter.AUTOMATIC;
 }
