@@ -39,7 +39,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
 		// Is the 'FullTextQuery.ID' value correct here? Do we want the Lucene internal document number?
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST, FullTextQuery.DOCUMENT, FullTextQuery.ID );
+		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.DOCUMENT, FullTextQuery.ID );
 
 		ScrollableResults projections = hibQuery.scroll();
 
@@ -94,7 +94,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST, FullTextQuery.ID );
+		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.ID );
 		hibQuery.setResultTransformer( new ProjectionToDelimStringResultTransformer() );
 
 		List<String> result = (List<String>) hibQuery.list();
@@ -120,7 +120,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST, FullTextQuery.DOCUMENT, FullTextQuery.ID );
+		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.DOCUMENT, FullTextQuery.ID );
 
 		hibQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
 
@@ -145,10 +145,9 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "dept incorrect", "ITech", projection[2] );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
-		assertEquals( "BOOST incorrect", 1.0F, projection[5] );
-		assertTrue( "DOCUMENT incorrect", projection[6] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[6] ).getFields().size() );
-		assertEquals( "legacy ID incorrect", 1000, projection[7] );
+		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
+		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[5] ).getFields().size() );
+		assertEquals( "legacy ID incorrect", 1000, projection[6] );
 	}
 
 	private void checkProjectionLast(Object[] projection, Session s) {
@@ -157,10 +156,9 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "dept incorrect", "ITech", projection[2] );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
-		assertEquals( "BOOST incorrect", 1.0F, projection[5] );
-		assertTrue( "DOCUMENT incorrect", projection[6] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[6] ).getFields().size() );
-		assertEquals( "legacy ID incorrect", 1004, projection[7] );
+		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
+		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[5] ).getFields().size() );
+		assertEquals( "legacy ID incorrect", 1004, projection[6] );
 	}
 
 	private void checkProjection2(Object[] projection, Session s) {
@@ -169,10 +167,9 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "dept incorrect", "ITech", projection[2] );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
-		assertEquals( "BOOST incorrect", 1.0F, projection[5] );
-		assertTrue( "DOCUMENT incorrect", projection[6] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[6] ).getFields().size() );
-		assertEquals( "legacy ID incorrect", 1003, projection[7] );
+		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
+		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[5] ).getFields().size() );
+		assertEquals( "legacy ID incorrect", 1003, projection[6] );
 	}
 
 	public void testLuceneObjectsProjectionWithIterate() throws Exception {
@@ -186,7 +183,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST,
+		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE,
 				FullTextQuery.DOCUMENT, FullTextQuery.ID );
 
 		int counter = 0;
@@ -198,9 +195,8 @@ public class ProjectionQueryTest extends SearchTestCase {
 			assertEquals( "dept incorrect", "ITech", projection[2] );
 			assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
 			assertEquals( "SCORE incorrect", 1.0F, projection[4] );
-			assertEquals( "BOOST incorrect", 1.0F, projection[5] );
-			assertTrue( "DOCUMENT incorrect", projection[6] instanceof Document );
-			assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[6] ).getFields().size() );
+			assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
+			assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[5] ).getFields().size() );
 		}
 		assertEquals( "incorrect number of results returned", 4, counter );
 
@@ -221,7 +217,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:Accounting" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.BOOST,
+		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE,
 				FullTextQuery.DOCUMENT, FullTextQuery.ID, FullTextQuery.DOCUMENT_ID );
 
 		List result = hibQuery.list();
@@ -235,11 +231,10 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "THIS incorrect", "Jackson", ( (Employee) projection[3] ).getLastname() );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
-		assertEquals( "BOOST incorrect", 1.0F, projection[5] );
-		assertTrue( "DOCUMENT incorrect", projection[6] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[6] ).getFields().size() );
-		assertEquals( "ID incorrect", 1001, projection[7] );
-		assertNotNull( "Lucene internal doc id", projection[8] );
+		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
+		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[5] ).getFields().size() );
+		assertEquals( "ID incorrect", 1001, projection[6] );
+		assertNotNull( "Lucene internal doc id", projection[7] );
 
 		// Change the projection order and null one
 		hibQuery.setProjection( FullTextQuery.DOCUMENT, FullTextQuery.THIS, FullTextQuery.SCORE, null, FullTextQuery.ID,
