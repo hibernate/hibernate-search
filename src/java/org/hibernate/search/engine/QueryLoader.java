@@ -16,12 +16,12 @@ import org.slf4j.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class QueryLoader implements Loader {
-	private final Logger log = LoggerFactory.getLogger( QueryLoader.class );
 
 	private Session session;
 	private Class entityType;
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Criteria criteria;
+	private boolean isExplicitCriteria;
 
 	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
 		this.session = session;
@@ -33,6 +33,8 @@ public class QueryLoader implements Loader {
 	}
 
 	public Object load(EntityInfo entityInfo) {
+		//if explicit criteria, make sure to use it to load the objects
+		if ( isExplicitCriteria ) load( new EntityInfo[] { entityInfo } );
 		return ObjectLoaderHelper.load( entityInfo, session );
 	}
 
@@ -46,6 +48,7 @@ public class QueryLoader implements Loader {
 	}
 
 	public void setCriteria(Criteria criteria) {
+		isExplicitCriteria = criteria != null;
 		this.criteria = criteria;
 	}
 }
