@@ -1,6 +1,8 @@
 //$Id$
 package org.hibernate.search.query;
 
+import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -38,19 +40,19 @@ import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.CachingWrapperFilter;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.Loader;
+import org.hibernate.search.engine.MultiClassesQueryLoader;
 import org.hibernate.search.engine.ProjectionLoader;
 import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.engine.MultiClassesQueryLoader;
 import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.reader.ReaderProvider;
-import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.transform.ResultTransformer;
@@ -289,106 +291,165 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private void buildFilters() {
-		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-		if ( filterDefinitions != null && filterDefinitions.size() > 0 ) {
-			/*
-			 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
-			 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
-			 */
-			ChainedFilter chainedFilter = new ChainedFilter();
-			for (FullTextFilterImpl filterDefinition : filterDefinitions.values()) {
-				FilterDef def = searchFactoryImplementor.getFilterDefinition( filterDefinition.getName() );
-				Class implClass = def.getImpl();
-				Object instance;
-				try {
-					instance = implClass.newInstance();
-				}
-				catch (InstantiationException e) {
-					throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
-				}
-				catch (IllegalAccessException e) {
-					throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
-				}
-				for (Map.Entry<String, Object> entry : filterDefinition.getParameters().entrySet()) {
-					def.invoke( entry.getKey(), instance, entry.getValue() );
-				}
-				if ( def.isCache() && def.getKeyMethod() == null && filterDefinition.getParameters().size() > 0 ) {
-					throw new SearchException( "Filter with parameters and no @Key method: " + filterDefinition.getName() );
-				}
-
-				FilterKey key = null;
-				if ( def.isCache() ) {
-					if ( def.getKeyMethod() == null ) {
-						key = new FilterKey() {
-							public int hashCode() {
-								return getImpl().hashCode();
-							}
-
-							public boolean equals(Object obj) {
-								if ( !( obj instanceof FilterKey ) ) return false;
-								FilterKey that = (FilterKey) obj;
-								return this.getImpl().equals( that.getImpl() );
-							}
-						};
-					}
-					else {
-						try {
-							key = (FilterKey) def.getKeyMethod().invoke( instance );
-						}
-						catch (IllegalAccessException e) {
-							throw new SearchException( "Unable to access @Key method: "
-									+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
-						}
-						catch (InvocationTargetException e) {
-							throw new SearchException( "Unable to access @Key method: "
-									+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
-						}
-						catch (ClassCastException e) {
-							throw new SearchException( "@Key method does not return FilterKey: "
-									+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
-						}
-					}
-					key.setImpl( def.getImpl() );
-				}
-
-				Filter filter = def.isCache() ?
-						searchFactoryImplementor.getFilterCachingStrategy().getCachedFilter( key ) :
-						null;
-				if ( filter == null ) {
-					if ( def.getFactoryMethod() != null ) {
-						try {
-							filter = (Filter) def.getFactoryMethod().invoke( instance );
-						}
-						catch (IllegalAccessException e) {
-							throw new SearchException( "Unable to access @Factory method: "
-									+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
-						}
-						catch (InvocationTargetException e) {
-							throw new SearchException( "Unable to access @Factory method: "
-									+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
-						}
-						catch (ClassCastException e) {
-							throw new SearchException( "@Key method does not return a org.apache.lucene.search.Filter class: "
-									+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
-						}
-					}
-					else {
-						try {
-							filter = (Filter) instance;
-						}
-						catch (ClassCastException e) {
-							throw new SearchException( "@Key method does not return a org.apache.lucene.search.Filter class: "
-									+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
-						}
-					}
-					if ( def.isCache() )
-						searchFactoryImplementor.getFilterCachingStrategy().addCachedFilter( key, filter );
-				}
-				chainedFilter.addFilter( filter );
-			}
-			if ( filter != null ) chainedFilter.addFilter( filter );
-			filter = chainedFilter;
+		if ( filterDefinitions == null || filterDefinitions.size() == 0 ) {
+			return; // there is nothing to do if we don't have any filter definitions
 		}
+		
+		ChainedFilter chainedFilter = new ChainedFilter();
+		for (FullTextFilterImpl fullTextFilter : filterDefinitions.values()) {
+			Filter filter = buildLuceneFilter(fullTextFilter);
+			chainedFilter.addFilter( filter );
+		}
+		
+		if ( filter != null ) chainedFilter.addFilter( filter );
+		filter = chainedFilter;
+	}
+
+	/**
+	 * Builds a Lucene filter using the given <code>FullTextFilter</code>.
+	 * 
+	 * @param fullTextFilter the Hibernate specific <code>FullTextFilter</code> used to create the 
+	 * Lucene <code>Filter</code>.
+	 * @return the Lucene filter mapped to the filter definition
+	 */
+	private Filter buildLuceneFilter(FullTextFilterImpl fullTextFilter) {
+		
+		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
+		
+		/*
+		 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
+		 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
+		 */
+		FilterDef def = searchFactoryImplementor.getFilterDefinition( fullTextFilter.getName() );
+		Object instance = createFilterInstance(fullTextFilter, def);
+		FilterKey key = createFilterKey(def, instance);
+
+		// try to get the filter out of the cache
+		Filter filter = def.isCache() ?
+				searchFactoryImplementor.getFilterCachingStrategy().getCachedFilter( key ) :
+				null;
+					
+		if ( filter == null ) {
+			filter = createFilter(def, instance);	
+			
+			// add filter to cache if we have to
+			if ( def.isCache() ) {
+				searchFactoryImplementor.getFilterCachingStrategy().addCachedFilter( key, filter );
+			}
+		}
+		return filter;
+	}
+
+	private Filter createFilter(FilterDef def, Object instance) {
+		Filter filter = null;
+		if ( def.getFactoryMethod() != null ) {
+			try {
+				filter = (Filter) def.getFactoryMethod().invoke( instance );
+			}
+			catch (IllegalAccessException e) {
+				throw new SearchException( "Unable to access @Factory method: "
+						+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+			}
+			catch (InvocationTargetException e) {
+				throw new SearchException( "Unable to access @Factory method: "
+						+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+			}
+			catch (ClassCastException e) {
+				throw new SearchException( "@Key method does not return a org.apache.lucene.search.Filter class: "
+						+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+			}
+		}
+		else {
+			try {
+				filter = (Filter) instance;
+			}
+			catch (ClassCastException e) {
+				throw new SearchException( "@Key method does not return a org.apache.lucene.search.Filter class: "
+						+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+			}
+		}
+		
+		filter = addCachingWrapperFilter(filter, def);
+		return filter;
+	}
+
+	/**
+	 * Decides whether to wrap the given filter around a <code>CachingWrapperFilter<code>.
+	 * 
+	 * @param filter the filter which maybe gets wrapped.
+	 * @param def The filter definition used to decide whether wrapping should occur or not.
+	 * @return The original filter or wrapped filter depending on the information extracted from 
+	 * <code>def</code>.
+	 */
+	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
+		if (def.getUseCachingWrapperFilter() == CachingWrapperFilter.YES
+				|| (def.getUseCachingWrapperFilter() == CachingWrapperFilter.AUTOMATIC && def
+						.isCache())) {
+			filter = new org.hibernate.search.filter.CachingWrapperFilter(filter);
+		}
+		
+		return filter;
+	}
+
+	private FilterKey createFilterKey(FilterDef def, Object instance) {
+		FilterKey key = null;
+		if ( !def.isCache() ) {
+			return key; // if the filter is not cached there is no key!
+		}
+				
+		if ( def.getKeyMethod() == null ) {
+			key = new FilterKey() {
+				public int hashCode() {
+					return getImpl().hashCode();
+				}
+
+				public boolean equals(Object obj) {
+					if ( !( obj instanceof FilterKey ) ) return false;
+					FilterKey that = (FilterKey) obj;
+					return this.getImpl().equals( that.getImpl() );
+				}
+			};
+		}
+		else {
+			try {
+				key = (FilterKey) def.getKeyMethod().invoke( instance );
+			}
+			catch (IllegalAccessException e) {
+				throw new SearchException( "Unable to access @Key method: "
+						+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
+			}
+			catch (InvocationTargetException e) {
+				throw new SearchException( "Unable to access @Key method: "
+						+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
+			}
+			catch (ClassCastException e) {
+				throw new SearchException( "@Key method does not return FilterKey: "
+						+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
+			}
+		}
+		key.setImpl( def.getImpl() );
+		return key;
+	}
+
+	private Object createFilterInstance(FullTextFilterImpl fullTextFilter,
+			FilterDef def) {
+		Object instance;
+		try {
+			instance = def.getImpl().newInstance();
+		}
+		catch (InstantiationException e) {
+			throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
+		}
+		catch (IllegalAccessException e) {
+			throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
+		}
+		for (Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet()) {
+			def.invoke( entry.getKey(), instance, entry.getValue() );
+		}
+		if ( def.isCache() && def.getKeyMethod() == null && fullTextFilter.getParameters().size() > 0 ) {
+			throw new SearchException( "Filter with parameters and no @Key method: " + fullTextFilter.getName() );
+		}
+		return instance;
 	}
 
 	private org.apache.lucene.search.Query filterQueryByClasses(org.apache.lucene.search.Query luceneQuery) {

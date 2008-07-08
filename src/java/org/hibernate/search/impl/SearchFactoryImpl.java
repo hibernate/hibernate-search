@@ -173,6 +173,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		FilterDef filterDef = new FilterDef();
 		filterDef.setImpl( defAnn.impl() );
 		filterDef.setCache( defAnn.cache() );
+		filterDef.setUseCachingWrapperFilter( defAnn.useCachingWrapperFilter() );
 		try {
 			filterDef.getImpl().newInstance();
 		}

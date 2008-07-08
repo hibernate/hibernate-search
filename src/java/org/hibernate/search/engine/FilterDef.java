@@ -7,17 +7,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.CachingWrapperFilter;
 
 /**
+ * A wrapper class which encapsualtes all required information to create a defined filter.
+ * 
  * @author Emmanuel Bernard
  */
 //TODO serialization
+@SuppressWarnings("unchecked")
 public class FilterDef {
 	private Class impl;
 	private Method factoryMethod;
 	private Method keyMethod;
 	private Map<String, Method> setters = new HashMap<String, Method>();
 	private boolean cache;
+	private CachingWrapperFilter useCachingWrapperFilter;
+
+	public CachingWrapperFilter getUseCachingWrapperFilter() {
+		return useCachingWrapperFilter;
+	}
+
+	public void setUseCachingWrapperFilter(
+			CachingWrapperFilter useCachingWrapperFilter) {
+		this.useCachingWrapperFilter = useCachingWrapperFilter;
+	}
 
 	public Class getImpl() {
 		return impl;

@@ -1,21 +1,19 @@
-//$Id$
+// $Id:$
 package org.hibernate.search.test.filter;
 
-import java.util.Date;
 import java.util.Calendar;
 
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.Session;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.RangeFilter;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
+import org.hibernate.Session;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Emmanuel Bernard
@@ -69,6 +67,11 @@ public class FilterTest extends SearchTestCase {
 		ftQuery = s.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cachetest");
 		assertEquals("Should filter out all", 0, ftQuery.getResultSize() );
+		
+		// HSEARCH-174 - we call System.gc() to force a garbage collection. Prior to the fix
+		// to HSEARCH-174 this would cause the filter to be garbage collected since Lucene 
+		// used weak references in the cache.
+		System.gc();
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cachetest");
@@ -158,6 +161,7 @@ public class FilterTest extends SearchTestCase {
 		s.close();
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Class[] getMappings() {
 		return new Class[] {
 				Driver.class,
