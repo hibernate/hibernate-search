@@ -19,7 +19,7 @@ import org.hibernate.util.SoftLimitMRUCache;
 @SuppressWarnings("serial")
 public class CachingWrapperFilter extends Filter {
 	
-	private static final int DEFAULT_SIZE = 128;
+	private static final int DEFAULT_SIZE = 5;
 	
 	/**
 	 * The cache using soft references in order to store the filter bit sets.
