@@ -62,9 +62,14 @@ public final class Environment {
 	 * define the reader strategy used
 	 */
 	public static final String READER_STRATEGY = READER_PREFIX + "strategy";
+	
 	/**
 	 * filter caching strategy class (must have a no-arg constructor and implements FilterCachingStrategy)
 	 */
 	public static final String FILTER_CACHING_STRATEGY = "hibernate.search.filter.cache_strategy";
-
+	
+	/**
+	 * Property name for the hard ref count of our <code>CachingWrapperFilter</code>.
+	 */
+	public static final String CACHING_WRAPPER_FILTER_SIZE = "hibernate.search.filter.caching_wrapper.size";	
 }

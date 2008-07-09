@@ -385,7 +385,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		if (def.getUseCachingWrapperFilter() == CachingWrapperFilter.YES
 				|| (def.getUseCachingWrapperFilter() == CachingWrapperFilter.AUTOMATIC && def
 						.isCache())) {
-			filter = new org.hibernate.search.filter.CachingWrapperFilter(filter);
+			int cachingWrapperFilterSize = getSearchFactoryImplementor().getCachingWrapperFilterSize();
+			filter = new org.hibernate.search.filter.CachingWrapperFilter(filter, cachingWrapperFilterSize);
 		}
 		
 		return filter;

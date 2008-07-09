@@ -6,6 +6,8 @@ import java.util.BitSet;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Filter;
 import org.hibernate.util.SoftLimitMRUCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A slightly different version of Lucene's original <code>CachingWrapperFilter</code> which
@@ -19,26 +21,40 @@ import org.hibernate.util.SoftLimitMRUCache;
 @SuppressWarnings("serial")
 public class CachingWrapperFilter extends Filter {
 	
-	private static final int DEFAULT_SIZE = 5;
+	private final Logger log = LoggerFactory.getLogger( CachingWrapperFilter.class );
+	
+	public static final int DEFAULT_SIZE = 5;
+	
+	private final int size;
 	
 	/**
 	 * The cache using soft references in order to store the filter bit sets.
 	 */
-	protected transient SoftLimitMRUCache cache;
+	private transient SoftLimitMRUCache cache;
 	
-	protected Filter filter;
+	private Filter filter;
 
 	/**
 	 * @param filter
 	 *            Filter to cache results of
 	 */
 	public CachingWrapperFilter(Filter filter) {
-		this.filter = filter;
+		this(filter, DEFAULT_SIZE);
 	}
+	
+	/**
+	 * @param filter
+	 *            Filter to cache results of
+	 */
+	public CachingWrapperFilter(Filter filter, int size) {
+		this.filter = filter;
+		this.size = size;
+	}	
 
 	public BitSet bits(IndexReader reader) throws IOException {
 		if (cache == null) {
-			cache = new SoftLimitMRUCache(DEFAULT_SIZE);
+			log.debug("Initialising SoftLimitMRUCache with hard ref size of {}", size);
+			cache = new SoftLimitMRUCache(size);
 		}
 
 		synchronized (cache) { // check cache

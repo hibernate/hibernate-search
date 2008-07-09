@@ -38,9 +38,11 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.reader.ReaderProvider;
@@ -54,6 +56,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Emmanuel Bernard
  */
+@SuppressWarnings("unchecked")
 public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private static final ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>> contexts =
 			new ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>>();
@@ -74,6 +77,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private final FilterCachingStrategy filterCachingStrategy;
 	private Map<String, Analyzer> analyzers;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
+	private final int cachingWrapperFilterSize;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -105,6 +109,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.worker = WorkerFactory.createWorker( cfg, this );
 		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		this.filterCachingStrategy = buildFilterCachingStrategy( cfg.getProperties() );
+		
+		this.cachingWrapperFilterSize = ConfigurationParseHelper.getIntValue( cfg.getProperties(), Environment.CACHING_WRAPPER_FILTER_SIZE, CachingWrapperFilter.DEFAULT_SIZE );
 	}
 
 	private static String defineIndexingStrategy(Configuration cfg) {
@@ -383,6 +389,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	public void addDirectoryProvider(DirectoryProvider<?> provider) {
 		this.dirProviderData.put( provider, new DirectoryProviderData() );
+	}
+
+	public int getCachingWrapperFilterSize() {
+		return cachingWrapperFilterSize;
 	}
 	
 }
