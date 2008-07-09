@@ -1,4 +1,4 @@
-//$
+// $Id:$
 package org.hibernate.search.impl;
 
 import java.util.Map;

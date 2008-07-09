@@ -1,11 +1,9 @@
 //$Id$
 package org.hibernate.search;
 
-import java.util.Map;
-
+import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
-import org.apache.lucene.analysis.Analyzer;
 
 /**
  * Provide application wide operations as well as access to the underlying Lucene resources.
