@@ -19,6 +19,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
+@SuppressWarnings("unchecked")
 public interface SearchFactoryImplementor extends SearchFactory {
 	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
 
@@ -36,13 +37,13 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	FilterDef getFilterDefinition(String name);
 
-	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider);
+	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider);
 
 	void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams);
 
-	public String getIndexingStrategy();
+	String getIndexingStrategy();
 
-	public void close();
+	void close();
 
 	void addClassToDirectoryProvider(Class clazz, DirectoryProvider<?> directoryProvider);
 
@@ -54,4 +55,5 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	void addDirectoryProvider(DirectoryProvider<?> provider);
 	
+	int getCachingWrapperFilterSize();	
 }
