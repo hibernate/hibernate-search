@@ -59,6 +59,7 @@ import org.hibernate.type.Type;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
+@SuppressWarnings({"serial", "unchecked"})
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 	private final Session session;
 	private final EventSource eventSource;
