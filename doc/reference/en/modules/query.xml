@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  $Id$ -->
 <chapter id="search-query" xreflabel="Querying">
+  <!--  $Id$ -->
+
   <title>Querying</title>
 
   <para>The second most important capability of Hibernate Search is the
@@ -366,11 +367,10 @@ for(BookView view : results) {
   <section>
     <title>Filters</title>
 
-    <para>Apache Lucene has a powerful feature that allows to filters results
-    from a query according to a custom filtering process. This is a very
-    powerful way to apply some data restrictions after a query, especially
-    since filters can be cached and reused. Some interesting usecases
-    are:</para>
+    <para>Apache Lucene has a powerful feature that allows to filter query
+    results according to a custom filtering process. This is a very powerful
+    way to apply additional data restrictions, especially since filters can be
+    cached and reused. Some interesting usecases are:</para>
 
     <itemizedlist>
       <listitem>
@@ -392,22 +392,24 @@ for(BookView view : results) {
     </itemizedlist>
 
     <para>Hibernate Search pushes the concept further by introducing the
-    notion of parameterizable named filters which are transparantly cached.
+    notion of parameterizable named filters which are transparently cached.
     For people familiar with the notion of Hibernate Core filters, the API is
-    very similar.</para>
+    very similar:</para>
 
     <programlisting>fullTextQuery = s.createFullTextQuery( query, Driver.class );
 fullTextQuery.enableFullTextFilter("bestDriver");
 fullTextQuery.enableFullTextFilter("security").setParameter( "login", "andre" );
 fullTextQuery.list(); //returns only best drivers where andre has credentials</programlisting>
 
-    <para>In this example we enabled 2 filters on top of this query. You can
+    <para>In this example we enabled two filters on top of the query. You can
     enable (or disable) as many filters as you want.</para>
 
     <para>Declaring filters is done through the
     <classname>@FullTextFilterDef</classname> annotation. This annotation can
-    be on any <literal>@Indexed</literal> entity regardless of the filter
-    operation.</para>
+    be on any <literal>@Indexed</literal> entity regardless of the query the
+    filter is later applied to. Filter names must be unique since all filters
+    are globally visible. Each named filter has to point to an actual filter
+    implementation.</para>
 
     <programlisting>@Entity
 @Indexed
@@ -416,8 +418,6 @@ fullTextQuery.list(); //returns only best drivers where andre has credentials</p
     <emphasis role="bold">@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class)</emphasis> //Filter factory with parameters
 })
 public class Driver { ... }</programlisting>
-
-    <para>Each named filter points to an actual filter implementation.</para>
 
     <programlisting>public class BestDriversFilter extends <emphasis
         role="bold">org.apache.lucene.search.Filter</emphasis> {
@@ -433,20 +433,16 @@ public class Driver { ... }</programlisting>
 }</programlisting>
 
     <para><classname>BestDriversFilter</classname> is an example of a simple
-    Lucene filter that will filter all results to only return drivers whose
-    score is 5. The filters must have a no-arg constructor when referenced in
-    a <literal>FulltextFilterDef.impl</literal>.</para>
-
-    <para>The <literal>cache</literal> flag, defaulted to
+    Lucene filter that will filter all results returning only drivers whose
+    score is 5. In this example the specified filter implements the
+    <literal>org.apache.lucene.search.Filter</literal> directly and contains a
+    no-arg constructor. The <literal>cache</literal> flag, defaulted to
     <literal>true</literal>, tells Hibernate Search to search the filter in
-    its internal cache and reuses it if found.</para>
+    its internal cache and reuse it if found.</para>
 
-    <para>Note that, usually, filter using the
-    <classname>IndexReader</classname> are wrapped in a Lucene
-    <classname>CachingWrapperFilter</classname> to benefit from some caching
-    speed improvement. If your Filter creation requires additional steps or if
-    the filter you are willing to use does not have a no-arg constructor, you
-    can use the factory pattern:</para>
+    <para>If your Filter creation requires additional steps or if the filter
+    you want to use does not have a no-arg constructor, you can use the
+    factory pattern:</para>
 
     <programlisting>@Entity
 @Indexed
@@ -469,9 +465,9 @@ public class BestDriversFilterFactory {
     similar to the component factory pattern, but the annotation is
     different!</para>
 
-    <para>Named filters comes in handy where the filters have parameters. For
-    example a security filter needs to know which credentials you are willing
-    to filter by:</para>
+    <para>Named filters come in handy where parameters have to be passed to
+    the filter. For example a security filter might want to know which
+    security level you want to apply:</para>
 
     <programlisting>fullTextQuery = s.createFullTextQuery( query, Driver.class );
 fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParameter( "level", 5 )</emphasis>;</programlisting>
@@ -503,14 +499,14 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     }
 }</programlisting>
 
-    <para>Note the method annotated <classname>@Key</classname> and returning
-    a <classname>FilterKey</classname> object. The returned object has a
-    special contract: the key object must implement equals / hashcode so that
-    2 keys are equals if and only if the given Filter types are the same and
-    the set of parameters are the same. In other words, 2 filter keys are
-    equal if and only if the filters from which the keys are generated can be
-    interchanged. The key object is used as a key in the cache
-    mechanism.</para>
+    <para>Note the method annotated <classname>@Key</classname> returning a
+    <classname>FilterKey</classname> object. The returned object has a special
+    contract: the key object must implement equals / hashcode so that 2 keys
+    are equal if and only if the given <classname>Filter</classname> types are
+    the same and the set of parameters are the same. In other words, 2 filter
+    keys are equal if and only if the filters from which the keys are
+    generated can be interchanged. The key object is used as a key in the
+    cache mechanism.</para>
 
     <para><classname>@Key</classname> methods are needed only if:</para>
 
@@ -526,12 +522,82 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     </itemizedlist>
 
     <para>In most cases, using the <literal>StandardFilterKey</literal>
-    implementation will be good enough. It delegates the equals/hashcode
+    implementation will be good enough. It delegates the equals / hashcode
     implementation to each of the parameters equals and hashcode
     methods.</para>
 
-    <para>Why should filters be cached? There are two area where filter
-    caching shines:</para>
+    <para>The filter cache is enabled by default and uses the notion of
+    SoftReferences to dispose memory when needed. To adjust the size of the
+    hard reference cache, use
+    <literal>hibernate.search.filter.cache_strategy.size</literal> (defaults
+    to 128). For advance use of filter caching, you can implement your own
+    <classname>FilterCachingStrategy</classname>. The classname is defined by
+    <literal>hibernate.search.filter.cache_strategy</literal>.</para>
+
+    <para>The described filter cache should not be confused with caching the
+    actual filter results. In Lucene it is common practise to wrap filters
+    using the <classname>IndexReader</classname> around a
+    <classname>CachingWrapperFilter.</classname> The wrapper will cache the
+    <classname>BitSet</classname> returned from the
+    <methodname>bits(IndexReader reader)</methodname>method to avoid expensive
+    recomputation. </para>
+
+    <para>Hibernate Search also takes care of this aspect of caching. If the
+    <literal>cache</literal> flag of <classname>@FullTextFilterDef
+    </classname>is set to <literal>true</literal>, it will automatically wrap
+    the specified filter around a Hibernate specific implementation of
+    CachingWrapperFilter
+    (<classname>org.hibernate.search.filter.CachingWrapperFilter</classname>).
+    In contrast to Lucene's version of this class SoftReferences are used
+    together with a hard reference count. The hard reference count can be
+    adjusted using
+    <literal>hibernate.search.filter.caching_wrapper.size</literal> (defaults
+    to 5). The wrapping behaviour can be controlled by
+    <literal>@FullTextFilterDef.useCachingWrapperFilter</literal>. There are
+    three differerent values for this parameter:</para>
+
+    <para><informaltable align="left" width="">
+        <tgroup cols="2">
+          <colspec align="center" />
+
+          <thead>
+            <row>
+              <entry align="center">Value</entry>
+
+              <entry align="center">Definition</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry align="left">CacheBitSet.AUTOMATIC</entry>
+
+              <entry>The use of <classname>CachingWrapperFilter</classname>
+              depends on the <literal>cache</literal> paramter of the filter
+              defintion. If <literal>cache</literal> is set to
+              <literal>true</literal> a wrapper will be used, otherwise not.
+              <literal>CacheBitSet.AUTOMATIC</literal> is the default
+              value.</entry>
+            </row>
+
+            <row>
+              <entry align="left">CacheBitSet.NO</entry>
+
+              <entry>No wrapper will be used.</entry>
+            </row>
+
+            <row>
+              <entry align="left">CacheBitSet.YES</entry>
+
+              <entry>The specified filter will be wrapped independent of the
+              <literal>cache</literal> flag. (Note, this options is quite
+              meaningless, because even though the BitSet will be cached there
+              is currently no way to reuse the fitler.)</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>Last but not least - why should filters be cached? There
+    are two areas where filter caching shines:</para>
 
     <itemizedlist>
       <listitem>
@@ -544,17 +610,6 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
         spent to execute the query)</para>
       </listitem>
     </itemizedlist>
-
-    <para>Cache is enabled by default and use the notion of SoftReferences to
-    dispose memory when needed. To adjust the size of the hard reference
-    cache, use <literal>hibernate.search.filter.cache_strategy.size</literal>
-    (defaults to 128). Don't forget to use a
-    <classname>CachingWrapperFilter</classname> when the filter is cacheable
-    and the Filter's bits methods makes use of IndexReader.</para>
-
-    <para>For advance use of filter caching, you can implement your own
-    <classname>FilterCachingStrategy</classname>. The classname is defined by
-    <literal>hibernate.search.filter.cache_strategy</literal>.</para>
   </section>
 
   <section>
