@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.annotations.CachingWrapperFilter;
+import org.hibernate.search.annotations.CacheBitResults;
 
 /**
  * A wrapper class which encapsualtes all required information to create a defined filter.
@@ -22,14 +22,14 @@ public class FilterDef {
 	private Method keyMethod;
 	private Map<String, Method> setters = new HashMap<String, Method>();
 	private boolean cache;
-	private CachingWrapperFilter useCachingWrapperFilter;
+	private CacheBitResults useCachingWrapperFilter;
 
-	public CachingWrapperFilter getUseCachingWrapperFilter() {
+	public CacheBitResults getUseCachingWrapperFilter() {
 		return useCachingWrapperFilter;
 	}
 
 	public void setUseCachingWrapperFilter(
-			CachingWrapperFilter useCachingWrapperFilter) {
+			CacheBitResults useCachingWrapperFilter) {
 		this.useCachingWrapperFilter = useCachingWrapperFilter;
 	}
 

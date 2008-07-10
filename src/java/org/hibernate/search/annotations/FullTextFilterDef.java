@@ -42,5 +42,5 @@ public @interface FullTextFilterDef {
 	/**
 	 * Determines whether the filter should be wrapped around a <code>CachingWrapperFilter</code>.
 	 */	
-	CachingWrapperFilter useCachingWrapperFilter() default CachingWrapperFilter.AUTOMATIC;
+	CacheBitResults useCachingWrapperFilter() default CacheBitResults.AUTOMATIC;
 }

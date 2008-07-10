@@ -40,7 +40,7 @@ import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.annotations.CachingWrapperFilter;
+import org.hibernate.search.annotations.CacheBitResults;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
@@ -382,8 +382,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * <code>def</code>.
 	 */
 	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
-		if (def.getUseCachingWrapperFilter() == CachingWrapperFilter.YES
-				|| (def.getUseCachingWrapperFilter() == CachingWrapperFilter.AUTOMATIC && def
+		if (def.getUseCachingWrapperFilter() == CacheBitResults.YES
+				|| (def.getUseCachingWrapperFilter() == CacheBitResults.AUTOMATIC && def
 						.isCache())) {
 			int cachingWrapperFilterSize = getSearchFactoryImplementor().getCachingWrapperFilterSize();
 			filter = new org.hibernate.search.filter.CachingWrapperFilter(filter, cachingWrapperFilterSize);
