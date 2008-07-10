@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  $Id$ -->
+
 <chapter id="search-batchindex">
+  <!--  $Id$ -->	
   <title>Manual indexing</title>
 
   <section id="search-batchindex-indexing">

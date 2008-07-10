@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  $Id$ -->
 <chapter id="getting-started">
+  <!--  $Id$ -->	
   <title>Getting started</title>
 
   <para>Welcome to Hibernate Search! The following chapter will guide you

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  $Id$ -->
+
 <chapter id="search-optimize">
+  <!--  $Id$ -->	
   <title>Index Optimization</title>
 
   <para>From time to time, the Lucene index needs to be optimized. The process

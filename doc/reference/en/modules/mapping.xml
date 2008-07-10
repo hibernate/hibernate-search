@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  $Id$ -->
+
 <chapter id="search-mapping" revision="3">
+  <!--  $Id$ -->	
   <title>Mapping entities to the index structure</title>
 
   <para>All the metadata information needed to index entities is described

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  $Id$ -->
+
 <chapter id="search-lucene-native">
+  <!--  $Id$ -->
   <title>Accessing Lucene natively</title>
 
   <section>
