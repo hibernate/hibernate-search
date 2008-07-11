@@ -17,13 +17,13 @@ public class String2FieldBridgeAdaptor implements FieldBridge {
 		this.stringBridge = stringBridge;
 	}
 
-	public void set(String name, Object value, Document document, LuceneOptions parameterObject) {
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		String indexedString = stringBridge.objectToString( value );
 		//Do not add fields on empty strings, seems a sensible default in most situations
 		//TODO if Store, probably also save empty ones
 		if ( StringHelper.isNotEmpty( indexedString ) ) {
-			Field field = new Field( name, indexedString, parameterObject.store, parameterObject.index, parameterObject.termVector );
-			if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
+			Field field = new Field( name, indexedString, luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
+			field.setBoost( luceneOptions.getBoost() );
 			document.add( field );
 		}
 	}

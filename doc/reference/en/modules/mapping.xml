@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <chapter id="search-mapping" revision="3">
-  <!--  $Id$ -->	
+  <!--  $Id$ -->
+
   <title>Mapping entities to the index structure</title>
 
   <para>All the metadata information needed to index entities is described
@@ -790,43 +790,48 @@ private Integer id;
         document fields</para>
 
         <programlisting>/**
- * Store the date in 3 different field year, month, day
- * to ease Range Query per year, month or day
- * (eg get all the elements of december for the last 5 years)
- *
+ * Store the date in 3 different fields - year, month, day - to ease Range Query per
+ * year, month or day (eg get all the elements of December for the last 5 years).
+ * 
  * @author Emmanuel Bernard
  */
 public class DateSplitBridge implements FieldBridge {
     private final static TimeZone GMT = TimeZone.getTimeZone("GMT");
 
-    <emphasis role="bold">public void set(String name, Object value, Document document, Field.Store
-            store, Field.Index index, Float boost) {
-                    </emphasis>
+    <emphasis role="bold">public void set(String name, Object value, Document document, LuceneOptions luceneOptions)</emphasis> {
         Date date = (Date) value;
-        Calendar cal = GregorianCalendar.getInstance( GMT );
-        cal.setTime( date );
-        int year = cal.get( Calendar.YEAR );
-        int month = cal.get( Calendar.MONTH ) + 1;
-        int day = cal.get( Calendar.DAY_OF_MONTH );
-        //set year
-        Field field = new Field( name + ".year", String.valueOf(year), store, index );
-        if ( boost != null ) field.setBoost( boost );
-        document.add( field );
-        //set month and pad it if needed
-        field = new Field( name + ".month", month &lt; 10 ? "0" : "" + String.valueOf(month), store, index);
-        if ( boost != null ) field.setBoost( boost );
-        document.add( field );
-        //set day and pad it if needed
-        field = new Field( name + ".day", day &lt; 10 ? "0" : "" + String.valueOf(day), store, index );
-        if ( boost != null ) field.setBoost( boost );
-        document.add( field );
+        Calendar cal = GregorianCalendar.getInstance(GMT);
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+  
+        // set year
+        Field field = new Field(name + ".year", String.valueOf(year),
+            luceneOptions.getStore(), luceneOptions.getIndex(),
+            luceneOptions.getTermVector());
+        field.setBoost(luceneOptions.getBoost());
+        document.add(field);
+  
+        // set month and pad it if needed
+        field = new Field(name + ".month", month &lt; 10 ? "0" : ""
+            + String.valueOf(month), luceneOptions.getStore(),
+            luceneOptions.getIndex(), luceneOptions.getTermVector());
+        field.setBoost(luceneOptions.getBoost());
+        document.add(field);
+  
+        // set day and pad it if needed
+        field = new Field(name + ".day", day &lt; 10 ? "0" : ""
+            + String.valueOf(day), luceneOptions.getStore(),
+            luceneOptions.getIndex(), luceneOptions.getTermVector());
+        field.setBoost(luceneOptions.getBoost());
+        document.add(field);
     }
 }
 
-
 //property
 <emphasis role="bold">@FieldBridge(impl = DateSplitBridge.class)</emphasis>
-private Integer length;                </programlisting>
+private Date date;                </programlisting>
 
         <para></para>
       </section>
@@ -861,18 +866,15 @@ public class Department {
     ...
 }
 
-public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
 
+public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
     private String sepChar;
 
     public void setParameterValues(Map parameters) {
         this.sepChar = (String) parameters.get( "sepChar" );
     }
 
-    public void set(String name, 
-                Object value, //the department instance (entity) in this case
-                Document document, //the Lucene document 
-                Field.Store store, Field.Index index, Float boost) {
+    <emphasis role="bold">public void set(String name, Object value, Document document, LuceneOptions luceneOptions)</emphasis> {
         // In this particular class the name of the new field was passed
         // from the name field of the ClassBridge Annotation. This is not
         // a requirement. It just works that way in this instance. The
@@ -887,10 +889,10 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
             fieldValue2 = "";
         }
         String fieldValue = fieldValue1 + sepChar + fieldValue2;
-        Field field = new Field( name, fieldValue, store, index );
-        if ( boost != null ) field.setBoost( boost );
+        Field field = new Field( name, fieldValue, luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
+        field.setBoost( luceneOptions.getBoost() );
         document.add( field );
-    }
+   }
 }</programlisting>
 
         <para>In this example, the particular

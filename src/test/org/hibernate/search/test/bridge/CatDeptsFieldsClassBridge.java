@@ -15,11 +15,12 @@ public class CatDeptsFieldsClassBridge implements FieldBridge, ParameterizedBrid
 
 	private String sepChar;
 
+	@SuppressWarnings("unchecked")
 	public void setParameterValues(Map parameters) {
 		this.sepChar = (String) parameters.get( "sepChar" );
 	}
 
-	public void set(String name, Object value, Document document, LuceneOptions parameterObject) {
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		// In this particular class the name of the new field was passed
 		// from the name field of the ClassBridge Annotation. This is not
 		// a requirement. It just works that way in this instance. The
@@ -34,8 +35,8 @@ public class CatDeptsFieldsClassBridge implements FieldBridge, ParameterizedBrid
 			fieldValue2 = "";
 		}
 		String fieldValue = fieldValue1 + sepChar + fieldValue2;
-		Field field = new Field( name, fieldValue, parameterObject.store, parameterObject.index, parameterObject.termVector );
-		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
+		Field field = new Field( name, fieldValue, luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
+		field.setBoost( luceneOptions.getBoost() );
 		document.add( field );
 	}
 }

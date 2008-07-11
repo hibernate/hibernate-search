@@ -2,7 +2,6 @@
 package org.hibernate.search.bridge;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 
 /**
  * Link between a java property and a Lucene Document
@@ -17,7 +16,8 @@ public interface FieldBridge {
 	 * A common implementation is to add a Field <code>name</code> to the given document following
 	 * the parameters (<code>store</code>, <code>index</code>, <code>boost</code>) if the
 	 * <code>value</code> is not null
-	 * @param parameterObject TODO
+	 * @param luceneOptions Contains the parameters used for adding <code>value</code> to 
+	 * the Lucene <code>document</code>.
 	 */
-	void set(String name, Object value, Document document, LuceneOptions parameterObject);
+	void set(String name, Object value, Document document, LuceneOptions luceneOptions);
 }

@@ -12,33 +12,41 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
 /**
- * Store the date in 3 different field year, month, day
- * to ease Range Query per year, month or day
- * (eg get all the elements of december for the last 5 years)
- *
+ * Store the date in 3 different fields - year, month, day - to ease Range Query per
+ * year, month or day (eg get all the elements of December for the last 5 years).
+ * 
  * @author Emmanuel Bernard
  */
 public class DateSplitBridge implements FieldBridge {
-	private final static TimeZone GMT = TimeZone.getTimeZone( "GMT" );
+	private final static TimeZone GMT = TimeZone.getTimeZone("GMT");
 
-	public void set(String name, Object value, Document document, LuceneOptions parameterObject) {
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		Date date = (Date) value;
-		Calendar cal = GregorianCalendar.getInstance( GMT );
-		cal.setTime( date );
-		int year = cal.get( Calendar.YEAR );
-		int month = cal.get( Calendar.MONTH ) + 1;
-		int day = cal.get( Calendar.DAY_OF_MONTH );
-		//set year
-		Field field = new Field( name + ".year", String.valueOf( year ), parameterObject.store, parameterObject.index, parameterObject.termVector );
-		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
-		document.add( field );
-		//set month and pad it if needed
-		field = new Field( name + ".month", month < 10 ? "0" : "" + String.valueOf( month ), parameterObject.store, parameterObject.index, parameterObject.termVector );
-		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
-		document.add( field );
-		//set day and pad it if needed
-		field = new Field( name + ".day", day < 10 ? "0" : "" + String.valueOf( day ), parameterObject.store, parameterObject.index, parameterObject.termVector );
-		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
-		document.add( field );
+		Calendar cal = GregorianCalendar.getInstance(GMT);
+		cal.setTime(date);
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		
+		// set year
+		Field field = new Field(name + ".year", String.valueOf(year),
+				luceneOptions.getStore(), luceneOptions.getIndex(),
+				luceneOptions.getTermVector());
+		field.setBoost(luceneOptions.getBoost());
+		document.add(field);
+		
+		// set month and pad it if needed
+		field = new Field(name + ".month", month < 10 ? "0" : ""
+				+ String.valueOf(month), luceneOptions.getStore(),
+				luceneOptions.getIndex(), luceneOptions.getTermVector());
+		field.setBoost(luceneOptions.getBoost());
+		document.add(field);
+		
+		// set day and pad it if needed
+		field = new Field(name + ".day", day < 10 ? "0" : ""
+				+ String.valueOf(day), luceneOptions.getStore(),
+				luceneOptions.getIndex(), luceneOptions.getTermVector());
+		field.setBoost(luceneOptions.getBoost());
+		document.add(field);
 	}
 }

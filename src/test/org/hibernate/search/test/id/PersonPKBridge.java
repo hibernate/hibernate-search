@@ -1,4 +1,4 @@
-//$
+// $Id:$
 package org.hibernate.search.test.id;
 
 import org.apache.lucene.document.Document;
@@ -27,20 +27,21 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 		return sb.toString();
 	}
 
-	public void set(String name, Object value, Document document, LuceneOptions parameterObject) {
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		PersonPK id = (PersonPK) value;
 
 		//store each property in a unique field
-		Field field = new Field( name + ".firstName", id.getFirstName(), parameterObject.store, parameterObject.index, parameterObject.termVector );
-		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
+		Field field = new Field( name + ".firstName", id.getFirstName(), luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
+		field.setBoost( luceneOptions.getBoost() );
 		document.add( field );
-		field = new Field( name + ".lastName", id.getLastName(), parameterObject.store, parameterObject.index, parameterObject.termVector );
-		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
+		
+		field = new Field( name + ".lastName", id.getLastName(), luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
+		field.setBoost( luceneOptions.getBoost() );
 		document.add( field );
 
 		//store the unique string representation in the named field
-		field = new Field( name, objectToString( id ), parameterObject.store, parameterObject.index, parameterObject.termVector );
-		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
+		field = new Field( name, objectToString( id ), luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
+		field.setBoost( luceneOptions.getBoost() );
 		document.add( field );
 	}
 }
