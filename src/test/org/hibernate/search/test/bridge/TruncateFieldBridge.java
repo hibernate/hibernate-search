@@ -4,6 +4,7 @@ package org.hibernate.search.test.bridge;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.util.StringHelper;
 
 /**
@@ -15,12 +16,12 @@ public class TruncateFieldBridge implements FieldBridge {
 		return field.stringValue();
 	}
 
-	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost) {
+	public void set(String name, Object value, Document document, LuceneOptions parameterObject) {
 		String indexedString = (String) value;
 		//Do not add fields on empty strings, seems a sensible default in most situations
 		if ( StringHelper.isNotEmpty( indexedString ) ) {
-			Field field = new Field( name, indexedString.substring( 0, indexedString.length() / 2 ), store, index, termVector );
-			if ( boost != null ) field.setBoost( boost );
+			Field field = new Field( name, indexedString.substring( 0, indexedString.length() / 2 ), parameterObject.store, parameterObject.index, parameterObject.termVector );
+			if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
 			document.add( field );
 		}
 	}

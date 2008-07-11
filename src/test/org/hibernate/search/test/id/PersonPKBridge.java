@@ -3,6 +3,7 @@ package org.hibernate.search.test.id;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
@@ -26,20 +27,20 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 		return sb.toString();
 	}
 
-	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost) {
+	public void set(String name, Object value, Document document, LuceneOptions parameterObject) {
 		PersonPK id = (PersonPK) value;
 
 		//store each property in a unique field
-		Field field = new Field( name + ".firstName", id.getFirstName(), store, index, termVector );
-		if ( boost != null ) field.setBoost( boost );
+		Field field = new Field( name + ".firstName", id.getFirstName(), parameterObject.store, parameterObject.index, parameterObject.termVector );
+		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
 		document.add( field );
-		field = new Field( name + ".lastName", id.getLastName(), store, index, termVector );
-		if ( boost != null ) field.setBoost( boost );
+		field = new Field( name + ".lastName", id.getLastName(), parameterObject.store, parameterObject.index, parameterObject.termVector );
+		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
 		document.add( field );
 
 		//store the unique string representation in the named field
-		field = new Field( name, objectToString( id ), store, index, termVector );
-		if ( boost != null ) field.setBoost( boost );
+		field = new Field( name, objectToString( id ), parameterObject.store, parameterObject.index, parameterObject.termVector );
+		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
 		document.add( field );
 	}
 }

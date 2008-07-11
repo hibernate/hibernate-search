@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 
 /**
@@ -18,7 +19,7 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 		this.equips = parameters;
 	}
 
-	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost) {
+	public void set(String name, Object value, Document document, LuceneOptions parameterObject) {
 		// In this particular class the name of the new field was passed
 		// from the name field of the ClassBridge Annotation. This is not
 		// a requirement. It just works that way in this instance. The
@@ -32,8 +33,8 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 		}
 		else {
 			String fieldValue = (String) equips.get( fieldValue1 );
-			field = new Field( name, fieldValue, store, index, termVector );
-			if ( boost != null ) field.setBoost( boost );
+			field = new Field( name, fieldValue, parameterObject.store, parameterObject.index, parameterObject.termVector );
+			if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
 		}
 		document.add( field );
 	}

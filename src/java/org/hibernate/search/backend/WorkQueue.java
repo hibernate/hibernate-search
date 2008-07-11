@@ -44,7 +44,7 @@ public class WorkQueue {
 
 
 	public List<LuceneWork> getSealedQueue() {
-		if (sealedQueue == null) throw new AssertionFailure("Access a Sealed WorkQueue whcih has not been sealed");
+		if (sealedQueue == null) throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
 		return sealedQueue;
 	}
 

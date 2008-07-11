@@ -9,6 +9,7 @@ import java.util.TimeZone;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
 
 /**
  * Store the date in 3 different field year, month, day
@@ -20,7 +21,7 @@ import org.hibernate.search.bridge.FieldBridge;
 public class DateSplitBridge implements FieldBridge {
 	private final static TimeZone GMT = TimeZone.getTimeZone( "GMT" );
 
-	public void set(String name, Object value, Document document, Field.Store store, Field.Index index, Field.TermVector termVector, Float boost) {
+	public void set(String name, Object value, Document document, LuceneOptions parameterObject) {
 		Date date = (Date) value;
 		Calendar cal = GregorianCalendar.getInstance( GMT );
 		cal.setTime( date );
@@ -28,16 +29,16 @@ public class DateSplitBridge implements FieldBridge {
 		int month = cal.get( Calendar.MONTH ) + 1;
 		int day = cal.get( Calendar.DAY_OF_MONTH );
 		//set year
-		Field field = new Field( name + ".year", String.valueOf( year ), store, index, termVector );
-		if ( boost != null ) field.setBoost( boost );
+		Field field = new Field( name + ".year", String.valueOf( year ), parameterObject.store, parameterObject.index, parameterObject.termVector );
+		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
 		document.add( field );
 		//set month and pad it if needed
-		field = new Field( name + ".month", month < 10 ? "0" : "" + String.valueOf( month ), store, index, termVector );
-		if ( boost != null ) field.setBoost( boost );
+		field = new Field( name + ".month", month < 10 ? "0" : "" + String.valueOf( month ), parameterObject.store, parameterObject.index, parameterObject.termVector );
+		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
 		document.add( field );
 		//set day and pad it if needed
-		field = new Field( name + ".day", day < 10 ? "0" : "" + String.valueOf( day ), store, index, termVector );
-		if ( boost != null ) field.setBoost( boost );
+		field = new Field( name + ".day", day < 10 ? "0" : "" + String.valueOf( day ), parameterObject.store, parameterObject.index, parameterObject.termVector );
+		if ( parameterObject.boost != null ) field.setBoost( parameterObject.boost );
 		document.add( field );
 	}
 }

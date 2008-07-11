@@ -27,7 +27,8 @@ import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.impl.InitContext;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
@@ -37,8 +38,6 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
-import org.hibernate.search.annotations.AnalyzerDefs;
-import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -46,8 +45,10 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.impl.InitContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.BinderHelper;
@@ -64,6 +65,7 @@ import org.slf4j.LoggerFactory;
  * @author Richard Hallier
  * @author Hardy Ferentschik
  */
+@SuppressWarnings("unchecked")
 public class DocumentBuilder<T> {
 	private static final Logger log = LoggerFactory.getLogger( DocumentBuilder.class );
 
@@ -603,7 +605,9 @@ public class DocumentBuilder<T> {
 			Field classField =
 					new Field( CLASS_FIELDNAME, instanceClass.getName(), Field.Store.YES, Field.Index.UN_TOKENIZED, Field.TermVector.NO );
 			doc.add( classField );
-			idBridge.set( idKeywordName, id, doc, Field.Store.YES, Field.Index.UN_TOKENIZED, Field.TermVector.NO, idBoost );
+			LuceneOptions luceneOptions = new LuceneOptions(Field.Store.YES,
+					Field.Index.UN_TOKENIZED, Field.TermVector.NO, idBoost);
+			idBridge.set( idKeywordName, id, doc, luceneOptions );
 		}
 		buildDocumentFields( instance, doc, rootPropertiesMetadata );
 		return doc;
@@ -615,26 +619,15 @@ public class DocumentBuilder<T> {
 		Object unproxiedInstance = unproxy( instance );
 		for (int i = 0; i < propertiesMetadata.classBridges.size(); i++) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
-
-			fb.set( propertiesMetadata.classNames.get( i ),
-					unproxiedInstance,
-					doc,
-					propertiesMetadata.classStores.get( i ),
-					propertiesMetadata.classIndexes.get( i ),
-					propertiesMetadata.classTermVectors.get( i ),
-					propertiesMetadata.classBoosts.get( i ) );
+			fb.set(propertiesMetadata.classNames.get(i), unproxiedInstance,
+					doc, propertiesMetadata.getClassLuceneOptions(i));
 		}
 		for (int i = 0; i < propertiesMetadata.fieldNames.size(); i++) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			Object value = getMemberValue( unproxiedInstance, member );
-			propertiesMetadata.fieldBridges.get( i ).set(
-					propertiesMetadata.fieldNames.get( i ),
-					value, doc,
-					propertiesMetadata.fieldStore.get( i ),
-					propertiesMetadata.fieldIndex.get( i ),
-					propertiesMetadata.fieldTermVectors.get( i ),
-					getBoost( member )
-			);
+			propertiesMetadata.fieldBridges.get(i).set(
+					propertiesMetadata.fieldNames.get(i), value, doc,
+					propertiesMetadata.getFieldLuceneOptions(i, getBoost(member)));
 		}
 		for (int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
@@ -823,6 +816,9 @@ public class DocumentBuilder<T> {
 		return safeFromTupleId;
 	}
 
+	/**
+	 * Wrapper class containing all the meta data extracted out of the entities.
+	 */
 	private static class PropertiesMetadata {
 		public Float boost;
 		public Analyzer analyzer;
@@ -849,5 +845,17 @@ public class DocumentBuilder<T> {
 			MAP,
 			ARRAY
 		}
+		
+		private LuceneOptions getClassLuceneOptions(int i) {
+			LuceneOptions options = new LuceneOptions(classStores.get(i),
+					classIndexes.get(i), classTermVectors.get(i), classBoosts.get(i));
+			return options;
+		}
+		
+		private LuceneOptions getFieldLuceneOptions(int i, Float boost) {
+			LuceneOptions options = new LuceneOptions(fieldStore.get(i),
+					fieldIndex.get(i), fieldTermVectors.get(i), boost);
+			return options;
+		}		
 	}
 }
