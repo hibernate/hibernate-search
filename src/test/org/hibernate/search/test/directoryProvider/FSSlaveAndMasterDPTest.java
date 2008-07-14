@@ -18,6 +18,15 @@ import org.hibernate.search.util.FileHelper;
  * @author Emmanuel Bernard
  */
 public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
+	
+	private static File root;
+	static {
+		String buildDir = System.getProperty("build.dir");
+		if (buildDir == null) {
+			buildDir = ".";
+		}
+		root = new File(buildDir, "lucenedirs");
+	}
 
 	@SuppressWarnings( { "PointlessArithmeticExpression" } )
 	public void testProperCopy() throws Exception {
@@ -91,8 +100,6 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	}
 
 	protected void setUp() throws Exception {
-		File base = new File(".");
-		File root = new File(base, "lucenedirs");
 		root.mkdir();
 
 		File master = new File(root, "master/main");
@@ -108,8 +115,6 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		File base = new File(".");
-		File root = new File(base, "lucenedirs");
 		FileHelper.delete( root );
 	}
 
@@ -117,6 +122,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return 2;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Class[] getMappings() {
 		return new Class[] {
 				SnowStorm.class
@@ -125,14 +131,14 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 	protected void configure(Configuration[] cfg) {
 		//master
-		cfg[0].setProperty( "hibernate.search.default.sourceBase", "./lucenedirs/master/copy");
-		cfg[0].setProperty( "hibernate.search.default.indexBase", "./lucenedirs/master/main");
+		cfg[0].setProperty( "hibernate.search.default.sourceBase",  root.getAbsolutePath() + "/master/copy");
+		cfg[0].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/master/main");
 		cfg[0].setProperty( "hibernate.search.default.refresh", "1"); //every minute
 		cfg[0].setProperty( "hibernate.search.default.directory_provider", "org.hibernate.search.store.FSMasterDirectoryProvider");
 
 		//slave(s)
-		cfg[1].setProperty( "hibernate.search.default.sourceBase", "./lucenedirs/master/copy");
-		cfg[1].setProperty( "hibernate.search.default.indexBase", "./lucenedirs/slave");
+		cfg[1].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + "/master/copy");
+		cfg[1].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/slave");
 		cfg[1].setProperty( "hibernate.search.default.refresh", "1"); //every minute
 		cfg[1].setProperty( "hibernate.search.default.directory_provider", "org.hibernate.search.store.FSSlaveDirectoryProvider");
 	}

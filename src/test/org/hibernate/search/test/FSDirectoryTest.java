@@ -37,11 +37,6 @@ public class FSDirectoryTest extends SearchTestCase {
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
 	}
 
-	private File getBaseIndexDir() {
-		File current = new File( "." );
-		return new File( current, "indextemp" );
-	}
-
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();

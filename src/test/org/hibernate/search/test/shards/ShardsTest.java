@@ -1,4 +1,4 @@
-//$Id$
+// $Id:$
 package org.hibernate.search.test.shards;
 
 import java.io.File;
@@ -166,17 +166,13 @@ public class ShardsTest extends SearchTestCase {
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
 	}
 
-	private File getBaseIndexDir() {
-		File current = new File( "." );
-		return new File( current, "indextemp" );
-	}
-
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Class[] getMappings() {
 		return new Class[] {
 				Animal.class,

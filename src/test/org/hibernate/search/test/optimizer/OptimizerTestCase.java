@@ -1,4 +1,4 @@
-//$Id$
+// $Id:$
 package org.hibernate.search.test.optimizer;
 
 import java.io.File;
@@ -35,13 +35,6 @@ public class OptimizerTestCase extends SearchTestCase {
 		}
 		//super.setUp(); //we need a fresh session factory each time for index set up
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
-	}
-
-	@SuppressWarnings( { "UnnecessaryLocalVariable" } )
-	private File getBaseIndexDir() {
-		File current = new File( "." );
-		File sub = new File( current, "indextemp" );
-		return sub;
 	}
 
 	protected void tearDown() throws Exception {

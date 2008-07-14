@@ -65,16 +65,7 @@
         <fileset dir="${lib.dir}">
             <include name="*.jar"/>
         </fileset>
-		<path refid="lib.moduleclass.path"/>
 		<pathelement path="${clover.jar}"/>
-    </path>
-
-    <path id="lib.moduleclass.path">
-		<!-- pathelement location="${jpa-api.jar}"/>
-		<pathelement location="${commons-annotations.jar}"/ -->
-        <!-- fileset dir="${ivy.dep.dir}/core">
-			<include name="*.jar"/>
-		</fileset -->
     </path>
 	
 	<path id="junit.moduleclasspath">
@@ -191,6 +182,7 @@
                     <include name="**/*.zip"/>
                 </fileset>
             </classpath>
+			<sysproperty key="build.dir" value="${build.dir}"/>
             <formatter type="plain"/>
             <formatter type="xml"/>
             <batchtest fork="yes" todir="${testreports.dir}" haltonfailure="no">
@@ -218,6 +210,7 @@
                     <include name="**/*.zip"/>
                 </fileset>
             </classpath>
+			<sysproperty key="build.dir" value="${build.dir}"/>
             <formatter type="plain"/>
 			<formatter type="xml"/>
 			<test fork="yes" todir="${testreports.dir}" haltonfailure="no" name="${testname}"/>
@@ -242,11 +235,6 @@
             status="integration"
         />
     </target>
-
-	<!-- target name="javadoc" description="Compile the Javadoc API documentation to dist dir">
-				<echo>Skipping java doc since ant's javadoc task cannot handle an alternative javadoc</echo>
-		 </target -->
-
 
 	<!-- Some of this can probably be moved to common-build... -->
 	<target name="dist" depends="get.deps.core,get.deps.test,jar,jar,javadoc,copysource,copytest,copylib,extras"

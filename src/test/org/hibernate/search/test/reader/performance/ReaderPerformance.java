@@ -25,9 +25,7 @@ import org.hibernate.search.util.FileHelper;
  * @author Sanne Grinovero
  */
 public abstract class ReaderPerformance extends SearchTestCase {
-	
-	private static final File baseIndexDir = new File( new File( "." ), "indextemp" );
-	
+		
 	//more iterations for more reliable measures:
 	private static final int TOTAL_WORK_BATCHES = 10;
 	//the next 3 define the kind of workload mix to test on:
@@ -40,6 +38,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	private static final int WARMUP_CYCLES = 6;
 	
 	protected void setUp() throws Exception {
+		File baseIndexDir = getBaseIndexDir();
 		baseIndexDir.mkdir();
 		File[] files = baseIndexDir.listFiles();
 		for ( File file : files ) {
@@ -54,7 +53,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 
 	private void buildBigIndex() throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
 		System.out.println( "Going to create fake index..." );
-		FSDirectory directory = FSDirectory.getDirectory(new File(baseIndexDir, Detective.class.getCanonicalName()));
+		FSDirectory directory = FSDirectory.getDirectory(new File(getBaseIndexDir(), Detective.class.getCanonicalName()));
 		IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
@@ -68,6 +67,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		System.out.println( "Index created." );
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Class[] getMappings() {
 		return new Class[] {
 				Detective.class,
@@ -77,13 +77,13 @@ public abstract class ReaderPerformance extends SearchTestCase {
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		FileHelper.delete( baseIndexDir );
+		FileHelper.delete( getBaseIndexDir() );
 	}
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
-		cfg.setProperty( "hibernate.search.default.indexBase", baseIndexDir.getAbsolutePath() );
+		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.default.optimizer.transaction_limit.max", "10" ); // workaround too many open files
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		cfg.setProperty( Environment.READER_STRATEGY, getReaderStrategyName() );

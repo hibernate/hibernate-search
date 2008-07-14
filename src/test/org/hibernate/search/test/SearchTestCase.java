@@ -1,6 +1,8 @@
 //$Id$
 package org.hibernate.search.test;
 
+import java.io.File;
+
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.store.Directory;
 import org.hibernate.HibernateException;
@@ -9,16 +11,36 @@ import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.search.Environment;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.RAMDirectoryProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * Base class for Hibernate Search unit tests.
+ * 
  * @author Emmanuel Bernard
  */
 public abstract class SearchTestCase extends HANTestCase {
+	
+	private static final Logger log = LoggerFactory
+			.getLogger(SearchTestCase.class);
+	
+	private static File indexDir;
+	static {
+		String buildDir = System.getProperty("build.dir");
+		if (buildDir == null) {
+			buildDir = ".";
+		}
+		File current = new File( buildDir );
+		indexDir = new File( current, "indextemp" );
+		log.debug("Using {} as index directory.", indexDir.getAbsolutePath());
+	}
+	
 	protected void setUp() throws Exception {
 		//super.setUp(); //we need a fresh session factory each time for index set up
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Directory getDirectory(Class clazz) {
 		return getLuceneEventListener().getSearchFactoryImplementor().getDirectoryProviders( clazz )[0].getDirectory();
 	}
@@ -42,5 +64,9 @@ public abstract class SearchTestCase extends HANTestCase {
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
 		cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
+	}
+	
+	protected File getBaseIndexDir() {
+		return indexDir;
 	}
 }

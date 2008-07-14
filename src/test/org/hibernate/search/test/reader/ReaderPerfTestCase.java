@@ -40,16 +40,12 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Class[] getMappings() {
 		return new Class[] {
 				Detective.class,
 				Suspect.class
 		};
-	}
-
-	private File getBaseIndexDir() {
-		File current = new File( "." );
-		return new File( current, "indextemp" );
 	}
 
 	protected void tearDown() throws Exception {
