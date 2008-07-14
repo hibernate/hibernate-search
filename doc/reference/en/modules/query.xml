@@ -407,9 +407,11 @@ fullTextQuery.list(); //returns only best drivers where andre has credentials</p
     <para>Declaring filters is done through the
     <classname>@FullTextFilterDef</classname> annotation. This annotation can
     be on any <literal>@Indexed</literal> entity regardless of the query the
-    filter is later applied to. Filter names must be unique since all filters
-    are globally visible. Each named filter has to point to an actual filter
-    implementation.</para>
+    filter is later applied to. This means filter definitions are global and
+    their names must be unique. A <classname>SearchException</classname> is
+    thrown in case two different <classname>@FullTextFilterDef</classname>
+    annotations with the same name are defined. Each named filter has to point
+    to an actual filter implementation.</para>
 
     <programlisting>@Entity
 @Indexed
@@ -540,7 +542,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     <classname>CachingWrapperFilter.</classname> The wrapper will cache the
     <classname>BitSet</classname> returned from the
     <methodname>bits(IndexReader reader)</methodname>method to avoid expensive
-    recomputation. </para>
+    recomputation.</para>
 
     <para>Hibernate Search also takes care of this aspect of caching. If the
     <literal>cache</literal> flag of <classname>@FullTextFilterDef
