@@ -4,11 +4,9 @@ package org.hibernate.search.store;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.annotations.Indexed;

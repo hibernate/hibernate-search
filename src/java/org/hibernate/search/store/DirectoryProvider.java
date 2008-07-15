@@ -15,8 +15,6 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * 
  * This class must be thread safe regarding <code>getDirectory()</code> calls
  *
- * To to implementors: a stop() method will be added in te future, for now use finalize() to free resources (we know)
- *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
  */
@@ -28,7 +26,7 @@ public interface DirectoryProvider<TDirectory extends Directory> {
 
 	/**
 	 * Executed after initialize, this method set up the heavy process of starting up the DirectoryProvider
-	 * IO processing as well as backgroup processing are expected to be set up here
+	 * IO processing as well as background processing are expected to be set up here
 	 *
 	 */
 	void start();
