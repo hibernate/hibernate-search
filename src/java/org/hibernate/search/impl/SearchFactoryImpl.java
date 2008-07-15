@@ -22,11 +22,11 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.annotations.common.util.StringHelper;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
+import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
@@ -58,8 +58,8 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings("unchecked")
 public class SearchFactoryImpl implements SearchFactoryImplementor {
-	private static final ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>> contexts =
-			new ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>>();
+	private static final ThreadLocal<WeakHashMap<SearchConfiguration, SearchFactoryImpl>> contexts =
+			new ThreadLocal<WeakHashMap<SearchConfiguration, SearchFactoryImpl>>();
 
 	static {
 		Version.touch();
@@ -96,7 +96,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public SearchFactoryImpl(Configuration cfg) {
+	public SearchFactoryImpl(SearchConfiguration cfg) {
 		//yuk
 		ReflectionManager reflectionManager = getReflectionManager( cfg );
 		this.indexingStrategy = defineIndexingStrategy( cfg ); //need to be done before the document builds
@@ -113,7 +113,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.cachingWrapperFilterSize = ConfigurationParseHelper.getIntValue( cfg.getProperties(), Environment.CACHING_WRAPPER_FILTER_SIZE, CachingWrapperFilter.DEFAULT_SIZE );
 	}
 
-	private static String defineIndexingStrategy(Configuration cfg) {
+	private static String defineIndexingStrategy(SearchConfiguration cfg) {
 		String indexingStrategy = cfg.getProperties().getProperty( Environment.INDEXING_STRATEGY, "event" );
 		if ( ! ("event".equals( indexingStrategy ) || "manual".equals( indexingStrategy ) ) ) {
 			throw new SearchException( Environment.INDEXING_STRATEGY + " unknown: " + indexingStrategy );
@@ -218,10 +218,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	//code doesn't have to be multithreaded because SF creation is not.
 	//this is not a public API, should really only be used during the SessionFActory building
 	//FIXME this is ugly, impl.staticmethod, fix that
-	public static SearchFactoryImpl getSearchFactory(Configuration cfg) {
-		WeakHashMap<Configuration, SearchFactoryImpl> contextMap = contexts.get();
+	public static SearchFactoryImpl getSearchFactory(SearchConfiguration cfg) {
+		WeakHashMap<SearchConfiguration, SearchFactoryImpl> contextMap = contexts.get();
 		if ( contextMap == null ) {
-			contextMap = new WeakHashMap<Configuration, SearchFactoryImpl>( 2 );
+			contextMap = new WeakHashMap<SearchConfiguration, SearchFactoryImpl>( 2 );
 			contexts.set( contextMap );
 		}
 		SearchFactoryImpl searchFactory = contextMap.get( cfg );
@@ -271,7 +271,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	//not happy about having it as a helper class but I don't want cfg to be associated with the SearchFactory
-	public static ReflectionManager getReflectionManager(Configuration cfg) {
+	public static ReflectionManager getReflectionManager(SearchConfiguration cfg) {
 		ReflectionManager reflectionManager;
 		try {
 			//TODO introduce a ReflectionManagerHolder interface to avoid reflection
@@ -314,7 +314,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return analyzer;
 	}
 
-	private void initDocumentBuilders(Configuration cfg, ReflectionManager reflectionManager) {
+	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager) {
 		InitContext context = new InitContext( cfg );
 		Iterator iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();

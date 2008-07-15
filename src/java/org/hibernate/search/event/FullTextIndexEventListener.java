@@ -26,6 +26,9 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
+import org.hibernate.search.transaction.EventSourceTransactionContext;
+import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,109 +44,148 @@ import org.slf4j.LoggerFactory;
 //TODO implement and use a LockableDirectoryProvider that wraps a DP to handle the lock inside the LDP
 @SuppressWarnings("serial")
 public class FullTextIndexEventListener implements PostDeleteEventListener,
-		PostInsertEventListener, PostUpdateEventListener,
-		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
-		PostCollectionUpdateEventListener, Initializable, Destructible {
+        PostInsertEventListener, PostUpdateEventListener,
+        PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
+        PostCollectionUpdateEventListener, Initializable, Destructible
+{
 
-	private static final Logger log = LoggerFactory.getLogger(FullTextIndexEventListener.class);
-	
-	protected boolean used;
-	protected SearchFactoryImplementor searchFactoryImplementor;
+   private static final Logger log = LoggerFactory.getLogger(FullTextIndexEventListener.class);
 
-	public void initialize(Configuration cfg) {
-		searchFactoryImplementor = SearchFactoryImpl.getSearchFactory( cfg );
-		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
-		if ( "event".equals( indexingStrategy ) ) {
-			used = searchFactoryImplementor.getDocumentBuilders().size() != 0;
-		}
-		else if ( "manual".equals( indexingStrategy ) ) {
-			used = false;
-		}
-	}
+   protected boolean used;
+   protected SearchFactoryImplementor searchFactoryImplementor;
 
-	public SearchFactoryImplementor getSearchFactoryImplementor() {
-		return searchFactoryImplementor;
-	}
+   /**
+    * Method that uses the SearchConfiguration interface as opposed to directly with Hibernate Core. This was edited
+    * for the JBoss Cache integration.
+    *
+    * @param searchConfiguration - so that it calls the same methods on the interface.
+    */
 
-	public void onPostDelete(PostDeleteEvent event) {
-		if ( used && searchFactoryImplementor.getDocumentBuilders().containsKey( event.getEntity().getClass() ) ) {
-			processWork( event.getEntity(), event.getId(), WorkType.DELETE, event );
-		}
-	}
+   public void initialize(SearchConfiguration searchConfiguration)
+   {
 
-	public void onPostInsert(PostInsertEvent event) {
-		if (used) {
-			final Object entity = event.getEntity();
-			DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entity.getClass() );
-			//not strictly necessary but a small optimization
-			if ( builder != null ) {
-				Serializable id = event.getId();
-				processWork( entity, id, WorkType.ADD, event );
-			}
-		}
-	}
+      searchFactoryImplementor = SearchFactoryImpl.getSearchFactory(searchConfiguration);
+      String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
+      if ("event".equals(indexingStrategy))
+      {
+         used = searchFactoryImplementor.getDocumentBuilders().size() != 0;
+      }
+      else if ("manual".equals(indexingStrategy))
+      {
+         used = false;
+      }
+   }
 
-	public void onPostUpdate(PostUpdateEvent event) {
-		if (used) {
-			final Object entity = event.getEntity();
-			//not strictly necessary but a small optimization
-			DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entity.getClass() );
-			if ( builder != null ) {
-				Serializable id = event.getId();
-				processWork( entity, id, WorkType.UPDATE, event );
-			}
-		}
-	}
+   public void initialize(Configuration cfg)
+   {
+      SearchConfiguration searchConfig = new SearchConfigurationFromHibernateCore(cfg);
+      initialize(searchConfig);
 
-	protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event) {
-		Work work = new Work(entity, id, workType);
-		searchFactoryImplementor.getWorker().performWork( work, event.getSession() );
-	}
+   }
 
-	public void cleanup() {
-		searchFactoryImplementor.close();
-	}
-	
-	public void onPostRecreateCollection(PostCollectionRecreateEvent event) {
-		processCollectionEvent( event );
-	}
-	
-	public void onPostRemoveCollection(PostCollectionRemoveEvent event) {
-		processCollectionEvent( event );
-	}
+   public SearchFactoryImplementor getSearchFactoryImplementor()
+   {
+      return searchFactoryImplementor;
+   }
 
-	public void onPostUpdateCollection(PostCollectionUpdateEvent event) {
-		processCollectionEvent( event );
-	}
-	
-	protected void processCollectionEvent(AbstractCollectionEvent event) {
-		Object entity = event.getAffectedOwnerOrNull();
-		if ( entity == null ) {
-			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
-			// or property-ref is used
-			//Should log really but we don't know if we're interested in this collection for indexing
-			return;
-		}
-		if ( used && searchFactoryImplementor.getDocumentBuilders().containsKey( entity.getClass() ) ) {
-			Serializable id = getId( entity, event );
-			if (id == null) {
-				log.warn(
-						"Unable to reindex entity on collection change, id cannot be extracted: {}",
-						event.getAffectedOwnerEntityName()
-				);
-				return;
-			}
-			processWork( entity, id, WorkType.COLLECTION, event );
-		}
-	}
+   public void onPostDelete(PostDeleteEvent event)
+   {
+      if (used && searchFactoryImplementor.getDocumentBuilders().containsKey(event.getEntity().getClass()))
+      {
+         processWork(event.getEntity(), event.getId(), WorkType.DELETE, event);
+      }
+   }
 
-	private Serializable getId(Object entity, AbstractCollectionEvent event) {
-		Serializable id = event.getAffectedOwnerIdOrNull();
-		if ( id == null ) {
-			//most likely this recovery is unnecessary since Hibernate Core probably try that 
-			EntityEntry entityEntry = event.getSession().getPersistenceContext().getEntry( entity );
-			id = entityEntry == null ? null : entityEntry.getId();
-		}
-		return id;
-	}
+   public void onPostInsert(PostInsertEvent event)
+   {
+      if (used)
+      {
+         final Object entity = event.getEntity();
+         DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get(entity.getClass());
+         //not strictly necessary but a small optimization
+         if (builder != null)
+         {
+            Serializable id = event.getId();
+            processWork(entity, id, WorkType.ADD, event);
+         }
+      }
+   }
+
+   public void onPostUpdate(PostUpdateEvent event)
+   {
+      if (used)
+      {
+         final Object entity = event.getEntity();
+         //not strictly necessary but a small optimization
+         DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get(entity.getClass());
+         if (builder != null)
+         {
+            Serializable id = event.getId();
+            processWork(entity, id, WorkType.UPDATE, event);
+         }
+      }
+   }
+
+   protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event)
+   {
+      Work work = new Work(entity, id, workType);
+      searchFactoryImplementor.getWorker().performWork(work, new EventSourceTransactionContext(event.getSession()));
+   }
+
+   public void cleanup()
+   {
+      searchFactoryImplementor.close();
+   }
+
+   public void onPostRecreateCollection(PostCollectionRecreateEvent event)
+   {
+      processCollectionEvent(event);
+   }
+
+   public void onPostRemoveCollection(PostCollectionRemoveEvent event)
+   {
+      processCollectionEvent(event);
+   }
+
+   public void onPostUpdateCollection(PostCollectionUpdateEvent event)
+   {
+      processCollectionEvent(event);
+   }
+
+   protected void processCollectionEvent(AbstractCollectionEvent event)
+   {
+      Object entity = event.getAffectedOwnerOrNull();
+      if (entity == null)
+      {
+         //Hibernate cannot determine every single time the owner especially in case detached objects are involved
+         // or property-ref is used
+         //Should log really but we don't know if we're interested in this collection for indexing
+         return;
+      }
+      if (used && searchFactoryImplementor.getDocumentBuilders().containsKey(entity.getClass()))
+      {
+         Serializable id = getId(entity, event);
+         if (id == null)
+         {
+            log.warn(
+                    "Unable to reindex entity on collection change, id cannot be extracted: {}",
+                    event.getAffectedOwnerEntityName()
+            );
+            return;
+         }
+         processWork(entity, id, WorkType.COLLECTION, event);
+      }
+   }
+
+   private Serializable getId(Object entity, AbstractCollectionEvent event)
+   {
+      Serializable id = event.getAffectedOwnerIdOrNull();
+      if (id == null)
+      {
+         //most likely this recovery is unnecessary since Hibernate Core probably try that
+         EntityEntry entityEntry = event.getSession().getPersistenceContext().getEntry(entity);
+         id = entityEntry == null ? null : entityEntry.getId();
+      }
+      return id;
+   }
 }

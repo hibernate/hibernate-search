@@ -4,9 +4,9 @@ package org.hibernate.search.reader;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.util.ReflectHelper;
 import org.hibernate.util.StringHelper;
@@ -16,7 +16,7 @@ import org.hibernate.util.StringHelper;
  */
 public abstract class ReaderProviderFactory {
 
-	private static Properties getProperties(Configuration cfg) {
+	private static Properties getProperties(SearchConfiguration cfg) {
 		Properties props = cfg.getProperties();
 		Properties workerProperties = new Properties();
 		for (Map.Entry entry : props.entrySet()) {
@@ -28,7 +28,7 @@ public abstract class ReaderProviderFactory {
 		return workerProperties;
 	}
 
-	public static ReaderProvider createReaderProvider(Configuration cfg, SearchFactoryImplementor searchFactoryImplementor) {
+	public static ReaderProvider createReaderProvider(SearchConfiguration cfg, SearchFactoryImplementor searchFactoryImplementor) {
 		Properties props = getProperties( cfg );
 		String impl = props.getProperty( Environment.READER_STRATEGY );
 		ReaderProvider readerProvider;

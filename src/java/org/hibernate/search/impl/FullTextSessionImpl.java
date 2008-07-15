@@ -43,6 +43,8 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.transaction.TransactionContext;
+import org.hibernate.search.transaction.EventSourceTransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentBuilder;
@@ -62,13 +64,14 @@ import org.hibernate.type.Type;
 @SuppressWarnings({"serial", "unchecked"})
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 	private final Session session;
-	private final EventSource eventSource;
 	private final SessionImplementor sessionImplementor;
 	private transient SearchFactoryImplementor searchFactory;
+   private final TransactionContext transactionContext;
 
-	public FullTextSessionImpl(org.hibernate.Session session) {
+
+   public FullTextSessionImpl(org.hibernate.Session session) {
 		this.session = (Session) session;
-		this.eventSource = (EventSource) session;
+      this.transactionContext = new EventSourceTransactionContext((EventSource) session);
 		this.sessionImplementor = (SessionImplementor) session;
 	}
 
@@ -94,7 +97,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public void flushToIndexes() {
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-		searchFactoryImplementor.getWorker().flushWorks(eventSource);
+		searchFactoryImplementor.getWorker().flushWorks(transactionContext);
 	}
 
 	/**
@@ -124,7 +127,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 			type = WorkType.PURGE;
 		}
 		Work work = new Work(entityType, id, type);
-		searchFactoryImplementor.getWorker().performWork( work, eventSource );
+		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 	}
 
 	/**
@@ -147,7 +150,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		}
 		Serializable id = session.getIdentifier( entity );
 		Work work = new Work(entity, id, WorkType.INDEX);
-		searchFactoryImplementor.getWorker().performWork( work, eventSource );
+		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 
 		//TODO
 		//need to add elements in a queue kept at the Session level

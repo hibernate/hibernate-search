@@ -13,8 +13,8 @@ import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.util.DelegateNamedAnalyzer;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.util.ReflectHelper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -32,7 +32,7 @@ public class InitContext {
 	private final Analyzer defaultAnalyzer;
 	private final Similarity defaultSimilarity;
 
-	public InitContext(Configuration cfg) {
+	public InitContext(SearchConfiguration cfg) {
 		defaultAnalyzer = initAnalyzer(cfg);
 		defaultSimilarity = initSimilarity(cfg);
 	}
@@ -63,7 +63,7 @@ public class InitContext {
 	 *            The current configuration.
 	 * @return The Lucene analyzer to use for tokenisation.
 	 */
-	private Analyzer initAnalyzer(Configuration cfg) {
+	private Analyzer initAnalyzer(SearchConfiguration cfg) {
 		Class analyzerClass;
 		String analyzerClassName = cfg.getProperty( Environment.ANALYZER_CLASS);
 		if (analyzerClassName != null) {
@@ -93,7 +93,7 @@ public class InitContext {
 	/**
 	 * Initializes the Lucene similarity to use
 	 */
-	private Similarity initSimilarity(Configuration cfg) {
+	private Similarity initSimilarity(SearchConfiguration cfg) {
 		Class similarityClass;
 		String similarityClassName = cfg.getProperty(Environment.SIMILARITY_CLASS);
 		if (similarityClassName != null) {
