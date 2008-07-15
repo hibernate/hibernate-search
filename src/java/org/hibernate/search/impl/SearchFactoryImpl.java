@@ -316,12 +316,11 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager) {
 		InitContext context = new InitContext( cfg );
-		Iterator iter = cfg.getClassMappings();
+		Iterator<Class> iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
 		while ( iter.hasNext() ) {
-			PersistentClass clazz = (PersistentClass) iter.next();
-			Class<?> mappedClass = clazz.getMappedClass();
+			Class mappedClass = iter.next();
 			if (mappedClass != null) {
 				XClass mappedXClass = reflectionManager.toXClass(mappedClass);
 				if ( mappedXClass != null) {
