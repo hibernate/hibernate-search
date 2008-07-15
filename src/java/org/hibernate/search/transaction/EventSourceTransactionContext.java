@@ -1,5 +1,7 @@
 package org.hibernate.search.transaction;
 
+import java.io.Serializable;
+
 import org.hibernate.Transaction;
 import org.hibernate.event.EventSource;
 
@@ -8,7 +10,7 @@ import javax.transaction.Synchronization;
 /**
 @author Navin Surtani  - navin@surtani.org
  */
-public class EventSourceTransactionContext implements TransactionContext
+public class EventSourceTransactionContext implements TransactionContext, Serializable
 {
    EventSource eventSource;
 
