@@ -6,6 +6,7 @@ import java.util.Properties;
 import java.util.TimerTask;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.io.File;
 import java.io.IOException;
@@ -32,15 +33,17 @@ import org.slf4j.Logger;
 public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	
 	private final Logger log = LoggerFactory.getLogger( FSMasterDirectoryProvider.class );
+	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 	
+	private volatile int current;
+	
+	//variables having visibility granted by a read of "current"
 	private FSDirectory directory;
-	private int current;
 	private String indexName;
-	private Timer timer;
 	private SearchFactoryImplementor searchFactory;
 	private long copyChunkSize;
 
-	//variables needed between initialize and start
+	//variables needed between initialize and start (used by same thread: no special care needed)
 	private File sourceDir;
 	private File indexDir;
 	private String directoryProviderName;
@@ -63,40 +66,44 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
 		this.searchFactory = searchFactoryImplementor;
+		current = 0; //write to volatile to publish all state
 	}
 
 	public void start() {
-		long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
+		int currentLocal = 0;
 		try {
 			//copy to source
 			if ( new File( sourceDir, "current1").exists() ) {
-				current = 2;
+				currentLocal = 2;
 			}
 			else if ( new File( sourceDir, "current2").exists() ) {
-				current = 1;
+				currentLocal = 1;
 			}
 			else {
 				log.debug( "Source directory for '{}' will be initialized", indexName);
-				current = 1;
+				currentLocal = 1;
 			}
-			String currentString = Integer.valueOf( current ).toString();
+			String currentString = Integer.valueOf( currentLocal ).toString();
 			File subDir = new File( sourceDir, currentString );
 			FileHelper.synchronize( indexDir, subDir, true, copyChunkSize );
 			new File( sourceDir, "current1 ").delete();
 			new File( sourceDir, "current2" ).delete();
 			//TODO small hole, no file can be found here
 			new File( sourceDir, "current" + currentString ).createNewFile();
-			log.debug( "Current directory: {}", current );
+			log.debug( "Current directory: {}", currentLocal );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
-		timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 		TimerTask task = new FSMasterDirectoryProvider.TriggerTask( indexDir, sourceDir, this );
+		long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
 		timer.scheduleAtFixedRate( task, period, period );
+		this.current = currentLocal; //write to volatile to publish all state
 	}
 
 	public FSDirectory getDirectory() {
+		@SuppressWarnings("unused")
+		int readCurrentState = current; //Unneeded value, needed to ensure visibility of state protected by memory barrier
 		return directory;
 	}
 
@@ -107,7 +114,12 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		// after initialize call
 		if ( obj == this ) return true;
 		if ( obj == null || !( obj instanceof FSMasterDirectoryProvider ) ) return false;
-		return indexName.equals( ( (FSMasterDirectoryProvider) obj ).indexName );
+		FSMasterDirectoryProvider other = (FSMasterDirectoryProvider)obj;
+		//break both memory barriers by reading volatile variables:
+		@SuppressWarnings("unused")
+		int readCurrentState = other.current;
+		readCurrentState = this.current;
+		return indexName.equals( other.indexName );
 	}
 
 	@Override
@@ -115,13 +127,15 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		// this code is actually broken since the value change after initialize call
 		// but from a practical POV this is fine since we only call this method
 		// after initialize call
+		@SuppressWarnings("unused")
+		int readCurrentState = current; //Unneeded value, to ensure visibility of state protected by memory barrier
 		int hash = 11;
 		return 37 * hash + indexName.hashCode();
 	}
 
-
-
 	public void stop() {
+		@SuppressWarnings("unused")
+		int readCurrentState = current; //Another unneeded value, to ensure visibility of state protected by memory barrier
 		timer.cancel();
 		try {
 			directory.close();
@@ -131,18 +145,18 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		}
 	}
 
-	class TriggerTask extends TimerTask {
+	private class TriggerTask extends TimerTask {
 
 		private final Executor executor;
 		private final FSMasterDirectoryProvider.CopyDirectory copyTask;
 
-		public TriggerTask(File source, File destination, DirectoryProvider directoryProvider) {
+		public TriggerTask(File source, File destination, DirectoryProvider<FSDirectory> directoryProvider) {
 			executor = Executors.newSingleThreadExecutor();
 			copyTask = new FSMasterDirectoryProvider.CopyDirectory( source, destination, directoryProvider );
 		}
 
 		public void run() {
-			if ( ! copyTask.inProgress ) {
+			if ( copyTask.inProgress.compareAndSet( false, true ) ) {
 				executor.execute( copyTask );
 			}
 			else {
@@ -151,33 +165,25 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		}
 	}
 
-	class CopyDirectory implements Runnable {
+	private class CopyDirectory implements Runnable {
 		private final File source;
 		private final File destination;
-		private volatile boolean inProgress;
-		private Lock directoryProviderLock;
-		private DirectoryProvider directoryProvider;
+		private final AtomicBoolean inProgress = new AtomicBoolean( false );
+		private final Lock directoryProviderLock;
 
-		public CopyDirectory(File source, File destination, DirectoryProvider directoryProvider) {
+		public CopyDirectory(File source, File destination, DirectoryProvider<FSDirectory> directoryProvider) {
 			this.source = source;
 			this.destination = destination;
-			this.directoryProvider = directoryProvider;
+			this.directoryProviderLock = searchFactory.getDirectoryProviderLock( directoryProvider );
 		}
 
 		public void run() {
 			//TODO get rid of current and use the marker file instead?
-			long start = System.currentTimeMillis();
-			inProgress = true;
-			if ( directoryProviderLock == null ) {
-				directoryProviderLock = searchFactory.getDirectoryProviderLock( directoryProvider );
-				directoryProvider = null;
-				searchFactory = null; //get rid of any useless link (help hot redeployment?)
-			}
+			directoryProviderLock.lock();
 			try {
-				directoryProviderLock.lock();
+				long start = System.currentTimeMillis();//keep time after lock is acquired for correct measure
 				int oldIndex = current;
-				int index = current == 1 ? 2 : 1;
-
+				int index = oldIndex == 1 ? 2 : 1;
 				File destinationFile = new File( destination, Integer.valueOf(index).toString() );
 				try {
 					log.trace( "Copying {} into {}", source, destinationFile );
@@ -187,7 +193,6 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				catch (IOException e) {
 					//don't change current
 					log.error( "Unable to synchronize source of " + indexName, e );
-					inProgress = false;
 					return;
 				}
 				if ( ! new File( destination, "current" + oldIndex ).delete() ) {
@@ -199,12 +204,12 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				catch( IOException e ) {
 					log.warn( "Unable to create current marker in source of " + indexName, e );
 				}
+				log.trace( "Copy for {} took {} ms", indexName, (System.currentTimeMillis() - start) );
 			}
 			finally {
 				directoryProviderLock.unlock();
-				inProgress = false;
+				inProgress.set( false );
 			}
-			log.trace( "Copy for {} took {} ms", indexName, (System.currentTimeMillis() - start) );
 		}
 	}
 }
