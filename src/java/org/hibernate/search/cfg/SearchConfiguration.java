@@ -16,8 +16,7 @@ public interface SearchConfiguration {
 	 *
 	 * @return iterator of indexed classes.
 	 */
-
-	Iterator<Class> getClassMappings();
+	Iterator<Class<?>> getClassMappings();
 
 	/**
 	 * Returns a {@link java.lang.Class} from a String parameter.
@@ -26,7 +25,7 @@ public interface SearchConfiguration {
 	 * @return java.lang.Class
 	 */
 
-	Class getClassMapping(String name);
+	Class<?> getClassMapping(String name);
 
 	/**
 	 * Gets a configuration property from its name
@@ -35,7 +34,6 @@ public interface SearchConfiguration {
 	 * @param propertyName - as a String.
 	 * @return the property as a String
 	 */
-
 	String getProperty(String propertyName);
 
 	/**
@@ -49,7 +47,8 @@ public interface SearchConfiguration {
 	/**
 	 * Returns a reflection manager if already available in the environment
 	 * null otherwise
-    * @return ReflectionManager
+	 *
+     * @return ReflectionManager
 	 */
 	ReflectionManager getReflectionManager();
 

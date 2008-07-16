@@ -1,23 +1,28 @@
 package org.hibernate.search.transaction;
 
-import javax.transaction.Synchronization;
 import java.io.Serializable;
+import javax.transaction.Synchronization;
 
 /**
-@author Navin Surtani  - navin@surtani.org
+ * Contract needed by Hibernate Search to bach changes per transactio
+ *
+ * @author Navin Surtani  - navin@surtani.org
  */
-public interface TransactionContext extends Serializable
-{
-   /**
-    *@return A boolean whether a transaction is in progress or not.
-    */
-   public boolean isTxInProgress();
+public interface TransactionContext {
+	/**
+	 * @return A boolean whether a transaction is in progress or not.
+	 */
+	public boolean isTransactionInProgress();
 
-   /**
-    *
-    * @return  a transaction object.
-    */
-   public Object getTransactionIdentifier();
+	/**
+	 * @return a transaction object.
+	 */
+	public Object getTransactionIdentifier();
 
-   public void registerSynchronization(Synchronization synchronization);
+	/**
+	 * register the givne synchronization
+	 * 
+ 	 * @param synchronization synchronization to register
+	 */
+	public void registerSynchronization(Synchronization synchronization);
 }

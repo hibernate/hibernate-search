@@ -1,22 +1,27 @@
 package org.hibernate.search.annotations;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.hibernate.search.bridge.StringBridge;
 
-import java.lang.annotation.*;
-
 /**
- * This annotation means that document ids will be generated externally and does not need to be
- * contained within the class being indexed.
- * <p />
- * Basically, this means that classes annotated with this will NOT be scanned for {@link org.hibernate.search.annotations.DocumentId} annotated fields.
+ * Objects whose identifier is provided externally and not part of the object state
+ * should be marked with this annotation
+ * <p/>
+ * This annotation should not be used in conjunction with {@link org.hibernate.search.annotations.DocumentId}
+ *
  * @author Navin Surtani  - navin@surtani.org
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
 @Documented
-public @interface ProvidedId
-{
+public @interface ProvidedId {
 
-   String name() default "ProvidedId";
-   Class<StringBridge> bridge() default StringBridge.class;
+	String name() default "providedId";
+
+	Class<StringBridge> bridge() default StringBridge.class;
 }

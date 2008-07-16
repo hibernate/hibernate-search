@@ -43,13 +43,13 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.transaction.TransactionContext;
-import org.hibernate.search.transaction.EventSourceTransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.FullTextQueryImpl;
+import org.hibernate.search.transaction.EventSourceTransactionContext;
+import org.hibernate.search.transaction.TransactionContext;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.stat.SessionStatistics;
 import org.hibernate.type.Type;
@@ -61,17 +61,17 @@ import org.hibernate.type.Type;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-@SuppressWarnings({"serial", "unchecked"})
+@SuppressWarnings( { "serial", "unchecked" } )
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 	private final Session session;
 	private final SessionImplementor sessionImplementor;
 	private transient SearchFactoryImplementor searchFactory;
-   private final TransactionContext transactionContext;
+	private final TransactionContext transactionContext;
 
 
-   public FullTextSessionImpl(org.hibernate.Session session) {
+	public FullTextSessionImpl(org.hibernate.Session session) {
 		this.session = (Session) session;
-      this.transactionContext = new EventSourceTransactionContext((EventSource) session);
+		this.transactionContext = new EventSourceTransactionContext( (EventSource) session );
 		this.sessionImplementor = (SessionImplementor) session;
 	}
 
@@ -82,7 +82,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 * @param entities must be immutable for the lifetime of the query object
 	 */
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class... entities) {
-		return new FullTextQueryImpl( luceneQuery, entities, sessionImplementor, new ParameterMetadata(null, null) );
+		return new FullTextQueryImpl( luceneQuery, entities, sessionImplementor, new ParameterMetadata( null, null ) );
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public void flushToIndexes() {
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-		searchFactoryImplementor.getWorker().flushWorks(transactionContext);
+		searchFactoryImplementor.getWorker().flushWorks( transactionContext );
 	}
 
 	/**
@@ -105,7 +105,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 *
 	 * @param entityType
 	 * @param id
-	 *
 	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
 	public void purge(Class entityType, Serializable id) {
@@ -126,7 +125,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		else {
 			type = WorkType.PURGE;
 		}
-		Work work = new Work(entityType, id, type);
+		Work work = new Work( entityType, id, type );
 		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 	}
 
@@ -139,7 +138,8 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
 	public void index(Object entity) {
-		if (entity == null) throw new IllegalArgumentException("Entity to index should not be null");;
+		if ( entity == null ) throw new IllegalArgumentException( "Entity to index should not be null" );
+		;
 		Class clazz = Hibernate.getClass( entity );
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
@@ -149,7 +149,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 			throw new IllegalArgumentException( "Entity to index not an @Indexed entity: " + entity.getClass().getName() );
 		}
 		Serializable id = session.getIdentifier( entity );
-		Work work = new Work(entity, id, WorkType.INDEX);
+		Work work = new Work( entity, id, WorkType.INDEX );
 		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 
 		//TODO
@@ -162,14 +162,14 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	public SearchFactory getSearchFactory() {
-		if (searchFactory == null) {
+		if ( searchFactory == null ) {
 			searchFactory = ContextHelper.getSearchFactory( session );
 		}
 		return searchFactory;
 	}
 
 	private SearchFactoryImplementor getSearchFactoryImplementor() {
-		if (searchFactory == null) {
+		if ( searchFactory == null ) {
 			searchFactory = ContextHelper.getSearchFactory( session );
 		}
 		return searchFactory;
@@ -410,7 +410,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	public List list(String query, QueryParameters queryParameters) throws HibernateException {
-		return sessionImplementor.list( query,  queryParameters );
+		return sessionImplementor.list( query, queryParameters );
 	}
 
 	public Iterator iterate(String query, QueryParameters queryParameters) throws HibernateException {

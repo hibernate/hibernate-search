@@ -56,7 +56,6 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Emmanuel Bernard
  */
-@SuppressWarnings("unchecked")
 public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private static final ThreadLocal<WeakHashMap<SearchConfiguration, SearchFactoryImpl>> contexts =
 			new ThreadLocal<WeakHashMap<SearchConfiguration, SearchFactoryImpl>>();
@@ -95,10 +94,11 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.backendQueueProcessorFactory = backendQueueProcessorFactory;
 	}
 
-	@SuppressWarnings( "unchecked" )
 	public SearchFactoryImpl(SearchConfiguration cfg) {
-		//yuk
-		ReflectionManager reflectionManager = getReflectionManager( cfg );
+		ReflectionManager reflectionManager = cfg.getReflectionManager();
+		if ( reflectionManager == null ) {
+			reflectionManager = new JavaReflectionManager();
+		}
 		this.indexingStrategy = defineIndexingStrategy( cfg ); //need to be done before the document builds
 		initDocumentBuilders( cfg, reflectionManager );
 
@@ -215,23 +215,6 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		filterDefinitions.put( defAnn.name(), filterDef );
 	}
 
-	//code doesn't have to be multithreaded because SF creation is not.
-	//this is not a public API, should really only be used during the SessionFActory building
-	//FIXME this is ugly, impl.staticmethod, fix that
-	public static SearchFactoryImpl getSearchFactory(SearchConfiguration cfg) {
-		WeakHashMap<SearchConfiguration, SearchFactoryImpl> contextMap = contexts.get();
-		if ( contextMap == null ) {
-			contextMap = new WeakHashMap<SearchConfiguration, SearchFactoryImpl>( 2 );
-			contexts.set( contextMap );
-		}
-		SearchFactoryImpl searchFactory = contextMap.get( cfg );
-		if ( searchFactory == null ) {
-			searchFactory = new SearchFactoryImpl( cfg );
-			contextMap.put( cfg, searchFactory );
-		}
-		return searchFactory;
-	}
-
 
 	public Map<Class, DocumentBuilder<Object>> getDocumentBuilders() {
 		return documentBuilders;
@@ -270,23 +253,6 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return readerProvider;
 	}
 
-	//not happy about having it as a helper class but I don't want cfg to be associated with the SearchFactory
-	public static ReflectionManager getReflectionManager(SearchConfiguration cfg) {
-		ReflectionManager reflectionManager;
-		try {
-			//TODO introduce a ReflectionManagerHolder interface to avoid reflection
-			//I want to avoid hard link between HAN and Validator for such a simple need
-			//reuse the existing reflectionManager one when possible
-			reflectionManager =
-					(ReflectionManager) cfg.getClass().getMethod( "getReflectionManager" ).invoke( cfg );
-
-		}
-		catch (Exception e) {
-			reflectionManager = new JavaReflectionManager();
-		}
-		return reflectionManager;
-	}
-
 	public DirectoryProvider[] getDirectoryProviders(Class entity) {
 		DocumentBuilder<Object> documentBuilder = getDocumentBuilders().get( entity );
 		return documentBuilder == null ? null : documentBuilder.getDirectoryProviders();
@@ -316,7 +282,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager) {
 		InitContext context = new InitContext( cfg );
-		Iterator<Class> iter = cfg.getClassMappings();
+		Iterator<Class<?>> iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
 		while ( iter.hasNext() ) {

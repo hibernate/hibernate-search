@@ -1,6 +1,8 @@
 //$Id$
 package org.hibernate.search.backend.impl;
 
+import java.util.Properties;
+
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
@@ -8,9 +10,6 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.transaction.TransactionContext;
 import org.hibernate.search.util.WeakIdentityHashMap;
-
-import javax.transaction.Transaction;
-import java.util.Properties;
 
 /**
  * Queue works per transaction.
@@ -21,55 +20,46 @@ import java.util.Properties;
  *
  * @author Emmanuel Bernard
  */
-public class TransactionalWorker implements Worker
-{
-   //not a synchronized map since for a given transaction, we have not concurrent access
-   protected final WeakIdentityHashMap synchronizationPerTransaction = new WeakIdentityHashMap();
-   private QueueingProcessor queueingProcessor;
+public class TransactionalWorker implements Worker {
+	//not a synchronized map since for a given transaction, we have not concurrent access
+	protected final WeakIdentityHashMap synchronizationPerTransaction = new WeakIdentityHashMap();
+	private QueueingProcessor queueingProcessor;
 
-   public void performWork(Work work, TransactionContext transactionContext)
-   {
-      if (transactionContext.isTxInProgress())
-      {
-         Object transaction = transactionContext.getTransactionIdentifier();
-         PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
-                 synchronizationPerTransaction.get(transaction);
-         if (txSync == null || txSync.isConsumed())
-         {
-            txSync = new PostTransactionWorkQueueSynchronization(queueingProcessor, synchronizationPerTransaction);
-            transactionContext.registerSynchronization(txSync);
-            synchronizationPerTransaction.put(transaction, txSync);
-         }
-         txSync.add(work);
-      }
-      else
-      {
-         WorkQueue queue = new WorkQueue(2); //one work can be split
-         queueingProcessor.add(work, queue);
-         queueingProcessor.prepareWorks(queue);
-         queueingProcessor.performWorks(queue);
-      }
-   }
-
-   public void initialize(Properties props, SearchFactoryImplementor searchFactory)
-   {
-      this.queueingProcessor = new BatchedQueueingProcessor(searchFactory, props);
-   }
-
-   public void close()
-   {
-      queueingProcessor.close();
-   }
-
-
-
-
-	public void flushWorks(TransactionContext transactionContext) {
-		if ( transactionContext.isTxInProgress() ) {
+	public void performWork(Work work, TransactionContext transactionContext) {
+		if ( transactionContext.isTransactionInProgress() ) {
 			Object transaction = transactionContext.getTransactionIdentifier();
 			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
 					synchronizationPerTransaction.get( transaction );
-			if ( txSync != null && ! txSync.isConsumed() ) {
+			if ( txSync == null || txSync.isConsumed() ) {
+				txSync = new PostTransactionWorkQueueSynchronization( queueingProcessor, synchronizationPerTransaction );
+				transactionContext.registerSynchronization( txSync );
+				synchronizationPerTransaction.put( transaction, txSync );
+			}
+			txSync.add( work );
+		}
+		else {
+			WorkQueue queue = new WorkQueue( 2 ); //one work can be split
+			queueingProcessor.add( work, queue );
+			queueingProcessor.prepareWorks( queue );
+			queueingProcessor.performWorks( queue );
+		}
+	}
+
+	public void initialize(Properties props, SearchFactoryImplementor searchFactory) {
+		this.queueingProcessor = new BatchedQueueingProcessor( searchFactory, props );
+	}
+
+	public void close() {
+		queueingProcessor.close();
+	}
+
+
+	public void flushWorks(TransactionContext transactionContext) {
+		if ( transactionContext.isTransactionInProgress() ) {
+			Object transaction = transactionContext.getTransactionIdentifier();
+			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
+					synchronizationPerTransaction.get( transaction );
+			if ( txSync != null && !txSync.isConsumed() ) {
 				txSync.flushWorks();
 			}
 		}
