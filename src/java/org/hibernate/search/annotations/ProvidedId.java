@@ -23,5 +23,5 @@ public @interface ProvidedId {
 
 	String name() default "providedId";
 
-	Class<StringBridge> bridge() default StringBridge.class;
+	Class<?> bridge() default StringBridge.class;
 }

@@ -1,6 +1,5 @@
-package org.hibernate.search.transaction;
+package org.hibernate.search.backend;
 
-import java.io.Serializable;
 import javax.transaction.Synchronization;
 
 /**

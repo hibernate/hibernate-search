@@ -23,12 +23,9 @@ import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.cfg.SearchConfiguration;
-import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.impl.SearchFactoryImpl;
-import org.hibernate.search.transaction.EventSourceTransactionContext;
+import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
