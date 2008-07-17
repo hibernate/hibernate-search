@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.query.explain;
 
 import javax.persistence.Entity;

@@ -9,7 +9,6 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RangeQuery;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.index.Term;
 
 import java.util.List;

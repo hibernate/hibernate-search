@@ -1,8 +1,6 @@
 //$Id$
 package org.hibernate.search.test.jpa;
 
-import javax.persistence.EntityManager;
-
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.apache.lucene.search.Query;

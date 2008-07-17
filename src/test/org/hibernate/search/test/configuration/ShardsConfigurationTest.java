@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.configuration;
 
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_BUFFERED_DOCS;

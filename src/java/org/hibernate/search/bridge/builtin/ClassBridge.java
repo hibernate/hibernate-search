@@ -1,4 +1,4 @@
-//$
+// $Id$
 package org.hibernate.search.bridge.builtin;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;

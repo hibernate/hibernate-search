@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.cfg;
 
 import java.util.Iterator;
@@ -14,7 +15,7 @@ import org.hibernate.mapping.PersistentClass;
  * @author Emmanuel Bernard
  */
 public class SearchConfigurationFromHibernateCore implements SearchConfiguration {
-	private org.hibernate.cfg.Configuration cfg;
+	private final org.hibernate.cfg.Configuration cfg;
 	private ReflectionManager reflectionManager;
 
 	public SearchConfigurationFromHibernateCore(org.hibernate.cfg.Configuration cfg) {
@@ -65,7 +66,7 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 		}
 
 		public boolean hasNext() {
-			//we need to read the next non null one. getMappedClass() can return null and should be ingored
+			//we need to read the next non null one. getMappedClass() can return null and should be ignored
 			if ( future != null) return true;
 			do {
 				if ( ! hibernatePersistentClassIterator.hasNext() ) {

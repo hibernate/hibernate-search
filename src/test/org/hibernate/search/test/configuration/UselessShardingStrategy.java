@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.configuration;
 
 import java.io.Serializable;

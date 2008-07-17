@@ -3,7 +3,6 @@ package org.hibernate.search.test.jms.master;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.Indexed;

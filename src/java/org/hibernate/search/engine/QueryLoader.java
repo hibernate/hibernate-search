@@ -1,16 +1,12 @@
 //$Id$
 package org.hibernate.search.engine;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard

@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.directoryProvider;
 
 import java.io.File;

@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.session;
 
 import java.sql.Statement;

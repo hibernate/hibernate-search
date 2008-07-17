@@ -3,7 +3,6 @@ package org.hibernate.search.test.session;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
 import javax.persistence.ManyToOne;
 import javax.persistence.FetchType;
 

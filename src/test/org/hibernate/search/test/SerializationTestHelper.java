@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test;
 
 import java.io.ByteArrayInputStream;

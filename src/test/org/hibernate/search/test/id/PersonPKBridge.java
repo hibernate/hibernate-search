@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 package org.hibernate.search.test.id;
 
 import org.apache.lucene.document.Document;

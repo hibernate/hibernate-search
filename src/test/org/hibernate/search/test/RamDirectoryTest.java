@@ -2,7 +2,6 @@
 package org.hibernate.search.test;
 
 import org.hibernate.Session;
-import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;

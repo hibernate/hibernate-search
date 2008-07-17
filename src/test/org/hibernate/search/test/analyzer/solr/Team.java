@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.analyzer.solr;
 
 import javax.persistence.Entity;

@@ -1,11 +1,5 @@
-//$Id$
+// $Id$
 package org.hibernate.search.test.optimizer;
-
-import java.io.File;
-
-import org.hibernate.search.store.FSDirectoryProvider;
-import org.hibernate.search.Environment;
-import org.apache.lucene.analysis.StopAnalyzer;
 
 /**
  * @author Emmanuel Bernard

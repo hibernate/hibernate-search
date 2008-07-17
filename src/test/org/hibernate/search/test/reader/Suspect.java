@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 

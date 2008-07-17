@@ -31,7 +31,7 @@ public class SharedReaderProvider implements ReaderProvider {
 	/**
 	 * nonfair lock. Need to be acquired on indexReader acquisition or release (semaphore)
 	 */
-	private Lock semaphoreIndexReaderLock = new ReentrantLock();
+	private final Lock semaphoreIndexReaderLock = new ReentrantLock();
 	/**
 	 * non fair list of locks to block per IndexReader only
 	 * Locks have to be acquired at least for indexReader retrieval and switch

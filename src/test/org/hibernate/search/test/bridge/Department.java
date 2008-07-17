@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.bridge;
 
 import javax.persistence.Entity;
@@ -11,7 +12,6 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Store;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 /**
  * @author John Griffin

@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.embedded.doubleinsert;
 
 import javax.persistence.Column;

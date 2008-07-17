@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.cfg;
 
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-//$
+// $Id$
 package org.hibernate.search.test.inheritance;
 
 import javax.persistence.MappedSuperclass;

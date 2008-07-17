@@ -1,4 +1,4 @@
-//$
+// $Id$
 package org.hibernate.search.util;
 
 import java.io.IOException;

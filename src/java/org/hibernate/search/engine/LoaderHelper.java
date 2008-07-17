@@ -1,4 +1,4 @@
-//$
+// $Id$
 package org.hibernate.search.engine;
 
 import java.util.ArrayList;

@@ -4,10 +4,6 @@ package org.hibernate.search.test.worker;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.Environment;
-import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.event.PostDeleteEventListener;
-import org.hibernate.event.PostUpdateEventListener;
-import org.hibernate.event.PostInsertEventListener;
 import org.apache.lucene.analysis.StopAnalyzer;
 
 /**

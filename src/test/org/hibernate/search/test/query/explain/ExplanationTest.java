@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.query.explain;
 
 import java.util.Map;
@@ -10,8 +11,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.Transaction;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 

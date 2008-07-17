@@ -1,4 +1,4 @@
-//$Id$
+// $Id$
 package org.hibernate.search.test.analyzer;
 
 import org.hibernate.search.test.SearchTestCase;

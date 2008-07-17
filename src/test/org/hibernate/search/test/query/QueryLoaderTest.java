@@ -1,8 +1,7 @@
-//$Id: $
+// $Id$
 package org.hibernate.search.test.query;
 
 import java.util.List;
-import java.sql.Statement;
 
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;

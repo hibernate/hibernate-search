@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.reader.performance;
 
 import java.util.concurrent.CountDownLatch;

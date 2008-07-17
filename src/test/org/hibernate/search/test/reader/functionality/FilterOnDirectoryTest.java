@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.reader.functionality;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;

@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.test.perf;
 
 import javax.persistence.Entity;

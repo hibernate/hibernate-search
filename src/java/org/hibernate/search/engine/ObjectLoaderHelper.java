@@ -1,6 +1,6 @@
+// $Id$
 package org.hibernate.search.engine;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.Serializable;
@@ -8,10 +8,8 @@ import java.io.Serializable;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Criteria;
-import org.hibernate.type.EntityType;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.annotations.common.AssertionFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

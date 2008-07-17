@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 package org.hibernate.search.event;
 
 import org.hibernate.event.PostCollectionRecreateEvent;

@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.backend.impl;
 
 import java.io.Serializable;

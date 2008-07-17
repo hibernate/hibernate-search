@@ -1,7 +1,7 @@
+// $Id$
 package org.hibernate.search.test.bridge;
 
 import java.util.List;
-import java.io.Serializable;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
@@ -15,7 +15,6 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.query.Employee;
 
 /**
  * @author John Griffin

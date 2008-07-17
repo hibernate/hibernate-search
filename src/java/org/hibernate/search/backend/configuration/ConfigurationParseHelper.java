@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.backend.configuration;
 
 import java.util.Properties;

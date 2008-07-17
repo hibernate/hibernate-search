@@ -1,4 +1,4 @@
-//$
+// $Id$
 package org.hibernate.search.annotations;
 
 import java.lang.annotation.Documented;
