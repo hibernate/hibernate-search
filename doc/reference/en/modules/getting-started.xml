@@ -361,11 +361,11 @@ List result = hibQuery.list();
 
     <para>Hibernate Search also introduces the notion of analyzer definitions
     which allow you to manage and reuse analyzers. This infrastructure is
-    supported by the Solr analyzer framework. The following example uses the
-    entity level annotation to apply a English language analyzer which would
-    help you to achieve your goal. The class
-    <classname>EnglishAnalyzer</classname> is a custom class using the
-    Snowball English Stemmer from the <ulink
+    supported by the Solr analyzer framework (see <xref
+    linkend="analyzer" />). The following example uses the entity level
+    annotation to apply a English language analyzer which would help you to
+    achieve your goal. The class <classname>EnglishAnalyzer</classname> is a
+    custom class using the Snowball English Stemmer from the <ulink
     url="http://lucene.apache.org/java/docs/lucene-sandbox/">Lucene
     Sandbox</ulink>.</para>
 
