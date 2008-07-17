@@ -3,6 +3,7 @@ package org.hibernate.search;
 
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.Explanation;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.transform.ResultTransformer;
@@ -76,6 +77,16 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Disable a given filter by its name
 	 */
 	void disableFullTextFilter(String name);
+
+	/**
+	 * Return the Lucene {@link org.apache.lucene.search.Explanation}
+	 * object describing the score computation for the matching object/document
+	 * in the current query
+	 *
+	 * @param documentId Lucene Document id to be explain. This is NOT the object id
+	 * @return Lucene Explanation
+	 */
+	Explanation explain(int documentId);
 
 	/**
 	 * {link:Query#setFirstResult}

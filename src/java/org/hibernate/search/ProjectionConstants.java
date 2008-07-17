@@ -36,6 +36,16 @@ public interface ProjectionConstants {
 	 */
 	public String DOCUMENT_ID = "__HSearch_DocumentId";
 	/**
+	 * Lucene {@link org.apache.lucene.search.Explanation} object describing the score computation for
+	 * the matching object/document
+	 * This feature is relatively expensive, do not use unless you return a limited
+	 * amount of objects (using pagination)
+	 * To retrieve explanation of a single result, consider retrieving {@link #DOCUMENT_ID}
+	 * and using fullTextQuery.explain(int)
+	 */
+	public String EXPLANATION = "__HSearch_Explanation";
+	
+	/**
 	 * Object class
 	 */
 	//TODO OBJECT CLASS

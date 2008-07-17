@@ -25,6 +25,7 @@ import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.Explanation;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -129,17 +130,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			return new IteratorImpl( Collections.EMPTY_LIST, noLoader );
 		}
 		try {
-			Hits hits = getHits( searcher );
+			QueryAndHits queryAndHits = getQueryAndHits( searcher );
 			int first = first();
-			int max = max( first, hits );
+			int max = max( first, queryAndHits.hits );
 			Session sess = (Session) this.session;
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
-			DocumentExtractor extractor = new DocumentExtractor( searchFactoryImplementor, indexProjection );
+			DocumentExtractor extractor = new DocumentExtractor( queryAndHits.preparedQuery, searcher, searchFactoryImplementor, indexProjection );
 			for (int index = first; index <= max; index++) {
 				//TODO use indexSearcher.getIndexReader().document( hits.id(index), FieldSelector(indexProjection) );
-				infos.add( extractor.extract( hits, index ) );
+				infos.add( extractor.extract( queryAndHits.hits, index ) );
 			}
 			Loader loader = getLoader( sess, searchFactoryImplementor );
 			return new IteratorImpl( infos, loader );
@@ -207,14 +208,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactory );
 		//FIXME: handle null searcher
-		Hits hits;
 		try {
-			hits = getHits( searcher );
+			QueryAndHits queryAndHits = getQueryAndHits( searcher );
 			int first = first();
-			int max = max( first, hits );
-			DocumentExtractor extractor = new DocumentExtractor( searchFactory, indexProjection );
+			int max = max( first, queryAndHits.hits );
+			DocumentExtractor extractor = new DocumentExtractor( queryAndHits.preparedQuery, searcher, searchFactory, indexProjection );
 			Loader loader = getLoader( (Session) this.session, searchFactory );
-			return new ScrollableResultsImpl( searcher, hits, first, max, fetchSize, extractor, loader, searchFactory );
+			return new ScrollableResultsImpl( searcher, queryAndHits.hits, first, max, fetchSize, extractor, loader, searchFactory );
 		}
 		catch (IOException e) {
 			//close only in case of exception
@@ -238,18 +238,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) return Collections.EMPTY_LIST;
-		Hits hits;
 		try {
-			hits = getHits( searcher );
+			QueryAndHits queryAndHits = getQueryAndHits( searcher );
 			int first = first();
-			int max = max( first, hits );
+			int max = max( first, queryAndHits.hits );
 			Session sess = (Session) this.session;
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
-			DocumentExtractor extractor = new DocumentExtractor( searchFactoryImplementor, indexProjection );
+			DocumentExtractor extractor = new DocumentExtractor( queryAndHits.preparedQuery, searcher, searchFactoryImplementor, indexProjection );
 			for (int index = first; index <= max; index++) {
-				infos.add( extractor.extract( hits, index ) );
+				infos.add( extractor.extract( queryAndHits.hits, index ) );
 			}
 			Loader loader = getLoader( sess, searchFactoryImplementor );
 			List list = loader.load( infos.toArray( new EntityInfo[infos.size()] ) );
@@ -274,6 +273,34 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 	}
 
+	public Explanation explain(int documentId) {
+		Explanation explanation = null;
+		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
+		Searcher searcher = buildSearcher( searchFactoryImplementor );
+		if (searcher == null) {
+			throw new SearchException("Unable to build explanation for document id:"
+					+ documentId + ". no index found");
+		}
+		try {
+			org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
+			buildFilters();
+			explanation = searcher.explain( query, documentId );
+		}
+		catch (IOException e) {
+			throw new HibernateException( "Unable to query Lucene index and build explanation", e );
+		}
+		finally {
+			//searcher cannot be null
+			try {
+				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
+			}
+			catch (SearchException e) {
+				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
+			}
+		}
+		return explanation;
+	}
+
 	/**
 	 * Execute the lucene search and return the machting hits.
 	 *
@@ -281,13 +308,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * @return The lucene hits.
 	 * @throws IOException in case there is an error executing the lucene search.
 	 */
-	private Hits getHits(Searcher searcher) throws IOException {
+	private QueryAndHits getQueryAndHits(Searcher searcher) throws IOException {
 		Hits hits;
 		org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
 		buildFilters();
 		hits = searcher.search( query, filter, sort );
 		setResultSize( hits );
-		return hits;
+		return new QueryAndHits( query, hits );
 	}
 
 	private void buildFilters() {
@@ -600,7 +627,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			else {
 				Hits hits;
 				try {
-					hits = getHits( searcher );
+					hits = getQueryAndHits( searcher ).hits;
 					resultSize = hits.length();
 				}
 				catch (IOException e) {
@@ -720,4 +747,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
 	};
+
+	private static class QueryAndHits {
+		private QueryAndHits(org.apache.lucene.search.Query preparedQuery, Hits hits) {
+			this.preparedQuery = preparedQuery;
+			this.hits = hits;
+		}
+
+		public final org.apache.lucene.search.Query preparedQuery;
+		public final Hits hits;
+	}
 }

@@ -6,6 +6,8 @@ import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.ProjectionConstants;
 
@@ -16,10 +18,14 @@ import org.hibernate.search.ProjectionConstants;
 public class DocumentExtractor {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
+	private final IndexSearcher searcher;
+	private final Query preparedQuery;
 
-	public DocumentExtractor(SearchFactoryImplementor searchFactoryImplementor, String... projection) {
+	public DocumentExtractor(Query preparedQuery, IndexSearcher searcher, SearchFactoryImplementor searchFactoryImplementor, String... projection) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.projection = projection;
+		this.searcher = searcher;
+		this.preparedQuery = preparedQuery;
 	}
 
 	private EntityInfo extract(Document document) {
@@ -55,6 +61,9 @@ public class DocumentExtractor {
 				}
 				else if ( ProjectionConstants.BOOST.equals( projection[x] ) ) {
 					eip[x] = doc.getBoost();
+				}
+				else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
+					eip[x] = searcher.explain( preparedQuery, hits.id( index ) );
 				}
 				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 					//THIS could be projected more than once

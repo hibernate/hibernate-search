@@ -5,6 +5,7 @@ import javax.persistence.Query;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Explanation;
 import org.hibernate.Criteria;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.search.ProjectionConstants;
@@ -89,4 +90,14 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 */
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
+
+	/**
+	 * Return the Lucene {@link org.apache.lucene.search.Explanation}
+	 * object describing the score computation for the matching object/document
+	 * in the current query
+	 *
+	 * @param documentId Lucene Document id to be explain. This is NOT the object id
+	 * @return Lucene Explanation
+	 */
+	Explanation explain(int documentId);
 }

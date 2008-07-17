@@ -19,6 +19,7 @@ import javax.persistence.TemporalType;
 
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.Explanation;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -225,6 +226,10 @@ public class FullTextQueryImpl implements FullTextQuery {
 		}
 		query.setFirstResult( firstResult );
 		return this;
+	}
+
+	public Explanation explain(int documentId) {
+		return query.explain( documentId );
 	}
 
 	public int executeUpdate() {
