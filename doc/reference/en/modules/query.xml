@@ -254,6 +254,14 @@ String authorName = firstResult[2];</programlisting>
             Lucene document id can change overtime between two different
             IndexReader opening (this feature is experimental)</para>
           </listitem>
+
+          <listitem>
+            <para>FullTextQuery.EXPLANATION: returns the Lucene Explanation
+            object for the matching object/document in the given query. Do not
+            use if you retrieve a lot of data. Running explanation typically
+            is as costly as running the whole Lucene query per matching
+            element. Make sure you use projection!</para>
+          </listitem>
         </itemizedlist>
       </section>
     </section>
@@ -361,6 +369,56 @@ for(BookView view : results) {
 
       <para>Examples of <classname>ResultTransformer</classname>
       implementations can be found in the Hibernate Core codebase.</para>
+    </section>
+
+    <section>
+      <title>Understanding results</title>
+
+      <para>You will find yourself sometimes puzzled by a result showing up in
+      a query or a result not showing up in a query. Luke is a great tool to
+      understand those mysteries. But Hibernate Search also let's you access
+      to the Lucene <classname>Explanation</classname> object for a given
+      result (in a given query). This class is considered fairly advanced to
+      Lucene users but can provide a good understanding of the scoring of an
+      object. You have two ways to access the Explanation object for a given
+      result:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Use the <methodname>fullTextQuery.explain(int)</methodname>
+          method</para>
+        </listitem>
+
+        <listitem>
+          <para>Use projection</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>The first approach takes a document id as a parameter and return
+      the Explanation object. The document id can be retrieved using
+      projection and the <literal>FullTextQuery.DOCUMENT_ID</literal>
+      constant.</para>
+
+      <warning>
+        <para>The Document id has nothing to do with the entity id. do not
+        mess up the two notions.</para>
+      </warning>
+
+      <para>The second approach let's you project the
+      <classname>Explanation</classname> object using the
+      <literal>FullTextQuery.EXPLANATION</literal> constant.</para>
+
+      <programlisting>FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )
+        .setProjection( FullTextQuery.DOCUMENT_ID, <emphasis role="bold">FullTextQuery.EXPLANATION</emphasis>, FullTextQuery.THIS );
+@SuppressWarnings("unchecked") List&lt;Object[]&gt; results = ftQuery.list();
+for (Object[] result : results) {
+    Explanation e = (Explanation) result[1];
+    display( e.toString() );
+}</programlisting>
+
+      <para>Be careful, building the explanation object is quite expensive, it
+      is roughly as expensive as running the Lucene query again. Don't do it
+      if you don't need the object and don't do it on too many results.</para>
     </section>
   </section>
 
