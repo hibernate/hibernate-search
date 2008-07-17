@@ -1,4 +1,4 @@
-//$
+// $Id:$
 package org.hibernate.search.test.similarity;
 
 import org.apache.lucene.search.DefaultSimilarity;
@@ -6,6 +6,7 @@ import org.apache.lucene.search.DefaultSimilarity;
 /**
  * @author Emmanuel Bernard
  */
+@SuppressWarnings("serial")
 public class DummySimilarity extends DefaultSimilarity {
 	private float CONST = 1.0f;
 

@@ -1,4 +1,4 @@
-//$
+// $Id:$
 package org.hibernate.search.test.similarity;
 
 import java.util.List;
@@ -56,6 +56,7 @@ public class SimilarityTest extends SearchTestCase {
 		s.close();
 
 	}
+	
 	protected Class[] getMappings() {
 		return new Class[] {
 				Trash.class,

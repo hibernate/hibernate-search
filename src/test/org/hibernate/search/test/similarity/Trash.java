@@ -1,4 +1,4 @@
-//$
+// $Id:$
 package org.hibernate.search.test.similarity;
 
 import javax.persistence.Id;
@@ -21,6 +21,7 @@ public class Trash {
 	@DocumentId
 	@GeneratedValue
 	private Integer id;
+	
 	@Field
 	private String name;
 
