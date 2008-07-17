@@ -593,17 +593,21 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     implementation to each of the parameters equals and hashcode
     methods.</para>
 
-    <para>The filter cache is enabled by default and uses the notion of
-    SoftReferences to dispose memory when needed. To adjust the size of the
-    hard reference cache, use
+    <para>The filter cache is enabled by default and uses a combination of
+    hard and soft references to allow disposal of memory when needed. The hard
+    reference cache keeps track of the most recently used filters and
+    transforms the ones least used to <classname>SoftReferences</classname>
+    when needed. Once the limit of the hard reference cache is reached
+    addtional filters are cached as <classname>SoftReferences</classname>. To
+    adjust the size of the hard reference cache, use
     <literal>hibernate.search.filter.cache_strategy.size</literal> (defaults
     to 128). For advance use of filter caching, you can implement your own
     <classname>FilterCachingStrategy</classname>. The classname is defined by
     <literal>hibernate.search.filter.cache_strategy</literal>.</para>
 
-    <para>The described filter cache should not be confused with caching the
-    actual filter results. In Lucene it is common practise to wrap filters
-    using the <classname>IndexReader</classname> around a
+    <para>The described filter cache mechanism should not be confused with
+    caching the actual filter results. In Lucene it is common practise to wrap
+    filters using the <classname>IndexReader</classname> around a
     <classname>CachingWrapperFilter.</classname> The wrapper will cache the
     <classname>BitSet</classname> returned from the
     <methodname>bits(IndexReader reader)</methodname>method to avoid expensive
@@ -616,12 +620,12 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     CachingWrapperFilter
     (<classname>org.hibernate.search.filter.CachingWrapperFilter</classname>).
     In contrast to Lucene's version of this class SoftReferences are used
-    together with a hard reference count. The hard reference count can be
-    adjusted using
-    <literal>hibernate.search.filter.caching_wrapper.size</literal> (defaults
-    to 5). The wrapping behaviour can be controlled by
-    <literal>@FullTextFilterDef.useCachingWrapperFilter</literal>. There are
-    three differerent values for this parameter:</para>
+    together with a hard reference count (see dicussion about filter cache).
+    The hard reference count can be adjusted using
+    <literal>hibernate.search.filter.cache_bit_results.size</literal>
+    (defaults to 5). The wrapping behaviour can be controlled by
+    <literal>@FullTextFilterDef.cacheBitResult</literal>. There are three
+    differerent values for this parameter:</para>
 
     <para><informaltable align="left" width="">
         <tgroup cols="2">

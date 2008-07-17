@@ -1,4 +1,4 @@
-//$Id$
+// $Id$
 package org.hibernate.search;
 
 /**
@@ -71,5 +71,5 @@ public final class Environment {
 	/**
 	 * Property name for the hard ref count of our <code>CachingWrapperFilter</code>.
 	 */
-	public static final String CACHING_WRAPPER_FILTER_SIZE = "hibernate.search.filter.caching_wrapper.size";	
+	public static final String CACHE_BIT_RESULT_SIZE = "hibernate.search.filter.cache_bit_results.size";	
 }

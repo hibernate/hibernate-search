@@ -3,7 +3,6 @@ package org.hibernate.search.test.filter;
 
 import java.util.Calendar;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -11,11 +10,9 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.RangeFilter;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
-import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -174,6 +171,6 @@ public class FilterTest extends SearchTestCase {
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure(cfg);
-		cfg.setProperty( "hibernate.search.filter.caching_wrapper.size", "10" );
+		cfg.setProperty( "hibernate.search.filter.cache_bit_results.size", "10" );
 	}	
 }

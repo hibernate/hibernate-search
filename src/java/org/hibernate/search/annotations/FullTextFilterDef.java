@@ -40,7 +40,8 @@ public @interface FullTextFilterDef {
 	boolean cache() default true;
 	
 	/**
-	 * Determines whether the filter should be wrapped around a <code>CachingWrapperFilter</code>.
+	 * Determines whether the <code>BitSet</code> returned from the filter should be 
+	 * cached or not. Default is <code>CacheBitResults.AUTOMATIC</code>.
 	 */	
-	CacheBitResults useCachingWrapperFilter() default CacheBitResults.AUTOMATIC;
+	CacheBitResults cacheBitResult() default CacheBitResults.AUTOMATIC;
 }

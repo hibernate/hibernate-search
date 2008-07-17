@@ -1,15 +1,15 @@
-// $Id:$
+// $Id$
 package org.hibernate.search.annotations;
 
 /**
- * Defines the strategy for using <code>CachingWrappingFilter</code>
+ * Defines the strategy for caching the <code>BitSet</code> returned by a defined filter.
  * 
  * @author Hardy Ferentschik
  * @see org.hibernate.search.filter.CachingWrapperFilter
  */
 public enum CacheBitResults {
 	/**
-	 * Use a <code>CachingWrapperFilter<code> depending on the value of the <code>cache</code>
+	 * Caching is dependent on the value of the <code>cache</code>
 	 * parameter of the filter definition. If <code>cache == true</code> a wrapping filter will 
 	 * be used, otherwise not.
 	 * @see FullTextFilterDef#cache()
@@ -17,12 +17,12 @@ public enum CacheBitResults {
 	AUTOMATIC,
 	
 	/**
-	 * Wrap the filter around a <code>CachingWrappingFilter</code>.
+	 * The filters <code>BitSet</code> will be cached.
 	 */
 	YES,
 	
 	/**
-	 * Do not use a <code>CachingWrappingFilter</code>.
+	 * No caching of the filter's <code>BitSet</code>.
 	 */
 	NO;
 }

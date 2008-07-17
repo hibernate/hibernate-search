@@ -22,7 +22,6 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.annotations.common.util.StringHelper;
-import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
@@ -76,7 +75,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private final FilterCachingStrategy filterCachingStrategy;
 	private Map<String, Analyzer> analyzers;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
-	private final int cachingWrapperFilterSize;
+	private final int cacheBitResultsSize;
 	/*
 	 * used as a barrier (piggyback usage) between initialization and subsequent usage of searchFactory in different threads
 	 * this is due to our use of the initialize pattern is a few areas
@@ -121,7 +120,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.worker = WorkerFactory.createWorker( cfg, this );
 		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		this.filterCachingStrategy = buildFilterCachingStrategy( cfg.getProperties() );
-		this.cachingWrapperFilterSize = ConfigurationParseHelper.getIntValue( cfg.getProperties(), Environment.CACHING_WRAPPER_FILTER_SIZE, CachingWrapperFilter.DEFAULT_SIZE );
+		this.cacheBitResultsSize = ConfigurationParseHelper.getIntValue( cfg.getProperties(), Environment.CACHE_BIT_RESULT_SIZE, CachingWrapperFilter.DEFAULT_SIZE );
 		this.barrier = 1; //write barrier
 	}
 
@@ -195,7 +194,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		FilterDef filterDef = new FilterDef();
 		filterDef.setImpl( defAnn.impl() );
 		filterDef.setCache( defAnn.cache() );
-		filterDef.setUseCachingWrapperFilter( defAnn.useCachingWrapperFilter() );
+		filterDef.setUseCachingWrapperFilter( defAnn.cacheBitResult() );
 		try {
 			filterDef.getImpl().newInstance();
 		}
@@ -388,9 +387,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.dirProviderData.put( provider, new DirectoryProviderData() );
 	}
 
-	public int getCachingWrapperFilterSize() {
+	public int getFilterCacheBitResultsSize() {
 		if (barrier != 0) {} //read barrier
-		return cachingWrapperFilterSize;
+		return cacheBitResultsSize;
 	}
-	
 }

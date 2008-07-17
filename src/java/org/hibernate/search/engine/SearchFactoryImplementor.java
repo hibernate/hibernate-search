@@ -55,5 +55,5 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	void addDirectoryProvider(DirectoryProvider<?> provider);
 	
-	int getCachingWrapperFilterSize();	
+	int getFilterCacheBitResultsSize();	
 }
