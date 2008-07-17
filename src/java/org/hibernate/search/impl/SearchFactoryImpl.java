@@ -77,6 +77,16 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private Map<String, Analyzer> analyzers;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cachingWrapperFilterSize;
+	/*
+	 * used as a barrier (piggyback usage) between initialization and subsequent usage of searchFactory in different threads
+	 * this is due to our use of the initialize pattern is a few areas
+	 * subsequent reads on volatiles should be very cheap on most platform especially since we don't write after init
+	 *
+	 * This volatile is meant to be written after initialization
+	 * and read by all subsequent methods accessing the SearchFactory state
+	 * read to be as barrier != 0. If barrier == 0 we have a race condition, but is not likely to happen.
+	 */
+	private volatile short barrier;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -87,10 +97,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
+		if (barrier != 0) { } //read barrier
 		return backendQueueProcessorFactory;
 	}
 
 	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
+		//no need to set a barrier, we init in the same thread as the init one
 		this.backendQueueProcessorFactory = backendQueueProcessorFactory;
 	}
 
@@ -109,8 +121,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.worker = WorkerFactory.createWorker( cfg, this );
 		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		this.filterCachingStrategy = buildFilterCachingStrategy( cfg.getProperties() );
-		
 		this.cachingWrapperFilterSize = ConfigurationParseHelper.getIntValue( cfg.getProperties(), Environment.CACHING_WRAPPER_FILTER_SIZE, CachingWrapperFilter.DEFAULT_SIZE );
+		this.barrier = 1; //write barrier
 	}
 
 	private static String defineIndexingStrategy(SearchConfiguration cfg) {
@@ -122,10 +134,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public String getIndexingStrategy() {
+		if (barrier != 0) { } //read barrier
 		return indexingStrategy;
 	}
 
 	public void close() {
+		if (barrier != 0) { } //read barrier
 		if ( stopped.compareAndSet( false, true) ) {
 			try {
 				worker.close();
@@ -146,6 +160,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public void addClassToDirectoryProvider(Class clazz, DirectoryProvider<?> directoryProvider) {
+		//no need to set a read barrier, we only use this class in the init thread
 		DirectoryProviderData data = dirProviderData.get(directoryProvider);
 		if (data == null) {
 			data = new DirectoryProviderData();
@@ -155,6 +170,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public Set<Class> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
+		if (barrier != 0) { } //read barrier
 		return Collections.unmodifiableSet( dirProviderData.get(directoryProvider).classes );
 	}
 
@@ -217,18 +233,22 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 
 	public Map<Class, DocumentBuilder<Object>> getDocumentBuilders() {
+		if (barrier != 0) { } //read barrier
 		return documentBuilders;
 	}
 
 	public Set<DirectoryProvider> getDirectoryProviders() {
+		if (barrier != 0) { } //read barrier
 		return this.dirProviderData.keySet();
 	}
 
 	public Worker getWorker() {
+		if (barrier != 0) { } //read barrier
 		return worker;
 	}
 
 	public void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy) {
+		//no need to set a read barrier, we run this method on the init thread
 		DirectoryProviderData data = dirProviderData.get(provider);
 		if (data == null) {
 			data = new DirectoryProviderData();
@@ -238,27 +258,33 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
+		//no need to set a read barrier, we run this method on the init thread
 		dirProviderIndexingParams.put( provider, indexingParams );
 	}
 
 	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
+		if (barrier != 0) {} //read barrier
 		return dirProviderData.get( provider ).optimizerStrategy;
 	}
 
 	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider ) {
+		if (barrier != 0) {} //read barrier
 		return dirProviderIndexingParams.get( provider );
 	}
 
 	public ReaderProvider getReaderProvider() {
+		if (barrier != 0) {} //read barrier
 		return readerProvider;
 	}
 
 	public DirectoryProvider[] getDirectoryProviders(Class entity) {
+		if (barrier != 0) {} //read barrier
 		DocumentBuilder<Object> documentBuilder = getDocumentBuilders().get( entity );
 		return documentBuilder == null ? null : documentBuilder.getDirectoryProviders();
 	}
 
 	public void optimize() {
+		if (barrier != 0) {} //read barrier
 		Set<Class> clazzs = getDocumentBuilders().keySet();
 		for (Class clazz : clazzs) {
 			optimize( clazz );
@@ -266,6 +292,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public void optimize(Class entityType) {
+		if (barrier != 0) {} //read barrier
 		if ( ! getDocumentBuilders().containsKey( entityType ) ) {
 			throw new SearchException("Entity not indexed: " + entityType);
 		}
@@ -275,6 +302,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public Analyzer getAnalyzer(String name) {
+		if (barrier != 0) {} //read barrier
 		final Analyzer analyzer = analyzers.get( name );
 		if ( analyzer == null) throw new SearchException( "Unknown Analyzer definition: " + name);
 		return analyzer;
@@ -335,10 +363,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public FilterCachingStrategy getFilterCachingStrategy() {
+		if (barrier != 0) {} //read barrier
 		return filterCachingStrategy;
 	}
 
 	public FilterDef getFilterDefinition(String name) {
+		if (barrier != 0) {} //read barrier
 		return filterDefinitions.get( name );
 	}
 
@@ -349,14 +379,17 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public Lock getDirectoryProviderLock(DirectoryProvider dp) {
+		if (barrier != 0) {} //read barrier
 		return this.dirProviderData.get( dp ).dirLock;
 	}
 
 	public void addDirectoryProvider(DirectoryProvider<?> provider) {
+		//no need to set a barrier we use this method in the init thread
 		this.dirProviderData.put( provider, new DirectoryProviderData() );
 	}
 
 	public int getCachingWrapperFilterSize() {
+		if (barrier != 0) {} //read barrier
 		return cachingWrapperFilterSize;
 	}
 	
