@@ -147,24 +147,33 @@
     summary of the books contained in your database.</para>
 
     <programlisting>
-package exmaple.Book
+package example;
 ...
 @Entity
 public class Book {
 
   @Id
+  @GeneratedValue
   private Integer id; 
+
   private String body;  
+
   private String summary; 
-  @ManyToMany private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
-  @ManyToOne private Author mainAuthor;
+
+  @ManyToMany 
+  private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+
+  @ManyToOne 
+  private Author mainAuthor;
+
   private Date publicationDate;
   
   public Book() {
   } 
   
   // standard getters/setters follow here
-... 
+  ...
+} 
     </programlisting>
 
     <para>First you have to tell Hibernate Search which
@@ -208,13 +217,14 @@ hibernate.search.default.indexBase = /var/lucene/indexes
     linkend="projections" /></para>
 
     <programlisting>
-package exmaple.Book
+package example;
 ...
 @Entity
 <emphasis role="bold">@Indexed</emphasis>
 public class Book {
 
   @Id
+  @GeneratedValue
   <emphasis role="bold">@DocumentId</emphasis>
   private Integer id;
   
@@ -223,28 +233,34 @@ public class Book {
   
   <emphasis role="bold">@Field(index=Index.TOKENIZED, store=Store.NO)</emphasis>
   private String summary; 
-  @ManyToMany private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
-  @ManyToOne private Author mainAuthor;
+
+  @ManyToMany 
+  private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+
+  @ManyToOne 
+  private Author mainAuthor;
+
   private Date publicationDate;
   
   public Book() {
   } 
   
   // standard getters/setters follow here
-... 
+  ... 
+}
   </programlisting>
   </section>
 
   <section>
     <title>Indexing</title>
 
-    <para>Hibernate Search will index every entity persisted, updated or
-    removed through Hibernate core transparently for the application. However,
-    the data already present in your database needs to be indexed once to
-    populate the Lucene index. Once you have added the above properties and
-    annotations it is time to trigger an initial batch index of your books.
-    You can achieve this by adding one of the following code examples to your
-    code (see also <xref linkend="search-batchindex" />):</para>
+    <para>Hibernate Search will index transparently every entity persisted,
+    updated or removed through Hibernate Core. However, you have to trigger an
+    inital indexing to populate the Lucene index with the data already present
+    in your database. Once you have added the above properties and annotations
+    it is time to trigger an initial batch index of your books. You can
+    achieve this by using one of the following code snipplets (see also <xref
+    linkend="search-batchindex" />):</para>
 
     <para>Example using Hibernate Session:</para>
 
@@ -255,7 +271,7 @@ List books = session.createQuery("from Book as book").list();
 for (Book book : books) {
     fullTextSession.index(book);
 }
-tx.commit(); //index are written at commit time       
+tx.commit(); //index is written at commit time       
     </programlisting>
 
     <para>Example using JPA:</para>
@@ -343,9 +359,12 @@ List result = hibQuery.list();
       </listitem>
     </itemizedlist>
 
-    <para>The following example uses the entity level annotation to apply a
-    English language analyzer which would help you to achieve your goal. The
-    class <classname>EnglishAnalyzer</classname> is a custom class using the
+    <para>Hibernate Search also introduces the notion of analyzer definitions
+    which allow you to manage and reuse analyzers. This infrastructure is
+    supported by the Solr analyzer framework. The following example uses the
+    entity level annotation to apply a English language analyzer which would
+    help you to achieve your goal. The class
+    <classname>EnglishAnalyzer</classname> is a custom class using the
     Snowball English Stemmer from the <ulink
     url="http://lucene.apache.org/java/docs/lucene-sandbox/">Lucene
     Sandbox</ulink>.</para>
@@ -367,7 +386,10 @@ public class Book {
   
   @Field(index=Index.TOKENIZED, store=Store.NO)
   private String summary; 
-  @ManyToMany private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+
+  @ManyToMany 
+  private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+
   @ManyToOne private Author mainAuthor;
   private Date publicationDate;
   
@@ -401,7 +423,7 @@ public class EnglishAnalyzer extends Analyzer {
     Hibernate Search. You should by now have a file system based index and be
     able to search and retrieve a list of managed objects via Hibernate
     Search. The next step is to get more familiar with the overall
-    architecture ((<xref linkend="search-architecture" />)) and explore the
+    architecture (<xref linkend="search-architecture" />) and explore the
     basic features in more detail.</para>
 
     <para>Two topics which where only briefly touched in this tutorial were
