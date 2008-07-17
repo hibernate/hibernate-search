@@ -34,13 +34,16 @@ public abstract class ReaderProviderFactory {
 		ReaderProvider readerProvider;
 		if ( StringHelper.isEmpty( impl ) ) {
 			//put another one
-				readerProvider = new SharedReaderProvider();
+			readerProvider = new SharedReaderProvider();
 		}
 		else if ( "not-shared".equalsIgnoreCase( impl ) ) {
 			readerProvider = new NotSharedReaderProvider();
 		}
 		else if ( "shared".equalsIgnoreCase( impl ) ) {
 			readerProvider = new SharedReaderProvider();
+		}
+		else if ( "shared-segments".equalsIgnoreCase( impl ) ) {
+			readerProvider = new SharingBufferReaderProvider();
 		}
 		else {
 			try {

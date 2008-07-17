@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="search-configuration">
-  <!--  $Id$ -->	
+  <!--  $Id$ -->
+
   <title>Configuration</title>
 
   <section id="search-configuration-directory" revision="1">
@@ -53,9 +54,9 @@
             based on an incremental copy mechanism reducing the average copy
             time.</para><para>DirectoryProvider typically used on the master
             node in a JMS back end cluster.</para><para>The <literal>
-            buffer_size_on_copy</literal> optimum depends
-            on your operating system and available RAM; most people reported
-            good results using values between 16 and 64MB.</para></entry>
+            buffer_size_on_copy</literal> optimum depends on your operating
+            system and available RAM; most people reported good results using
+            values between 16 and 64MB.</para></entry>
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
@@ -67,9 +68,9 @@
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
             </para><para><literal>refresh</literal>: refresh period in second
             (the copy will take place every refresh seconds).</para><para>
-            <literal>buffer_size_on_copy</literal>: The amount of
-            MegaBytes to move in a single low level copy instruction;
-            defaults to 16MB.</para></entry>
+            <literal>buffer_size_on_copy</literal>: The amount of MegaBytes to
+            move in a single low level copy instruction; defaults to
+            16MB.</para></entry>
           </row>
 
           <row>
@@ -83,10 +84,10 @@
             information (default 3600 seconds - 60 minutes).</para><para>Note
             that the copy is based on an incremental copy mechanism reducing
             the average copy time.</para><para>DirectoryProvider typically
-            used on slave nodes using a JMS back end.</para><para>The <literal>
-            buffer_size_on_copy</literal> optimum depends
-            on your operating system and available RAM; most people reported
-            good results using values between 16 and 64MB.</para></entry>
+            used on slave nodes using a JMS back end.</para><para>The
+            <literal> buffer_size_on_copy</literal> optimum depends on your
+            operating system and available RAM; most people reported good
+            results using values between 16 and 64MB.</para></entry>
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
@@ -98,9 +99,9 @@
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
             </para><para><literal>refresh</literal>: refresh period in second
             (the copy will take place every refresh seconds).</para><para>
-            <literal>buffer_size_on_copy</literal>: The amount of
-            MegaBytes to move in a single low level copy instruction;
-            defaults to 16MB.</para></entry>
+            <literal>buffer_size_on_copy</literal>: The amount of MegaBytes to
+            move in a single low level copy instruction; defaults to
+            16MB.</para></entry>
           </row>
 
           <row>
@@ -448,12 +449,33 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     <title>Reader strategy configuration</title>
 
     <para>The different reader strategies are described in <xref
-    linkend="search-architecture-readerstrategy" />. The default reader
-    strategy is <literal>shared</literal>. This can be adjusted:</para>
+    linkend="search-architecture-readerstrategy" />. Out of the box strategies
+    are:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><literal>shared</literal>: share index readers across several
+        queries</para>
+      </listitem>
+
+      <listitem>
+        <para><literal>shared-segments</literal>: index readers are shared
+        across several queries and when reopening is needed, the inchanged
+        state is shared. This strategy is the most efficient.</para>
+      </listitem>
+
+      <listitem>
+        <para><literal>not-shared</literal>: create an index reader for each
+        individual query</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The default reader strategy is <literal>shared</literal>. This can
+    be adjusted:</para>
 
     <programlisting>hibernate.search.reader.strategy = not-shared</programlisting>
 
-    <para>Adding this property switch to the <literal>non shared</literal>
+    <para>Adding this property switch to the <literal>not-shared</literal>
     strategy.</para>
 
     <para>Or if you have a custom reader strategy:</para>
@@ -574,46 +596,68 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     Lucene <literal>IndexWriter</literal> such as
     <literal>mergeFactor</literal>, <literal>maxMergeDocs</literal> and
     <literal>maxBufferedDocs</literal>. You can specify these parameters
-    either as default values applying for all indexes, on a per index
-    basis, or even per shard.</para>
+    either as default values applying for all indexes, on a per index basis,
+    or even per shard.</para>
 
     <para>There are two sets of parameters allowing for different performance
     settings depending on the use case. During indexing operations triggered
     by database modifications, the parameters are grouped by the
-    <literal>transaction</literal> keyword:
-    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.transaction.&lt;parameter_name&gt;</programlisting>
-    When indexing occurs via <literal>FullTextSession.index()</literal> (see <xref
-    linkend="search-batchindex" />), the used properties are those grouped under the <literal>batch</literal> keyword:
-    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting>
-    </para>
+    <literal>transaction</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.transaction.&lt;parameter_name&gt;</programlisting>
+    When indexing occurs via <literal>FullTextSession.index()</literal> (see
+    <xref linkend="search-batchindex" />), the used properties are those
+    grouped under the <literal>batch</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting></para>
 
     <para>Unless the corresponding <literal>.batch</literal> property is
     explicitly set, the value will default to the
-    <literal>.transaction</literal> property.
-    If no value is set for a <literal>.batch</literal> value in a specific shard configuration,
-    Hibernate Search will look at the index section, then at the default section and after that
-    it will look for a <literal>.transaction</literal> in the same order:
-    <programlisting>
+    <literal>.transaction</literal> property. If no value is set for a
+    <literal>.batch</literal> value in a specific shard configuration,
+    Hibernate Search will look at the index section, then at the default
+    section and after that it will look for a <literal>.transaction</literal>
+    in the same order: <programlisting>
     hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
     hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
     hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
-    This configuration will result in these settings applied to the second shard of Animals index:
-    <itemizedlist>
-    	<listitem><literal>transaction.max_merge_docs</literal> = 10</listitem>
-        <listitem><literal>batch.max_merge_docs</literal> = 100</listitem>
-        <listitem><literal>transaction.merge_factor</literal> = 20</listitem>
-        <listitem><literal>batch.merge_factor</literal> = 20</listitem>
-    </itemizedlist>
-    All other values will use the defaults defined in Lucene.
-    </para>
+    This configuration will result in these settings applied to the second
+    shard of Animals index: <itemizedlist>
+        <listitem>
+           
 
-    <para>
-    The default for all values is to leave them at Lucene&#39;s own default,
-    so the listed values in the following table actually depend on the
-    version of Lucene you are using;
-    values shown are relative to version <literal>2.3</literal>.
-    For more information about Lucene indexing performances, please
-    refer to the Lucene documentation.</para>
+          <literal>transaction.max_merge_docs</literal>
+
+           = 10 
+        </listitem>
+
+        <listitem>
+           
+
+          <literal>batch.max_merge_docs</literal>
+
+           = 100 
+        </listitem>
+
+        <listitem>
+           
+
+          <literal>transaction.merge_factor</literal>
+
+           = 20 
+        </listitem>
+
+        <listitem>
+           
+
+          <literal>batch.merge_factor</literal>
+
+           = 20 
+        </listitem>
+      </itemizedlist> All other values will use the defaults defined in
+    Lucene.</para>
+
+    <para>The default for all values is to leave them at Lucene's own default,
+    so the listed values in the following table actually depend on the version
+    of Lucene you are using; values shown are relative to version
+    <literal>2.3</literal>. For more information about Lucene indexing
+    performances, please refer to the Lucene documentation.</para>
 
     <table>
       <title>List of indexing performance properties</title>
@@ -630,14 +674,13 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         </thead>
 
         <tbody>
-        
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_delete_terms</literal></entry>
 
-            <entry><para>Determines the minimal number of delete terms required before the buffered
-			in-memory delete terms are applied and flushed. If there are documents
-			buffered in memory at the time, they are merged and a new segment is
-   			created.</para></entry>
+            <entry><para>Determines the minimal number of delete terms
+            required before the buffered in-memory delete terms are applied
+            and flushed. If there are documents buffered in memory at the
+            time, they are merged and a new segment is created.</para></entry>
 
             <entry>Disabled (flushes by RAM usage)</entry>
           </row>
@@ -646,8 +689,8 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_docs</literal></entry>
 
             <entry><para>Controls the amount of documents buffered in memory
-            during indexing. The bigger the more RAM is consumed.</para>
-           </entry>
+            during indexing. The bigger the more RAM is
+            consumed.</para></entry>
 
             <entry>Disabled (flushes by RAM usage)</entry>
           </row>
@@ -655,27 +698,32 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_field_length</literal></entry>
 
-            <entry><para>The maximum number of terms that will be indexed for a single field.
-            This limits the amount of memory required for indexing so that very large data will not crash the indexing process by
-			running out of memory. This setting refers to the number of running terms,
-			not to the number of different terms.</para>
-			<para>This silently truncates large documents, excluding from the index all terms that occur further in the document.
-			If you know your source documents are large, be sure to set this value high enough to accomodate the expected size. 
-			If you set it to Integer.MAX_VALUE, then the only limit is your memory, but you should anticipate an OutOfMemoryError.
-			</para>
-			<para>If setting this value in <literal>batch</literal> differently than in <literal>transaction</literal>
-			you may get different data (and results) in your index depending on the indexing mode.</para>
-           </entry>
+            <entry><para>The maximum number of terms that will be indexed for
+            a single field. This limits the amount of memory required for
+            indexing so that very large data will not crash the indexing
+            process by running out of memory. This setting refers to the
+            number of running terms, not to the number of different
+            terms.</para> <para>This silently truncates large documents,
+            excluding from the index all terms that occur further in the
+            document. If you know your source documents are large, be sure to
+            set this value high enough to accomodate the expected size. If you
+            set it to Integer.MAX_VALUE, then the only limit is your memory,
+            but you should anticipate an OutOfMemoryError. </para> <para>If
+            setting this value in <literal>batch</literal> differently than in
+            <literal>transaction</literal> you may get different data (and
+            results) in your index depending on the indexing
+            mode.</para></entry>
 
             <entry>10000</entry>
           </row>
-          
+
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_merge_docs</literal></entry>
 
-            <entry><para>Defines the largest number of documents allowed in a segment.
-            Larger values are best for batched indexing and speedier searches.
-            Small values are best for transaction indexing.</para></entry>
+            <entry><para>Defines the largest number of documents allowed in a
+            segment. Larger values are best for batched indexing and speedier
+            searches. Small values are best for transaction
+            indexing.</para></entry>
 
             <entry>Unlimited (Integer.MAX_VALUE)</entry>
           </row>
@@ -700,26 +748,28 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].ram_buffer_size</literal></entry>
 
-            <entry><para>Controls the amount of RAM in MB dedicated to document buffers.
-            When used together max_buffered_docs a flush occurs for whichever event happens first.</para>
-            <para>Generally for faster indexing performance it's best to flush by RAM usage instead of document
-   			count and use as large a RAM buffer as you can.</para>
-            </entry>
+            <entry><para>Controls the amount of RAM in MB dedicated to
+            document buffers. When used together max_buffered_docs a flush
+            occurs for whichever event happens first.</para> <para>Generally
+            for faster indexing performance it's best to flush by RAM usage
+            instead of document count and use as large a RAM buffer as you
+            can.</para></entry>
 
             <entry>16 MB</entry>
           </row>
+
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].term_index_interval</literal></entry>
 
-            <entry><para>Expert: Set the interval between indexed terms.</para>
-            <para>Large values cause less memory to be used by IndexReader, but slow random-access to terms.
-            Small values cause more memory to be used by an IndexReader, and speed
-   			random-access to terms. See Lucene documentation for more details.</para>
-            </entry>
+            <entry><para>Expert: Set the interval between indexed
+            terms.</para> <para>Large values cause less memory to be used by
+            IndexReader, but slow random-access to terms. Small values cause
+            more memory to be used by an IndexReader, and speed random-access
+            to terms. See Lucene documentation for more
+            details.</para></entry>
 
             <entry>128</entry>
           </row>
-
         </tbody>
       </tgroup>
     </table>

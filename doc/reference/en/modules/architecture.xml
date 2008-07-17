@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="search-architecture">
-  <!--  $Id$ -->	
+  <!--  $Id$ -->
+
   <title>Architecture</title>
 
   <section>
@@ -71,11 +72,11 @@
     detects the presence of a transaction and adjust the scoping.</para>
 
     <note>
-      Hibernate Search works perfectly fine in the Hibernate / EntityManager long conversation pattern aka. atomic conversation.
+       Hibernate Search works perfectly fine in the Hibernate / EntityManager long conversation pattern aka. atomic conversation. 
     </note>
 
     <note>
-      Depending on user demand, additional scoping will be considered, the pluggability mechanism being already in place.
+       Depending on user demand, additional scoping will be considered, the pluggability mechanism being already in place. 
     </note>
   </section>
 
@@ -198,21 +199,38 @@
       <title>Shared</title>
 
       <para>With this strategy, Hibernate Search will share the same
-      IndexReader, for a given Lucene index, across multiple queries and
-      threads provided that the IndexReader is still up-to-date. If the
-      IndexReader is not up-to-date, a new one is opened and provided.
-      Generally speaking, this strategy provides much better performances than
-      the <literal>not-shared</literal> strategy. It is especially true if the
-      number of updates is much lower than the reads. This strategy is the
-      default.</para>
+      <classname>IndexReader</classname>, for a given Lucene index, across
+      multiple queries and threads provided that the
+      <classname>IndexReader</classname> is still up-to-date. If the
+      <classname>IndexReader</classname> is not up-to-date, a new one is
+      opened and provided. Generally speaking, </para>
+    </section>
+
+    <section>
+      <title>Shared Segments</title>
+
+      <para>This strategies goes a step further the shared strategy and tries
+      to minimize reopening even when the underlying index has changed. Each
+      <classname>IndexReader</classname> is made of several
+      <classname>SegmentReader</classname>s. This strategy only reopens
+      segments that have been modified or created and shared the already
+      loaded segments. This strategy will become the default strategy in the
+      near future.</para>
+
+      <para>The name of this strategy is
+      <literal>shared-segments</literal>.</para>
     </section>
 
     <section>
       <title>Not-shared</title>
 
-      <para>Every time a query is executed, a Lucene IndexReader is opened.
-      This strategy is not the most efficient since opening and warming up an
-      IndexReader can be a relatively expensive operation.</para>
+      <para>Every time a query is executed, a Lucene
+      <classname>IndexReader</classname> is opened. This strategy is not the
+      most efficient since opening and warming up an
+      <classname>IndexReader</classname> can be a relatively expensive
+      operation.</para>
+
+      <para>The name of this strategy is <literal>not-shared</literal>.</para>
     </section>
 
     <section>
@@ -222,11 +240,6 @@
       needs by implementing
       <classname>org.hibernate.search.reader.ReaderProvider</classname>. The
       implementation must be thread safe.</para>
-
-      <note>
-        <para>Some additional strategies are planned in future versions of
-        Hibernate Search</para>
-      </note>
     </section>
   </section>
 </chapter>
