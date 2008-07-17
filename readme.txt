@@ -1,6 +1,6 @@
 Hibernate Search
 ==================================================
-Version: 3.0.1.GA, 20.02.2008
+Version: 3.1.0.Beta1, 17.07.2008
 
 Description
 -----------
@@ -15,8 +15,8 @@ queries.
 Hibernate Search is using Apache Lucene(tm) under the cover.
 
 
-Hibernate Requires Hibernate Core 3.2 and above.
-This version runs well with Hibernate Annotations 3.3.x and Hibernate EntityManager 3.3.x
+Hibernate Requires Hibernate Core 3.3 and above.
+This version runs well with Hibernate Annotations 3.4.x and Hibernate EntityManager 3.4.x
 
 
 Instructions

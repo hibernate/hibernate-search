@@ -1,6 +1,68 @@
 Hibernate Search Changelog
 ==========================
 
+3.1.0.Beta1 (17-07-2008)
+------------------------
+
+** Bug
+    * [HSEARCH-166] - documentation error : hibernate.search.worker.batch_size vs hibernate.worker.batch_size
+    * [HSEARCH-171] - Do not log missing objects when using QueryLoader
+    * [HSEARCH-173] - CachingWrapperFilter loses its WeakReference making filter caching inefficient
+    * [HSEARCH-194] - Inconsistent performance between hibernate search and pure lucene access
+    * [HSEARCH-196] - ObjectNotFoundException not caught in FullTextSession
+    * [HSEARCH-198] - Documentation out of sync with implemented/released features
+    * [HSEARCH-203] - Counter of index modification operations not always incremented
+    * [HSEARCH-204] - Improper calls to Session during a projection not involving THIS
+    * [HSEARCH-205] - Out of Memory on copy of large indexes
+    * [HSEARCH-217] - Proper errors on parsing of all numeric configuration parameters
+    * [HSEARCH-227] - Criteria based fetching is not used when objects are loaded one by one (iterate())
+
+
+** Improvement
+    * [HSEARCH-19] - Do not filter classes on queries when we know that all Directories only contains the targeted classes
+    * [HSEARCH-156] - Retrofit FieldBridge.set lucene parameters into a LuceneOptions class
+    * [HSEARCH-157] - Make explicit in FAQ and doc that query.list() followed by query.getResultSize() triggers only one query
+    * [HSEARCH-163] - Enhance error messages when @FieldBridge is wrongly used (no impl or impl not implementing the right interfaces)
+    * [HSEARCH-176] - Permits alignment properties to lucene default (Sanne Grinovero)
+    * [HSEARCH-179] - Documentation should be explicit that @FulltextFilter filters every object, regardless which object is annotated
+    * [HSEARCH-181] - Better management of file-based index directories (Sanne Grinovero)
+    * [HSEARCH-189] - Thread management improvements for Master/Slave DirectoryProviders
+    * [HSEARCH-197] - Move to slf4j
+    * [HSEARCH-199] - Property close Search resources on SessionFactory.close()
+    * [HSEARCH-202] - Avoid many maps lookup in Workspace
+    * [HSEARCH-207] - Make DateBridge TwoWay to facilitate projection
+    * [HSEARCH-208] - Raise exception on index and purge when the entity is not an indexed entity
+    * [HSEARCH-209] - merge FullTextIndexCollectionEventListener into FullTextIndexEventListener
+    * [HSEARCH-215] - Rename Search.createFTS to Search.getFTS deprecating the old method
+    * [HSEARCH-223] - Use multiple criteria queries rather than ObjectLoader in most cases
+    * [HSEARCH-230] - Ensure initialization safety in a multi-core machine
+
+** New Feature
+    * [HSEARCH-133] - Allow overriding DefaultSimilarity for indexing and searching (Nick Vincent)
+    * [HSEARCH-141] - Allow term position information to be stored in an index
+    * [HSEARCH-153] - Provide the possibility to configure writer.setRAMBufferSizeMB()  (Lucene 2.3)
+    * [HSEARCH-154] - Provide a facility to access Lucene query explanations
+    * [HSEARCH-164] - Built-in bridge to index java.lang.Class
+    * [HSEARCH-165] - URI and URL built-in bridges
+    * [HSEARCH-174] - Improve transparent filter caching by wrapping filters into our own CachingWrapperFilter
+    * [HSEARCH-186] - Enhance analyzer to support the Solr model
+    * [HSEARCH-190] - Add pom
+    * [HSEARCH-191] - Make build independent of Hibernate Core structure
+    * [HSEARCH-192] - Move to Hibernate Core 3.3
+    * [HSEARCH-193] - Use dependency on Solr-analyzer JAR rather than the full Solr JAR
+    * [HSEARCH-195] - Expose Analyzers instance by name: searchFactory.getAnalyzer(String)
+    * [HSEARCH-200] - Expose IndexWriter setting MAX_FIELD_LENGTH via IndexWriterSetting
+    * [HSEARCH-212] - Added ReaderProvider strategy reusing unchanged segments (using reader.reopen())
+    * [HSEARCH-220] - introduce session.flushToIndexes API and deprecate batch_size
+
+
+** Task
+    * [HSEARCH-169] - Migrate to Lucene 2.3.1 (index corruption possiblity in 2.3.0)
+    * [HSEARCH-187] - Clarify which directories need read-write access, verify readonly behaviour on others.
+    * [HSEARCH-214] - Upgrade Lucene to 2.3.2
+    * [HSEARCH-229] - Deprecate FullTextQuery.BOOST
+
+
 3.0.1.GA (20-02-2008)
 ---------------------
 
