@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <chapter id="search-lucene-native">
   <!--  $Id$ -->
+
   <title>Accessing Lucene natively</title>
 
   <section>
@@ -12,7 +12,7 @@
     way to access Lucene natively. The <classname>SearchFactory</classname>
     can be accessed from a <classname>FullTextSession</classname>:</para>
 
-    <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(regularSession);
+    <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
 SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
   </section>
 

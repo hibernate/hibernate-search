@@ -18,7 +18,7 @@
 
   <programlisting>Session session = sessionFactory.openSession();
 ...
-FullTextSession fullTextSession = Search.createFullTextSession(session);    </programlisting>
+FullTextSession fullTextSession = Search.getFullTextSession(session);    </programlisting>
 
   <para>The search facility is built on native Lucene queries.</para>
 
@@ -43,7 +43,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
   <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
 
 FullTextEntityManager fullTextEntityManager = 
-    org.hibernate.hibernate.search.jpa.Search.createFullTextEntityManager(em);
+    org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 
 ...
 org.apache.lucene.queryParser.QueryParser parser = new QueryParser("title", new StopAnalyzer() );
@@ -72,6 +72,13 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       <para>This subject is generally speaking out of the scope of this
       documentation. Please refer to the Lucene documentation or Lucene In
       Action.</para>
+
+      <para>It is quite useful to use the same analyzer when indexing a field
+      and when querying that field. Hibernate Search let's you access analyzer
+      instances that have been defined through an analyzer definition (see
+      <xref linkend="analyzer" /> for more information).</para>
+
+      <programlisting>analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("phonetic-analyzer");</programlisting>
     </section>
 
     <section>
@@ -83,7 +90,7 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
         <para>Once the Lucene query is built, it needs to be wrapped into an
         Hibernate Query.</para>
 
-        <programlisting>FullTextSession fullTextSession = Search.createFullTextSession( session );
+        <programlisting>FullTextSession fullTextSession = Search.getFullTextSession( session );
 org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );</programlisting>
 
         <para>If not specified otherwise, the query will be executed against
@@ -418,7 +425,7 @@ for (Object[] result : results) {
 
       <para>Be careful, building the explanation object is quite expensive, it
       is roughly as expensive as running the Lucene query again. Don't do it
-      if you don't need the object and don't do it on too many results.</para>
+      if you don't need the object</para>
     </section>
   </section>
 

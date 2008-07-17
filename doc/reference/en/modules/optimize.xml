@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <chapter id="search-optimize">
-  <!--  $Id$ -->	
+  <!--  $Id$ -->
+
   <title>Index Optimization</title>
 
   <para>From time to time, the Lucene index needs to be optimized. The process
@@ -77,7 +77,7 @@ hibernate.search.Animal.optimizer.transaction_limit.max = 50</programlisting>
 
     <programlisting>searchFactory.optimize(Order.class);</programlisting>
 
-	<programlisting>searchFactory.optimize();</programlisting>
+    <programlisting>searchFactory.optimize();</programlisting>
 
     <para>The first example optimizes the Lucene index holding
     <classname>Order</classname>s; the second, optimizes all indexes.</para>
@@ -85,7 +85,7 @@ hibernate.search.Animal.optimizer.transaction_limit.max = 50</programlisting>
     <para>The <classname>SearchFactory</classname> can be accessed from a
     <classname>FullTextSession</classname>:</para>
 
-    <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(regularSession);
+    <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
 SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
 
     <para>Note that <literal>searchFactory.optimize()</literal> has no effect
@@ -99,15 +99,31 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlistin
     <para>Apache Lucene has a few parameters to influence how optimization is
     performed. Hibernate Search exposes those parameters.</para>
 
-    <para>Further index optimisation parameters include:
-    <itemizedlist>
-		<listitem><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_buffered_docs</literal></listitem>
-		<listitem><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_field_length</literal></listitem>
-		<listitem><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_merge_docs</literal></listitem>
-		<listitem><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].merge_factor</literal></listitem>
-		<listitem><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].ram_buffer_size</literal></listitem>
-		<listitem><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].term_index_interval</literal></listitem>
-	</itemizedlist>
-    See <xref linkend="lucene-indexing-performance" /> for more details.</para>
+    <para>Further index optimisation parameters include: <itemizedlist>
+        <listitem>
+          <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_buffered_docs</literal>
+        </listitem>
+
+        <listitem>
+          <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_field_length</literal>
+        </listitem>
+
+        <listitem>
+          <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_merge_docs</literal>
+        </listitem>
+
+        <listitem>
+          <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].merge_factor</literal>
+        </listitem>
+
+        <listitem>
+          <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].ram_buffer_size</literal>
+        </listitem>
+
+        <listitem>
+          <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].term_index_interval</literal>
+        </listitem>
+      </itemizedlist> See <xref linkend="lucene-indexing-performance" /> for
+    more details.</para>
   </section>
 </chapter>

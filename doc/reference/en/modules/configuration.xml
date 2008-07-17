@@ -319,15 +319,6 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
             lookup the JMS queue from. The queue will be used to post work
             messages.</entry>
           </row>
-
-          <row>
-            <entry><literal>hibernate.search.worker.batch_size</literal></entry>
-
-            <entry>Defines the maximum number of elements indexed before
-            flushing the transaction-bound queue. Default to 0 (ie no limit).
-            See <xref linkend="search-batchindex" /> for more
-            information.</entry>
-          </row>
         </tbody>
       </tgroup>
     </table>
@@ -499,8 +490,9 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
       Note that there is no performance runtime when the listeners are enabled
       while no entity is indexable.</para>
 
-      <para>To enable Hibernate Search in Hibernate Core, add the
-      <literal>FullTextIndexEventListener</literal> for the three Hibernate
+      <para>To enable Hibernate Search in Hibernate Core (ie. if you don't use
+      Hibernate Annotations), add the
+      <literal>FullTextIndexEventListener</literal> for the six Hibernate
       events that occur after changes are executed to the database. Once
       again, such a configuration is not useful with Hibernate Annotations or
       Hibernate EntityManager.</para>
@@ -515,6 +507,15 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
             &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
         &lt;/event&gt;
         &lt;event type="post-delete"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-collection-recreate"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-collection-remove"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-collection-update"/&gt;
             &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
         &lt;/event&gt;
     &lt;/session-factory&gt;
@@ -534,36 +535,12 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
           <para><filename>lucene-core-*.jar</filename>: Lucene core
           engine</para>
         </listitem>
+
+        <listitem>
+          <para><filename>apache-solr-analyzer.jar</filename>: Additional
+          analyzer infrastructure</para>
+        </listitem>
       </itemizedlist>
-
-      <section>
-        <title>Hibernate Core 3.2.6 and beyond</title>
-
-        <para>If you use Hibernate Core 3.2.6 and beyond, make sure to add
-        three additional event listeners that cope with collection
-        events</para>
-
-        <programlisting>&lt;hibernate-configuration&gt;
-     &lt;session-factory&gt;
-        ...
-        &lt;event type="post-collection-recreate"/&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
-        &lt;/event&gt;
-        &lt;event type="post-collection-remove"/&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
-        &lt;/event&gt;
-        &lt;event type="post-collection-update"/&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
-        &lt;/event&gt;
-    &lt;/session-factory&gt;
-&lt;/hibernate-configuration&gt;</programlisting>
-
-        <para>Those additional event listeners have been introduced in
-        Hibernate 3.2.6. note the
-        <classname>FullTextIndexCollectionEventListener</classname> usage. You
-        need to explicitly reference those event listeners unless you use
-        Hibernate Annotations 3.3.1 and above.</para>
-      </section>
     </section>
 
     <section>
@@ -613,10 +590,9 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     <literal>.batch</literal> value in a specific shard configuration,
     Hibernate Search will look at the index section, then at the default
     section and after that it will look for a <literal>.transaction</literal>
-    in the same order: <programlisting>
-    hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
-    hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
-    hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
+    in the same order: <programlisting>hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
+hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
+hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     This configuration will result in these settings applied to the second
     shard of Animals index: <itemizedlist>
         <listitem>

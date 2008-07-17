@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <chapter id="search-batchindex">
-  <!--  $Id$ -->	
+  <!--  $Id$ -->
+
   <title>Manual indexing</title>
 
   <section id="search-batchindex-indexing">
@@ -12,7 +12,7 @@
     want to build your index for the first time. You can achieve that goal
     using the <classname>FullTextSession</classname>.</para>
 
-    <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(session);
+    <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 for (Customer customer : customers) {
     <emphasis role="bold">fullTextSession.index(customer);</emphasis>
@@ -20,7 +20,7 @@ for (Customer customer : customers) {
 tx.commit(); //index are written at commit time    </programlisting>
 
     <para>For maximum efficiency, Hibernate Search batches index operations
-    and executse them at commit time (Note: you don't need to use
+    and executes them at commit time (Note: you don't need to use
     <classname>org.hibernate.Transaction</classname> in a JTA
     environment).</para>
 
@@ -29,17 +29,20 @@ tx.commit(); //index are written at commit time    </programlisting>
     transaction commit, you can potentially face an
     <classname>OutOfMemoryException</classname>.</para>
 
-    <para>To avoid that, you can set up the
-    <literal>hibernate.search.worker.batch_size</literal> property to a
-    sensitive value: all index operations are queued until
-    <literal>batch_size</literal> is reached. Every time
-    <literal>batch_size</literal> is reached (or if the transaction is
-    committed), the queue is processed (freeing memory) and emptied. Be aware
-    that the changes cannot be rollbacked if the number of index elements goes
-    beyond <literal>batch_size</literal>. Be also aware that the queue limits
-    are also applied on regular transparent indexing (and not only when
-    <literal>session.index()</literal> is used). That's why a sensitive
-    <literal>batch_size</literal> value is expected.</para>
+    <para>To avoid that, you can use
+    <methodname>fullTextSession.flushToIndexes()</methodname>: all index
+    operations are queued until
+    <methodname>fullTextSession.flushToIndexes()</methodname> is called. Every
+    time <methodname>fullTextSession.flushToIndexes()</methodname> is called
+    (or if the transaction is committed), the queue is processed (freeing
+    memory) and emptied. Be aware that changes made before a flush cannot be
+    rollbacked. </para>
+
+    <note>
+      <para><literal>hibernate.search.worker.batch_size</literal> has been
+      deprecated in favor of this explicit API which provides better
+      control</para>
+    </note>
 
     <para>Other parameters which also can affect indexing time and memory
     consumption are
@@ -55,7 +58,7 @@ tx.commit(); //index are written at commit time    </programlisting>
     and
     <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.term_index_interval</literal>
     . These parameters are Lucene specific and Hibernate Search is just
-    passing these paramters through - see <xref
+    passing these parameters through - see <xref
     linkend="lucene-indexing-performance" /> for more details.</para>
 
     <para>Here is an especially efficient way to index a given class (useful
@@ -65,18 +68,22 @@ tx.commit(); //index are written at commit time    </programlisting>
 fullTextSession.setCacheMode(CacheMode.IGNORE);
 transaction = fullTextSession.beginTransaction();
 //Scrollable results will avoid loading too many objects in memory
-ScrollableResults results = fullTextSession.createCriteria( Email.class ).scroll( ScrollMode.FORWARD_ONLY );
+ScrollableResults results = fullTextSession.createCriteria( Email.class )
+    .setFetchSize(BATCH_SIZE)
+    .scroll( ScrollMode.FORWARD_ONLY );
 int index = 0;
 while( results.next() ) {
     index++;
     fullTextSession.index( results.get(0) ); //index each element
-    if (index % batchSize == 0) s.clear(); //clear every batchSize since the queue is processed
+    if (index % BATCH_SIZE == 0) {
+        fullTextSession.flushToIndexes(); //apply changes to indexes
+        fullTextSession.clear(); //clear since the queue is processed
+    }
 }
 transaction.commit();</programlisting>
 
-    <para>It is critical that <literal>batchSize</literal> in the previous
-    example matches the <literal>batch_size</literal> value described
-    previously.</para>
+    <para>Try to use a batch size that guaranty that your application will not
+    run out of memory.</para>
   </section>
 
   <section>
@@ -87,7 +94,7 @@ transaction.commit();</programlisting>
     from the database. This operation is named purging and is done through the
     <classname>FullTextSession</classname>.</para>
 
-    <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(session);
+    <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 for (Customer customer : customers) {
     <emphasis role="bold">fullTextSession.purge( Customer.class, customer.getId() );</emphasis>
@@ -100,7 +107,7 @@ tx.commit(); //index are written at commit time    </programlisting>
     <para>If you need to remove all entities of a given type, you can use the
     <methodname>purgeAll</methodname> method.</para>
 
-    <programlisting>FullTextSession fullTextSession = Search.createFullTextSession(session);
+    <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 <emphasis role="bold">fullTextSession.purgeAll( Customer.class );</emphasis>
 //optionally optimize the index
@@ -113,7 +120,8 @@ tx.commit(); //index are written at commit time    </programlisting>
     <note>
       <para>Methods <methodname>index</methodname>,
       <methodname>purge</methodname> and <methodname>purgeAll</methodname> are
-      available on <classname>FullTextEntityManager</classname> as well.</para>
+      available on <classname>FullTextEntityManager</classname> as
+      well.</para>
     </note>
   </section>
 </chapter>

@@ -547,6 +547,8 @@ public class MyEntity {
         thumb rule, the same analyzer should be used for both the indexing and
         the query for a given field.</para>
       </caution>
+
+      <para>analyzer searchFactory.getanalyzer()</para>
     </section>
   </section>
 
@@ -634,9 +636,26 @@ public class Meeting {
             </warning>
           </listitem>
         </varlistentry>
-      </variablelist>
 
-      <para></para>
+        <varlistentry>
+          <term>java.net.URI, java.net.URL</term>
+
+          <listitem>
+            <para>URI and URL are converted to their string
+            representation</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>java.lang.Class</term>
+
+          <listitem>
+            <para>Class are converted to their filly qualified class name. The
+            thread context classloader is used when the class is
+            rehydrated</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
     </section>
 
     <section>
@@ -832,8 +851,6 @@ public class DateSplitBridge implements FieldBridge {
 //property
 <emphasis role="bold">@FieldBridge(impl = DateSplitBridge.class)</emphasis>
 private Date date;                </programlisting>
-
-        <para></para>
       </section>
 
       <section>

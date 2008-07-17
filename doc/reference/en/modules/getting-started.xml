@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="getting-started">
-  <!--  $Id$ -->	
+  <!--  $Id$ -->
+
   <title>Getting started</title>
 
   <para>Welcome to Hibernate Search! The following chapter will guide you
@@ -37,11 +38,11 @@
           <row>
             <entry>Hibernate Core</entry>
 
-            <entry>This instructions have been tested against Hibernate 3.2.x.
+            <entry>This instructions have been tested against Hibernate 3.3.x.
             Next to the main <literal>hibernate3.jar</literal> you will need
             all required libaries from the <literal>lib</literal> directory of
             the distribution. Refer to <literal>README.txt</literal> in the
-            <literal>lib</literal> directory of the distibution to determine
+            <literal>lib</literal> directory of the distribution to determine
             the minimum runtime requirements.</entry>
           </row>
 
@@ -56,7 +57,7 @@
             has its own set of annotations (<emphasis>@Indexed, @DocumentId,
             @Field,...</emphasis>) for which there exists so far no
             alternative configuration. The tutorial is tested against version
-            3.3.x of Hibernate Annotations. </entry>
+            3.4.x of Hibernate Annotations.</entry>
           </row>
         </tbody>
       </tgroup>
@@ -94,17 +95,17 @@
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
-   &lt;version&gt;3.0.1.GA&lt;/version&gt;
+   &lt;version&gt;3.1.0.Beta1&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-annotations&lt;/artifactId&gt;
-   &lt;version&gt;3.3.0.ga&lt;/version&gt;
+   &lt;version&gt;3.4.0.CR1&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
-   &lt;version&gt;3.3.1.ga&lt;/version&gt;
+   &lt;version&gt;3.4.0.CR1&lt;/version&gt;
 &lt;/dependency&gt;
       </programlisting>
 
@@ -248,7 +249,7 @@ public class Book {
     <para>Example using Hibernate Session:</para>
 
     <programlisting>
-FullTextSession fullTextSession = Search.createFullTextSession(session);
+FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 List books = session.createQuery("from Book as book").list();
 for (Book book : books) {
@@ -261,7 +262,7 @@ tx.commit(); //index are written at commit time
 
     <programlisting>
 EntityManager em = entityManagerFactory.createEntityManager();
-FullTextEntityManager fullTextEntityManager = Search.createFullTextEntityManager(em);
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
 List books = em.createQuery("select book from Book as book").getResultList();
 for (Book book : books) {
     fullTextEntityManager.index(book);
@@ -285,7 +286,7 @@ for (Book book : books) {
     <para>Example using Hibernate Session:</para>
 
     <programlisting>
-FullTextSession fullTextSession = Search.createFullTextSession(session);
+FullTextSession fullTextSession = Search.getFullTextSession(session);
 
 Transaction tx = fullTextSession.beginTransaction();
 
@@ -305,7 +306,7 @@ session.close();
 EntityManager em = entityManagerFactory.createEntityManager();
 
 FullTextEntityManager fullTextEntityManager = 
-    org.hibernate.hibernate.search.jpa.Search.createFullTextEntityManager(em);
+    org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[]{"summary", "body"}, 
   new StandardAnalyzer());
 Query query = parser.parse( "Java rocks!" );
