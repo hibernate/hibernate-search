@@ -548,7 +548,223 @@ public class MyEntity {
         the query for a given field.</para>
       </caution>
 
-      <para>analyzer searchFactory.getanalyzer()</para>
+      <section>
+        <title>Analyzer definitions</title>
+
+        <para>Analyzers can become quite complex to deal with. Hibernate
+        Search introduces the notion of analyzer definition. An analyzer
+        definition can be reused by many <classname>@Analyzer</classname>
+        declarations. An analyzer definition is composed of:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>a name: the unique string used to refer to the
+            definition</para>
+          </listitem>
+
+          <listitem>
+            <para>a tokenizer: a piece of code used to chunk the sentence into
+            individual words</para>
+          </listitem>
+
+          <listitem>
+            <para>a list of filters: each filter is responsible to remove
+            words, modify words and sometimes add words into the stream
+            provided by the tokenizer</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>This separation of tasks (tokenizer, list of filters) allows
+        reuse of each individual component and let you build your ideal
+        analyzer ns a very flexible way (just like a lego). This
+        infrastructure is supported by the Solr analyzer framework. Make sure
+        to add <filename>apache-solr-*.jar</filename> to your classpath to use
+        analyzer definitions: this jar is distributed with your distribution
+        of Hibernate Search and is a striped down version of the Solr
+        jar.</para>
+
+        <programlisting>@AnalyzerDef(name="customanalyzer",
+        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+        filters = {
+                @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
+                @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+                @TokenFilterDef(factory = StopFilterFactory.class, params = {
+                    @Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
+                    @Parameter(name="ignoreCase", value="true")
+                })
+})
+public class Team {
+    ...
+}</programlisting>
+
+        <para>A tokenizer is defined by its factory which is responsible for
+        building the tokenizer and using the optional list of parameters. This
+        example use the standard tokenizer. A filter is defined by its factory
+        which is responsible for creating the filter instance using the
+        opetional paramenters. In our example, the StopFilter filter is built
+        reading the dedicated words property file and is expected to ignore
+        case. The list of parameters is dependent on the tokenizer or filter
+        factory.</para>
+
+        <warning>
+          <para>Filters are applied in the order they are defined in the
+          <classname>@AnalyzerDef</classname> annotation. Make sure to think
+          twice about this order.</para>
+        </warning>
+
+        <para>Once defined, an analyzer definition can be reused by an
+        <classname>@Analyzer</classname> declaration using the definition name
+        rather than declaring an implementation class.</para>
+
+        <programlisting>@Entity
+@Indexed
+@AnalyzerDef(name="customanalyzer", ... )
+public class Team {
+    @Id
+    @DocumentId
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    private String name;
+
+    @Field
+    private String location;
+
+    @Field <emphasis role="bold">@Analyzer(definition = "customanalyzer")</emphasis>
+    private String description;
+}</programlisting>
+
+        <para>Analyzer instances declared by
+        <classname>@AnalyzerDef</classname> are available by their name in the
+        <classname>SearchFactory</classname>.</para>
+
+        <programlisting>Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("customanalyzer");</programlisting>
+
+        <para>This is quite useful wen building queries. Fields in queries
+        should be analyzed with the same analyzer used to index the field so
+        that they speak a common "language": the same tokens are reused
+        between the query and the indexing process. This rule has some
+        exceptions but is true most of the time, respect it unless you know
+        what you are doing.</para>
+      </section>
+
+      <section>
+        <title>Available analyzers</title>
+
+        <para>Solr and Lucene come with a lot of useful default tokenizers and
+        filters. You can find a complete list of tokenizer factories and
+        filter factories at <ulink
+        url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters</ulink>.
+        Let check a few of them.</para>
+
+        <table>
+          <title>Some of the tokenizers avalable</title>
+
+          <tgroup cols="3">
+            <thead>
+              <row>
+                <entry align="center">Factory</entry>
+
+                <entry align="center">Description</entry>
+
+                <entry align="center">parameters</entry>
+              </row>
+            </thead>
+
+            <tbody>
+              <row>
+                <entry>StandardTokenizerFactory</entry>
+
+                <entry>Use the Lucene StandardTokenizer</entry>
+
+                <entry>none</entry>
+              </row>
+
+              <row>
+                <entry>HTMLStripStandardTokenizerFactory</entry>
+
+                <entry>Remove HTML tags, keep the text and pass it to a
+                StandardTokenizer</entry>
+
+                <entry>none</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+        <table>
+          <title>Some of the filters avalable</title>
+
+          <tgroup cols="3">
+            <thead>
+              <row>
+                <entry align="center">Factory</entry>
+
+                <entry align="center">Description</entry>
+
+                <entry align="center">parameters</entry>
+              </row>
+            </thead>
+
+            <tbody>
+              <row>
+                <entry>StandardFilterFactory</entry>
+
+                <entry>Remove dots from acronyms and 's from words</entry>
+
+                <entry>none</entry>
+              </row>
+
+              <row>
+                <entry>LowerCaseFilterFactory</entry>
+
+                <entry>Lowercase words</entry>
+
+                <entry>none</entry>
+              </row>
+
+              <row>
+                <entry>StopFilterFactory</entry>
+
+                <entry>remove words (tokens) matching a list of stop
+                words</entry>
+
+                <entry><para><literal>words</literal>: points to a resource
+                file containing the stop words</para><para>ignoreCase: true if
+                <literal>case</literal> should be ignore when comparing stop
+                words, <literal>false</literal> otherwise </para></entry>
+              </row>
+
+              <row>
+                <entry>SnowballPorterFilterFactory</entry>
+
+                <entry>Reduces a word to it's root in a given language. (eg.
+                protect, protects, protection share the same root). Using such
+                a filter allows searches matching related words. </entry>
+
+                <entry><para><literal>language</literal>: Danish, Dutch,
+                English, Finnish, French, German, Italian, Norwegian,
+                Portuguese, Russian, Spanish, Swedish</para>and a few
+                more</entry>
+              </row>
+
+              <row>
+                <entry>ISOLatin1AccentFilterFactory</entry>
+
+                <entry>remove accents for languages like French</entry>
+
+                <entry>none</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+        <para>Don't hesitate to check all the implementations of
+        <classname>org.apache.solr.analysis.TokenizerFactory</classname> and
+        <classname>org.apache.solr.analysis.TokenFilterFactory</classname> in
+        your IDE to see the implementations available.</para>
+      </section>
     </section>
   </section>
 
