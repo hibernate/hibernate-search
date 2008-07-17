@@ -2,7 +2,7 @@
 <chapter id="search-lucene-native">
   <!--  $Id$ -->
 
-  <title>Accessing Lucene natively</title>
+  <title>Advanced features</title>
 
   <section>
     <title>SearchFactory</title>
@@ -84,5 +84,93 @@ finally {
     especially to do native queries. Using the shared
     <literal>IndexReader</literal>s will make most queries more
     efficient.</para>
+  </section>
+
+  <section>
+    <title>Customizing Lucene's scoring formula</title>
+
+    <para>Lucene allows the user to customize its scoring formula by extending
+    <classname>org.apache.lucene.search.Similarity</classname>. The abstract
+    methods defined in this class match the factors of the follownig formula
+    calculating the score of query q for document d:</para>
+
+    <para><emphasis role="bold">score(q,d) = coord(q,d) · queryNorm(q) ·
+    ∑<subscript>t in q</subscript> ( tf(t in d) ·
+    idf(t)<superscript>2</superscript> · t.getBoost() · norm(t,d)
+    )</emphasis></para>
+
+    <para><informaltable align="left" width="">
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">Factor</entry>
+
+              <entry align="center">Description</entry>
+            </row>
+          </thead>
+
+          <tbody>
+            <row>
+              <entry align="left">tf(t ind)</entry>
+
+              <entry>Term frequency factor for the term (t) in the document
+              (d).</entry>
+            </row>
+
+            <row>
+              <entry align="left">idf(t)</entry>
+
+              <entry>Inverse document frequency of the term.</entry>
+            </row>
+
+            <row>
+              <entry align="left">coord(q,d)</entry>
+
+              <entry>Score factor based on how many of the query terms are
+              found in the specified document.</entry>
+            </row>
+
+            <row>
+              <entry align="left">queryNorm(q) </entry>
+
+              <entry>Normalizing factor used to make scores between queries
+              comparable. </entry>
+            </row>
+
+            <row>
+              <entry align="left">t.getBoost()</entry>
+
+              <entry>Field boost.</entry>
+            </row>
+
+            <row>
+              <entry align="left">norm(t,d)</entry>
+
+              <entry>Encapsulates a few (indexing time) boost and length
+              factors.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>It is beyond the scope of this manual to explain this
+    formula in more detail. Please refer to
+    <classname>Similarity</classname>'s Javadocs for more information. </para>
+
+    <para>Hibernate Search provides two ways to modify Lucene's similarity
+    calculation. First you can set the default similarity by specifying the
+    fully specified classname of your <classname>Similarity</classname>
+    implementation using the property
+    <constant>hibernate.search.similarity</constant>. The default value is
+    <classname>org.apache.lucene.search.DefaultSimilarity</classname>.
+    Additionally you can override the default similarity on class level using
+    the <literal>@Similarity</literal> annotation.<programlisting>@Entity
+@Indexed
+<emphasis role="bold">@Similarity(impl = DummySimilarity.class)</emphasis>
+public class Book {
+   ...
+}</programlisting>As an exmaple, let's assume it is not important how often a
+    term appears in a document. Documents with a single occurrence of the term
+    should be scored the same as documents with multiple occurrences. In this
+    case your custom implementation of the method <methodname>tf(float
+    freq)</methodname> should return 1.0. </para>
   </section>
 </chapter>
