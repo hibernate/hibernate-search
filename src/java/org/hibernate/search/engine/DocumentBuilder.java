@@ -118,7 +118,7 @@ public class DocumentBuilder<T> {
 			ProvidedId provided = clazz.getAnnotation( org.hibernate.search.annotations.ProvidedId.class );
 			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
 
-			//FIXME navssurtani use something similar to BridgeFactory.extractType(ClassBridge)
+			//TODO navssurtani use something similar to BridgeFactory.extractType(ClassBridge)
 			idBridge = getProvidedIdBridge();
 			idKeywordName = provided.name();
 
