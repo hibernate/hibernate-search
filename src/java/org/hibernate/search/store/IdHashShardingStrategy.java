@@ -12,20 +12,20 @@ import org.apache.lucene.document.Document;
  * @author Emmanuel Bernard
  */
 public class IdHashShardingStrategy implements IndexShardingStrategy {
-	private DirectoryProvider[] providers;
-	public void initialize(Properties properties, DirectoryProvider[] providers) {
+	private DirectoryProvider<?>[] providers;
+	public void initialize(Properties properties, DirectoryProvider<?>[] providers) {
 		this.providers = providers;
 	}
 
-	public DirectoryProvider[] getDirectoryProvidersForAllShards() {
+	public DirectoryProvider<?>[] getDirectoryProvidersForAllShards() {
 		return providers;
 	}
 
-	public DirectoryProvider getDirectoryProviderForAddition(Class entity, Serializable id, String idInString, Document document) {
+	public DirectoryProvider<?> getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return providers[ hashKey(idInString) ];
 	}
 
-	public DirectoryProvider[] getDirectoryProvidersForDeletion(Class entity, Serializable id, String idInString) {
+	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		if ( idInString == null ) return providers;
 		return new DirectoryProvider[] { providers[ hashKey(idInString) ] };
 	}

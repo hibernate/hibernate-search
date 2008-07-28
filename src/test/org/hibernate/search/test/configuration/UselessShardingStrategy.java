@@ -14,19 +14,19 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class UselessShardingStrategy implements IndexShardingStrategy {
 	
-	public DirectoryProvider getDirectoryProviderForAddition(Class entity, Serializable id, String idInString, Document document) {
+	public DirectoryProvider<?> getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return null;
 	}
 
-	public DirectoryProvider[] getDirectoryProvidersForAllShards() {
+	public DirectoryProvider<?>[] getDirectoryProvidersForAllShards() {
 		return null;
 	}
 
-	public DirectoryProvider[] getDirectoryProvidersForDeletion(Class entity, Serializable id, String idInString) {
+	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return null;
 	}
 
-	public void initialize(Properties properties, DirectoryProvider[] providers) {
+	public void initialize(Properties properties, DirectoryProvider<?>[] providers) {
 	}
 
 }
