@@ -34,6 +34,8 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		cfg.setProperty( "hibernate.search.Documents.transaction.max_buffered_docs", "6" );
 		cfg.setProperty( "hibernate.search.Documents.sharding_strategy.nbr_of_shards", "4" );
 		cfg.setProperty( "hibernate.search.Documents.sharding_strategy", UselessShardingStrategy.class.getCanonicalName() );
+		cfg.setProperty( "hibernate.search.Documents.sharding_strategy.test.system.default", "45" );
+		cfg.setProperty( "hibernate.search.Documents.sharding_strategy.test.output", "70" );
 		cfg.setProperty( "hibernate.search.Documents.0.batch.max_merge_docs", "57" );
 		cfg.setProperty( "hibernate.search.Documents.0.directory_provider", RAMDirectoryProvider.class.getCanonicalName() );
 		cfg.setProperty( "hibernate.search.Documents.0.transaction.max_buffered_docs", "58" );

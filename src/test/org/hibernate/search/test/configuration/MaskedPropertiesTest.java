@@ -3,6 +3,7 @@ package org.hibernate.search.test.configuration;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Enumeration;
 
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.test.SerializationTestHelper;
@@ -20,6 +21,7 @@ public class MaskedPropertiesTest extends junit.framework.TestCase {
 		cfg.put( "hibernate.search.Animals.transaction.max_merge_docs", "5" );
 		cfg.put( "hibernate.search.default.transaction.max_merge_docs", "6" );
 		cfg.put( "hibernate.search.default.transaction.indexwriter.max_field_length", "7" );
+		cfg.put( "hibernate.notsearch.tests.default", "7" );
 
 		//this is more a "concept demo" than a test:
 		Properties root = new MaskedProperty( cfg, "hibernate.search" );
@@ -38,6 +40,13 @@ public class MaskedPropertiesTest extends junit.framework.TestCase {
 		assertEquals( "7" , newStyleTransaction.getProperty( "max_field_length" ) );
 		assertEquals( "7" , newStyleTransactionInShard2.getProperty( "max_field_length" ) );
 		assertEquals( "5" , transaction.getProperty( "max_merge_docs" ) );
+
+		Enumeration<?> propertyNames = newStyleTransaction.propertyNames();
+		int count = 0;
+		while ( propertyNames.hasMoreElements() ) {
+			count++;
+			System.out.println( propertyNames.nextElement() );
+		}
 	}
 	
 	public void testSerializability() throws IOException, ClassNotFoundException {

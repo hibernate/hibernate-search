@@ -15,6 +15,10 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +27,14 @@ import org.slf4j.LoggerFactory;
  * A wrapper to Properties, to restrict the availability of
  * values to only those which have a key beginning with some
  * masking String.
- * Methods to list available keys or values or otherwise
- * enumerate available properties are not available.
+ * Supported methods to enumerate the lsit of properties are:
+ *   - propertyNames()
+ *   - keySet()
+ *   - keys()
+ * Other methods including methods returning Entries and values are not supported
  * 
  * @author Sanne Grinovero
+ * @author Emmanuel Bernard
  */
 public class MaskedProperty extends Properties implements Serializable {
 	
@@ -36,6 +44,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	private final Properties masked;
 	private final Properties fallBack;
 	private final String radix;
+	private transient List<String> propertyNames;
 	
 	/**
 	 * Provides a view to the provided Properties hiding
@@ -131,12 +140,40 @@ public class MaskedProperty extends Properties implements Serializable {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * @throws UnsupportedOperationException
-	 */
 	@Override
 	public Enumeration<?> propertyNames() {
-		throw new UnsupportedOperationException();
+		initPropertyNames();
+		return new PropertyNameEnumeration();
+	}
+
+	private void initPropertyNames() {
+		if ( propertyNames != null) return;
+		propertyNames = new ArrayList<String>();
+		List<String> maskedProperties = new ArrayList<String>();
+		//we use keys to be safe and avoid CCE for non String key entries
+		Enumeration maskedNames = masked.keys();
+		while ( maskedNames.hasMoreElements() ) {
+			Object key = maskedNames.nextElement();
+			if ( String.class.isInstance( key ) ) {
+				String maskedProperty = (String) key;
+				if ( maskedProperty.startsWith( radix ) ) {
+					maskedProperties.add(maskedProperty);
+					propertyNames.add(maskedProperty.substring( radix.length(), maskedProperty.length() ) );
+				}
+			}
+		}
+		if (fallBack != null) {
+			Enumeration fallbackKeys = fallBack.keys();
+			while ( fallbackKeys.hasMoreElements() ) {
+				Object key = fallbackKeys.nextElement();
+				if ( String.class.isInstance( key ) ) {
+					String fallbackProperty = (String) key;
+					if ( ! maskedProperties.contains( fallbackProperty )) {
+						propertyNames.add(fallbackProperty);
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -198,12 +235,10 @@ public class MaskedProperty extends Properties implements Serializable {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * @throws UnsupportedOperationException
-	 */
 	@Override
 	public boolean contains(Object value) {
-		throw new UnsupportedOperationException();
+		initPropertyNames();
+		return propertyNames.contains( value );
 	}
 
 	/**
@@ -219,6 +254,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 */
 	@Override
 	public Enumeration<Object> elements() {
+		//TODO
 		throw new UnsupportedOperationException();
 	}
 
@@ -253,15 +289,14 @@ public class MaskedProperty extends Properties implements Serializable {
 	 */
 	@Override
 	public Enumeration<Object> keys() {
-		throw new UnsupportedOperationException();
+		initPropertyNames();
+		return new PropertyNameEnumeration();
 	}
 
-	/**
-	 * @throws UnsupportedOperationException
-	 */
 	@Override
 	public Set<Object> keySet() {
-		throw new UnsupportedOperationException();
+		initPropertyNames();
+		return new HashSet<Object>(propertyNames);
 	}
 
 	/**
@@ -301,7 +336,8 @@ public class MaskedProperty extends Properties implements Serializable {
 	 */
 	@Override
 	public int size() {
-		throw new UnsupportedOperationException();
+		initPropertyNames();
+		return propertyNames.size();
 	}
 
 	@Override
@@ -356,5 +392,17 @@ public class MaskedProperty extends Properties implements Serializable {
 	private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
 		aOutputStream.defaultWriteObject();
 	}
-	
+
+	private class PropertyNameEnumeration implements Enumeration<Object> {
+		private int index = -1;
+
+		public boolean hasMoreElements() {
+			return index + 1 < propertyNames.size();
+		}
+
+		public Object nextElement() {
+			index++;
+			return propertyNames.get( index );
+		}
+	}
 }
