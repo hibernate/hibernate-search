@@ -1,5 +1,5 @@
-// $Id: SearchConfiguration.java 14874 2008-07-04 15:52:20Z hardy.ferentschik $
-package org.hibernate.search.cfg;
+// $Id$
+package org.hibernate.search.event;
 
 import java.util.Properties;
 
@@ -10,7 +10,6 @@ import org.hibernate.event.PostCollectionUpdateEventListener;
 import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
-import org.hibernate.search.event.FullTextIndexEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,7 @@ public class EventListenerRegister {
 	private static final Logger log = LoggerFactory.getLogger(EventListenerRegister.class);
 
 	@SuppressWarnings("unchecked")
-	public static void enableHibernateSearch(EventListeners eventListeners, Properties properties) {
+	public static void enableHibernateSearch(EventListeners eventListeners, Properties properties) {		
 		// check whether search is explicitly enabled - if so there is nothing to do		
 		String enableSearchListeners = properties.getProperty( "hibernate.search.autoregister_listeners" );
 		if("false".equalsIgnoreCase(enableSearchListeners )) {
