@@ -37,6 +37,7 @@ public class EventListenerRegister {
 		FullTextIndexEventListener searchEventListener = new FullTextIndexEventListener();
 		
 		//TODO Generalize this. Pretty much the same code all the time. Reflection? 
+		final Class<? extends FullTextIndexEventListener> searchEventListenerClass = searchEventListener.getClass();
 		{
 			boolean present = false;
 			PostInsertEventListener[] listeners = eventListeners
@@ -45,18 +46,19 @@ public class EventListenerRegister {
 				for (Object eventListener : listeners) {
 					// not isAssignableFrom since the user could subclass
 					present = present
-							|| searchEventListener.getClass() == eventListener.getClass();
+							|| searchEventListenerClass == eventListener.getClass()
+							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
 				}
 				if (!present) {
 					int length = listeners.length + 1;
 					PostInsertEventListener[] newListeners = new PostInsertEventListener[length];
 					System.arraycopy(listeners, 0, newListeners, 0, length - 1);
-					newListeners[length - 1] = (PostInsertEventListener) searchEventListener;
+					newListeners[length - 1] = searchEventListener;
 					eventListeners.setPostInsertEventListeners(newListeners);
 				}
 			} else {
 				eventListeners
-						.setPostInsertEventListeners(new PostInsertEventListener[] { (PostInsertEventListener) searchEventListener });
+						.setPostInsertEventListeners(new PostInsertEventListener[] { searchEventListener });
 			}
 		}
 		{
@@ -67,19 +69,19 @@ public class EventListenerRegister {
 				for (Object eventListener : listeners) {
 					// not isAssignableFrom since the user could subclass
 					present = present
-							|| searchEventListener.getClass() == eventListener
-									.getClass();
+							|| searchEventListenerClass == eventListener.getClass()
+							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
 				}
 				if (!present) {
 					int length = listeners.length + 1;
 					PostUpdateEventListener[] newListeners = new PostUpdateEventListener[length];
 					System.arraycopy(listeners, 0, newListeners, 0, length - 1);
-					newListeners[length - 1] = (PostUpdateEventListener) searchEventListener;
+					newListeners[length - 1] = searchEventListener;
 					eventListeners.setPostUpdateEventListeners(newListeners);
 				}
 			} else {
 				eventListeners
-						.setPostUpdateEventListeners(new PostUpdateEventListener[] { (PostUpdateEventListener) searchEventListener });
+						.setPostUpdateEventListeners(new PostUpdateEventListener[] { searchEventListener });
 			}
 		}
 		{
@@ -90,19 +92,19 @@ public class EventListenerRegister {
 				for (Object eventListener : listeners) {
 					// not isAssignableFrom since the user could subclass
 					present = present
-							|| searchEventListener.getClass() == eventListener
-									.getClass();
+							|| searchEventListenerClass == eventListener.getClass()
+							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
 				}
 				if (!present) {
 					int length = listeners.length + 1;
 					PostDeleteEventListener[] newListeners = new PostDeleteEventListener[length];
 					System.arraycopy(listeners, 0, newListeners, 0, length - 1);
-					newListeners[length - 1] = (PostDeleteEventListener) searchEventListener;
+					newListeners[length - 1] = searchEventListener;
 					eventListeners.setPostDeleteEventListeners(newListeners);
 				}
 			} else {
 				eventListeners
-						.setPostDeleteEventListeners(new PostDeleteEventListener[] { (PostDeleteEventListener) searchEventListener });
+						.setPostDeleteEventListeners(new PostDeleteEventListener[] { searchEventListener });
 			}
 		}		
 		{
@@ -111,19 +113,21 @@ public class EventListenerRegister {
 			if ( listeners != null ) {
 				for (Object eventListener : listeners) {
 					//not isAssignableFrom since the user could subclass
-					present = present || searchEventListener.getClass() == eventListener.getClass();
+					present = present
+							|| searchEventListenerClass == eventListener.getClass()
+							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
 				}
 				if ( !present ) {
 					int length = listeners.length + 1;
 					PostCollectionRecreateEventListener[] newListeners = new PostCollectionRecreateEventListener[length];
 					System.arraycopy( listeners, 0, newListeners, 0, length - 1 );
-					newListeners[length - 1] = (PostCollectionRecreateEventListener) searchEventListener;
+					newListeners[length - 1] = searchEventListener;
 					eventListeners.setPostCollectionRecreateEventListeners( newListeners );
 				}
 			}
 			else {
 				eventListeners.setPostCollectionRecreateEventListeners(
-						new PostCollectionRecreateEventListener[] { (PostCollectionRecreateEventListener) searchEventListener }
+						new PostCollectionRecreateEventListener[] { searchEventListener }
 				);
 			}
 		}
@@ -133,19 +137,21 @@ public class EventListenerRegister {
 			if ( listeners != null ) {
 				for (Object eventListener : listeners) {
 					//not isAssignableFrom since the user could subclass
-					present = present || searchEventListener.getClass() == eventListener.getClass();
+					present = present
+							|| searchEventListenerClass == eventListener.getClass()
+							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
 				}
 				if ( !present ) {
 					int length = listeners.length + 1;
 					PostCollectionRemoveEventListener[] newListeners = new PostCollectionRemoveEventListener[length];
 					System.arraycopy( listeners, 0, newListeners, 0, length - 1 );
-					newListeners[length - 1] = (PostCollectionRemoveEventListener) searchEventListener;
+					newListeners[length - 1] = searchEventListener;
 					eventListeners.setPostCollectionRemoveEventListeners( newListeners );
 				}
 			}
 			else {
 				eventListeners.setPostCollectionRemoveEventListeners(
-						new PostCollectionRemoveEventListener[] { (PostCollectionRemoveEventListener) searchEventListener }
+						new PostCollectionRemoveEventListener[] { searchEventListener }
 				);
 			}
 		}
@@ -155,19 +161,19 @@ public class EventListenerRegister {
 			if ( listeners != null ) {
 				for (Object eventListener : listeners) {
 					//not isAssignableFrom since the user could subclass
-					present = present || searchEventListener.getClass() == eventListener.getClass();
+					present = present || searchEventListenerClass == eventListener.getClass();
 				}
 				if ( !present ) {
 					int length = listeners.length + 1;
 					PostCollectionUpdateEventListener[] newListeners = new PostCollectionUpdateEventListener[length];
 					System.arraycopy( listeners, 0, newListeners, 0, length - 1 );
-					newListeners[length - 1] = (PostCollectionUpdateEventListener) searchEventListener;
+					newListeners[length - 1] = searchEventListener;
 					eventListeners.setPostCollectionUpdateEventListeners( newListeners );
 				}
 			}
 			else {
 				eventListeners.setPostCollectionUpdateEventListeners(
-						new PostCollectionUpdateEventListener[] { (PostCollectionUpdateEventListener) searchEventListener }
+						new PostCollectionUpdateEventListener[] { searchEventListener }
 				);
 			}
 		}		
