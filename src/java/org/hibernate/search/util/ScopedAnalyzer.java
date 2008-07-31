@@ -2,8 +2,9 @@
 package org.hibernate.search.util;
 
 import java.io.Reader;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -20,6 +21,10 @@ public class ScopedAnalyzer extends Analyzer {
 	public void setGlobalAnalyzer(Analyzer globalAnalyzer) {
 		this.globalAnalyzer = globalAnalyzer;
 	}
+	
+	public Analyzer getGlobalAnalyzer() {
+		return globalAnalyzer;
+	}	
 
 	public void addScopedAnalyzer(String scope, Analyzer scopedAnalyzer) {
 		scopedAnalyzers.put( scope, scopedAnalyzer );
@@ -33,11 +38,15 @@ public class ScopedAnalyzer extends Analyzer {
 		return getAnalyzer( fieldName ).getPositionIncrementGap( fieldName );
 	}
 
-	private Analyzer getAnalyzer(String fieldName) {
+	public Analyzer getAnalyzer(String fieldName) {
 		Analyzer analyzer = scopedAnalyzers.get( fieldName );
 		if (analyzer == null) {
 			analyzer = globalAnalyzer;
 		}
 		return analyzer;
+	}
+	
+	public Set<String> getFields() {
+		return scopedAnalyzers.keySet();
 	}
 }

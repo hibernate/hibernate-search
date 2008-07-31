@@ -25,7 +25,6 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
-import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
@@ -38,6 +37,7 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
+import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -49,6 +49,7 @@ import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.ScopedAnalyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -306,6 +307,19 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		if ( analyzer == null) throw new SearchException( "Unknown Analyzer definition: " + name);
 		return analyzer;
 	}
+	
+	public ScopedAnalyzer getAnalyzer(Class clazz) {
+		if ( clazz ==  null) {
+			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
+		}
+		
+		DocumentBuilder<Object> builder = documentBuilders.get( clazz );
+		if ( builder == null ) {
+			throw new IllegalArgumentException( "Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName() );
+		}
+		
+		return builder.getAnalyzer();
+	}	
 
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager) {
 		InitContext context = new InitContext( cfg );
