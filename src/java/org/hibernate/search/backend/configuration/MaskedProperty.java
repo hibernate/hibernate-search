@@ -10,15 +10,13 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * A wrapper to Properties, to restrict the availability of
  * values to only those which have a key beginning with some
  * masking String.
- * Supported methods to enumerate the lsit of properties are:
+ * Supported methods to enumerate the list of properties are:
  *   - propertyNames()
  *   - keySet()
  *   - keys()
@@ -44,7 +42,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	private final Properties masked;
 	private final Properties fallBack;
 	private final String radix;
-	private transient List<String> propertyNames;
+	private transient Set<Object> propertyNames;
 	
 	/**
 	 * Provides a view to the provided Properties hiding
@@ -143,37 +141,33 @@ public class MaskedProperty extends Properties implements Serializable {
 	@Override
 	public Enumeration<?> propertyNames() {
 		initPropertyNames();
-		return new PropertyNameEnumeration();
+		return Collections.enumeration( propertyNames );
 	}
 
-	private void initPropertyNames() {
+	private synchronized void initPropertyNames() {
 		if ( propertyNames != null) return;
-		propertyNames = new ArrayList<String>();
-		List<String> maskedProperties = new ArrayList<String>();
+		Set<Object> maskedProperties = new TreeSet<Object>();
 		//we use keys to be safe and avoid CCE for non String key entries
-		Enumeration maskedNames = masked.keys();
+		Enumeration<?> maskedNames = masked.propertyNames();
 		while ( maskedNames.hasMoreElements() ) {
 			Object key = maskedNames.nextElement();
 			if ( String.class.isInstance( key ) ) {
 				String maskedProperty = (String) key;
 				if ( maskedProperty.startsWith( radix ) ) {
-					maskedProperties.add(maskedProperty);
-					propertyNames.add(maskedProperty.substring( radix.length(), maskedProperty.length() ) );
+					maskedProperties.add(maskedProperty.substring( radix.length(), maskedProperty.length() ) );
 				}
 			}
 		}
 		if (fallBack != null) {
-			Enumeration fallbackKeys = fallBack.keys();
-			while ( fallbackKeys.hasMoreElements() ) {
-				Object key = fallbackKeys.nextElement();
+			Enumeration<?> fallBackNames = fallBack.propertyNames();
+			while ( fallBackNames.hasMoreElements() ) {
+				Object key = fallBackNames.nextElement();
 				if ( String.class.isInstance( key ) ) {
-					String fallbackProperty = (String) key;
-					if ( ! maskedProperties.contains( fallbackProperty )) {
-						propertyNames.add(fallbackProperty);
-					}
+					maskedProperties.add( (String) key );
 				}
 			}
 		}
+		propertyNames = Collections.unmodifiableSet( maskedProperties );
 	}
 	
 	/**
@@ -276,12 +270,8 @@ public class MaskedProperty extends Properties implements Serializable {
 
 	@Override
 	public boolean isEmpty() {
-		if ( fallBack==null ) {
-			return masked.isEmpty();
-		}
-		else {
-			return masked.isEmpty() && fallBack.isEmpty();
-		}
+		initPropertyNames();
+		return propertyNames.isEmpty();
 	}
 
 	/**
@@ -290,13 +280,13 @@ public class MaskedProperty extends Properties implements Serializable {
 	@Override
 	public Enumeration<Object> keys() {
 		initPropertyNames();
-		return new PropertyNameEnumeration();
+		return Collections.enumeration( propertyNames );
 	}
 
 	@Override
 	public Set<Object> keySet() {
 		initPropertyNames();
-		return new HashSet<Object>(propertyNames);
+		return propertyNames;
 	}
 
 	/**
@@ -393,16 +383,4 @@ public class MaskedProperty extends Properties implements Serializable {
 		aOutputStream.defaultWriteObject();
 	}
 
-	private class PropertyNameEnumeration implements Enumeration<Object> {
-		private int index = -1;
-
-		public boolean hasMoreElements() {
-			return index + 1 < propertyNames.size();
-		}
-
-		public Object nextElement() {
-			index++;
-			return propertyNames.get( index );
-		}
-	}
 }

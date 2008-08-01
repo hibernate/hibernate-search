@@ -59,4 +59,30 @@ public class MaskedPropertiesTest extends junit.framework.TestCase {
 		assertEquals( "value", theCopy.getProperty( "key" ) );
 	}
 	
+	public void testListingKeys() {
+		Properties defaultProp = new Properties();
+		defaultProp.put( "some.inherited.prop", "to test standard Properties fallback behaviour" );
+		Properties rootProp = new Properties( defaultProp );
+		rootProp.put( "some.long.dotted.prop1", "hello!" );
+		rootProp.put( "hidden.long.dotted.prop2", "hello again" );
+		Properties fallbackProp = new Properties();
+		fallbackProp.put( "default.long.dotted.prop3", "hello!" );
+		Properties masked = new MaskedProperty( rootProp, "some", fallbackProp );
+		
+		assertTrue( masked.keySet().contains( "long.dotted.prop1" ) );
+		assertTrue( masked.keySet().contains( "default.long.dotted.prop3" ) );
+		assertTrue( masked.keySet().contains( "inherited.prop" ) );
+		assertFalse( masked.keySet().contains( "hidden.long.dotted.prop2" ) );
+		assertFalse( masked.keySet().contains( "long.dotted.prop2" ) );
+		
+		Properties maskedAgain = new MaskedProperty( masked, "long.dotted", masked ); //falling back to same instance for **
+		assertTrue( maskedAgain.keySet().contains( "prop1" ) );
+		assertTrue( maskedAgain.keySet().contains( "long.dotted.prop1" ) ); //**: prop 1 should be visible in both ways
+		assertTrue( maskedAgain.keySet().contains( "default.long.dotted.prop3" ) );
+		
+		Properties maskingAll = new MaskedProperty( masked, "secured" );
+		assertTrue( maskingAll.keySet().isEmpty() );
+		assertTrue( maskingAll.isEmpty() );
+	}
+	
 }
