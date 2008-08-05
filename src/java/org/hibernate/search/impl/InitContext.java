@@ -1,27 +1,22 @@
 // $Id:$
 package org.hibernate.search.impl;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.Environment;
-import org.hibernate.search.cfg.SearchConfiguration;
-import org.hibernate.search.util.DelegateNamedAnalyzer;
-import org.hibernate.util.ReflectHelper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Similarity;
-import org.apache.solr.analysis.TokenizerFactory;
-import org.apache.solr.analysis.TokenizerChain;
-import org.apache.solr.analysis.TokenFilterFactory;
+
+import org.hibernate.search.Environment;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.util.DelegateNamedAnalyzer;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -31,10 +26,12 @@ public class InitContext {
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
 	private final Similarity defaultSimilarity;
+	private final boolean solrPresent;
 
 	public InitContext(SearchConfiguration cfg) {
 		defaultAnalyzer = initAnalyzer(cfg);
 		defaultSimilarity = initSimilarity(cfg);
+		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
 	}
 
 	public void addAnalyzerDef(AnalyzerDef ann) {
@@ -165,37 +162,25 @@ public class InitContext {
 	}
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {
-		TokenizerDef token = analyzerDef.tokenizer();
-		TokenizerFactory tokenFactory = (TokenizerFactory) instantiate( token.factory() );
-		tokenFactory.init( getMapOfParameters( token.params() ) );
-
-		final int length = analyzerDef.filters().length;
-		TokenFilterFactory[] filters = new TokenFilterFactory[length];
-		for ( int index = 0 ; index < length ; index++ ) {
-			TokenFilterDef filterDef = analyzerDef.filters()[index];
-			filters[index] = (TokenFilterFactory) instantiate( filterDef.factory() );
-			filters[index].init( getMapOfParameters( filterDef.params() ) );
+		if ( ! solrPresent ) {
+			throw new SearchException( "Use of @AnalyzerDef while Solr is not present in the classpath. Add apache-solr-analyzer.jar" );
 		}
-		return new TokenizerChain(tokenFactory, filters);
+		//SolrAnalyzerBuilder references Solr classes.
+		//InitContext should not (directly or indirectly) load a Solr class to avoid hard dependency
+		// unless necessary
+		// the curent mecanism (check sor class presence and call SolrAnalyzerBuilder if needed
+		// seems to be sufficient on Apple VM (derived from Sun's
+		// TODO check on other VMs and be ready for a more reflexive approach
+		return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef );
 	}
 
-	private Object instantiate(Class clazz) {
+	private boolean isPresent(String classname) {
 		try {
-			return clazz.newInstance();
+			ReflectHelper.classForName( classname, InitContext.class );
+			return true;
 		}
-		catch (IllegalAccessException e) {
-			throw new SearchException( "Unable to instantiate class: " + clazz, e );
+		catch ( Exception e ) {
+			return false;
 		}
-		catch (InstantiationException e) {
-			throw new SearchException( "Unable to instantiate class: " + clazz, e );
-		}
-	}
-
-	private Map<String, String> getMapOfParameters(Parameter[] params) {
-		Map<String, String> mapOfParams = new HashMap<String, String>( params.length );
-		for (Parameter param : params) {
-			mapOfParams.put( param.name(), param.value() );
-		}
-		return Collections.unmodifiableMap( mapOfParams );
 	}
 }
