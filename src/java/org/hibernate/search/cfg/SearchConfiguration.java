@@ -21,9 +21,8 @@ public interface SearchConfiguration {
 
 	/**
 	 * Returns a {@link java.lang.Class} from a String parameter.
-	 * TODO: should it be Iteratable
 	 * @param name
-	 * @return java.lang.Class
+	 * @return An iterator of Classes.
 	 */
 
 	Class<?> getClassMapping(String name);
