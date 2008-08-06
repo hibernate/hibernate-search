@@ -4,7 +4,6 @@ package org.hibernate.search;
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.ScopedAnalyzer;
 
 /**
  * Provide application wide operations as well as access to the underlying Lucene resources.
@@ -52,5 +51,5 @@ public interface SearchFactory {
 	 * @throws IllegalArgumentException in case <code>clazz == null</code> or the specified
 	 * class is not an indexed entity.
 	 */
-	ScopedAnalyzer getAnalyzer(Class clazz);
+	Analyzer getAnalyzer(Class clazz);
 }

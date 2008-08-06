@@ -308,7 +308,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return analyzer;
 	}
 	
-	public ScopedAnalyzer getAnalyzer(Class clazz) {
+	public Analyzer getAnalyzer(Class clazz) {
 		if ( clazz ==  null) {
 			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
 		}

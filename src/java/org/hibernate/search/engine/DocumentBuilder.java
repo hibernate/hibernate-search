@@ -705,7 +705,7 @@ public class DocumentBuilder<T> {
 		return shardingStrategy;
 	}
 
-	public ScopedAnalyzer getAnalyzer() {
+	public Analyzer getAnalyzer() {
 		return analyzer;
 	}
 
