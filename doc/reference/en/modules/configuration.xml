@@ -308,7 +308,7 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
 
             <entry>Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS connection factory from
-            (<literal>java:/ConnectionFactory</literal> by default in JBoss
+            (<literal>/ConnectionFactory</literal> by default in JBoss
             AS)</entry>
           </row>
 
@@ -353,7 +353,7 @@ hibernate.search.default.directory_provider = org.hibernate.search.store.FSSlave
 
 ## Backend configuration
 hibernate.search.worker.backend = jms
-hibernate.search.worker.jms.connection_factory = java:/ConnectionFactory
+hibernate.search.worker.jms.connection_factory = /ConnectionFactory
 hibernate.search.worker.jms.queue = queue/hibernatesearch
 #optional jndi configuration (check your JMS provider for more information)
 
