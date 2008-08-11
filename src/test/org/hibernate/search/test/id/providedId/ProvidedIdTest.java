@@ -10,8 +10,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class ProvidedIdTest extends SearchTestCase {
 
    public void testProvidedId() throws ParseException {
 
-      final Log log = LogFactory.getLog(JBossCachePerson.class);
+      final Logger log = LoggerFactory.getLogger(ProvidedIdTest.class);
       person1 = new JBossCachePerson();
       person1.setName("Navin Surtani");
       person1.setBlurb("Likes playing WoW");
@@ -61,7 +61,7 @@ public class ProvidedIdTest extends SearchTestCase {
 
       transaction = fullTextSession.beginTransaction();
       
-      QueryParser parser = new QueryParser("Name", new StandardAnalyzer());
+      QueryParser parser = new QueryParser("name", new StandardAnalyzer());
       Query luceneQuery = parser.parse("Goat");
 
       FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(luceneQuery, JBossCachePerson.class);
@@ -72,9 +72,8 @@ public class ProvidedIdTest extends SearchTestCase {
       transaction.commit();
       session.close();
 
-      System.out.println("result size is " + results.size());
 
-      if(log.isDebugEnabled()) log.warn("result size is " + results.size());
+      if(log.isDebugEnabled()) log.debug("result size is " + results.size());
    }
 
 

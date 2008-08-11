@@ -4,6 +4,7 @@ import org.hibernate.search.annotations.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
 import java.io.Serializable;
 
 
@@ -17,6 +18,10 @@ public class JBossCachePerson implements Serializable
 {
 
    @Id
+   @GeneratedValue
+   private long id;
+
+
    @Field (index = Index.TOKENIZED, store = Store.YES)
    private String name;
    @Field (index = Index.TOKENIZED, store = Store.YES)
