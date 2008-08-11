@@ -1,9 +1,6 @@
 <project name="Documentation" default="all.doc" basedir=".">
 
-    <import file="../../common-build.xml"/>
     <import file="docbook-common-build.xml"/>
-
-
     <target name="all.doc" depends="clean">
 
         <!-- TRANSLATOR: Duplicate this call for your language -->

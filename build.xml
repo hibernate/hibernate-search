@@ -1,4 +1,4 @@
-<!-- $Id:$ -->
+<!-- $Id$ -->
 <!--
 
   Hibernate Search ANT build script.
@@ -156,6 +156,7 @@
         <copy todir="${build.testresources.dir}">
             <fileset dir="${testresources.dir}">
                 <include name="**/*.*"/>
+				<exclude name="hibernate.properties"/>
             </fileset>
         </copy>
         <mkdir dir="${build.testresources.dir}/jars"/>
@@ -172,49 +173,65 @@
     </target>
 
     <target name="junit" depends="compiletest, prepare-test-resources">
-        <mkdir dir="${testreports.dir}"/>
-        <junit forkmode="perBatch" printsummary="yes" haltonfailure="yes">
-            <classpath>
-                <path path="${build.testresources.dir}"/>
-                <path refid="junit.classpath"/>             
-                <fileset dir="${jdbc.dir}">
-                    <include name="**/*.jar"/>
-                    <include name="**/*.zip"/>
-                </fileset>
-            </classpath>
-			<sysproperty key="build.dir" value="${build.dir}"/>
-            <formatter type="plain"/>
-            <formatter type="xml"/>
-            <batchtest fork="yes" todir="${testreports.dir}" haltonfailure="no">
-				<fileset dir="${testclasses.dir}">
-					<include name="**/*Test.class"/>
-					<exclude name="**/JMSSlaveTest.class"/>
-					<!-- Only temporary excluded here until the next release of core. Test should then pass again -->
-					<exclude name="**/UnresolvedBridgeTest.class"/>
-				</fileset>
-            </batchtest>
-			<test fork="yes" todir="${testreports.dir}" haltonfailure="no" name="org.hibernate.search.test.jms.slave.JMSSlaveTest"/>	
-        </junit>
+		<for list="${targetdb}" param="db">
+			<sequential>
+				<antcall target="test-resources">
+					<param name="db" value="@{db}"/>
+				</antcall>
+				<mkdir dir="${testreports.dir}/@{db}"/>
+				<echo>Running against db: @{db}</echo>
+				<junit forkmode="perBatch" printsummary="yes" haltonfailure="yes">
+					<classpath>
+						<path path="${build.testresources.dir}"/>
+						<path refid="junit.classpath"/>             
+						<fileset dir="${jdbc.dir}">
+							<include name="**/*.jar"/>
+							<include name="**/*.zip"/>
+						</fileset>
+					</classpath>
+					<sysproperty key="build.dir" value="${build.dir}"/>
+					<formatter type="plain"/>
+					<formatter type="xml"/>
+					<batchtest fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no">
+						<fileset dir="${testclasses.dir}">
+							<include name="**/*Test.class"/>
+							<exclude name="**/JMSSlaveTest.class"/>
+							<!-- Only temporary excluded here until the next release of core. Test should then pass again -->
+							<exclude name="**/UnresolvedBridgeTest.class"/>
+						</fileset>
+					</batchtest>
+					<test fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no" name="org.hibernate.search.test.jms.slave.JMSSlaveTest"/>	
+				</junit>
+			</sequential>
+		</for>		
     </target>
 
 	<!-- Run a single unit test. -->
 	<target name="junitsingle" depends="compiletest"
 			description="Run a single test suite (requires testname and jdbc.driver properties)">
-		<mkdir dir="${testreports.dir}"/>
-		<junit printsummary="yes" fork="yes" haltonfailure="yes">
-			<classpath>
-                <path path="${build.testresources.dir}"/>
-                <path refid="junit.classpath"/>
-                <fileset dir="${jdbc.dir}">
-                    <include name="**/*.jar"/>
-                    <include name="**/*.zip"/>
-                </fileset>
-            </classpath>
-			<sysproperty key="build.dir" value="${build.dir}"/>
-            <formatter type="plain"/>
-			<formatter type="xml"/>
-			<test fork="yes" todir="${testreports.dir}" haltonfailure="no" name="${testname}"/>
-		</junit>
+		<for list="${targetdb}" param="db">
+			<sequential>
+				<antcall target="test-resources">
+					<param name="db" value="@{db}"/>
+				</antcall>
+				<mkdir dir="${testreports.dir}/@{db}"/>
+				<echo>Running against db: @{db}</echo>
+				<junit printsummary="yes" fork="yes" haltonfailure="yes">
+					<classpath>
+						<path path="${build.testresources.dir}"/>
+						<path refid="junit.classpath"/>             
+						<fileset dir="${jdbc.dir}">
+							<include name="**/*.jar"/>
+							<include name="**/*.zip"/>
+						</fileset>
+					</classpath>
+					<sysproperty key="build.dir" value="${build.dir}"/>
+					<formatter type="plain"/>
+					<formatter type="xml"/>
+					<test fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no" name="${testname}"/>
+				</junit>
+			</sequential>
+		</for>		
 	</target>
 
 	<target name="jar" depends="compile" description="Build the distribution .jar file">
@@ -311,6 +328,4 @@
 			<tarfileset prefix="${name}-${version}" dir="${dist.dir}"/>
 		</tar>
 	</target>
-
-
 </project>
