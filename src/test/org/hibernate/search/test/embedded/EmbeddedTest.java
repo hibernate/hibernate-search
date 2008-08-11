@@ -273,6 +273,7 @@ public class EmbeddedTest extends SearchTestCase {
 		StateCandidate candiate = new StateCandidate();
 		candiate.setName( "Mueller" );
 		candiate.setState( state );
+		state.setCandidate( candiate );
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -297,7 +298,7 @@ public class EmbeddedTest extends SearchTestCase {
 		// remove the following line to see the test fails. It should not be necessary to
 		// to also update the name of the candidate. Only updating the state should work
 		// as well.
-		candiate.setName( "Beckstein" );
+		//candiate.setName( "Beckstein" );
 		state.setName( "Hessen" );
 		candiate = (StateCandidate) s.merge( candiate );
 		tx.commit();
