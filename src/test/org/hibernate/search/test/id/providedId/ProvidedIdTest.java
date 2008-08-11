@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class ProvidedIdTest extends SearchTestCase {
 
-   JBossCachePerson person1, person2, person3, person4;
+   JBossCachePerson person1, person2;
 
    protected Class[] getMappings() {
       return new Class[]{
@@ -30,22 +30,13 @@ public class ProvidedIdTest extends SearchTestCase {
 
    public void testProvidedId() throws ParseException {
 
-      final Logger log = LoggerFactory.getLogger(ProvidedIdTest.class);
       person1 = new JBossCachePerson();
-      person1.setName("Navin Surtani");
-      person1.setBlurb("Likes playing WoW");
+      person1.setName("Big Goat");
+      person1.setBlurb("Eats grass");
 
       person2 = new JBossCachePerson();
-      person2.setName("Big Goat");
-      person2.setBlurb("Eats grass");
-
-      person3 = new JBossCachePerson();
-      person3.setName("Mini Goat");
-      person3.setBlurb("Eats cheese");
-
-      person4 = new JBossCachePerson();
-      person4.setName("Smelly Cat");
-      person4.setBlurb("Eats fish");
+      person2.setName("Mini Goat");
+      person2.setBlurb("Eats cheese");
 
 
       Session session = openSession();
@@ -53,8 +44,6 @@ public class ProvidedIdTest extends SearchTestCase {
       Transaction transaction = session.beginTransaction();
       session.persist(person1);
       session.persist(person2);
-      session.persist(person3);
-      session.persist(person4);
 
       transaction.commit();
       session.clear();
@@ -72,8 +61,7 @@ public class ProvidedIdTest extends SearchTestCase {
       transaction.commit();
       session.close();
 
-
-      if(log.isDebugEnabled()) log.debug("result size is " + results.size());
+      assert results.size() == 2;
    }
 
 
