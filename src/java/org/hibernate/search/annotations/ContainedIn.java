@@ -26,7 +26,7 @@ import java.lang.annotation.Documented;
  *<br>
  * &#64;Indexed<br>
  * public class Order {<br>
- *     &#64;ContainedBy<br>
+ *     &#64;ContainedIn<br>
  *     Set<OrderLine> lines;<br>
  * }<br>
  * </code><br>
