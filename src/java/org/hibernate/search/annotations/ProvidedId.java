@@ -15,7 +15,7 @@ import org.hibernate.search.bridge.StringBridge;
  * <p/>
  * This annotation should not be used in conjunction with {@link org.hibernate.search.annotations.DocumentId}
  *
- * @author Navin Surtani  - navin@surtani.org
+ * @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
