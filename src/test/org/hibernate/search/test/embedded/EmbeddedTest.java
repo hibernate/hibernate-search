@@ -18,8 +18,8 @@ import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-@SuppressWarnings("unchecked")
 public class EmbeddedTest extends SearchTestCase {
 
 	public void testEmbeddedIndexing() throws Exception {
@@ -42,11 +42,10 @@ public class EmbeddedTest extends SearchTestCase {
 		s.persist( tower );
 		tx.commit();
 
-
 		FullTextSession session = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
 		Query query;
-		List result;
+		List<?> result;
 
 		query = parser.parse( "address.street:place" );
 		result = session.createFullTextQuery( query ).list();
@@ -71,7 +70,6 @@ public class EmbeddedTest extends SearchTestCase {
 		address.getOwnedBy().setName( "Buckhead community" );
 		tx.commit();
 
-
 		s.clear();
 
 		session = Search.getFullTextSession( s );
@@ -89,38 +87,37 @@ public class EmbeddedTest extends SearchTestCase {
 		s.close();
 
 	}
-	
+
 	public void testEmbeddedIndexingOneToMany() throws Exception {
 		Country country = new Country();
-		country.setName("Germany");
-		List states = new ArrayList<State>();
+		country.setName( "Germany" );
+		List<State> states = new ArrayList<State>();
 		State bayern = new State();
-		bayern.setName("Bayern");
+		bayern.setName( "Bayern" );
 		State hessen = new State();
-		hessen.setName("Hessen");
+		hessen.setName( "Hessen" );
 		State sachsen = new State();
-		sachsen.setName("Sachsen");
-		states.add(bayern);
-		states.add(hessen);
-		states.add(sachsen);
-		country.setStates(states);
+		sachsen.setName( "Sachsen" );
+		states.add( bayern );
+		states.add( hessen );
+		states.add( sachsen );
+		country.setStates( states );
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( country );
 		tx.commit();
 
-
 		FullTextSession session = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
 		Query query;
-		List result;
+		List<?> result;
 
 		query = parser.parse( "states.name:Hessen" );
 		result = session.createFullTextQuery( query ).list();
 		assertEquals( "unable to find property in embedded", 1, result.size() );
 		s.close();
-	}	
+	}
 
 	public void testContainedIn() throws Exception {
 		Tower tower = new Tower();
@@ -151,7 +148,7 @@ public class EmbeddedTest extends SearchTestCase {
 		FullTextSession session = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
 		Query query;
-		List result;
+		List<?> result;
 
 		query = parser.parse( "address.street:peachtree" );
 		result = session.createFullTextQuery( query, Tower.class ).list();
@@ -201,14 +198,13 @@ public class EmbeddedTest extends SearchTestCase {
 		Product p1 = new Product();
 		p1.setName( "Candide" );
 		p1.getAuthors().add( a );
-		p1.getAuthors().add( a2 ); //be creative
+		p1.getAuthors().add( a2 ); // be creative
 
 		Product p2 = new Product();
 		p2.setName( "Le malade imaginaire" );
 		p2.getAuthors().add( a3 );
 		p2.getOrders().put( "Emmanuel", o );
 		p2.getOrders().put( "Gavin", o2 );
-
 
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -229,17 +225,17 @@ public class EmbeddedTest extends SearchTestCase {
 
 		QueryParser parser = new MultiFieldQueryParser( new String[] { "name", "authors.name" }, new StandardAnalyzer() );
 		Query query;
-		List result;
+		List<?> result;
 
 		query = parser.parse( "Hugo" );
 		result = session.createFullTextQuery( query, Product.class ).list();
 		assertEquals( "collection of embedded ignored", 1, result.size() );
 
-		//update the collection
+		// update the collection
 		Product p = (Product) result.get( 0 );
 		p.getAuthors().add( a4 );
 
-		//PhraseQuery
+		// PhraseQuery
 		query = new TermQuery( new Term( "orders.orderNumber", "ZERTYD" ) );
 		result = session.createFullTextQuery( query, Product.class ).list();
 		assertEquals( "collection of untokenized ignored", 1, result.size() );
@@ -255,29 +251,74 @@ public class EmbeddedTest extends SearchTestCase {
 		session = Search.getFullTextSession( s );
 		query = parser.parse( "Proust" );
 		result = session.createFullTextQuery( query, Product.class ).list();
-		//HSEARCH-56
+		// HSEARCH-56
 		assertEquals( "update of collection of embedded ignored", 1, result.size() );
 
 		s.delete( s.get( Product.class, p1.getId() ) );
 		s.delete( s.get( Product.class, p2.getId() ) );
 		tx.commit();
 		s.close();
-
 	}
 
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
+	/**
+	 * Tests that updating an indexed embedded object updates the Lucene index as well.
+	 * 
+	 * @throws Exception in case the test fails
+	 * @see HSEARCH-142
+	 */
+	public void testEmbeddedObjectUpdate() throws Exception {
+
+		State state = new State();
+		state.setName( "Bavaria" );
+		StateCandidate candiate = new StateCandidate();
+		candiate.setName( "Mueller" );
+		candiate.setState( state );
+
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( candiate );
+		tx.commit();
+		s.clear();
+
+		FullTextSession session = Search.getFullTextSession( s );
+		tx = session.beginTransaction();
+
+		QueryParser parser = new MultiFieldQueryParser( new String[] { "name", "state.name" }, new StandardAnalyzer() );
+		Query query;
+		List<?> result;
+
+		query = parser.parse( "Bavaria" );
+		result = session.createFullTextQuery( query, StateCandidate.class ).list();
+		assertEquals( "IndexEmbedded ignored.", 1, result.size() );
+		tx.commit();
+		s.clear();
+		
+		tx = s.beginTransaction();
+		// remove the following line to see the test fails. It should not be necessary to
+		// to also update the name of the candidate. Only updating the state should work
+		// as well.
+		candiate.setName( "Beckstein" );
+		state.setName( "Hessen" );
+		candiate = (StateCandidate) s.merge( candiate );
+		tx.commit();
+		s.clear();
+		
+		tx = s.beginTransaction();
+		session = Search.getFullTextSession( s );
+		query = parser.parse( "Hessen" );
+		result = session.createFullTextQuery( query, StateCandidate.class ).list();
+		assertEquals( "IndexEmbedded ignored.", 1, result.size() );
+		tx.commit();
+		s.clear();
+		s.close();
+	}
+
+	protected void configure( org.hibernate.cfg.Configuration cfg ) {
 		super.configure( cfg );
 	}
 
-	protected Class[] getMappings() {
-		return new Class[] {
-				Tower.class,
-				Address.class,
-				Product.class,
-				Order.class,
-				Author.class,
-				Country.class,
-				State.class
-		};
+	protected Class<?>[] getMappings() {
+		return new Class[] { Tower.class, Address.class, Product.class, Order.class, Author.class, Country.class,
+				State.class, StateCandidate.class };
 	}
 }
