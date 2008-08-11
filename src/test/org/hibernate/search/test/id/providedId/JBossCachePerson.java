@@ -1,8 +1,9 @@
 package org.hibernate.search.test.id.providedId;
 
 import org.hibernate.search.annotations.*;
-import org.hibernate.annotations.Entity;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.io.Serializable;
 
 
@@ -15,6 +16,7 @@ import java.io.Serializable;
 public class JBossCachePerson implements Serializable
 {
 
+   @Id
    @Field (index = Index.TOKENIZED, store = Store.YES)
    private String name;
    @Field (index = Index.TOKENIZED, store = Store.YES)
