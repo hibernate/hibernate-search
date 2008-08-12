@@ -7,14 +7,18 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Hardy Ferentschik
  */
 @Entity
+@Indexed // @indexed should not be needed, see HSEARCH-142 and testEmbeddedObjectUpdate()
 public class State {
 	@Id
+	@DocumentId
 	@GeneratedValue
 	private Integer id;
 	

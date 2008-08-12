@@ -1,6 +1,6 @@
+// $Id:$
 package org.hibernate.search.test.embedded;
 
-// $Id:$
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
