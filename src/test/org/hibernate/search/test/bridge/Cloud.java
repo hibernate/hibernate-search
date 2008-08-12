@@ -27,8 +27,8 @@ public class Cloud {
     private int id;
     private Long long1;
     private long long2;
-    private Integer int1;
-    private int int2;
+    private Integer integerv1;
+    private int integerv2;
     private Double double1;
     private double double2;
     private Float float1;
@@ -126,21 +126,21 @@ public class Cloud {
     }
 
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)
-    public Integer getInt1() {
-        return int1;
+    public Integer getIntegerv1() {
+        return integerv1;
     }
 
-    public void setInt1(Integer int1) {
-        this.int1 = int1;
+    public void setIntegerv1(Integer integerv1) {
+        this.integerv1 = integerv1;
     }
 
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)
-    public int getInt2() {
-        return int2;
+    public int getIntegerv2() {
+        return integerv2;
     }
 
-    public void setInt2(int int2) {
-        this.int2 = int2;
+    public void setIntegerv2(int integerv2) {
+        this.integerv2 = integerv2;
     }
 
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)

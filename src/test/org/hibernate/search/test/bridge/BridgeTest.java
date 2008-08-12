@@ -34,8 +34,8 @@ public class BridgeTest extends SearchTestCase {
         cloud.setDate( null );
         cloud.setDouble1( null );
         cloud.setDouble2( 2.1d );
-        cloud.setInt1( null );
-        cloud.setInt2( 2 );
+        cloud.setIntegerv1( null );
+        cloud.setIntegerv2( 2 );
         cloud.setFloat1( null );
         cloud.setFloat2( 2.1f );
         cloud.setLong1( null );
@@ -59,12 +59,12 @@ public class BridgeTest extends SearchTestCase {
         List result;
 
         query = parser.parse("double2:[2.1 TO 2.1] AND float2:[2.1 TO 2.1] " +
-				"AND int2:[2 TO 2.1] AND long2:[2 TO 2.1] AND type:\"dog\" AND storm:false");
+				"AND integerv2:[2 TO 2.1] AND long2:[2 TO 2.1] AND type:\"dog\" AND storm:false");
 
 		result = session.createFullTextQuery(query).list();
         assertEquals( "find primitives and do not fail on null", 1, result.size() );
 
-        query = parser.parse("double1:[2.1 TO 2.1] OR float1:[2.1 TO 2.1] OR int1:[2 TO 2.1] OR long1:[2 TO 2.1]");
+        query = parser.parse("double1:[2.1 TO 2.1] OR float1:[2.1 TO 2.1] OR integerv1:[2 TO 2.1] OR long1:[2 TO 2.1]");
         result = session.createFullTextQuery(query).list();
         assertEquals( "null elements should not be stored", 0, result.size() ); //the query is dumb because restrictive
 
