@@ -196,8 +196,6 @@
 						<fileset dir="${testclasses.dir}">
 							<include name="**/*Test.class"/>
 							<exclude name="**/JMSSlaveTest.class"/>
-							<!-- Only temporary excluded here until the next release of core. Test should then pass again -->
-							<exclude name="**/UnresolvedBridgeTest.class"/>
 						</fileset>
 					</batchtest>
 					<test fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no" name="org.hibernate.search.test.jms.slave.JMSSlaveTest"/>	
