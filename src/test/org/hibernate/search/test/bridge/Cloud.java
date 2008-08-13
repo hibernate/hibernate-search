@@ -34,7 +34,7 @@ public class Cloud {
     private Float float1;
     private float float2;
     private String string;
-    private Date date;
+    private Date myDate;
     private Date dateYear;
     private Date dateMonth;
     private Date dateDay;
@@ -189,12 +189,12 @@ public class Cloud {
     }
 
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)
-    public Date getDate() {
-        return date;
+    public Date getMyDate() {
+        return myDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setMyDate(Date myDate) {
+        this.myDate = myDate;
     }
 
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)

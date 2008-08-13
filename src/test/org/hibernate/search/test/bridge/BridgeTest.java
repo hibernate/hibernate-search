@@ -31,7 +31,7 @@ import org.apache.lucene.index.Term;
 public class BridgeTest extends SearchTestCase {
     public void testDefaultAndNullBridges() throws Exception {
         Cloud cloud = new Cloud();
-        cloud.setDate( null );
+        cloud.setMyDate( null );
         cloud.setDouble1( null );
         cloud.setDouble2( 2.1d );
         cloud.setIntegerv1( null );
@@ -128,7 +128,7 @@ public class BridgeTest extends SearchTestCase {
         c.set( Calendar.MILLISECOND, 5 );
 
         Date date = new Date( c.getTimeInMillis() );
-        cloud.setDate( date ); //5 millisecond
+        cloud.setMyDate( date ); //5 millisecond
         cloud.setDateDay( date );
         cloud.setDateHour( date );
         cloud.setDateMillisecond( date );
@@ -148,7 +148,7 @@ public class BridgeTest extends SearchTestCase {
         Query query;
         List result;
 
-        query = parser.parse("date:[19900101 TO 20060101]"
+        query = parser.parse("myDate:[19900101 TO 20060101]"
                 + " AND dateDay:[20001214 TO 2000121501]"
                 + " AND dateMonth:[200012 TO 20001201]"
                 + " AND dateYear:[2000 TO 200001]"
