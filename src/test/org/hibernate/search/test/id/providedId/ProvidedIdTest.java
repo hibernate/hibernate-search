@@ -6,12 +6,15 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Hits;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -25,7 +28,7 @@ public class ProvidedIdTest extends SearchTestCase {
 		};
 	}
 
-	public void testProvidedId() throws ParseException {
+	public void testProvidedId() throws Exception {
 
 		JBossCachePerson person1 = new JBossCachePerson();
 		person1.setName( "Big Goat" );
@@ -50,15 +53,18 @@ public class ProvidedIdTest extends SearchTestCase {
 		QueryParser parser = new QueryParser( "name", new StandardAnalyzer() );
 		Query luceneQuery = parser.parse( "Goat" );
 
-		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, JBossCachePerson.class );
+		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
+		//needs it. So we use plain Lucene 
 
-
-		List results = fullTextQuery.list();
-
+		//we know there is only one DP
+		DirectoryProvider provider = fullTextSession.getSearchFactory().getDirectoryProviders( JBossCachePerson.class )[0];
+		IndexSearcher searcher =  new IndexSearcher( provider.getDirectory() );
+		Hits hits = searcher.search( luceneQuery );
+		searcher.close();
 		transaction.commit();
 		session.close();
 
-		assertEquals( 2, results.size() );
+		assertEquals( 2, hits.length() );
 	}
 
 

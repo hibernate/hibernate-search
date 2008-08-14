@@ -234,4 +234,14 @@ public class BridgeFactory {
 				throw new AssertionFailure( "Unknown Resolution: " + resolution );
 		}
 	}
+
+	public static TwoWayFieldBridge extractTwoWayType(ClassBridge classBridge) {
+		FieldBridge fb = extractType( classBridge );
+		if ( fb instanceof TwoWayFieldBridge ) {
+			return ( TwoWayFieldBridge ) fb;
+		}
+		else {
+			throw new SearchException( "ClassBridge passed in is not an instance of " + TwoWayFieldBridge.class.getSimpleName() );
+		}
+	}
 }

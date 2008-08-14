@@ -1,6 +1,7 @@
 package org.hibernate.search.test.id.providedId;
 
 import org.hibernate.search.annotations.*;
+import org.hibernate.search.bridge.builtin.LongBridge;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,7 +13,7 @@ import java.io.Serializable;
  @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
  */
 @Entity
-@ProvidedId
+@ProvidedId(bridgeImpl = @ClassBridge(impl = LongBridge.class))
 @Indexed
 public class JBossCachePerson implements Serializable
 {
