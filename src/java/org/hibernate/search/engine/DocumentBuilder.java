@@ -118,21 +118,13 @@ public class DocumentBuilder<T> {
 			ProvidedId provided = clazz.getAnnotation( org.hibernate.search.annotations.ProvidedId.class );
 			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
 
-			//TODO navssurtani use something similar to BridgeFactory.extractType(ClassBridge)
-			idBridge = getProvidedIdBridge();
+         idBridge = BridgeFactory.extractTwoWayType(provided.bridgeImpl());
 			idKeywordName = provided.name();
-
-
 		}
 		//if composite id, use of (a, b) in ((1,2)TwoWayString2FieldBridgeAdaptor, (3,4)) fails on most database
 		//a TwoWayString2FieldBridgeAdaptor is never a composite id
 		safeFromTupleId = TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
 	}
-
-	private TwoWayFieldBridge getProvidedIdBridge() {
-		return new TwoWayString2FieldBridgeAdaptor( new StringBridge() );
-	}
-
 
 	private Analyzer getAnalyzer(XAnnotatedElement annotatedElement, InitContext context) {
 		org.hibernate.search.annotations.Analyzer analyzerAnn =

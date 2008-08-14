@@ -8,6 +8,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 
 /**
  * Objects whose identifier is provided externally and not part of the object state
@@ -17,12 +19,12 @@ import org.hibernate.search.bridge.StringBridge;
  *
  * @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( ElementType.TYPE )
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
 @Documented
 public @interface ProvidedId {
 
-	String name() default "providedId";
+   String name() default "providedId";
 
-	Class<?> bridge() default StringBridge.class;
+   ClassBridge bridgeImpl() default @ClassBridge(impl = org.hibernate.search.bridge.builtin.StringBridge.class);
 }

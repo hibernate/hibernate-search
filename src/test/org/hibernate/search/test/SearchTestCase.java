@@ -36,7 +36,7 @@ public abstract class SearchTestCase extends HANTestCase {
 	}
 	
 	protected void setUp() throws Exception {
-		//super.setUp(); //we need a fresh session factory each time for index set up
+//		super.setUp(); //we need a fresh session factory each time for index set up
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
 	}
 
