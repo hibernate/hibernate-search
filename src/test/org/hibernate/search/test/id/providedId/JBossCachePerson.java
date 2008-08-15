@@ -13,7 +13,7 @@ import java.io.Serializable;
  @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
  */
 @Entity
-@ProvidedId(bridgeImpl = @ClassBridge(impl = LongBridge.class))
+@ProvidedId(bridge = @FieldBridge(impl = LongBridge.class))
 @Indexed
 public class JBossCachePerson implements Serializable
 {
