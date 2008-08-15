@@ -118,7 +118,7 @@ public class DocumentBuilder<T> {
 			ProvidedId provided = clazz.getAnnotation( org.hibernate.search.annotations.ProvidedId.class );
 			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
 
-			idBridge = BridgeFactory.extractTwoWayType(provided.bridgeImpl());
+			idBridge = BridgeFactory.extractTwoWayType(provided.bridge());
 			idKeywordName = provided.name();
 		}
 		//if composite id, use of (a, b) in ((1,2)TwoWayString2FieldBridgeAdaptor, (3,4)) fails on most database
