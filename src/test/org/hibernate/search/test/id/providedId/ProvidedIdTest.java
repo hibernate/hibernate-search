@@ -1,9 +1,6 @@
 package org.hibernate.search.test.id.providedId;
 
-import java.util.List;
-
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.IndexSearcher;
@@ -11,7 +8,6 @@ import org.apache.lucene.search.Hits;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.store.DirectoryProvider;
@@ -24,28 +20,32 @@ public class ProvidedIdTest extends SearchTestCase {
 
 	protected Class[] getMappings() {
 		return new Class[] {
-				JBossCachePerson.class
+				ProvidedIdPerson.class
 		};
 	}
 
 	public void testProvidedId() throws Exception {
 
-		JBossCachePerson person1 = new JBossCachePerson();
+		ProvidedIdPerson person1 = new ProvidedIdPerson();
 		person1.setName( "Big Goat" );
 		person1.setBlurb( "Eats grass" );
 
-		JBossCachePerson person2 = new JBossCachePerson();
+		ProvidedIdPerson person2 = new ProvidedIdPerson();
 		person2.setName( "Mini Goat" );
 		person2.setBlurb( "Eats cheese" );
 
+      ProvidedIdPersonSub person3 = new ProvidedIdPersonSub();
+      person3.setName ( "Regular goat" );
+      person3.setBlurb ( "Is anorexic" );
 
-		Session session = openSession();
+      Session session = openSession();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		Transaction transaction = session.beginTransaction();
 		session.persist( person1 );
 		session.persist( person2 );
+      session.persist( person3 );
 
-		transaction.commit();
+      transaction.commit();
 		session.clear();
 
 		transaction = fullTextSession.beginTransaction();
@@ -57,14 +57,14 @@ public class ProvidedIdTest extends SearchTestCase {
 		//needs it. So we use plain Lucene 
 
 		//we know there is only one DP
-		DirectoryProvider provider = fullTextSession.getSearchFactory().getDirectoryProviders( JBossCachePerson.class )[0];
+		DirectoryProvider provider = fullTextSession.getSearchFactory().getDirectoryProviders( ProvidedIdPerson.class )[0];
 		IndexSearcher searcher =  new IndexSearcher( provider.getDirectory() );
 		Hits hits = searcher.search( luceneQuery );
 		searcher.close();
 		transaction.commit();
 		session.close();
 
-		assertEquals( 2, hits.length() );
+		assertEquals( 3, hits.length() );
 	}
 
 

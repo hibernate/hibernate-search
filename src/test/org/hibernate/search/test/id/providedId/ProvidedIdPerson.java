@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Entity
 @ProvidedId(bridge = @FieldBridge(impl = LongBridge.class))
 @Indexed
-public class JBossCachePerson implements Serializable
+public class ProvidedIdPerson implements Serializable
 {
 
    @Id
