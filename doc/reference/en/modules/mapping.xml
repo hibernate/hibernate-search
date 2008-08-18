@@ -1136,4 +1136,35 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
       </section>
     </section>
   </section>
+
+  <section id="provided-id">
+	<title>Providing your own id</title>
+	
+	<para>You can provide your own id for Hibernate Search if you are extending the internals. You will have to generate a unique value so it can be given to Lucene to
+		be indexed. This will have to be given to Hibernate Search when you create an org.hibernate.search.Work object - the document id is required in the constructor.
+	</para>
+	
+		<section id="@ProvidedId">
+			<title>The @ProvidedId annotation</title>
+			
+			<para>Unlike conventional Hibernate Search API and @DocumentId, this annotation is used on the class and not a field. You also can provide your own bridge implementation when you put in this annotation by calling the bridge() which is on @ProvidedId. Also, if you annotate a class with @ProvidedId, your subclasses will also get the annotation - but it is not done by using the java.lang.annotations.@Inherited. Be sure however, to <emphasis>not</emphasis> use this annotation with @DocumentId as your system will break.
+			</para>
+			
+			<programlisting>
+				
+				@ProvidedId (bridge = org.my.own.package.MyCustomBridge)
+				@Indexed
+				public class MyClass{
+				
+				@Field
+				String MyString;
+				
+				...
+				
+				}
+				
+				
+			</programlisting>			
+		</section>
+  </section>	
 </chapter>

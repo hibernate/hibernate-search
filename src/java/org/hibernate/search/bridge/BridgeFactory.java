@@ -293,11 +293,11 @@ public class BridgeFactory {
                }
             }
             catch (Exception e) {
-               throw new HibernateException( "Unable to instantiate FieldBridge for " + ClassBridge.class.getName(), e );
+               throw new HibernateException( "Unable to instantiate FieldBridge for " + org.hibernate.search.annotations.FieldBridge.class.getName(), e );
             }
          }
       }
-      if ( bridge == null ) throw new SearchException( "Unable to guess FieldBridge for " + ClassBridge.class.getName() );
+      if ( bridge == null ) throw new SearchException( "Unable to guess FieldBridge for " + org.hibernate.search.annotations.FieldBridge.class.getName() );
 
       return bridge;
    }
