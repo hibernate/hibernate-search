@@ -115,7 +115,7 @@ public class DocumentBuilder<T> {
 		this.analyzer.setGlobalAnalyzer( rootPropertiesMetadata.analyzer );
 		if ( idKeywordName == null ) {
 			// if no DocumentId then check if we have a ProvidedId instead
-			ProvidedId provided = findProvidedId( clazz );
+			ProvidedId provided = findProvidedId( clazz, reflectionManager );
 			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
 
 			idBridge = BridgeFactory.extractTwoWayType(provided.bridge());
@@ -126,10 +126,10 @@ public class DocumentBuilder<T> {
 		safeFromTupleId = TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
 	}
 
-	private ProvidedId findProvidedId(XClass clazz) {
+	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {
 		ProvidedId id = null;
 		XClass currentClass = clazz;
-		while ( id == null && currentClass != null) {
+		while ( id == null && ( ! reflectionManager.equals( currentClass, Object.class ) ) ) {
 			id = currentClass.getAnnotation( ProvidedId.class );
 			currentClass = clazz.getSuperclass();
 		}
