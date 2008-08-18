@@ -2,9 +2,9 @@ package org.hibernate.search.test.id.providedId;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -20,7 +20,8 @@ public class ProvidedIdTest extends SearchTestCase {
 
 	protected Class[] getMappings() {
 		return new Class[] {
-				ProvidedIdPerson.class
+				ProvidedIdPerson.class,
+				ProvidedIdPersonSub.class
 		};
 	}
 
@@ -34,18 +35,18 @@ public class ProvidedIdTest extends SearchTestCase {
 		person2.setName( "Mini Goat" );
 		person2.setBlurb( "Eats cheese" );
 
-      ProvidedIdPersonSub person3 = new ProvidedIdPersonSub();
-      person3.setName ( "Regular goat" );
-      person3.setBlurb ( "Is anorexic" );
+		ProvidedIdPersonSub person3 = new ProvidedIdPersonSub();
+		person3.setName( "Regular goat" );
+		person3.setBlurb( "Is anorexic" );
 
-      Session session = openSession();
+		Session session = openSession();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		Transaction transaction = session.beginTransaction();
 		session.persist( person1 );
 		session.persist( person2 );
-      session.persist( person3 );
+		session.persist( person3 );
 
-      transaction.commit();
+		transaction.commit();
 		session.clear();
 
 		transaction = fullTextSession.beginTransaction();
@@ -57,8 +58,9 @@ public class ProvidedIdTest extends SearchTestCase {
 		//needs it. So we use plain Lucene 
 
 		//we know there is only one DP
-		DirectoryProvider provider = fullTextSession.getSearchFactory().getDirectoryProviders( ProvidedIdPerson.class )[0];
-		IndexSearcher searcher =  new IndexSearcher( provider.getDirectory() );
+		DirectoryProvider provider = fullTextSession.getSearchFactory()
+				.getDirectoryProviders( ProvidedIdPerson.class )[0];
+		IndexSearcher searcher = new IndexSearcher( provider.getDirectory() );
 		Hits hits = searcher.search( luceneQuery );
 		searcher.close();
 		transaction.commit();
