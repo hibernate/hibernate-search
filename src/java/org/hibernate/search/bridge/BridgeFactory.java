@@ -160,39 +160,9 @@ public class BridgeFactory {
 		else {
 			bridgeAnn = member.getAnnotation( org.hibernate.search.annotations.FieldBridge.class );
 		}
+		final String memberName = member.getName();
 		if ( bridgeAnn != null ) {
-			Class impl = bridgeAnn.impl();
-			if (impl == void.class)
-				throw new SearchException("@FieldBridge with no implementation class defined in: " + member.getName() );
-			try {
-				Object instance = impl.newInstance();
-				if ( FieldBridge.class.isAssignableFrom( impl ) ) {
-					bridge = (FieldBridge) instance;
-				}
-				else if ( org.hibernate.search.bridge.TwoWayStringBridge.class.isAssignableFrom( impl ) ) {
-					bridge = new TwoWayString2FieldBridgeAdaptor(
-							(org.hibernate.search.bridge.TwoWayStringBridge) instance );
-				}
-				else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
-					bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
-				}
-				else {
-					throw new SearchException("@FieldBridge implementation implements none of the field bridge interfaces: "
-							+ impl + " in " + member.getName() );
-				}
-				if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
-					Map params = new HashMap( bridgeAnn.params().length );
-					for ( Parameter param : bridgeAnn.params() ) {
-						params.put( param.name(), param.value() );
-					}
-					( (ParameterizedBridge) instance ).setParameterValues( params );
-				}
-
-			}
-			catch (Exception e) {
-				//TODO add classname
-				throw new HibernateException( "Unable to instanciate FieldBridge for " + member.getName(), e );
-			}
+			bridge = doExtractType( bridgeAnn, memberName );
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
 			Resolution resolution =
@@ -210,7 +180,46 @@ public class BridgeFactory {
 			}
 		}
 		//TODO add classname
-		if ( bridge == null ) throw new SearchException( "Unable to guess FieldBridge for " + member.getName() );
+		if ( bridge == null ) throw new SearchException( "Unable to guess FieldBridge for " + memberName );
+		return bridge;
+	}
+
+	/** assume not null bridgeAnn */
+	private static FieldBridge doExtractType(org.hibernate.search.annotations.FieldBridge bridgeAnn, String memberName) {
+		assert bridgeAnn != null : "doExtractType assume bridge instance not null";
+		FieldBridge bridge;
+		Class impl = bridgeAnn.impl();
+		if (impl == void.class)
+			throw new SearchException("@FieldBridge with no implementation class defined in: " + memberName );
+		try {
+			Object instance = impl.newInstance();
+			if ( FieldBridge.class.isAssignableFrom( impl ) ) {
+				bridge = (FieldBridge) instance;
+			}
+			else if ( TwoWayStringBridge.class.isAssignableFrom( impl ) ) {
+				bridge = new TwoWayString2FieldBridgeAdaptor(
+						( TwoWayStringBridge) instance );
+			}
+			else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
+				bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
+			}
+			else {
+				throw new SearchException("@FieldBridge implementation implements none of the field bridge interfaces: "
+						+ impl + " in " + memberName
+				);
+			}
+			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
+				Map params = new HashMap( bridgeAnn.params().length );
+				for ( Parameter param : bridgeAnn.params() ) {
+					params.put( param.name(), param.value() );
+				}
+				( (ParameterizedBridge) instance ).setParameterValues( params );
+			}
+		}
+		catch (Exception e) {
+			//TODO add classname
+			throw new SearchException( "Unable to instanciate FieldBridge for " + memberName, e );
+		}
 		return bridge;
 	}
 
@@ -235,15 +244,17 @@ public class BridgeFactory {
 		}
 	}
 
-   /**
-    * Takes in a fieldBridge and will return you a TwoWayFieldBridge instance.
-    *
-    * @param fieldBridge
-    * @return a TwoWayFieldBridge instance if the Field Bridge is an instance of a TwoWayFieldBridge.
-    * @throws SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge. 
-    */
+	/**
+	 * Takes in a fieldBridge and will return you a TwoWayFieldBridge instance.
+	 *
+	 * @param fieldBridge
+	 *
+	 * @return a TwoWayFieldBridge instance if the Field Bridge is an instance of a TwoWayFieldBridge.
+	 *
+	 * @throws SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge.
+	 */
 
-   public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge) {
+	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge) {
 		FieldBridge fb = extractType( fieldBridge );
 		if ( fb instanceof TwoWayFieldBridge ) {
 			return ( TwoWayFieldBridge ) fb;
@@ -253,54 +264,29 @@ public class BridgeFactory {
 		}
 	}
 
-   /**
-    * This extracts and instantiates the implementation class from a ClassBridge
-    * annotation.
-    *
-    * @param fieldBridgeAnnotation the FieldBridge annotation
-    * @return FieldBridge
-    */
-   public static FieldBridge extractType(org.hibernate.search.annotations.FieldBridge fieldBridgeAnnotation)
-   {
-      FieldBridge bridge = null;
+	/**
+	 * This extracts and instantiates the implementation class from a ClassBridge
+	 * annotation.
+	 *
+	 * @param fieldBridgeAnnotation the FieldBridge annotation
+	 *
+	 * @return FieldBridge
+	 */
+	public static FieldBridge extractType(org.hibernate.search.annotations.FieldBridge fieldBridgeAnnotation) {
+		FieldBridge bridge = null;
 
-      if ( fieldBridgeAnnotation != null ) {
-         Class impl = fieldBridgeAnnotation.impl();
-         //TODO better error information ( see guessType() )
-         if (impl != null) {
-            try {
-               Object instance = impl.newInstance();
-               if ( FieldBridge.class.isAssignableFrom( impl ) ) {
-                  bridge = (FieldBridge) instance;
-               }
-               else if ( org.hibernate.search.bridge.TwoWayStringBridge.class.isAssignableFrom( impl ) ) {
-                  bridge = new TwoWayString2FieldBridgeAdaptor(
-                        (org.hibernate.search.bridge.TwoWayStringBridge) instance );
-               }
-               else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
-                  bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
-               }
-               else {
-                  throw new SearchException("@ClassBridge implementation implements none of the field bridge interfaces: "
-                        + impl );
-               }
-               if ( fieldBridgeAnnotation.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
-                  Map params = new HashMap( fieldBridgeAnnotation.params().length );
-                  for ( Parameter param : fieldBridgeAnnotation.params() ) {
-                     params.put( param.name(), param.value() );
-                  }
-                  ( (ParameterizedBridge) instance ).setParameterValues( params );
-               }
-            }
-            catch (Exception e) {
-               throw new HibernateException( "Unable to instantiate FieldBridge for " + org.hibernate.search.annotations.FieldBridge.class.getName(), e );
-            }
-         }
-      }
-      if ( bridge == null ) throw new SearchException( "Unable to guess FieldBridge for " + org.hibernate.search.annotations.FieldBridge.class.getName() );
+		if ( fieldBridgeAnnotation != null ) {
+			bridge = doExtractType( fieldBridgeAnnotation, null );
+		}
 
-      return bridge;
-   }
+		if ( bridge == null ) {
+			throw new SearchException(
+					"Unable to guess FieldBridge for " + org.hibernate.search.annotations.FieldBridge.class.getName()
+			);
+		}
+
+		return bridge;
+	}
 
 
 }

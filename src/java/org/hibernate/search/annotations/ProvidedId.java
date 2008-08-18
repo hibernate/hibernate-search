@@ -26,5 +26,5 @@ public @interface ProvidedId {
 
    String name() default "providedId";
 
-   ClassBridge bridge() default @ClassBridge(impl = org.hibernate.search.bridge.builtin.StringBridge.class);
+   FieldBridge bridge() default @FieldBridge(impl = org.hibernate.search.bridge.builtin.StringBridge.class);
 }
