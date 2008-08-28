@@ -3,6 +3,7 @@ package org.hibernate.search.event;
 
 import java.util.Properties;
 
+import org.hibernate.search.Environment;
 import org.hibernate.event.EventListeners;
 import org.hibernate.event.PostCollectionRecreateEventListener;
 import org.hibernate.event.PostCollectionRemoveEventListener;
@@ -10,7 +11,7 @@ import org.hibernate.event.PostCollectionUpdateEventListener;
 import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
-import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
 
 /**
@@ -18,163 +19,126 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class EventListenerRegister {
 
-	private static final Logger log = LoggerFactory.getLogger(EventListenerRegister.class);
-
-	@SuppressWarnings("unchecked")
-	public static void enableHibernateSearch(EventListeners eventListeners, Properties properties) {		
-		// check whether search is explicitly enabled - if so there is nothing to do		
-		String enableSearchListeners = properties.getProperty( "hibernate.search.autoregister_listeners" );
-		if("false".equalsIgnoreCase(enableSearchListeners )) {
-			log.info("Property hibernate.search.autoregister_listeners is set to false." +
-					" No attempt will be made to register Hibernate Search event listeners.");
+	/**
+	 * Add the FullTextIndexEventListener to all listeners, if enabled in configuration
+	 * and if not already registered.
+	 * @param listeners
+	 * @param properties the Search configuration
+	 */
+	public static void enableHibernateSearch(EventListeners listeners, Properties properties) {		
+		// check whether search is explicitly disabled - if so there is nothing to do	
+		String enableSearchListeners = properties.getProperty( Environment.AUTOREGISTER_LISTENERS );
+		if ( "false".equalsIgnoreCase( enableSearchListeners ) ) {
+			LoggerFactory.getLogger( EventListenerRegister.class ).info(
+					"Property hibernate.search.autoregister_listeners is set to false." +
+					" No attempt will be made to register Hibernate Search event listeners." );
 			return;
 		}
-				
-		FullTextIndexEventListener searchEventListener = new FullTextIndexEventListener();
+		final FullTextIndexEventListener searchListener = new FullTextIndexEventListener();
+		// PostInsertEventListener
+		listeners.setPostInsertEventListeners(
+			addIfNeeded(
+				listeners.getPostInsertEventListeners(),
+				searchListener,
+				new PostInsertEventListener[] { searchListener } )
+			);
+		// PostUpdateEventListener
+		listeners.setPostUpdateEventListeners(
+			addIfNeeded(
+				listeners.getPostUpdateEventListeners(),
+				searchListener,
+				new PostUpdateEventListener[] { searchListener } )
+			);
+		// PostDeleteEventListener
+		listeners.setPostDeleteEventListeners(
+			addIfNeeded(
+				listeners.getPostDeleteEventListeners(),
+				searchListener,
+				new PostDeleteEventListener[] { searchListener } )
+			);
 		
-		//TODO Generalize this. Pretty much the same code all the time. Reflection? 
-		final Class<? extends FullTextIndexEventListener> searchEventListenerClass = searchEventListener.getClass();
-		{
-			boolean present = false;
-			PostInsertEventListener[] listeners = eventListeners
-					.getPostInsertEventListeners();
-			if (listeners != null) {
-				for (Object eventListener : listeners) {
-					// not isAssignableFrom since the user could subclass
-					present = present
-							|| searchEventListenerClass == eventListener.getClass()
-							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
-				}
-				if (!present) {
-					int length = listeners.length + 1;
-					PostInsertEventListener[] newListeners = new PostInsertEventListener[length];
-					System.arraycopy(listeners, 0, newListeners, 0, length - 1);
-					newListeners[length - 1] = searchEventListener;
-					eventListeners.setPostInsertEventListeners(newListeners);
-				}
-			} else {
-				eventListeners
-						.setPostInsertEventListeners(new PostInsertEventListener[] { searchEventListener });
-			}
-		}
-		{
-			boolean present = false;
-			PostUpdateEventListener[] listeners = eventListeners
-					.getPostUpdateEventListeners();
-			if (listeners != null) {
-				for (Object eventListener : listeners) {
-					// not isAssignableFrom since the user could subclass
-					present = present
-							|| searchEventListenerClass == eventListener.getClass()
-							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
-				}
-				if (!present) {
-					int length = listeners.length + 1;
-					PostUpdateEventListener[] newListeners = new PostUpdateEventListener[length];
-					System.arraycopy(listeners, 0, newListeners, 0, length - 1);
-					newListeners[length - 1] = searchEventListener;
-					eventListeners.setPostUpdateEventListeners(newListeners);
-				}
-			} else {
-				eventListeners
-						.setPostUpdateEventListeners(new PostUpdateEventListener[] { searchEventListener });
-			}
-		}
-		{
-			boolean present = false;
-			PostDeleteEventListener[] listeners = eventListeners
-					.getPostDeleteEventListeners();
-			if (listeners != null) {
-				for (Object eventListener : listeners) {
-					// not isAssignableFrom since the user could subclass
-					present = present
-							|| searchEventListenerClass == eventListener.getClass()
-							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
-				}
-				if (!present) {
-					int length = listeners.length + 1;
-					PostDeleteEventListener[] newListeners = new PostDeleteEventListener[length];
-					System.arraycopy(listeners, 0, newListeners, 0, length - 1);
-					newListeners[length - 1] = searchEventListener;
-					eventListeners.setPostDeleteEventListeners(newListeners);
-				}
-			} else {
-				eventListeners
-						.setPostDeleteEventListeners(new PostDeleteEventListener[] { searchEventListener });
-			}
-		}		
-		{
-			boolean present = false;
-			PostCollectionRecreateEventListener[] listeners = eventListeners.getPostCollectionRecreateEventListeners();
-			if ( listeners != null ) {
-				for (Object eventListener : listeners) {
-					//not isAssignableFrom since the user could subclass
-					present = present
-							|| searchEventListenerClass == eventListener.getClass()
-							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
-				}
-				if ( !present ) {
-					int length = listeners.length + 1;
-					PostCollectionRecreateEventListener[] newListeners = new PostCollectionRecreateEventListener[length];
-					System.arraycopy( listeners, 0, newListeners, 0, length - 1 );
-					newListeners[length - 1] = searchEventListener;
-					eventListeners.setPostCollectionRecreateEventListeners( newListeners );
-				}
-			}
-			else {
-				eventListeners.setPostCollectionRecreateEventListeners(
-						new PostCollectionRecreateEventListener[] { searchEventListener }
-				);
-			}
-		}
-		{
-			boolean present = false;
-			PostCollectionRemoveEventListener[] listeners = eventListeners.getPostCollectionRemoveEventListeners();
-			if ( listeners != null ) {
-				for (Object eventListener : listeners) {
-					//not isAssignableFrom since the user could subclass
-					present = present
-							|| searchEventListenerClass == eventListener.getClass()
-							|| searchEventListenerClass == eventListener.getClass().getSuperclass(); //for FullTextIndexCollectionEventListener
-				}
-				if ( !present ) {
-					int length = listeners.length + 1;
-					PostCollectionRemoveEventListener[] newListeners = new PostCollectionRemoveEventListener[length];
-					System.arraycopy( listeners, 0, newListeners, 0, length - 1 );
-					newListeners[length - 1] = searchEventListener;
-					eventListeners.setPostCollectionRemoveEventListeners( newListeners );
-				}
-			}
-			else {
-				eventListeners.setPostCollectionRemoveEventListeners(
-						new PostCollectionRemoveEventListener[] { searchEventListener }
-				);
-			}
-		}
-		{
-			boolean present = false;
-			PostCollectionUpdateEventListener[] listeners = eventListeners.getPostCollectionUpdateEventListeners();
-			if ( listeners != null ) {
-				for (Object eventListener : listeners) {
-					//not isAssignableFrom since the user could subclass
-					present = present || searchEventListenerClass == eventListener.getClass();
-				}
-				if ( !present ) {
-					int length = listeners.length + 1;
-					PostCollectionUpdateEventListener[] newListeners = new PostCollectionUpdateEventListener[length];
-					System.arraycopy( listeners, 0, newListeners, 0, length - 1 );
-					newListeners[length - 1] = searchEventListener;
-					eventListeners.setPostCollectionUpdateEventListeners( newListeners );
-				}
-			}
-			else {
-				eventListeners.setPostCollectionUpdateEventListeners(
-						new PostCollectionUpdateEventListener[] { searchEventListener }
-				);
-			}
-		}		
+		// PostCollectionRecreateEventListener
+		listeners.setPostCollectionRecreateEventListeners(
+			addIfNeeded(
+				listeners.getPostCollectionRecreateEventListeners(),
+				searchListener,
+				new PostCollectionRecreateEventListener[] { searchListener } )
+			);
+		// PostCollectionRemoveEventListener
+		listeners.setPostCollectionRemoveEventListeners(
+			addIfNeeded(
+				listeners.getPostCollectionRemoveEventListeners(),
+				searchListener,
+				new PostCollectionRemoveEventListener[] { searchListener } )
+			);
+		// PostCollectionUpdateEventListener
+		listeners.setPostCollectionUpdateEventListeners(
+			addIfNeeded(
+				listeners.getPostCollectionUpdateEventListeners(),
+				searchListener,
+				new PostCollectionUpdateEventListener[] { searchListener } )
+			);
+		
 	}
+
+	/**
+	 * Verifies if a Search listener is already present; if not it will return
+	 * a grown address adding the listener to it.
+	 * @param <T> the type of listeners
+	 * @param listeners
+	 * @param searchEventListener
+	 * @param toUseOnNull this is returned if listeners==null
+	 * @return
+	 */
+	private static <T> T[] addIfNeeded(T[] listeners, T searchEventListener, T[] toUseOnNull) {
+		if ( listeners == null ) {
+			return toUseOnNull;
+		}
+		else if ( ! isPresentInListeners( listeners ) ) {
+			return appendToArray( listeners, searchEventListener );
+		}
+		else {
+			return listeners;
+		}
+	}
+
+	/**
+	 * Will add one element to the end of an array.
+	 * @param <T> The array type
+	 * @param listeners The original array
+	 * @param newElement The element to be added
+	 * @return A new array containing all listeners and newElement.
+	 */
+	@SuppressWarnings("unchecked")
+	private static <T> T[] appendToArray(T[] listeners, T newElement) {
+		int length = listeners.length;
+		T[] ret = (T[])java.lang.reflect.Array.newInstance(
+				listeners.getClass().getComponentType(), length + 1 );
+		System.arraycopy( listeners, 0, ret, 0, length );
+		ret[length] = newElement;
+		return ret;
+	}
+	
+	/**
+	 * Verifies if a FullTextIndexEventListener is contained in the array.
+	 * @param listeners
+	 * @return true if it is contained in.
+	 */
+	@SuppressWarnings("deprecation")
+	private static boolean isPresentInListeners(Object[] listeners) {
+		for (Object eventListener : listeners) {
+			if ( FullTextIndexEventListener.class == eventListener.getClass() ) {
+				return true;
+			}
+			if ( FullTextIndexCollectionEventListener.class == eventListener.getClass() ) {
+				return true;
+			}
+		}
+		return false;
+	}
+		
 }

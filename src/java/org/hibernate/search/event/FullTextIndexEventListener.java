@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 //TODO work on sharing the same indexWriters and readers across a single post operation...
 //TODO implement and use a LockableDirectoryProvider that wraps a DP to handle the lock inside the LDP
+//TODO make this class final as soon as FullTextIndexCollectionEventListener is removed.
 @SuppressWarnings( "serial" )
 public class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
