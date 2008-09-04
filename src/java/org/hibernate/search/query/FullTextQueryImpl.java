@@ -409,9 +409,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * <code>def</code>.
 	 */
 	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
-		if (def.getUseCachingWrapperFilter() == CacheBitResults.YES
-				|| (def.getUseCachingWrapperFilter() == CacheBitResults.AUTOMATIC && def
-						.isCache())) {
+		if (def.getUseCachingWrapperFilter() == CacheBitResults.AUTOMATIC && def.isCache() ) {
 			int cachingWrapperFilterSize = getSearchFactoryImplementor().getFilterCacheBitResultsSize();
 			filter = new org.hibernate.search.filter.CachingWrapperFilter(filter, cachingWrapperFilterSize);
 		}

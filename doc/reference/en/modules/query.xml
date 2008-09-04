@@ -624,7 +624,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     The hard reference count can be adjusted using
     <literal>hibernate.search.filter.cache_bit_results.size</literal>
     (defaults to 5). The wrapping behaviour can be controlled by
-    <literal>@FullTextFilterDef.cacheBitResult</literal>. There are three
+    <literal>@FullTextFilterDef.cacheBitResult</literal>. There are two
     differerent values for this parameter:</para>
 
     <para><informaltable align="left" width="">
@@ -641,30 +641,22 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
           <tbody>
             <row>
-              <entry align="left">CacheBitSet.AUTOMATIC</entry>
+              <entry align="left">CacheBitResults.AUTOMATIC</entry>
 
               <entry>The use of <classname>CachingWrapperFilter</classname>
               depends on the <literal>cache</literal> paramter of the filter
               defintion. If <literal>cache</literal> is set to
               <literal>true</literal> a wrapper will be used, otherwise not.
-              <literal>CacheBitSet.AUTOMATIC</literal> is the default
+              <literal>CacheBitResults.AUTOMATIC</literal> is the default
               value.</entry>
             </row>
 
             <row>
-              <entry align="left">CacheBitSet.NO</entry>
+              <entry align="left">CacheBitResults.NO</entry>
 
               <entry>No wrapper will be used.</entry>
             </row>
 
-            <row>
-              <entry align="left">CacheBitSet.YES</entry>
-
-              <entry>The specified filter will be wrapped independent of the
-              <literal>cache</literal> flag. (Note, this options is quite
-              meaningless, because even though the BitSet will be cached there
-              is currently no way to reuse the fitler.)</entry>
-            </row>
           </tbody>
         </tgroup>
       </informaltable>Last but not least - why should filters be cached? There

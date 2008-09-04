@@ -16,10 +16,6 @@ public enum CacheBitResults {
 	 */
 	AUTOMATIC,
 	
-	/**
-	 * The filters <code>BitSet</code> will be cached.
-	 */
-	YES,
 	
 	/**
 	 * No caching of the filter's <code>BitSet</code>.
