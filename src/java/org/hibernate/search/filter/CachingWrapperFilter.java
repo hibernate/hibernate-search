@@ -33,7 +33,7 @@ public class CachingWrapperFilter extends Filter {
 	 */
 	private transient SoftLimitMRUCache cache;
 	
-	private Filter filter;
+	private final Filter filter;
 
 	/**
 	 * @param filter
@@ -58,6 +58,7 @@ public class CachingWrapperFilter extends Filter {
 			cache = new SoftLimitMRUCache(size);
 		}
 
+		//memory barrier ensure cache == null will not always stay true on concurrent threads
 		synchronized (cache) { // check cache
 			BitSet cached = (BitSet) cache.get(reader);
 			if (cached != null) {
