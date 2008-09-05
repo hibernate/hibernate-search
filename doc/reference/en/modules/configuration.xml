@@ -636,7 +636,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     performances, please refer to the Lucene documentation.</para>
 
     <table>
-      <title>List of indexing performance properties</title>
+      <title>List of indexing performance and behavior properties</title>
 
       <tgroup cols="3">
         <thead>
@@ -745,6 +745,21 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             details.</para></entry>
 
             <entry>128</entry>
+          </row>
+          
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].use_compound_file</literal></entry>
+
+            <entry><para>Leaving this value to false is generally the best
+            performing option. You may need to enable it to have the index
+            written to a single compound file to use less file handlers, but
+            increasing the number of permitted file handlers is usually a
+            preferred solution.</para>
+            <para>Especially when synchronizing indexes using JMS avoid
+            this option as it will copy the complete index each time.</para>
+            <para>Boolean parameter, use "<literal>true</literal>" or "<literal>false</literal>".</para></entry>
+
+            <entry>false</entry>
           </row>
         </tbody>
       </tgroup>

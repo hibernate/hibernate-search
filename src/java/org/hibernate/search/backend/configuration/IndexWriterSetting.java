@@ -13,6 +13,7 @@ import org.hibernate.search.SearchException;
  * @author Sanne Grinovero
  */
 public enum IndexWriterSetting implements Serializable {
+	
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setMaxBufferedDeleteTerms(int)
 	 */
@@ -60,7 +61,7 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setRAMBufferSizeMB( value );
 		}
-	},
+	} ,
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setTermIndexInterval(int)
 	 */
@@ -68,7 +69,22 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setTermIndexInterval( value );
 		}
+	} ,
+	/**
+	 * @see org.apache.lucene.index.IndexWriter#setUseCompoundFile(boolean)
+	 */
+	USE_COMPOUND_FILE( "use_compound_file" ) {
+		public void applySetting(IndexWriter writer, int value) {
+			writer.setUseCompoundFile( intToBoolean( value ) );
+		}
+		@Override
+		public Integer parseVal(String value) {
+			return USE_COMPOUND_FILE.parseBoolean( value );
+		}
 	};
+	
+	private static final Integer TRUE = Integer.valueOf( 1 );
+	private static final Integer FALSE = Integer.valueOf( 0 );
 	
 	private final String cfgKey;
 	
@@ -97,6 +113,16 @@ public enum IndexWriterSetting implements Serializable {
 	public Integer parseVal(String value) {
 		return ConfigurationParseHelper.parseInt( value,
 				"Invalid value for " + cfgKey + ": " + value );
+	}
+	
+	private Integer parseBoolean(String value) {
+		boolean v = ConfigurationParseHelper.parseBoolean( value,
+				"Invalid value for " + cfgKey + ": " + value );
+		return v ? TRUE : FALSE;
+	}
+	
+	private static boolean intToBoolean(int value) {
+		return value == TRUE.intValue();
 	}
 	
 }

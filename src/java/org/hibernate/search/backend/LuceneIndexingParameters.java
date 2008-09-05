@@ -56,7 +56,7 @@ public class LuceneIndexingParameters implements Serializable {
 		if ( log.isWarnEnabled() ) {
 			Integer maxFieldLengthTransaction = transParams.parameters.get( MAX_FIELD_LENGTH );
 			Integer maxFieldLengthBatch = transParams.parameters.get( MAX_FIELD_LENGTH );
-			if ( notEquals( maxFieldLengthTransaction, maxFieldLengthBatch ) ){
+			if ( notEquals( maxFieldLengthTransaction, maxFieldLengthBatch ) ) {
 				log.warn( "The max_field_length value configured for transaction is different than the value configured for batch." );
 			}
 		}
@@ -116,14 +116,14 @@ public class LuceneIndexingParameters implements Serializable {
 		}
 		
 		public Integer getCurrentValueFor(IndexWriterSetting ws){
-			return parameters.get(ws);
+			return parameters.get( ws );
 		}
 
 		public void setCurrentValueFor(IndexWriterSetting ws, Integer newValue){
-			if (newValue==null){
-				parameters.remove(ws);
+			if ( newValue == null ) {
+				parameters.remove( ws );
 			} else {
-				parameters.put(ws, newValue);
+				parameters.put( ws, newValue );
 			}
 		}
 
@@ -138,17 +138,17 @@ public class LuceneIndexingParameters implements Serializable {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if ( this == obj )
 				return true;
-			if (obj == null)
+			if ( obj == null )
 				return false;
-			if (getClass() != obj.getClass())
+			if ( getClass() != obj.getClass() )
 				return false;
 			final ParameterSet other = (ParameterSet) obj;
 			if (parameters == null) {
-				if (other.parameters != null)
+				if ( other.parameters != null )
 					return false;
-			} else if (!parameters.equals(other.parameters))
+			} else if ( ! parameters.equals( other.parameters ) )
 				return false;
 			return true;
 		}

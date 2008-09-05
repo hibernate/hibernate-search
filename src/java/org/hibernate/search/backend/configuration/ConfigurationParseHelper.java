@@ -67,4 +67,27 @@ public abstract class ConfigurationParseHelper {
 		return parseInt( propValue, defValue, "Unable to parse " + key + ": " + propValue );
 	}
 
+	/**
+	 * Parses a string to recognize exactly either "true" or "false".
+	 * @param value the string to be parsed
+	 * @param errorMsgOnParseFailure the message to be put in the exception if thrown
+	 * @return true if value is "true", false if value is "false"
+	 * @throws SearchException for invalid format or values.
+	 */
+	public static final boolean parseBoolean(String value, String errorMsgOnParseFailure) {
+		// avoiding Boolean.valueOf() to have more checks: makes it easy to spot wrong type in cfg.
+		if ( value == null ) {
+			throw new SearchException( errorMsgOnParseFailure );
+		}
+		else if ( "false".equalsIgnoreCase( value.trim() ) ) {
+			return false;
+		}
+		else if ( "true".equalsIgnoreCase( value.trim() ) ) {
+			return true;
+		}
+		else {
+			throw new SearchException( errorMsgOnParseFailure );
+		}
+	}
+
 }
