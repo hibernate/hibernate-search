@@ -50,6 +50,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
+		if ( getSessions() != null ) getSessions().close();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
 	}

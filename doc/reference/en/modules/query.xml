@@ -606,7 +606,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     <literal>hibernate.search.filter.cache_strategy</literal>.</para>
 
     <para>The described filter cache mechanism should not be confused with
-    caching the actual filter results. In Lucene it is common practise to wrap
+    caching the actual filter results. In Lucene it is common practice to wrap
     filters using the <classname>IndexReader</classname> around a
     <classname>CachingWrapperFilter.</classname> The wrapper will cache the
     <classname>BitSet</classname> returned from the

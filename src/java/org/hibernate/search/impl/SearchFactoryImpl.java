@@ -147,6 +147,14 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			catch (Exception e) {
 				log.error( "Worker raises an exception on close()", e );
 			}
+
+			try {
+				readerProvider.destroy();
+			}
+			catch (Exception e) {
+				log.error( "ReaderProvider raises an exception on destroy()", e );
+			}
+
 			//TODO move to DirectoryProviderFactory for cleaner
 			for (DirectoryProvider dp : getDirectoryProviders() ) {
 				try {

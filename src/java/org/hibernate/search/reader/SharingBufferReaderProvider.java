@@ -76,6 +76,16 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		currentReaders = Collections.unmodifiableMap( map );
 	}
 
+	public void destroy() {
+		IndexReader[] readers = allReaders.keySet().toArray( new IndexReader[allReaders.size()] );
+		for (IndexReader reader : readers) {
+			ReaderUsagePair usage =  allReaders.get( reader );
+			usage.close();
+		}
+
+		if ( allReaders.size() != 0 ) log.warn( "ReaderProvider contains readers not properly closed at destroy time" );
+	}
+
 	public IndexReader openReader(DirectoryProvider... directoryProviders) {
 		int length = directoryProviders.length;
 		IndexReader[] readers = new IndexReader[length];

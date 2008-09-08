@@ -30,5 +30,14 @@ public interface ReaderProvider {
 	 */
 	void closeReader(IndexReader reader);
 
+	/**
+	 * inialize the reader provider before its use
+	 */
 	void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor);
+
+	/**
+	 * called when a SearchFactory is destroyed. This method typically releases resources
+	 * This method is guaranteed to be executed after readers are released by queries (assuming no user error). 
+	 */
+	void destroy();
 }

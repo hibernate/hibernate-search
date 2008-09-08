@@ -47,4 +47,7 @@ public class NotSharedReaderProvider implements ReaderProvider {
 
 	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
 	}
+
+	public void destroy() {
+	}
 }

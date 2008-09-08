@@ -40,7 +40,7 @@ public class SharedReaderProvider implements ReaderProvider {
 	 */
 	private Map<DirectoryProvider, Lock> perDirectoryProviderManipulationLocks;
 	/**
-	 * Contain the active (ie non obsolete IndexReader for a given Directory
+	 * Contains the active (ie non obsolete IndexReader for a given Directory
 	 * There may be no entry (warm up)
 	 * <p/>
 	 * protected by semaphoreIndexReaderLock
@@ -217,66 +217,75 @@ public class SharedReaderProvider implements ReaderProvider {
 		}
 
 		for (IndexReader subReader : readers) {
-			ReaderData readerData;
-			//TODO can we avoid that lock?
+			closeInternalReader( trace, subReader, false );
+		}
+	}
+
+	private void closeInternalReader(boolean trace, IndexReader subReader, boolean finalClose) {
+		ReaderData readerData;
+		//TODO can we avoid that lock?
+		semaphoreIndexReaderLock.lock();
+		try {
+			readerData = searchIndexReaderSemaphores.get( subReader );
+		}
+		finally {
+			semaphoreIndexReaderLock.unlock();
+		}
+
+		if ( readerData == null ) {
+			log.error( "Trying to close a Lucene IndexReader not present: {}", subReader.directory() );
+			//TODO should we try to close?
+			return;
+		}
+
+		//acquire the locks in the same order as everywhere else
+		Lock directoryProviderLock = perDirectoryProviderManipulationLocks.get( readerData.provider );
+		boolean closeReader = false;
+		directoryProviderLock.lock();
+		try {
+			boolean isActive;
+			isActive = activeSearchIndexReaders.get( readerData.provider ) == subReader;
+			if ( trace ) log.trace( "Indexreader not active: {}", subReader );
 			semaphoreIndexReaderLock.lock();
 			try {
 				readerData = searchIndexReaderSemaphores.get( subReader );
+				if ( readerData == null ) {
+					log.error( "Trying to close a Lucene IndexReader not present: {}" + subReader.directory() );
+					//TODO should we try to close?
+					return;
+				}
+
+				//final close, the semaphore should be at 0 already
+				if (!finalClose) {
+					readerData.semaphore--;
+					if ( trace ) log.trace( "Semaphore decreased to: {} for {}", readerData.semaphore, subReader );
+				}
+
+				if ( readerData.semaphore < 0 )
+					log.error( "Semaphore negative: {}", subReader.directory() );
+				if ( ( !isActive ) && readerData.semaphore == 0 ) {
+					searchIndexReaderSemaphores.remove( subReader );
+					closeReader = true;
+				}
+				else {
+					closeReader = false;
+				}
 			}
 			finally {
 				semaphoreIndexReaderLock.unlock();
 			}
+		}
+		finally {
+			directoryProviderLock.unlock();
+		}
 
-			if ( readerData == null ) {
-				log.error( "Trying to close a Lucene IndexReader not present: {}", subReader.directory() );
-				//TODO should we try to close?
-				continue;
-			}
-
-			//acquire the locks in the same order as everywhere else
-			Lock directoryProviderLock = perDirectoryProviderManipulationLocks.get( readerData.provider );
-			boolean closeReader = false;
-			directoryProviderLock.lock();
+		if ( closeReader ) {
+			if ( trace ) log.trace( "Closing IndexReader: {}", subReader );
 			try {
-				boolean isActive;
-				isActive = activeSearchIndexReaders.get( readerData.provider ) == subReader;
-				if ( trace ) log.trace( "Indexreader not active: {}", subReader );
-				semaphoreIndexReaderLock.lock();
-				try {
-					readerData = searchIndexReaderSemaphores.get( subReader );
-					if ( readerData == null ) {
-						log.error( "Trying to close a Lucene IndexReader not present: {}" + subReader.directory() );
-						//TODO should we try to close?
-						continue;
-					}
-					readerData.semaphore--;
-					if ( trace ) log.trace( "Semaphore decreased to: {} for {}", readerData.semaphore, subReader );
-					if ( readerData.semaphore < 0 )
-						log.error( "Semaphore negative: {}", subReader.directory() );
-					if ( ( !isActive ) && readerData.semaphore == 0 ) {
-						searchIndexReaderSemaphores.remove( subReader );
-						closeReader = true;
-					}
-					else {
-						closeReader = false;
-					}
-				}
-				finally {
-					semaphoreIndexReaderLock.unlock();
-				}
+				subReader.close();
 			}
-			finally {
-				directoryProviderLock.unlock();
-			}
-
-			if ( closeReader ) {
-				if ( trace ) log.trace( "Closing IndexReader: {}", subReader );
-				try {
-					subReader.close();
-				}
-				catch (IOException e) {
-					log.warn( "Unable to close Lucene IndexReader", e );
-				}
+			catch ( IOException e) {
+				log.warn( "Unable to close Lucene IndexReader", e );
 			}
 		}
 	}
@@ -288,6 +297,29 @@ public class SharedReaderProvider implements ReaderProvider {
 			perDirectoryProviderManipulationLocks.put( dp, new ReentrantLock() );
 		}
 		perDirectoryProviderManipulationLocks = Collections.unmodifiableMap( perDirectoryProviderManipulationLocks );
+	}
+
+	public void destroy() {
+		boolean trace = log.isTraceEnabled();
+		IndexReader[] readers;
+		semaphoreIndexReaderLock.lock();
+		try {
+			//release active readers
+			activeSearchIndexReaders.clear();
+			readers = searchIndexReaderSemaphores.keySet().toArray( new IndexReader[searchIndexReaderSemaphores.size()] );
+		}
+		finally {
+			semaphoreIndexReaderLock.unlock();
+		}
+
+		for (IndexReader reader : readers) {
+			closeInternalReader( trace, reader, true );
+		}
+
+		if ( searchIndexReaderSemaphores.size() != 0 ) {
+			log.warn( "ReaderProvider contains readers not properly closed at destroy time" );
+		}
+
 	}
 
 	private static class ReaderData {

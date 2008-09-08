@@ -4,6 +4,10 @@ package org.hibernate.search.backend;
 import java.io.Serializable;
 
 /**
+ * A unit of work triggering an optimize operation
+ * This work does not propagate to a cluster: it should be filtered before being sent to
+ * the network
+ *
  * @author Andrew Hahn
  * @author Emmanuel Bernard
  */
