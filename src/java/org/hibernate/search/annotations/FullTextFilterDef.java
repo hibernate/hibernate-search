@@ -32,16 +32,10 @@ public @interface FullTextFilterDef {
 	 *
 	 */
 	@SuppressWarnings("unchecked")
-	Class impl();
+	Class<?> impl();
 
 	/**
-	 * Enable caching for this filter (default true).
+	 * Cache mode for the filter. Default to instance and results caching
 	 */
-	boolean cache() default true;
-	
-	/**
-	 * Determines whether the <code>BitSet</code> returned from the filter should be 
-	 * cached or not. Default is <code>CacheBitResults.AUTOMATIC</code>.
-	 */	
-	CacheBitResults cacheBitResult() default CacheBitResults.AUTOMATIC;
+	FilterCacheModeType cache() default FilterCacheModeType.INSTANCE_AND_RESULTS;
 }

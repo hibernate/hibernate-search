@@ -65,7 +65,7 @@ public class FilterTest extends SearchTestCase {
 		assertEquals("No filter should happen", 3, ftQuery.getResultSize() );
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "cachetest");
+		ftQuery.enableFullTextFilter( "cacheresultstest");
 		assertEquals("Should filter out all", 0, ftQuery.getResultSize() );
 		
 		// HSEARCH-174 - we call System.gc() to force a garbage collection.
@@ -74,15 +74,33 @@ public class FilterTest extends SearchTestCase {
 		System.gc();
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "cachetest");
+		ftQuery.enableFullTextFilter( "cacheresultstest");
 		try {
 			ftQuery.getResultSize();
 		}
 		catch (IllegalStateException e) {
-			fail("Cache does not work");
+			fail("Cache results does not work");
 		}
 
+		ftQuery = s.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancetest");
+		assertEquals("Should filter out all", 0, ftQuery.getResultSize() );
+
+		ftQuery = s.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancetest");
+		try {
+			ftQuery.getResultSize();
+			fail("Cache instance does not work");
+		}
+		catch (IllegalStateException e) {
+			//success
+		}
+
+
 		s.getTransaction().commit();
+
+
+
 		s.close();
 		deleteData();
 	}

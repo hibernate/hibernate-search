@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.CacheBitResults;
+import org.hibernate.search.annotations.FilterCacheModeType;
+import org.hibernate.search.annotations.FullTextFilterDef;
 
 /**
  * A wrapper class which encapsualtes all required information to create a defined filter.
@@ -17,28 +19,29 @@ import org.hibernate.search.annotations.CacheBitResults;
 //TODO serialization
 @SuppressWarnings("unchecked")
 public class FilterDef {
-	private Class impl;
 	private Method factoryMethod;
 	private Method keyMethod;
 	private Map<String, Method> setters = new HashMap<String, Method>();
-	private boolean cache;
-	private CacheBitResults useCachingWrapperFilter;
+	private final FilterCacheModeType cacheMode;
+	private final Class<?> impl;
+	private final String name;
 
-	public CacheBitResults getUseCachingWrapperFilter() {
-		return useCachingWrapperFilter;
+	public FilterDef(FullTextFilterDef def) {
+		this.name = def.name();
+		this.impl = def.impl();
+		this.cacheMode = def.cache();
 	}
 
-	public void setUseCachingWrapperFilter(
-			CacheBitResults useCachingWrapperFilter) {
-		this.useCachingWrapperFilter = useCachingWrapperFilter;
+	public String getName() {
+		return name;
 	}
 
-	public Class getImpl() {
+	public FilterCacheModeType getCacheMode() {
+		return cacheMode;
+	}
+
+	public Class<?> getImpl() {
 		return impl;
-	}
-
-	public void setImpl(Class impl) {
-		this.impl = impl;
 	}
 
 	public Method getFactoryMethod() {
@@ -74,13 +77,5 @@ public class FilterDef {
 		catch (InvocationTargetException e) {
 			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: " + this.impl, e );
 		}
-	}
-
-	public void setCache(boolean cache) {
-		this.cache = cache;
-	}
-
-	public boolean isCache() {
-		return cache;
 	}
 }

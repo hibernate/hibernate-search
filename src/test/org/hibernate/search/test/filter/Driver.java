@@ -13,6 +13,7 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
+import org.hibernate.search.annotations.FilterCacheModeType;
 
 /**
  * @author Emmanuel Bernard
@@ -20,9 +21,10 @@ import org.hibernate.search.annotations.FullTextFilterDefs;
 @Entity
 @Indexed
 @FullTextFilterDefs( {
-		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class), //actual Filter implementation
-		@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class), //Filter factory with parameters
-		@FullTextFilterDef(name = "cachetest", impl = ExcludeAllFilterFactory.class, cache = true) //Filter factory with parameters
+		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache = FilterCacheModeType.NO), //actual Filter implementation
+		@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_RESULTS), //Filter factory with parameters
+		@FullTextFilterDef(name = "cacheresultstest", impl = ExcludeAllFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_RESULTS),
+		@FullTextFilterDef(name = "cacheinstancetest", impl = InstanceBasedExcludeAllFilter.class, cache = FilterCacheModeType.INSTANCE_ONLY)
 })
 public class Driver {
 	@Id

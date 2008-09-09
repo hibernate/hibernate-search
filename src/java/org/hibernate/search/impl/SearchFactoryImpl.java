@@ -18,6 +18,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -49,9 +52,6 @@ import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.ScopedAnalyzer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -200,10 +200,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			throw new SearchException("Multiple definition of @FullTextFilterDef.name=" + defAnn.name() + ": "
 					+ mappedXClass.getName() );
 		}
-		FilterDef filterDef = new FilterDef();
-		filterDef.setImpl( defAnn.impl() );
-		filterDef.setCache( defAnn.cache() );
-		filterDef.setUseCachingWrapperFilter( defAnn.cacheBitResult() );
+
+		FilterDef filterDef = new FilterDef(defAnn);
 		try {
 			filterDef.getImpl().newInstance();
 		}

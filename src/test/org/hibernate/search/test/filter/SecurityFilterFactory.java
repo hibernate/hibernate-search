@@ -1,17 +1,16 @@
 //$Id$
 package org.hibernate.search.test.filter;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.TermQuery;
+
+import org.hibernate.search.annotations.Factory;
+import org.hibernate.search.annotations.Key;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
-import org.hibernate.search.annotations.Key;
-import org.hibernate.search.annotations.Factory;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.QueryFilter;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.QueryWrapperFilter;
-import org.apache.lucene.search.CachingWrapperFilter;
-import org.apache.lucene.index.Term;
 
 /**
  * Apply a security filter to the results
@@ -38,6 +37,6 @@ public class SecurityFilterFactory {
 	@Factory
 	public Filter getFilter() {
 		Query query = new TermQuery( new Term("teacher", login) );
-		return new CachingWrapperFilter( new QueryWrapperFilter(query) );
+		return new QueryWrapperFilter(query);
 	}
 }

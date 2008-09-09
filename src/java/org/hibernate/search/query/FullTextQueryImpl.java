@@ -41,7 +41,6 @@ import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.annotations.CacheBitResults;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
@@ -53,12 +52,15 @@ import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
+import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.transform.ResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.hibernate.search.util.FilterCacheModeTypeHelper.*;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}
@@ -352,7 +354,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		FilterKey key = createFilterKey(def, instance);
 
 		// try to get the filter out of the cache
-		Filter filter = def.isCache() ?
+		Filter filter = cacheInstance( def.getCacheMode() ) ?
 				searchFactoryImplementor.getFilterCachingStrategy().getCachedFilter( key ) :
 				null;
 					
@@ -360,7 +362,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			filter = createFilter(def, instance);	
 			
 			// add filter to cache if we have to
-			if ( def.isCache() ) {
+			if ( cacheInstance( def.getCacheMode() ) ) {
 				searchFactoryImplementor.getFilterCachingStrategy().addCachedFilter( key, filter );
 			}
 		}
@@ -391,8 +393,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				filter = (Filter) instance;
 			}
 			catch (ClassCastException e) {
-				throw new SearchException( "@Key method does not return a org.apache.lucene.search.Filter class: "
-						+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+				throw new SearchException( "Filter implementation does not implement the Filter interface: "
+						+ def.getImpl().getName() + ". "
+						+ (def.getFactoryMethod() != null ? def.getFactoryMethod().getName() : ""), e );
 			}
 		}
 		
@@ -409,7 +412,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * <code>def</code>.
 	 */
 	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
-		if (def.getUseCachingWrapperFilter() == CacheBitResults.AUTOMATIC && def.isCache() ) {
+		if ( cacheResults( def.getCacheMode() ) ) {
 			int cachingWrapperFilterSize = getSearchFactoryImplementor().getFilterCacheBitResultsSize();
 			filter = new org.hibernate.search.filter.CachingWrapperFilter(filter, cachingWrapperFilterSize);
 		}
@@ -419,7 +422,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	private FilterKey createFilterKey(FilterDef def, Object instance) {
 		FilterKey key = null;
-		if ( !def.isCache() ) {
+		if ( !cacheInstance( def.getCacheMode() ) ) {
 			return key; // if the filter is not cached there is no key!
 		}
 				
@@ -454,7 +457,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			}
 		}
 		key.setImpl( def.getImpl() );
-		return key;
+
+		//Make sure Filters are isolated by filter def name
+		StandardFilterKey wrapperKey = new StandardFilterKey();
+		wrapperKey.addParameter( def.getName() );
+		wrapperKey.addParameter( key );
+		return wrapperKey;
 	}
 
 	private Object createFilterInstance(FullTextFilterImpl fullTextFilter,
@@ -472,7 +480,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		for (Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet()) {
 			def.invoke( entry.getKey(), instance, entry.getValue() );
 		}
-		if ( def.isCache() && def.getKeyMethod() == null && fullTextFilter.getParameters().size() > 0 ) {
+		if ( cacheInstance( def.getCacheMode() ) && def.getKeyMethod() == null && fullTextFilter.getParameters().size() > 0 ) {
 			throw new SearchException( "Filter with parameters and no @Key method: " + fullTextFilter.getName() );
 		}
 		return instance;
