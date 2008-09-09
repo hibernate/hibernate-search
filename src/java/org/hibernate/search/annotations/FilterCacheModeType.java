@@ -25,6 +25,6 @@ public enum FilterCacheModeType {
 	 * concurrent filter.bits() calls
 	 * BitSet Results are cached per IndexReader 
 	 */
-	INSTANCE_AND_RESULTS
+	INSTANCE_AND_BITSETRESULTS
 
 }
