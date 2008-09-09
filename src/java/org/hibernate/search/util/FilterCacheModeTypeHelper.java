@@ -11,7 +11,7 @@ public class FilterCacheModeTypeHelper {
 
 	public static boolean cacheInstance(FilterCacheModeType type) {
 		switch ( type ) {
-			case NO:
+			case NONE:
 				return false;
 			case INSTANCE_AND_BITSETRESULTS:
 				return true;
@@ -24,7 +24,7 @@ public class FilterCacheModeTypeHelper {
 
 	public static boolean cacheResults(FilterCacheModeType type) {
 		switch ( type ) {
-			case NO:
+			case NONE:
 				return false;
 			case INSTANCE_AND_BITSETRESULTS:     
 				return true;

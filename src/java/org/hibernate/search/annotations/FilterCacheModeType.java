@@ -7,10 +7,10 @@ package org.hibernate.search.annotations;
  */
 public enum FilterCacheModeType {
 	/**
-	 * NO filter instance and no result is cached by Hibernate Search
+	 * No filter instance and no result is cached by Hibernate Search
 	 * For every filter call, a new filter instance is created
 	 */
-	NO,
+	NONE,
 
 	/**
 	 * The filter instance is cached by Hibernate Search and reused across

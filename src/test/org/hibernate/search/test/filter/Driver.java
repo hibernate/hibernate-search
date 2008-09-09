@@ -21,7 +21,7 @@ import org.hibernate.search.annotations.FilterCacheModeType;
 @Entity
 @Indexed
 @FullTextFilterDefs( {
-		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache = FilterCacheModeType.NO), //actual Filter implementation
+		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache = FilterCacheModeType.NONE), //actual Filter implementation
 		@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_BITSETRESULTS), //Filter factory with parameters
 		@FullTextFilterDef(name = "cacheresultstest", impl = ExcludeAllFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_BITSETRESULTS),
 		@FullTextFilterDef(name = "cacheinstancetest", impl = InstanceBasedExcludeAllFilter.class, cache = FilterCacheModeType.INSTANCE_ONLY)
