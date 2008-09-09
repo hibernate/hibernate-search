@@ -13,7 +13,7 @@ public class FilterCacheModeTypeHelper {
 		switch ( type ) {
 			case NO:
 				return false;
-			case INSTANCE_AND_RESULTS:
+			case INSTANCE_AND_BITSETRESULTS:
 				return true;
 			case INSTANCE_ONLY:
 				return true;
@@ -26,7 +26,7 @@ public class FilterCacheModeTypeHelper {
 		switch ( type ) {
 			case NO:
 				return false;
-			case INSTANCE_AND_RESULTS:
+			case INSTANCE_AND_BITSETRESULTS:     
 				return true;
 			case INSTANCE_ONLY:
 				return false;

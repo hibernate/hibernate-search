@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.annotations.CacheBitResults;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
 
