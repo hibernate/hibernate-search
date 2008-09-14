@@ -12,6 +12,7 @@ import org.apache.lucene.document.Document;
  * @author Emmanuel Bernard
  */
 public class IdHashShardingStrategy implements IndexShardingStrategy {
+	
 	private DirectoryProvider<?>[] providers;
 	public void initialize(Properties properties, DirectoryProvider<?>[] providers) {
 		this.providers = providers;
@@ -27,17 +28,17 @@ public class IdHashShardingStrategy implements IndexShardingStrategy {
 
 	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		if ( idInString == null ) return providers;
-		return new DirectoryProvider[] { providers[ hashKey(idInString) ] };
+		return new DirectoryProvider[] { providers[hashKey( idInString )] };
 	}
 
 	private int hashKey(String key) {
-		//reproduce the hashCode implementaiton of String as documented in the javadoc
+		// reproduce the hashCode implementation of String as documented in the javadoc
 		// to be safe cross Java version (in case it changes some day)
 		int hash = 0;
 		int length = key.length();
-		for (int index = 0 ; index < length ; index++) {
-			hash = 31*hash + key.charAt( index );
+		for ( int index = 0; index < length; index++ ) {
+			hash = 31 * hash + key.charAt( index );
 		}
-		return hash % providers.length;
+		return Math.abs( hash % providers.length );
 	}
 }
