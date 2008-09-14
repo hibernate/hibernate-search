@@ -20,8 +20,8 @@ public interface FullTextSession extends Session {
 
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
-	 * Indexation is batched per transaction
-	 * Non indexable entities are ignored
+	 * Indexation is batched per transaction: if a transaction is active, the operation
+	 * will not affect the index at least until commit.
 	 *
 	 * @param entity The entity to index - must not be <code>null</code>.
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity

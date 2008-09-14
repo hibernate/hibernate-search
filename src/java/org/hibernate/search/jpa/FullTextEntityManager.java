@@ -21,8 +21,9 @@ public interface FullTextEntityManager extends EntityManager {
 
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
-	 * Indexation is batched per transaction
-	 *
+	 * Indexation is batched per transaction: if a transaction is active, the operation
+	 * will not affect the index at least until commit.
+	 * 
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
 	void index(Object entity);
