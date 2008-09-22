@@ -7,10 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.bridge.StringBridge;
-import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
-
 /**
  * Objects whose identifier is provided externally and not part of the object state
  * should be marked with this annotation
@@ -27,4 +23,5 @@ public @interface ProvidedId {
    String name() default "providedId";
 
    FieldBridge bridge() default @FieldBridge(impl = org.hibernate.search.bridge.builtin.StringBridge.class);
+   
 }

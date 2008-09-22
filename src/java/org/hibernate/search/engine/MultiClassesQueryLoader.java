@@ -33,7 +33,7 @@ public class MultiClassesQueryLoader implements Loader {
 	public void setEntityTypes(Class[] entityTypes) {
 		List<Class> safeEntityTypes;
 		//TODO should we go find the root entity for a given class rather than just checking for it's root status?
-		//     root entity could lead to quite inefficient queries in Hibnernate when using table per class
+		//     root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.length == 0 ) {
 			//support all classes
 			safeEntityTypes = new ArrayList<Class>();

@@ -11,7 +11,7 @@ import org.apache.lucene.analysis.TokenStream;
 /**
  * A <code>ScopedAnalyzer</code> is a wrapper class containing all analyzers for a given class.
  * <code>ScopedAnalyzer</code> behaves similar to <code>PerFieldAnalyzerWrapper</code> by delegating requests for
- * <code>TokenStream</code>s to the underlying <code>Analyzer</code> depending on the requested the field name.
+ * <code>TokenStream</code>s to the underlying <code>Analyzer</code> depending on the requested field name.
  * 
  * @author Emmanuel Bernard
  */
