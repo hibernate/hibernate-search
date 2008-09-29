@@ -17,6 +17,7 @@ import org.apache.lucene.document.Document;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public abstract class LuceneWork implements Serializable {
 
@@ -27,7 +28,7 @@ public abstract class LuceneWork implements Serializable {
 	/**
 	 * Flag indicating if this lucene work has to be indexed in batch mode.
 	 */
-	private boolean batch = false;
+	private final boolean batch;
 	private final String idInString;
 
 	public LuceneWork(Serializable id, String idInString, Class entity) {
@@ -35,19 +36,19 @@ public abstract class LuceneWork implements Serializable {
 	}
 
 	public LuceneWork(Serializable id, String idInString, Class entity, Document document) {
+		this( id, idInString, entity, document, false );
+	}
+
+	public LuceneWork(Serializable id, String idInString, Class entity, Document document, boolean batch) {
 		this.id = id;
 		this.idInString = idInString;
 		this.entityClass = entity;
 		this.document = document;
+		this.batch = batch;
 	}
 
 	public boolean isBatch() {
 		return batch;
-	}
-
-	//TODO move to final field, or enable synchronization?
-	public void setBatch(boolean batch) {
-		this.batch = batch;
 	}
 
 	public Document getDocument() {
@@ -65,4 +66,7 @@ public abstract class LuceneWork implements Serializable {
 	public String getIdInString() {
 		return idInString;
 	}
+	
+	public abstract <T> T getWorkDelegate(WorkVisitor<T> visitor);
+
 }

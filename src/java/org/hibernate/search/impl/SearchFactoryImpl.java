@@ -14,7 +14,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -392,12 +391,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	private static class DirectoryProviderData {
-		public final Lock dirLock = new ReentrantLock();
+		public final ReentrantLock dirLock = new ReentrantLock();
 		public OptimizerStrategy optimizerStrategy;
 		public Set<Class> classes = new HashSet<Class>(2);
 	}
 
-	public Lock getDirectoryProviderLock(DirectoryProvider dp) {
+	public ReentrantLock getDirectoryProviderLock(DirectoryProvider dp) {
 		if (barrier != 0) {} //read barrier
 		return this.dirProviderData.get( dp ).dirLock;
 	}

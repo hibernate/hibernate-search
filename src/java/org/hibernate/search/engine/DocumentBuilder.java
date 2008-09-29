@@ -544,12 +544,9 @@ public class DocumentBuilder<T> {
 		else if ( workType == WorkType.INDEX ) {
 			Document doc = getDocument( entity, id );
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-			LuceneWork work = new AddLuceneWork( id, idInString, entityClass, doc );
-			work.setBatch( true );
-			queue.add( work );
+			queue.add( new AddLuceneWork( id, idInString, entityClass, doc, true ) );
 			searchForContainers = true;
 		}
-
 		else {
 			throw new AssertionFailure( "Unknown WorkType: " + workType );
 		}
