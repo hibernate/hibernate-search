@@ -49,6 +49,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.engine.LuceneOptionsImpl;
 import org.hibernate.search.impl.InitContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -503,18 +504,39 @@ public class DocumentBuilder<T> {
 	//TODO could we use T instead of EntityClass?
 	public void addWorkToQueue(Class entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
 		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition
+		List<LuceneWork> toDelete = new ArrayList<LuceneWork>();
+		boolean duplicateDelete = false;
 		for (LuceneWork luceneWork : queue) {
-			//any work on the same entity should be ignored
+   			//avoid unecessary duplicated work
 			if ( luceneWork.getEntityClass() == entityClass
 					) {
 				Serializable currentId = luceneWork.getId();
+				//currentId != null => either ADD or Delete work
 				if ( currentId != null && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
-					return;
+					if (workType == WorkType.DELETE) { //TODO add PURGE?
+						//DELETE should have precedence over any update before (HSEARCH-257)
+						//if an Add work is here, remove it
+						//if an other delete is here remember but still search for Add
+						if (luceneWork instanceof AddLuceneWork) {
+							toDelete.add( luceneWork );
+						}
+						else if (luceneWork instanceof DeleteLuceneWork) {
+							duplicateDelete = true;
+						}
+					}
+					else {
+						//we can safely say we are out, the other work is an ADD
+						return;
+					}
 				}
 				//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
 			}
-
 		}
+		for ( LuceneWork luceneWork : toDelete ) {
+			toDelete.remove( luceneWork );
+		}
+		if (duplicateDelete) return;
+
 		boolean searchForContainers = false;
 		String idInString = idBridge.objectToString( id );
 		if ( workType == WorkType.ADD ) {
@@ -620,7 +642,7 @@ public class DocumentBuilder<T> {
 			Field classField =
 					new Field( CLASS_FIELDNAME, instanceClass.getName(), Field.Store.YES, Field.Index.UN_TOKENIZED, Field.TermVector.NO );
 			doc.add( classField );
-			LuceneOptions luceneOptions = new LuceneOptions( Field.Store.YES,
+			LuceneOptions luceneOptions = new LuceneOptionsImpl( Field.Store.YES,
 					Field.Index.UN_TOKENIZED, Field.TermVector.NO, idBoost );
 			idBridge.set( idKeywordName, id, doc, luceneOptions );
 		}
@@ -866,13 +888,13 @@ public class DocumentBuilder<T> {
 		}
 
 		private LuceneOptions getClassLuceneOptions(int i) {
-			LuceneOptions options = new LuceneOptions( classStores.get( i ),
+			LuceneOptions options = new LuceneOptionsImpl( classStores.get( i ),
 					classIndexes.get( i ), classTermVectors.get( i ), classBoosts.get( i ) );
 			return options;
 		}
 
 		private LuceneOptions getFieldLuceneOptions(int i, Float boost) {
-			LuceneOptions options = new LuceneOptions( fieldStore.get( i ),
+			LuceneOptions options = new LuceneOptionsImpl( fieldStore.get( i ),
 					fieldIndex.get( i ), fieldTermVectors.get( i ), boost );
 			return options;
 		}
