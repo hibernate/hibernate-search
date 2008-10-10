@@ -17,7 +17,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed
+@Indexed(index="idx1")
 @Analyzer(impl = Test1Analyzer.class)
 public class MyEntity {
 	@Id
