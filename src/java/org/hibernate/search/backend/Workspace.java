@@ -2,9 +2,8 @@
 package org.hibernate.search.backend;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
@@ -13,6 +12,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
@@ -21,20 +21,13 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 /**
- * Lucene workspace.
- * <p/>
- * <b>This is not intended to be used in a multithreaded environment</b>.
- * <p/>
+ * Lucene workspace for a DirectoryProvider.<p/>
  * <ul>
- * <li>One cannot execute modification through an IndexReader when an IndexWriter has been acquired
- * on the same underlying directory
- * </li>
- * <li>One cannot get an IndexWriter when an IndexReader have been acquired and modified on the same
- * underlying directory
- * </li>
- * <li>The recommended approach is to execute all the modifications on the IndexReaders, {@link #clean()}, and acquire the
- * index writers
- * </li>
+ * <li>Before using getIndexWriter or getIndexReader the lock must be acquired, and resources must be closed
+ * before releasing the lock.</li>
+ * <li>One cannot get an IndexWriter when an IndexReader has been acquired and not closed, and vice-versa.</li>
+ * <li>The recommended approach is to execute all the modifications on the IndexReader, and after that on
+ * the IndexWriter</li>
  * </ul>
  *
  * @author Emmanuel Bernard
@@ -42,34 +35,45 @@ import org.slf4j.Logger;
  * @author Sanne Grinovero
  */
 //TODO introduce the notion of read only IndexReader? We cannot enforce it because Lucene uses abstract classes, not interfaces.
+//TODO renaming to "DirectoryWorkspace" would be nice.
 public class Workspace {
-	
-	private final Logger log = LoggerFactory.getLogger( Workspace.class );
-	private final SearchFactoryImplementor searchFactoryImplementor;
-	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer();
-	private final Map<DirectoryProvider, DPWorkspace> directorySpace = new HashMap<DirectoryProvider, DPWorkspace>() {
 
-		@Override
-		public DPWorkspace get(Object key) {
-			DirectoryProvider dp = (DirectoryProvider) key;
-			DPWorkspace directoryWorkSpace = super.get( dp );
-			if ( directoryWorkSpace==null ) {
-				directoryWorkSpace = new DPWorkspace( dp );
-				put( dp, directoryWorkSpace );
-			}
-			return directoryWorkSpace;
-		}
-		
-	};
+	private final Logger log = LoggerFactory.getLogger( Workspace.class );
+	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer();
+	
+	// invariant state:
+
+	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final DirectoryProvider directoryProvider;
+	private final OptimizerStrategy optimizerStrategy;
+	private final ReentrantLock lock;
+	private final boolean singleEntityInDirectory;
+	private final LuceneIndexingParameters indexingParams;
+
+	// variable state:
 	
 	/**
-	 * Flag indicating if the current work should be executed using
-	 * the Lucene parameters for batch indexing.
+	 * Current open IndexReader, or null when closed. Guarded by synchronization.
 	 */
-	private boolean isBatch = false;
-
-	public Workspace(SearchFactoryImplementor searchFactoryImplementor) {
+	private IndexReader reader;
+	
+	/**
+	 * Current open IndexWriter, or null when closed. Guarded by synchronization.
+	 */
+	private IndexWriter writer;
+	
+	/**
+	 * Keeps a count of modification operations done on the index.
+	 */
+	private final AtomicLong operations = new AtomicLong( 0L );
+	
+	public Workspace(SearchFactoryImplementor searchFactoryImplementor, DirectoryProvider provider) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.directoryProvider = provider;
+		this.optimizerStrategy = searchFactoryImplementor.getOptimizerStrategy( directoryProvider );
+		this.singleEntityInDirectory = searchFactoryImplementor.getClassesInDirectoryProvider( provider ).size() == 1;
+		this.indexingParams = searchFactoryImplementor.getIndexingParameters( directoryProvider );
+		this.lock = searchFactoryImplementor.getDirectoryProviderLock( provider );
 	}
 
 	public DocumentBuilder getDocumentBuilder(Class entity) {
@@ -77,285 +81,183 @@ public class Workspace {
 	}
 
 	/**
-	 * Retrieve a read write IndexReader; the purpose should be to
-	 * modify the index. (mod count will be incremented)
-	 * For a given DirectoryProvider, An IndexReader must be used before an IndexWriter
+	 * If optimization has not been forced give a change to configured OptimizerStrategy
+	 * to optimize the index.
+	 * @throws AssertionFailure if the lock is not owned or if an IndexReader is open.
 	 */
-	public IndexReader getIndexReader(DirectoryProvider provider, Class entity) {
-		DPWorkspace space = directorySpace.get( provider );
-		return space.getIndexReader( entity );
+	public void optimizerPhase() {
+		assertOwnLock();
+		// used getAndSet(0) because Workspace is going to be reused by next transaction.
+		optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
+		optimizerStrategy.optimize( this );
 	}
-
-	//for index optimization
-	public IndexWriter getIndexWriter(DirectoryProvider provider) {
-		return getIndexWriter( provider, null, false );
-	}
-
+	
 	/**
-	 * retrieve a read write IndexWriter
-	 * For a given DirectoryProvider, An IndexReader must be used before an IndexWriter
+	 * Used by OptimizeLuceneWork after index optimization to flag that
+	 * optimization has been forced.
+	 * @see OptimizeLuceneWork
+	 * @see SearchFactory#optimize()
+	 * @see SearchFactory#optimize(Class)
 	 */
-	public IndexWriter getIndexWriter(DirectoryProvider provider, Class entity, boolean modificationOperation) {
-		DPWorkspace space = directorySpace.get( provider );
-		return space.getIndexWriter( entity, modificationOperation );
-	}
-
-	private void cleanUp(SearchException originalException) {
-		//release all readers and writers, then release locks
-		SearchException raisedException = originalException;
-		for ( DPWorkspace space : directorySpace.values() ) {
-			try {
-				space.closeIndexReader();
-			}
-			catch (IOException e) {
-				if ( raisedException != null ) {
-					log.error( "Subsequent Exception while closing IndexReader", e );
-				}
-				else {
-					raisedException = new SearchException( "Exception while closing IndexReader", e );
-				}
-			}
-		}
-		//first release all locks for DirectoryProviders not needing optimization
-		for ( DPWorkspace space : directorySpace.values() ) {
-			if ( ! space.needsOptimization() ) {
-				raisedException = closeWriterAndUnlock( space, raisedException );
-			}
-		}
-		//then for remaining DirectoryProvider
-		for ( DPWorkspace space : directorySpace.values() ) {
-			if ( space.needsOptimization() ) {
-				if ( raisedException == null ) {//avoid optimizations in case of errors or exceptions
-					OptimizerStrategy optimizerStrategy = space.getOptimizerStrategy();
-					optimizerStrategy.addTransaction( space.countOperations() );
-					try {
-						optimizerStrategy.optimize( this );
-					}
-					catch (SearchException e) {
-						//this will also cause skipping other optimizations:
-						raisedException = new SearchException( "Exception while optimizing directoryProvider: "
-								+ space.getDirectory().toString(), e );
-					}
-				}
-				raisedException = closeWriterAndUnlock( space, raisedException );
-			}
-		}
-		if ( raisedException != null ) throw raisedException;
-	}
-
-	private SearchException closeWriterAndUnlock( DPWorkspace space, SearchException raisedException ) {
-		try {
-			space.closeIndexWriter();
-		}
-		catch (IOException e) {
-			if ( raisedException != null ) {
-				log.error( "Subsequent Exception while closing IndexWriter", e );
-			}
-			else {
-				raisedException = new SearchException( "Exception while closing IndexWriter", e );
-			}
-		}
-		space.unLock();
-		return raisedException;
-	}
-
-	/**
-	 * release resources consumed in the workspace if any
-	 */
-	public void clean() {
-		cleanUp( null );
-	}
-
-	public void optimize(DirectoryProvider provider) {
-		DPWorkspace space = directorySpace.get( provider );
-		OptimizerStrategy optimizerStrategy = space.getOptimizerStrategy();
-		space.setOptimizationForced();
+	public void optimize() {
+		assertOwnLock(); // the DP is not affected, but needs to ensure the optimizerStrategy is accesses in threadsafe way
 		optimizerStrategy.optimizationForced();
 	}
 
-	public boolean isBatch() {
-		return isBatch;
-	}
-
-	public void setBatch(boolean isBatch) {
-		this.isBatch = isBatch;
-	}
-	
-	//TODO this should have it's own source file but currently needs the container-Workspace cleanup()
-	//for exceptions. Best to wait for move to parallel batchWorkers (one per Directory)?
 	/**
-	 * A per-DirectoryProvider Workspace
+	 * Gets an IndexReader to alter the index, opening one if needed.
+	 * The caller needs to own the lock relevant to this DirectoryProvider.
+	 * @throws AssertionFailure if an IndexWriter is open or if the lock is not owned.
+	 * @return a new IndexReader or one already open.
+	 * @see #lock()
 	 */
-	private class DPWorkspace {
-		
-		private final DirectoryProvider directoryProvider;
-		private final Lock lock;
-		
-		private IndexReader reader;
-		private IndexWriter writer;
-		private boolean locked = false;
-		private boolean optimizationForced = false;
-		private long operations = 0L;
-		
-		DPWorkspace(DirectoryProvider dp) {
-			this.directoryProvider = dp;
-			this.lock = searchFactoryImplementor.getDirectoryProviderLock( dp );
+	public synchronized IndexReader getIndexReader() {
+		assertOwnLock();
+		// one cannot access a reader for update while a writer is in use
+		if ( writer != null )
+			throw new AssertionFailure( "Tries to read for update an index while a writer is in use." );
+		if ( reader != null )
+			return reader;
+		Directory directory = directoryProvider.getDirectory();
+		try {
+			reader = IndexReader.open( directory );
+			log.trace( "IndexReader opened" );
 		}
-		
-		public boolean needsOptimization() {
-			return isLocked() && !isOptimizationForced();
+		catch ( IOException e ) {
+			reader = null;
+			throw new SearchException( "Unable to open IndexReader on directory " + directory, e );
 		}
+		return reader;
+	}
 
-		/**
-		 * Sets a flag to signal optimization has been forced.
-		 * Cannot be undone.
-		 */
-		void setOptimizationForced() {
-			optimizationForced = true;			
-		}
-
-		/**
-		 * @return the Directory from the DirectoryProvider
-		 */
-		Directory getDirectory() {
-			return directoryProvider.getDirectory();
-		}
-
-		/**
-		 * @return A count of performed modification operations
-		 */
-		long countOperations() {
-			return operations;
-		}
-
-		/**
-		 * @return The OptimizerStrategy configured for this DirectoryProvider
-		 */
-		OptimizerStrategy getOptimizerStrategy() {
-			return searchFactoryImplementor.getOptimizerStrategy( directoryProvider );
-		}
-
-		/**
-		 * @return true if optimization has been forced
-		 */
-		boolean isOptimizationForced() {
-			return optimizationForced;
-		}
-
-		/**
-		 * @return true if underlying DirectoryProvider is locked
-		 */
-		boolean isLocked() {
-			return locked;
-		}
-
-		/**
-		 * Gets the currently open IndexWriter, or creates one.
-		 * If a IndexReader was open, it will be closed first.
-		 * @param entity The entity for which the IndexWriter is needed. entity can be null when calling for Optimize
-		 * @param modificationOperation set to true if needed to perform modifications to index
-		 * @return created or existing IndexWriter
-		 */
-		IndexWriter getIndexWriter(Class entity, boolean modificationOperation) {
-			//one has to close a reader for update before a writer is accessed
+	/**
+	 * Closes a previously opened IndexReader.
+	 * @throws SearchException on IOException during Lucene close operation.
+	 * @throws AssertionFailure if the lock is not owned or if there is no IndexReader to close.
+	 * @see #getIndexReader()
+	 */
+	public synchronized void closeIndexReader() {
+		assertOwnLock();
+		IndexReader toClose = reader;
+		reader = null;
+		if ( toClose != null ) {
 			try {
-				closeIndexReader();
+				toClose.close();
+				log.trace( "IndexReader closed" );
 			}
-			catch (IOException e) {
+			catch ( IOException e ) {
 				throw new SearchException( "Exception while closing IndexReader", e );
 			}
-			if ( modificationOperation ) {
-				operations++; //estimate the number of modifications done on this index
-			}
-			if ( writer != null ) return writer;
-			lock();
-			try {
-				DocumentBuilder documentBuilder = searchFactoryImplementor.getDocumentBuilders().get( entity );
-				Analyzer analyzer = entity != null ?
-						documentBuilder.getAnalyzer() :
-						SIMPLE_ANALYZER; //never used
-				writer = new IndexWriter( directoryProvider.getDirectory(), analyzer, false ); //has been created at init time
-				if ( entity != null ) {
-					writer.setSimilarity( documentBuilder.getSimilarity() );
-				}
-				LuceneIndexingParameters indexingParams = searchFactoryImplementor.getIndexingParameters( directoryProvider );
-				indexingParams.applyToWriter( writer, isBatch );
-			}
-			catch (IOException e) {
-				cleanUp(
-						new SearchException( "Unable to open IndexWriter" + ( entity != null ? " for " + entity : "" ), e )
-				);
-			}
-			return writer;
 		}
-
-		/**
-		 * Gets an IndexReader to alter the index;
-		 * (operations count will be incremented)
-		 * @throws AssertionFailure if an IndexWriter is open
-		 * @param entity The entity for which the IndexWriter is needed
-		 * @return a new or existing IndexReader
-		 */
-		IndexReader getIndexReader(Class entity) {
-			//one cannot access a reader for update after a writer has been accessed
-			if ( writer != null )
-				throw new AssertionFailure( "Tries to read for update an index while a writer is accessed for " + entity );
-			operations++; //estimate the number of modifications done on this index
-			if ( reader != null ) return reader;
-			lock();
-			try {
-				reader = IndexReader.open( directoryProvider.getDirectory() );
-			}
-			catch (IOException e) {
-				cleanUp( new SearchException( "Unable to open IndexReader for " + entity, e ) );
-			}
-			return reader;
+		else {
+			throw new AssertionFailure( "No IndexReader open to close." );
 		}
-
-		/**
-		 * Unlocks underlying DirectoryProvider iff locked.
-		 */
-		void unLock() {
-			if ( locked ) {
-				lock.unlock();
-				locked = false;
-			}
-		}
-		
-		/**
-		 * Locks underlying DirectoryProvider iff not locked already.
-		 */
-		void lock() {
-			if ( !locked ) {
-				lock.lock();
-				locked = true;
-			}
-		}
-
-		/**
-		 * Closes the IndexReader, if open.
-		 * @throws IOException
-		 */
-		void closeIndexReader() throws IOException {
-			IndexReader toClose = reader;
-			reader = null;
-			if ( toClose!=null ) {
-				toClose.close();
-			}
-		}
-		
-		/**
-		 * Closes the IndexWriter, if open.
-		 * @throws IOException
-		 */
-		void closeIndexWriter() throws IOException {
-			IndexWriter toClose = writer;
-			writer = null;
-			if ( toClose!=null ) {
-				toClose.close();
-			}
-		}
-		
 	}
 	
+	/**
+	 * Gets the IndexWriter, opening one if needed.
+	 * @param batchmode when true the indexWriter settings for batch mode will be applied.
+	 * Ignored if IndexWriter is open already.
+	 * @throws AssertionFailure if an IndexReader is open or the lock is not owned.
+	 * @throws SearchException on a IOException during index opening.
+	 * @return a new IndexWriter or one already open.
+	 */
+	public synchronized IndexWriter getIndexWriter(boolean batchmode) {
+		assertOwnLock();
+		// one has to close a reader for update before a writer is accessed
+		if ( reader != null )
+			throw new AssertionFailure( "Tries to open an IndexWriter while an IndexReader is open in update mode." );
+		if ( writer != null )
+			return writer;
+		try {
+			// don't care about the Analyzer as it will be selected during usage of IndexWriter.
+			writer = new IndexWriter( directoryProvider.getDirectory(), SIMPLE_ANALYZER, false ); // has been created at init time
+			indexingParams.applyToWriter( writer, batchmode );
+			log.trace( "IndexWriter opened" );
+		}
+		catch ( IOException e ) {
+			writer = null;
+			throw new SearchException( "Unable to open IndexWriter", e );
+		}
+		return writer;
+	}
+
+	/**
+	 * Closes a previously opened IndexWriter.
+	 * @throws SearchException on IOException during Lucene close operation.
+	 * @throws AssertionFailure if there is no IndexWriter to close, or if the lock is not owned.
+	 */
+	public synchronized void closeIndexWriter() {
+		assertOwnLock();
+		IndexWriter toClose = writer;
+		writer = null;
+		if ( toClose != null ) {
+			try {
+				toClose.close();
+				log.trace( "IndexWriter closed" );
+			}
+			catch ( IOException e ) {
+				throw new SearchException( "Exception while closing IndexWriter", e );
+			}
+		}
+		else {
+			throw new AssertionFailure( "No open IndexWriter to close" );
+		}
+	}
+
+	/**
+	 * Increment the counter of modification operations done on the index.
+	 * Used (currently only) by the OptimizerStrategy.
+	 * @param modCount the increment to add to the counter.
+	 */
+	public void incrementModificationCounter(int modCount) {
+		operations.addAndGet( modCount );
+	}
+
+	/**
+	 * Some optimizations can be enabled only when the same Directory is not shared
+	 * among more entities.
+	 * @return true iff only one entity type is using this Directory.
+	 */
+	public boolean isSingleEntityInDirectory() {
+		return singleEntityInDirectory;
+	}
+	
+	/**
+	 * Acquires a lock on the DirectoryProvider backing this Workspace;
+	 * this is required to use getIndexWriter(boolean), closeIndexWriter(),
+	 * getIndexReader(), closeIndexReader().
+	 * @see #getIndexWriter(boolean)
+	 * @see #closeIndexWriter()
+	 * @see #getIndexReader()
+	 * @see #closeIndexReader()
+	 */
+	public void lock() {
+		lock.lock();
+	}
+
+	/**
+	 * Releases the lock obtained by calling lock()
+	 * @throws AssertionFailure when unlocking without having closed IndexWriter or IndexReader.
+	 * @see #lock()
+	 */
+	public synchronized void unlock() {
+		try {
+			if ( this.reader != null ) {
+				throw new AssertionFailure( "Unlocking Workspace without having closed the IndexReader" );
+			}
+			if ( this.writer != null ) {
+				throw new AssertionFailure( "Unlocking Workspace without having closed the IndexWriter" );
+			}
+		}
+		finally {
+			lock.unlock();
+		}
+	}
+
+	private final void assertOwnLock() {
+		if ( ! lock.isHeldByCurrentThread() )
+			throw new AssertionFailure( "Not owning DirectoryProvider Lock" );
+	}
+
 }

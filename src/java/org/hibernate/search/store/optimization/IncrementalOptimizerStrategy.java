@@ -51,7 +51,7 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 		if ( needOptimization() ) {
 			log.debug( "Optimize {} after {} operations and {} transactions",
 				new Object[] { directoryProvider.getDirectory(), operations, transactions });
-			IndexWriter writer = workspace.getIndexWriter( directoryProvider );
+			IndexWriter writer = workspace.getIndexWriter( false ); //TODO true or false?
 			try {
 				writer.optimize();
 			}
