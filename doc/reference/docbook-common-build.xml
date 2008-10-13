@@ -1,29 +1,20 @@
-<!--
-   To build the reference docs for a particular language only, use "ant -Dlang=en", for
-   example, and call either lang.all, lang.docpdf, lang.dochtml, or lang.dochtmlsingle
-   for the target of your choice.
-
-   You can also call lang.section-check to track down missing identifiers in a particular
-   language, or you can call lang.revdiff to get a difference report for a particular
-   language, compared with the English reference.
--->
 <project name="ReferenceDocumentation" default="all.doc" basedir=".">
     <!-- Allow this to be overriden by others importing this project. -->
     <dirname property="imported.basedir" file="${ant.file.ReferenceDocumentation}"/>
 
     <!-- Set build directories for all formats. -->
-    <property name="build.dir"             value="${basedir}/build"/>
+    <property name="build.dir" value="${basedir}/build"/>
 
     <!-- Support files for build process. -->
-    <property name="support.dir"           value="${imported.basedir}/support"/>
+    <property name="support.dir" value="${imported.basedir}/support"/>
 
     <!-- Base name for documentation artifacts. -->
-    <property name="docname"               value="hibernate_reference"/>
+    <property name="docname" value="hibernate_reference"/>
 
     <!-- Set DocBook stylesheets. -->
-    <property name="db.style.fopdf"        value="fopdf.xsl"/>
-    <property name="db.style.html"         value="html_chunk.xsl"/>
-    <property name="db.style.htmlsingle"   value="html.xsl"/>
+    <property name="db.style.fopdf" value="fopdf.xsl"/>
+    <property name="db.style.html" value="html_chunk.xsl"/>
+    <property name="db.style.htmlsingle" value="html.xsl"/>
 
     <!-- Classpath for the build tools. -->
     <path id="lib.classpath">
@@ -32,6 +23,8 @@
         </fileset>
     </path>
 
+    <taskdef name="xinclude" classname="org.znerd.xincludetask.XIncludeTask" classpathref="lib.classpath"/>
+
     <!-- ################################################################## -->
 
     <target name="all.doc"
@@ -39,38 +32,38 @@
             description="Compile documentation for all languages and all formats.">
 
         <!-- TRANSLATOR: Duplicate this line for your language -->
-        <antcall target="lang.all"><param name="lang" value="en"/></antcall>
-        <antcall target="lang.all"><param name="lang" value="fr"/></antcall>
-        <!-- TODO: These translations need updating before we can enable them...
-        <antcall target="lang.all"><param name="lang" value="ja"/></antcall>
-    	<antcall target="lang.all"><param name="lang" value="ko"/></antcall>
-        <antcall target="lang.all"><param name="lang" value="zh-cn"/></antcall>
-    	-->
-
+        <antcall target="lang.all">
+            <param name="lang" value="en"/>
+        </antcall>
+        <!--antcall target="lang.all">
+            <param name="lang" value="fr"/>
+        </antcall-->
     </target>
 
     <target name="all.revdiff"
             description="Generates a diff report for all translated versions.">
 
         <!-- TRANSLATOR: Duplicate this line for your language -->
-		<antcall target="lang.revdiff"><param name="lang" value="fr"/></antcall>
-        <antcall target="lang.revdiff"><param name="lang" value="ko"/></antcall>
-		<antcall target="lang.revdiff"><param name="lang" value="ja"/></antcall>
-        <antcall target="lang.revdiff"><param name="lang" value="zh-cn"/></antcall>
-
+        <antcall target="lang.revdiff">
+            <param name="lang" value="fr"/>
+        </antcall>
     </target>
 
     <!-- ################################################################## -->
 
     <target name="clean">
-
         <!-- Delete build directory. -->
         <delete dir="${build.dir}"/>
-
     </target>
 
-    <target name="lang.all">
+    <target name="xinclude" description="Resolve xi:include references and generate a complete master document.">
+        <mkdir dir="${build.dir}/${lang}"/>
+        <xinclude in="${basedir}/${lang}/master.xml" out="${build.dir}/${lang}/master.xml"/>
+    </target>
+
+    <target name="lang.all">        
         <!-- Compile the documentation for a single language in all formats. -->
+        <antcall target="xinclude"/>
         <antcall target="lang.docpdf"/>
         <antcall target="lang.dochtml"/>
         <antcall target="lang.dochtmlsingle"/>
@@ -90,11 +83,12 @@
         </copy>
 
         <!-- Create the XSL/FO temporary file. -->
-        <java classname="com.icl.saxon.StyleSheet" fork="true" dir="${basedir}" maxmemory="128m" >
+        <java classname="com.icl.saxon.StyleSheet" fork="true" dir="${basedir}" maxmemory="128m">
             <classpath refid="lib.classpath"/>
             <arg value="-o"/>
             <arg value="${build.dir}/${lang}/pdf/docbook_fop.tmp"/>
-            <arg value="${basedir}/${lang}/master.xml"/>
+
+            <arg value="${build.dir}/${lang}/master.xml"/>
             <arg value="${basedir}/${lang}/styles/${db.style.fopdf}"/>
         </java>
 
@@ -110,7 +104,7 @@
         </copy>
 
         <!-- Create a PDF from the XSL/FO, using customized fop userconfig.xml -->
-        <java classname="org.apache.fop.apps.Fop" fork="true" dir="${basedir}" maxmemory="128m" >
+        <java classname="org.apache.fop.apps.Fop" fork="true" dir="${basedir}" maxmemory="128m">
             <classpath refid="lib.classpath"/>
             <arg value="-c"/>
             <arg value="${basedir}/${lang}/fop/userconfig.xml"/>
@@ -128,29 +122,29 @@
         </java>
     </target>
 
-    <target name="lang.docpdf" depends="lang.docpdf.normal,lang.docpdf.customized"
+    <target name="lang.docpdf" depends="xinclude,lang.docpdf.normal,lang.docpdf.customized"
             description="Generates the PDF documentation only for a language (set lang)">
         <!-- House keeping,delete temporary files. -->
         <delete>
             <fileset dir="${build.dir}/${lang}/pdf" excludes="**/*.pdf"/>
         </delete>
-        <delete  dir="${build.dir}/${lang}/pdf/images"/>
+        <delete dir="${build.dir}/${lang}/pdf/images"/>
     </target>
 
-    <target name="lang.dochtml"
+    <target name="lang.dochtml" depends="xinclude"
             description="Generates the HTML documentation only for a language (set lang)">
 
         <mkdir dir="${build.dir}/${lang}/html/"/>
 
         <java classname="com.icl.saxon.StyleSheet" fork="true" dir="${build.dir}/${lang}/html">
             <classpath refid="lib.classpath"/>
-            <arg value="${basedir}/${lang}/master.xml"/>
+            <arg value="${build.dir}/${lang}/master.xml"/>
             <arg value="${basedir}/${lang}/styles/${db.style.html}"/>
         </java>
     </target>
 
-    <target name="lang.dochtmlsingle"
-        description="Generates the single-page HTML documentation only for a language (set lang)">
+    <target name="lang.dochtmlsingle" depends="xinclude"
+            description="Generates the single-page HTML documentation only for a language (set lang)">
 
         <mkdir dir="${build.dir}/${lang}/html_single/"/>
 
@@ -158,7 +152,7 @@
             <classpath refid="lib.classpath"/>
             <arg value="-o"/>
             <arg value="${build.dir}/${lang}/html_single/index.html"/>
-            <arg value="${basedir}/${lang}/master.xml"/>
+            <arg value="${build.dir}/${lang}/master.xml"/>
             <arg value="${basedir}/${lang}/styles/${db.style.htmlsingle}"/>
         </java>
     </target>
@@ -180,28 +174,28 @@
 
     </target>
 
-    <target name="lang.revdiff"
+    <target name="lang.revdiff" depends="xinclude"
             description="Reports difference between English and translation (set lang)">
 
-		<mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.dir}"/>
 
         <taskdef name="revdiff"
-            classname="org.hibernate.docproc.revdiff.RevDiffReportTask"
-            classpathref="lib.classpath">
+                 classname="org.hibernate.docproc.revdiff.RevDiffReportTask"
+                 classpathref="lib.classpath">
 
         </taskdef>
 
-        <revdiff original="${basedir}/en/master.xml"
-                 copy="${basedir}/${lang}/master.xml"
+        <revdiff original="${build.dir}/en/master.xml"
+                 copy="${build.dir}/${lang}/master.xml"
                  report="${build.dir}/status_${lang}.html"/>
 
     </target>
 
-    <target name="lang.section-check" depends="lang.dochtml"
+    <target name="lang.section-check" depends="xinclude,lang.dochtml"
             description="Reports missing unique chapter/section identifiers (set lang)">
         <java classname="com.icl.saxon.StyleSheet" fork="true" dir="${build.dir}/${lang}/html">
             <classpath refid="lib.classpath"/>
-            <arg value="${basedir}/${lang}/master.xml"/>
+            <arg value="${build.dir}/${lang}/master.xml"/>
             <arg value="${support.dir}/section-check.xsl"/>
         </java>
     </target>

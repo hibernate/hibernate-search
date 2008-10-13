@@ -1,16 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--  $Id$ -->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3CR3//EN"
-"../support/docbook-dtd/docbookx.dtd" [
-<!ENTITY getting-started SYSTEM "modules/getting-started.xml">
-<!ENTITY architecture SYSTEM "modules/architecture.xml">
-<!ENTITY configuration SYSTEM "modules/configuration.xml">
-<!ENTITY mapping SYSTEM "modules/mapping.xml">
-<!ENTITY query SYSTEM "modules/query.xml">
-<!ENTITY batchindex SYSTEM "modules/batchindex.xml">
-<!ENTITY optimize SYSTEM "modules/optimize.xml">
-<!ENTITY lucene-native SYSTEM "modules/lucene-native.xml">
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+  ~ indicated by the @author tags or express copyright attribution
+  ~ statements applied by the authors.  All third-party contributions are
+  ~ distributed under license by Red Hat Middleware LLC.
+  ~
+  ~ This copyrighted material is made available to anyone wishing to use, modify,
+  ~ copy, or redistribute it subject to the terms and conditions of the GNU
+  ~ Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~ for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this distribution; if not, write to:
+  ~ Free Software Foundation, Inc.
+  ~ 51 Franklin Street, Fifth Floor
+  ~ Boston, MA  02110-1301  USA
+  -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+        <!ENTITY versionNumber "3.1.0.Beta1">
+        <!ENTITY copyrightYear "2004">
+        <!ENTITY copyrightHolder "Red Hat Middleware, LLC.">
 ]>
+
 <book lang="en">
   <bookinfo>
     <title>Hibernate Search</title>
@@ -19,7 +37,7 @@
 
     <subtitle>Reference Guide</subtitle>
 
-    <releaseinfo>3.1.0.Beta1</releaseinfo>
+    <releaseinfo>&versionNumber;</releaseinfo>
 
     <mediaobject>
       <imageobject>
@@ -50,19 +68,13 @@
 
   </preface>
 
-  &getting-started; 
+  <xi:include href="modules/getting-started.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/architecture.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/configuration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/mapping.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/query.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/batchindex.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/optimize.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/lucene-native.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
-  &architecture;
-
-  &configuration;
-
-  &mapping;
-
-  &query;
-
-  &batchindex;
-
-  &optimize;
-
-  &lucene-native;
 </book>
