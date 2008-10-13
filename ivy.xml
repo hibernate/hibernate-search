@@ -19,10 +19,12 @@
         <dependency org="org.slf4j" name="slf4j-api" rev="1.4.2" conf="default->default"/>        
         <dependency org="org.hibernate" name="hibernate-core" rev="3.3.0.CR2" conf="default->default"/>
         <dependency org="javax.transaction" name="jta" rev="1.1" conf="default->default"/>
-        <dependency org="org.apache.lucene" name="lucene-core" rev="2.3.2" conf="default->default"/>
+        <dependency org="org.apache.lucene" name="lucene-core" rev="2.4.0" conf="default->default"/>
         <dependency org="javax.jms" name="jms" rev="1.1" conf="default->default"/> <!-- optional -->
         <dependency org="javax.annotation" name="jsr250-api" rev="1.0" conf="default->default"/> <!-- optional -->
-        <dependency org="org.hibernate.apache.lucene.solr" name="apache-solr-analyzer" rev="1.2.0" conf="default->default"/> <!-- optional -->
+        <dependency org="org.apache.solr" name="solr-core" rev="1.3.0" conf="default->default"/>
+        <dependency org="org.apache.solr" name="solr-common" rev="1.3.0" conf="default->default"/>
+        <!--dependency org="org.hibernate.apache.lucene.solr" name="apache-solr-analyzer" rev="1.3.0" conf="default->default"/-->
 
         <!-- transitive dependencies -->
         <dependency org="antlr" name="antlr" rev="2.7.6" conf="test->default"/>
