@@ -61,15 +61,9 @@
         <xinclude in="${basedir}/${lang}/master.xml" out="${build.dir}/${lang}/master.xml"/>
     </target>
 
-    <target name="lang.all">        
+    <target name="lang.all" depends="xinclude,lang.docpdf,lang.dochtml,lang.dochtmlsingle,lang.htmlmisc">        
         <!-- Compile the documentation for a single language in all formats. -->
-        <antcall target="xinclude"/>
-        <antcall target="lang.docpdf"/>
-        <antcall target="lang.dochtml"/>
-        <antcall target="lang.dochtmlsingle"/>
-        <antcall target="lang.htmlmisc"/>
     </target>
-
 
     <target name="lang.docpdf.prepare">
 
