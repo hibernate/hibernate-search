@@ -2,37 +2,43 @@
 package org.hibernate.search.test.analyzer.solr;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.Analyzer;
-import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.ISOLatin1AccentFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
+import org.apache.solr.analysis.SnowballPorterFilterFactory;
+import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.StopFilterFactory;
+
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
 @Indexed
-@AnalyzerDef(name="customanalyzer",
+@AnalyzerDef(name = "customanalyzer",
 		tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 		filters = {
 				@TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
 				@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 				@TokenFilterDef(factory = StopFilterFactory.class, params = {
-					@Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
-					@Parameter(name="ignoreCase", value="true")
+						@Parameter(name = "words",
+								value = "org/hibernate/search/test/analyzer/solr/stoplist.properties"),
+						@Parameter(name = "ignoreCase", value = "true")
+				}),
+				@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+						@Parameter(name = "language", value = "English")
 				})
-})
+		})
 public class Team {
 	@Id
 	@DocumentId
@@ -45,7 +51,8 @@ public class Team {
 	@Field
 	private String location;
 
-	@Field @Analyzer(definition = "customanalyzer")
+	@Field
+	@Analyzer(definition = "customanalyzer")
 	private String description;
 
 	public Integer getId() {

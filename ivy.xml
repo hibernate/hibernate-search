@@ -24,6 +24,7 @@
         <dependency org="javax.annotation" name="jsr250-api" rev="1.0" conf="default->default"/> <!-- optional -->
         <dependency org="org.apache.solr" name="solr-core" rev="1.3.0" conf="default->default"/>
         <dependency org="org.apache.solr" name="solr-common" rev="1.3.0" conf="default->default"/>
+        <dependency org="org.apache.solr" name="solr-lucene-snowball" rev="1.3.0" conf="default->default"/>
         <!--dependency org="org.hibernate.apache.lucene.solr" name="apache-solr-analyzer" rev="1.3.0" conf="default->default"/-->
 
         <!-- transitive dependencies -->
