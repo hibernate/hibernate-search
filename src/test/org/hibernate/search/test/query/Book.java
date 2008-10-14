@@ -61,7 +61,6 @@ public class Book {
 		this.body = body;
 	}
 
-	//@Unstored
 	@Field(index=Index.TOKENIZED, store=Store.NO)
 	public String getBody() {
 		return body;

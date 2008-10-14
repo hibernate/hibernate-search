@@ -33,7 +33,6 @@ public class Document {
 
 	@Id
 	@GeneratedValue
-	//@Keyword(id = true)
     @DocumentId
 	public Long getId() {
 		return id;
@@ -43,7 +42,6 @@ public class Document {
 		this.id = id;
 	}
 
-	//@Text
     @Field( store = Store.YES, index = Index.TOKENIZED )
     @Boost(2)
 	public String getTitle() {
@@ -54,7 +52,6 @@ public class Document {
 		this.title = title;
 	}
 
-	//@Unstored(name = "Abstract")
     @Field( name="Abstract", store = Store.NO, index = Index.TOKENIZED )
     public String getSummary() {
 		return summary;
@@ -65,7 +62,6 @@ public class Document {
 	}
 
 	@Lob
-	//@Unstored
     @Field( store = Store.NO, index = Index.TOKENIZED )
     public String getText() {
 		return text;

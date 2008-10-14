@@ -36,7 +36,6 @@ public class AlternateDocument {
 	}
 
 	@Id
-	//@Keyword(id = true)
 	@DocumentId()
 	public Long getId() {
 		return id;
@@ -46,7 +45,6 @@ public class AlternateDocument {
 		this.id = id;
 	}
 
-	//@Text
 	@Field( name = "alt_title", store = Store.YES, index = Index.TOKENIZED )
 	@Boost(2)
 	public String getTitle() {
@@ -57,7 +55,6 @@ public class AlternateDocument {
 		this.title = title;
 	}
 
-	//@Unstored(name = "Abstract")
 	@Field( name="Abstract", store = Store.NO, index = Index.TOKENIZED )
 	public String getSummary() {
 		return summary;
@@ -68,7 +65,6 @@ public class AlternateDocument {
 	}
 
 	@Lob
-	//@Unstored
 	@Field( store = Store.NO, index = Index.TOKENIZED )
 	public String getText() {
 		return text;
