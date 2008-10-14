@@ -1,0 +1,7 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.hibernate</groupId>
+  <artifactId>hibernate-search-quickstart</artifactId>
+  <packaging>jar</packaging>
+  <version>3.1.0.Beta2</version>
+</project>

@@ -199,8 +199,8 @@
     a working configuration you can start experimenting with other directory
     providers (see <xref linkend="search-configuration-directory" />). Next to
     the directory provider you also have to specify the default root directory
-    for all indexes via <literal>hibernate.search.default.indexBase</literal>.
-    </para>
+    for all indexes via
+    <literal>hibernate.search.default.indexBase</literal>.</para>
 
     <para>Lets further assume that your application contains the Hibernate
     managed classes <classname>example.Book</classname> and
@@ -548,20 +548,29 @@ public class Book {
   <section>
     <title>What's next</title>
 
-    <para>The above paragraphs hopefully helped you getting started with
-    Hibernate Search. You should by now have a file system based index and be
-    able to search and retrieve a list of managed objects via Hibernate
-    Search. The next step is to get more familiar with the overall
-    architecture (<xref linkend="search-architecture" />) and explore the
-    basic features in more detail.</para>
+    <para>The above paragraphs hopefully helped you getting an overview of
+    Hibernate Search. Using the maven archetype plugin and the following
+    command you can create an initial runnable maven project structure
+    populated with the example code of this tutorial.</para>
 
-    <para>Two topics which where only briefly touched in this tutorial were
+    <para><programlisting>mvn archetype:create \ 
+    -DarchetypeGroupId=org.hibernate \
+    -DarchetypeArtifactId=hibernate-search-quickstart \ 
+    -DarchetypeVersion=3.1.0.Beta2 \
+    -DgroupId=my.company -DartifactId=quickstart</programlisting>Using the
+    maven project you can execute the examples, inspect the file system based
+    index and search and retrieve a list of managed objects. Just run
+    <emphasis>mvn package</emphasis> to compile the sources and run the unit
+    tests.</para>
+
+    <para>The next step after this tutorial is to get more familiar with the
+    overall architecture of Hibernate Search (<xref
+    linkend="search-architecture" />) and explore the basic features in more
+    detail. Two topics which where only briefly touched in this tutorial were
     analyzer configuration (<xref linkend="analyzer" />) and field bridges
     (<xref linkend="search-mapping-bridge" />), both important features
-    required for more fine-grained indexing.</para>
-
-    <para>More advanced topics cover clustering (<xref
-    linkend="jms-backend" />) and large indexes handling (<xref
-    linkend="search-configuration-directory-sharding" />).</para>
+    required for more fine-grained indexing. More advanced topics cover
+    clustering (<xref linkend="jms-backend" />) and large indexes handling
+    (<xref linkend="search-configuration-directory-sharding" />).</para>
   </section>
 </chapter>
