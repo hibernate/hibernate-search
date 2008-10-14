@@ -22,8 +22,8 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">        
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="getting-started">
   <!--  $Id$ -->
 
@@ -98,7 +98,7 @@
   <section>
     <title>Maven</title>
 
-    <para>Instead of managing all dependencies yourself maven users have the
+    <para>Instead of managing all dependencies manually, maven users have the
     possibility to use the <ulink
     url="http://repository.jboss.com/maven2">JBoss maven repository</ulink>.
     Just add the JBoss repository url to the <emphasis>repositories</emphasis>
@@ -120,7 +120,7 @@
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
-   &lt;version&gt;3.1.0.Beta1&lt;/version&gt;
+   &lt;version&gt;3.1.0.Beta2&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
@@ -132,15 +132,37 @@
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
    &lt;version&gt;3.4.0.CR1&lt;/version&gt;
 &lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
+   &lt;artifactId&gt;solr-common&lt;/artifactId&gt;
+   &lt;version&gt;1.3.0&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
+   &lt;artifactId&gt;solr-core&lt;/artifactId&gt;
+   &lt;version&gt;1.3.0&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
+   &lt;artifactId&gt;solr-lucene-snowball&lt;/artifactId&gt;
+   &lt;version&gt;1.3.0&lt;/version&gt;
+&lt;/dependency&gt;
       </programlisting>
 
-    <para>Not all three dependencies are required.
-    <emphasis>hibernate-search</emphasis> alone contains everything needed to
-    use Hibernate Search. <emphasis>hibernate-annotations</emphasis> is only
-    needed if you use non Hibernate Search annotations like we do in the
-    examples of this tutorial. Last but not least,
-    <emphasis>hibernate-entitymanager</emphasis> is only required if you use
-    Hibernate Search in conjunction with JPA.</para>
+    <para>Not all dependencies are required. Only the
+    <emphasis>hibernate-search</emphasis> dependeny is mandatory. This
+    dependeny, together with its required transitive dependencies, contains
+    everything needed to use Hibernate Search.
+    <emphasis>hibernate-annotations</emphasis> is only needed if you want to
+    use annotations to configure your domain model as we do in this tutorial.
+    However, even if you choose not to use Hibernate Annotations you will
+    still have to use the Hibernate Search specific annotations to configure
+    your Lucene index. Currently there is no XML configuration option
+    available for Hibernate Search.
+    <emphasis>hibernate-entitymanager</emphasis> is required if you want to
+    use Hibernate Search in conjunction with JPA. Finally, the Solr
+    dependencies are only needed if you want to utilize Solr's analyzer
+    framework. More about this later.</para>
   </section>
 
   <section>
@@ -153,10 +175,21 @@
     <literal>hibernate.cfg.xml</literal>. If you are using Hibernate via JPA
     you can also add the properties to <literal>persistence.xml</literal>. The
     good news is that for standard use most properties offer a sensible
-    default.</para>
+    default. Within <filename>persistence.xml</filename> this could look like
+    this:</para>
 
-    <para>Apache Lucene has a notion of <literal>Directory</literal> to store
-    the index files. Hibernate Search handles the initialization and
+    <para><programlisting>
+...
+&lt;property name="hibernate.search.default.directory_provider" 
+   value="org.hibernate.search.store.FSDirectoryProvider"/&gt; 
+
+&lt;property name="hibernate.search.default.indexBase" value="/var/lucene/indexes"/&gt; 
+...
+    </programlisting>First you have to tell Hibernate Search which
+    <classname>DirectoryProvider</classname> to use. This can be achieved by
+    setting the <literal>hibernate.search.default.directory_provider</literal>
+    property. Apache Lucene has a notion of <literal>Directory</literal> to
+    store the index files. Hibernate Search handles the initialization and
     configuration of a Lucene <literal>Directory</literal> instance via a
     <literal>DirectoryProvider</literal>. In this tutorial we will use a
     subclass of <literal>DirectoryProvider</literal> called
@@ -164,12 +197,16 @@
     to physically inspect the Lucene indexes created by Hibernate Search (eg
     via <ulink url="http://www.getopt.org/luke/">Luke</ulink>). Once you have
     a working configuration you can start experimenting with other directory
-    providers (see <xref linkend="search-configuration-directory" />).</para>
+    providers (see <xref linkend="search-configuration-directory" />). Next to
+    the directory provider you also have to specify the default root directory
+    for all indexes via <literal>hibernate.search.default.indexBase</literal>.
+    </para>
 
-    <para>Lets assume that your application contains the Hibernate managed
-    class <classname>example.Book</classname> and you now want to add free
-    text search capabilities to your application in order to search body and
-    summary of the books contained in your database.</para>
+    <para>Lets further assume that your application contains the Hibernate
+    managed classes <classname>example.Book</classname> and
+    <classname>example.Author</classname> and you want to add free text search
+    capabilities to your application in order to search the books contained in
+    your database.</para>
 
     <programlisting>
 package example;
@@ -181,15 +218,12 @@ public class Book {
   @GeneratedValue
   private Integer id; 
 
-  private String body;  
+  private String title;  
 
-  private String summary; 
+  private String subtitle; 
 
   @ManyToMany 
   private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
-
-  @ManyToOne 
-  private Author mainAuthor;
 
   private Date publicationDate;
   
@@ -201,45 +235,82 @@ public class Book {
 } 
     </programlisting>
 
-    <para>First you have to tell Hibernate Search which
-    <classname>DirectoryProvider</classname> to use. This can be achieved by
-    setting the <literal>hibernate.search.default.directory_provider</literal>
-    property. You also have to specify the default root directory for all
-    indexes via <literal>hibernate.search.default.indexBase</literal>.</para>
-
-    <programlisting>
+    <para><programlisting>
+package example;
 ...
-# the default directory provider
-hibernate.search.default.directory_provider = org.hibernate.search.store.FSDirectoryProvider
+@Entity
+public class Author {
 
-# the default base directory for the indecies
-hibernate.search.default.indexBase = /var/lucene/indexes    
-...
-    </programlisting>
+  @Id
+  @GeneratedValue
+  private Integer id;
 
-    <para>Next you have to add three annotations to the
-    <classname>Book</classname> class. The first annotation
-    <literal>@Indexed</literal> marks <classname>Book</classname> as
-    indexable. By design Hibernate Search needs to store an untokenized id in
-    the index to ensure index unicity for a given entity.
-    <literal>@DocumentId</literal> marks the property to use for this purpose.
-    Most if not all the time, the property is the database primary key. Last
-    but not least you have to index the fields you want to make searchable. In
-    our example these fields are <literal>body</literal> and
-    <literal>summary</literal>. Both properties get annotated with
-    <literal>@Field</literal>. The property
+  private String name;
+
+  public Author() {
+  } 
+ 
+  // standard getters/setters follow here
+  ...
+}
+
+</programlisting></para>
+
+    <para>To achieve this you have to add a few annotations to the
+    <classname>Book</classname> and <classname>Author</classname> class. The
+    first annotation <literal>@Indexed</literal> marks
+    <classname>Book</classname> as indexable. By design Hibernate Search needs
+    to store an untokenized id in the index to ensure index unicity for a
+    given entity. <literal>@DocumentId</literal> marks the property to use for
+    this purpose and is in most cases the same as the database primary
+    key.</para>
+
+    <para>Next you have to mark the fields you want to make searchable. Let's
+    start with <literal>title</literal> and <literal>subtitle</literal> and
+    annotate both with <literal>@Field</literal>. The parameter
     <literal>index=Index.TOKENIZED</literal> will ensure that the text will be
-    tokenized using the default Lucene analyzer whereas
-    <literal>store=Store.NO</literal> ensures that the actual data will not be
-    stored in the index. Usually, tokenizing means chunking a sentence into
-    individual words (and potentially excluding common words like
-    <literal>a</literal>, <literal>the </literal>etc).</para>
+    tokenized using the default Lucene analyzer. Usually, tokenizing means
+    chunking a sentence into individual words and potentially excluding common
+    words like <literal>'a'</literal> or '<literal>the</literal>'. We will
+    talk more about analyzers a little later on. The second parameter we
+    specify within <literal>@Field</literal>,<literal>
+    store=Store.NO</literal>, ensures that the actual data will not be stored
+    in the index. This is the default settings and probably a good choice
+    unless you want to avoid database roundtrips and retrieve the indexed data
+    via projections (<xref linkend="projections" />). Without projections,
+    Hibernate Search will per default execute the Lucene query in order to
+    find the database identifiers of the entities matching the query critera
+    and use these identifiers to retrieve managed objects from the database.
+    Is it not better then to always use projections? The answer is no, since
+    projections only returns object arrays and not managed entities. The
+    decision for or against projection has to be made on a case to case
+    basis.</para>
 
-    <para>These settings are sufficient for an initial test. For more details
-    on entity mapping refer to <xref linkend="search-mapping-entity" />. In
-    case you want to store and retrieve the indexed data in order to avoid
-    database roundtrips, refer to projections in <xref
-    linkend="projections" /></para>
+    <para>After this short look under the hood let's go back to annotating the
+    <classname>Book</classname> class. Another annotation we have not yet
+    discussed is <literal>@DateBridge</literal>. This annotation is one of the
+    built-in field bridges in Hibernate Search. The Lucene index is purely
+    string based. For this reason Hibernate Search must convert the data types
+    of the indexed fields to strings and vice versa. A range of predefined
+    bridges are provided, including the <classname>DateBridge</classname>
+    which will convert a <classname>java.util.Date</classname> into a
+    <classname>String</classname> with the specified resolution. For more
+    details see <xref linkend="search-mapping-bridge" />.</para>
+
+    <para>This leaves us with <literal>@IndexedEmbedded. </literal>This
+    annotation is used to indexed associated entities
+    (<literal>@ManyToMany</literal>, <literal>@*ToOne</literal> and
+    <literal>@Embedded</literal>) as part of the owning entity. This is needed
+    since a Lucene index document is a flat data structure which does not know
+    anything about object relations. To ensure that the author's name wil be
+    searchable you have to make sure that the names are indexed as part of the
+    book itself. On top of <literal>@IndexedEmbedded</literal> you will also
+    have to mark all fields of the associated entity you want to have included
+    in the index with <literal>@Indexed</literal>. For more dedails see <xref
+    linkend="search-mapping-associated" />.</para>
+
+    <para>These settings should be sufficient for now. For more details on
+    entity mapping refer to <xref linkend="search-mapping-entity" />.</para>
 
     <programlisting>
 package example;
@@ -254,17 +325,17 @@ public class Book {
   private Integer id;
   
   <emphasis role="bold">@Field(index=Index.TOKENIZED, store=Store.NO)</emphasis>
-  private String body;
+  private String title;
   
   <emphasis role="bold">@Field(index=Index.TOKENIZED, store=Store.NO)</emphasis>
-  private String summary; 
+  private String subtitle; 
 
+  <emphasis role="bold">@IndexedEmbedded</emphasis>
   @ManyToMany 
   private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
 
-  @ManyToOne 
-  private Author mainAuthor;
-
+<emphasis role="bold">  @Field(index = Index.UN_TOKENIZED, store = Store.YES)
+  @DateBridge(resolution = Resolution.DAY)</emphasis>
   private Date publicationDate;
   
   public Book() {
@@ -274,12 +345,33 @@ public class Book {
   ... 
 }
   </programlisting>
+
+    <programlisting>
+package example;
+...
+@Entity
+public class Author {
+
+  @Id
+  @GeneratedValue
+  private Integer id;
+
+  <emphasis role="bold">@Field(index=Index.TOKENIZED, store=Store.NO)</emphasis>
+  private String name;
+
+  public Author() {
+  } 
+ 
+  // standard getters/setters follow here
+  ...
+}
+  </programlisting>
   </section>
 
   <section>
     <title>Indexing</title>
 
-    <para>Hibernate Search will index transparently every entity persisted,
+    <para>Hibernate Search will transparently index every entity persisted,
     updated or removed through Hibernate Core. However, you have to trigger an
     inital indexing to populate the Lucene index with the data already present
     in your database. Once you have added the above properties and annotations
@@ -320,9 +412,8 @@ for (Book book : books) {
     <title>Searching</title>
 
     <para>Now it is time to execute a first search. The following code will
-    prepare a query against the fields <literal>summary</literal> and
-    <literal>body</literal>, execute it and return a list of
-    <classname>Book</classname>s:</para>
+    prepare a query against the indexed fields, execute it and return a list
+    of <classname>Book</classname>s:</para>
 
     <para>Example using Hibernate Session:</para>
 
@@ -331,7 +422,7 @@ FullTextSession fullTextSession = Search.getFullTextSession(session);
 
 Transaction tx = fullTextSession.beginTransaction();
 
-MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[]{"summary", "body"}, 
+MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[]{"title", "subtitle", "authors.name", "publicationDate"}, 
   new StandardAnalyzer());
 Query query = parser.parse( "Java rocks!" );
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
@@ -348,7 +439,7 @@ EntityManager em = entityManagerFactory.createEntityManager();
 
 FullTextEntityManager fullTextEntityManager = 
     org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);
-MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[]{"summary", "body"}, 
+MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[]{"title", "subtitle", "authors.name", "publicationDate"}, 
   new StandardAnalyzer());
 Query query = parser.parse( "Java rocks!" );
 org.hibernate.Query hibQuery = fullTextEntityManager.createFullTextQuery( query, Book.class );
@@ -359,12 +450,14 @@ List result = hibQuery.list();
   <section>
     <title>Analyzer</title>
 
-    <para>Assume that one of your indexed book entities contains the text
-    "Java rocks" and you want to get hits for all of the following queries:
-    "rock", "rocks", "rocked" and "rocking". In Lucene this can be achieved by
-    choosing an analyzer class which applies word stemming during the indexing
-    process. Hibernate Search offers several ways to configure the analyzer to
-    use (see <xref linkend="analyzer" />):</para>
+    <para>Assume that one of your indexed book entities has the title
+    "Refactoring: Improving the Design of Existing Code" and you want to get
+    hits for all of the following queries: "refactor", "refactors",
+    "refactored" and "refactoring". In Lucene this can be achieved by choosing
+    an analyzer class which applies word stemming during the indexing
+    <emphasis role="bold">and</emphasis> search process. Hibernate Search
+    offers several ways to configure the analyzer to use (see <xref
+    linkend="analyzer" />):</para>
 
     <itemizedlist>
       <listitem>
@@ -374,70 +467,81 @@ List result = hibQuery.list();
       </listitem>
 
       <listitem>
-        <para>Setting the <literal>Analyzer</literal> annotation at the entity
-        level.</para>
+        <para>Setting the <literal><literal>@Analyzer</literal></literal>
+        annotation at the entity level.</para>
       </listitem>
 
       <listitem>
-        <para>Setting the <literal>Analyzer</literal> annotation at the field
-        level.</para>
+        <para>Setting the <literal>@<literal>Analyzer</literal></literal>
+        annotation at the field level.</para>
       </listitem>
     </itemizedlist>
 
-    <para>Hibernate Search also introduces the notion of analyzer definitions
-    which allow you to manage and reuse analyzers. This infrastructure is
-    supported by the Solr analyzer framework (see <xref
-    linkend="analyzer" />). The following example uses the entity level
-    annotation to apply a English language analyzer which would help you to
-    achieve your goal. The class <classname>EnglishAnalyzer</classname> is a
-    custom class using the Snowball English Stemmer from the <ulink
-    url="http://lucene.apache.org/java/docs/lucene-sandbox/">Lucene
-    Sandbox</ulink>.</para>
+    <para>When using the <literal>@Analyzer</literal> annotation one can
+    either specify the fully qualified classname of the analyzer to use or one
+    can refer to an analyzer definition defined by the
+    <literal>@AnalyzerDef</literal> annotation. In the latter case the Solr
+    analyzer framework with its factories approach can be used. To find out
+    more about the factory classes available you can either browse the Solr
+    JavaDoc or read the corresponding section on the <ulink
+    url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">Solr
+    Wiki.</ulink> In the example a
+    <classname>StandardTokenizerFactory</classname> is used followed by two
+    filter factories, <classname>LowerCaseFilterFactory</classname> and
+    <classname>SnowballPorterFilterFactory</classname>. The standard tokenizer
+    splits words at punctuation characters and hyphens while keeping email
+    addresses and internet hostnames intact. It is a good general purpose
+    tokenizer. The lowercase filter lowercases then the letters in each token
+    whereas the snowball filter finally applies the actual language
+    stemming.</para>
+
+    <para>Generally, when using the Solr framework you have to start with a
+    tokenizer followed by an arbitrary number of filters.</para>
 
     <programlisting>
-package example.Book
+
+package example;
 ...
 @Entity
 @Indexed
-<emphasis role="bold">@Analyzer(impl = example.EnglishAnalyzer.class)</emphasis>
+<emphasis role="bold">@AnalyzerDef(name = "customanalyzer",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+      @Parameter(name = "language", value = "English")
+    })
+  })</emphasis>
 public class Book {
 
   @Id
+  @GeneratedValue
   @DocumentId
   private Integer id;
   
   @Field(index=Index.TOKENIZED, store=Store.NO)
-  private String body;
+  <emphasis role="bold">@Analyzer(definition = "customanalyzer")</emphasis>
+  private String title;
   
   @Field(index=Index.TOKENIZED, store=Store.NO)
-  private String summary; 
+  <emphasis role="bold">@Analyzer(definition = "customanalyzer")</emphasis>
+  private String subtitle; 
 
+  @IndexedEmbedded
   @ManyToMany 
   private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
 
-  @ManyToOne private Author mainAuthor;
+<emphasis role="bold"> </emphasis> @Field(index = Index.UN_TOKENIZED, store = Store.YES)
+  @DateBridge(resolution = Resolution.DAY)
   private Date publicationDate;
   
   public Book() {
   } 
   
   // standard getters/setters follow here
-... 
+  ... 
 }
 
-public class EnglishAnalyzer extends Analyzer {
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TokenStream tokenStream(String fieldName, Reader reader) {
-        TokenStream result = new StandardTokenizer(reader);
-        result = new StandardFilter(result);
-        result = new LowerCaseFilter(result);
-        result = new SnowballFilter(result, name);
-        return result;
-    }
-}
   </programlisting>
   </section>
 

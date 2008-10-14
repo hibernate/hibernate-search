@@ -22,8 +22,8 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"> 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="search-configuration">
   <!--  $Id$ -->
 
@@ -562,8 +562,8 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         </listitem>
 
         <listitem>
-          <para><filename>apache-solr-analyzer.jar</filename>: Additional
-          analyzer infrastructure</para>
+          <para><filename>solr-*.jar</filename>: Additional analyzer
+          infrastructure</para>
         </listitem>
       </itemizedlist>
     </section>
@@ -771,7 +771,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
 
             <entry>128</entry>
           </row>
-          
+
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].use_compound_file</literal></entry>
 
@@ -779,10 +779,11 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             performing option. You may need to enable it to have the index
             written to a single compound file to use less file handlers, but
             increasing the number of permitted file handlers is usually a
-            preferred solution.</para>
-            <para>Especially when synchronizing indexes using JMS avoid
-            this option as it will copy the complete index each time.</para>
-            <para>Boolean parameter, use "<literal>true</literal>" or "<literal>false</literal>".</para></entry>
+            preferred solution.</para> <para>Especially when synchronizing
+            indexes using JMS avoid this option as it will copy the complete
+            index each time.</para> <para>Boolean parameter, use
+            "<literal>true</literal>" or
+            "<literal>false</literal>".</para></entry>
 
             <entry>false</entry>
           </row>
