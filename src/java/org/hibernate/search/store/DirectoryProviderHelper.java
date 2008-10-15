@@ -1,19 +1,20 @@
 // $Id$
 package org.hibernate.search.store;
 
-import java.util.Properties;
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
-import org.hibernate.search.SearchException;
-import org.hibernate.search.util.FileHelper;
-import org.hibernate.annotations.common.util.StringHelper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
+import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -21,7 +22,7 @@ import org.slf4j.Logger;
  */
 public class DirectoryProviderHelper {
 	
-	private static final Logger log = LoggerFactory.getLogger( DirectoryProviderHelper.class );
+	private static final Logger log = LoggerFactory.make();
 	private static final String ROOTINDEX_PROP_NAME = "sourceBase";
 	private static final String RELATIVEINDEX_PROP_NAME = "source";
 	public static final String COPYBUFFERSIZE_PROP_NAME = "buffer_size_on_copy";

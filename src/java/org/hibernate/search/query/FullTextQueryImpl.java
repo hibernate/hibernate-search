@@ -1,8 +1,6 @@
 //$Id$
 package org.hibernate.search.query;
 
-import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -18,6 +16,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
@@ -25,7 +24,8 @@ import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.Explanation;
+import org.slf4j.Logger;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -54,13 +54,13 @@ import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.reader.ReaderProvider;
+import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.ContextHelper;
+import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
+import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
+import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.*;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}
@@ -70,7 +70,7 @@ import static org.hibernate.search.util.FilterCacheModeTypeHelper.*;
  */
 //TODO implements setParameter()
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
-	private final Logger log = LoggerFactory.getLogger( FullTextQueryImpl.class );
+	private final Logger log = LoggerFactory.make();
 	private final org.apache.lucene.search.Query luceneQuery;
 	private Class[] classes;
 	private Set<Class> classesAndSubclasses;

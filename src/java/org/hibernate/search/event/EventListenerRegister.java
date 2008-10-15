@@ -3,7 +3,6 @@ package org.hibernate.search.event;
 
 import java.util.Properties;
 
-import org.hibernate.search.Environment;
 import org.hibernate.event.EventListeners;
 import org.hibernate.event.PostCollectionRecreateEventListener;
 import org.hibernate.event.PostCollectionRemoveEventListener;
@@ -11,8 +10,9 @@ import org.hibernate.event.PostCollectionUpdateEventListener;
 import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.search.Environment;
+import org.hibernate.search.util.LoggerFactory;
 
-import org.slf4j.LoggerFactory;
 
 /**
  * Helper methods initializing Hibernate Search event listeners.
@@ -33,7 +33,7 @@ public class EventListenerRegister {
 		// check whether search is explicitly disabled - if so there is nothing to do	
 		String enableSearchListeners = properties.getProperty( Environment.AUTOREGISTER_LISTENERS );
 		if ( "false".equalsIgnoreCase( enableSearchListeners ) ) {
-			LoggerFactory.getLogger( EventListenerRegister.class ).info(
+			LoggerFactory.make().info(
 					"Property hibernate.search.autoregister_listeners is set to false." +
 					" No attempt will be made to register Hibernate Search event listeners." );
 			return;

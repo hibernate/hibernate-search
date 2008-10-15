@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -17,11 +17,10 @@
 */
 package org.hibernate.search.test.analyzer.inheritance;
 
-import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
+import org.apache.lucene.queryParser.QueryParser;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -29,6 +28,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.AnalyzerUtils;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Test to verify HSEARCH-267.
@@ -40,7 +40,7 @@ import org.hibernate.search.test.util.AnalyzerUtils;
  */
 public class AnalyzerInheritanceTest extends SearchTestCase {
 
-	public static final Logger log = LoggerFactory.getLogger( AnalyzerInheritanceTest.class );
+	public static final Logger log = LoggerFactory.make();
 
 	/**
 	 * Try to verify that the right analyzer is used by indexing and searching.

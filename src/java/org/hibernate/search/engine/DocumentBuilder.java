@@ -16,6 +16,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Similarity;
+import org.slf4j.Logger;
+
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -49,14 +51,12 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
-import org.hibernate.search.engine.LuceneOptionsImpl;
 import org.hibernate.search.impl.InitContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.BinderHelper;
+import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ScopedAnalyzer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Set up and provide a manager for indexes classes
@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings( "unchecked" )
 public class DocumentBuilder<T> {
-	private static final Logger log = LoggerFactory.getLogger( DocumentBuilder.class );
+	private static final Logger log = LoggerFactory.make();
 
 	private final PropertiesMetadata rootPropertiesMetadata = new PropertiesMetadata();
 	private final XClass beanClass;

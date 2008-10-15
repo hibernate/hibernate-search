@@ -10,6 +10,8 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
+import org.slf4j.Logger;
+
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
@@ -17,8 +19,7 @@ import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Lucene workspace for a DirectoryProvider.<p/>
@@ -38,7 +39,7 @@ import org.slf4j.Logger;
 //TODO renaming to "DirectoryWorkspace" would be nice.
 public class Workspace {
 
-	private final Logger log = LoggerFactory.getLogger( Workspace.class );
+	private final Logger log = LoggerFactory.make();
 	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer();
 	
 	// invariant state:

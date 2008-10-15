@@ -9,24 +9,25 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.WorkQueue;
+import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Batch work until #performWorks is called.
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BatchedQueueingProcessor implements QueueingProcessor {
 
-	private static final Logger log = LoggerFactory.getLogger( BatchedQueueingProcessor.class );
+	private static final Logger log = LoggerFactory.make();
 
 	private final boolean sync;
 	private final int batchSize;

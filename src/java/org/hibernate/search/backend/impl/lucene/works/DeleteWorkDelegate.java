@@ -6,17 +6,17 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.BooleanClause;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
 import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Stateless implementation that performs a <code>DeleteLuceneWork</code>.
@@ -31,7 +31,7 @@ import org.hibernate.search.engine.DocumentBuilder;
 class DeleteWorkDelegate implements LuceneWorkDelegate {
 
 	private final Workspace workspace;
-	private final Logger log = LoggerFactory.getLogger( DeleteWorkDelegate.class );
+	private final Logger log = LoggerFactory.make();
 
 	DeleteWorkDelegate(Workspace workspace) {
 		this.workspace = workspace;

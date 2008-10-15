@@ -5,6 +5,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
+import org.slf4j.Logger;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -12,15 +14,14 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.AnalyzerUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public class AnalyzerTest extends SearchTestCase {
 
-	public static final Logger log = LoggerFactory.getLogger(AnalyzerTest.class);
+	public static final Logger log = LoggerFactory.make();
 
 	public void testScopedAnalyzers() throws Exception {
 		MyEntity en = new MyEntity();

@@ -11,7 +11,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Helper class to test analyzers. Taken and modified from <i>Lucene in Action</i>.
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AnalyzerUtils {
 
-	public static final Logger log = LoggerFactory.getLogger( AnalyzerUtils.class );
+	public static final Logger log = LoggerFactory.make();
 
 	public static Token[] tokensFromAnalysis(Analyzer analyzer, String field, String text) throws IOException {
 		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );

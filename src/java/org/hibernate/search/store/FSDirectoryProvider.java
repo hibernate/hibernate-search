@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
+import org.slf4j.Logger;
+
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Use a Lucene FSDirectory
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 
-	private final Logger log = LoggerFactory.getLogger( FSDirectoryProvider.class );
+	private final Logger log = LoggerFactory.make();
 	
 	private FSDirectory directory;
 	private String indexName;

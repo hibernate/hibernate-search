@@ -19,7 +19,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * A wrapper to Properties, to restrict the availability of
@@ -38,7 +39,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	
 	private static final long serialVersionUID = -593307257383085113L;
 	
-	private transient Logger log = LoggerFactory.getLogger( MaskedProperty.class );
+	private transient Logger log = LoggerFactory.make();
 	private final Properties masked;
 	private final Properties fallBack;
 	private final String radix;
@@ -376,7 +377,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
 		//always perform the default de-serialization first
 		aInputStream.defaultReadObject();
-		log = LoggerFactory.getLogger( MaskedProperty.class );
+		log = LoggerFactory.make();
 	}
 
 	private void writeObject(ObjectOutputStream aOutputStream) throws IOException {

@@ -1,22 +1,23 @@
 //$Id$
 package org.hibernate.search.store;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.io.File;
-import java.io.IOException;
 
 import org.apache.lucene.store.FSDirectory;
+import org.slf4j.Logger;
+
 import org.hibernate.AssertionFailure;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * File based directory provider that takes care of getting a version of the index
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	
-	private final Logger log = LoggerFactory.getLogger( FSSlaveDirectoryProvider.class );
+	private final Logger log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 	
 	private volatile int current; //used also as memory barrier of all other values, which are set once.

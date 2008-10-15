@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.slf4j.Logger;
+
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
 * Stateless implementation that performs a OptimizeLuceneWork.
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 class OptimizeWorkDelegate implements LuceneWorkDelegate {
 	
 	private final Workspace workspace;
-	private final Logger log = LoggerFactory.getLogger( OptimizeWorkDelegate.class );
+	private final Logger log = LoggerFactory.make();
 
 	OptimizeWorkDelegate(Workspace workspace) {
 		this.workspace = workspace;

@@ -14,12 +14,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
+import org.slf4j.Logger;
+
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * As does SharedReaderProvider this also shares IndexReaders as long as they are "current";
@@ -43,7 +44,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	 */
 	protected Map<DirectoryProvider,PerDirectoryLatestReader> currentReaders;
 	
-	private final Logger log = LoggerFactory.getLogger( SharingBufferReaderProvider.class );
+	private final Logger log = LoggerFactory.make();
 
 	public void closeReader(IndexReader multiReader) {
 		if ( multiReader == null ) return;

@@ -2,8 +2,8 @@
 package org.hibernate.search.backend.impl.jms;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
 import javax.jms.QueueConnection;
@@ -11,11 +11,11 @@ import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.hibernate.HibernateException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -23,7 +23,7 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 public class JMSBackendQueueProcessor implements Runnable {
 	private List<LuceneWork> queue;
 	private JMSBackendQueueProcessorFactory factory;
-	private Logger log = LoggerFactory.getLogger( JMSBackendQueueProcessor.class );
+	private Logger log = LoggerFactory.make();
 
 	public JMSBackendQueueProcessor(List<LuceneWork> queue,
 									JMSBackendQueueProcessorFactory jmsBackendQueueProcessorFactory) {

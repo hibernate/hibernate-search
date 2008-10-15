@@ -1,17 +1,18 @@
 // $Id$
 package org.hibernate.search.engine;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.slf4j.Logger;
+
+import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
-import org.hibernate.Criteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class ObjectLoaderHelper {
 
 	private static final int MAX_IN_CLAUSE = 500;
-	private static final Logger log = LoggerFactory.getLogger( ObjectLoader.class );
+	private static final Logger log = LoggerFactory.make();
 
 	public static Object load(EntityInfo entityInfo, Session session) {
 		//be sure to get an initialized object but save from ONFE and ENFE

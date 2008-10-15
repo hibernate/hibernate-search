@@ -6,27 +6,29 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Similarity;
+import org.slf4j.Logger;
+
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
 import org.hibernate.search.engine.DocumentBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
-* Stateless implementation that performs a AddLuceneWork.
-* @see LuceneWorkVisitor
-* @see LuceneWorkDelegate
-* @author Emmanuel Bernard
-* @author Hardy Ferentschik
-* @author John Griffin
-* @author Sanne Grinovero
-*/
+ * Stateless implementation that performs a AddLuceneWork.
+ *
+ * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
+ * @author John Griffin
+ * @author Sanne Grinovero
+ * @see LuceneWorkVisitor
+ * @see LuceneWorkDelegate
+ */
 class AddWorkDelegate implements LuceneWorkDelegate {
-	
+
 	private final Workspace workspace;
-	private final Logger log = LoggerFactory.getLogger( AddWorkDelegate.class );
+	private final Logger log = LoggerFactory.make();
 
 	AddWorkDelegate(Workspace workspace) {
 		this.workspace = workspace;
@@ -41,24 +43,28 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		Analyzer analyzer = documentBuilder.getAnalyzer();
 		Similarity similarity = documentBuilder.getSimilarity();
 		if ( log.isTraceEnabled() ) {
-			log.trace( "add to Lucene index: {}#{}:{}",
-					new Object[] { work.getEntityClass(), work.getId(), work.getDocument() } );
+			log.trace(
+					"add to Lucene index: {}#{}:{}",
+					new Object[] { work.getEntityClass(), work.getId(), work.getDocument() }
+			);
 		}
 		try {
 			//TODO the next two operations should be atomic to enable concurrent usage of IndexWriter
 			// make a wrapping Similarity based on ThreadLocals? or having it autoselect implementation basing on entity?
 			writer.setSimilarity( similarity );
-			writer.addDocument( work.getDocument() , analyzer );
+			writer.addDocument( work.getDocument(), analyzer );
 			workspace.incrementModificationCounter( 1 );
 		}
-		catch (IOException e) {
-			throw new SearchException( "Unable to add to Lucene index: "
-					+ work.getEntityClass() + "#" + work.getId(), e );
+		catch ( IOException e ) {
+			throw new SearchException(
+					"Unable to add to Lucene index: "
+							+ work.getEntityClass() + "#" + work.getId(), e
+			);
 		}
 	}
 
 	public void performWork(LuceneWork work, IndexReader reader) {
-		throw new UnsupportedOperationException();		
+		throw new UnsupportedOperationException();
 	}
-	
+
 }

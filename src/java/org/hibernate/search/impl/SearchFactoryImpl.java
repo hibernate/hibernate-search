@@ -18,7 +18,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -51,6 +50,7 @@ import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -63,7 +63,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		Version.touch();
 	}
 
-	private final Logger log = LoggerFactory.getLogger( SearchFactoryImpl.class );
+	private final Logger log = LoggerFactory.make();
 
 	private final Map<Class, DocumentBuilder<Object>> documentBuilders = new HashMap<Class, DocumentBuilder<Object>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider

@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
+import org.slf4j.Logger;
+
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
-import org.hibernate.search.backend.configuration.MaskedProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_FIELD_LENGTH;
+import org.hibernate.search.backend.configuration.MaskedProperty;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Wrapper class around the Lucene indexing parameters defined in IndexWriterSetting.
@@ -46,7 +46,7 @@ public class LuceneIndexingParameters implements Serializable {
 		//get keys for "batch" (defaulting to transaction)
 		Properties batchProps = new MaskedProperty( indexingParameters, BATCH, transactionProps ); //TODO to close HSEARCH-201 just remove 3° parameter
 		//logger only used during object construction: (logger not serializable).
-		Logger log = LoggerFactory.getLogger( LuceneIndexingParameters.class );
+		Logger log = LoggerFactory.make();
 		transactionIndexParameters = new ParameterSet( transactionProps, TRANSACTION, log );
 		batchIndexParameters = new ParameterSet( batchProps, BATCH, log );
 		doSanityChecks( transactionIndexParameters, batchIndexParameters, log );

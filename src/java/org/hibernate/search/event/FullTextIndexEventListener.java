@@ -3,6 +3,8 @@ package org.hibernate.search.event;
 
 import java.io.Serializable;
 
+import org.slf4j.Logger;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.EntityEntry;
 import org.hibernate.event.AbstractCollectionEvent;
@@ -23,11 +25,10 @@ import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
+import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.backend.impl.EventSourceTransactionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * This listener supports setting a parent directory for all generated index files.
@@ -46,7 +47,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener, Initializable, Destructible {
 
-	private static final Logger log = LoggerFactory.getLogger( FullTextIndexEventListener.class );
+	private static final Logger log = LoggerFactory.make();
 
 	protected boolean used;
 	protected SearchFactoryImplementor searchFactoryImplementor;

@@ -1,17 +1,18 @@
 // $Id$
 package org.hibernate.search.store.optimization;
 
-import java.util.Properties;
 import java.io.IOException;
+import java.util.Properties;
 
-import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.backend.Workspace;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.SearchException;
 import org.apache.lucene.index.IndexWriter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
+import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Optimization strategy triggered after a certain amount of operations
@@ -24,7 +25,7 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 	private long operations = 0;
 	private long transactions = 0;
 	private DirectoryProvider directoryProvider;
-	private final Logger log = LoggerFactory.getLogger( IncrementalOptimizerStrategy.class );
+	private final Logger log = LoggerFactory.make();
 
 	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, SearchFactoryImplementor searchFactoryImplementor) {
 		this.directoryProvider = directoryProvider;

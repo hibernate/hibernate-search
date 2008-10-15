@@ -6,9 +6,10 @@ import java.util.BitSet;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Filter;
-import org.hibernate.util.SoftLimitMRUCache;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.util.SoftLimitMRUCache;
 
 /**
  * A slightly different version of Lucene's original <code>CachingWrapperFilter</code> which
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class CachingWrapperFilter extends Filter {
 	
-	private final Logger log = LoggerFactory.getLogger( CachingWrapperFilter.class );
+	private final Logger log = LoggerFactory.make();
 	
 	public static final int DEFAULT_SIZE = 5;
 	

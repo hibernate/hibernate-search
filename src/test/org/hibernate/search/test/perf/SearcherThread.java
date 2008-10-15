@@ -2,8 +2,8 @@
 package org.hibernate.search.test.perf;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -11,20 +11,21 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.IndexSearcher;
-import org.hibernate.SessionFactory;
-import org.hibernate.search.Search;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.FullTextQuery;
+import org.apache.lucene.search.Query;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public class SearcherThread implements Runnable {
-	private static final Logger log = LoggerFactory.getLogger( SearcherThread.class );
+	private static final Logger log = LoggerFactory.make();
 	private final int threadId;
 	private final String queryString;
 	private final SessionFactory sf;

@@ -5,19 +5,20 @@ import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.slf4j.Logger;
+
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Sanne Grinovero
  */
 class PerDPQueueProcessor {
 	
-	private final Logger log = LoggerFactory.getLogger( PerDPQueueProcessor.class );
+	private final Logger log = LoggerFactory.make();
 	private final Workspace workspace;
 	private final LuceneWorkVisitor worker;
 	private final List<LuceneWork> workOnWriter = new ArrayList<LuceneWork>();

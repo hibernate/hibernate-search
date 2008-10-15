@@ -14,12 +14,12 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import static org.hibernate.search.reader.ReaderProviderHelper.buildMultiReader;
 import static org.hibernate.search.reader.ReaderProviderHelper.clean;
 import org.hibernate.search.store.DirectoryProvider;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Share readers per SearchFactory, reusing them iff they are still valid.
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class SharedReaderProvider implements ReaderProvider {
-	private final Logger log = LoggerFactory.getLogger ( SharedReaderProvider.class );
+	private final Logger log = LoggerFactory.make();
 	/**
 	 * nonfair lock. Need to be acquired on indexReader acquisition or release (semaphore)
 	 */

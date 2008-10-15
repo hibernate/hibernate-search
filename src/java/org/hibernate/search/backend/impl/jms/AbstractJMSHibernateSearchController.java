@@ -9,12 +9,13 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
+import org.slf4j.Logger;
+
 import org.hibernate.Session;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.util.ContextHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.ContextHelper;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Implement the Hibernate Search controller responsible for processing the
@@ -26,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
-	private static final Logger log = LoggerFactory.getLogger( AbstractJMSHibernateSearchController.class );
+	private static final Logger log = LoggerFactory.make();
 
 	/**
 	 * Return the current or give a new session

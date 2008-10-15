@@ -1,22 +1,23 @@
 //$Id$
 package org.hibernate.search.store;
 
-import java.util.Timer;
+import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
-import java.io.File;
-import java.io.IOException;
 
 import org.apache.lucene.store.FSDirectory;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.util.FileHelper;
-import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
+import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * File based DirectoryProvider that takes care of index copy
@@ -32,7 +33,7 @@ import org.slf4j.Logger;
 //TODO rename copy?
 public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	
-	private final Logger log = LoggerFactory.getLogger( FSMasterDirectoryProvider.class );
+	private final Logger log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 	
 	private volatile int current;
