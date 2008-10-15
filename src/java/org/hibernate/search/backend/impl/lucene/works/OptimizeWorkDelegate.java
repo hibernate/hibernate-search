@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 class OptimizeWorkDelegate implements LuceneWorkDelegate {
 	
 	private final Workspace workspace;
-	private final Logger log = LoggerFactory.getLogger( AddWorkDelegate.class );
+	private final Logger log = LoggerFactory.getLogger( OptimizeWorkDelegate.class );
 
 	OptimizeWorkDelegate(Workspace workspace) {
 		this.workspace = workspace;

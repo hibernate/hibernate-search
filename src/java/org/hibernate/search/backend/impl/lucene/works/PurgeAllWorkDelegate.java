@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 */
 class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 	
-	private final Logger log = LoggerFactory.getLogger( AddWorkDelegate.class );
+	private final Logger log = LoggerFactory.getLogger( PurgeAllWorkDelegate.class );
 
 	PurgeAllWorkDelegate() {
 	}
