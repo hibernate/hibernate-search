@@ -420,9 +420,9 @@ public class DocumentBuilder<T> {
 		// Field > property > entity analyzer
 		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer(), context );
 		if ( analyzer == null ) analyzer = getAnalyzer( member, context );
-		if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
-		if ( analyzer == null ) throw new AssertionFailure( "Analizer should not be undefined" );
-		this.analyzer.addScopedAnalyzer( fieldName, analyzer );
+		if ( analyzer != null ) {
+			this.analyzer.addScopedAnalyzer( fieldName, analyzer );
+		}
 	}
 
 	private String buildEmbeddedPrefix(String prefix, IndexedEmbedded embeddedAnn, XProperty member) {
