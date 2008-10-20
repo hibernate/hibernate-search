@@ -26,7 +26,6 @@ public interface TwoWayFieldBridge extends FieldBridge {
 	/**
 	 * convert the object representation to a String
 	 * The return String must not be null, it can be empty though
-	 * EXPERIMENTAL API subject to change in the future
 	 */
 	String objectToString(Object object);
 }
