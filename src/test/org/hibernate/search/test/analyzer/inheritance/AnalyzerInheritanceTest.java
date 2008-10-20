@@ -49,7 +49,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 	 */
 	public void testBySearch() throws Exception {
 		SubClass testClass = new SubClass();
-		testClass.setName( "Proca•ne" );
+		testClass.setName( "Proca\u00EFne" );
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		s.persist( testClass );
@@ -59,7 +59,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 
 
 		QueryParser parser = new QueryParser( "name", s.getSearchFactory().getAnalyzer( SubClass.class ) );
-		org.apache.lucene.search.Query luceneQuery = parser.parse( "name:Proca•ne" );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "name:Proca\u00EFne" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery, SubClass.class );
 		assertEquals( 1, query.getResultSize() );
 
@@ -86,7 +86,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Analyzer analyzer = s.getSearchFactory().getAnalyzer( SubClass.class );
 
-		Token[] tokens = AnalyzerUtils.tokensFromAnalysis(analyzer, "name", "Proca•ne");
+		Token[] tokens = AnalyzerUtils.tokensFromAnalysis(analyzer, "name", "Proca\u00EFne");
 		AnalyzerUtils.assertTokensEqual( tokens, new String[]{"Procaine"});
 
 		s.close();
