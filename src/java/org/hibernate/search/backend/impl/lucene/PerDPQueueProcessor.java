@@ -152,7 +152,8 @@ class PerDPQueueProcessor {
 	 */
 	private void useWriterOnly() {
 		log.debug( "Skipping usage of an IndexReader for updates" );
-		workOnWriter.addAll( workOnReader );
+		//position 0 needed to maintain correct ordering of Work: delete operations first.
+		workOnWriter.addAll( 0, workOnReader );
 		workOnReader.clear();
 	}
 	
