@@ -261,7 +261,7 @@ public class Book {
     </section>
 
     <section id="search-mapping-associated">
-      <title>Embedded and associated objects </title>
+      <title>Embedded and associated objects</title>
 
       <para>Associated objects as well as embedded objects can be indexed as
       part of the root entity index. It is necessary if you expect to search a
@@ -526,15 +526,14 @@ public class Essay {
     <section id="analyzer">
       <title>Analyzer</title>
 
-      <para>The default analyzer class used to index the elements is
+      <para>The default analyzer class used to index tokenized fields is
       configurable through the <literal>hibernate.search.analyzer</literal>
-      property. If none is defined,
-      <classname>org.apache.lucene.analysis.standard.StandardAnalyzer</classname>
-      is used as the default.</para>
+      property. The default value for this property is
+      <classname>org.apache.lucene.analysis.standard.StandardAnalyzer</classname>.</para>
 
-      <para>You can also define the analyzer class per entity, per property
-      and even per @Field (useful when multiple fields are indexed from a
-      single property).</para>
+      <para>You can also define the analyzer class per entity, property and
+      even per @Field (useful when multiple fields are indexed from a single
+      property).</para>
 
       <programlisting>@Entity
 @Indexed
@@ -558,8 +557,8 @@ public class MyEntity {
     ...
 }</programlisting>
 
-      <para>In this example, <classname>EntityAnalyzer</classname> is used
-      index all tokenized properties (eg. <literal>name</literal>), except for
+      <para>In this example, <classname>EntityAnalyzer</classname> is used to
+      index all tokenized properties (eg. <literal>name</literal>), except
       <literal>summary</literal> and <literal>body</literal> which are indexed
       with <classname>PropertyAnalyzer</classname> and
       <classname>FieldAnalyzer</classname> respectively.</para>
@@ -569,17 +568,18 @@ public class MyEntity {
         time a bad practice. It makes query building more complex and results
         less predictable (for the novice), especially if you are using a
         QueryParser (which uses the same analyzer for the whole query). As a
-        thumb rule, the same analyzer should be used for both the indexing and
-        the query for a given field.</para>
+        rule of thumb, for any given field the same analyzer should be used
+        for indexing and querying.</para>
       </caution>
 
       <section>
         <title>Analyzer definitions</title>
 
-        <para>Analyzers can become quite complex to deal with. Hibernate
-        Search introduces the notion of analyzer definition. An analyzer
-        definition can be reused by many <classname>@Analyzer</classname>
-        declarations. An analyzer definition is composed of:</para>
+        <para>Analyzers can become quite complex to deal with for which reason
+        Hibernate Search introduces the notion of analyzer definitions. An
+        analyzer definition can be reused by many
+        <classname>@Analyzer</classname> declarations. An analyzer definition
+        is composed of:</para>
 
         <itemizedlist>
           <listitem>
@@ -588,25 +588,31 @@ public class MyEntity {
           </listitem>
 
           <listitem>
-            <para>a tokenizer: a piece of code used to chunk the sentence into
-            individual words</para>
+            <para>a tokenizer: responsible for tokenizing the input stream
+            into individual words</para>
           </listitem>
 
           <listitem>
-            <para>a list of filters: each filter is responsible to remove
-            words, modify words and sometimes add words into the stream
-            provided by the tokenizer</para>
+            <para>a list of filters: each filter is responsible to remove,
+            modify or sometimes even add words into the stream provided by the
+            tokenizer</para>
           </listitem>
         </itemizedlist>
 
-        <para>This separation of tasks (tokenizer, list of filters) allows
-        reuse of each individual component and let you build your ideal
-        analyzer ns a very flexible way (just like a lego). This
-        infrastructure is supported by the Solr analyzer framework. Make sure
-        to add <filename>solr-*.jar</filename> to your classpath to use
-        analyzer definitions: this jar is distributed with your distribution
-        of Hibernate Search and is a striped down version of the Solr
-        jar.</para>
+        <para>This separation of tasks - a tokenizer followed by a list of
+        filters - allows easy reuse of each individual component and let you
+        build your customized analyzer in a very flexible way (just like
+        lego). Generally speaking the <classname>Tokenizer</classname> starts
+        the analysis process by turning the character input into tokens which
+        are then further processed by the <classname>TokenFilter</classname>s.
+        Hibernate Search supports this infrastructure by utilizing the Solr
+        analyzer framework. Make sure to add<filename> solr-core.jar and
+        </filename><filename>solr-common.jar</filename> to your classpath to
+        use analyzer definitions. In case you also want to utilizing a
+        snowball stemmer also include the
+        <filename>solr-lucene-snowball.jar.</filename> Your distribution of
+        Hibernate Search provides these dependecies in its
+        <filename>lib</filename> directory.</para>
 
         <programlisting>@AnalyzerDef(name="customanalyzer",
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),

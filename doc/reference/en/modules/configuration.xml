@@ -557,13 +557,13 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         </listitem>
 
         <listitem>
-          <para><filename>lucene-core-*.jar</filename>: Lucene core
+          <para><filename>lucene-core.jar</filename>: Lucene core
           engine</para>
         </listitem>
 
         <listitem>
-          <para><filename>solr-*.jar</filename>: Additional analyzer
-          infrastructure</para>
+          <para><filename>solr-core.jar</filename>, solr-common.jar:
+          Additional analyzer infrastructure</para>
         </listitem>
       </itemizedlist>
     </section>
