@@ -28,15 +28,22 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 	}
 
 	public IndexInteractionType getIndexInteractionType() {
-		return IndexInteractionType.NEEDS_INDEXREADER;
+		return IndexInteractionType.PREFER_INDEXREADER;
 	}
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
-		throw new UnsupportedOperationException();
+		log.trace( "purgeAll Lucene index using IndexWriter for type: {}", work.getEntityClass() );
+		try {
+			Term term = new Term( DocumentBuilder.CLASS_FIELDNAME, work.getEntityClass().getName() );
+			writer.deleteDocuments( term );
+		}
+		catch (Exception e) {
+			throw new SearchException( "Unable to purge all from Lucene index: " + work.getEntityClass(), e );
+		}
 	}
 
 	public void performWork(LuceneWork work, IndexReader reader) {
-		log.trace( "purgeAll Lucene index using IndexReader: {}", work.getEntityClass() );
+		log.trace( "purgeAll Lucene index using IndexReader for type: {}", work.getEntityClass() );
 		try {
 			Term term = new Term( DocumentBuilder.CLASS_FIELDNAME, work.getEntityClass().getName() );
 			reader.deleteDocuments( term );

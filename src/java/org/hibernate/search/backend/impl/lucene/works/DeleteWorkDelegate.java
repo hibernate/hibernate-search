@@ -38,24 +38,24 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 	}
 
 	public IndexInteractionType getIndexInteractionType() {
-		return IndexInteractionType.NEEDS_INDEXWRITER;
+		return IndexInteractionType.PREFER_INDEXWRITER;
 	}
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		log.trace( "Removing {}#{} by query.", work.getEntityClass(), work.getId() );
 		DocumentBuilder builder = workspace.getDocumentBuilder( work.getEntityClass() );
 
-		BooleanQuery entityDeltionQuery = new BooleanQuery();
+		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
 		TermQuery idQueryTerm = new TermQuery( builder.getTerm( work.getId() ) );
-		entityDeltionQuery.add(idQueryTerm, BooleanClause.Occur.MUST);
+		entityDeletionQuery.add( idQueryTerm, BooleanClause.Occur.MUST );
 
-		Term classNameQueryTerm =  new Term(DocumentBuilder.CLASS_FIELDNAME, work.getEntityClass().getName());
-		TermQuery classNameQuery = new TermQuery( classNameQueryTerm);
-		entityDeltionQuery.add(classNameQuery, BooleanClause.Occur.MUST);
+		Term classNameQueryTerm =  new Term( DocumentBuilder.CLASS_FIELDNAME, work.getEntityClass().getName() );
+		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
+		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.MUST );
 
 		try {
-			writer.deleteDocuments( entityDeltionQuery );
+			writer.deleteDocuments( entityDeletionQuery );
 		}
 		catch ( Exception e ) {
 			String message = "Unable to remove " + work.getEntityClass() + "#" + work.getId() + " from index.";
