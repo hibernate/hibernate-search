@@ -2,6 +2,7 @@
 package org.hibernate.search.backend;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -48,7 +49,7 @@ public class Workspace {
 	private final DirectoryProvider directoryProvider;
 	private final OptimizerStrategy optimizerStrategy;
 	private final ReentrantLock lock;
-	private final boolean singleEntityInDirectory;
+	private final Set<Class> entitiesInDirectory;
 	private final LuceneIndexingParameters indexingParams;
 
 	// variable state:
@@ -72,7 +73,7 @@ public class Workspace {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.directoryProvider = provider;
 		this.optimizerStrategy = searchFactoryImplementor.getOptimizerStrategy( directoryProvider );
-		this.singleEntityInDirectory = searchFactoryImplementor.getClassesInDirectoryProvider( provider ).size() == 1;
+		this.entitiesInDirectory = searchFactoryImplementor.getClassesInDirectoryProvider( provider );
 		this.indexingParams = searchFactoryImplementor.getIndexingParameters( directoryProvider );
 		this.lock = searchFactoryImplementor.getDirectoryProviderLock( provider );
 	}
@@ -216,12 +217,11 @@ public class Workspace {
 	}
 
 	/**
-	 * Some optimizations can be enabled only when the same Directory is not shared
-	 * among more entities.
-	 * @return true iff only one entity type is using this Directory.
+	 * @return The unmodifiable set of entity types being indexed
+	 * in the underlying Lucene Directory backing this Workspace.
 	 */
-	public boolean isSingleEntityInDirectory() {
-		return singleEntityInDirectory;
+	public Set<Class> getEntitiesInDirectory() {
+		return entitiesInDirectory;
 	}
 	
 	/**
