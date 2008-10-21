@@ -25,10 +25,15 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	private final Workspace linkedWorkspace;
 
 	public LuceneWorkVisitor(Workspace workspace) {
-		this.addDelegate = new AddWorkDelegate( workspace );
-		this.deleteDelegate = new DeleteWorkDelegate( workspace );
-		this.optimizeDelegate = new OptimizeWorkDelegate( workspace );
+		if ( workspace.getEntitiesInDirectory().size() == 1 ) {
+			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
+		}
+		else {
+			this.deleteDelegate = new DeleteWorkDelegate( workspace );
+		}
 		this.purgeAllDelegate = new PurgeAllWorkDelegate();
+		this.addDelegate = new AddWorkDelegate( workspace );
+		this.optimizeDelegate = new OptimizeWorkDelegate( workspace );
 		this.linkedWorkspace = workspace;
 	}
 
