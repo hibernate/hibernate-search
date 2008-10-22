@@ -80,7 +80,7 @@ public class DocumentBuilder<T> {
 	private Float idBoost;
 	public static final String CLASS_FIELDNAME = "_hibernate_class";
 	private TwoWayFieldBridge idBridge;
-	private Set<Class> mappedSubclasses = new HashSet<Class>();
+	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private ReflectionManager reflectionManager;
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
@@ -592,8 +592,8 @@ public class DocumentBuilder<T> {
 			if ( member.isArray() ) {
 				for (Object arrayValue : (Object[]) value) {
 					//highly inneficient but safe wrt the actual targeted class
-					Class valueClass = Hibernate.getClass( arrayValue );
-					DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilders().get( valueClass );
+					Class<?> valueClass = Hibernate.getClass( arrayValue );
+					DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( valueClass );
 					if ( builder == null ) continue;
 					processContainedInValue( arrayValue, queue, valueClass, builder, searchFactoryImplementor );
 				}
@@ -609,15 +609,15 @@ public class DocumentBuilder<T> {
 				}
 				for (Object collectionValue : collection) {
 					//highly inneficient but safe wrt the actual targeted class
-					Class valueClass = Hibernate.getClass( collectionValue );
-					DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilders().get( valueClass );
+					Class<?> valueClass = Hibernate.getClass( collectionValue );
+					DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( valueClass );
 					if ( builder == null ) continue;
 					processContainedInValue( collectionValue, queue, valueClass, builder, searchFactoryImplementor );
 				}
 			}
 			else {
-				Class valueClass = Hibernate.getClass( value );
-				DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilders().get( valueClass );
+				Class<?> valueClass = Hibernate.getClass( value );
+				DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( valueClass );
 				if ( builder == null ) continue;
 				processContainedInValue( value, queue, valueClass, builder, searchFactoryImplementor );
 			}
@@ -753,14 +753,14 @@ public class DocumentBuilder<T> {
 		}
 	}
 
-	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class clazz, Document document) {
-		DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilders().get( clazz );
+	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document) {
+		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( clazz );
 		if ( builder == null ) throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
 		return (Serializable) builder.getIdBridge().get( builder.getIdKeywordName(), document );
 	}
 
-	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class clazz, Document document, String[] fields) {
-		DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilders().get( clazz );
+	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields) {
+		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( clazz );
 		if ( builder == null ) throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
@@ -824,10 +824,10 @@ public class DocumentBuilder<T> {
 		return -1;
 	}
 
-	public void postInitialize(Set<Class> indexedClasses) {
+	public void postInitialize(Set<Class<?>> indexedClasses) {
 		//this method does not requires synchronization
 		Class plainClass = reflectionManager.toClass( beanClass );
-		Set<Class> tempMappedSubclasses = new HashSet<Class>();
+		Set<Class<?>> tempMappedSubclasses = new HashSet<Class<?>>();
 		//together with the caller this creates a o(2), but I think it's still faster than create the up hierarchy for each class
 		for (Class currentClass : indexedClasses) {
 			if ( plainClass.isAssignableFrom( currentClass ) ) tempMappedSubclasses.add( currentClass );
@@ -845,7 +845,7 @@ public class DocumentBuilder<T> {
 	}
 
 
-	public Set<Class> getMappedSubclasses() {
+	public Set<Class<?>> getMappedSubclasses() {
 		return mappedSubclasses;
 	}
 

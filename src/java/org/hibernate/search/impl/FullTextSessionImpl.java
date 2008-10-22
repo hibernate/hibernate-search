@@ -61,7 +61,6 @@ import org.hibernate.type.Type;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-@SuppressWarnings( { "serial", "unchecked" } )
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 	private final Session session;
 	private final SessionImplementor sessionImplementor;
@@ -107,14 +106,13 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 * @param id
 	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
-	public void purge(Class entityType, Serializable id) {
+	public void purge(Class<?> entityType, Serializable id) {
 		if ( entityType == null ) return;
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		// not strictly necessary but a small optimization plus let's make sure the
 		// client didn't mess something up.
-		Map<Class, DocumentBuilder<Object>> builders = searchFactoryImplementor.getDocumentBuilders();
-		DocumentBuilder<Object> builder = builders.get( entityType );
 
+		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( entityType );
 		if ( builder == null ) {
 			throw new IllegalArgumentException( entityType.getName() + " is not a mapped entity (don't forget to add @Indexed)" );
 		}
@@ -139,12 +137,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 */
 	public void index(Object entity) {
 		if ( entity == null ) throw new IllegalArgumentException( "Entity to index should not be null" );
-		;
-		Class clazz = Hibernate.getClass( entity );
+
+		Class<?> clazz = Hibernate.getClass( entity );
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//not strictly necessary but a small optimization
-		DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( clazz );
+		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( clazz );
 		if ( builder == null ) {
 			throw new IllegalArgumentException( "Entity to index not an @Indexed entity: " + entity.getClass().getName() );
 		}

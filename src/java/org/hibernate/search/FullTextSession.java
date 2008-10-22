@@ -16,7 +16,7 @@ public interface FullTextSession extends Session {
 	 * of type <code>entities</code> and their respective subclasses.
 	 * If no entity is provided, no type filtering is done.
 	 */
-	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class... entities);
+	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
 
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
@@ -41,7 +41,7 @@ public interface FullTextSession extends Session {
 	 *
 	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
-	public void purge(Class entityType, Serializable id);
+	public void purge(Class<?> entityType, Serializable id);
 
 	/**
 	 * Remove all entities from a particular class of an index.
@@ -49,7 +49,7 @@ public interface FullTextSession extends Session {
 	 * @param entityType
 	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
 	 */
-	public void purgeAll(Class entityType);
+	public void purgeAll(Class<?> entityType);
 
 	/**
 	 * flush full text changes to the index

@@ -25,7 +25,9 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 
-	Map<Class, DocumentBuilder<Object>> getDocumentBuilders();
+	Map<Class<?>, DocumentBuilder<?>> getDocumentBuilders();
+
+	<T> DocumentBuilder<T> getDocumentBuilder(Class<T> entityType);
 
 	Worker getWorker();
 
@@ -45,13 +47,13 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	void close();
 
-	void addClassToDirectoryProvider(Class clazz, DirectoryProvider<?> directoryProvider);
+	void addClassToDirectoryProvider(Class<?> clazz, DirectoryProvider<?> directoryProvider);
 
-	Set<Class> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider);
+	Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider);
 
-	Set<DirectoryProvider> getDirectoryProviders();
+	Set<DirectoryProvider<?>> getDirectoryProviders();
 
-	ReentrantLock getDirectoryProviderLock(DirectoryProvider dp);
+	ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp);
 
 	void addDirectoryProvider(DirectoryProvider<?> provider);
 	

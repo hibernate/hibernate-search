@@ -23,7 +23,7 @@ public interface SearchFactory {
 	 * But if the given entity is configured to use sharded indexes, then multiple
 	 * elements will be returned. In this case all of them should be considered.
 	 */
-	DirectoryProvider[] getDirectoryProviders(Class entity);
+	DirectoryProvider[] getDirectoryProviders(Class<?> entity);
 
 	/**
 	 * Optimize all indexes
@@ -51,5 +51,5 @@ public interface SearchFactory {
 	 * @throws IllegalArgumentException in case <code>clazz == null</code> or the specified
 	 * class is not an indexed entity.
 	 */
-	Analyzer getAnalyzer(Class clazz);
+	Analyzer getAnalyzer(Class<?> clazz);
 }

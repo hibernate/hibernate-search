@@ -72,8 +72,8 @@ import org.hibernate.transform.ResultTransformer;
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
 	private static final Logger log = LoggerFactory.make();
 	private final org.apache.lucene.search.Query luceneQuery;
-	private Class[] classes;
-	private Set<Class> classesAndSubclasses;
+	private Class<?>[] classes;
+	private Set<Class<?>> classesAndSubclasses;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Integer firstResult;
@@ -528,7 +528,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
-		Map<Class, DocumentBuilder<Object>> builders = searchFactoryImplementor.getDocumentBuilders();
+		Map<Class<?>, DocumentBuilder<?>> builders = searchFactoryImplementor.getDocumentBuilders();
 		List<DirectoryProvider> directories = new ArrayList<DirectoryProvider>();
 
 		Similarity searcherSimilarity = null;
@@ -543,10 +543,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			classesAndSubclasses = null;
 		}
 		else {
-			Set<Class> involvedClasses = new HashSet<Class>( classes.length );
+			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( classes.length );
 			Collections.addAll( involvedClasses, classes );
-			for (Class clazz : classes) {
-				DocumentBuilder builder = builders.get( clazz );
+			for (Class<?> clazz : classes) {
+				DocumentBuilder<?> builder = builders.get( clazz );
 				if ( builder != null ) involvedClasses.addAll( builder.getMappedSubclasses() );
 			}
 
@@ -567,7 +567,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
 		if ( classesAndSubclasses != null) {
 			for (DirectoryProvider dp : directories) {
-				final Set<Class> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider( dp );
+				final Set<Class<?>> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider( dp );
 				// if a DP contains only one class, we know for sure it's part of classesAndSubclasses
 				if ( classesInDirectoryProvider.size() > 1 ) {
 					//risk of needClassFilterClause

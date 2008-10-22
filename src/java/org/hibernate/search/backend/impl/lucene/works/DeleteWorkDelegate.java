@@ -42,15 +42,16 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 	}
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
-		log.trace( "Removing {}#{} by query.", work.getEntityClass(), work.getId() );
-		DocumentBuilder builder = workspace.getDocumentBuilder( work.getEntityClass() );
+		final Class<?> entityType = work.getEntityClass();
+		log.trace( "Removing {}#{} by query.", entityType, work.getId() );
+		DocumentBuilder<?> builder = workspace.getDocumentBuilder( entityType );
 
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
 		TermQuery idQueryTerm = new TermQuery( builder.getTerm( work.getId() ) );
 		entityDeletionQuery.add( idQueryTerm, BooleanClause.Occur.MUST );
 
-		Term classNameQueryTerm =  new Term( DocumentBuilder.CLASS_FIELDNAME, work.getEntityClass().getName() );
+		Term classNameQueryTerm =  new Term( DocumentBuilder.CLASS_FIELDNAME, entityType.getName() );
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
 		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.MUST );
 
@@ -58,7 +59,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 			writer.deleteDocuments( entityDeletionQuery );
 		}
 		catch ( Exception e ) {
-			String message = "Unable to remove " + work.getEntityClass() + "#" + work.getId() + " from index.";
+			String message = "Unable to remove " + entityType + "#" + work.getId() + " from index.";
 			throw new SearchException( message, e );
 		}
 	}
@@ -75,15 +76,16 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		 * We can only delete by term, and the index doesn't have a term that
 		 * uniquely identify the entry. See logic below
 		 */
-		log.trace( "Removing {}#{} from Lucene index.", work.getEntityClass(), work.getId() );
-		DocumentBuilder builder = workspace.getDocumentBuilder( work.getEntityClass() );
+		final Class<?> entityType = work.getEntityClass();
+		log.trace( "Removing {}#{} from Lucene index.", entityType, work.getId() );
+		DocumentBuilder<?> builder = workspace.getDocumentBuilder( entityType );
 		Term term = builder.getTerm( work.getId() );
 		TermDocs termDocs = null;
 		try {
 			//TODO is there a faster way?
 			//TODO include TermDocs into the workspace?
 			termDocs = reader.termDocs( term );
-			String entityName = work.getEntityClass().getName();
+			String entityName = entityType.getName();
 			while ( termDocs.next() ) {
 				int docIndex = termDocs.doc();
 				if ( entityName.equals( reader.document( docIndex ).get( DocumentBuilder.CLASS_FIELDNAME ) ) ) {
@@ -97,7 +99,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		catch ( Exception e ) {
 			throw new SearchException(
 					"Unable to remove from Lucene index: "
-							+ work.getEntityClass() + "#" + work.getId(), e
+							+ entityType + "#" + work.getId(), e
 			);
 		}
 		finally {

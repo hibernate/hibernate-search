@@ -134,15 +134,21 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			if ( work != null) {
 				if ( layer.isRightLayer( work.getType() ) ) {
 					queue.set( i, null ); // help GC and avoid 2 loaded queues in memory
-					Class entityClass = work.getEntityClass() != null ?
-								work.getEntityClass() :
-								Hibernate.getClass( work.getEntity() );
-					DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entityClass );
-					if ( builder == null ) continue; //or exception?
-					builder.addWorkToQueue(entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor );
+					addWorkToBuilderQueue( luceneQueue, work );
 				}
 			}
 		}
+	}
+
+	private <T> void addWorkToBuilderQueue(List<LuceneWork> luceneQueue, Work work) {
+		@SuppressWarnings( "unchecked" )
+		Class<T> entityClass = work.getEntityClass() != null ?
+					work.getEntityClass() :
+					Hibernate.getClass( work.getEntity() );
+		DocumentBuilder<T> builder = searchFactoryImplementor.getDocumentBuilder( entityClass );
+		if ( builder == null ) return;
+		//TODO remove casting when Work is Work<T>
+		builder.addWorkToQueue(entityClass, (T) work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor );
 	}
 
 	//TODO implements parallel batchWorkers (one per Directory)

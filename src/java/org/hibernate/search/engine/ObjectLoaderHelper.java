@@ -41,12 +41,12 @@ public class ObjectLoaderHelper {
 		return maybeProxy;
 	}
 
-	public static void initializeObjects(EntityInfo[] entityInfos, Criteria criteria, Class entityType,
+	public static void initializeObjects(EntityInfo[] entityInfos, Criteria criteria, Class<?> entityType,
 										 SearchFactoryImplementor searchFactoryImplementor) {
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) return;
 
-		DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilders().get( entityType );
+		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( entityType );
 		String idName = builder.getIdentifierName();
 		int loop = maxResults / MAX_IN_CLAUSE;
 		boolean exact = maxResults % MAX_IN_CLAUSE == 0;

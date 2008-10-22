@@ -54,7 +54,7 @@ public class SharedReaderProvider implements ReaderProvider {
 	 */
 	private Map<IndexReader, ReaderData> searchIndexReaderSemaphores = new HashMap<IndexReader, ReaderData>();
 
-	public IndexReader openReader(DirectoryProvider[] directoryProviders) {
+	public IndexReader openReader(DirectoryProvider... directoryProviders) {
 		boolean trace = log.isTraceEnabled();
 		int length = directoryProviders.length;
 		IndexReader[] readers = new IndexReader[length];
@@ -320,7 +320,7 @@ public class SharedReaderProvider implements ReaderProvider {
 	}
 
 	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
-		Set<DirectoryProvider> providers = searchFactoryImplementor.getDirectoryProviders();
+		Set<DirectoryProvider<?>> providers = searchFactoryImplementor.getDirectoryProviders();
 		perDirectoryProviderManipulationLocks = new HashMap<DirectoryProvider, Lock>( providers.size() );
 		for ( DirectoryProvider dp : providers ) {
 			perDirectoryProviderManipulationLocks.put( dp, new ReentrantLock() );

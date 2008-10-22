@@ -38,7 +38,8 @@ class LuceneBackendQueueProcessor implements Runnable {
 		QueueProcessors processors = new QueueProcessors( visitorsMap );
 		// divide tasks in parts, adding to QueueProcessors by affected Directory.
 		for ( LuceneWork work : queue ) {
-			DocumentBuilder documentBuilder = searchFactoryImplementor.getDocumentBuilders().get( work.getEntityClass() );
+			final Class<?> entityType = work.getEntityClass();
+			DocumentBuilder<?> documentBuilder = searchFactoryImplementor.getDocumentBuilder( entityType );
 			IndexShardingStrategy shardingStrategy = documentBuilder.getDirectoryProviderSelectionStrategy();
 			work.getWorkDelegate( providerSelectionVisitor ).addAsPayLoadsToQueue( work, shardingStrategy, processors );
 		}

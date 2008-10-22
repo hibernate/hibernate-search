@@ -80,7 +80,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onPostInsert(PostInsertEvent event) {
 		if ( used ) {
 			final Object entity = event.getEntity();
-			DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entity.getClass() );
+			DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( entity.getClass() );
 			//not strictly necessary but a small optimization
 			if ( builder != null ) {
 				Serializable id = event.getId();
@@ -93,7 +93,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Object entity = event.getEntity();
 			//not strictly necessary but a small optimization
-			DocumentBuilder<Object> builder = searchFactoryImplementor.getDocumentBuilders().get( entity.getClass() );
+			DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( entity.getClass() );
 			if ( builder != null ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event );

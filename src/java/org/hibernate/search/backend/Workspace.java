@@ -49,7 +49,7 @@ public class Workspace {
 	private final DirectoryProvider directoryProvider;
 	private final OptimizerStrategy optimizerStrategy;
 	private final ReentrantLock lock;
-	private final Set<Class> entitiesInDirectory;
+	private final Set<Class<?>> entitiesInDirectory;
 	private final LuceneIndexingParameters indexingParams;
 
 	// variable state:
@@ -69,7 +69,7 @@ public class Workspace {
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 	
-	public Workspace(SearchFactoryImplementor searchFactoryImplementor, DirectoryProvider provider) {
+	public Workspace(SearchFactoryImplementor searchFactoryImplementor, DirectoryProvider<?> provider) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.directoryProvider = provider;
 		this.optimizerStrategy = searchFactoryImplementor.getOptimizerStrategy( directoryProvider );
@@ -78,8 +78,8 @@ public class Workspace {
 		this.lock = searchFactoryImplementor.getDirectoryProviderLock( provider );
 	}
 
-	public DocumentBuilder getDocumentBuilder(Class entity) {
-		return searchFactoryImplementor.getDocumentBuilders().get( entity );
+	public <T> DocumentBuilder<T> getDocumentBuilder(Class<T> entity) {
+		return searchFactoryImplementor.getDocumentBuilder( entity );
 	}
 
 	/**
@@ -173,6 +173,7 @@ public class Workspace {
 			return writer;
 		try {
 			// don't care about the Analyzer as it will be selected during usage of IndexWriter.
+			//FIXME use the non deprecated constructor => requires to call #Commit()
 			writer = new IndexWriter( directoryProvider.getDirectory(), SIMPLE_ANALYZER, false ); // has been created at init time
 			indexingParams.applyToWriter( writer, batchmode );
 			log.trace( "IndexWriter opened" );
@@ -220,7 +221,7 @@ public class Workspace {
 	 * @return The unmodifiable set of entity types being indexed
 	 * in the underlying Lucene Directory backing this Workspace.
 	 */
-	public Set<Class> getEntitiesInDirectory() {
+	public Set<Class<?>> getEntitiesInDirectory() {
 		return entitiesInDirectory;
 	}
 	

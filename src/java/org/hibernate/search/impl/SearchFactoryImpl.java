@@ -65,9 +65,9 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	private static final Logger log = LoggerFactory.make();
 
-	private final Map<Class, DocumentBuilder<Object>> documentBuilders = new HashMap<Class, DocumentBuilder<Object>>();
+	private final Map<Class<?>, DocumentBuilder<?>> documentBuilders = new HashMap<Class<?>, DocumentBuilder<?>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
-	private final Map<DirectoryProvider, DirectoryProviderData> dirProviderData = new HashMap<DirectoryProvider, DirectoryProviderData>();
+	private final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData = new HashMap<DirectoryProvider<?>, DirectoryProviderData>();
 	private final Worker worker;
 	private final ReaderProvider readerProvider;
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
@@ -113,7 +113,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.indexingStrategy = defineIndexingStrategy( cfg ); //need to be done before the document builds
 		initDocumentBuilders( cfg, reflectionManager );
 
-		Set<Class> indexedClasses = documentBuilders.keySet();
+		Set<Class<?>> indexedClasses = documentBuilders.keySet();
 		for (DocumentBuilder builder : documentBuilders.values()) {
 			builder.postInitialize( indexedClasses );
 		}
@@ -166,7 +166,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		}
 	}
 
-	public void addClassToDirectoryProvider(Class clazz, DirectoryProvider<?> directoryProvider) {
+	public void addClassToDirectoryProvider(Class<?> clazz, DirectoryProvider<?> directoryProvider) {
 		//no need to set a read barrier, we only use this class in the init thread
 		DirectoryProviderData data = dirProviderData.get(directoryProvider);
 		if (data == null) {
@@ -176,7 +176,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		data.classes.add(clazz);
 	}
 
-	public Set<Class> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
+	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
 		if (barrier != 0) { } //read barrier
 		return Collections.unmodifiableSet( dirProviderData.get(directoryProvider).classes );
 	}
@@ -237,12 +237,17 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 
-	public Map<Class, DocumentBuilder<Object>> getDocumentBuilders() {
+	public Map<Class<?>, DocumentBuilder<?>> getDocumentBuilders() {
 		if (barrier != 0) { } //read barrier
 		return documentBuilders;
 	}
 
-	public Set<DirectoryProvider> getDirectoryProviders() {
+	@SuppressWarnings( "unckecked" )
+	public <T> DocumentBuilder<T> getDocumentBuilder(Class<T> entityType) {
+		return ( DocumentBuilder<T> ) documentBuilders.get( entityType );
+	}
+
+	public Set<DirectoryProvider<?>> getDirectoryProviders() {
 		if (barrier != 0) { } //read barrier
 		return this.dirProviderData.keySet();
 	}
@@ -282,15 +287,15 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return readerProvider;
 	}
 
-	public DirectoryProvider[] getDirectoryProviders(Class entity) {
+	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
 		if (barrier != 0) {} //read barrier
-		DocumentBuilder<Object> documentBuilder = getDocumentBuilders().get( entity );
+		DocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
 		return documentBuilder == null ? null : documentBuilder.getDirectoryProviders();
 	}
 
 	public void optimize() {
 		if (barrier != 0) {} //read barrier
-		Set<Class> clazzs = getDocumentBuilders().keySet();
+		Set<Class<?>> clazzs = getDocumentBuilders().keySet();
 		for (Class clazz : clazzs) {
 			optimize( clazz );
 		}
@@ -318,7 +323,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
 		}
 		
-		DocumentBuilder<Object> builder = documentBuilders.get( clazz );
+		DocumentBuilder<?> builder = documentBuilders.get( clazz );
 		if ( builder == null ) {
 			throw new IllegalArgumentException( "Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName() );
 		}
@@ -393,10 +398,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private static class DirectoryProviderData {
 		public final ReentrantLock dirLock = new ReentrantLock();
 		public OptimizerStrategy optimizerStrategy;
-		public Set<Class> classes = new HashSet<Class>(2);
+		public Set<Class<?>> classes = new HashSet<Class<?>>(2);
 	}
 
-	public ReentrantLock getDirectoryProviderLock(DirectoryProvider dp) {
+	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
 		if (barrier != 0) {} //read barrier
 		return this.dirProviderData.get( dp ).dirLock;
 	}

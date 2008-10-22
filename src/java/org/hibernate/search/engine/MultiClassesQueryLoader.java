@@ -37,7 +37,7 @@ public class MultiClassesQueryLoader implements Loader {
 		if ( entityTypes.length == 0 ) {
 			//support all classes
 			safeEntityTypes = new ArrayList<Class>();
-			for( Map.Entry<Class, DocumentBuilder<Object>> entry : searchFactoryImplementor.getDocumentBuilders().entrySet() ) {
+			for( Map.Entry<Class<?>, DocumentBuilder<?>> entry : searchFactoryImplementor.getDocumentBuilders().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().isRoot() ) {
 					safeEntityTypes.add( entry.getKey() );
@@ -108,14 +108,14 @@ public class MultiClassesQueryLoader implements Loader {
 	}
 
 	private static class RootEntityMetadata {
-		public final Class rootEntity;
-		public final Set<Class> mappedSubclasses;
+		public final Class<?> rootEntity;
+		public final Set<Class<?>> mappedSubclasses;
 		private final Criteria criteria;
 		public final boolean useObjectLoader;
 
-		RootEntityMetadata(Class rootEntity, SearchFactoryImplementor searchFactoryImplementor, Session session) {
+		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor, Session session) {
 			this.rootEntity = rootEntity;
-			DocumentBuilder provider = searchFactoryImplementor.getDocumentBuilders().get( rootEntity );
+			DocumentBuilder<?> provider = searchFactoryImplementor.getDocumentBuilder( rootEntity );
 			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
 			this.mappedSubclasses = provider.getMappedSubclasses();
 			this.criteria = session.createCriteria( rootEntity );
