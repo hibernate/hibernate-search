@@ -23,7 +23,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 	
 	private FSDirectory directory;
 	private String indexName;

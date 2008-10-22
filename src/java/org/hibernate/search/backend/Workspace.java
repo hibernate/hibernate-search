@@ -40,7 +40,7 @@ import org.hibernate.search.util.LoggerFactory;
 //TODO renaming to "DirectoryWorkspace" would be nice.
 public class Workspace {
 
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer();
 	
 	// invariant state:
@@ -256,7 +256,7 @@ public class Workspace {
 		}
 	}
 
-	private final void assertOwnLock() {
+	private void assertOwnLock() {
 		if ( ! lock.isHeldByCurrentThread() )
 			throw new AssertionFailure( "Not owning DirectoryProvider Lock" );
 	}

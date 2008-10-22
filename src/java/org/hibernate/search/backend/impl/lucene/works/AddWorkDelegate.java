@@ -27,8 +27,9 @@ import org.hibernate.search.util.LoggerFactory;
  */
 class AddWorkDelegate implements LuceneWorkDelegate {
 
+	private static final Logger log = LoggerFactory.make();
+
 	private final Workspace workspace;
-	private final Logger log = LoggerFactory.make();
 
 	AddWorkDelegate(Workspace workspace) {
 		this.workspace = workspace;

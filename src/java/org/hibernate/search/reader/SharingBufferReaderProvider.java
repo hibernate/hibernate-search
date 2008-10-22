@@ -32,7 +32,9 @@ import org.hibernate.search.util.LoggerFactory;
  * @author Sanne Grinovero
  */
 public class SharingBufferReaderProvider implements ReaderProvider {
-	
+
+	private static final Logger log = LoggerFactory.make();	
+
 	/**
 	 * contains all Readers (most current per DP and all unclosed old) 
 	 */
@@ -43,8 +45,6 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	 * contains last updated Reader; protected by lockOnOpenLatest (in the values)
 	 */
 	protected Map<DirectoryProvider,PerDirectoryLatestReader> currentReaders;
-	
-	private final Logger log = LoggerFactory.make();
 
 	public void closeReader(IndexReader multiReader) {
 		if ( multiReader == null ) return;

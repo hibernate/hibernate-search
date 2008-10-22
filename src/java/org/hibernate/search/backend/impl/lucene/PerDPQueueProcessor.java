@@ -18,7 +18,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 class PerDPQueueProcessor {
 	
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 	private final Workspace workspace;
 	private final LuceneWorkVisitor worker;
 	private final List<LuceneWork> workOnWriter = new ArrayList<LuceneWork>();

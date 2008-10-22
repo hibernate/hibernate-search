@@ -22,7 +22,7 @@ import org.hibernate.search.util.LoggerFactory;
 */
 class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 	
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 
 	PurgeAllWorkDelegate() {
 	}

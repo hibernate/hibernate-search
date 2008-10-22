@@ -33,7 +33,7 @@ import org.hibernate.search.util.LoggerFactory;
 //TODO rename copy?
 public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 	
 	private volatile int current;

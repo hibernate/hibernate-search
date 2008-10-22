@@ -70,7 +70,7 @@ import org.hibernate.transform.ResultTransformer;
  */
 //TODO implements setParameter()
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 	private final org.apache.lucene.search.Query luceneQuery;
 	private Class[] classes;
 	private Set<Class> classesAndSubclasses;

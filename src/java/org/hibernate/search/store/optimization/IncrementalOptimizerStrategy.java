@@ -20,12 +20,14 @@ import org.hibernate.search.util.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class IncrementalOptimizerStrategy implements OptimizerStrategy {
+	
+	private static final Logger log = LoggerFactory.make();	
+
 	private int operationMax = -1;
 	private int transactionMax = -1;
 	private long operations = 0;
 	private long transactions = 0;
 	private DirectoryProvider directoryProvider;
-	private final Logger log = LoggerFactory.make();
 
 	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, SearchFactoryImplementor searchFactoryImplementor) {
 		this.directoryProvider = directoryProvider;

@@ -63,7 +63,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		Version.touch();
 	}
 
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 
 	private final Map<Class, DocumentBuilder<Object>> documentBuilders = new HashMap<Class, DocumentBuilder<Object>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider

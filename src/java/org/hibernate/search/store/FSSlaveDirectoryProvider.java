@@ -33,7 +33,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 	
 	private volatile int current; //used also as memory barrier of all other values, which are set once.

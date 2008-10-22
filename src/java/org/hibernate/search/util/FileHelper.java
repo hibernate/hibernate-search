@@ -17,10 +17,11 @@ import org.slf4j.Logger;
  * @author Sanne Grinovero
  */
 public abstract class FileHelper {
-	
+
+    private static final Logger log = LoggerFactory.make();
 	private static final int FAT_PRECISION = 2000;
 	public static final long DEFAULT_COPY_BUFFER_SIZE = 16 * 1024 * 1024; // 16 MB
-	private static final Logger log = LoggerFactory.make();
+
 	
 	public static void synchronize(File source, File destination, boolean smart) throws IOException {
 		synchronize( source, destination, smart, DEFAULT_COPY_BUFFER_SIZE );

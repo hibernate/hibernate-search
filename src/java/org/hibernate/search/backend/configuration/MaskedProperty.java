@@ -38,8 +38,8 @@ import org.hibernate.search.util.LoggerFactory;
 public class MaskedProperty extends Properties implements Serializable {
 	
 	private static final long serialVersionUID = -593307257383085113L;
-	
-	private transient Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
+
 	private final Properties masked;
 	private final Properties fallBack;
 	private final String radix;
@@ -373,15 +373,4 @@ public class MaskedProperty extends Properties implements Serializable {
 			return false;
 		return true;
 	}
-	
-	private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
-		//always perform the default de-serialization first
-		aInputStream.defaultReadObject();
-		log = LoggerFactory.make();
-	}
-
-	private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
-		aOutputStream.defaultWriteObject();
-	}
-
 }

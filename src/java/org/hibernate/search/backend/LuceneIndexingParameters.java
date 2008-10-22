@@ -27,6 +27,7 @@ import org.hibernate.search.util.LoggerFactory;
 public class LuceneIndexingParameters implements Serializable {
 
 	private static final long serialVersionUID = 5424606407623591663L;
+	private static final Logger log = LoggerFactory.make();
 	
 	// value keyword
 	public static final String EXPLICIT_DEFAULT_VALUE = "default";
@@ -45,14 +46,12 @@ public class LuceneIndexingParameters implements Serializable {
 		Properties transactionProps = new MaskedProperty( indexingParameters, TRANSACTION );
 		//get keys for "batch" (defaulting to transaction)
 		Properties batchProps = new MaskedProperty( indexingParameters, BATCH, transactionProps ); //TODO to close HSEARCH-201 just remove 3° parameter
-		//logger only used during object construction: (logger not serializable).
-		Logger log = LoggerFactory.make();
-		transactionIndexParameters = new ParameterSet( transactionProps, TRANSACTION, log );
-		batchIndexParameters = new ParameterSet( batchProps, BATCH, log );
-		doSanityChecks( transactionIndexParameters, batchIndexParameters, log );
+		transactionIndexParameters = new ParameterSet( transactionProps, TRANSACTION);
+		batchIndexParameters = new ParameterSet( batchProps, BATCH);
+		doSanityChecks( transactionIndexParameters, batchIndexParameters);
 	}
 
-	private void doSanityChecks(ParameterSet transParams, ParameterSet batchParams, Logger log) {
+	private void doSanityChecks(ParameterSet transParams, ParameterSet batchParams) {
 		if ( log.isWarnEnabled() ) {
 			Integer maxFieldLengthTransaction = transParams.parameters.get( MAX_FIELD_LENGTH );
 			Integer maxFieldLengthBatch = transParams.parameters.get( MAX_FIELD_LENGTH );
@@ -83,7 +82,7 @@ public class LuceneIndexingParameters implements Serializable {
 		
 		final Map<IndexWriterSetting, Integer> parameters = new EnumMap<IndexWriterSetting, Integer>(IndexWriterSetting.class);
 		
-		public ParameterSet(Properties prop, String paramName, Logger log) {
+		public ParameterSet(Properties prop, String paramName) {
 			//don't iterate on property entries as we know all the keys:
 			for ( IndexWriterSetting t : IndexWriterSetting.values() ) {
 				String key = t.getKey();

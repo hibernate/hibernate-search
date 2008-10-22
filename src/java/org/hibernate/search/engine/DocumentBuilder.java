@@ -324,7 +324,7 @@ public class DocumentBuilder<T> {
 			}
 			maxLevel = potentialLevel > maxLevel ? maxLevel : potentialLevel;
 			level++;
-
+			                                                             
 			XClass elementClass;
 			if ( void.class == embeddedAnn.targetElement() ) {
 				elementClass = member.getElementClass();

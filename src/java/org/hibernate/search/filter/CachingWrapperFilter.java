@@ -23,7 +23,7 @@ import org.hibernate.util.SoftLimitMRUCache;
 @SuppressWarnings("serial")
 public class CachingWrapperFilter extends Filter {
 	
-	private final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 	
 	public static final int DEFAULT_SIZE = 5;
 	

@@ -21,9 +21,10 @@ import org.hibernate.search.util.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class JMSBackendQueueProcessor implements Runnable {
+	private static final Logger log = LoggerFactory.make();
+
 	private List<LuceneWork> queue;
 	private JMSBackendQueueProcessorFactory factory;
-	private Logger log = LoggerFactory.make();
 
 	public JMSBackendQueueProcessor(List<LuceneWork> queue,
 									JMSBackendQueueProcessorFactory jmsBackendQueueProcessorFactory) {
