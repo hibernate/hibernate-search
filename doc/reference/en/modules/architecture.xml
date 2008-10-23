@@ -228,22 +228,14 @@
       multiple queries and threads provided that the
       <classname>IndexReader</classname> is still up-to-date. If the
       <classname>IndexReader</classname> is not up-to-date, a new one is
-      opened and provided. Generally speaking, </para>
-    </section>
-
-    <section>
-      <title>Shared Segments</title>
-
-      <para>This strategies goes a step further the shared strategy and tries
-      to minimize reopening even when the underlying index has changed. Each
+      opened and provided. Each
       <classname>IndexReader</classname> is made of several
       <classname>SegmentReader</classname>s. This strategy only reopens
-      segments that have been modified or created and shared the already
-      loaded segments. This strategy will become the default strategy in the
-      near future.</para>
-
-      <para>The name of this strategy is
-      <literal>shared-segments</literal>.</para>
+      segments that have been modified or created after last opening and
+      shares the already loaded segments from the previous instance.
+      This strategy is the default.</para>
+      
+      <para>The name of this strategy is <literal>shared</literal>.</para>
     </section>
 
     <section>

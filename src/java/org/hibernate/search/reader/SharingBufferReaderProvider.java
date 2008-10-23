@@ -23,11 +23,10 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
- * As does SharedReaderProvider this also shares IndexReaders as long as they are "current";
+ * This ReaderProvider shares IndexReaders as long as they are "current";
  * main difference with SharedReaderProvider is the way to update the Readers when needed:
  * this uses IndexReader.reopen() which should improve performance on larger indexes
  * as it shares buffers with previous IndexReader generation for the segments which didn't change.
- * Current drawbacks are: need of Lucene > 2.3.0 and less mature (experimental).
  * 
  * @author Sanne Grinovero
  */

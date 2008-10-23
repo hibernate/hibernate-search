@@ -24,9 +24,10 @@ import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Share readers per SearchFactory, reusing them iff they are still valid.
- *
+ * @Deprecated replaced by SharingBufferReaderProvider
  * @author Emmanuel Bernard
  */
+@Deprecated
 public class SharedReaderProvider implements ReaderProvider {
 	private static final Logger log = LoggerFactory.make();
 

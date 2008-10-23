@@ -471,13 +471,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     <itemizedlist>
       <listitem>
         <para><literal>shared</literal>: share index readers across several
-        queries</para>
-      </listitem>
-
-      <listitem>
-        <para><literal>shared-segments</literal>: index readers are shared
-        across several queries and when reopening is needed, the inchanged
-        state is shared. This strategy is the most efficient.</para>
+        queries. This strategy is the most efficient.</para>
       </listitem>
 
       <listitem>
@@ -491,7 +485,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
 
     <programlisting>hibernate.search.reader.strategy = not-shared</programlisting>
 
-    <para>Adding this property switch to the <literal>not-shared</literal>
+    <para>Adding this property switches to the <literal>not-shared</literal>
     strategy.</para>
 
     <para>Or if you have a custom reader strategy:</para>
