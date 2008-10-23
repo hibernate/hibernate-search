@@ -42,6 +42,7 @@ import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.EntityState;
 import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
@@ -66,6 +67,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private static final Logger log = LoggerFactory.make();
 
 	private final Map<Class<?>, DocumentBuilder<?>> documentBuilders = new HashMap<Class<?>, DocumentBuilder<?>>();
+	private final Map<Class<?>, DocumentBuilder<?>> containedInOnlyBuilders = new HashMap<Class<?>, DocumentBuilder<?>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
 	private final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData = new HashMap<DirectoryProvider<?>, DirectoryProviderData>();
 	private final Worker worker;
@@ -115,6 +117,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 		Set<Class<?>> indexedClasses = documentBuilders.keySet();
 		for (DocumentBuilder builder : documentBuilders.values()) {
+			builder.postInitialize( indexedClasses );
+		}
+		//not really necessary today
+		for (DocumentBuilder builder : containedInOnlyBuilders.values()) {
 			builder.postInitialize( indexedClasses );
 		}
 		this.worker = WorkerFactory.createWorker( cfg, this );
@@ -244,7 +250,14 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	@SuppressWarnings( "unckecked" )
 	public <T> DocumentBuilder<T> getDocumentBuilder(Class<T> entityType) {
+		if (barrier != 0) { } //read barrier
 		return ( DocumentBuilder<T> ) documentBuilders.get( entityType );
+	}
+
+	@SuppressWarnings( "unckecked" )
+	public <T> DocumentBuilder<T> getContainedInOnlyBuilder(Class<T> entityType) {
+		if (barrier != 0) { } //read barrier
+		return ( DocumentBuilder<T> ) containedInOnlyBuilders.get( entityType );
 	}
 
 	public Set<DirectoryProvider<?>> getDirectoryProviders() {
@@ -343,13 +356,25 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				if ( mappedXClass != null) {
 					if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
 						DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders( mappedXClass, cfg, this, reflectionManager );
-
-						final DocumentBuilder<Object> documentBuilder = new DocumentBuilder<Object>(
+						//FIXME DocumentBuilder needs to be built by a helper method receiving Class<T> to infer T properly
+						//XClass unfortunately is not (yet) genericized: TODO?
+						final DocumentBuilder<?> documentBuilder = new DocumentBuilder(
 								mappedXClass, context, providers.getProviders(), providers.getSelectionStrategy(),
 								reflectionManager
 						);
 
 						documentBuilders.put( mappedClass, documentBuilder );
+					}
+					else {
+						//FIXME DocumentBuilder needs to be built by a helper method receiving Class<T> to infer T properly
+						//XClass unfortunately is not (yet) genericized: TODO?
+						final DocumentBuilder<?> documentBuilder = new DocumentBuilder(
+								mappedXClass, context, reflectionManager
+						);
+						//TODO enhance that, I don't like to expose EntityState
+						if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
+							containedInOnlyBuilders.put( mappedClass, documentBuilder );
+						}
 					}
 					bindFilterDefs(mappedXClass);
 					//TODO should analyzer def for classes at tyher sqme level???

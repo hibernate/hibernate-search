@@ -19,7 +19,6 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-@SuppressWarnings("unchecked")
 public interface SearchFactoryImplementor extends SearchFactory {
 	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
 
@@ -28,6 +27,8 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	Map<Class<?>, DocumentBuilder<?>> getDocumentBuilders();
 
 	<T> DocumentBuilder<T> getDocumentBuilder(Class<T> entityType);
+
+	<T> DocumentBuilder<T> getContainedInOnlyBuilder(Class<T> entityType);
 
 	Worker getWorker();
 

@@ -264,7 +264,6 @@ public class EmbeddedTest extends SearchTestCase {
 	 * Tests that updating an indexed embedded object updates the Lucene index as well.
 	 * 
 	 * @throws Exception in case the test fails
-	 * @see HSEARCH-142
 	 */
 	public void testEmbeddedObjectUpdate() throws Exception {
 
@@ -316,6 +315,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 	protected Class<?>[] getMappings() {
 		return new Class[] { Tower.class, Address.class, Product.class, Order.class, Author.class, Country.class,
-				State.class, StateCandidate.class };
+				State.class, StateCandidate.class, NonIndexedEntity.class
+		};
 	}
 }

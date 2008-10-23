@@ -146,6 +146,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 					work.getEntityClass() :
 					Hibernate.getClass( work.getEntity() );
 		DocumentBuilder<T> builder = searchFactoryImplementor.getDocumentBuilder( entityClass );
+		if ( builder == null ) {
+			//might be a entity contained in
+			builder = searchFactoryImplementor.getContainedInOnlyBuilder( entityClass );
+		}
 		if ( builder == null ) return;
 		//TODO remove casting when Work is Work<T>
 		builder.addWorkToQueue(entityClass, (T) work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor );

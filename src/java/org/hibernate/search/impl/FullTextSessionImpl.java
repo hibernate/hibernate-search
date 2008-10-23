@@ -112,9 +112,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		// not strictly necessary but a small optimization plus let's make sure the
 		// client didn't mess something up.
 
-		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( entityType );
-		if ( builder == null ) {
-			throw new IllegalArgumentException( entityType.getName() + " is not a mapped entity (don't forget to add @Indexed)" );
+		if ( searchFactoryImplementor.getDocumentBuilder( entityType ) == null
+				&& searchFactoryImplementor.getContainedInOnlyBuilder( entityType ) == null ) {
+			throw new IllegalArgumentException( "Entity to index is not an @Indexed entity nor @ContainedIn another entity: "
+					+ entityType.getName() );
 		}
 		WorkType type;
 		if ( id == null ) {
@@ -142,9 +143,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//not strictly necessary but a small optimization
-		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( clazz );
-		if ( builder == null ) {
-			throw new IllegalArgumentException( "Entity to index not an @Indexed entity: " + entity.getClass().getName() );
+		if ( searchFactoryImplementor.getDocumentBuilder( clazz ) == null
+				&& searchFactoryImplementor.getContainedInOnlyBuilder( clazz ) == null ) {
+			throw new IllegalArgumentException( "Entity to index is not an @Indexed entity nor @ContainedIn another entity: "
+					+ entity.getClass().getName() );
 		}
 		Serializable id = session.getIdentifier( entity );
 		Work work = new Work( entity, id, WorkType.INDEX );

@@ -67,7 +67,6 @@ import org.hibernate.search.util.ScopedAnalyzer;
  * @author Richard Hallier
  * @author Hardy Ferentschik
  */
-@SuppressWarnings( "unchecked" )
 public class DocumentBuilder<T> {
 	private static final Logger log = LoggerFactory.make();
 
@@ -90,14 +89,19 @@ public class DocumentBuilder<T> {
 	//if composite id, use of (a, b) in ((1,2), (3,4)) fails on most database
 	private boolean safeFromTupleId;
 	private boolean idProvided = false;
+	private EntityState entityState;
 
 
 	public boolean isRoot() {
 		return isRoot;
 	}
 
+	/**
+	 * used on an @Indexed entity
+	 */
 	public DocumentBuilder(XClass clazz, InitContext context, DirectoryProvider[] directoryProviders,
 						   IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
+		this.entityState = EntityState.INDEXED;
 		this.beanClass = clazz;
 		this.directoryProviders = directoryProviders;
 		this.shardingStrategy = shardingStrategy;
@@ -105,6 +109,10 @@ public class DocumentBuilder<T> {
 		this.reflectionManager = reflectionManager;
 		this.similarity = context.getDefaultSimilarity();
 
+		init( clazz, context, reflectionManager );
+	}
+
+	private void init(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
 		if ( clazz == null ) throw new AssertionFailure( "Unable to build a DocumentBuilder with a null class" );
 		rootPropertiesMetadata.boost = getBoost( clazz );
 		rootPropertiesMetadata.analyzer = context.getDefaultAnalyzer();
@@ -113,7 +121,7 @@ public class DocumentBuilder<T> {
 		initializeMembers( clazz, rootPropertiesMetadata, true, "", processedClasses, context );
 		//processedClasses.remove( clazz ); for the sake of completness
 		this.analyzer.setGlobalAnalyzer( rootPropertiesMetadata.analyzer );
-		if ( idKeywordName == null ) {
+		if ( entityState == EntityState.INDEXED && idKeywordName == null ) {
 			// if no DocumentId then check if we have a ProvidedId instead
 			ProvidedId provided = findProvidedId( clazz, reflectionManager );
 			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
@@ -123,7 +131,26 @@ public class DocumentBuilder<T> {
 		}
 		//if composite id, use of (a, b) in ((1,2)TwoWayString2FieldBridgeAdaptor, (3,4)) fails on most database
 		//a TwoWayString2FieldBridgeAdaptor is never a composite id
-		safeFromTupleId = TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
+		safeFromTupleId = entityState != EntityState.INDEXED || TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
+	}
+
+	/**
+	 * used on a non @Indexed entity
+	 */
+	public DocumentBuilder(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
+		this.entityState = EntityState.CONTAINED_IN_ONLY;
+		this.beanClass = clazz;
+		this.directoryProviders = null;
+		this.shardingStrategy = null;
+
+		//FIXME get rid of it when boost is stored?
+		this.reflectionManager = reflectionManager;
+		this.similarity = context.getDefaultSimilarity();
+
+		init( clazz, context, reflectionManager );
+		if (rootPropertiesMetadata.containedInGetters.size() == 0) {
+			this.entityState = EntityState.NON_INDEXABLE;
+		}
 	}
 
 	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {
@@ -502,75 +529,73 @@ public class DocumentBuilder<T> {
 	}
 
 	//TODO could we use T instead of EntityClass?
-	public void addWorkToQueue(Class entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
 		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition
-		List<LuceneWork> toDelete = new ArrayList<LuceneWork>();
-		boolean duplicateDelete = false;
-		for (LuceneWork luceneWork : queue) {
-   			//avoid unecessary duplicated work
-			if ( luceneWork.getEntityClass() == entityClass
-					) {
-				Serializable currentId = luceneWork.getId();
-				//currentId != null => either ADD or Delete work
-				if ( currentId != null && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
-					if (workType == WorkType.DELETE) { //TODO add PURGE?
-						//DELETE should have precedence over any update before (HSEARCH-257)
-						//if an Add work is here, remove it
-						//if an other delete is here remember but still search for Add
-						if (luceneWork instanceof AddLuceneWork) {
-							toDelete.add( luceneWork );
+		if ( entityState == EntityState.INDEXED ) {
+			List<LuceneWork> toDelete = new ArrayList<LuceneWork>();
+			boolean duplicateDelete = false;
+			for (LuceneWork luceneWork : queue) {
+				//avoid unecessary duplicated work
+				if ( luceneWork.getEntityClass() == entityClass
+						) {
+					Serializable currentId = luceneWork.getId();
+					//currentId != null => either ADD or Delete work
+					if ( currentId != null && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
+						if (workType == WorkType.DELETE) { //TODO add PURGE?
+							//DELETE should have precedence over any update before (HSEARCH-257)
+							//if an Add work is here, remove it
+							//if an other delete is here remember but still search for Add
+							if (luceneWork instanceof AddLuceneWork) {
+								toDelete.add( luceneWork );
+							}
+							else if (luceneWork instanceof DeleteLuceneWork) {
+								duplicateDelete = true;
+							}
 						}
-						else if (luceneWork instanceof DeleteLuceneWork) {
-							duplicateDelete = true;
+						else {
+							//we can safely say we are out, the other work is an ADD
+							return;
 						}
 					}
-					else {
-						//we can safely say we are out, the other work is an ADD
-						return;
-					}
+					//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
 				}
-				//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
 			}
-		}
-		for ( LuceneWork luceneWork : toDelete ) {
-			toDelete.remove( luceneWork );
-		}
-		if (duplicateDelete) return;
+			for ( LuceneWork luceneWork : toDelete ) {
+				toDelete.remove( luceneWork );
+			}
+			if (duplicateDelete) return;
 
-		boolean searchForContainers = false;
-		String idInString = idBridge.objectToString( id );
-		if ( workType == WorkType.ADD ) {
-			Document doc = getDocument( entity, id );
-			queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
-			searchForContainers = true;
-		}
-		else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
-			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-		}
-		else if ( workType == WorkType.PURGE_ALL ) {
-			queue.add( new PurgeAllLuceneWork( entityClass ) );
-		}
-		else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
-			Document doc = getDocument( entity, id );
-			/**
-			 * even with Lucene 2.1, use of indexWriter to update is not an option
-			 * We can only delete by term, and the index doesn't have a term that
-			 * uniquely identify the entry.
-			 * But essentially the optimization we are doing is the same Lucene is doing, the only extra cost is the
-			 * double file opening.
-			 */
-			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-			queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
-			searchForContainers = true;
-		}
-		else if ( workType == WorkType.INDEX ) {
-			Document doc = getDocument( entity, id );
-			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-			queue.add( new AddLuceneWork( id, idInString, entityClass, doc, true ) );
-			searchForContainers = true;
-		}
-		else {
-			throw new AssertionFailure( "Unknown WorkType: " + workType );
+			String idInString = idBridge.objectToString( id );
+			if ( workType == WorkType.ADD ) {
+				Document doc = getDocument( entity, id );
+				queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
+			}
+			else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
+				queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
+			}
+			else if ( workType == WorkType.PURGE_ALL ) {
+				queue.add( new PurgeAllLuceneWork( entityClass ) );
+			}
+			else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
+				Document doc = getDocument( entity, id );
+				/**
+				 * even with Lucene 2.1, use of indexWriter to update is not an option
+				 * We can only delete by term, and the index doesn't have a term that
+				 * uniquely identify the entry.
+				 * But essentially the optimization we are doing is the same Lucene is doing, the only extra cost is the
+				 * double file opening.
+				 */
+				queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
+				queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
+			}
+			else if ( workType == WorkType.INDEX ) {
+				Document doc = getDocument( entity, id );
+				queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
+				queue.add( new AddLuceneWork( id, idInString, entityClass, doc, true ) );
+			}
+			else {
+				throw new AssertionFailure( "Unknown WorkType: " + workType );
+			}
 		}
 
 		/**
@@ -578,7 +603,7 @@ public class DocumentBuilder<T> {
 		 * have to be updated)
 		 * When the internal object is changed, we apply the {Add|Update}Work on containedIns
 		 */
-		if ( searchForContainers ) {
+		if ( workType.searchForContainers() ) {
 			processContainedIn( entity, queue, rootPropertiesMetadata, searchFactoryImplementor );
 		}
 	}
@@ -626,7 +651,7 @@ public class DocumentBuilder<T> {
 		//do not walk through them
 	}
 
-	private void processContainedInValue(Object value, List<LuceneWork> queue, Class valueClass,
+	private void processContainedInValue(Object value, List<LuceneWork> queue, Class<?> valueClass,
 										 DocumentBuilder builder, SearchFactoryImplementor searchFactoryImplementor) {
 		Serializable id = (Serializable) builder.getMemberValue( value, builder.idGetter );
 		builder.addWorkToQueue( valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor );
@@ -634,7 +659,8 @@ public class DocumentBuilder<T> {
 
 	public Document getDocument(T instance, Serializable id) {
 		Document doc = new Document();
-		XClass instanceClass = reflectionManager.toXClass( Hibernate.getClass( instance ) );
+		final Class<?> entityType = Hibernate.getClass( instance );
+		XClass instanceClass = reflectionManager.toXClass( entityType );
 		if ( rootPropertiesMetadata.boost != null ) {
 			doc.setBoost( rootPropertiesMetadata.boost );
 		}
@@ -718,10 +744,16 @@ public class DocumentBuilder<T> {
 	}
 
 	public DirectoryProvider[] getDirectoryProviders() {
+		if( entityState != EntityState.INDEXED ) {
+			throw new AssertionFailure("Contained in only entity: getDirectoryProvider should not have been called.");
+		}
 		return directoryProviders;
 	}
 
 	public IndexShardingStrategy getDirectoryProviderSelectionStrategy() {
+		if( entityState != EntityState.INDEXED ) {
+			throw new AssertionFailure("Contained in only entity: getDirectoryProviderSelectionStrategy should not have been called.");
+		}
 		return shardingStrategy;
 	}
 
@@ -825,6 +857,7 @@ public class DocumentBuilder<T> {
 	}
 
 	public void postInitialize(Set<Class<?>> indexedClasses) {
+		if (entityState == EntityState.NON_INDEXABLE) throw new AssertionFailure("A non indexed entity is post processed");
 		//this method does not requires synchronization
 		Class plainClass = reflectionManager.toClass( beanClass );
 		Set<Class<?>> tempMappedSubclasses = new HashSet<Class<?>>();
@@ -844,6 +877,9 @@ public class DocumentBuilder<T> {
 		}
 	}
 
+	public EntityState getEntityState() {
+		return entityState;
+	}
 
 	public Set<Class<?>> getMappedSubclasses() {
 		return mappedSubclasses;

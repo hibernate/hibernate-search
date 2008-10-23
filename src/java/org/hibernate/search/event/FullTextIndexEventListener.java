@@ -72,17 +72,20 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	}
 
 	public void onPostDelete(PostDeleteEvent event) {
-		if ( used && searchFactoryImplementor.getDocumentBuilders().containsKey( event.getEntity().getClass() ) ) {
-			processWork( event.getEntity(), event.getId(), WorkType.DELETE, event );
+		if ( used ) {
+			final Class<?> entityType = event.getEntity().getClass();
+			if ( searchFactoryImplementor.getDocumentBuilders().containsKey( entityType )
+					|| searchFactoryImplementor.getContainedInOnlyBuilder( entityType ) != null ) {
+				processWork( event.getEntity(), event.getId(), WorkType.DELETE, event );
+			}
 		}
 	}
 
 	public void onPostInsert(PostInsertEvent event) {
 		if ( used ) {
 			final Object entity = event.getEntity();
-			DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( entity.getClass() );
-			//not strictly necessary but a small optimization
-			if ( builder != null ) {
+			if ( searchFactoryImplementor.getDocumentBuilder( entity.getClass() ) != null
+					|| searchFactoryImplementor.getContainedInOnlyBuilder( entity.getClass() ) != null ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.ADD, event );
 			}
@@ -92,9 +95,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onPostUpdate(PostUpdateEvent event) {
 		if ( used ) {
 			final Object entity = event.getEntity();
-			//not strictly necessary but a small optimization
-			DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( entity.getClass() );
-			if ( builder != null ) {
+			if ( searchFactoryImplementor.getDocumentBuilder( entity.getClass() ) != null
+					|| searchFactoryImplementor.getContainedInOnlyBuilder( entity.getClass() ) != null ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event );
 			}
@@ -131,16 +133,19 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			//Should log really but we don't know if we're interested in this collection for indexing
 			return;
 		}
-		if ( used && searchFactoryImplementor.getDocumentBuilders().containsKey( entity.getClass() ) ) {
-			Serializable id = getId( entity, event );
-			if ( id == null ) {
-				log.warn(
-						"Unable to reindex entity on collection change, id cannot be extracted: {}",
-						event.getAffectedOwnerEntityName()
-				);
-				return;
+		if ( used ) {
+			if ( searchFactoryImplementor.getDocumentBuilder( entity.getClass() ) != null
+					|| searchFactoryImplementor.getContainedInOnlyBuilder( entity.getClass() ) != null ) {
+				Serializable id = getId( entity, event );
+				if ( id == null ) {
+					log.warn(
+							"Unable to reindex entity on collection change, id cannot be extracted: {}",
+							event.getAffectedOwnerEntityName()
+					);
+					return;
+				}
+				processWork( entity, id, WorkType.COLLECTION, event );
 			}
-			processWork( entity, id, WorkType.COLLECTION, event );
 		}
 	}
 

@@ -10,23 +10,38 @@ package org.hibernate.search.backend;
  * @author John Griffin
  */
 public enum WorkType {
-	ADD,
-	UPDATE,
-	DELETE,
-	COLLECTION,
+	ADD(true),
+	UPDATE(true),
+	DELETE(false),
+	COLLECTION(true),
 	/**
 	 * Used to remove a specific instance
 	 * of a class from an index.
 	 */
-	PURGE,
+	PURGE(false),
 	/**
 	 * Used to remove all instances of a
 	 * class from an index.
 	 */
-	PURGE_ALL,
+	PURGE_ALL(false),
 	
 	/**
 	 * This type is used for batch indexing.
 	 */
-	INDEX 
+	INDEX(true);
+
+	private final boolean searchForContainers;
+
+	private WorkType(boolean searchForContainers) {
+		this.searchForContainers = searchForContainers;
+	}
+
+	/**
+	 * When references are changed, either null or another one, we expect dirty checking to be triggered (both sides
+	 * have to be updated)
+	 * When the internal object is changed, we apply the {Add|Update}Work on containedIns
+	 */
+	public boolean searchForContainers() {
+		return this.searchForContainers;
+	}
 }

@@ -15,7 +15,6 @@ import org.hibernate.search.annotations.Indexed;
  * @author Hardy Ferentschik
  */
 @Entity
-@Indexed // @indexed should not be needed, see HSEARCH-142 and testEmbeddedObjectUpdate()
 public class State {
 	@Id
 	@DocumentId
