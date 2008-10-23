@@ -32,5 +32,5 @@ public @interface IndexedEmbedded {
 	/**
 	 * Overrides the type of an association. If a collection, overrides the type of the collection generics
 	 */
-	Class targetElement() default void.class;
+	Class<?> targetElement() default void.class;
 }
