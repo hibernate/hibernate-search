@@ -26,7 +26,6 @@ class PerDPQueueProcessor {
 	
 	// if any work passed to addWork needs one, set corresponding flag to true:
 	private boolean batchmode = false;
-	private boolean needsReader = false;
 	private boolean needsWriter = false;
 	private boolean preferReader = false;
 	
@@ -42,9 +41,6 @@ class PerDPQueueProcessor {
 		}
 		IndexInteractionType type = work.getWorkDelegate( worker ).getIndexInteractionType();
 		switch ( type ) {
-			case NEEDS_INDEXREADER :
-				needsReader = true;
-				//fall through:
 			case PREFER_INDEXREADER :
 				preferReader = true;
 				workOnReader.add( work );
@@ -64,7 +60,7 @@ class PerDPQueueProcessor {
 		// skip "resource optimization mode" when in batch to have all tasks use preferred (optimal) mode.
 		if ( ! batchmode ) {
 			// 	see if we can skip using some resource
-			if ( ! needsReader && ! needsWriter ) { // no specific need:
+			if ( ! needsWriter ) { // no specific need:
 				if ( preferReader ) {
 					useReaderOnly();
 				}
@@ -72,11 +68,12 @@ class PerDPQueueProcessor {
 					useWriterOnly();
 				}
 			}
-			else if ( needsReader && !needsWriter ) {
-				useReaderOnly();
-			}
-			else if ( !needsReader && needsWriter ) {
+			else {
 				useWriterOnly();
+			}
+			if ( ! (workOnWriter.isEmpty() || workOnReader.isEmpty() ) ) {
+				throw new AssertionFailure(
+					"During non-batch mode performWorks tries to use both IndexWriter and IndexReader." );
 			}
 		}
 		// apply changes to index:
@@ -116,7 +113,6 @@ class PerDPQueueProcessor {
 		finally {
 			workspace.closeIndexWriter();
 		}
-		
 	}
 
 	/**
