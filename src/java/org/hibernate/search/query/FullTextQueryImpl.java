@@ -323,28 +323,28 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		if ( filterDefinitions == null || filterDefinitions.size() == 0 ) {
 			return; // there is nothing to do if we don't have any filter definitions
 		}
-		
+
 		ChainedFilter chainedFilter = new ChainedFilter();
 		for (FullTextFilterImpl fullTextFilter : filterDefinitions.values()) {
 			Filter filter = buildLuceneFilter(fullTextFilter);
 			chainedFilter.addFilter( filter );
 		}
-		
+
 		if ( filter != null ) chainedFilter.addFilter( filter );
 		filter = chainedFilter;
 	}
 
 	/**
 	 * Builds a Lucene filter using the given <code>FullTextFilter</code>.
-	 * 
-	 * @param fullTextFilter the Hibernate specific <code>FullTextFilter</code> used to create the 
+	 *
+	 * @param fullTextFilter the Hibernate specific <code>FullTextFilter</code> used to create the
 	 * Lucene <code>Filter</code>.
 	 * @return the Lucene filter mapped to the filter definition
 	 */
 	private Filter buildLuceneFilter(FullTextFilterImpl fullTextFilter) {
-		
+
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-		
+
 		/*
 		 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
 		 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
@@ -357,10 +357,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		Filter filter = cacheInstance( def.getCacheMode() ) ?
 				searchFactoryImplementor.getFilterCachingStrategy().getCachedFilter( key ) :
 				null;
-					
+
 		if ( filter == null ) {
-			filter = createFilter(def, instance);	
-			
+			filter = createFilter(def, instance);
+
 			// add filter to cache if we have to
 			if ( cacheInstance( def.getCacheMode() ) ) {
 				searchFactoryImplementor.getFilterCachingStrategy().addCachedFilter( key, filter );
@@ -398,17 +398,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 						+ (def.getFactoryMethod() != null ? def.getFactoryMethod().getName() : ""), e );
 			}
 		}
-		
+
 		filter = addCachingWrapperFilter(filter, def);
 		return filter;
 	}
 
 	/**
 	 * Decides whether to wrap the given filter around a <code>CachingWrapperFilter<code>.
-	 * 
+	 *
 	 * @param filter the filter which maybe gets wrapped.
 	 * @param def The filter definition used to decide whether wrapping should occur or not.
-	 * @return The original filter or wrapped filter depending on the information extracted from 
+	 * @return The original filter or wrapped filter depending on the information extracted from
 	 * <code>def</code>.
 	 */
 	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
@@ -416,7 +416,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			int cachingWrapperFilterSize = getSearchFactoryImplementor().getFilterCacheBitResultsSize();
 			filter = new org.hibernate.search.filter.CachingWrapperFilter(filter, cachingWrapperFilterSize);
 		}
-		
+
 		return filter;
 	}
 
@@ -425,7 +425,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		if ( !cacheInstance( def.getCacheMode() ) ) {
 			return key; // if the filter is not cached there is no key!
 		}
-				
+
 		if ( def.getKeyMethod() == null ) {
 			key = new FilterKey() {
 				public int hashCode() {
@@ -534,7 +534,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		Similarity searcherSimilarity = null;
 		//TODO check if caching this work for the last n list of classes makes a perf boost
 		if ( classes == null || classes.length == 0 ) {
-			//no class means all classes
+			// empty classes array means search over all indexed enities,
+			// but we have to make sure there is at least one
+			if ( builders.isEmpty() ) {
+				throw new HibernateException( "There are no mapped entities (don't forget to add @Indexed to at least one class)." );
+			}
+
 			for (DocumentBuilder builder : builders.values()) {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy().getDirectoryProvidersForAllShards();

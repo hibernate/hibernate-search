@@ -38,7 +38,7 @@ public class QueryUnindexedEntityTest extends SearchTestCase {
 			fail();
 		}
 		catch ( HibernateException e ) {
-			assertTrue( "Wrong message", e.getMessage().startsWith( "Not a mapped entity" ) );
+			assertTrue( "Wrong message", e.getMessage().startsWith( "There are no mapped entities" ) );
 		}
 
 		tx.rollback();
