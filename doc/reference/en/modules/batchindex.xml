@@ -130,7 +130,8 @@ tx.commit(); //index are written at commit time    </programlisting>
     index but will not touch the database.</para>
 
     <para>If you need to remove all entities of a given type, you can use the
-    <methodname>purgeAll</methodname> method.</para>
+    <methodname>purgeAll</methodname> method. This operation remove all entities of the type passed
+        as a parameter as well as all its subtypes.</para>
 
     <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();

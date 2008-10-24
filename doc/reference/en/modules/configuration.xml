@@ -184,7 +184,7 @@ public class Rule { ... }</programlisting>
   </section>
 
   <section id="search-configuration-directory-sharding" revision="1">
-    <title>Index sharding</title>
+    <title>Sharding indexes</title>
 
     <para>In some extreme cases involving huge indexes (in size), it is
     necessary to split (shard) the indexing data of a given entity type into
@@ -259,6 +259,50 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
       <listitem>
         <para>for subindex 4: /usr/lucene/indexes/Animal.4 (shared indexBase,
         default indexName)</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>Sharing indexes (two entities into the same directory)</title>
+
+    <para>It is possible to store more than one entity index information into
+    a single Lucene index.</para>
+
+    <note>
+      <para>This is only presented here so that you know the option is
+      available. There is really not much benefit in sharing indexes.</para>
+    </note>
+
+    <para>There are actually two ways to accomplish merging an index:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Configuring the underlying directory providers to point to the
+        same physical index directory. In practice, you set the property
+        <literal>hibernate.search.[fully qualified entity
+        name].indexName=(relative directory from indexBase)</literal> to the
+        same value.</para>
+
+        <para>For example, let’s say that we want the Furniture entity to
+        actually be stored in the same directory as the Animal entity. We
+        would have the configuration setting set to “Animal”. Both entities
+        will then be stored in the Animal directory</para>
+
+        <para><programlisting><code>hibernate.search.org.hibernate.search.test.shards.Furniture.indexName = Aninal
+hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</code></programlisting></para>
+      </listitem>
+
+      <listitem>
+        <para>Setting the <code>@Indexed</code> annotation’s
+        <methodname>index</methodname> attribute of the entities you want to
+        merge to the same value.</para>
+
+        <para>If we wanted all Furniture instances to be indexed in the Animal
+        index along with all instances of Animal we would specify
+        <code>@Indexed(index=”Animal”)</code> on both
+        <classname>Animal</classname> and <classname>Furniture</classname>
+        classes.</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -613,45 +657,26 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
 hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
 hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     This configuration will result in these settings applied to the second
-    shard of Animals index: <itemizedlist>
-        <listitem>
-           
-
-          <literal>transaction.max_merge_docs</literal>
-
-           = 10 
+    shard of Animals index:</para> <itemizedlist>
+        <listitem><para><literal>transaction.max_merge_docs</literal> = 10</para>
         </listitem>
 
-        <listitem>
-           
-
-          <literal>batch.max_merge_docs</literal>
-
-           = 100 
+        <listitem><para><literal>batch.max_merge_docs</literal> = 100</para>
         </listitem>
 
-        <listitem>
-           
+        <listitem><para><literal>transaction.merge_factor</literal> = 20</para></listitem>
 
-          <literal>transaction.merge_factor</literal>
-
-           = 20 
+        <listitem><para><literal>batch.merge_factor</literal> = 20</para>
         </listitem>
+      </itemizedlist>
 
-        <listitem>
-           
-
-          <literal>batch.merge_factor</literal>
-
-           = 20 
-        </listitem>
-      </itemizedlist> All other values will use the defaults defined in
+      <para>All other values will use the defaults defined in
     Lucene.</para>
 
     <para>The default for all values is to leave them at Lucene's own default,
     so the listed values in the following table actually depend on the version
     of Lucene you are using; values shown are relative to version
-    <literal>2.3</literal>. For more information about Lucene indexing
+    <literal>2.4</literal>. For more information about Lucene indexing
     performances, please refer to the Lucene documentation.</para>
 
     <table>
