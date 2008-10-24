@@ -298,7 +298,7 @@ public class Author {
     details see <xref linkend="search-mapping-bridge" />.</para>
 
     <para>This leaves us with <literal>@IndexedEmbedded. </literal>This
-    annotation is used to indexed associated entities
+    annotation is used to index associated entities
     (<literal>@ManyToMany</literal>, <literal>@*ToOne</literal> and
     <literal>@Embedded</literal>) as part of the owning entity. This is needed
     since a Lucene index document is a flat data structure which does not know

@@ -446,21 +446,21 @@ public class Owner {
       feature richness.</para>
 
       <para><note>
-          <para>An associated object can itself be (but don't have to)
+          <para>An associated object can itself (but does not have to) be
           <literal>@Indexed</literal></para>
         </note></para>
 
       <para>When @IndexedEmbedded points to an entity, the association has to
       be directional and the other side has to be annotated
-      <literal>@ContainedIn</literal> (as see in the previous example). If
+      <literal>@ContainedIn</literal> (as seen in the previous example). If
       not, Hibernate Search has no way to update the root index when the
-      associated entity is updated (in ou example, a <literal>Place</literal>
+      associated entity is updated (in our example, a <literal>Place</literal>
       index document has to be updated when the associated
-      <classname>Address</classname> instance is updated.</para>
+      <classname>Address</classname> instance is updated).</para>
 
       <para>Sometimes, the object type annotated by
       <classname>@IndexedEmbedded</classname> is not the object type targeted
-      by Hibernate and Hibernate Search especially when interface are used in
+      by Hibernate and Hibernate Search especially when interfaces are used in
       lieu of their implementation. You can override the object type targeted
       by Hibernate Search using the <methodname>targetElement</methodname>
       parameter.</para>
@@ -491,8 +491,8 @@ public class Owner implements Person { ... }</programlisting>
     <section>
       <title>Boost factor</title>
 
-      <para>Lucene has the notion of <emphasis>boost factor</emphasis> . It's
-      a way to give more weigth to a field or to an indexed element over an
+      <para>Lucene has the notion of <emphasis>boost factor</emphasis>. It's a
+      way to give more weigth to a field or to an indexed element over an
       other during the indexation process. You can use
       <literal>@Boost</literal> at the field or the class level.</para>
 
