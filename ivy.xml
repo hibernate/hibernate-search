@@ -15,9 +15,9 @@
 		
         <!-- compile time dependencies -->
         <dependency name="ejb3-persistence" rev="1.0.2.GA" conf="default->default"/>
-        <dependency name="commons-annotations" rev="3.1.0.CR1" conf="default->default"/>
+        <dependency name="commons-annotations" rev="3.1.0.GA" conf="default->default"/>
         <dependency org="org.slf4j" name="slf4j-api" rev="1.4.2" conf="default->default"/>        
-        <dependency org="org.hibernate" name="hibernate-core" rev="3.3.0.CR2" conf="default->default"/>
+        <dependency org="org.hibernate" name="hibernate-core" rev="3.3.1.GA" conf="default->default"/>
         <dependency org="javax.transaction" name="jta" rev="1.1" conf="default->default"/>
         <dependency org="org.apache.lucene" name="lucene-core" rev="2.4.0" conf="default->default"/>
         <dependency org="javax.jms" name="jms" rev="1.1" conf="default->default"/> <!-- optional -->
@@ -33,8 +33,8 @@
         <dependency org="dom4j" name="dom4j" rev="1.6.1" conf="test->default"/>
 
         <!-- test deps -->
-        <dependency name="annotations" rev="3.4.0.CR2" conf="test->default"/>
-        <dependency name="entitymanager" rev="3.4.0.CR1" conf="test->default"/>
+        <dependency name="annotations" rev="3.4.0.GA" conf="test->default"/>
+        <dependency name="entitymanager" rev="3.4.0.GA" conf="test->default"/>
         <dependency org="cglib" name="cglib" rev="2.1_3" conf="test->default"/>
         <dependency org="asm" name="asm" rev="1.5.3" conf="test->default"/>
         <dependency org="asm" name="asm-attrs" rev="1.5.3" conf="test->default"/>
