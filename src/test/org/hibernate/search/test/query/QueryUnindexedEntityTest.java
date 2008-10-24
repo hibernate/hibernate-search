@@ -19,7 +19,7 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class QueryUnindexedEntityTest extends SearchTestCase {
 
-	public void testResultTransformToDelimString() throws Exception {
+	public void testQueryOnAllEntities() throws Exception {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 
@@ -32,7 +32,7 @@ public class QueryUnindexedEntityTest extends SearchTestCase {
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "name", new StandardAnalyzer() );
 		Query query = parser.parse( "name:foo" );
-		FullTextQuery hibQuery = s.createFullTextQuery( query, Person.class );
+		FullTextQuery hibQuery = s.createFullTextQuery( query );
 		try {
 			hibQuery.list();
 			fail();
