@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -43,9 +44,9 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -62,6 +63,7 @@ import org.hibernate.type.Type;
  * @author Hardy Ferentschik
  */
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
+
 	private final Session session;
 	private final SessionImplementor sessionImplementor;
 	private transient SearchFactoryImplementor searchFactory;
@@ -69,9 +71,9 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 
 	public FullTextSessionImpl(org.hibernate.Session session) {
-		this.session = (Session) session;
-		this.transactionContext = new EventSourceTransactionContext( (EventSource) session );
-		this.sessionImplementor = (SessionImplementor) session;
+		this.session = ( Session ) session;
+		this.transactionContext = new EventSourceTransactionContext( ( EventSource ) session );
+		this.sessionImplementor = ( SessionImplementor ) session;
 	}
 
 	/**
@@ -85,10 +87,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	/**
-	 * Remove all entities from a particular class of an index.
-	 *
-	 * @param entityType
-	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
+	 * {@inheritDoc}
 	 */
 	public void purgeAll(Class entityType) {
 		purge( entityType, null );
@@ -100,32 +99,39 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	/**
-	 * Remove a particular entity from a particular class of an index.
-	 *
-	 * @param entityType
-	 * @param id
-	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
+	 * {@inheritDoc}
 	 */
 	public void purge(Class<?> entityType, Serializable id) {
-		if ( entityType == null ) return;
-		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-		// not strictly necessary but a small optimization plus let's make sure the
-		// client didn't mess something up.
-
-		if ( searchFactoryImplementor.getDocumentBuilder( entityType ) == null
-				&& searchFactoryImplementor.getContainedInOnlyBuilder( entityType ) == null ) {
-			throw new IllegalArgumentException( "Entity to index is not an @Indexed entity nor @ContainedIn another entity: "
-					+ entityType.getName() );
+		if ( entityType == null ) {
+			return;
 		}
-		WorkType type;
+
+		// accessing the document builders is not strictly necessary but a small optimization plus let's make sure the
+		// client didn't mess something up.
+		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
+		DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilder( entityType );
+		if ( builder == null ) {
+			String msg = "Entity to index is not an @Indexed entity: " + entityType.getName();
+			throw new IllegalArgumentException( msg );
+		}
+
+		Work work;
 		if ( id == null ) {
-			type = WorkType.PURGE_ALL;
+			// purge the main entity
+			work = new Work( entityType, id, WorkType.PURGE_ALL );
+			searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+
+			// purge the subclasses
+			Set<Class<?>> subClasses = builder.getMappedSubclasses();
+			for ( Class clazz : subClasses ) {
+				work = new Work( clazz, id, WorkType.PURGE_ALL );
+				searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+			}
 		}
 		else {
-			type = WorkType.PURGE;
+			work = new Work( entityType, id, WorkType.PURGE );
+			searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 		}
-		Work work = new Work( entityType, id, type );
-		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 	}
 
 	/**
@@ -134,19 +140,21 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 * The entity must be associated with the session
 	 *
 	 * @param entity The entity to index - must not be <code>null</code>.
+	 *
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
 	public void index(Object entity) {
-		if ( entity == null ) throw new IllegalArgumentException( "Entity to index should not be null" );
+		if ( entity == null ) {
+			throw new IllegalArgumentException( "Entity to index should not be null" );
+		}
 
 		Class<?> clazz = Hibernate.getClass( entity );
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//not strictly necessary but a small optimization
-		if ( searchFactoryImplementor.getDocumentBuilder( clazz ) == null
-				&& searchFactoryImplementor.getContainedInOnlyBuilder( clazz ) == null ) {
-			throw new IllegalArgumentException( "Entity to index is not an @Indexed entity nor @ContainedIn another entity: "
-					+ entity.getClass().getName() );
+		if ( searchFactoryImplementor.getDocumentBuilder( clazz ) == null ) {
+			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
+			throw new IllegalArgumentException( msg );
 		}
 		Serializable id = session.getIdentifier( entity );
 		Work work = new Work( entity, id, WorkType.INDEX );
@@ -203,7 +211,8 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.filter( collection, filter, value, type );
 	}
 
-	public Collection filter(Object collection, String filter, Object[] values, Type[] types) throws HibernateException {
+	public Collection filter(Object collection, String filter, Object[] values, Type[] types)
+			throws HibernateException {
 		return session.filter( collection, filter, values, types );
 	}
 

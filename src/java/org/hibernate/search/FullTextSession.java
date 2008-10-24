@@ -34,20 +34,22 @@ public interface FullTextSession extends Session {
 	SearchFactory getSearchFactory();
 
 	/**
-	 * Remove a particular entity from a particular class of an index.
+	 * Remove the entity with the type <code>entityType</code> and the identifier <code>id</code> from the index.
+	 * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
+	 * case this method behaves like {@link #purgeAll(Class<?>)}.
 	 *
-	 * @param entityType
-	 * @param id
+	 * @param entityType The type of the entity to delete.
+	 * @param id The id of the entity to delete.
 	 *
-	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
+	 * @throws IllegalArgumentException if entityType is <code>null</codE> or not an @Indexed entity type.
 	 */
 	public void purge(Class<?> entityType, Serializable id);
 
 	/**
-	 * Remove all entities from a particular class of an index.
+	 * Remove all entities from of particular class and all its subclasses from the index.
 	 *
-	 * @param entityType
-	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
+	 * @param entityType The class of the entities to remove.
+	 * @throws IllegalArgumentException if entityType is <code>null</code> or not an @Indexed entity type.
 	 */
 	public void purgeAll(Class<?> entityType);
 
