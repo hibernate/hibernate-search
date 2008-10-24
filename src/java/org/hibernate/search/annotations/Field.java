@@ -49,9 +49,14 @@ public @interface Field {
 	 */
 	Analyzer analyzer() default @Analyzer;
 
+
+	/**
+	 * Field bridge used. Default is autowired.
+	 */
+	Boost boost() default @Boost( value = 1.0F );
+
 	/**
 	 * Field bridge used. Default is autowired.
 	 */
 	FieldBridge bridge() default @FieldBridge;
-
 }

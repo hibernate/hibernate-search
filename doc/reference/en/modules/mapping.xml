@@ -492,13 +492,13 @@ public class Owner implements Person { ... }</programlisting>
       <title>Boost factor</title>
 
       <para>Lucene has the notion of <emphasis>boost factor</emphasis>. It's a
-      way to give more weigth to a field or to an indexed element over an
-      other during the indexation process. You can use
-      <literal>@Boost</literal> at the field or the class level.</para>
+      way to give more weigth to a field or to an indexed element over others
+      during the indexation process. You can use <literal>@Boost</literal> at
+      the @Field, method or class level.</para>
 
       <programlisting>@Entity
 @Indexed(index="indexes/essays")
-<emphasis role="bold">@Boost(2)</emphasis>
+<emphasis role="bold">@Boost(1.7f)</emphasis>
 public class Essay {
     ...
 
@@ -506,21 +506,34 @@ public class Essay {
     @DocumentId
     public Long getId() { return id; }
 
-    @Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES)
-    <emphasis role="bold">@Boost(2.5f)</emphasis>
+    @Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES, boost=<emphasis
+          role="bold">@Boost(2f)</emphasis>)
+    <emphasis role="bold">@Boost(1.5f)</emphasis>
     public String getSummary() { return summary; }
 
     @Lob
-    @Field(index=Index.TOKENIZED)
+    @Field(index=Index.TOKENIZED, boost=<emphasis role="bold">@Boost(1.2f)</emphasis>)
     public String getText() { return text; }
+
+    @Field
+    public String getISBN() { return isbn; }
+
 }        </programlisting>
 
       <para>In our example, Essay's probability to reach the top of the search
-      list will be multiplied by 2 and the summary field will be 2.5 more
-      important than the test field. Note that this explaination is actually
-      wrong, but it is simple and close enought to the reality. Please check
-      the Lucene documentation or the excellent <citetitle>Lucene In Action
-      </citetitle> from Otis Gospodnetic and Erik Hatcher.</para>
+      list will be multiplied by 1.7. The <methodname>summary</methodname>
+      field will be 2.5 (2 * 1.5) more important than the
+      <methodname>isbn</methodname> field. The <methodname>text</methodname>
+      field will be 1.2 times more important than the
+      <methodname>isbn</methodname> field. Note that this explanation in
+      strictest terms is actually wrong, but it is simple and close enough to
+      reality for all practical purposes. Please check the Lucene
+      documentation or the excellent <citetitle>Lucene In Action </citetitle>
+      from Otis Gospodnetic and Erik Hatcher.</para>
+
+      <para><methodname>@Field.boost</methodname>,
+      <classname>@Boost</classname> on a property and
+      <classname>@Boost</classname> on a class are all cumulative.</para>
     </section>
 
     <section id="analyzer">

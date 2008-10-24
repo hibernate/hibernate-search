@@ -80,7 +80,7 @@ public class DocumentBuilder<T> {
 	public static final String CLASS_FIELDNAME = "_hibernate_class";
 	private TwoWayFieldBridge idBridge;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
-	private ReflectionManager reflectionManager;
+	private ReflectionManager reflectionManager; //available only during initializationa nd post-initialization
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
 	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
@@ -105,7 +105,7 @@ public class DocumentBuilder<T> {
 		this.beanClass = clazz;
 		this.directoryProviders = directoryProviders;
 		this.shardingStrategy = shardingStrategy;
-		//FIXME get rid of it when boost is stored?
+		//set to null after post-initialization
 		this.reflectionManager = reflectionManager;
 		this.similarity = context.getDefaultSimilarity();
 
@@ -126,7 +126,7 @@ public class DocumentBuilder<T> {
 			ProvidedId provided = findProvidedId( clazz, reflectionManager );
 			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
 
-			idBridge = BridgeFactory.extractTwoWayType(provided.bridge());
+			idBridge = BridgeFactory.extractTwoWayType( provided.bridge() );
 			idKeywordName = provided.name();
 		}
 		//if composite id, use of (a, b) in ((1,2)TwoWayString2FieldBridgeAdaptor, (3,4)) fails on most database
@@ -143,12 +143,12 @@ public class DocumentBuilder<T> {
 		this.directoryProviders = null;
 		this.shardingStrategy = null;
 
-		//FIXME get rid of it when boost is stored?
+
 		this.reflectionManager = reflectionManager;
 		this.similarity = context.getDefaultSimilarity();
 
 		init( clazz, context, reflectionManager );
-		if (rootPropertiesMetadata.containedInGetters.size() == 0) {
+		if ( rootPropertiesMetadata.containedInGetters.size() == 0 ) {
 			this.entityState = EntityState.NON_INDEXABLE;
 		}
 	}
@@ -156,7 +156,7 @@ public class DocumentBuilder<T> {
 	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {
 		ProvidedId id = null;
 		XClass currentClass = clazz;
-		while ( id == null && ( ! reflectionManager.equals( currentClass, Object.class ) ) ) {
+		while ( id == null && ( !reflectionManager.equals( currentClass, Object.class ) ) ) {
 			id = currentClass.getAnnotation( ProvidedId.class );
 			currentClass = clazz.getSuperclass();
 		}
@@ -303,7 +303,7 @@ public class DocumentBuilder<T> {
 					throw new SearchException(
 							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName() );
 				}
-				idBoost = getBoost( member );
+				idBoost = getBoost( member, null );
 				setAccessible( member );
 				idGetter = member;
 			}
@@ -317,6 +317,7 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
 				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
+				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
 				// property > entity analyzer (no field analyzer)
 				Analyzer analyzer = getAnalyzer( member, context );
 				if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
@@ -351,7 +352,7 @@ public class DocumentBuilder<T> {
 			}
 			maxLevel = potentialLevel > maxLevel ? maxLevel : potentialLevel;
 			level++;
-			                                                             
+
 			XClass elementClass;
 			if ( void.class == embeddedAnn.targetElement() ) {
 				elementClass = member.getElementClass();
@@ -375,7 +376,7 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.embeddedGetters.add( member );
 				PropertiesMetadata metadata = new PropertiesMetadata();
 				propertiesMetadata.embeddedPropertiesMetadata.add( metadata );
-				metadata.boost = getBoost( member );
+				metadata.boost = getBoost( member, null );
 				//property > entity analyzer
 				Analyzer analyzer = getAnalyzer( member, context );
 				metadata.analyzer = analyzer != null ? analyzer : propertiesMetadata.analyzer;
@@ -441,6 +442,7 @@ public class DocumentBuilder<T> {
 		propertiesMetadata.fieldNames.add( fieldName );
 		propertiesMetadata.fieldStore.add( getStore( fieldAnn.store() ) );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
+		propertiesMetadata.fieldBoosts.add( getBoost(member, fieldAnn) );
 		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
 		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, member, reflectionManager ) );
 
@@ -450,6 +452,14 @@ public class DocumentBuilder<T> {
 		if ( analyzer != null ) {
 			this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 		}
+	}
+
+	private Float getBoost(XProperty member, org.hibernate.search.annotations.Field fieldAnn) {
+		float computedBoost = 1.0f;
+		Boost boostAnn = member.getAnnotation( Boost.class );
+		if (boostAnn != null) computedBoost = boostAnn.value();
+		if (fieldAnn != null) computedBoost *= fieldAnn.boost().value();
+		return computedBoost;
 	}
 
 	private String buildEmbeddedPrefix(String prefix, IndexedEmbedded embeddedAnn, XProperty member) {
@@ -509,7 +519,7 @@ public class DocumentBuilder<T> {
 		}
 	}
 
-	private Float getBoost(XAnnotatedElement element) {
+	private Float getBoost(XClass element) {
 		if ( element == null ) return null;
 		Boost boost = element.getAnnotation( Boost.class );
 		return boost != null ?
@@ -541,14 +551,14 @@ public class DocumentBuilder<T> {
 					Serializable currentId = luceneWork.getId();
 					//currentId != null => either ADD or Delete work
 					if ( currentId != null && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
-						if (workType == WorkType.DELETE) { //TODO add PURGE?
+						if ( workType == WorkType.DELETE ) { //TODO add PURGE?
 							//DELETE should have precedence over any update before (HSEARCH-257)
 							//if an Add work is here, remove it
 							//if an other delete is here remember but still search for Add
-							if (luceneWork instanceof AddLuceneWork) {
+							if ( luceneWork instanceof AddLuceneWork ) {
 								toDelete.add( luceneWork );
 							}
-							else if (luceneWork instanceof DeleteLuceneWork) {
+							else if ( luceneWork instanceof DeleteLuceneWork ) {
 								duplicateDelete = true;
 							}
 						}
@@ -560,10 +570,10 @@ public class DocumentBuilder<T> {
 					//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
 				}
 			}
-			for ( LuceneWork luceneWork : toDelete ) {
+			for (LuceneWork luceneWork : toDelete) {
 				toDelete.remove( luceneWork );
 			}
-			if (duplicateDelete) return;
+			if ( duplicateDelete ) return;
 
 			String idInString = idBridge.objectToString( id );
 			if ( workType == WorkType.ADD ) {
@@ -660,13 +670,13 @@ public class DocumentBuilder<T> {
 	public Document getDocument(T instance, Serializable id) {
 		Document doc = new Document();
 		final Class<?> entityType = Hibernate.getClass( instance );
-		XClass instanceClass = reflectionManager.toXClass( entityType );
+		//XClass instanceClass = reflectionManager.toXClass( entityType );
 		if ( rootPropertiesMetadata.boost != null ) {
 			doc.setBoost( rootPropertiesMetadata.boost );
 		}
 		{
 			Field classField =
-					new Field( CLASS_FIELDNAME, instanceClass.getName(), Field.Store.YES, Field.Index.UN_TOKENIZED, Field.TermVector.NO );
+					new Field( CLASS_FIELDNAME, entityType.getName(), Field.Store.YES, Field.Index.UN_TOKENIZED, Field.TermVector.NO );
 			doc.add( classField );
 			LuceneOptions luceneOptions = new LuceneOptionsImpl( Field.Store.YES,
 					Field.Index.UN_TOKENIZED, Field.TermVector.NO, idBoost );
@@ -690,7 +700,7 @@ public class DocumentBuilder<T> {
 			Object value = getMemberValue( unproxiedInstance, member );
 			propertiesMetadata.fieldBridges.get( i ).set(
 					propertiesMetadata.fieldNames.get( i ), value, doc,
-					propertiesMetadata.getFieldLuceneOptions( i, getBoost( member ) ) );
+					propertiesMetadata.getFieldLuceneOptions( i ) );
 		}
 		for (int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
@@ -744,15 +754,15 @@ public class DocumentBuilder<T> {
 	}
 
 	public DirectoryProvider[] getDirectoryProviders() {
-		if( entityState != EntityState.INDEXED ) {
-			throw new AssertionFailure("Contained in only entity: getDirectoryProvider should not have been called.");
+		if ( entityState != EntityState.INDEXED ) {
+			throw new AssertionFailure( "Contained in only entity: getDirectoryProvider should not have been called." );
 		}
 		return directoryProviders;
 	}
 
 	public IndexShardingStrategy getDirectoryProviderSelectionStrategy() {
-		if( entityState != EntityState.INDEXED ) {
-			throw new AssertionFailure("Contained in only entity: getDirectoryProviderSelectionStrategy should not have been called.");
+		if ( entityState != EntityState.INDEXED ) {
+			throw new AssertionFailure( "Contained in only entity: getDirectoryProviderSelectionStrategy should not have been called." );
 		}
 		return shardingStrategy;
 	}
@@ -857,7 +867,8 @@ public class DocumentBuilder<T> {
 	}
 
 	public void postInitialize(Set<Class<?>> indexedClasses) {
-		if (entityState == EntityState.NON_INDEXABLE) throw new AssertionFailure("A non indexed entity is post processed");
+		if ( entityState == EntityState.NON_INDEXABLE )
+			throw new AssertionFailure( "A non indexed entity is post processed" );
 		//this method does not requires synchronization
 		Class plainClass = reflectionManager.toClass( beanClass );
 		Set<Class<?>> tempMappedSubclasses = new HashSet<Class<?>>();
@@ -875,6 +886,7 @@ public class DocumentBuilder<T> {
 			}
 			superClass = superClass.getSuperclass();
 		}
+		this.reflectionManager = null;
 	}
 
 	public EntityState getEntityState() {
@@ -904,6 +916,7 @@ public class DocumentBuilder<T> {
 		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
 		public final List<Field.Store> fieldStore = new ArrayList<Field.Store>();
 		public final List<Field.Index> fieldIndex = new ArrayList<Field.Index>();
+		public final List<Float> fieldBoosts = new ArrayList<Float>();
 		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
 		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
 		public final List<PropertiesMetadata> embeddedPropertiesMetadata = new ArrayList<PropertiesMetadata>();
@@ -929,9 +942,10 @@ public class DocumentBuilder<T> {
 			return options;
 		}
 
-		private LuceneOptions getFieldLuceneOptions(int i, Float boost) {
-			LuceneOptions options = new LuceneOptionsImpl( fieldStore.get( i ),
-					fieldIndex.get( i ), fieldTermVectors.get( i ), boost );
+		private LuceneOptions getFieldLuceneOptions(int i) {
+			LuceneOptions options;
+			options = new LuceneOptionsImpl( fieldStore.get( i ),
+					fieldIndex.get( i ), fieldTermVectors.get( i ), fieldBoosts.get( i ) );
 			return options;
 		}
 	}
