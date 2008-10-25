@@ -809,6 +809,65 @@ public class Team {
         <classname>org.apache.solr.analysis.TokenFilterFactory</classname> in
         your IDE to see the implementations available.</para>
       </section>
+
+      <section id="analyzer-retrievinganalyzer">
+        <title>Retrieving an analyzer</title>
+
+        <para>During indexing time, Hibernate Search is using analyzers under
+        the hood for you. In some situations, retrieving analyzers can be
+        handy. If your domain model makes use of multiple analyzers (maybe to
+        benefit from stemming, use phonetic approximation and so on), you need
+        to make sure to use the same analyzers when you build your query.
+        </para>
+
+        <note>
+          <para>This rule can be broken but you need a good reason for it. If
+          you are unsure, use the same analyzers.</para>
+        </note>
+
+        <para>You can retrieve the scoped analyzer for a given entity used at
+        indexing time by Hibernate Search. A scoped analyzer is an analyzer
+        which applies the right analyzers depending on the field indexed:
+        multiple analyzers can be defined on a given entity each one working
+        on an individual field, a scoped analyzer unify all these analyzers
+        into a context-aware analyzer. While the theory seems a bit complex,
+        using the right analyzer in a query is very easy. </para>
+
+        <example>
+          <title>Using the scoped analyzer when building a full-text
+          query</title>
+
+          <programlisting>org.apache.lucene.queryParser.QueryParser parser = new QueryParser(
+    "title", 
+    fullTextSession.getSearchFactory().getAnalyzer( Song.class )
+);
+
+org.apache.lucene.search.Query luceneQuery = parser.parse( "title:sky Or title_stemmed:diamond" );
+
+org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Song.class );
+
+List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
+        </example>
+
+        <para>In the example above, the song title is indexed in two fields:
+        the standard analyzer is used in the field <literal>title</literal>
+        and a stemming analyzer is used in the field
+        <literal>title_stemmed</literal>. By using the analyzer provided by
+        the search factory, the query uses the appropriate analyzer depending
+        on the field targeted.</para>
+
+        <note>
+          <para>This is true if you use the query parser which takes the
+          analyzer into consideration. If you do not use the Lucene query
+          parser, make sure to use the scoped analyzer and tokenize the query
+          accordingly. TODO: show an example</para>
+        </note>
+
+        <para>If your query targets more that one query and you wish to use
+        your standard analyzer, make sure to describe it using an analyzer
+        definition. You can retrieve analyzers by their definition name using
+        <code>searchFactory.getAnalyzer(String)</code>.</para>
+      </section>
     </section>
   </section>
 
@@ -1184,13 +1243,17 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
   <section id="provided-id">
     <title>Providing your own id</title>
 
+    <warning>
+      <para>This part of the documentation is a work in progress.</para>
+    </warning>
+
     <para>You can provide your own id for Hibernate Search if you are
     extending the internals. You will have to generate a unique value so it
     can be given to Lucene to be indexed. This will have to be given to
     Hibernate Search when you create an org.hibernate.search.Work object - the
     document id is required in the constructor.</para>
 
-    <section id="@ProvidedId">
+    <section id="ProvidedId">
       <title>The @ProvidedId annotation</title>
 
       <para>Unlike conventional Hibernate Search API and @DocumentId, this

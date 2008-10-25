@@ -22,8 +22,8 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"> 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="search-query" xreflabel="Querying">
   <!--  $Id$ -->
 
@@ -95,15 +95,22 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       <title>Building a Lucene query</title>
 
       <para>This subject is generally speaking out of the scope of this
-      documentation. Please refer to the Lucene documentation or Lucene In
-      Action.</para>
+      documentation. Please refer to the Lucene documentation Lucene In Action
+      or Hibernate Search in Action from Manning.</para>
 
-      <para>It is quite useful to use the same analyzer when indexing a field
-      and when querying that field. Hibernate Search let's you access analyzer
-      instances that have been defined through an analyzer definition (see
-      <xref linkend="analyzer" /> for more information).</para>
+      <para>It is essential to use the same analyzer when indexing a field and
+      when querying that field. Hibernate Search gives you access to the
+      analyzers used during indexing time (see <xref
+      linkend="analyzer-retrievinganalyzer" /> for more information).</para>
 
-      <programlisting>analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("phonetic-analyzer");</programlisting>
+      <programlisting>//retrieve an analyzer by name
+Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("phonetic-analyzer");
+
+//or the scoped analyzer for a given entity
+Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer(Song.class);</programlisting>
+
+      <para>Using the same analyzer at indexing and querying time is
+      important. See <xref linkend="analyzer" /> for more information.</para>
     </section>
 
     <section>
@@ -681,7 +688,6 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
               <entry>No wrapper will be used.</entry>
             </row>
-
           </tbody>
         </tgroup>
       </informaltable>Last but not least - why should filters be cached? There
