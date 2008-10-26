@@ -259,6 +259,7 @@
 		<copy todir="${dist.dir}/doc/reference" failonerror="false">
 			<fileset dir="${basedir}/doc/reference/build">
 				<include name="**/*.*"/>
+                <exclude name="en/master.xml"/>
 			</fileset>
 		</copy>
 
