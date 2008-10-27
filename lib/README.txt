@@ -12,7 +12,7 @@ slf4j-api: required together with a slf4j-[impl].jar eg slf4j-log4j12.jar
 jms.jar: optional, needed for JMS based clustering strategy, usually available with your application server
 jsr-250-api.jar: optional, needed for JMS based clustering strategy, usually available with your application server
 solr-core.jar, solr-common.jar: optional (used version 1.3.0), needed if @AnalyzerDef is used
-solr-lucenen-snowball.jar: optional, needed if snowball stemmer is used
+lucene-snowball.jar: optional, needed if snowball stemmer is used
 
 Test
 ====

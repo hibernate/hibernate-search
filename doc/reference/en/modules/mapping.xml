@@ -623,7 +623,7 @@ public class MyEntity {
         </filename><filename>solr-common.jar</filename> to your classpath to
         use analyzer definitions. In case you also want to utilizing a
         snowball stemmer also include the
-        <filename>solr-lucene-snowball.jar.</filename> Your distribution of
+        <filename>lucene-snowball.jar.</filename> Your distribution of
         Hibernate Search provides these dependecies in its
         <filename>lib</filename> directory.</para>
 
@@ -817,8 +817,8 @@ public class Team {
         the hood for you. In some situations, retrieving analyzers can be
         handy. If your domain model makes use of multiple analyzers (maybe to
         benefit from stemming, use phonetic approximation and so on), you need
-        to make sure to use the same analyzers when you build your query.
-        </para>
+        to make sure to use the same analyzers when you build your
+        query.</para>
 
         <note>
           <para>This rule can be broken but you need a good reason for it. If
@@ -831,7 +831,7 @@ public class Team {
         multiple analyzers can be defined on a given entity each one working
         on an individual field, a scoped analyzer unify all these analyzers
         into a context-aware analyzer. While the theory seems a bit complex,
-        using the right analyzer in a query is very easy. </para>
+        using the right analyzer in a query is very easy.</para>
 
         <example>
           <title>Using the scoped analyzer when building a full-text
