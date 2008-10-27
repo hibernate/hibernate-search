@@ -1,8 +1,58 @@
 Hibernate Search Changelog
 ==========================
 
-3.1.0.Beta2 (27-09-2008)
+3.1.0.Beta2 (27-10-2008)
 ------------------------
+
+** Bug
+    * [HSEARCH-142] - Modifications on objects indexed via @IndexedEmbedded not updated when not annotated @Indexed
+    * [HSEARCH-162] - NPE on queries when no entity is marked as @Indexed
+    * [HSEARCH-222] - Entities not found during concurrent update
+    * [HSEARCH-225] - Avoid using IndexReader.deleteDocument when index is not shared amongst several entity types
+    * [HSEARCH-232] - Using SnowballPorterFilterFactory throws NoClassDefFoundError
+    * [HSEARCH-237] - IdHashShardingStrategy fails on IDs having negative hashcode
+    * [HSEARCH-241] - initialize methods taking Properties cannot list available properties
+    * [HSEARCH-247] - Hibernate Search cannot run without apache-solr-analyzer.jar
+    * [HSEARCH-253] - Inconsistent detection of EventListeners during autoregistration into Hibernate listeners
+    * [HSEARCH-257] - Ignore delete operation when Core does update then delete on the same entity
+    * [HSEARCH-259] - Filter were not isolated by name in the cache
+    * [HSEARCH-262] - fullTextSession.purgeAll(Class<?>) does not consider subclasses
+    * [HSEARCH-263] - Wrong analyzers used in IndexWriter
+    * [HSEARCH-267] - Inheritance of annotations and analyzer
+    * [HSEARCH-271] - wrong Similarity used when sharing index among entities
+    * [HSEARCH-287] - master.xml is mistakenly copied to the distribution
+
+** Deprecation
+    * [HSEARCH-279] - deprecate SharedReaderProvider replaced by SharingBufferReaderProvider as default ReaderProvider
+
+** Improvement
+    * [HSEARCH-145] - Document a configuration property
+    * [HSEARCH-226] - Use Lucene ability to delete by query in IndexWriter
+    * [HSEARCH-240] - Generify the IndexShardingStrategy
+    * [HSEARCH-245] - Add ReaderStratregy.destroy() method
+    * [HSEARCH-256] - Remove CacheBitResults.YES
+    * [HSEARCH-260] - Simplify the Filter Caching definition: cache=FilterCacheModeType.[MODE]
+    * [HSEARCH-272] - Improve contention on DirectoryProviders in lucene backend
+    * [HSEARCH-273] - Make LuceneOptions an interface
+    * [HSEARCH-282] - Make the API more Generics friendly
+
+** New Feature
+    * [HSEARCH-170] - Support @Boost in @Field
+    * [HSEARCH-235] - provide a destroy() method in ReaderProvider
+    * [HSEARCH-252] - Document Solr integration
+    * [HSEARCH-258] - Add configuration option for Lucene's UseCompoundFile
+
+** Patch
+    * [HSEARCH-20] - Lucene extensions
+
+** Task
+    * [HSEARCH-231] - Update the getting started guide with Solr analyzers
+    * [HSEARCH-236] - Find whether or not indexWriter.optimize() requires an index lock
+    * [HSEARCH-244] - Abiltiy to ask SearchFactory for the scoped analyzer of a given class
+    * [HSEARCH-254] - Migrate to Solr 1.3
+    * [HSEARCH-276] - upgrade to Lucene 2.4
+    * [HSEARCH-286] - Align to GA versions of all dependencies
+    * [HSEARCH-292] - Document the new Filter caching approach
 
 
 3.1.0.Beta1 (17-07-2008)
