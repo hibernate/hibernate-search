@@ -293,6 +293,7 @@
 			<packageset dir="${src.dir}" defaultexcludes="yes">
 				<include name="**/*"/>
 			</packageset>
+            <link href="http://lucene.apache.org/java/2_4_0/api"/>            
 		</javadoc>
 	</target>
 	
