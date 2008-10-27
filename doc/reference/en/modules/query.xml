@@ -514,7 +514,7 @@ fullTextQuery.list(); //returns only best drivers where andre has credentials</p
     <programlisting>@Entity
 @Indexed
 @FullTextFilterDefs( {
-    <emphasis role="bold">@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache=false)</emphasis>, 
+    <emphasis role="bold">@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class)</emphasis>, 
     <emphasis role="bold">@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class)</emphasis> 
 })
 public class Driver { ... }</programlisting>
@@ -536,9 +536,7 @@ public class Driver { ... }</programlisting>
     Lucene filter which reduces the result set to drivers whose score is 5. In
     this example the specified filter implements the
     <literal>org.apache.lucene.search.Filter</literal> directly and contains a
-    no-arg constructor. The <literal>cache</literal> flag, defaulted to
-    <literal>true</literal>, tells Hibernate Search to search the filter in
-    its internal cache and reuse it if found.</para>
+    no-arg constructor. </para>
 
     <para>If your Filter creation requires additional steps or if the filter
     you want to use does not have a no-arg constructor, you can use the
@@ -695,7 +693,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
               <entry>No filter instance and no result is cached by Hibernate
               Search. For every filter call, a new filter instance is created.
               This setting might be useful for rapidly changing data sets or
-              heavily memory constrained environments. </entry>
+              heavily memory constrained environments.</entry>
             </row>
 
             <row>
@@ -707,7 +705,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
               setting is useful when a filter uses its own specific caching
               mechanism or the filter results change dynamically due to
               application specific events making <classname>BitSet</classname>
-              caching in both cases unnecessary. </entry>
+              caching in both cases unnecessary.</entry>
             </row>
 
             <row>

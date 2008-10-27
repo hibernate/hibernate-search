@@ -125,12 +125,12 @@
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-annotations&lt;/artifactId&gt;
-   &lt;version&gt;3.4.0.CR1&lt;/version&gt;
+   &lt;version&gt;3.4.0.GA&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
-   &lt;version&gt;3.4.0.CR1&lt;/version&gt;
+   &lt;version&gt;3.4.0.GA&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
