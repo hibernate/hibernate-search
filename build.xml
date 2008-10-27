@@ -37,11 +37,10 @@
 	<taskdef resource="fr/jayasoft/ivy/ant/antlib.xml"
 			  uri="antlib:fr.jayasoft.ivy.ant" classpathref="ivy.lib.path"/>
 
-    <import file="${common.dir}/common-build.xml"/>
-
-    
     <property name="build.testresources.dir" value="${build.dir}/testresources"/>
     <property name="testresources.dir" value="${basedir}/src/test-resources"/>
+
+    <import file="${common.dir}/common-build.xml"/>
 
     <!-- override order for JBossXB to bootstrap properly -->
     <path id="junit.classpath">

@@ -35,6 +35,7 @@
 	<property name="dist.src.dir" location="${dist.dir}/src"/>
 	<property name="dist.test.dir" location="${dist.dir}/test"/>
 	<property name="dist.lib.dir" location="${dist.dir}/lib"/>
+    <property name="dist.filter.dir" location="${dist.dir}/filters"/>
 	<property name="jar.name" value="${name}"/>
 	<property name="jar.file.name" value="${dist.dir}/${jar.name}.jar"/>
 	<property name="jartest.file.name" value="${dist.dir}/${jar.name}-tests.jar"/>
@@ -219,6 +220,10 @@
 		<copy todir="${dist.test.dir}">
 			<fileset dir="${test.dir}"/>
 		</copy>
+        <mkdir dir="${dist.filter.dir}"/>
+		<copy todir="${dist.filter.dir}">
+			<fileset dir="${filter.dir}"/>
+		</copy>
 	</target>
 	
 	<target name="copysource" depends="copytest"
@@ -298,15 +303,13 @@
 	</target>
 	
 	<target name="extras" description="Copies miscellaneous files to root dir">
-		<copy todir="${dist.dir}/bin" failonerror="false">
-			<fileset dir="bin">
-				<include name="*.bat"/>
-			</fileset>
-		</copy>
 		<copy file="readme.txt" todir="${dist.dir}"/>
 		<copy file="lgpl.txt" todir="${dist.dir}"/>
 		<copy file="changelog.txt" todir="${dist.dir}"/>
 		<copy file="build.xml" todir="${dist.dir}"/>
+        <copy todir="${dist.dir}/jdbc">
+           <fileset dir="jdbc"/>
+        </copy>
 		<replace file="${dist.dir}/build.xml">
 			<replacetoken><![CDATA[../${name}-${version}]]>
 			</replacetoken>
@@ -392,7 +395,7 @@
 		</for>
 	</target>
 	
-	<target name="junitreport" depends="">
+	<target name="junitreport">
 		<junitreport todir="${testreports.dir}">
 			<fileset dir="${testreports.dir}">
 				<include name="TEST-*.xml"/>

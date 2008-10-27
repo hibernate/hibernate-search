@@ -1,4 +1,6 @@
 common.dir=.
 src.dir=src
 test.dir=test
+filter.dir=filters
 testresources.dir=test-resources
+test.resources.dir=test-resources
