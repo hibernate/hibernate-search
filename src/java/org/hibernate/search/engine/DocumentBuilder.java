@@ -571,7 +571,7 @@ public class DocumentBuilder<T> {
 				}
 			}
 			for (LuceneWork luceneWork : toDelete) {
-				toDelete.remove( luceneWork );
+				queue.remove( luceneWork );
 			}
 			if ( duplicateDelete ) return;
 
