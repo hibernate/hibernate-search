@@ -4,13 +4,13 @@ package org.hibernate.search.backend;
 import javax.transaction.Synchronization;
 
 /**
- * Contract needed by Hibernate Search to bach changes per transactio
+ * Contract needed by Hibernate Search to batch changes per transaction.
  *
  * @author Navin Surtani  - navin@surtani.org
  */
 public interface TransactionContext {
 	/**
-	 * @return A boolean whether a transaction is in progress or not.
+	 * @return A boolean indicating whether a transaction is in progress or not.
 	 */
 	public boolean isTransactionInProgress();
 
@@ -20,7 +20,7 @@ public interface TransactionContext {
 	public Object getTransactionIdentifier();
 
 	/**
-	 * register the givne synchronization
+	 * Register the given synchronization.
 	 * 
  	 * @param synchronization synchronization to register
 	 */
