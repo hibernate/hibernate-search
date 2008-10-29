@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 package org.hibernate.search.test.worker.duplication;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import org.hibernate.search.test.SearchTestCase;
 public class WorkDuplicationTest extends SearchTestCase {
 
 	/**
-	 * This test assures that HSEARCH-257. Before the fix SEarch would issue another <code>AddLuceneWork</code> after
+	 * This test assures that HSEARCH-257. Before the fix Search would issue another <code>AddLuceneWork</code> after
 	 * the <code>DeleteLuceneWork</code>. This lead to the fact that after the deletion there was still a Lucene document
 	 * in the index.
 	 *
@@ -74,7 +74,8 @@ public class WorkDuplicationTest extends SearchTestCase {
 		IndexSearcher searcher = new IndexSearcher( reader );
 
 		try {
-			// we have to test using Lucene directly.
+			// we have to test using Lucene directly since query loaders will ignore hits for which there is no
+			// database entry
 			TopDocs topDocs = searcher.search( luceneQuery, null, 1 );
 			assertTrue( "We should have no hit", topDocs.totalHits == 0 );
 		}
