@@ -62,10 +62,10 @@ public class SharingBufferIndexProviderTest extends TestCase {
 		}
 	}
 	
-	private DirectoryProvider[] getRandomEvailableDPs() {
+	private DirectoryProvider[] getRandomAvailableDPs() {
 		int arraySize = random.nextInt( readerProvider.manipulators.size() - 1 ) + 1;
 		DirectoryProvider[] array = new DirectoryProvider[arraySize];
-		List<DirectoryProvider> availableDPs = new ArrayList<DirectoryProvider>( readerProvider.manipulators.keySet() );
+		List<DirectoryProvider> availableDPs = new ArrayList<DirectoryProvider>( readerProvider.directoryProviders );
 		for (int i=0; i<arraySize; i++){
 			int chosenDpIndex = random.nextInt( availableDPs.size() );
 			array[i] = availableDPs.get( chosenDpIndex );
@@ -82,7 +82,7 @@ public class SharingBufferIndexProviderTest extends TestCase {
 				//manage termination:
 				return;
 			}
-			IndexReader fakeOpenReader = readerProvider.openReader( getRandomEvailableDPs() );
+			IndexReader fakeOpenReader = readerProvider.openReader( getRandomAvailableDPs() );
 			Thread.yield();
 			readerProvider.closeReader( fakeOpenReader );
 			countDoneSearches.incrementAndGet();
@@ -93,9 +93,9 @@ public class SharingBufferIndexProviderTest extends TestCase {
 		public void run() {
 			super.run();
 			Thread.yield();
-			DirectoryProvider[] randomEvailableDPs = getRandomEvailableDPs();
+			DirectoryProvider[] randomEvailableDPs = getRandomAvailableDPs();
 			for ( DirectoryProvider dp : randomEvailableDPs ) {
-				TestManipulatorPerDP testManipulatorPerDP = readerProvider.manipulators.get( dp );
+				TestManipulatorPerDP testManipulatorPerDP = readerProvider.manipulators.get( dp.getDirectory() );
 				testManipulatorPerDP.setIndexChanged();
 			}
 			countDoneIndexmods.incrementAndGet();

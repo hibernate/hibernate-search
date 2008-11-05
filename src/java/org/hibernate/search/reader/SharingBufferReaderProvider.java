@@ -2,8 +2,6 @@
 package org.hibernate.search.reader;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -14,6 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
+import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -23,33 +22,35 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
- * This ReaderProvider shares IndexReaders as long as they are "current";
+ * This <code>ReaderProvider</code> shares IndexReaders as long as they are "current";
  * main difference with SharedReaderProvider is the way to update the Readers when needed:
  * this uses IndexReader.reopen() which should improve performance on larger indexes
  * as it shares buffers with previous IndexReader generation for the segments which didn't change.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class SharingBufferReaderProvider implements ReaderProvider {
 
-	private static final Logger log = LoggerFactory.make();	
+	private static final Logger log = LoggerFactory.make();
 
 	/**
-	 * contains all Readers (most current per DP and all unclosed old) 
+	 * contains all Readers (most current per DP and all unclosed old)
 	 */
 	//TODO ConcurrentHashMap's constructor could benefit from some hints as arguments.
-	protected final Map<IndexReader,ReaderUsagePair> allReaders = new ConcurrentHashMap<IndexReader,ReaderUsagePair>();
-	
+	protected final Map<IndexReader, ReaderUsagePair> allReaders = new ConcurrentHashMap<IndexReader, ReaderUsagePair>();
+
 	/**
 	 * contains last updated Reader; protected by lockOnOpenLatest (in the values)
 	 */
-	protected Map<DirectoryProvider,PerDirectoryLatestReader> currentReaders;
+	protected final Map<Directory, PerDirectoryLatestReader> currentReaders = new ConcurrentHashMap<Directory, PerDirectoryLatestReader>();
 
 	public void closeReader(IndexReader multiReader) {
-		if ( multiReader == null ) return;
+		if ( multiReader == null ) {
+			return;
+		}
 		IndexReader[] readers;
 		if ( multiReader instanceof MultiReader ) {
-			readers = ReaderProviderHelper.getSubReadersFromMultiReader( (MultiReader) multiReader );
+			readers = ReaderProviderHelper.getSubReadersFromMultiReader( ( MultiReader ) multiReader );
 		}
 		else {
 			throw new AssertionFailure( "Everything should be wrapped in a MultiReader" );
@@ -57,33 +58,55 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		log.debug( "Closing MultiReader: {}", multiReader );
 		for ( IndexReader reader : readers ) {
 			ReaderUsagePair container = allReaders.get( reader );
-			container.close();//virtual
+			container.close(); //virtual
 		}
 		log.trace( "IndexReader closed." );
 	}
 
 	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
-		Map<DirectoryProvider,PerDirectoryLatestReader> map = new HashMap<DirectoryProvider,PerDirectoryLatestReader>();
 		Set<DirectoryProvider<?>> providers = searchFactoryImplementor.getDirectoryProviders();
+
+		// create the readers for the known providers. Unfortunately, it is not possible to
+		// create all readers in initalize since some providers have more than one directory (eg
+		// FSSlaveDirectoryProvider). See also HSEARCH-250.
 		for ( DirectoryProvider provider : providers ) {
-			try {
-				map.put( provider, new PerDirectoryLatestReader( provider ) );
-			} catch (IOException e) {
-				throw new SearchException( "Unable to open Lucene IndexReader", e );
-			}
+			createReader( provider.getDirectory() );
 		}
-		//FIXME I'm not convinced this non-final fields are safe without locks, but I may be wrong.
-		currentReaders = Collections.unmodifiableMap( map );
+	}
+
+	/**
+	 * Thread safe creation of <code>PerDirectoryLatestReader</code>.
+	 *
+	 * @param directory The Lucene directory for which to create the reader.
+	 * @return either the cached instance for the specified <code>Directory</code> or a newly created one.
+	 * @see <a href="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-250">HSEARCH-250</a>
+	 */
+	private synchronized PerDirectoryLatestReader createReader(Directory directory) {
+		PerDirectoryLatestReader reader = currentReaders.get( directory );
+		if ( reader != null ) {
+			return reader;
+		}
+
+		try {
+			reader = new PerDirectoryLatestReader( directory );
+			currentReaders.put( directory, reader );
+			return reader;
+		}
+		catch ( IOException e ) {
+			throw new SearchException( "Unable to open Lucene IndexReader", e );
+		}
 	}
 
 	public void destroy() {
 		IndexReader[] readers = allReaders.keySet().toArray( new IndexReader[allReaders.size()] );
-		for (IndexReader reader : readers) {
-			ReaderUsagePair usage =  allReaders.get( reader );
+		for ( IndexReader reader : readers ) {
+			ReaderUsagePair usage = allReaders.get( reader );
 			usage.close();
 		}
 
-		if ( allReaders.size() != 0 ) log.warn( "ReaderProvider contains readers not properly closed at destroy time" );
+		if ( allReaders.size() != 0 ) {
+			log.warn( "ReaderProvider contains readers not properly closed at destroy time" );
+		}
 	}
 
 	public IndexReader openReader(DirectoryProvider... directoryProviders) {
@@ -95,7 +118,10 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "Opening IndexReader from {}", directoryProvider.getDirectory() );
 			}
-			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directoryProvider );
+			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directoryProvider.getDirectory() );
+			if ( directoryLatestReader == null ) { // might eg happen for FSSlaveDirectoryProvider
+				directoryLatestReader = createReader( directoryProvider.getDirectory() );
+			}
 			readers[index] = directoryLatestReader.refreshAndGet();
 		}
 		// don't use ReaderProviderHelper.buildMultiReader as we need our own cleanup.
@@ -106,7 +132,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 			try {
 				return new CacheableMultiReader( readers );
 			}
-			catch (Exception e) {
+			catch ( Exception e ) {
 				//Lucene 2.2 used to throw IOExceptions here
 				for ( IndexReader ir : readers ) {
 					ReaderUsagePair readerUsagePair = allReaders.get( ir );
@@ -116,17 +142,17 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 			}
 		}
 	}
-	
+
 	//overridable method for testability:
-	protected IndexReader readerFactory(DirectoryProvider provider) throws IOException {
-		return IndexReader.open( provider.getDirectory() );
+	protected IndexReader readerFactory(Directory directory) throws IOException {
+		return IndexReader.open( directory );
 	}
 
 	/**
 	 * Container for the couple IndexReader,UsageCounter.
 	 */
 	protected final class ReaderUsagePair {
-		
+
 		public final IndexReader reader;
 		/**
 		 * When reaching 0 (always test on change) the reader should be really
@@ -136,60 +162,64 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		 * additionally when creating it will be used (+1)
 		 */
 		protected final AtomicInteger usageCounter = new AtomicInteger( 2 );
-		
+
 		ReaderUsagePair(IndexReader r) {
 			reader = r;
 		}
-		
+
 		/**
-		 * closes the IndexReader if no other resource is using it;
-		 * in this case the reference to this container will also be removed.
+		 * Closes the <code>IndexReader</code> if no other resource is using it
+		 * in which case the reference to this container will also be removed.
 		 */
 		public void close() {
 			int refCount = usageCounter.decrementAndGet();
-			if ( refCount==0  ) {
+			if ( refCount == 0 ) {
 				//TODO I've been experimenting with the idea of an async-close: didn't appear to have an interesting benefit,
 				//so discarded the code. should try with bigger indexes to see if the effect gets more impressive.
 				ReaderUsagePair removed = allReaders.remove( reader );//remove ourself
 				try {
 					reader.close();
-				} catch (IOException e) {
+				}
+				catch ( IOException e ) {
 					log.warn( "Unable to close Lucene IndexReader", e );
 				}
 				assert removed != null;
 			}
-			else if ( refCount<0 ) {
+			else if ( refCount < 0 ) {
 				//doesn't happen with current code, could help spotting future bugs?
-				throw new AssertionFailure( "Closing an IndexReader for which you didn't own a lock-token, or somebody else which didn't own closed already." );
+				throw new AssertionFailure(
+						"Closing an IndexReader for which you didn't own a lock-token, or somebody else which didn't own closed already."
+				);
 			}
 		}
-		
-		public String toString(){
+
+		public String toString() {
 			return "Reader:" + this.hashCode() + " ref.count=" + usageCounter.get();
 		}
-		
+
 	}
-	
+
 	/**
 	 * An instance for each DirectoryProvider,
 	 * establishing the association between "current" ReaderUsagePair
 	 * for a DirectoryProvider and it's lock.
 	 */
 	protected final class PerDirectoryLatestReader {
-		
+
 		/**
 		 * Reference to the most current IndexReader for a DirectoryProvider;
 		 * guarded by lockOnReplaceCurrent;
 		 */
 		public ReaderUsagePair current; //guarded by lockOnReplaceCurrent 
 		private final Lock lockOnReplaceCurrent = new ReentrantLock();
-		
+
 		/**
-		 * @param provider The DirectoryProvider for which we manage the IndexReader.
+		 * @param directory The <code>Directory</code> for which we manage the <code>IndexReader</code>.
+		 *
 		 * @throws IOException when the index initialization fails.
 		 */
-		public PerDirectoryLatestReader(DirectoryProvider provider) throws IOException {
-			IndexReader reader = readerFactory( provider );
+		public PerDirectoryLatestReader(Directory directory) throws IOException {
+			IndexReader reader = readerFactory( directory );
 			ReaderUsagePair initialPair = new ReaderUsagePair( reader );
 			initialPair.usageCounter.set( 1 );//a token to mark as active (preventing real close).
 			lockOnReplaceCurrent.lock();//no harm, just ensuring safe publishing.
@@ -201,6 +231,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		/**
 		 * Gets an updated IndexReader for the current DirectoryProvider;
 		 * the index status will be checked.
+		 *
 		 * @return the current IndexReader if it's in sync with underlying index, a new one otherwise.
 		 */
 		public IndexReader refreshAndGet() {
@@ -211,7 +242,8 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 				IndexReader beforeUpdateReader = current.reader;
 				try {
 					updatedReader = beforeUpdateReader.reopen();
-				} catch (IOException e) {
+				}
+				catch ( IOException e ) {
 					throw new SearchException( "Unable to reopen IndexReader", e );
 				}
 				if ( beforeUpdateReader == updatedReader ) {
@@ -226,7 +258,8 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 					current = newPair;
 					allReaders.put( updatedReader, newPair );//unfortunately still needs lock
 				}
-			} finally {
+			}
+			finally {
 				lockOnReplaceCurrent.unlock();
 			}
 			// doesn't need lock:
@@ -235,7 +268,5 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 			}
 			return updatedReader;
 		}
-		
 	}
-	
 }
