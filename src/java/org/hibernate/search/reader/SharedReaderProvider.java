@@ -23,7 +23,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
- * Share readers per SearchFactory, reusing them iff they are still valid.
+ * Share readers per <code>SearchFactory</code>, reusing them if they are still valid.
+ * 
  * @Deprecated replaced by SharingBufferReaderProvider
  * @author Emmanuel Bernard
  */
