@@ -4,6 +4,7 @@ package org.hibernate.search.test.directoryProvider;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
@@ -12,7 +13,7 @@ import org.hibernate.dialect.Dialect;
 
 /**
  * Build multiple session factories from the same set of classes
- * The configuration can be altered overriding the #configure() method
+ * The configuration can be altered overriding {@link #configure}.
  *
  * @author Emmanuel Bernard
  */
@@ -26,32 +27,40 @@ public abstract class MultipleSFTestCase extends TestCase {
 	protected abstract int getSFNbrs();
 
 	protected void buildSessionFactories(Class[] classes, String[] packages, String[] xmlFiles) throws Exception {
-		if (sessionFactories == null) sessionFactories = new SessionFactory[ getSFNbrs() ];
-		if (cfgs == null) cfgs = new AnnotationConfiguration[ getSFNbrs() ];
-		for (SessionFactory sf : sessionFactories ) if ( sf != null ) sf.close();
-		for (int sfIndex = 0 ; sfIndex < getSFNbrs() ; sfIndex++ ) {
+		if ( sessionFactories == null ) {
+			sessionFactories = new SessionFactory[getSFNbrs()];
+		}
+		if ( cfgs == null ) {
+			cfgs = new AnnotationConfiguration[getSFNbrs()];
+		}
+		for ( SessionFactory sf : sessionFactories ) {
+			if ( sf != null ) {
+				sf.close();
+			}
+		}
+		for ( int sfIndex = 0; sfIndex < getSFNbrs(); sfIndex++ ) {
 			cfgs[sfIndex] = new AnnotationConfiguration();
 		}
 		configure( cfgs );
-		for (int sfIndex = 0 ; sfIndex < getSFNbrs() ; sfIndex++ ) {
+		for ( int sfIndex = 0; sfIndex < getSFNbrs(); sfIndex++ ) {
 			try {
 				if ( recreateSchema() ) {
 					cfgs[sfIndex].setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
 				}
-				for ( int i = 0; i < packages.length; i++ ) {
-					cfgs[sfIndex].addPackage( packages[i] );
+				for ( String aPackage : packages ) {
+					cfgs[sfIndex].addPackage( aPackage );
 				}
-				for ( int i = 0; i < classes.length; i++ ) {
-					cfgs[sfIndex].addAnnotatedClass( classes[i] );
+				for ( Class aClass : classes ) {
+					cfgs[sfIndex].addAnnotatedClass( aClass );
 				}
-				for ( int i = 0; i < xmlFiles.length; i++ ) {
-					InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFiles[i] );
+				for ( String xmlFile : xmlFiles ) {
+					InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );
 					cfgs[sfIndex].addInputStream( is );
 				}
 				setDialect( Dialect.getDialect() );
 				sessionFactories[sfIndex] = cfgs[sfIndex].buildSessionFactory( /*new TestInterceptor()*/ );
 			}
-			catch (Exception e) {
+			catch ( Exception e ) {
 				e.printStackTrace();
 				throw e;
 			}
@@ -68,11 +77,11 @@ public abstract class MultipleSFTestCase extends TestCase {
 	protected abstract Class[] getMappings();
 
 	protected String[] getAnnotatedPackages() {
-		return new String[]{};
+		return new String[] { };
 	}
 
 	protected String[] getXmlFiles() {
-		return new String[]{};
+		return new String[] { };
 	}
 
 	private void setDialect(Dialect dialect) {
@@ -83,7 +92,7 @@ public abstract class MultipleSFTestCase extends TestCase {
 		return dialect;
 	}
 
-	protected abstract void configure(Configuration[] cfg) ;
+	protected abstract void configure(Configuration[] cfg);
 
 	protected boolean recreateSchema() {
 		return true;

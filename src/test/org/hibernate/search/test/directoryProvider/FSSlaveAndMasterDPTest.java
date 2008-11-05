@@ -7,114 +7,155 @@ import java.util.List;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
+import org.slf4j.Logger;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
+ * Test case for master/slave directories.
+ *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
-	
+
+	private static final Logger log = LoggerFactory.make();
+
 	private static File root;
+
 	static {
-		String buildDir = System.getProperty("build.dir");
-		if (buildDir == null) {
+		String buildDir = System.getProperty( "build.dir" );
+		if ( buildDir == null ) {
 			buildDir = ".";
 		}
-		root = new File(buildDir, "lucenedirs");
+		root = new File( buildDir, "lucenedirs" );
+		log.info( "Using {} as test directory.", root.getAbsolutePath() );
 	}
 
-	@SuppressWarnings( { "PointlessArithmeticExpression" } )
+	/**
+	 * The lucene index directory which is shared bewtween master and slave.
+	 */
+	private String masterCopy = "/master/copy";
+
+	/**
+	 * The lucene index directory which is specific to the master node.
+	 */
+	private String masterMain = "/master/main";
+
+	/**
+	 * The lucene index directory which is specific to the slave node.
+	 */
+	private String slave = "/slave";
+
+	/**
+	 * Verifies that copies of the master get properly copied to the slaves.
+	 *
+	 * @throws Exception in case the test fails.
+	 */
 	public void testProperCopy() throws Exception {
-		Session s1 = getSessionFactories()[0].openSession( );
+
+		// assert that the salve index is empty
+		FullTextSession fullTextSession = Search.getFullTextSession( getSlaveSession() );
+		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+		List result = fullTextSession.createFullTextQuery( parser.parse( "location:texas" ) ).list();
+		assertEquals( "No copy yet, fresh index expected", 0, result.size() );
+		fullTextSession.close();
+		
+
+		// create an entity on the master and persist it in order to index it
+		Session session = getMasterSession();
 		SnowStorm sn = new SnowStorm();
 		sn.setDate( new Date() );
-		sn.setLocation( "Dallas, TX, USA");
+		sn.setLocation( "Dallas, TX, USA" );
+		session.persist( sn );
+		session.flush(); //we don' commit so we need to flush manually
+		session.close();
 
-		FullTextSession fts2 = Search.getFullTextSession( getSessionFactories()[1].openSession( ) );
-		QueryParser parser = new QueryParser("id", new StopAnalyzer() );
-		List result = fts2.createFullTextQuery( parser.parse( "location:texas" ) ).list();
-		assertEquals( "No copy yet, fresh index expected", 0, result.size() );
+		int waitPeriodMilli = 2010; // wait  a bit more than 2 refresh periods (one master / one slave)  -  2 * 1 * 1000 + 10
+		Thread.sleep( waitPeriodMilli );
 
-		s1.persist( sn );
-		s1.flush(); //we don' commit so we need to flush manually
-
-		fts2.close();
-		s1.close();
-
-		int waitPeroid = 2 * 1 * 1000 + 10; //wait a bit more than 2 refresh (one master / one slave)
-		Thread.sleep( waitPeroid );
-
-		//temp test original
-		fts2 = Search.getFullTextSession( getSessionFactories()[0].openSession( ) );
-		result = fts2.createFullTextQuery( parser.parse( "location:dallas" ) ).list();
+		// assert that the master hass indexed the snowstorm
+		fullTextSession = Search.getFullTextSession( getMasterSession() );
+		result = fullTextSession.createFullTextQuery( parser.parse( "location:dallas" ) ).list();
 		assertEquals( "Original should get one", 1, result.size() );
+		fullTextSession.close();
 
-		fts2 = Search.getFullTextSession( getSessionFactories()[1].openSession( ) );
-		result = fts2.createFullTextQuery( parser.parse( "location:dallas" ) ).list();
-		assertEquals("First copy did not work out", 1, result.size() );
+		// assert that index got copied to the salve as well
+		log.info("Searching slave");
+		fullTextSession = Search.getFullTextSession( getSlaveSession() );
+		result = fullTextSession.createFullTextQuery( parser.parse( "location:dallas" ) ).list();
+		assertEquals( "First copy did not work out", 1, result.size() );
+		fullTextSession.close();
 
-		s1 = getSessionFactories()[0].openSession( );
+		// add a new snowstorm to the master
+		session = getMasterSession();
 		sn = new SnowStorm();
 		sn.setDate( new Date() );
-		sn.setLocation( "Chennai, India");
+		sn.setLocation( "Chennai, India" );
+		session.persist( sn );
+		session.flush(); //we don' commit so we need to flush manually
+		session.close();
 
-		s1.persist( sn );
-		s1.flush(); //we don' commit so we need to flush manually
+		Thread.sleep( waitPeriodMilli ); //wait a bit more than 2 refresh (one master / one slave)
 
-		fts2.close();
-		s1.close();
+		// assert that the new snowstorm made it into the slave
+		fullTextSession = Search.getFullTextSession( getSlaveSession() );
+		result = fullTextSession.createFullTextQuery( parser.parse( "location:chennai" ) ).list();
+		assertEquals( "Second copy did not work out", 1, result.size() );
+		fullTextSession.close();
 
-		Thread.sleep( waitPeroid ); //wait a bit more than 2 refresh (one master / one slave)
-
-		fts2 = Search.getFullTextSession( getSessionFactories()[1].openSession( ) );
-		result = fts2.createFullTextQuery( parser.parse( "location:chennai" ) ).list();
-		assertEquals("Second copy did not work out", 1, result.size() );
-
-		s1 = getSessionFactories()[0].openSession( );
+		session = getMasterSession();
 		sn = new SnowStorm();
 		sn.setDate( new Date() );
-		sn.setLocation( "Melbourne, Australia");
+		sn.setLocation( "Melbourne, Australia" );
+		session.persist( sn );
+		session.flush(); //we don' commit so we need to flush manually
+		session.close();
 
-		s1.persist( sn );
-		s1.flush(); //we don' commit so we need to flush manually
+		Thread.sleep( waitPeriodMilli ); //wait a bit more than 2 refresh (one master / one slave)
 
-		fts2.close();
-		s1.close();
+		// once more - assert that the new snowstorm made it into the slave
+		fullTextSession = Search.getFullTextSession( getSessionFactories()[1].openSession() );
+		result = fullTextSession.createFullTextQuery( parser.parse( "location:melbourne" ) ).list();
+		assertEquals( "Third copy did not work out", 1, result.size() );
 
-		Thread.sleep( waitPeroid ); //wait a bit more than 2 refresh (one master / one slave)
-
-		fts2 = Search.getFullTextSession( getSessionFactories()[1].openSession( ) );
-		result = fts2.createFullTextQuery( parser.parse( "location:melbourne" ) ).list();
-		assertEquals("Third copy did not work out", 1, result.size() );
-
-		fts2.close();
-		//run the searchfactory.close() operations
+		fullTextSession.close();
 		for ( SessionFactory sf : getSessionFactories() ) {
 			sf.close();
 		}
 	}
 
+	private Session getMasterSession() {
+		return getSessionFactories()[0].openSession();
+	}
+
+	private Session getSlaveSession() {
+		return getSessionFactories()[1].openSession();
+	}
+
 	protected void setUp() throws Exception {
 		root.mkdir();
 
-		File master = new File(root, "master/main");
+		File master = new File( root, masterMain );
 		master.mkdirs();
-		master = new File(root, "master/copy");
+		master = new File( root, masterCopy );
 		master.mkdirs();
 
-		File slave = new File(root, "slave");
-		slave.mkdir();
-		                                                                            
+		File slaveFile = new File( root, slave );
+		slaveFile.mkdir();
+
 		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
+		log.info( "Deleting test directory {} ", root.getAbsolutePath() );
 		FileHelper.delete( root );
 	}
 
@@ -122,7 +163,6 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return 2;
 	}
 
-	@SuppressWarnings("unchecked")
 	protected Class[] getMappings() {
 		return new Class[] {
 				SnowStorm.class
@@ -131,15 +171,19 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 	protected void configure(Configuration[] cfg) {
 		//master
-		cfg[0].setProperty( "hibernate.search.default.sourceBase",  root.getAbsolutePath() + "/master/copy");
-		cfg[0].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/master/main");
-		cfg[0].setProperty( "hibernate.search.default.refresh", "1"); //every minute
-		cfg[0].setProperty( "hibernate.search.default.directory_provider", "org.hibernate.search.store.FSMasterDirectoryProvider");
+		cfg[0].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy );
+		cfg[0].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + masterMain );
+		cfg[0].setProperty( "hibernate.search.default.refresh", "1" ); //every second
+		cfg[0].setProperty(
+				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSMasterDirectoryProvider"
+		);
 
 		//slave(s)
-		cfg[1].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + "/master/copy");
-		cfg[1].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/slave");
-		cfg[1].setProperty( "hibernate.search.default.refresh", "1"); //every minute
-		cfg[1].setProperty( "hibernate.search.default.directory_provider", "org.hibernate.search.store.FSSlaveDirectoryProvider");
+		cfg[1].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy );
+		cfg[1].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave );
+		cfg[1].setProperty( "hibernate.search.default.refresh", "1" ); //every second
+		cfg[1].setProperty(
+				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSSlaveDirectoryProvider"
+		);
 	}
 }
