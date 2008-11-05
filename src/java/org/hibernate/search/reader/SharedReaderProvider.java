@@ -147,7 +147,7 @@ public class SharedReaderProvider implements ReaderProvider {
 		 * not worse than NotShared and limit the locking time, hence scalability
 		 */
 		try {
-			reader = IndexReader.open( directoryProvider.getDirectory() );
+			reader = IndexReader.open( directoryProvider.getDirectory(), true );
 		}
 		catch ( IOException e ) {
 			throw new SearchException( "Unable to open Lucene IndexReader", e );

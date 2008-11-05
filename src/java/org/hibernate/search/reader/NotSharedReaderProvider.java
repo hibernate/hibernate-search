@@ -23,7 +23,7 @@ public class NotSharedReaderProvider implements ReaderProvider {
 		IndexReader[] readers = new IndexReader[length];
 		try {
 			for (int index = 0; index < length; index++) {
-				readers[index] = IndexReader.open( directoryProviders[index].getDirectory() );
+				readers[index] = IndexReader.open( directoryProviders[index].getDirectory(), true );
 			}
 		}
 		catch (IOException e) {

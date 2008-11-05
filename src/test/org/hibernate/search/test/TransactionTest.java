@@ -51,7 +51,7 @@ public class TransactionTest extends SearchTestCase {
 	}
 
 	private int getDocumentNumber() throws IOException {
-		IndexReader reader = IndexReader.open( getDirectory( Document.class ) );
+		IndexReader reader = IndexReader.open( getDirectory( Document.class ), false );
 		try {
 			return reader.numDocs();
 		}

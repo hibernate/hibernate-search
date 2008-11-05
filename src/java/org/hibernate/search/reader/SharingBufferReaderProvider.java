@@ -145,7 +145,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 
 	//overridable method for testability:
 	protected IndexReader readerFactory(Directory directory) throws IOException {
-		return IndexReader.open( directory );
+		return IndexReader.open( directory, true );
 	}
 
 	/**

@@ -122,7 +122,7 @@ public class Workspace {
 			return reader;
 		Directory directory = directoryProvider.getDirectory();
 		try {
-			reader = IndexReader.open( directory );
+			reader = IndexReader.open( directory, false );
 			log.trace( "IndexReader opened" );
 		}
 		catch ( IOException e ) {
