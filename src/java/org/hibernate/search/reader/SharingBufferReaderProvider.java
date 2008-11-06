@@ -34,7 +34,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	private static final Logger log = LoggerFactory.make();
 
 	/**
-	 * contains all Readers (most current per DP and all unclosed old)
+	 * contains all Readers (most current per Directory and all unclosed old readers)
 	 */
 	//TODO ConcurrentHashMap's constructor could benefit from some hints as arguments.
 	protected final Map<IndexReader, ReaderUsagePair> allReaders = new ConcurrentHashMap<IndexReader, ReaderUsagePair>();
@@ -67,7 +67,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		Set<DirectoryProvider<?>> providers = searchFactoryImplementor.getDirectoryProviders();
 
 		// create the readers for the known providers. Unfortunately, it is not possible to
-		// create all readers in initalize since some providers have more than one directory (eg
+		// create all readers in initialize since some providers have more than one directory (eg
 		// FSSlaveDirectoryProvider). See also HSEARCH-250.
 		for ( DirectoryProvider provider : providers ) {
 			createReader( provider.getDirectory() );
@@ -114,13 +114,11 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		IndexReader[] readers = new IndexReader[length];
 		log.debug( "Opening IndexReader for directoryProviders: {}", length );
 		for ( int index = 0; index < length; index++ ) {
-			DirectoryProvider directoryProvider = directoryProviders[index];
-			if ( log.isTraceEnabled() ) {
-				log.trace( "Opening IndexReader from {}", directoryProvider.getDirectory() );
-			}
-			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directoryProvider.getDirectory() );
+			Directory directory = directoryProviders[index].getDirectory();
+			log.trace( "Opening IndexReader from {}", directory );
+			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directory );
 			if ( directoryLatestReader == null ) { // might eg happen for FSSlaveDirectoryProvider
-				directoryLatestReader = createReader( directoryProvider.getDirectory() );
+				directoryLatestReader = createReader( directory );
 			}
 			readers[index] = directoryLatestReader.refreshAndGet();
 		}
@@ -144,7 +142,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	}
 
 	//overridable method for testability:
-	protected IndexReader readerFactory(Directory directory) throws IOException {
+	protected IndexReader readerFactory(final Directory directory) throws IOException {
 		return IndexReader.open( directory, true );
 	}
 
@@ -229,7 +227,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		}
 
 		/**
-		 * Gets an updated IndexReader for the current DirectoryProvider;
+		 * Gets an updated IndexReader for the current Directory;
 		 * the index status will be checked.
 		 *
 		 * @return the current IndexReader if it's in sync with underlying index, a new one otherwise.
