@@ -8,6 +8,9 @@ package org.hibernate.search.bridge;
  *
  * objectToString( stringToObject( string ) ).equals(string) for string not null
  * stringToObject( objectToString( object ) ).equals(object) for object not null 
+ * 
+ * As for all Bridges implementors must be threasafe.
+ * 
  * @author Emmanuel Bernard
  */
 public interface TwoWayStringBridge extends StringBridge {

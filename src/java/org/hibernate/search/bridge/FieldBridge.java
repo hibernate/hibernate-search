@@ -5,7 +5,9 @@ import org.apache.lucene.document.Document;
 
 /**
  * Link between a java property and a Lucene Document
- * Usually a Java property will be linked to a Document Field
+ * Usually a Java property will be linked to a Document Field.
+ * 
+ * All implementations need to be threadsafe.
  *
  * @author Emmanuel Bernard
  */
