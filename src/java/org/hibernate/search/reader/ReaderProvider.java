@@ -17,7 +17,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  */
 public interface ReaderProvider {
 	/**
-	 * Open a reader on all the listed directory providers.
+	 * Open a read-only reader on all the listed directory providers.
 	 * The opened reader has to be closed through {@link #closeReader(IndexReader)}.
 	 * The opening can be virtual.
 	 */

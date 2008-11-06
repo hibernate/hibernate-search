@@ -99,8 +99,8 @@ finally {
       </listitem>
 
       <listitem>
-        <para>This indexReader must not be used for modification operations
-        (especially delete), if you want to use an read/write index reader,
+        <para>This indexReader can't be used for modification operations
+        (you would get an exception). If you want to use a read/write index reader,
         open one from the Lucene Directory object.</para>
       </listitem>
     </itemizedlist>
