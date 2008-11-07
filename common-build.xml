@@ -99,7 +99,6 @@
 	
 	<path id="lib.class.path">
 		<path refid="lib.moduleclass.path"/>
-		<pathelement path="${clover.jar}"/>
 	</path>
 	
 	<!-- overridable in modules -->
@@ -137,15 +136,7 @@
 	<path id="testsrc.path">
 		<pathelement location="${test.dir}"/>
 	</path>
-		
-	<path id="junit.classpath">
-		<pathelement path="${classes.dir}"/>
-		<pathelement path="${testclasses.dir}"/>
-		<path refid="lib.class.path"/>
-		<path refid="junit.moduleclasspath"/>
-		<path location="${clover.jar}"/>
-	</path>
-	
+			
 	<!-- Determine the database against which to run  tests-->
 	<if>
 		<equals arg1="${targetdb}" arg2="$${targetdb}"/>
@@ -155,30 +146,11 @@
 		</then>
 	</if>
 	
-	<!-- Clover tasks -->
-	<target name="with.clover">
-		<clover-setup initString="clover_coverage.db"/>
-	</target>
-	
-	<target name="cloverreport.html" depends="with.clover"
-		description="Generate a clover report from the current clover database.">
-		<clover-report>
-			<current outfile="${clover.out.dir}">
-				<format type="html"/>
-			</current>
-		</clover-report>
-	</target>
-	
-	<target name="cloverreport"
-		depends="with.clover,junitreport,cloverreport.html"
-		description="Run the tests and generate a clover report">
-	</target>
-	
+
 	<!-- Tasks -->
 	<target name="clean" description="Cleans up build and dist directories">
 		<delete dir="${build.dir}"/>
 		<delete dir="${dist.target.dir}"/>
-		<delete dir="${clover.out.dir}"/>
 	</target>
 	
 	<target name="init" description="Initialize the build">

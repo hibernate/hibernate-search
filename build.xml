@@ -8,163 +8,186 @@
 -->
 
 <project name="Hibernate Search" default="dist" basedir="."
-    xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
+         xmlns:ivy="antlib:fr.jayasoft.ivy.ant">
 
     <!-- Give user a chance to override without editing this file
 		   (and without typing -D each time it compiles it) -->
-	<property file="build.properties"/>
-	<property file="${user.home}/.ant.properties"/>
+    <property file="build.properties"/>
+    <property file="${user.home}/.ant.properties"/>
 
-	<!-- Name of project and version, used to create filenames -->
-	<property name="Name" value="Hibernate Search"/>
-	<property name="name" value="hibernate-search"/>
-	<property name="version" value="3.1.0.Beta2"/>
-	<property name="javadoc.packagenames" value="org.hibernate.search.*"/>
-	<property name="copy.test" value="true"/>
-	<property name="javac.source" value="1.5"/>
-	<property name="javac.target" value="1.5"/>
+    <!-- Name of project and version, used to create filenames -->
+    <property name="Name" value="Hibernate Search"/>
+    <property name="name" value="hibernate-search"/>
+    <property name="version" value="3.1.0.Beta2"/>
+    <property name="javadoc.packagenames" value="org.hibernate.search.*"/>
+    <property name="copy.test" value="true"/>
+    <property name="javac.source" value="1.5"/>
+    <property name="javac.target" value="1.5"/>
     <property name="jdbc.dir" value="jdbc"/>
     <property name="common.dir" value="${basedir}"/>
 
-    <property name="ivy.dep.dir" value="${basedir}/build/lib" />
+    <property name="ivy.dep.dir" value="${basedir}/build/lib"/>
 
     <!-- ivy load -->
-	<property name="ivy.jar.dir" value="${basedir}/ivy" />
-    <property name="ivy.conf.dir" value="${basedir}" />
-	<path id="ivy.lib.path">
-		<fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-	</path>
-	<taskdef resource="fr/jayasoft/ivy/ant/antlib.xml"
-			  uri="antlib:fr.jayasoft.ivy.ant" classpathref="ivy.lib.path"/>
+    <property name="ivy.jar.dir" value="${basedir}/ivy"/>
+    <property name="ivy.conf.dir" value="${basedir}"/>
+    <path id="ivy.lib.path">
+        <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+    </path>
+    <taskdef resource="fr/jayasoft/ivy/ant/antlib.xml"
+             uri="antlib:fr.jayasoft.ivy.ant" classpathref="ivy.lib.path"/>
 
     <import file="${common.dir}/common-build.xml"/>
 
     <property name="build.testresources.dir" value="${build.dir}/testresources"/>
     <property name="testresources.dir" value="${basedir}/src/test-resources"/>
 
-    <!-- override order for JBossXB to bootstrap properly -->
-    <path id="junit.classpath">
-           <fileset dir="${lib.dir}">
-                 <include name="*.jar"/>
-           </fileset>
-           <pathelement path="${classes.dir}"/>
-           <pathelement path="${testclasses.dir}"/>
-           <path refid="junit.moduleclasspath"/>
-           <path refid="lib.class.path"/>
-           <path location="${clover.jar}"/>
-    </path>
-	
-    <!-- override order for JBossXB to bootstrap properly -->
-    <path id="lib.class.path">
+
+    <path id="lib.class.path.required" description="Compile and runtime libraries. Required jars only.">
         <fileset dir="${ivy.dep.dir}/core">
             <include name="*.jar"/>
             <exclude name="xml-apis.jar"/>
             <exclude name="xerces*.jar"/>
+            <exclude name="solr*.jar"/>
+            <exclude name="ejb3-persistence.jar"/>
         </fileset>
         <fileset dir="${lib.dir}">
             <include name="*.jar"/>
         </fileset>
-		<pathelement path="${clover.jar}"/>
     </path>
-	
-	<path id="junit.moduleclasspath">
+
+    <path id="lib.class.path.optional" description="Compile and runtime libraries. Optional jars only.">
+        <fileset dir="${ivy.dep.dir}/core">
+            <include name="solr*.jar"/>
+            <include name="ejb3-persistence.jar"/>
+        </fileset>
+    </path>
+
+    <path id="lib.class.path" description="Compile and runtime libraries.">
+        <path refid="lib.class.path.required"/>
+        <path refid="lib.class.path.optional"/>
+    </path>
+
+    <path id="junit.moduleclasspath.required" description="Test classes. Optional jars excluded.">
         <!-- order matters for JBoss XB proper bootstrap -->
         <fileset dir="${lib.dir}/test">
-			<include name="*.jar"/>
-			<include name="*.zip"/>
-		</fileset>
+            <include name="*.jar"/>
+        </fileset>
         <pathelement location="${src.dir}"/>
-		<pathelement location="${test.dir}"/>
-		<!-- pathelement location="${annotations.jar}"/>
-        <pathelement location="${entitymanager.jar}"/ -->
+        <pathelement location="${test.dir}"/>
         <fileset dir="${ivy.dep.dir}/test">
-			<include name="*.jar"/>
-		</fileset>
+            <include name="*.jar"/>
+            <exclude name="annotations.jar"/>
+        </fileset>
         <fileset dir="${jdbc.dir}">
-			<include name="*.jar"/>
-			<include name="*.zip"/>
-		</fileset>
-	</path>
+            <include name="*.jar"/>
+            <include name="*.zip"/>
+        </fileset>
+    </path>
+
+    <path id="junit.moduleclasspath.optional" description="Optional test jars.">
+        <fileset dir="${ivy.dep.dir}/test">
+            <include name="annotations.jar"/>
+        </fileset>
+    </path>
+
+    <path id="junit.classpath.required.only"
+          description="Classpath containing all compile and test classes excluding the optional ones, eg Annotations, Solr, JPA">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${classes.dir}"/>
+        <pathelement path="${testclasses.dir}"/>
+        <path refid="junit.moduleclasspath.required"/>
+        <path refid="lib.class.path.required"/>
+    </path>
+
+    <path id="junit.classpath"
+          description="Classpath containing all compile and test classes including the optional ones">
+        <path refid="junit.classpath.required.only"/>
+        <path refid="junit.moduleclasspath.optional"/>
+        <path refid="lib.class.path.optional"/>
+    </path>
 
     <target name="init">
-		<antcall target="common-build.init"/>
+        <antcall target="common-build.init"/>
         <tstamp>
             <format property="now" pattern="yyyyMMddhhmmss"/>
         </tstamp>
         <mkdir dir="${ivy.dep.dir}/core"/>
         <mkdir dir="${ivy.dep.dir}/test"/>
-        <ivy:configure file="${ivy.jar.dir}/ivyconf.xml" />
+        <ivy:configure file="${ivy.jar.dir}/ivyconf.xml"/>
         <mkdir dir="${lib.dir}/test"/>
         <mkdir dir="${build.testresources.dir}"/>
     </target>
 
     <target name="get.deps.core" depends="init" description="retrieve the core dependencies">
-        <ivy:resolve conf="default" />
-        <ivy:retrieve pattern="${ivy.dep.dir}/core/[artifact].[ext]" conf="default" />
+        <ivy:resolve conf="default"/>
+        <ivy:retrieve pattern="${ivy.dep.dir}/core/[artifact].[ext]" conf="default"/>
     </target>
 
     <target name="compile" depends="init,get.deps.core" description="Compile the Java source code">
         <available
-				classname="org.eclipse.core.launcher.Main"
-				property="build.compiler"
-				value="org.eclipse.jdt.core.JDTCompilerAdapter"
-				classpath="${java.class.path}"/>
-		<javac
-				srcdir="${src.dir}"
-				destdir="${classes.dir}"
-				classpathref="lib.class.path"
-				debug="${javac.debug}"
-				optimize="${javac.optimize}"
-				nowarn="on"
+                classname="org.eclipse.core.launcher.Main"
+                property="build.compiler"
+                value="org.eclipse.jdt.core.JDTCompilerAdapter"
+                classpath="${java.class.path}"/>
+        <javac
+                srcdir="${src.dir}"
+                destdir="${classes.dir}"
+                classpathref="lib.class.path"
+                debug="${javac.debug}"
+                optimize="${javac.optimize}"
+                nowarn="on"
                 source="${javac.source}"
                 target="${javac.target}">
-			<src path="${src.dir}"/>
-		</javac>
-		<copy todir="${classes.dir}">
-			<fileset dir="${src.dir}">
-				<include name="**/resources/*.properties"/>
-				<include name="**/*.xsd"/>
-			</fileset>
-		</copy>
-	</target>
+            <src path="${src.dir}"/>
+        </javac>
+        <copy todir="${classes.dir}">
+            <fileset dir="${src.dir}">
+                <include name="**/resources/*.properties"/>
+                <include name="**/*.xsd"/>
+            </fileset>
+        </copy>
+    </target>
 
-     <target name="get.deps.test" depends="init" description="retrieve the test dependencies">
-        <ivy:resolve conf="test" />
-        <ivy:retrieve pattern="${ivy.dep.dir}/test/[artifact].[ext]" conf="test" />
+    <target name="get.deps.test" depends="init" description="retrieve the test dependencies">
+        <ivy:resolve conf="test"/>
+        <ivy:retrieve pattern="${ivy.dep.dir}/test/[artifact].[ext]" conf="test"/>
     </target>
 
     <target name="compiletest" depends="init,get.deps.test,compile" description="Compile the tests">
         <available
-				classname="org.eclipse.core.launcher.Main"
-				property="build.compiler"
-				value="org.eclipse.jdt.core.JDTCompilerAdapter"
-				classpath="${java.class.path}"/>
-		<javac
-				destdir="${testclasses.dir}"
-				classpathref="junit.classpath"
-				debug="${javac.debug}"
-				optimize="${javac.optimize}"
-				nowarn="on"
+                classname="org.eclipse.core.launcher.Main"
+                property="build.compiler"
+                value="org.eclipse.jdt.core.JDTCompilerAdapter"
+                classpath="${java.class.path}"/>
+        <javac
+                destdir="${testclasses.dir}"
+                classpathref="junit.classpath"
+                debug="${javac.debug}"
+                optimize="${javac.optimize}"
+                nowarn="on"
                 source="${javac.source}"
                 target="${javac.target}">
-			<src refid="testsrc.path"/>
-		</javac>
-	</target>
+            <src refid="testsrc.path"/>
+        </javac>
+    </target>
 
     <target name="prepare-test-resources" depends="compiletest">
         <copy todir="${build.testresources.dir}">
             <fileset dir="${testresources.dir}">
                 <include name="**/*.*"/>
-				<exclude name="hibernate.properties"/>
+                <exclude name="hibernate.properties"/>
             </fileset>
         </copy>
         <mkdir dir="${build.testresources.dir}/jars"/>
-        <jar filesetmanifest="merge" jarfile="${build.testresources.dir}/jars/jms-slave.jar" >
+        <jar filesetmanifest="merge" jarfile="${build.testresources.dir}/jars/jms-slave.jar">
             <fileset dir="${testclasses.dir}">
                 <include name="org/hibernate/search/test/jms/slave/**.*"/>
             </fileset>
         </jar>
-        <jar filesetmanifest="merge" jarfile="${build.testresources.dir}/jars/jms-master.jar" >
+        <jar filesetmanifest="merge" jarfile="${build.testresources.dir}/jars/jms-master.jar">
             <fileset dir="${testclasses.dir}">
                 <include name="org/hibernate/search/test/jms/master/**.*"/>
             </fileset>
@@ -172,101 +195,123 @@
     </target>
 
     <target name="junit" depends="compiletest, prepare-test-resources">
-		<for list="${targetdb}" param="db">
-			<sequential>
-				<antcall target="test-resources">
-					<param name="db" value="@{db}"/>
-				</antcall>
-				<mkdir dir="${testreports.dir}/@{db}"/>
-				<echo>Running against db: @{db}</echo>
-				<junit forkmode="perBatch" printsummary="yes" haltonfailure="yes">
-					<classpath>
-						<path path="${build.testresources.dir}"/>
-						<path refid="junit.classpath"/>             
-						<fileset dir="${jdbc.dir}">
-							<include name="**/*.jar"/>
-							<include name="**/*.zip"/>
-						</fileset>
-					</classpath>
-					<sysproperty key="build.dir" value="${build.dir}"/>
-					<formatter type="plain"/>
-					<formatter type="xml"/>
-					<batchtest fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no">
-						<fileset dir="${testclasses.dir}">
-							<include name="**/*Test.class"/>
-							<exclude name="**/JMSSlaveTest.class"/>
-						</fileset>
-					</batchtest>
-					<test fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no" name="org.hibernate.search.test.jms.slave.JMSSlaveTest"/>	
-				</junit>
-			</sequential>
-		</for>		
+        <for list="${targetdb}" param="db">
+            <sequential>
+                <antcall target="test-resources">
+                    <param name="db" value="@{db}"/>
+                </antcall>
+                <mkdir dir="${testreports.dir}/@{db}"/>
+                <echo>Running against db: @{db}</echo>
+                <junit forkmode="perBatch" printsummary="yes" haltonfailure="yes">
+                    <classpath>
+                        <path path="${build.testresources.dir}"/>
+                        <path refid="junit.classpath"/>
+                        <fileset dir="${jdbc.dir}">
+                            <include name="**/*.jar"/>
+                            <include name="**/*.zip"/>
+                        </fileset>
+                    </classpath>
+                    <sysproperty key="build.dir" value="${build.dir}"/>
+                    <formatter type="plain"/>
+                    <formatter type="xml"/>
+                    <batchtest fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no">
+                        <fileset dir="${testclasses.dir}">
+                            <include name="**/*Test.class"/>
+                            <exclude name="**/JMSSlaveTest.class"/>
+                            <exclude name="**/classloading/**"/>
+                        </fileset>
+                    </batchtest>
+                    <test fork="yes"
+                          todir="${testreports.dir}/@{db}"
+                          haltonfailure="no"
+                          name="org.hibernate.search.test.jms.slave.JMSSlaveTest"/>
+                </junit>
+                <junit forkmode="perBatch" printsummary="yes" haltonfailure="yes">
+                    <classpath>
+                        <path path="${build.testresources.dir}"/>
+                        <path refid="junit.classpath.required.only"/>
+                        <fileset dir="${jdbc.dir}">
+                            <include name="**/*.jar"/>
+                            <include name="**/*.zip"/>
+                        </fileset>
+                    </classpath>
+                    <sysproperty key="build.dir" value="${build.dir}"/>
+                    <formatter type="plain"/>
+                    <formatter type="xml"/>
+                    <batchtest fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no">
+                        <fileset dir="${testclasses.dir}">
+                            <include name="**/classloading/**/*Test.class"/>
+                        </fileset>
+                    </batchtest>
+                </junit>
+            </sequential>
+        </for>
     </target>
 
-	<!-- Run a single unit test. -->
-	<target name="junitsingle" depends="compiletest"
-			description="Run a single test suite (requires testname and jdbc.driver properties)">
-		<for list="${targetdb}" param="db">
-			<sequential>
-				<antcall target="test-resources">
-					<param name="db" value="@{db}"/>
-				</antcall>
-				<mkdir dir="${testreports.dir}/@{db}"/>
-				<echo>Running against db: @{db}</echo>
-				<junit printsummary="yes" fork="yes" haltonfailure="yes">
-					<classpath>
-						<path path="${build.testresources.dir}"/>
-						<path refid="junit.classpath"/>             
-						<fileset dir="${jdbc.dir}">
-							<include name="**/*.jar"/>
-							<include name="**/*.zip"/>
-						</fileset>
-					</classpath>
-					<sysproperty key="build.dir" value="${build.dir}"/>
-					<formatter type="plain"/>
-					<formatter type="xml"/>
-					<test fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no" name="${testname}"/>
-				</junit>
-			</sequential>
-		</for>		
-	</target>
+    <!-- Run a single unit test. -->
+    <target name="junitsingle" depends="compiletest"
+            description="Run a single test suite (requires testname and jdbc.driver properties)">
+        <for list="${targetdb}" param="db">
+            <sequential>
+                <antcall target="test-resources">
+                    <param name="db" value="@{db}"/>
+                </antcall>
+                <mkdir dir="${testreports.dir}/@{db}"/>
+                <echo>Running against db: @{db}</echo>
+                <junit printsummary="yes" fork="yes" haltonfailure="yes">
+                    <classpath>
+                        <path path="${build.testresources.dir}"/>
+                        <path refid="junit.classpath"/>
+                        <fileset dir="${jdbc.dir}">
+                            <include name="**/*.jar"/>
+                            <include name="**/*.zip"/>
+                        </fileset>
+                    </classpath>
+                    <sysproperty key="build.dir" value="${build.dir}"/>
+                    <formatter type="plain"/>
+                    <formatter type="xml"/>
+                    <test fork="yes" todir="${testreports.dir}/@{db}" haltonfailure="no" name="${testname}"/>
+                </junit>
+            </sequential>
+        </for>
+    </target>
 
-	<target name="jar" depends="compile" description="Build the distribution .jar file">
-		<mkdir dir="${classes.dir}/META-INF"/>
-		<manifest file="${classes.dir}/META-INF/MANIFEST.MF">
-			<attribute name="Implementation-Title" value="${Name}"/>
-			<attribute name="Implementation-Version" value="${version}"/>
+    <target name="jar" depends="compile" description="Build the distribution .jar file">
+        <mkdir dir="${classes.dir}/META-INF"/>
+        <manifest file="${classes.dir}/META-INF/MANIFEST.MF">
+            <attribute name="Implementation-Title" value="${Name}"/>
+            <attribute name="Implementation-Version" value="${version}"/>
             <attribute name="Implementation-Vendor" value="hibernate.org"/>
             <attribute name="Implementation-Vendor-Id" value="hibernate.org"/>
             <attribute name="Implementation-URL" value="http://search.hibernate.org"/>
-		</manifest>
-		<antcall target="common-build.jar"/>
+        </manifest>
+        <antcall target="common-build.jar"/>
         <ivy:resolve conf="default"/>
         <ivy:publish artifactspattern="${dist.dir}/[artifact].[ext]"
-            resolver="local"
-            pubrevision="latest"
-            pubdate="${now}"
-            status="integration"
-        />
+                     resolver="local"
+                     pubrevision="latest"
+                     pubdate="${now}"
+                     status="integration"
+                />
     </target>
 
-	<!-- Some of this can probably be moved to common-build... -->
-	<target name="dist" depends="get.deps.core,get.deps.test,jar,jar,javadoc,copysource,copytest,copylib,extras"
-			description="Build everything">
+    <!-- Some of this can probably be moved to common-build... -->
+    <target name="dist" depends="get.deps.core,get.deps.test,jar,jar,javadoc,copysource,copytest,copylib,extras"
+            description="Build everything">
 
-		<ant inheritall="false" dir="${basedir}/doc/reference"/>
-		<copy todir="${dist.dir}/doc/reference" failonerror="false">
-			<fileset dir="${basedir}/doc/reference/build">
-				<include name="**/*.*"/>
+        <ant inheritall="false" dir="${basedir}/doc/reference"/>
+        <copy todir="${dist.dir}/doc/reference" failonerror="false">
+            <fileset dir="${basedir}/doc/reference/build">
+                <include name="**/*.*"/>
                 <exclude name="en/master.xml"/>
-			</fileset>
-		</copy>
+            </fileset>
+        </copy>
 
-		<copy todir="${dist.dir}" failonerror="false">
-			<fileset dir="${common.dir}">
-				<include name="common-build.xml"/>
-			</fileset>
-		</copy>
+        <copy todir="${dist.dir}" failonerror="false">
+            <fileset dir="${common.dir}">
+                <include name="common-build.xml"/>
+            </fileset>
+        </copy>
 
         <copy todir="${dist.dir}/test-resources" failonerror="false">
             <fileset dir="${testresources.dir}">
@@ -281,31 +326,32 @@
 
         <!-- copy dependencies -->
         <copy todir="${dist.lib.dir}" failonerror="false">
-			<!-- fileset file="${jpa-api.jar}"/>
-            <fileset file="${commons-annotations.jar}"/ -->
+            <!-- fileset file="${jpa-api.jar}"/>
+                        <fileset file="${commons-annotations.jar}"/ -->
             <fileset dir="${ivy.dep.dir}/core">
                 <include name="*.jar"/>
             </fileset>
         </copy>
         <mkdir dir="${dist.lib.dir}/test"/>
         <copy todir="${dist.lib.dir}/test" failonerror="false">
-			<fileset dir="${ivy.dep.dir}/test">
+            <fileset dir="${ivy.dep.dir}/test">
                 <include name="*.jar"/>
             </fileset>
         </copy>
         <copy todir="${dist.lib.dir}/test" failonerror="false">
-			<fileset file="${lib.dir}/test/*.jar"/>
+            <fileset file="${lib.dir}/test/*.jar"/>
         </copy>
 
         <mkdir dir="${dist.lib.dir}/build"/>
         <copy todir="${dist.lib.dir}/build" failonerror="false">
-			<fileset file="${lib.dir}/build/*.jar"/>
+            <fileset file="${lib.dir}/build/*.jar"/>
         </copy>
 
         <!-- ivy uses the module name without hibernate- (to mimic the directory names). Revert the situation -->
         <move file="${dist.lib.dir}/commons-annotations.jar" tofile="${dist.lib.dir}/hibernate-commons-annotations.jar"
               failonerror="false"/>
-        <move file="${dist.lib.dir}/test/commons-annotations.jar" tofile="${dist.lib.dir}/test/hibernate-commons-annotations.jar"
+        <move file="${dist.lib.dir}/test/commons-annotations.jar"
+              tofile="${dist.lib.dir}/test/hibernate-commons-annotations.jar"
               failonerror="false"/>
         <move file="${dist.lib.dir}/test/annotations.jar" tofile="${dist.lib.dir}/test/hibernate-annotations.jar"
               failonerror="false"/>
@@ -314,16 +360,16 @@
 
 
         <copy file="${basedir}/build.properties.dist" tofile="${dist.dir}/build.properties" failonerror="false">
-		</copy>
-		<antcall target="common-build.dist"/>
-	</target>
+        </copy>
+        <antcall target="common-build.dist"/>
+    </target>
 
     <target name="zip-dist" description="zip the dist">
-		<zip zipfile="${dist.dir}-${version}.zip">
-			<zipfileset prefix="${name}-${version}" dir="${dist.dir}"/>
-		</zip>
-		<tar compression="gzip" tarfile="${dist.dir}-${version}.tar.gz">
-			<tarfileset prefix="${name}-${version}" dir="${dist.dir}"/>
-		</tar>
-	</target>
+        <zip zipfile="${dist.dir}-${version}.zip">
+            <zipfileset prefix="${name}-${version}" dir="${dist.dir}"/>
+        </zip>
+        <tar compression="gzip" tarfile="${dist.dir}-${version}.tar.gz">
+            <tarfileset prefix="${name}-${version}" dir="${dist.dir}"/>
+        </tar>
+    </target>
 </project>
