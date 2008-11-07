@@ -19,7 +19,12 @@ import org.hibernate.search.util.DelegateNamedAnalyzer;
 import org.hibernate.util.ReflectHelper;
 
 /**
+ * Provides access to some default configuration settings (eg default <code>Analyzer</code> or default
+ * <code>Similarity</code>) and checks whether certain optional libraries are available.
+ *
+ *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class InitContext {
 	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
@@ -27,11 +32,13 @@ public class InitContext {
 	private final Analyzer defaultAnalyzer;
 	private final Similarity defaultSimilarity;
 	private final boolean solrPresent;
+	private final boolean jpaPresent;
 
 	public InitContext(SearchConfiguration cfg) {
 		defaultAnalyzer = initAnalyzer(cfg);
 		defaultSimilarity = initSimilarity(cfg);
 		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
+		jpaPresent = isPresent( "javax.persistence.Id" );
 	}
 
 	public void addAnalyzerDef(AnalyzerDef ann) {
@@ -68,8 +75,6 @@ public class InitContext {
 				analyzerClass = ReflectHelper.classForName(analyzerClassName);
 			} catch (Exception e) {
 				return buildLazyAnalyzer( analyzerClassName );
-//				throw new SearchException("Lucene analyzer class '" + analyzerClassName + "' defined in property '"
-//						+ Environment.ANALYZER_CLASS + "' could not be found.", e);
 			}
 		} else {
 			analyzerClass = StandardAnalyzer.class;
@@ -88,7 +93,10 @@ public class InitContext {
 	}
 
 	/**
-	 * Initializes the Lucene similarity to use
+	 * Initializes the Lucene similarity to use.
+	 *
+	 * @param cfg the search configuration.
+	 * @return returns the default similarity class.
 	 */
 	private Similarity initSimilarity(SearchConfiguration cfg) {
 		Class similarityClass;
@@ -165,13 +173,17 @@ public class InitContext {
 		if ( ! solrPresent ) {
 			throw new SearchException( "Use of @AnalyzerDef while Solr is not present in the classpath. Add apache-solr-analyzer.jar" );
 		}
-		//SolrAnalyzerBuilder references Solr classes.
-		//InitContext should not (directly or indirectly) load a Solr class to avoid hard dependency
+		// SolrAnalyzerBuilder references Solr classes.
+		// InitContext should not (directly or indirectly) load a Solr class to avoid hard dependency
 		// unless necessary
 		// the curent mecanism (check sor class presence and call SolrAnalyzerBuilder if needed
 		// seems to be sufficient on Apple VM (derived from Sun's
 		// TODO check on other VMs and be ready for a more reflexive approach
 		return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef );
+	}
+
+	public boolean isJpaPresent() {
+		return jpaPresent;
 	}
 
 	private boolean isPresent(String classname) {

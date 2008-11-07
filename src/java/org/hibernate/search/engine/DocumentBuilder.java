@@ -3,6 +3,8 @@ package org.hibernate.search.engine;
 
 import java.io.Serializable;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -75,6 +77,11 @@ public class DocumentBuilder<T> {
 	private final DirectoryProvider[] directoryProviders;
 	private final IndexShardingStrategy shardingStrategy;
 	private String idKeywordName;
+
+	/**
+	 * Flag indicating whether <code>@DocumentId</code> was explicitly specified.
+	 */
+	private boolean explicitDocumentId = false;
 	private XMember idGetter;
 	private Float idBoost;
 	public static final String CLASS_FIELDNAME = "_hibernate_class";
@@ -91,13 +98,8 @@ public class DocumentBuilder<T> {
 	private boolean idProvided = false;
 	private EntityState entityState;
 
-
-	public boolean isRoot() {
-		return isRoot;
-	}
-
 	/**
-	 * used on an @Indexed entity
+	 * Constructor used on an @Indexed entity.
 	 */
 	public DocumentBuilder(XClass clazz, InitContext context, DirectoryProvider[] directoryProviders,
 						   IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
@@ -135,7 +137,7 @@ public class DocumentBuilder<T> {
 	}
 
 	/**
-	 * used on a non @Indexed entity
+	 * Constructor used on a non @Indexed entity.
 	 */
 	public DocumentBuilder(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
@@ -151,6 +153,10 @@ public class DocumentBuilder<T> {
 		if ( rootPropertiesMetadata.containedInGetters.size() == 0 ) {
 			this.entityState = EntityState.NON_INDEXABLE;
 		}
+	}
+
+	public boolean isRoot() {
+		return isRoot;
 	}
 
 	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {
@@ -214,7 +220,7 @@ public class DocumentBuilder<T> {
 			if ( analyzer != null ) {
 				propertiesMetadata.analyzer = analyzer;
 			}
-			getAnalyzerDefs( currClass, context );
+			checkForAnalyzerDefs( currClass, context );
 			// Check for any ClassBridges annotation.
 			ClassBridges classBridgesAnn = currClass.getAnnotation( ClassBridges.class );
 			if ( classBridgesAnn != null ) {
@@ -265,7 +271,7 @@ public class DocumentBuilder<T> {
 		}
 	}
 
-	private void getAnalyzerDefs(XAnnotatedElement annotatedElement, InitContext context) {
+	private void checkForAnalyzerDefs(XAnnotatedElement annotatedElement, InitContext context) {
 		AnalyzerDefs defs = annotatedElement.getAnnotation( AnalyzerDefs.class );
 		if ( defs != null ) {
 			for (AnalyzerDef def : defs.value()) {
@@ -287,62 +293,41 @@ public class DocumentBuilder<T> {
 	private void initializeMember(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
 								  String prefix, Set<XClass> processedClasses, InitContext context) {
 
-		DocumentId documentIdAnn = member.getAnnotation( DocumentId.class );
-		if ( documentIdAnn != null ) {
-			if ( isRoot ) {
-				if ( idKeywordName != null ) {
-					throw new AssertionFailure( "Two document id assigned: "
-							+ idKeywordName + " and " + BinderHelper.getAttributeName( member, documentIdAnn.name() ) );
-				}
-				idKeywordName = prefix + BinderHelper.getAttributeName( member, documentIdAnn.name() );
-				FieldBridge fieldBridge = BridgeFactory.guessType( null, member, reflectionManager );
-				if ( fieldBridge instanceof TwoWayFieldBridge ) {
-					idBridge = (TwoWayFieldBridge) fieldBridge;
-				}
-				else {
-					throw new SearchException(
-							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName() );
-				}
-				idBoost = getBoost( member, null );
-				setAccessible( member );
-				idGetter = member;
-			}
-			else {
-				//component should index their document id
-				setAccessible( member );
-				propertiesMetadata.fieldGetters.add( member );
-				String fieldName = prefix + BinderHelper.getAttributeName( member, documentIdAnn.name() );
-				propertiesMetadata.fieldNames.add( fieldName );
-				propertiesMetadata.fieldStore.add( getStore( Store.YES ) );
-				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
-				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
-				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
-				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
-				// property > entity analyzer (no field analyzer)
-				Analyzer analyzer = getAnalyzer( member, context );
-				if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
-				if ( analyzer == null ) throw new AssertionFailure( "Analizer should not be undefined" );
-				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
-			}
-		}
-		{
-			org.hibernate.search.annotations.Field fieldAnn =
-					member.getAnnotation( org.hibernate.search.annotations.Field.class );
-			if ( fieldAnn != null ) {
+		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context );
+		checkForField( member, propertiesMetadata, prefix, context );
+		checkForFields( member, propertiesMetadata, prefix, context );
+		checkForAnalyzerDefs( member, context );
+		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context );
+		checkForConstraintIn( member, propertiesMetadata );
+	}
+
+	private void checkForFields(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, InitContext context) {
+		org.hibernate.search.annotations.Fields fieldsAnn =
+				member.getAnnotation( org.hibernate.search.annotations.Fields.class );
+		if ( fieldsAnn != null ) {
+			for (org.hibernate.search.annotations.Field fieldAnn : fieldsAnn.value()) {
 				bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, context );
 			}
 		}
-		{
-			org.hibernate.search.annotations.Fields fieldsAnn =
-					member.getAnnotation( org.hibernate.search.annotations.Fields.class );
-			if ( fieldsAnn != null ) {
-				for (org.hibernate.search.annotations.Field fieldAnn : fieldsAnn.value()) {
-					bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, context );
-				}
-			}
-		}
-		getAnalyzerDefs( member, context );
+	}
 
+	private void checkForField(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, InitContext context) {
+		org.hibernate.search.annotations.Field fieldAnn =
+				member.getAnnotation( org.hibernate.search.annotations.Field.class );
+		if ( fieldAnn != null ) {
+			bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, context );
+		}
+	}
+
+	private void checkForConstraintIn(XProperty member, PropertiesMetadata propertiesMetadata) {
+		ContainedIn containedAnn = member.getAnnotation( ContainedIn.class );
+		if ( containedAnn != null ) {
+			setAccessible( member );
+			propertiesMetadata.containedInGetters.add( member );
+		}
+	}
+
+	private void checkForIndexedEmbedded(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, Set<XClass> processedClasses, InitContext context) {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
 			int oldMaxLevel = maxLevel;
@@ -411,12 +396,101 @@ public class DocumentBuilder<T> {
 			level--;
 			maxLevel = oldMaxLevel; //set back the the old max level
 		}
+	}
 
-		ContainedIn containedAnn = member.getAnnotation( ContainedIn.class );
-		if ( containedAnn != null ) {
-			setAccessible( member );
-			propertiesMetadata.containedInGetters.add( member );
+	private void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
+		Annotation idAnnotation = getIdAnnotation( member, context );
+		if ( idAnnotation != null ) {
+			String attributeName = getIdAttributeName( member, idAnnotation );
+			if ( isRoot ) {
+				if ( idKeywordName != null && explicitDocumentId ) {
+					throw new AssertionFailure( "Two document id assigned: "
+							+ idKeywordName + " and " + attributeName );
+				}
+				idKeywordName = prefix + attributeName;
+				FieldBridge fieldBridge = BridgeFactory.guessType( null, member, reflectionManager );
+				if ( fieldBridge instanceof TwoWayFieldBridge ) {
+					idBridge = (TwoWayFieldBridge) fieldBridge;
+				}
+				else {
+					throw new SearchException(
+							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName() );
+				}
+				idBoost = getBoost( member, null );
+				setAccessible( member );
+				idGetter = member;
+			}
+			else {
+				//component should index their document id
+				setAccessible( member );
+				propertiesMetadata.fieldGetters.add( member );
+				String fieldName = prefix + attributeName;
+				propertiesMetadata.fieldNames.add( fieldName );
+				propertiesMetadata.fieldStore.add( getStore( Store.YES ) );
+				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
+				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
+				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
+				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
+				// property > entity analyzer (no field analyzer)
+				Analyzer analyzer = getAnalyzer( member, context );
+				if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
+				if ( analyzer == null ) throw new AssertionFailure( "Analizer should not be undefined" );
+				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
+			}
 		}
+	}
+
+	/**
+	 * Checks whether the specified property contains an annotation used as document id.
+	 * This can either be an explicit <code>@DocumentId</code> or if no <code>@DocumentId</code> is specified a
+	 * JPA <code>@Id</code> annotation. The check for the JPA annotation is indirectly to avoid a hard dependency
+	 * to Hibernate Annotations.
+	 *
+	 * @param member the property to check for the id annotation.
+	 * @return the annotation used as document id or <code>null</code> if id annotation is specified on the property.
+	 */
+	private Annotation getIdAnnotation(XProperty member, InitContext context) {
+		// check for explicit DocumentId
+		Annotation documentIdAnn = member.getAnnotation( DocumentId.class );
+		if ( documentIdAnn != null ) {
+			explicitDocumentId = true;
+			return documentIdAnn;
+		}
+
+		// check for JPA @Id
+		if ( !explicitDocumentId && context.isJpaPresent() ) {
+			Class idClass;
+			try {
+				idClass = org.hibernate.util.ReflectHelper.classForName( "javax.persistence.Id", InitContext.class );
+			} catch ( ClassNotFoundException e ) {
+				throw new SearchException( "Unable to load @Id.class even though it should be present ?!" );
+			}
+			documentIdAnn = member.getAnnotation( idClass );
+			if ( documentIdAnn != null )
+					log.debug( "Found JPA id and using it as document id" );
+		}
+		return documentIdAnn;
+	}
+
+	/**
+	 *  Determines the property name for the document id. It is either the name of the property itself or the
+	 *  value of the name attribute of the <code>idAnnotation</code>.
+	 *
+	 * @param member the property used as id property.
+	 * @param idAnnotation the id annotation
+	 * @return property name to be used as document id.
+	 */
+	private String getIdAttributeName(XProperty member, Annotation idAnnotation) {
+		String name = null;
+		try {
+			Method m = idAnnotation.getClass().getMethod( "name" );
+			name = (String) m.invoke( idAnnotation );
+		}
+		catch ( Exception e ) {
+			// ignore
+		}
+
+		return BinderHelper.getAttributeName( member, name );
 	}
 
 	private void bindClassAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, InitContext context) {
