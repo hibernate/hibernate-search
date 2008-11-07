@@ -2,6 +2,7 @@
 package org.hibernate.search.test.worker.duplication;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
@@ -13,6 +14,13 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.backend.WorkType;
+import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
@@ -85,6 +93,44 @@ public class WorkDuplicationTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
+
+	/**
+	 * Tests that adding and deleting the same entity only results into a single delete in the work queue.
+	 * See HSEARCH-293.
+	 *
+	 * @throws Exception in case the test fails.
+	 */
+	@SuppressWarnings( "unchecked" )
+	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
+		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
+		SearchFactoryImpl searchFactory = ( SearchFactoryImpl ) fullTextSession.getSearchFactory();
+		DocumentBuilder builder = searchFactory.getDocumentBuilder( SpecialPerson.class );
+
+		// create test entity
+		SpecialPerson person = new SpecialPerson();
+		person.setName( "Joe Smith" );
+
+		EmailAddress emailAddress = new EmailAddress();
+		emailAddress.setAddress( "foo@foobar.com" );
+		emailAddress.setDefaultAddress(true);
+
+		person.addEmailAddress( emailAddress );
+
+		List<LuceneWork> queue = new ArrayList<LuceneWork>();
+
+		builder.addWorkToQueue( SpecialPerson.class, person, 1, WorkType.ADD, queue, searchFactory );
+
+		assertEquals("There should only be one job in the queue", 1, queue.size());
+		assertTrue("Wrong job type", queue.get(0) instanceof AddLuceneWork );
+
+		builder.addWorkToQueue( SpecialPerson.class, person, 1, WorkType.DELETE, queue, searchFactory );
+
+		assertEquals("There should only be one job in the queue", 1, queue.size());
+		assertTrue("Wrong job type. Add job should have been replaced by delete.", queue.get(0) instanceof DeleteLuceneWork );
+
+		fullTextSession.close();
+	}	
+
 
 	protected Class[] getMappings() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
