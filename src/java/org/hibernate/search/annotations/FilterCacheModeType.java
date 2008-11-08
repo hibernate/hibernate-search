@@ -15,7 +15,7 @@ public enum FilterCacheModeType {
 
 	/**
 	 * The filter instance is cached by Hibernate Search and reused across
-	 * concurrent <code>Filter.bits()</code> calls.
+	 * concurrent <code>Filter.getDocIdSet()</code> calls.
 	 * Results are not cached by Hibernate Search.
 	 *
 	 * @see org.apache.lucene.search.Filter#bits(org.apache.lucene.index.IndexReader)
@@ -24,13 +24,13 @@ public enum FilterCacheModeType {
 	INSTANCE_ONLY,
 
 	/**
-	 * Both the filter instance and the <code>BitSet</code> results are cached.
+	 * Both the filter instance and the <code>DocIdSet</code> results are cached.
 	 * The filter instance is cached by Hibernate Search and reused across
-	 * concurrent <code>Filter.bits()</code> calls.
-	 * <code>BitSet</code> results are cached per <code>IndexReader</code>.
+	 * concurrent <code>Filter.getDocIdSet()</code> calls.
+	 * <code>DocIdSet</code> results are cached per <code>IndexReader</code>.
 	 *
 	 * @see org.apache.lucene.search.Filter#bits(org.apache.lucene.index.IndexReader) 
 	 */
-	INSTANCE_AND_BITSETRESULTS
+	INSTANCE_AND_DOCIDSETRESULTS
 
 }

@@ -37,5 +37,5 @@ public @interface FullTextFilterDef {
 	/**
 	 * Cache mode for the filter. Default to instance and results caching
 	 */
-	FilterCacheModeType cache() default FilterCacheModeType.INSTANCE_AND_BITSETRESULTS;
+	FilterCacheModeType cache() default FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS;
 }
