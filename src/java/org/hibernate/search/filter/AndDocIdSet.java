@@ -1,30 +1,32 @@
 package org.hibernate.search.filter;
 
 import java.io.IOException;
-import java.util.BitSet;
 import java.util.List;
 import static java.lang.Math.max;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.util.DocIdBitSet;
+import org.apache.lucene.util.OpenBitSet;
 
 /**
- * A DocIdSet built as applying "AND" operation to a list of other DocIdSet.
+ * A DocIdSet built as applying "AND" operation to a list of other DocIdSet(s).
  * The DocIdSetIterator returned will return only document ids contained
- * in all DocIdSet handed to the constructor.
+ * in all DocIdSet(s) handed to the constructor.
  * 
  * @author Sanne Grinovero
  */
 public class AndDocIdSet extends DocIdSet {
 	
-	private DocIdBitSet docIdBitSet;
+	private OpenBitSet docIdBitSet;
 	private final List<DocIdSet> andedDocIdSets;
 	
-	public AndDocIdSet(List<DocIdSet> andedDocIdSets) {
+	private final int maxDocNumber;
+	
+	public AndDocIdSet(List<DocIdSet> andedDocIdSets, int maxDocs) {
 		if ( andedDocIdSets == null || andedDocIdSets.size() < 2 )
-			throw new IllegalArgumentException( "To \"and\" some DocIdSet they should be at least 2" );
+			throw new IllegalArgumentException( "To \"and\" some DocIdSet(s) they should be at least 2" );
 		this.andedDocIdSets = andedDocIdSets;
+		this.maxDocNumber = maxDocs;
 	}
 	
 	private synchronized void buildBitset() throws IOException {
@@ -33,71 +35,72 @@ public class AndDocIdSet extends DocIdSet {
 		//TODO if some andedDocIdSets are DocIdBitSet, merge them first.
 		int size = andedDocIdSets.size();
 		DocIdSetIterator[] iterators = new DocIdSetIterator[size];
-		int[] positions = new int[size];
 		boolean valuesExist = true;
-		int maxIndex = 0;
 		for (int i=0; i<size; i++) {
 			// build all iterators
-			DocIdSetIterator iterator = andedDocIdSets.get(i).iterator();
-			iterators[i] = iterator;
-			// and move to first position
-			boolean nextExists = iterator.next();
-			if ( ! nextExists ) {
-				valuesExist = false;
-				break;
-			}
-			int currentFilterValue = iterator.doc();
-			positions[i] = currentFilterValue;
-			// find the initial maximum position
-			maxIndex = max( maxIndex, currentFilterValue );
+			iterators[i] = andedDocIdSets.get(i).iterator();
 		}
-		BitSet bitSet = new BitSet();
+		OpenBitSet bitSet;
 		if ( valuesExist ) { // skip further processing if some idSet is empty
-			do {
-				if ( allSame( positions ) ) {
-					// enable a bit if all idSets agree on it:
-					bitSet.set( maxIndex );
-					maxIndex++;
-				}
-				maxIndex = advance( iterators, positions, maxIndex );
-			} while ( maxIndex != -1 ); // -1 means the end of some bitSet has been reached (end condition)
+			bitSet = new OpenBitSet( maxDocNumber );
+			markBitSetOnAgree( iterators, bitSet );
 		}
-		docIdBitSet = new DocIdBitSet( bitSet );
+		else {
+			bitSet = new OpenBitSet(); //TODO a less expensive "empty"
+		}
+		docIdBitSet = bitSet;
 	}
 
-	/**
-	 * Have all DocIdSetIterator having current doc id minor than currentMaxPosition
-	 * skip to at least this position.
-	 * @param iterators
-	 * @param positions
-	 * @return maximum position of all DocIdSetIterator after the operation, or -1 when at least one reached the end.
-	 * @throws IOException 
-	 */
-	private final int advance(final DocIdSetIterator[] iterators, final int[] positions, int currentMaxPosition) throws IOException {
-		for (int i=0; i<positions.length; i++) {
-			if ( positions[i] != currentMaxPosition ) {
-				boolean validPosition = iterators[i].skipTo( currentMaxPosition );
-				if ( ! validPosition )
-					return -1;
-				positions[i] = iterators[i].doc();
-				currentMaxPosition = max( currentMaxPosition, positions[i] );
+	private final void markBitSetOnAgree(final DocIdSetIterator[] iterators, final OpenBitSet result) throws IOException {
+		final int iteratorSize = iterators.length;
+		int targetPosition = Integer.MIN_VALUE;
+		int votes = 0;
+		// Each iterator can vote "ok" for the current target to
+		// be reached; when all agree the bit is set.
+		// if an iterator disagrees (it jumped longer), it's current position becomes the new targetPosition
+		// for the others and he is considered "first" in the voting round (every iterator votes for himself ;-)
+		int i = 0;
+		//iterator initialize, just one "next" for each DocIdSetIterator
+		for ( ;i<iteratorSize; i++ ) {
+			final DocIdSetIterator iterator = iterators[i];
+			if ( ! iterator.next() ) return; //current iterator has no values, so skip all
+			final int position = iterator.doc();
+			if ( targetPosition==position ) {
+				votes++; //stopped as same position of others
+			}
+			else {
+				targetPosition = max( targetPosition, position );
+				if (targetPosition==position) //means it changed
+					votes=1;
 			}
 		}
-		return currentMaxPosition;
-	}
-
-	/**
-	 * see if all DocIdSetIterator stopped at the same position.
-	 * @param positions the array of current positions.
-	 * @return true if all DocIdSetIterator agree on the current docId.
-	 */
-	private final boolean allSame(final int[] positions) {
-		int base = positions[0];
-		for (int i=1; i<positions.length; i++) {
-			if ( base != positions[i] )
-				return false;
+		// end iterator initialize
+		if (votes==iteratorSize) {
+			result.fastSet( targetPosition );
+			targetPosition++;
 		}
-		return true;
+		i=0;
+		votes=0; //could be smarted but would make the code even more complex for a minor optimization out of cycle.
+		// enter main loop:
+		while ( true ) {
+			final DocIdSetIterator iterator = iterators[i];
+			final boolean validPosition = iterator.skipTo( targetPosition );
+			if ( ! validPosition )
+				return; //exit condition
+			final int position = iterator.doc();
+			if ( position == targetPosition ) {
+				if ( ++votes == iteratorSize ) {
+					result.fastSet( position );
+					votes = 0;
+					targetPosition++;
+				}
+			}
+			else {
+				votes = 1;
+				targetPosition = position;
+			}
+			i = ++i % iteratorSize;
+		}
 	}
 
 	@Override

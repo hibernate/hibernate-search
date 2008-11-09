@@ -11,7 +11,7 @@ import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
 
 /**
- * A wrapper class which encapsualtes all required information to create a defined filter.
+ * A wrapper class which encapsulates all required information to create a defined filter.
  * 
  * @author Emmanuel Bernard
  */

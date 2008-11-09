@@ -52,7 +52,7 @@ public class ChainedFilter extends Filter {
 			for ( Filter f : chainedFilters ) {
 				subSets.add( f.getDocIdSet( reader ) );
 			}
-			return new AndDocIdSet( subSets );
+			return new AndDocIdSet( subSets, reader.maxDoc() );
 		}
 	}
 
