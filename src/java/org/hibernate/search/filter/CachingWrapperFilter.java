@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.BitSet;
 
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.slf4j.Logger;
 
@@ -27,53 +28,56 @@ public class CachingWrapperFilter extends Filter {
 	
 	public static final int DEFAULT_SIZE = 5;
 	
-	private final int size;
-	
 	/**
 	 * The cache using soft references in order to store the filter bit sets.
 	 */
-	private transient SoftLimitMRUCache cache;
+	private final SoftLimitMRUCache cache;
 	
 	private final Filter filter;
 
 	/**
-	 * @param filter
-	 *            Filter to cache results of
+	 * @param filter Filter to cache results of
 	 */
 	public CachingWrapperFilter(Filter filter) {
 		this(filter, DEFAULT_SIZE);
 	}
 	
 	/**
-	 * @param filter
-	 *            Filter to cache results of
+	 * @param filter Filter to cache results of
 	 */
 	public CachingWrapperFilter(Filter filter, int size) {
 		this.filter = filter;
-		this.size = size;
+		log.debug( "Initialising SoftLimitMRUCache with hard ref size of {}", size );
+		this.cache = new SoftLimitMRUCache( size );
 	}	
 
+	@Override
 	public BitSet bits(IndexReader reader) throws IOException {
-		if (cache == null) {
-			log.debug("Initialising SoftLimitMRUCache with hard ref size of {}", size);
-			cache = new SoftLimitMRUCache(size);
+		throw new UnsupportedOperationException();
+		/* BitSet cached = (BitSet) cache.get(reader);
+		if (cached != null) {
+			return cached;
 		}
-
-		//memory barrier ensure cache == null will not always stay true on concurrent threads
-		synchronized (cache) { // check cache
-			BitSet cached = (BitSet) cache.get(reader);
-			if (cached != null) {
+		final BitSet bits = filter.bits(reader);
+		cache.put(reader, bits);
+		return bits; */
+	}
+	
+	@Override
+	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+		DocIdSet cached = (DocIdSet) cache.get( reader );
+		if ( cached != null ) {
+			return cached;
+		}
+		synchronized (cache) {
+			cached = (DocIdSet) cache.get( reader );
+			if ( cached != null ) {
 				return cached;
 			}
+			final DocIdSet docIdSet = filter.getDocIdSet( reader );
+			cache.put( reader, docIdSet );
+			return docIdSet;
 		}
-
-		final BitSet bits = filter.bits(reader);
-
-		synchronized (cache) { // update cache
-			cache.put(reader, bits);
-		}
-
-		return bits;
 	}
 
 	public String toString() {
