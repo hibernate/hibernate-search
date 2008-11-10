@@ -29,8 +29,8 @@ public class AndDocIdSet extends DocIdSet {
 		this.maxDocNumber = maxDocs;
 	}
 	
-	private synchronized void buildBitset() throws IOException {
-		if ( docIdBitSet != null ) return; // double check for concurrent initialization
+	private synchronized OpenBitSet buildBitset() throws IOException {
+		if ( docIdBitSet != null ) return docIdBitSet; // double check for concurrent initialization
 		//TODO if all andedDocIdSets are actually DocIdBitSet, use their internal BitSet instead of next algo.
 		//TODO if some andedDocIdSets are DocIdBitSet, merge them first.
 		int size = andedDocIdSets.size();
@@ -49,6 +49,7 @@ public class AndDocIdSet extends DocIdSet {
 			bitSet = new OpenBitSet(); //TODO a less expensive "empty"
 		}
 		docIdBitSet = bitSet;
+		return bitSet;
 	}
 
 	private final void markBitSetOnAgree(final DocIdSetIterator[] iterators, final OpenBitSet result) throws IOException {
@@ -132,10 +133,9 @@ public class AndDocIdSet extends DocIdSet {
 			return iterator.skipTo( target );
 		}
 		
-		private void ensureInitialized() throws IOException {
-			if ( docIdBitSet == null ) buildBitset();
+		private final void ensureInitialized() throws IOException {
 			if ( iterator == null ) {
-				iterator = docIdBitSet.iterator();
+				iterator = buildBitset().iterator();
 			}
 		}
 		
