@@ -26,7 +26,6 @@ import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -103,8 +102,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		}
 	}
 
-	protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event) {
-		Work work = new Work( entity, id, workType );
+	protected <T> void  processWork(T entity, Serializable id, WorkType workType, AbstractEvent event) {
+		Work<T> work = new Work<T>( entity, id, workType );
 		final EventSourceTransactionContext transactionContext = new EventSourceTransactionContext( event.getSession() );
 		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 	}

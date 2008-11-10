@@ -6,15 +6,20 @@ import java.io.Serializable;
 import org.hibernate.classic.Session;
 
 /**
- * Extends the Hibernate {@link Session} with Full text search and indexing capabilities
+ * Extends the Hibernate {@link Session} with fulltext search and indexing capabilities.
  *
  * @author Emmanuel Bernard
  */
 public interface FullTextSession extends Session {
 	/**
-	 * Create a Query on top of a native Lucene Query returning the matching objects
+	 * Create a fulltext query on top of a native Lucene query returning the matching objects
 	 * of type <code>entities</code> and their respective subclasses.
-	 * If no entity is provided, no type filtering is done.
+	 *
+	 * @param luceneQuery The native Lucene query to be rn against the Lucene index.
+	 * @param entities List of classes for type filtering. The query result will only return entities of
+	 * the specified types and their respective subtype. If no class is specified no type filtering will take place.
+	 *
+	 * @return A <code>FullTextQuery</code> wrapping around the native Lucene wuery.
 	 */
 	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
 
@@ -24,12 +29,13 @@ public interface FullTextSession extends Session {
 	 * will not affect the index at least until commit.
 	 *
 	 * @param entity The entity to index - must not be <code>null</code>.
+	 *
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
-	void index(Object entity);
+	<T> void index(T entity);
 
 	/**
-	 * return the SearchFactory
+	 * @return the <code>SearchFactory</code> instance.
 	 */
 	SearchFactory getSearchFactory();
 
@@ -43,15 +49,16 @@ public interface FullTextSession extends Session {
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</codE> or not an @Indexed entity type.
 	 */
-	public void purge(Class<?> entityType, Serializable id);
+	public <T> void purge(Class<T> entityType, Serializable id);
 
 	/**
 	 * Remove all entities from of particular class and all its subclasses from the index.
 	 *
 	 * @param entityType The class of the entities to remove.
+	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not an @Indexed entity type.
 	 */
-	public void purgeAll(Class<?> entityType);
+	public <T> void purgeAll(Class<T> entityType);
 
 	/**
 	 * flush full text changes to the index

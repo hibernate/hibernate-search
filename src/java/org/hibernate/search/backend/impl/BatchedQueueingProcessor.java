@@ -53,7 +53,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		//default to a simple asynchronous operation
 		int min = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
 		//no queue limit
-		int queueSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE );
+		int queueSize = ConfigurationParseHelper.getIntValue(
+				properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE
+		);
 
 		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_BATCHSIZE, 0 );
 
@@ -67,7 +69,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			 */
 			executorService = new ThreadPoolExecutor(
 					min, min, 60, TimeUnit.SECONDS,
-					new LinkedBlockingQueue<Runnable>(queueSize),
+					new LinkedBlockingQueue<Runnable>( queueSize ),
 					new ThreadPoolExecutor.CallerRunsPolicy()
 			);
 		}
@@ -84,15 +86,15 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		else {
 			try {
 				Class processorFactoryClass = ReflectHelper.classForName( backend, BatchedQueueingProcessor.class );
-				backendQueueProcessorFactory = (BackendQueueProcessorFactory) processorFactoryClass.newInstance();
+				backendQueueProcessorFactory = ( BackendQueueProcessorFactory ) processorFactoryClass.newInstance();
 			}
-			catch (ClassNotFoundException e) {
+			catch ( ClassNotFoundException e ) {
 				throw new SearchException( "Unable to find processor class: " + backend, e );
 			}
-			catch (IllegalAccessException e) {
+			catch ( IllegalAccessException e ) {
 				throw new SearchException( "Unable to instanciate processor class: " + backend, e );
 			}
-			catch (InstantiationException e) {
+			catch ( InstantiationException e ) {
 				throw new SearchException( "Unable to instanciate processor class: " + backend, e );
 			}
 		}
@@ -129,9 +131,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	}
 
 	private void processWorkByLayer(List<Work> queue, int initialSize, List<LuceneWork> luceneQueue, Layer layer) {
-		for ( int i = 0 ; i < initialSize ; i++ ) {
+		for ( int i = 0; i < initialSize; i++ ) {
 			Work work = queue.get( i );
-			if ( work != null) {
+			if ( work != null ) {
 				if ( layer.isRightLayer( work.getType() ) ) {
 					queue.set( i, null ); // help GC and avoid 2 loaded queues in memory
 					addWorkToBuilderQueue( luceneQueue, work );
@@ -140,19 +142,22 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		}
 	}
 
-	private <T> void addWorkToBuilderQueue(List<LuceneWork> luceneQueue, Work work) {
-		@SuppressWarnings( "unchecked" )
+	private <T> void addWorkToBuilderQueue(List<LuceneWork> luceneQueue, Work<T> work) {
+		@SuppressWarnings("unchecked")
 		Class<T> entityClass = work.getEntityClass() != null ?
-					work.getEntityClass() :
-					Hibernate.getClass( work.getEntity() );
+				work.getEntityClass() :
+				Hibernate.getClass( work.getEntity() );
 		DocumentBuilder<T> builder = searchFactoryImplementor.getDocumentBuilder( entityClass );
 		if ( builder == null ) {
 			//might be a entity contained in
 			builder = searchFactoryImplementor.getContainedInOnlyBuilder( entityClass );
 		}
-		if ( builder == null ) return;
-		//TODO remove casting when Work is Work<T>
-		builder.addWorkToQueue(entityClass, (T) work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor );
+		if ( builder == null ) {
+			return;
+		}
+		builder.addWorkToQueue(
+				entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor
+		);
 	}
 
 	//TODO implements parallel batchWorkers (one per Directory)
@@ -177,20 +182,22 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			try {
 				executorService.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
 			}
-			catch (InterruptedException e) {
+			catch ( InterruptedException e ) {
 				log.error( "Unable to properly shut down asynchronous indexing work", e );
 			}
 		}
 	}
 
 	private static enum Layer {
-	    FIRST,
+		FIRST,
 		SECOND;
 
 		public boolean isRightLayer(WorkType type) {
-			if (this == FIRST && type != WorkType.COLLECTION) return true;
-			return this == SECOND && type == WorkType.COLLECTION;
+			if ( this == FIRST && type != WorkType.COLLECTION ) {
+				return true;
 			}
+			return this == SECOND && type == WorkType.COLLECTION;
+		}
 	}
 
 }
