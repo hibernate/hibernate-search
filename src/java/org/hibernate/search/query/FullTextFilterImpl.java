@@ -1,8 +1,8 @@
 // $Id$
 package org.hibernate.search.query;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.hibernate.search.FullTextFilter;
 
@@ -29,7 +29,6 @@ public class FullTextFilterImpl implements FullTextFilter {
 	public Object getParameter(String name) {
 		return parameters.get( name );
 	}
-
 
 	public Map<String, Object> getParameters() {
 		return parameters;

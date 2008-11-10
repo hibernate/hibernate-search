@@ -5,27 +5,24 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.hibernate.search.engine.EntityInfo;
+
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.query.QueryHits;
 
 /**
  * @author Emmanuel Bernard
  * @author John Griffin
+ * @author Hardy Ferentschik
  */
 public class DocumentExtractor {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
-	private final IndexSearcher searcher;
-	private final Query preparedQuery;
+	private final QueryHits queryHits;
 
-	public DocumentExtractor(Query preparedQuery, IndexSearcher searcher, SearchFactoryImplementor searchFactoryImplementor, String... projection) {
+	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String... projection) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.projection = projection;
-		this.searcher = searcher;
-		this.preparedQuery = preparedQuery;
+		this.queryHits = queryHits;
 	}
 
 	private EntityInfo extract(Document document) {
@@ -35,20 +32,19 @@ public class DocumentExtractor {
 		if ( projection != null && projection.length > 0 ) {
 			projected = DocumentBuilder.getDocumentFields( searchFactoryImplementor, clazz, document, projection );
 		}
-		EntityInfo entityInfo = new EntityInfo( clazz, id, projected );
-		return entityInfo;
+		return new EntityInfo( clazz, id, projected );
 	}
 
-	public EntityInfo extract(Hits hits, int index) throws IOException {
-		Document doc = hits.doc( index );
+	public EntityInfo extract(int index) throws IOException {
+		Document doc = queryHits.doc( index );
 		//TODO if we are only looking for score (unlikely), avoid accessing doc (lazy load)
 		EntityInfo entityInfo = extract( doc );
 		Object[] eip = entityInfo.projection;
 
 		if ( eip != null && eip.length > 0 ) {
-			for (int x = 0; x < projection.length; x++) {
+			for ( int x = 0; x < projection.length; x++ ) {
 				if ( ProjectionConstants.SCORE.equals( projection[x] ) ) {
-					eip[x] = hits.score( index );
+					eip[x] = queryHits.score( index );
 				}
 				else if ( ProjectionConstants.ID.equals( projection[x] ) ) {
 					eip[x] = entityInfo.id;
@@ -57,18 +53,18 @@ public class DocumentExtractor {
 					eip[x] = doc;
 				}
 				else if ( ProjectionConstants.DOCUMENT_ID.equals( projection[x] ) ) {
-					eip[x] = hits.id( index );
+					eip[x] = queryHits.docId( index );
 				}
 				else if ( ProjectionConstants.BOOST.equals( projection[x] ) ) {
 					eip[x] = doc.getBoost();
 				}
 				else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
-					eip[x] = searcher.explain( preparedQuery, hits.id( index ) );
+					eip[x] = queryHits.explain( index );
 				}
 				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 					//THIS could be projected more than once
 					//THIS loading delayed to the Loader phase
-					entityInfo.indexesOfThis.add(x);
+					entityInfo.indexesOfThis.add( x );
 				}
 			}
 		}

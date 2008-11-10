@@ -10,15 +10,18 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.Searcher;
+import org.apache.lucene.document.Document;
 import org.slf4j.Logger;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -70,12 +73,13 @@ public class SearcherThread implements Runnable {
 			Query q = getQuery();
 			long start = System.currentTimeMillis();
 			// Search
-			Hits hits = indexsearcher.search( q );
+			TopDocs hits = indexsearcher.search( q, 1000 );
 			List<String> names = new ArrayList<String>(100);
 			for (int i = 0 ; i < 100 ; i++) {
-				names.add( hits.doc( i ).get( "name" ) );
+				Document doc = getDocument( indexsearcher, hits.scoreDocs[i].doc );
+				names.add( doc.get( "name" ) );
 			}
-			int resultSize = hits.length();
+			int resultSize = hits.totalHits;
 			long totalTime = System.currentTimeMillis() - start;
 //			log.error( "Lucene [ Thread-id : " + threadId + " ] Total time taken for search is : " + totalTime + "ms with total no. of matching records : " + hits.length() );
 			setTime( totalTime );
@@ -89,6 +93,14 @@ public class SearcherThread implements Runnable {
 		}
 		catch (Exception e) {
 			e.printStackTrace( );
+		}
+	}
+
+	private Document getDocument(Searcher searcher, int docId ) {
+		try {
+			return searcher.doc( docId );
+		} catch (IOException ioe) {
+			throw new SearchException( "Unable to retrieve document", ioe );
 		}
 	}
 

@@ -89,7 +89,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void purgeAll(Class entityType) {
+	public <T> void purgeAll(Class<T> entityType) {
 		purge( entityType, null );
 	}
 
@@ -101,7 +101,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void purge(Class<?> entityType, Serializable id) {
+	public <T> void purge(Class<T> entityType, Serializable id) {
 		if ( entityType == null ) {
 			return;
 		}
@@ -115,35 +115,35 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 			throw new IllegalArgumentException( msg );
 		}
 
-		Work work;
+		Work<T> work;
 		if ( id == null ) {
 			// purge the main entity
-			work = new Work( entityType, id, WorkType.PURGE_ALL );
+			work = new Work<T>( entityType, id, WorkType.PURGE_ALL );
 			searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 
 			// purge the subclasses
 			Set<Class<?>> subClasses = builder.getMappedSubclasses();
+			Work subClassWork;
 			for ( Class clazz : subClasses ) {
-				work = new Work( clazz, id, WorkType.PURGE_ALL );
-				searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+				subClassWork = new Work( clazz, id, WorkType.PURGE_ALL );
+				searchFactoryImplementor.getWorker().performWork( subClassWork, transactionContext );
 			}
 		}
 		else {
-			work = new Work( entityType, id, WorkType.PURGE );
+			work = new Work<T>( entityType, id, WorkType.PURGE );
 			searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 		}
 	}
 
 	/**
-	 * (re)index an entity.
-	 * Non indexable entities are ignored
-	 * The entity must be associated with the session
+	 * (Re-)index an entity.
+	 * The entity must be associated with the session and non indexable entities are ignored.
 	 *
 	 * @param entity The entity to index - must not be <code>null</code>.
 	 *
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
-	public void index(Object entity) {
+	public <T> void index(T entity) {
 		if ( entity == null ) {
 			throw new IllegalArgumentException( "Entity to index should not be null" );
 		}
@@ -157,7 +157,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 			throw new IllegalArgumentException( msg );
 		}
 		Serializable id = session.getIdentifier( entity );
-		Work work = new Work( entity, id, WorkType.INDEX );
+		Work<T> work = new Work<T>( entity, id, WorkType.INDEX );
 		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 
 		//TODO

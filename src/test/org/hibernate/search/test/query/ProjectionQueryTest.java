@@ -230,7 +230,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "dept incorrect", "Accounting", projection[2] );
 		assertEquals( "THIS incorrect", "Jackson", ( (Employee) projection[3] ).getLastname() );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
-		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
+		assertEquals( "SCORE incorrect", 1.9162908F, projection[4] );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[5] ).getFields().size() );
 		assertEquals( "ID incorrect", 1001, projection[6] );
@@ -249,7 +249,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[0] ).getFields().size() );
 		assertEquals( "THIS incorrect", projection[1], s.get( Employee.class, (Serializable) projection[4] ) );
-		assertEquals( "SCORE incorrect", 1.0F, projection[2] );
+		assertEquals( "SCORE incorrect", 1.9162908F, projection[2] );
 		assertNull( "BOOST not removed", projection[3] );
 		assertEquals( "ID incorrect", 1001, projection[4] );
 		assertEquals( "id incorrect", 1001, projection[5] );

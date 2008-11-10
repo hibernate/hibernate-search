@@ -15,7 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.slf4j.Logger;
 
@@ -52,9 +51,8 @@ import org.hibernate.type.Type;
  */
 public class ScrollableResultsImpl implements ScrollableResults {
 	private static final Logger log = LoggerFactory.make();
-	private final IndexSearcher searcher;
 	private final SearchFactory searchFactory;
-	private final Hits hits;
+	private final IndexSearcher searcher;
 	private final int first;
 	private final int max;
 	private final int fetchSize;
@@ -64,13 +62,11 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	private final DocumentExtractor documentExtractor;
 	private final Map<EntityInfo, Object[]> resultContext;
 
-	public ScrollableResultsImpl(
-			IndexSearcher searcher, Hits hits, int first, int max, int fetchSize, DocumentExtractor extractor,
+	public ScrollableResultsImpl( IndexSearcher searcher, int first, int max, int fetchSize, DocumentExtractor extractor,
 			Loader loader, SearchFactory searchFactory
 	) {
-		this.searcher = searcher;
 		this.searchFactory = searchFactory;
-		this.hits = hits;
+		this.searcher = searcher;
 		this.first = first;
 		this.max = max;
 		this.current = first;
@@ -106,12 +102,12 @@ public class ScrollableResultsImpl implements ScrollableResults {
 			try {
 				if ( entityInfos[x - first] == null ) {
 					//FIXME should check that clazz match classes but this complicates a lot the firstResult/maxResult
-					entityInfos[x - first] = documentExtractor.extract( hits, x );
+					entityInfos[x - first] = documentExtractor.extract( x );
 					entityInfosLoaded.add( entityInfos[x - first] );
 				}
 			}
 			catch (IOException e) {
-				throw new HibernateException( "Unable to read Lucene hits[" + x + "]", e );
+				throw new HibernateException( "Unable to read Lucene topDocs[" + x + "]", e );
 			}
 
 		}
@@ -165,7 +161,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * amount positive or negative, we perform the same tests that
 	 * we performed in next() and previous().
 	 *
-	 * @param i
+	 * @param i the scroll distance.
 	 * @return boolean
 	 * @throws HibernateException
 	 */

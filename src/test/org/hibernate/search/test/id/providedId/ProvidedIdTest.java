@@ -2,9 +2,9 @@ package org.hibernate.search.test.id.providedId;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -61,12 +61,12 @@ public class ProvidedIdTest extends SearchTestCase {
 		DirectoryProvider provider = fullTextSession.getSearchFactory()
 				.getDirectoryProviders( ProvidedIdPerson.class )[0];
 		IndexSearcher searcher = new IndexSearcher( provider.getDirectory() );
-		Hits hits = searcher.search( luceneQuery );
+		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		searcher.close();
 		transaction.commit();
 		session.close();
 
-		assertEquals( 3, hits.length() );
+		assertEquals( 3, hits.totalHits );
 	}
 
 

@@ -24,7 +24,6 @@
     <property name="javac.source" value="1.5"/>
     <property name="javac.target" value="1.5"/>
     <property name="jdbc.dir" value="jdbc"/>
-    <property name="common.dir" value="${basedir}"/>
 
     <property name="ivy.dep.dir" value="${basedir}/build/lib"/>
 
@@ -37,7 +36,7 @@
     <taskdef resource="fr/jayasoft/ivy/ant/antlib.xml"
              uri="antlib:fr.jayasoft.ivy.ant" classpathref="ivy.lib.path"/>
 
-    <import file="${common.dir}/common-build.xml"/>
+    <import file="common-build.xml"/>
 
     <property name="build.testresources.dir" value="${build.dir}/testresources"/>
     <property name="testresources.dir" value="${basedir}/src/test-resources"/>
@@ -308,7 +307,7 @@
         </copy>
 
         <copy todir="${dist.dir}" failonerror="false">
-            <fileset dir="${common.dir}">
+            <fileset dir="${basedir}">
                 <include name="common-build.xml"/>
             </fileset>
         </copy>

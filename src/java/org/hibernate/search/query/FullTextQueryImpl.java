@@ -18,12 +18,12 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.slf4j.Logger;
 
 import org.hibernate.Criteria;
@@ -132,29 +132,29 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			return new IteratorImpl( Collections.EMPTY_LIST, noLoader );
 		}
 		try {
-			QueryAndHits queryAndHits = getQueryAndHits( searcher );
+			QueryHits queryHits = getQueryHits( searcher );
 			int first = first();
-			int max = max( first, queryAndHits.hits );
-			Session sess = (Session) this.session;
+			int max = max( first, queryHits.totalHits );
+			Session sess = ( Session ) this.session;
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
-			DocumentExtractor extractor = new DocumentExtractor( queryAndHits.preparedQuery, searcher, searchFactoryImplementor, indexProjection );
-			for (int index = first; index <= max; index++) {
+			DocumentExtractor extractor = new DocumentExtractor( queryHits, searchFactoryImplementor, indexProjection );
+			for ( int index = first; index <= max; index++ ) {
 				//TODO use indexSearcher.getIndexReader().document( hits.id(index), FieldSelector(indexProjection) );
-				infos.add( extractor.extract( queryAndHits.hits, index ) );
+				infos.add( extractor.extract( index ) );
 			}
 			Loader loader = getLoader( sess, searchFactoryImplementor );
 			return new IteratorImpl( infos, loader );
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			throw new HibernateException( "Unable to query Lucene index", e );
 		}
 		finally {
 			try {
 				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
 			}
-			catch (SearchException e) {
+			catch ( SearchException e ) {
 				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
 			}
 		}
@@ -167,9 +167,11 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			return loader;
 		}
 		if ( criteria != null ) {
-			if ( classes.length > 1 ) throw new SearchException( "Cannot mix criteria and multiple entity types" );
+			if ( classes.length > 1 ) {
+				throw new SearchException( "Cannot mix criteria and multiple entity types" );
+			}
 			if ( criteria instanceof CriteriaImpl ) {
-				String targetEntity = ( (CriteriaImpl) criteria ).getEntityOrClassName();
+				String targetEntity = ( ( CriteriaImpl ) criteria ).getEntityOrClassName();
 				if ( classes.length == 1 && !classes[0].getName().equals( targetEntity ) ) {
 					throw new SearchException( "Criteria query entity should match query entity" );
 				}
@@ -178,7 +180,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 						Class entityType = ReflectHelper.classForName( targetEntity );
 						classes = new Class[] { entityType };
 					}
-					catch (ClassNotFoundException e) {
+					catch ( ClassNotFoundException e ) {
 						throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
 					}
 				}
@@ -211,19 +213,21 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		IndexSearcher searcher = buildSearcher( searchFactory );
 		//FIXME: handle null searcher
 		try {
-			QueryAndHits queryAndHits = getQueryAndHits( searcher );
+			QueryHits queryHits = getQueryHits( searcher );
 			int first = first();
-			int max = max( first, queryAndHits.hits );
-			DocumentExtractor extractor = new DocumentExtractor( queryAndHits.preparedQuery, searcher, searchFactory, indexProjection );
-			Loader loader = getLoader( (Session) this.session, searchFactory );
-			return new ScrollableResultsImpl( searcher, queryAndHits.hits, first, max, fetchSize, extractor, loader, searchFactory );
+			int max = max( first, queryHits.totalHits );
+			DocumentExtractor extractor = new DocumentExtractor( queryHits, searchFactory, indexProjection );
+			Loader loader = getLoader( ( Session ) this.session, searchFactory );
+			return new ScrollableResultsImpl(
+					searcher, first, max, fetchSize, extractor, loader, searchFactory
+			);
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			//close only in case of exception
 			try {
 				closeSearcher( searcher, searchFactory.getReaderProvider() );
 			}
-			catch (SearchException ee) {
+			catch ( SearchException ee ) {
 				//we have the initial issue already
 			}
 			throw new HibernateException( "Unable to query Lucene index", e );
@@ -239,18 +243,20 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		SearchFactoryImplementor searchFactoryImplementor = ContextHelper.getSearchFactoryBySFI( session );
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
-		if ( searcher == null ) return Collections.EMPTY_LIST;
+		if ( searcher == null ) {
+			return Collections.EMPTY_LIST;
+		}
 		try {
-			QueryAndHits queryAndHits = getQueryAndHits( searcher );
+			QueryHits queryHits = getQueryHits( searcher );
 			int first = first();
-			int max = max( first, queryAndHits.hits );
-			Session sess = (Session) this.session;
+			int max = max( first, queryHits.totalHits );
+			Session sess = ( Session ) this.session;
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
-			DocumentExtractor extractor = new DocumentExtractor( queryAndHits.preparedQuery, searcher, searchFactoryImplementor, indexProjection );
-			for (int index = first; index <= max; index++) {
-				infos.add( extractor.extract( queryAndHits.hits, index ) );
+			DocumentExtractor extractor = new DocumentExtractor( queryHits, searchFactoryImplementor, indexProjection );
+			for ( int index = first; index <= max; index++ ) {
+				infos.add( extractor.extract( index ) );
 			}
 			Loader loader = getLoader( sess, searchFactoryImplementor );
 			List list = loader.load( infos.toArray( new EntityInfo[infos.size()] ) );
@@ -262,14 +268,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				return resultTransformer.transformList( list );
 			}
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			throw new HibernateException( "Unable to query Lucene index", e );
 		}
 		finally {
 			try {
 				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
 			}
-			catch (SearchException e) {
+			catch ( SearchException e ) {
 				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
 			}
 		}
@@ -279,16 +285,18 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		Explanation explanation = null;
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		Searcher searcher = buildSearcher( searchFactoryImplementor );
-		if (searcher == null) {
-			throw new SearchException("Unable to build explanation for document id:"
-					+ documentId + ". no index found");
+		if ( searcher == null ) {
+			throw new SearchException(
+					"Unable to build explanation for document id:"
+							+ documentId + ". no index found"
+			);
 		}
 		try {
 			org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
 			buildFilters();
 			explanation = searcher.explain( query, documentId );
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			throw new HibernateException( "Unable to query Lucene index and build explanation", e );
 		}
 		finally {
@@ -296,7 +304,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			try {
 				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
 			}
-			catch (SearchException e) {
+			catch ( SearchException e ) {
 				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
 			}
 		}
@@ -307,16 +315,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * Execute the lucene search and return the machting hits.
 	 *
 	 * @param searcher The index searcher.
-	 * @return The lucene hits.
+	 *
+	 * @return An instance of <code>QueryHits</code> wrapping the Lucene query and the matching documents.
+	 *
 	 * @throws IOException in case there is an error executing the lucene search.
 	 */
-	private QueryAndHits getQueryAndHits(Searcher searcher) throws IOException {
-		Hits hits;
+	private QueryHits getQueryHits(Searcher searcher) throws IOException {
 		org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
 		buildFilters();
-		hits = searcher.search( query, filter, sort );
-		setResultSize( hits );
-		return new QueryAndHits( query, hits );
+		QueryHits queryHits = new QueryHits( searcher, query, filter, sort );
+		resultSize = queryHits.totalHits;
+		return queryHits;
 	}
 
 	private void buildFilters() {
@@ -325,12 +334,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 
 		ChainedFilter chainedFilter = new ChainedFilter();
-		for (FullTextFilterImpl fullTextFilter : filterDefinitions.values()) {
-			Filter filter = buildLuceneFilter(fullTextFilter);
+		for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
+			Filter filter = buildLuceneFilter( fullTextFilter );
 			chainedFilter.addFilter( filter );
 		}
 
-		if ( filter != null ) chainedFilter.addFilter( filter );
+		if ( filter != null ) {
+			chainedFilter.addFilter( filter );
+		}
 		filter = chainedFilter;
 	}
 
@@ -339,6 +350,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 *
 	 * @param fullTextFilter the Hibernate specific <code>FullTextFilter</code> used to create the
 	 * Lucene <code>Filter</code>.
+	 *
 	 * @return the Lucene filter mapped to the filter definition
 	 */
 	private Filter buildLuceneFilter(FullTextFilterImpl fullTextFilter) {
@@ -350,8 +362,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
 		 */
 		FilterDef def = searchFactoryImplementor.getFilterDefinition( fullTextFilter.getName() );
-		Object instance = createFilterInstance(fullTextFilter, def);
-		FilterKey key = createFilterKey(def, instance);
+		Object instance = createFilterInstance( fullTextFilter, def );
+		FilterKey key = createFilterKey( def, instance );
 
 		// try to get the filter out of the cache
 		Filter filter = cacheInstance( def.getCacheMode() ) ?
@@ -359,7 +371,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				null;
 
 		if ( filter == null ) {
-			filter = createFilter(def, instance);
+			filter = createFilter( def, instance );
 
 			// add filter to cache if we have to
 			if ( cacheInstance( def.getCacheMode() ) ) {
@@ -373,33 +385,41 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		Filter filter = null;
 		if ( def.getFactoryMethod() != null ) {
 			try {
-				filter = (Filter) def.getFactoryMethod().invoke( instance );
+				filter = ( Filter ) def.getFactoryMethod().invoke( instance );
 			}
-			catch (IllegalAccessException e) {
-				throw new SearchException( "Unable to access @Factory method: "
-						+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+			catch ( IllegalAccessException e ) {
+				throw new SearchException(
+						"Unable to access @Factory method: "
+								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName()
+				);
 			}
-			catch (InvocationTargetException e) {
-				throw new SearchException( "Unable to access @Factory method: "
-						+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+			catch ( InvocationTargetException e ) {
+				throw new SearchException(
+						"Unable to access @Factory method: "
+								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName()
+				);
 			}
-			catch (ClassCastException e) {
-				throw new SearchException( "@Key method does not return a org.apache.lucene.search.Filter class: "
-						+ def.getImpl().getName() + "." + def.getFactoryMethod().getName() );
+			catch ( ClassCastException e ) {
+				throw new SearchException(
+						"@Key method does not return a org.apache.lucene.search.Filter class: "
+								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName()
+				);
 			}
 		}
 		else {
 			try {
-				filter = (Filter) instance;
+				filter = ( Filter ) instance;
 			}
-			catch (ClassCastException e) {
-				throw new SearchException( "Filter implementation does not implement the Filter interface: "
-						+ def.getImpl().getName() + ". "
-						+ (def.getFactoryMethod() != null ? def.getFactoryMethod().getName() : ""), e );
+			catch ( ClassCastException e ) {
+				throw new SearchException(
+						"Filter implementation does not implement the Filter interface: "
+								+ def.getImpl().getName() + ". "
+								+ ( def.getFactoryMethod() != null ? def.getFactoryMethod().getName() : "" ), e
+				);
 			}
 		}
 
-		filter = addCachingWrapperFilter(filter, def);
+		filter = addCachingWrapperFilter( filter, def );
 		return filter;
 	}
 
@@ -408,13 +428,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 *
 	 * @param filter the filter which maybe gets wrapped.
 	 * @param def The filter definition used to decide whether wrapping should occur or not.
+	 *
 	 * @return The original filter or wrapped filter depending on the information extracted from
-	 * <code>def</code>.
+	 *         <code>def</code>.
 	 */
 	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
 		if ( cacheResults( def.getCacheMode() ) ) {
 			int cachingWrapperFilterSize = getSearchFactoryImplementor().getFilterCacheBitResultsSize();
-			filter = new org.hibernate.search.filter.CachingWrapperFilter(filter, cachingWrapperFilterSize);
+			filter = new org.hibernate.search.filter.CachingWrapperFilter( filter, cachingWrapperFilterSize );
 		}
 
 		return filter;
@@ -433,27 +454,35 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				}
 
 				public boolean equals(Object obj) {
-					if ( !( obj instanceof FilterKey ) ) return false;
-					FilterKey that = (FilterKey) obj;
+					if ( !( obj instanceof FilterKey ) ) {
+						return false;
+					}
+					FilterKey that = ( FilterKey ) obj;
 					return this.getImpl().equals( that.getImpl() );
 				}
 			};
 		}
 		else {
 			try {
-				key = (FilterKey) def.getKeyMethod().invoke( instance );
+				key = ( FilterKey ) def.getKeyMethod().invoke( instance );
 			}
-			catch (IllegalAccessException e) {
-				throw new SearchException( "Unable to access @Key method: "
-						+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
+			catch ( IllegalAccessException e ) {
+				throw new SearchException(
+						"Unable to access @Key method: "
+								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
+				);
 			}
-			catch (InvocationTargetException e) {
-				throw new SearchException( "Unable to access @Key method: "
-						+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
+			catch ( InvocationTargetException e ) {
+				throw new SearchException(
+						"Unable to access @Key method: "
+								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
+				);
 			}
-			catch (ClassCastException e) {
-				throw new SearchException( "@Key method does not return FilterKey: "
-						+ def.getImpl().getName() + "." + def.getKeyMethod().getName() );
+			catch ( ClassCastException e ) {
+				throw new SearchException(
+						"@Key method does not return FilterKey: "
+								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
+				);
 			}
 		}
 		key.setImpl( def.getImpl() );
@@ -466,28 +495,29 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private Object createFilterInstance(FullTextFilterImpl fullTextFilter,
-			FilterDef def) {
+										FilterDef def) {
 		Object instance;
 		try {
 			instance = def.getImpl().newInstance();
 		}
-		catch (InstantiationException e) {
+		catch ( InstantiationException e ) {
 			throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
 		}
-		catch (IllegalAccessException e) {
+		catch ( IllegalAccessException e ) {
 			throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
 		}
-		for (Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet()) {
+		for ( Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet() ) {
 			def.invoke( entry.getKey(), instance, entry.getValue() );
 		}
-		if ( cacheInstance( def.getCacheMode() ) && def.getKeyMethod() == null && fullTextFilter.getParameters().size() > 0 ) {
+		if ( cacheInstance( def.getCacheMode() ) && def.getKeyMethod() == null && fullTextFilter.getParameters()
+				.size() > 0 ) {
 			throw new SearchException( "Filter with parameters and no @Key method: " + fullTextFilter.getName() );
 		}
 		return instance;
 	}
 
 	private org.apache.lucene.search.Query filterQueryByClasses(org.apache.lucene.search.Query luceneQuery) {
-		if ( ! needClassFilterClause ) {
+		if ( !needClassFilterClause ) {
 			return luceneQuery;
 		}
 		else {
@@ -496,7 +526,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			BooleanQuery classFilter = new BooleanQuery();
 			//annihilate the scoring impact of DocumentBuilder.CLASS_FIELDNAME
 			classFilter.setBoost( 0 );
-			for (Class clazz : classesAndSubclasses) {
+			for ( Class clazz : classesAndSubclasses ) {
 				Term t = new Term( DocumentBuilder.CLASS_FIELDNAME, clazz.getName() );
 				TermQuery termQuery = new TermQuery( t );
 				classFilter.add( termQuery, BooleanClause.Occur.SHOULD );
@@ -508,12 +538,15 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 	}
 
-	private int max(int first, Hits hits) {
-		return maxResults == null ?
-				hits.length() - 1 :
-				maxResults + first < hits.length() ?
-						first + maxResults - 1 :
-						hits.length() - 1;
+	private int max(int first, int totalHits) {
+		if ( maxResults == null ) {
+			return totalHits - 1;
+		}
+		else {
+			return maxResults + first < totalHits ?
+					first + maxResults - 1 :
+					totalHits - 1;
+		}
 	}
 
 	private int first() {
@@ -537,12 +570,15 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			// empty classes array means search over all indexed enities,
 			// but we have to make sure there is at least one
 			if ( builders.isEmpty() ) {
-				throw new HibernateException( "There are no mapped entities (don't forget to add @Indexed to at least one class)." );
+				throw new HibernateException(
+						"There are no mapped entities (don't forget to add @Indexed to at least one class)."
+				);
 			}
 
-			for (DocumentBuilder builder : builders.values()) {
+			for ( DocumentBuilder builder : builders.values() ) {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
-				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy().getDirectoryProvidersForAllShards();
+				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy()
+						.getDirectoryProvidersForAllShards();
 				populateDirectories( directories, directoryProviders, searchFactoryImplementor );
 			}
 			classesAndSubclasses = null;
@@ -550,18 +586,22 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		else {
 			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( classes.length );
 			Collections.addAll( involvedClasses, classes );
-			for (Class<?> clazz : classes) {
+			for ( Class<?> clazz : classes ) {
 				DocumentBuilder<?> builder = builders.get( clazz );
-				if ( builder != null ) involvedClasses.addAll( builder.getMappedSubclasses() );
+				if ( builder != null ) {
+					involvedClasses.addAll( builder.getMappedSubclasses() );
+				}
 			}
 
-			for (Class clazz : involvedClasses) {
+			for ( Class clazz : involvedClasses ) {
 				DocumentBuilder builder = builders.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
-				if ( builder == null )
+				if ( builder == null ) {
 					throw new HibernateException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
+				}
 
-				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy().getDirectoryProvidersForAllShards();
+				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy()
+						.getDirectoryProvidersForAllShards();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				populateDirectories( directories, directoryProviders, searchFactoryImplementor );
 			}
@@ -570,33 +610,41 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 		//compute optimization needClassFilterClause
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
-		if ( classesAndSubclasses != null) {
-			for (DirectoryProvider dp : directories) {
-				final Set<Class<?>> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider( dp );
+		if ( classesAndSubclasses != null ) {
+			for ( DirectoryProvider dp : directories ) {
+				final Set<Class<?>> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider(
+						dp
+				);
 				// if a DP contains only one class, we know for sure it's part of classesAndSubclasses
 				if ( classesInDirectoryProvider.size() > 1 ) {
 					//risk of needClassFilterClause
-					for (Class clazz : classesInDirectoryProvider) {
-						if ( ! classesAndSubclasses.contains( clazz ) ) {
+					for ( Class clazz : classesInDirectoryProvider ) {
+						if ( !classesAndSubclasses.contains( clazz ) ) {
 							this.needClassFilterClause = true;
 							break;
 						}
 					}
 				}
-				if ( this.needClassFilterClause ) break;
+				if ( this.needClassFilterClause ) {
+					break;
+				}
 			}
 		}
 
 		//set up the searcher
 		final DirectoryProvider[] directoryProviders = directories.toArray( new DirectoryProvider[directories.size()] );
-		IndexSearcher is = new IndexSearcher( searchFactoryImplementor.getReaderProvider().openReader( directoryProviders ) );
+		IndexSearcher is = new IndexSearcher(
+				searchFactoryImplementor.getReaderProvider().openReader(
+						directoryProviders
+				)
+		);
 		is.setSimilarity( searcherSimilarity );
 		return is;
 	}
 
 	private void populateDirectories(List<DirectoryProvider> directories, DirectoryProvider[] directoryProviders,
 									 SearchFactoryImplementor searchFactoryImplementor) {
-		for (DirectoryProvider provider : directoryProviders) {
+		for ( DirectoryProvider provider : directoryProviders ) {
 			if ( !directories.contains( provider ) ) {
 				directories.add( provider );
 			}
@@ -608,7 +656,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			similarity = builder.getSimilarity();
 		}
 		else if ( !similarity.getClass().equals( builder.getSimilarity().getClass() ) ) {
-			throw new HibernateException( "Cannot perform search on two entities with differing Similarity implementations (" + similarity.getClass().getName() + " & " + builder.getSimilarity().getClass().getName() + ")" );
+			throw new HibernateException(
+					"Cannot perform search on two entities with differing Similarity implementations (" + similarity.getClass()
+							.getName() + " & " + builder.getSimilarity().getClass().getName() + ")"
+			);
 		}
 
 		return similarity;
@@ -617,15 +668,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private void closeSearcher(Searcher searcher, ReaderProvider readerProvider) {
 		Set<IndexReader> indexReaders = getIndexReaders( searcher );
 
-		for (IndexReader indexReader : indexReaders) {
+		for ( IndexReader indexReader : indexReaders ) {
 			readerProvider.closeReader( indexReader );
 		}
 	}
-
-	private void setResultSize(Hits hits) {
-		resultSize = hits.length();
-	}
-
 
 	public int getResultSize() {
 		if ( resultSize == null ) {
@@ -636,12 +682,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				resultSize = 0;
 			}
 			else {
-				Hits hits;
+				TopDocs hits;
 				try {
-					hits = getQueryAndHits( searcher ).hits;
-					resultSize = hits.length();
+					hits = getQueryHits( searcher ).topDocs;
+					resultSize = hits.totalHits;
 				}
-				catch (IOException e) {
+				catch ( IOException e ) {
 					throw new HibernateException( "Unable to query Lucene index", e );
 				}
 				finally {
@@ -650,7 +696,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 						closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
 						//searchFactoryImplementor.getReaderProvider().closeReader( searcher.getIndexReader() );
 					}
-					catch (SearchException e) {
+					catch ( SearchException e ) {
 						log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
 					}
 				}
@@ -723,7 +769,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			filterDefinitions = new HashMap<String, FullTextFilterImpl>();
 		}
 		FullTextFilterImpl filterDefinition = filterDefinitions.get( name );
-		if ( filterDefinition != null ) return filterDefinition;
+		if ( filterDefinition != null ) {
+			return filterDefinition;
+		}
 
 		filterDefinition = new FullTextFilterImpl();
 		filterDefinition.setName( name );
@@ -758,14 +806,4 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
 	};
-
-	private static class QueryAndHits {
-		private QueryAndHits(org.apache.lucene.search.Query preparedQuery, Hits hits) {
-			this.preparedQuery = preparedQuery;
-			this.hits = hits;
-		}
-
-		public final org.apache.lucene.search.Query preparedQuery;
-		public final Hits hits;
-	}
 }

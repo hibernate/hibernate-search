@@ -10,10 +10,11 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
+
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
 import org.hibernate.search.store.FSDirectoryProvider;
@@ -132,10 +133,11 @@ public class FSDirectoryTest extends SearchTestCase {
 		try {
 			QueryParser qp = new QueryParser( "id", new StandardAnalyzer() );
 			Query query = qp.parse( "title:Action OR Abstract:Action" );
-			Hits hits = searcher.search( query );
-			assertEquals( 2, hits.length() );
-			assertTrue( hits.score( 0 ) == 2 * hits.score( 1 ) );
-			assertEquals( "Hibernate in Action", hits.doc( 0 ).get( "title" ) );
+			TopDocs hits = searcher.search( query, 1000 );
+			assertEquals( 2, hits.totalHits );
+			assertTrue( hits.scoreDocs[0].score == 2 * hits.scoreDocs[1].score );
+			org.apache.lucene.document.Document doc = searcher.doc( 0 );
+			assertEquals( "Hibernate in Action", doc.get( "title" ) );
 		}
 		finally {
 			searcher.close();
@@ -164,9 +166,10 @@ public class FSDirectoryTest extends SearchTestCase {
 		// ( fails when deleting -concurrently- to IndexSearcher initialization! )
 		FileHelper.delete(getBaseIndexDir());
 		TermQuery query = new TermQuery( new Term("title","action") );
-		Hits hits = searcher.search( query );
-		assertEquals( 1, hits.length() );
-		assertEquals( "Hibernate Search in Action", hits.doc( 0 ).get( "title" ) );
+		TopDocs hits = searcher.search( query, 1000 );
+		assertEquals( 1, hits.totalHits );
+		org.apache.lucene.document.Document doc = searcher.doc( 0 );
+		assertEquals( "Hibernate Search in Action", doc.get( "title" ) );
 		searcher.close();
 	}
 

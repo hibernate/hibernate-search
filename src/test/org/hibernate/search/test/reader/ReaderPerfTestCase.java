@@ -13,6 +13,8 @@ import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.slf4j.Logger;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -22,11 +24,15 @@ import org.hibernate.search.Search;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public abstract class ReaderPerfTestCase extends SearchTestCase {
+
+	private static final Logger log = LoggerFactory.make();
+
 	protected void setUp() throws Exception {
 		File sub = getBaseIndexDir();
 		sub.mkdir();
@@ -50,7 +56,9 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		if ( getSessions() != null ) getSessions().close();
+		if ( getSessions() != null ) {
+			getSessions().close();
+		}
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
 	}
@@ -58,22 +66,24 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 	public boolean insert = true;
 
 	public void testConcurrency() throws Exception {
-		Session s = openSession( );
+		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		for ( int index = 0 ; index < 5000 ; index++ ) {
+		for ( int index = 0; index < 5000; index++ ) {
 			Detective detective = new Detective();
 			detective.setName( "John Doe " + index );
 			detective.setBadge( "123455" + index );
-			detective.setPhysicalDescription( "Blond green eye etc etc");
+			detective.setPhysicalDescription( "Blond green eye etc etc" );
 			s.persist( detective );
 			Suspect suspect = new Suspect();
 			suspect.setName( "Jane Doe " + index );
-			suspect.setPhysicalDescription( "brunette, short, 30-ish");
+			suspect.setPhysicalDescription( "brunette, short, 30-ish" );
 			if ( index % 20 == 0 ) {
 				suspect.setSuspectCharge( "thief liar " );
 			}
 			else {
-				suspect.setSuspectCharge( " It's 1875 in London. The police have captured career criminal Montmorency. In the process he has been grievously wounded and it is up to a young surgeon to treat his wounds. During his recovery Montmorency learns of the city's new sewer system and sees in it the perfect underground highway for his thievery.  Washington Post columnist John Kelly recommends this title for middle schoolers, especially to be read aloud.");
+				suspect.setSuspectCharge(
+						" It's 1875 in London. The police have captured career criminal Montmorency. In the process he has been grievously wounded and it is up to a young surgeon to treat his wounds. During his recovery Montmorency learns of the city's new sewer system and sees in it the perfect underground highway for his thievery.  Washington Post columnist John Kelly recommends this title for middle schoolers, especially to be read aloud."
+				);
 			}
 			s.persist( suspect );
 		}
@@ -88,6 +98,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		ReverseWork reverseWork = new ReverseWork( getSessions() );
 		long start = System.currentTimeMillis();
 		int iteration = 100;
+		log.info( "Starting worker threads." );
 		for ( int i = 0; i < iteration; i++ ) {
 			es.execute( work );
 			es.execute( reverseWork );
@@ -95,12 +106,11 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		while ( work.count < iteration - 1 ) {
 			Thread.sleep( 20 );
 		}
-		System.out.println( iteration + " iterations in " + nThreads + " threads: " + ( System
-				.currentTimeMillis() - start ) );
+		log.debug( iteration + " iterations in " + nThreads + " threads: " + ( System.currentTimeMillis() - start ) );
 	}
 
 	protected class Work implements Runnable {
-		private Random random = new Random( );
+		private Random random = new Random();
 		private SessionFactory sf;
 		public volatile int count = 0;
 
@@ -112,12 +122,13 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			Session s = sf.openSession();
 			Transaction tx = s.beginTransaction();
 			QueryParser parser = new MultiFieldQueryParser(
-					new String[] {"name", "physicalDescription", "suspectCharge"},
-					new StandardAnalyzer() );
+					new String[] { "name", "physicalDescription", "suspectCharge" },
+					new StandardAnalyzer()
+			);
 			FullTextQuery query = getQuery( "John Doe", parser, s );
 			assertTrue( query.getResultSize() != 0 );
 
-			query = getQuery( "green",  parser, s );
+			query = getQuery( "green", parser, s );
 			random.nextInt( query.getResultSize() - 15 );
 			query.setFirstResult( random.nextInt( query.getResultSize() - 15 ) );
 			query.setMaxResults( 10 );
@@ -131,18 +142,18 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			query = getQuery( "John Doe", parser, s );
 			assertTrue( query.getResultSize() != 0 );
 
-			query = getQuery( "thief",  parser, s );
+			query = getQuery( "thief", parser, s );
 			int firstResult = random.nextInt( query.getResultSize() - 15 );
 			query.setFirstResult( firstResult );
 			query.setMaxResults( 10 );
 			List result = query.list();
-			Object object = result.get(0);
-			if (insert && object instanceof Detective) {
-				Detective detective = (Detective) object;
+			Object object = result.get( 0 );
+			if ( insert && object instanceof Detective ) {
+				Detective detective = ( Detective ) object;
 				detective.setPhysicalDescription( detective.getPhysicalDescription() + " Eye" + firstResult );
 			}
-			else if (insert && object instanceof Suspect) {
-				Suspect suspect = (Suspect) object;
+			else if ( insert && object instanceof Suspect ) {
+				Suspect suspect = ( Suspect ) object;
 				suspect.setPhysicalDescription( suspect.getPhysicalDescription() + " Eye" + firstResult );
 			}
 			tx.commit();
@@ -153,9 +164,9 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		private FullTextQuery getQuery(String queryString, QueryParser parser, Session s) {
 			Query luceneQuery = null;
 			try {
-				luceneQuery = parser.parse(queryString);
+				luceneQuery = parser.parse( queryString );
 			}
-			catch (ParseException e) {
+			catch ( ParseException e ) {
 				e.printStackTrace();
 			}
 			return Search.getFullTextSession( s ).createFullTextQuery( luceneQuery );
@@ -174,12 +185,13 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			Session s = sf.openSession();
 			Transaction tx = s.beginTransaction();
 			QueryParser parser = new MultiFieldQueryParser(
-					new String[] {"name", "physicalDescription", "suspectCharge"},
-					new StandardAnalyzer() );
+					new String[] { "name", "physicalDescription", "suspectCharge" },
+					new StandardAnalyzer()
+			);
 			FullTextQuery query = getQuery( "John Doe", parser, s );
 			assertTrue( query.getResultSize() != 0 );
 
-			query = getQuery( "london",  parser, s );
+			query = getQuery( "london", parser, s );
 			random.nextInt( query.getResultSize() - 15 );
 			query.setFirstResult( random.nextInt( query.getResultSize() - 15 ) );
 			query.setMaxResults( 10 );
@@ -193,7 +205,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			getQuery( "John Doe", parser, s );
 			assertTrue( query.getResultSize() != 0 );
 
-			query = getQuery( "green",  parser, s );
+			query = getQuery( "green", parser, s );
 			random.nextInt( query.getResultSize() - 15 );
 			query.setFirstResult( random.nextInt( query.getResultSize() - 15 ) );
 			query.setMaxResults( 10 );
@@ -205,9 +217,9 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		private FullTextQuery getQuery(String queryString, QueryParser parser, Session s) {
 			Query luceneQuery = null;
 			try {
-				luceneQuery = parser.parse(queryString);
+				luceneQuery = parser.parse( queryString );
 			}
-			catch (ParseException e) {
+			catch ( ParseException e ) {
 				e.printStackTrace();
 			}
 			return Search.getFullTextSession( s ).createFullTextQuery( luceneQuery );
