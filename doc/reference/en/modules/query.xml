@@ -522,9 +522,9 @@ public class Driver { ... }</programlisting>
     <programlisting>public class BestDriversFilter extends <emphasis
         role="bold">org.apache.lucene.search.Filter</emphasis> {
 
-    public BitSet bits(IndexReader reader) throws IOException {
-        BitSet bitSet = new BitSet( reader.maxDoc() );
-        TermDocs termDocs = reader.termDocs( new Term("score", "5") );
+    public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+        OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
+        TermDocs termDocs = reader.termDocs( new Term( "score", "5" ) );
         while ( termDocs.next() ) {
             bitSet.set( termDocs.doc() );
         }
@@ -536,7 +536,7 @@ public class Driver { ... }</programlisting>
     Lucene filter which reduces the result set to drivers whose score is 5. In
     this example the specified filter implements the
     <literal>org.apache.lucene.search.Filter</literal> directly and contains a
-    no-arg constructor. </para>
+    no-arg constructor.</para>
 
     <para>If your Filter creation requires additional steps or if the filter
     you want to use does not have a no-arg constructor, you can use the
@@ -642,25 +642,23 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     the actual filter results. In Lucene it is common practice to wrap filters
     using the <classname>IndexReader</classname> around a
     <classname>CachingWrapperFilter.</classname> The wrapper will cache the
-    <classname>BitSet</classname> returned from the
-    <methodname>bits(IndexReader reader)</methodname> method to avoid
-    expensive recomputation. The <classname>BitSet</classname> uses one bit
-    per Document. If for example your index contains ten millions documents,
-    the <classname>BitSet</classname> structure will take 1.2 Mb of memory. It
-    is important to mention that the computed <classname>BitSet</classname> is
-    only cachable for the same <classname>IndexReader</classname> instance,
-    because the reader effectively represents the state of the index at the
-    moment it was opened. The document list cannot change within an opened
+    <classname>DocIdSet</classname> returned from the
+    <methodname>getDocIdSet(IndexReader reader)</methodname> method to avoid
+    expensive recomputation. It is important to mention that the computed
+    <classname>DocIdSet</classname> is only cachable for the same
+    <classname>IndexReader</classname> instance, because the reader
+    effectively represents the state of the index at the moment it was opened.
+    The document list cannot change within an opened
     <classname>IndexReader</classname>. A different/new<classname>
     IndexReader</classname> instance, however, works potentially on a
     different set of <classname>Document</classname>s (either from a different
     index or simply because the index has changed), hence the cached
-    <classname>BitSet</classname> has to be recomputed.</para>
+    <classname>DocIdSet</classname> has to be recomputed.</para>
 
     <para>Hibernate Search also helps with this aspect of caching. Per default
     the <literal>cache</literal> flag of <classname>@FullTextFilterDef
     </classname>is set to
-    <literal>FilterCacheModeType.INSTANCE_AND_BITSETRESULTS</literal> which
+    <literal>FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS</literal> which
     will automatically cache the filter instance as well as wrap the specified
     filter around a Hibernate specific implementation of
     <classname>CachingWrapperFilter</classname>
@@ -700,20 +698,21 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
               <entry align="left">FilterCacheModeType.INSTANCE_ONLY</entry>
 
               <entry>The filter instance is cached and reused across
-              concurrent <methodname>Filter.bits()</methodname> calls.
-              <classname>BitSet</classname> results are not cached. This
+              concurrent <methodname>Filter.getDocIdSet()</methodname> calls.
+              <classname>DocIdSet</classname> results are not cached. This
               setting is useful when a filter uses its own specific caching
               mechanism or the filter results change dynamically due to
-              application specific events making <classname>BitSet</classname>
-              caching in both cases unnecessary.</entry>
+              application specific events making
+              <classname>DocIdSet</classname> caching in both cases
+              unnecessary.</entry>
             </row>
 
             <row>
               <entry
-              align="left">FilterCacheModeType.INSTANCE_AND_BITSETRESULTS</entry>
+              align="left">FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS</entry>
 
               <entry>Both the filter instance and the
-              <classname>BitSet</classname> results are cached. This is the
+              <classname>DocIdSet</classname> results are cached. This is the
               default value.</entry>
             </row>
           </tbody>
@@ -728,8 +727,8 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
       </listitem>
 
       <listitem>
-        <para>the Filter BitSet is expensive to compute (compared to the time
-        spent to execute the query)</para>
+        <para>the Filter's DocIdSet is expensive to compute (compared to the
+        time spent to execute the query)</para>
       </listitem>
     </itemizedlist>
   </section>
