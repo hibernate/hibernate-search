@@ -4,10 +4,10 @@ package org.hibernate.search.backend;
 import java.util.Properties;
 
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.backend.TransactionContext;
 
 /**
- * Perform work for a given session. This implementation has to be multi threaded
+ * Perform work for a given session. This implementation has to be multi threaded.
+ *
  * @author Emmanuel Bernard
  */
 public interface Worker {
@@ -24,7 +24,9 @@ public interface Worker {
 	void close();
 
 	/**
-	 * flush any work queue
+	 * Flush any work queue.
+	 *
+	 * @param transactionContext the current transaction (context).
 	 */
 	void flushWorks(TransactionContext transactionContext);
 }
