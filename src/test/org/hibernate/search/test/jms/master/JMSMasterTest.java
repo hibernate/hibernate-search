@@ -54,11 +54,11 @@ public class JMSMasterTest extends SearchTestCase {
 		s.close();
 		//create the work queue to send
 		Document doc = new Document();
-		Field field = new Field( DocumentBuilder.CLASS_FIELDNAME, ts.getClass().getName(), Field.Store.YES, Field.Index.UN_TOKENIZED );
+		Field field = new Field( DocumentBuilder.CLASS_FIELDNAME, ts.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED );
 		doc.add( field );
-		field = new Field("id", "1", Field.Store.YES, Field.Index.UN_TOKENIZED );
+		field = new Field("id", "1", Field.Store.YES, Field.Index.NOT_ANALYZED );
 		doc.add( field );
-		field = new Field("logo", ts.getLogo(), Field.Store.NO, Field.Index.TOKENIZED );
+		field = new Field("logo", ts.getLogo(), Field.Store.NO, Field.Index.ANALYZED );
 		doc.add( field );
 		LuceneWork luceneWork = new AddLuceneWork(ts.getId(), String.valueOf( ts.getId() ), ts.getClass(), doc );
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();

@@ -23,12 +23,17 @@ public abstract class AbstractTestAnalyzer extends Analyzer {
 	private class InternalTokenStream extends TokenStream {
 		private int position;
 
-		public Token next() throws IOException {
-			if ( position >= getTokens().length) {
+		public Token next(final Token reusableToken) throws IOException {
+			assert reusableToken != null;
+			if ( position >= getTokens().length ) {
 				return null;
 			}
 			else {
-				return new Token( getTokens()[position++], 0, 0 );
+				reusableToken.clear();
+				reusableToken.setTermBuffer( getTokens()[position++] );
+				reusableToken.setStartOffset( 0 );
+				reusableToken.setEndOffset( 0 );
+				return reusableToken;
 			}
 		}
 	}

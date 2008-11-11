@@ -28,7 +28,8 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 	public void start() {
 		directory = new RAMDirectory();
 		try {
-			IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), true );
+			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
+			IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), true, fieldLength );
 			iw.close();
 		}
 		catch (IOException e) {

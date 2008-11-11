@@ -26,23 +26,24 @@ public class AnalyzerUtils {
 	public static Token[] tokensFromAnalysis(Analyzer analyzer, String field, String text) throws IOException {
 		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
 		List<Token> tokenList = new ArrayList<Token>();
+		Token reusableToken = new Token();
 		while ( true ) {
-			Token token = stream.next();
+
+			Token token = stream.next( reusableToken );
 			if ( token == null ) {
 				break;
 			}
 
-			tokenList.add( token );
+			tokenList.add( ( Token ) token.clone() );
 		}
 
-		return ( Token[] ) tokenList.toArray( new Token[0] );
+		return tokenList.toArray( new Token[tokenList.size()] );
 	}
 
 	public static void displayTokens(Analyzer analyzer, String field, String text) throws IOException {
 		Token[] tokens = tokensFromAnalysis( analyzer, field, text );
 
-		for ( int i = 0; i < tokens.length; i++ ) {
-			Token token = tokens[i];
+		for ( Token token : tokens ) {
 			log.debug( "[" + getTermText( token ) + "] " );
 		}
 	}
@@ -52,9 +53,7 @@ public class AnalyzerUtils {
 
 		int position = 0;
 
-		for ( int i = 0; i < tokens.length; i++ ) {
-			Token token = tokens[i];
-
+		for ( Token token : tokens ) {
 			int increment = token.getPositionIncrement();
 
 			if ( increment > 0 ) {
@@ -72,9 +71,7 @@ public class AnalyzerUtils {
 		StringBuilder builder = new StringBuilder();
 		int position = 0;
 
-		for ( int i = 0; i < tokens.length; i++ ) {
-			Token token = tokens[i];
-
+		for ( Token token : tokens ) {
 			int increment = token.getPositionIncrement();
 
 			if ( increment > 0 ) {

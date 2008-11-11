@@ -55,7 +55,8 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	private void buildBigIndex() throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
 		System.out.println( "Going to create fake index..." );
 		FSDirectory directory = FSDirectory.getDirectory(new File(getBaseIndexDir(), Detective.class.getCanonicalName()));
-		IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true );
+		IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
+		IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		for (int batch=0; batch<=5000000; batch++){
@@ -63,6 +64,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		}
 		executor.shutdown();
 		executor.awaitTermination( 600, TimeUnit.SECONDS );
+		iw.commit();
 		iw.optimize();
 		iw.close();
 		System.out.println( "Index created." );

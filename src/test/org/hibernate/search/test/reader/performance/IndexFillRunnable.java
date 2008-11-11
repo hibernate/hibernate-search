@@ -16,23 +16,29 @@ public class IndexFillRunnable implements Runnable {
 
 	private volatile int jobSeed = 0;
 	private final IndexWriter iw;
-	
+
 	public IndexFillRunnable(IndexWriter iw) {
 		super();
 		this.iw = iw;
 	}
 
 	public void run() {
-		Field f1 = new Field("name", "Some One " + jobSeed++, Store.NO, Index.TOKENIZED );
-		Field f2 = new Field("physicalDescription", " just more people sitting around and filling my index... ", Store.NO, Index.TOKENIZED );
+		Field f1 = new Field( "name", "Some One " + jobSeed++, Store.NO, Index.ANALYZED );
+		Field f2 = new Field(
+				"physicalDescription",
+				" just more people sitting around and filling my index... ",
+				Store.NO,
+				Index.ANALYZED
+		);
 		Document d = new Document();
 		d.add( f1 );
 		d.add( f2 );
 		try {
 			iw.addDocument( d );
-		} catch (IOException e) {
+		}
+		catch ( IOException e ) {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

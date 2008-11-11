@@ -103,6 +103,7 @@ class PerDPQueueProcessor {
 			for (LuceneWork lw : workOnWriter) {
 				lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
 			}
+			workspace.commitIndexWriter();
 			//TODO next line is assuming the OptimizerStrategy will need an IndexWriter;
 			// would be nicer to have the strategy put an OptimizeWork on the queue,
 			// or just return "yes please" (true) to some method?

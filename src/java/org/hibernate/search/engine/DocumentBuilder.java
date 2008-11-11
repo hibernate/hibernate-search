@@ -583,11 +583,11 @@ public class DocumentBuilder<T> {
 			case NO:
 				return Field.Index.NO;
 			case NO_NORMS:
-				return Field.Index.NO_NORMS;
+				return Field.Index.NOT_ANALYZED_NO_NORMS;
 			case TOKENIZED:
-				return Field.Index.TOKENIZED;
+				return Field.Index.ANALYZED;
 			case UN_TOKENIZED:
-				return Field.Index.UN_TOKENIZED;
+				return Field.Index.NOT_ANALYZED;
 			default:
 				throw new AssertionFailure( "Unexpected Index: " + index );
 		}
@@ -750,10 +750,10 @@ public class DocumentBuilder<T> {
 		}
 		{
 			Field classField =
-					new Field( CLASS_FIELDNAME, entityType.getName(), Field.Store.YES, Field.Index.UN_TOKENIZED, Field.TermVector.NO );
+					new Field( CLASS_FIELDNAME, entityType.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED, Field.TermVector.NO );
 			doc.add( classField );
 			LuceneOptions luceneOptions = new LuceneOptionsImpl( Field.Store.YES,
-					Field.Index.UN_TOKENIZED, Field.TermVector.NO, idBoost );
+					Field.Index.NOT_ANALYZED, Field.TermVector.NO, idBoost );
 			idBridge.set( idKeywordName, id, doc, luceneOptions );
 		}
 		buildDocumentFields( instance, doc, rootPropertiesMetadata );

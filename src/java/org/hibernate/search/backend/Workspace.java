@@ -25,11 +25,11 @@ import org.hibernate.search.util.LoggerFactory;
 /**
  * Lucene workspace for a DirectoryProvider.<p/>
  * <ul>
- * <li>Before using getIndexWriter or getIndexReader the lock must be acquired, and resources must be closed
- * before releasing the lock.</li>
+ * <li>Before using {@link #getIndexWriter} or {@link #getIndexReader} the lock must be acquired,
+ * and resources must be closed before releasing the lock.</li>
  * <li>One cannot get an IndexWriter when an IndexReader has been acquired and not closed, and vice-versa.</li>
- * <li>The recommended approach is to execute all the modifications on the IndexReader, and after that on
- * the IndexWriter</li>
+ * <li>The recommended approach is to execute all the modifications on the <code>IndexReader</code>, and after that on
+ * the <code>IndexWriter</code></li>.
  * </ul>
  *
  * @author Emmanuel Bernard
@@ -173,8 +173,8 @@ public class Workspace {
 			return writer;
 		try {
 			// don't care about the Analyzer as it will be selected during usage of IndexWriter.
-			//FIXME use the non deprecated constructor => requires to call #Commit()
-			writer = new IndexWriter( directoryProvider.getDirectory(), SIMPLE_ANALYZER, false ); // has been created at init time
+			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
+			writer = new IndexWriter( directoryProvider.getDirectory(), SIMPLE_ANALYZER, false, fieldLength ); // has been created at init time
 			indexingParams.applyToWriter( writer, batchmode );
 			log.trace( "IndexWriter opened" );
 		}
@@ -184,6 +184,30 @@ public class Workspace {
 		}
 		return writer;
 	}
+
+	/**
+	 * Commits changes to a previously opened index writer.
+	 *
+	 * @throws SearchException on IOException during Lucene close operation.
+	 * @throws AssertionFailure if there is no IndexWriter to close, or if the lock is not owned.
+	 */
+	public synchronized void commitIndexWriter() {
+		assertOwnLock();
+		if ( writer != null ) {
+			try {
+				writer.commit();
+				log.trace( "Index changes commited." );
+			}
+			catch ( IOException e ) {
+				throw new SearchException( "Exception while commiting index changes", e );
+			}
+		}
+		else {
+			throw new AssertionFailure( "No open IndexWriter to commit changes." );
+		}
+	}
+
+
 
 	/**
 	 * Closes a previously opened IndexWriter.

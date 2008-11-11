@@ -77,7 +77,8 @@ public class DirectoryProviderHelper {
 		FSDirectory fsDirectory = FSDirectory.getDirectory( indexDir );
 		if ( ! IndexReader.indexExists( fsDirectory ) ) {
 			log.debug( "Initialize index: '{}'", indexDir.getAbsolutePath() );
-			IndexWriter iw = new IndexWriter( fsDirectory, new StandardAnalyzer(), true );
+			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
+			IndexWriter iw = new IndexWriter( fsDirectory, new StandardAnalyzer(), true, fieldLength );
 			iw.close();
 		}
 		return fsDirectory;
