@@ -130,9 +130,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		workQueue.setSealedQueue( luceneQueue );
 	}
 
-	private void processWorkByLayer(List<Work> queue, int initialSize, List<LuceneWork> luceneQueue, Layer layer) {
+	private <T> void processWorkByLayer(List<Work> queue, int initialSize, List<LuceneWork> luceneQueue, Layer layer) {
 		for ( int i = 0; i < initialSize; i++ ) {
-			Work work = queue.get( i );
+			@SuppressWarnings("unchecked")
+			Work<T> work = queue.get( i );
 			if ( work != null ) {
 				if ( layer.isRightLayer( work.getType() ) ) {
 					queue.set( i, null ); // help GC and avoid 2 loaded queues in memory

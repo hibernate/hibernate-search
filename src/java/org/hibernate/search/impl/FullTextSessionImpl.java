@@ -123,9 +123,9 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 			// purge the subclasses
 			Set<Class<?>> subClasses = builder.getMappedSubclasses();
-			Work subClassWork;
 			for ( Class clazz : subClasses ) {
-				subClassWork = new Work( clazz, id, WorkType.PURGE_ALL );
+				@SuppressWarnings( "unchecked" )
+				Work subClassWork = new Work( clazz, id, WorkType.PURGE_ALL );
 				searchFactoryImplementor.getWorker().performWork( subClassWork, transactionContext );
 			}
 		}
