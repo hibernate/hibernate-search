@@ -21,10 +21,12 @@
         <dependency org="javax.transaction" name="jta" rev="1.1" conf="default->default"/>
         <dependency org="org.apache.lucene" name="lucene-core" rev="2.4.0" conf="default->default"/>
         <dependency org="org.apache.lucene" name="lucene-snowball" rev="2.4.0" conf="default->default"/>
+        <dependency org="org.apache.lucene" name="lucene-analyzers" rev="2.4.0" conf="default->default"/> <!-- optional -->
+        <dependency org="org.apache.commons" name="commons-codec" rev="1.3" conf="default->default"/> <!-- optional -->
         <dependency org="javax.jms" name="jms" rev="1.1" conf="default->default"/> <!-- optional -->
         <dependency org="javax.annotation" name="jsr250-api" rev="1.0" conf="default->default"/> <!-- optional -->
-        <dependency org="org.apache.solr" name="solr-core" rev="1.3.0" conf="default->default"/>
-        <dependency org="org.apache.solr" name="solr-common" rev="1.3.0" conf="default->default"/>
+        <dependency org="org.apache.solr" name="solr-core" rev="1.3.0" conf="default->default"/> <!-- optional -->
+        <dependency org="org.apache.solr" name="solr-common" rev="1.3.0" conf="default->default"/> <!-- optional -->
 
         <!-- transitive dependencies -->
         <dependency org="antlr" name="antlr" rev="2.7.6" conf="test->default"/>

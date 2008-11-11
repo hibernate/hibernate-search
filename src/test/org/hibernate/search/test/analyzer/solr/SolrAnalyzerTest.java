@@ -3,11 +3,14 @@ package org.hibernate.search.test.analyzer.solr;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.Token;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.AnalyzerUtils;
 
 /**
  * Tests the Solr analyzer creation framework.
@@ -59,6 +62,90 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		// cleanup
 		fts.delete( fts.createFullTextQuery( query ).list().get( 0 ) );
 		tx.commit();
+		fts.close();
+	}
+
+	/**
+	 * Tests the analyzers defined on {@link Team}.
+	 *
+	 * @throws Exception in case the test fails.
+	 */
+	public void testAnalyzers() throws Exception {
+		FullTextSession fts = Search.getFullTextSession( openSession() );
+
+		Analyzer analyzer = fts.getSearchFactory().getAnalyzer( "standard_analyzer" );
+		String text = "This is just FOOBAR's";
+		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "This", "is", "just", "FOOBAR" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "html_standard_analyzer" );
+		text = "This is <b>foo</b><i>bar's</i>";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "This", "is", "foo", "bar" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "html_whitespace_analyzer" );
+		text = "This is <b>foo</b><i>bar's</i>";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "This", "is", "foo", "bar's" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "trim_analyzer" );
+		text = " Kittens!   ";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "kittens" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "length_analyzer" );
+		text = "ab abc abcd abcde abcdef";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "abc", "abcd", "abcde" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "length_analyzer" );
+		text = "ab abc abcd abcde abcdef";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "abc", "abcd", "abcde" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "porter_analyzer" );
+		text = "bikes bikes biking";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "bike", "bike", "bike" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "word_analyzer" );
+		text = "CamelCase";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "Camel", "Case" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "synonym_analyzer" );
+		text = "ipod cosmos";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "ipod", "i-pod", "universe", "cosmos" } );
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "shingle_analyzer" );
+		text = "please divide this sentence into shingles";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual(
+				tokens,
+				new String[] {
+						"please",
+						"please divide",
+						"divide",
+						"divide this",
+						"this",
+						"this sentence",
+						"sentence",
+						"sentence into",
+						"into",
+						"into shingles",
+						"shingles"
+				}
+		);
+
+		analyzer = fts.getSearchFactory().getAnalyzer( "phonetic_analyzer" );
+		text = "The quick brown fox jumped over the lazy dogs";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.displayTokens( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual(
+				tokens, new String[] { "0", "KK", "BRN", "FKS", "JMPT", "OFR", "0", "LS", "TKS" }
+		);
+
 		fts.close();
 	}
 
