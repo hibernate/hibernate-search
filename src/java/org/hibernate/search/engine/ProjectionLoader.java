@@ -21,6 +21,7 @@ public class ProjectionLoader implements Loader {
 	private Boolean projectThis;
 	private ResultTransformer transformer;
 	private String[] aliases;
+	private Class[] entityTypes;
 
 	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
 		this.session = session;
@@ -31,6 +32,10 @@ public class ProjectionLoader implements Loader {
 		init( session, searchFactoryImplementor );
 		this.transformer = transformer;
 		this.aliases = aliases;
+	}
+
+	public void setEntityTypes(Class[] entityTypes) {
+		this.entityTypes = entityTypes;
 	}
 
 	public Object load(EntityInfo entityInfo) {
@@ -54,7 +59,7 @@ public class ProjectionLoader implements Loader {
 			if ( projectThis ) {
 				MultiClassesQueryLoader loader = new MultiClassesQueryLoader();
 				loader.init( session, searchFactoryImplementor );
-				loader.setEntityTypes( new Class[]{} );
+				loader.setEntityTypes( entityTypes );
 				objectLoader = loader;
 			}
 		}
