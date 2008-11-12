@@ -1,6 +1,7 @@
 package org.hibernate.search.filter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import static java.lang.Math.max;
 
@@ -17,7 +18,7 @@ import org.apache.lucene.util.OpenBitSet;
  */
 public class AndDocIdSet extends DocIdSet {
 	
-	private OpenBitSet docIdBitSet;
+	private DocIdSet docIdBitSet;
 	private final List<DocIdSet> andedDocIdSets;
 	
 	private final int maxDocNumber;
@@ -25,34 +26,26 @@ public class AndDocIdSet extends DocIdSet {
 	public AndDocIdSet(List<DocIdSet> andedDocIdSets, int maxDocs) {
 		if ( andedDocIdSets == null || andedDocIdSets.size() < 2 )
 			throw new IllegalArgumentException( "To \"and\" some DocIdSet(s) they should be at least 2" );
-		this.andedDocIdSets = andedDocIdSets;
+		this.andedDocIdSets = new ArrayList<DocIdSet>( andedDocIdSets ); // make a defensive mutable copy
 		this.maxDocNumber = maxDocs;
 	}
 	
-	private synchronized OpenBitSet buildBitset() throws IOException {
-		if ( docIdBitSet != null ) return docIdBitSet; // double check for concurrent initialization
+	private synchronized DocIdSet buildBitset() throws IOException {
+		if ( docIdBitSet != null ) return docIdBitSet; // check for concurrent initialization
 		//TODO if all andedDocIdSets are actually DocIdBitSet, use their internal BitSet instead of next algo.
 		//TODO if some andedDocIdSets are DocIdBitSet, merge them first.
 		int size = andedDocIdSets.size();
 		DocIdSetIterator[] iterators = new DocIdSetIterator[size];
-		boolean valuesExist = true;
 		for (int i=0; i<size; i++) {
 			// build all iterators
 			iterators[i] = andedDocIdSets.get(i).iterator();
 		}
-		OpenBitSet bitSet;
-		if ( valuesExist ) { // skip further processing if some idSet is empty
-			bitSet = new OpenBitSet( maxDocNumber );
-			markBitSetOnAgree( iterators, bitSet );
-		}
-		else {
-			bitSet = new OpenBitSet(); //TODO a less expensive "empty"
-		}
-		docIdBitSet = bitSet;
-		return bitSet;
+		andedDocIdSets.clear(); // contained DocIdSets are not needed any more, release them.
+		docIdBitSet = makeDocIdSetOnAgreedBits( iterators ); // before returning hold a copy as cache
+		return docIdBitSet;
 	}
 
-	private final void markBitSetOnAgree(final DocIdSetIterator[] iterators, final OpenBitSet result) throws IOException {
+	private final DocIdSet makeDocIdSetOnAgreedBits(final DocIdSetIterator[] iterators) throws IOException {
 		final int iteratorSize = iterators.length;
 		int targetPosition = Integer.MIN_VALUE;
 		int votes = 0;
@@ -62,9 +55,12 @@ public class AndDocIdSet extends DocIdSet {
 		// for the others and he is considered "first" in the voting round (every iterator votes for himself ;-)
 		int i = 0;
 		//iterator initialize, just one "next" for each DocIdSetIterator
-		for ( ;i<iteratorSize; i++ ) {
+		for ( ; i<iteratorSize; i++ ) {
 			final DocIdSetIterator iterator = iterators[i];
-			if ( ! iterator.next() ) return; //current iterator has no values, so skip all
+			if ( ! iterator.next() ) {
+				//current iterator has no values, so skip all
+				return EmptyDocIdBitSet.instance;
+			}
 			final int position = iterator.doc();
 			if ( targetPosition==position ) {
 				votes++; //stopped as same position of others
@@ -75,6 +71,7 @@ public class AndDocIdSet extends DocIdSet {
 					votes=1;
 			}
 		}
+		final OpenBitSet result = new OpenBitSet( maxDocNumber );
 		// end iterator initialize
 		if (votes==iteratorSize) {
 			result.fastSet( targetPosition );
@@ -87,7 +84,7 @@ public class AndDocIdSet extends DocIdSet {
 			final DocIdSetIterator iterator = iterators[i];
 			final boolean validPosition = iterator.skipTo( targetPosition );
 			if ( ! validPosition )
-				return; //exit condition
+				return result; //exit condition
 			final int position = iterator.doc();
 			if ( position == targetPosition ) {
 				if ( ++votes == iteratorSize ) {

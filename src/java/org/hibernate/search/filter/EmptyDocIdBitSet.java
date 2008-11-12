@@ -1,11 +1,19 @@
 package org.hibernate.search.filter;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 
-public class EmptyDocIdBitSet extends DocIdSet {
+/**
+ * A DocIdSet which is always empty.
+ * Stateless and ThreadSafe.
+ * @author Sanne Grinovero
+ */
+public final class EmptyDocIdBitSet extends DocIdSet implements Serializable {
+
+	private static final long serialVersionUID = 6429929383767238322L;
 
 	public static final DocIdSet instance = new EmptyDocIdBitSet();
 	
@@ -16,7 +24,7 @@ public class EmptyDocIdBitSet extends DocIdSet {
 	}
 
 	@Override
-	public DocIdSetIterator iterator() {
+	public final DocIdSetIterator iterator() {
 		return iterator;
 	}
 
@@ -24,20 +32,20 @@ public class EmptyDocIdBitSet extends DocIdSet {
 	 * implements a DocIdSetIterator for an empty DocIdSet
 	 * As it is empty it also is stateless and so it can be reused.
 	 */
-	private static class EmptyDocIdSetIterator extends DocIdSetIterator {
+	private static final class EmptyDocIdSetIterator extends DocIdSetIterator {
 
 		@Override
-		public int doc() {
-			throw new IllegalStateException("Should never be called");
+		public final int doc() {
+			throw new IllegalStateException( "Should never be called" );
 		}
 
 		@Override
-		public boolean next() throws IOException {
+		public final boolean next() throws IOException {
 			return false;
 		}
 
 		@Override
-		public boolean skipTo(int target) throws IOException {
+		public final boolean skipTo(int target) throws IOException {
 			return false;
 		}
 
