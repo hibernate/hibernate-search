@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_FIELD_LENGTH;
+import static org.hibernate.search.backend.configuration.IndexWriterSetting.USE_COMPOUND_FILE;
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -46,18 +47,25 @@ public class LuceneIndexingParameters implements Serializable {
 		Properties transactionProps = new MaskedProperty( indexingParameters, TRANSACTION );
 		//get keys for "batch" (defaulting to transaction)
 		Properties batchProps = new MaskedProperty( indexingParameters, BATCH, transactionProps ); //TODO to close HSEARCH-201 just remove 3° parameter
-		transactionIndexParameters = new ParameterSet( transactionProps, TRANSACTION);
-		batchIndexParameters = new ParameterSet( batchProps, BATCH);
-		doSanityChecks( transactionIndexParameters, batchIndexParameters);
+		transactionIndexParameters = new ParameterSet( transactionProps, TRANSACTION );
+		batchIndexParameters = new ParameterSet( batchProps, BATCH );
+		doSanityChecks( transactionIndexParameters, batchIndexParameters );
 	}
 
 	private void doSanityChecks(ParameterSet transParams, ParameterSet batchParams) {
 		if ( log.isWarnEnabled() ) {
 			Integer maxFieldLengthTransaction = transParams.parameters.get( MAX_FIELD_LENGTH );
-			Integer maxFieldLengthBatch = transParams.parameters.get( MAX_FIELD_LENGTH );
+			Integer maxFieldLengthBatch = batchParams.parameters.get( MAX_FIELD_LENGTH );
 			if ( notEquals( maxFieldLengthTransaction, maxFieldLengthBatch ) ) {
-				log.warn( "The max_field_length value configured for transaction is different than the value configured for batch." );
+				log.warn( "The max_field_length value configured for transaction is "
+						+ "different than the value configured for batch." );
 			}
+		}
+		Integer useCompoundTransaction = transParams.parameters.get( USE_COMPOUND_FILE );
+		Integer useCompoundBatch = batchParams.parameters.get( USE_COMPOUND_FILE );
+		if ( notEquals( useCompoundTransaction, useCompoundBatch ) ) {
+			throw new SearchException( "The IndexWriter setting \"use_compound_file\" for batch "+
+					"mode can't be different from the transaction setting." );
 		}
 	}
 

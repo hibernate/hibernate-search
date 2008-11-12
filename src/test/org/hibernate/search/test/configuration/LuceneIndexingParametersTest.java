@@ -4,6 +4,7 @@ package org.hibernate.search.test.configuration;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SerializationTestHelper;
@@ -15,6 +16,7 @@ import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERGE_FACTOR;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.RAM_BUFFER_SIZE;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.USE_COMPOUND_FILE;
+import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_FIELD_LENGTH;
 import static org.hibernate.search.test.configuration.ConfigurationReadTestCase.TransactionType.TRANSACTION;
 import static org.hibernate.search.test.configuration.ConfigurationReadTestCase.TransactionType.BATCH;
 
@@ -27,7 +29,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		super.configure( cfg );
 		
 		cfg.setProperty( "hibernate.search.default.batch.ram_buffer_size", "1" );
-		cfg.setProperty( "hibernate.search.default.batch.use_compound_file", "true" );
+		cfg.setProperty( "hibernate.search.default.transaction.use_compound_file", "true" );
 //set by super : cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
 		
 		cfg.setProperty( "hibernate.search.default.transaction.ram_buffer_size", "2" );
@@ -51,12 +53,12 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		cfg.setProperty( "hibernate.search.Documents.transaction.merge_factor", "6" );
 		cfg.setProperty( "hibernate.search.Documents.transaction.max_buffered_docs", "7" );
 		cfg.setProperty( "hibernate.search.Documents.batch.max_merge_docs", "9" );
-		
+		cfg.setProperty( "hibernate.search.Documents.transaction.max_field_length", "7" );
+		cfg.setProperty( "hibernate.search.Documents.batch.max_field_length", "9" );
 	}
 	
 	public void testDefaultIndexProviderParameters() throws Exception {
 		assertValueIsSet( Author.class, BATCH, USE_COMPOUND_FILE, 1 );
-		assertValueIsDefault( Author.class, TRANSACTION, USE_COMPOUND_FILE );
 		assertValueIsSet( Author.class, TRANSACTION, RAM_BUFFER_SIZE, 2 );
 		assertValueIsSet( Author.class, TRANSACTION, MAX_MERGE_DOCS, 9 );
 		assertValueIsSet( Author.class, TRANSACTION, MAX_BUFFERED_DOCS,  11 );
@@ -73,6 +75,12 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 	public void testUnsetBatchValueTakesTransaction() throws Exception {
 		assertValueIsSet( Document.class, BATCH, MERGE_FACTOR, 6 );
 		assertValueIsSet( Document.class, BATCH, MAX_BUFFERED_DOCS, 1000 );
+	}
+	
+	public void testMaxFieldLength() throws Exception {
+		// there should also be logged a warning being logged about these:
+		assertValueIsSet( Document.class, TRANSACTION, MAX_FIELD_LENGTH, 7 );
+		assertValueIsSet( Document.class, BATCH, MAX_FIELD_LENGTH, 9 );
 	}
 	
 	public void testExplicitBatchParameters() throws Exception {
@@ -104,6 +112,13 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 			SerializationTestHelper.duplicateBySerialization( param );
 		assertEquals( param.getBatchIndexParameters(), paramCopy.getBatchIndexParameters() );
 		assertEquals( param.getTransactionIndexParameters(), paramCopy.getTransactionIndexParameters() );
+	}
+	
+	public void testInvalidConfiguration() {
+		AnnotationConfiguration configuration = new AnnotationConfiguration();
+		configuration.setProperty( "hibernate.search.default.transaction.use_compound_file", "true" );
+		configuration.setProperty( "hibernate.search.default.batch.use_compound_file", "false" );
+		assertCfgIsInvalid( configuration, getMappings() );
 	}
 	
 	protected Class[] getMappings() {
