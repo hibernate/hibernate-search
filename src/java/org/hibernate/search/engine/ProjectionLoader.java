@@ -8,13 +8,16 @@ import org.hibernate.Session;
 import org.hibernate.transform.ResultTransformer;
 
 /**
+ * Implementation of the <code>Loader</code> interface used for loading entities which are projected via
+ * {@link org.hibernate.search.ProjectionConstants#THIS}.
+ *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-//TODO change the underlying ObjectLoader to a MutliClassesQueryLoader
 public class ProjectionLoader implements Loader {
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Session session;
-	private ObjectLoader objectLoader;
+	private Loader objectLoader;
 	private Boolean projectThis;
 	private ResultTransformer transformer;
 	private String[] aliases;
@@ -27,13 +30,13 @@ public class ProjectionLoader implements Loader {
 	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, ResultTransformer transformer, String[] aliases) {
 		init( session, searchFactoryImplementor );
 		this.transformer = transformer;
-		this.aliases =  aliases;
+		this.aliases = aliases;
 	}
 
 	public Object load(EntityInfo entityInfo) {
 		initThisProjectionFlag( entityInfo );
 		if ( projectThis ) {
-			for (int index : entityInfo.indexesOfThis) {
+			for ( int index : entityInfo.indexesOfThis ) {
 				entityInfo.projection[index] = objectLoader.load( entityInfo );
 			}
 		}
@@ -49,29 +52,32 @@ public class ProjectionLoader implements Loader {
 		if ( projectThis == null ) {
 			projectThis = entityInfo.indexesOfThis.size() != 0;
 			if ( projectThis ) {
-				//TODO use QueryLoader when possible
-				objectLoader = new ObjectLoader();
-				objectLoader.init( session, searchFactoryImplementor );
+				MultiClassesQueryLoader loader = new MultiClassesQueryLoader();
+				loader.init( session, searchFactoryImplementor );
+				loader.setEntityTypes( new Class[]{} );
+				objectLoader = loader;
 			}
 		}
 	}
 
 	public List load(EntityInfo... entityInfos) {
 		List results = new ArrayList( entityInfos.length );
-		if ( entityInfos.length == 0 ) return results;
+		if ( entityInfos.length == 0 ) {
+			return results;
+		}
 
 		initThisProjectionFlag( entityInfos[0] );
 		if ( projectThis ) {
-			objectLoader.load( entityInfos ); //load by batch
-			for (EntityInfo entityInfo : entityInfos) {
-				for (int index : entityInfo.indexesOfThis) {
-					//set one by one to avoid loosing null objects (skipped in the objectLoader.load( EntityInfo[] ))
+			objectLoader.load( entityInfos ); // load by batch
+			for ( EntityInfo entityInfo : entityInfos ) {
+				for ( int index : entityInfo.indexesOfThis ) {
+					// set one by one to avoid loosing null objects (skipped in the objectLoader.load( EntityInfo[] ))
 					entityInfo.projection[index] = objectLoader.load( entityInfo );
 				}
 			}
 		}
-		for (EntityInfo entityInfo : entityInfos) {
-			if ( transformer != null) {
+		for ( EntityInfo entityInfo : entityInfos ) {
+			if ( transformer != null ) {
 				results.add( transformer.transformTuple( entityInfo.projection, aliases ) );
 			}
 			else {
