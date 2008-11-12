@@ -20,9 +20,6 @@
         <dependency org="org.hibernate" name="hibernate-core" rev="3.3.1.GA" conf="default->default"/>
         <dependency org="javax.transaction" name="jta" rev="1.1" conf="default->default"/>
         <dependency org="org.apache.lucene" name="lucene-core" rev="2.4.0" conf="default->default"/>
-        <dependency org="org.apache.lucene" name="lucene-snowball" rev="2.4.0" conf="default->default"/>
-        <dependency org="org.apache.lucene" name="lucene-analyzers" rev="2.4.0" conf="default->default"/> <!-- optional -->
-        <dependency org="org.apache.commons" name="commons-codec" rev="1.3" conf="default->default"/> <!-- optional -->
         <dependency org="javax.jms" name="jms" rev="1.1" conf="default->default"/> <!-- optional -->
         <dependency org="javax.annotation" name="jsr250-api" rev="1.0" conf="default->default"/> <!-- optional -->
         <dependency org="org.apache.solr" name="solr-core" rev="1.3.0" conf="default->default"/> <!-- optional -->
@@ -36,6 +33,9 @@
         <!-- test deps -->
         <dependency name="annotations" rev="3.4.0.GA" conf="test->default"/>
         <dependency name="entitymanager" rev="3.4.0.GA" conf="test->default"/>
+        <dependency org="org.apache.lucene" name="lucene-snowball" rev="2.4.0" conf="test->default"/>
+        <dependency org="org.apache.lucene" name="lucene-analyzers" rev="2.4.0" conf="test->default"/>
+        <dependency org="org.apache.commons" name="commons-codec" rev="1.3" conf="test->default"/>         
         <dependency org="cglib" name="cglib" rev="2.1_3" conf="test->default"/>
         <dependency org="asm" name="asm" rev="1.5.3" conf="test->default"/>
         <dependency org="asm" name="asm-attrs" rev="1.5.3" conf="test->default"/>

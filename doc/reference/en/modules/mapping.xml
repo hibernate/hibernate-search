@@ -623,8 +623,11 @@ public class MyEntity {
         </filename><filename>solr-common.jar</filename> to your classpath to
         use analyzer definitions. In case you also want to utilizing a
         snowball stemmer also include the
-        <filename>lucene-snowball.jar.</filename> Your distribution of
-        Hibernate Search provides these dependecies in its
+        <filename>lucene-snowball.jar.</filename> Other Solr analyzers might
+        depend on more libraries. For example, the
+        <classname>PhoneticFilterFactory</classname> depends on <ulink
+        url="http://commons.apache.org/codec">commons-codec</ulink>. Your
+        distribution of Hibernate Search provides these dependecies in its
         <filename>lib</filename> directory.</para>
 
         <programlisting>@AnalyzerDef(name="customanalyzer",
@@ -993,8 +996,9 @@ public class Meeting {
         bridge. To do so you need to implements the
         <literal>org.hibernate.search.bridge.StringBridge</literal>
         interface.</para>
-        <para>All implementations have to be thread-safe as they
-        are used concurrently.</para>
+
+        <para>All implementations have to be thread-safe as they are used
+        concurrently.</para>
 
         <programlisting>/**
  * Padding Integer bridge.
@@ -1065,9 +1069,10 @@ private Integer length;                </programlisting>
         <classname>TwoWayStringBridge</classname> ,
         <classname>FieldBridge</classname> implementations (see
         bellow).</para>
+
         <para>All implementations have to be thread-safe, but the parameters
-        are set during initialization and no special care is required at
-        this stage.</para>
+        are set during initialization and no special care is required at this
+        stage.</para>
 
         <para>If you expect to use your bridge implementation on for an id
         property (ie annotated with <literal>@DocumentId</literal> ), you need

@@ -481,11 +481,16 @@ List result = hibQuery.list();
     either specify the fully qualified classname of the analyzer to use or one
     can refer to an analyzer definition defined by the
     <literal>@AnalyzerDef</literal> annotation. In the latter case the Solr
-    analyzer framework with its factories approach can be used. To find out
+    analyzer framework with its factories approach is utilized. To find out
     more about the factory classes available you can either browse the Solr
     JavaDoc or read the corresponding section on the <ulink
     url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">Solr
-    Wiki.</ulink> In the example a
+    Wiki.</ulink> Note that depending on the chosen factory class additional
+    libraries on top of the Solr dependencies might be required. For example,
+    the <classname>PhoneticFilterFactory</classname> depends on <ulink
+    url="http://commons.apache.org/codec">commons-codec</ulink>. </para>
+
+    <para>In the example below a
     <classname>StandardTokenizerFactory</classname> is used followed by two
     filter factories, <classname>LowerCaseFilterFactory</classname> and
     <classname>SnowballPorterFilterFactory</classname>. The standard tokenizer
