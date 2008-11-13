@@ -23,12 +23,12 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-        <!ENTITY versionNumber "3.1.0.CR1">
-        <!ENTITY copyrightYear "2004">
-        <!ENTITY copyrightHolder "Red Hat Middleware, LLC.">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY versionNumber "3.1.0.CR1">
+<!ENTITY copyrightYear "2004">
+<!ENTITY copyrightHolder "Red Hat Middleware, LLC.">
 ]>
-
 <book lang="en">
   <bookinfo>
     <title>Hibernate Search</title>
@@ -51,30 +51,42 @@
   <preface id="preface" revision="2">
     <title>Preface</title>
 
-    <para>Full text search engines like <productname>Apache
-    Lucene</productname> are very powerful technologies to add efficient free
-    text search capabilities to applications. However, they suffer several mismatches when
-    dealing with object domain models. Amongst other things indexes have to be kept up to date and
-    mismatches between index structure and domain model as well as query mismatches 
-    have to be avoided.
-    </para>
-    <para>
-    Hibernate Search indexes your domain model with the help of a few annotations,
-    takes care of database/index synchronization and brings back
-    regular managed objects from free text queries. To achieve this Hibernate Search
-    is combining the power of <ulink url="http://www.hibernate.org">Hibernate</ulink> and  
-    <ulink url="http://lucene.apache.org">Apache Lucene</ulink>.
-    </para>
+    <para>Full text search engines like Apache Lucene are very powerful
+    technologies to add efficient free text search capabilities to
+    applications. However, they suffer several mismatches when dealing with
+    object domain models. Amongst other things indexes have to be kept up to
+    date and mismatches between index structure and domain model as well as
+    query mismatches have to be avoided.</para>
 
+    <para>Hibernate Search indexes your domain model with the help of a few
+    annotations, takes care of database/index synchronization and brings back
+    regular managed objects from free text queries. To achieve this Hibernate
+    Search is combining the power of <ulink
+    url="http://www.hibernate.org">Hibernate</ulink> and <ulink
+    url="http://lucene.apache.org">Apache Lucene</ulink>.</para>
   </preface>
 
-  <xi:include href="modules/getting-started.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/architecture.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/configuration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/mapping.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/query.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/batchindex.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/optimize.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="modules/lucene-native.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="modules/getting-started.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
 
+  <xi:include href="modules/architecture.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/configuration.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/mapping.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/query.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/batchindex.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/optimize.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/lucene-native.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

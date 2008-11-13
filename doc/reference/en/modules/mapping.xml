@@ -183,8 +183,10 @@ public class Essay {
       <para>Finally, the id property of an entity is a special property used
       by Hibernate Search to ensure index unicity of a given entity. By
       design, an id has to be stored and must not be tokenized. To mark a
-      property as index id, use the <literal>@DocumentId</literal>
-      annotation.</para>
+      property as index id, use the <literal>@DocumentId</literal> annotation.
+      If you are using Hibernate Annotations and you have specified @Id you
+      can omit @DocumentId. The chosen entity id will also be used as document
+      id.</para>
 
       <programlisting>@Entity
 @Indexed(index="indexes/essays")
@@ -206,13 +208,7 @@ public class Essay {
       <para>These annotations define an index with three fields:
       <literal>id</literal> , <literal>Abstract</literal> and
       <literal>text</literal> . Note that by default the field name is
-      decapitalized, following the JavaBean specification.</para>
-
-      <note>
-        <para>You <emphasis>must</emphasis> specify
-        <literal>@DocumentId</literal> on the identifier property of your
-        entity class.</para>
-      </note>
+      decapitalized, following the JavaBean specification</para>
     </section>
 
     <section>
@@ -1208,7 +1204,7 @@ public class Department {
     private String network;
     private String branchHead;
     private String branch;
-    private Integer maxEmployees;
+    private Integer maxEmployees
     ...
 }
 
@@ -1275,21 +1271,13 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
       sure however, to <emphasis>not</emphasis> use this annotation with
       @DocumentId as your system will break.</para>
 
-      <programlisting>
-				
-				@ProvidedId (bridge = org.my.own.package.MyCustomBridge)
-				@Indexed
-				public class MyClass{
-				
-				@Field
-				String MyString;
-				
-				...
-				
-				}
-				
-				
-			</programlisting>
+      <programlisting>@ProvidedId (bridge = org.my.own.package.MyCustomBridge)
+@Indexed
+public class MyClass{
+    @Field
+    String MyString;
+    ...
+}</programlisting>
     </section>
   </section>
 </chapter>
