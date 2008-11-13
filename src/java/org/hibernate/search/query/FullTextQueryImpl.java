@@ -63,7 +63,7 @@ import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
 
 /**
- * Implementation of {@link org.hibernate.search.FullTextQuery}
+ * Implementation of {@link org.hibernate.search.FullTextQuery}.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -83,13 +83,20 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private Filter filter;
 	private Criteria criteria;
 	private String[] indexProjection;
+	private Set<String> idFieldNames;
+	private boolean allowFieldSelectionInProjection = true;
 	private ResultTransformer resultTransformer;
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Map<String, FullTextFilterImpl> filterDefinitions;
 	private int fetchSize = 1;
 
 	/**
-	 * classes must be immutable
+	 * Constructs a  <code>FullTextQueryImpl</code> instance.
+	 *
+	 * @param query  The Lucene query
+	 * @param classes  Array of classes (must be immutable) used to filter the results to the given class types.
+	 * @param session Access to the Hibernate session.
+	 * @param parameterMetadata  Additional query metadata.
 	 */
 	public FullTextQueryImpl(org.apache.lucene.search.Query query, Class[] classes, SessionImplementor session,
 							 ParameterMetadata parameterMetadata) {
@@ -139,7 +146,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
-			DocumentExtractor extractor = new DocumentExtractor( queryHits, searchFactoryImplementor, indexProjection );
+			DocumentExtractor extractor = new DocumentExtractor(
+					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
+			);
 			for ( int index = first; index <= max; index++ ) {
 				//TODO use indexSearcher.getIndexReader().document( hits.id(index), FieldSelector(indexProjection) );
 				infos.add( extractor.extract( index ) );
@@ -208,7 +217,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public ScrollableResults scroll() throws HibernateException {
 		//keep the searcher open until the resultset is closed
-		SearchFactoryImplementor searchFactory = ContextHelper.getSearchFactoryBySFI( session );
+		SearchFactoryImplementor searchFactory = getSearchFactoryImplementor();
 
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactory );
@@ -217,7 +226,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			QueryHits queryHits = getQueryHits( searcher );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
-			DocumentExtractor extractor = new DocumentExtractor( queryHits, searchFactory, indexProjection );
+			DocumentExtractor extractor = new DocumentExtractor(
+					queryHits, searchFactory, indexProjection, idFieldNames,allowFieldSelectionInProjection
+			);
 			Loader loader = getLoader( ( Session ) this.session, searchFactory );
 			return new ScrollableResultsImpl(
 					searcher, first, max, fetchSize, extractor, loader, searchFactory
@@ -241,7 +252,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public List list() throws HibernateException {
-		SearchFactoryImplementor searchFactoryImplementor = ContextHelper.getSearchFactoryBySFI( session );
+		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
@@ -255,7 +266,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
-			DocumentExtractor extractor = new DocumentExtractor( queryHits, searchFactoryImplementor, indexProjection );
+			DocumentExtractor extractor = new DocumentExtractor(
+					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
+			);
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
 			}
@@ -383,7 +396,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private Filter createFilter(FilterDef def, Object instance) {
-		Filter filter = null;
+		Filter filter;
 		if ( def.getFactoryMethod() != null ) {
 			try {
 				filter = ( Filter ) def.getFactoryMethod().invoke( instance );
@@ -558,12 +571,16 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 
 	/**
-	 * can return null
+	 * Build the index searcher for this fulltext query.
+	 *
+	 * @param searchFactoryImplementor the search factory.
+	 * @return the <code>IndexSearcher</code> for this query (can be <code>null</code>.
 	 * TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
 		Map<Class<?>, DocumentBuilder<?>> builders = searchFactoryImplementor.getDocumentBuilders();
 		List<DirectoryProvider> directories = new ArrayList<DirectoryProvider>();
+		Set<String> idFieldNames = new HashSet<String>();
 
 		Similarity searcherSimilarity = null;
 		//TODO check if caching this work for the last n list of classes makes a perf boost
@@ -572,15 +589,19 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			// but we have to make sure there is at least one
 			if ( builders.isEmpty() ) {
 				throw new HibernateException(
-						"There are no mapped entities (don't forget to add @Indexed to at least one class)."
+						"There are no mapped entities. Don't forget to add @Indexed to at least one class."
 				);
 			}
 
 			for ( DocumentBuilder builder : builders.values() ) {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
+				if ( builder.getIdKeywordName() != null ) {
+					idFieldNames.add( builder.getIdKeywordName() );
+					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
+				}
 				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy()
 						.getDirectoryProvidersForAllShards();
-				populateDirectories( directories, directoryProviders, searchFactoryImplementor );
+				populateDirectories( directories, directoryProviders );
 			}
 			classesAndSubclasses = null;
 		}
@@ -600,14 +621,18 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				if ( builder == null ) {
 					throw new HibernateException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
 				}
-
+				if ( builder.getIdKeywordName() != null ) {
+					idFieldNames.add( builder.getIdKeywordName() );
+					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
+				}
 				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy()
 						.getDirectoryProvidersForAllShards();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
-				populateDirectories( directories, directoryProviders, searchFactoryImplementor );
+				populateDirectories( directories, directoryProviders );
 			}
-			classesAndSubclasses = involvedClasses;
+			this.classesAndSubclasses = involvedClasses;
 		}
+		this.idFieldNames = idFieldNames;
 
 		//compute optimization needClassFilterClause
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
@@ -643,8 +668,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return is;
 	}
 
-	private void populateDirectories(List<DirectoryProvider> directories, DirectoryProvider[] directoryProviders,
-									 SearchFactoryImplementor searchFactoryImplementor) {
+	private void populateDirectories(List<DirectoryProvider> directories, DirectoryProvider[] directoryProviders) {
 		for ( DirectoryProvider provider : directoryProviders ) {
 			if ( !directories.contains( provider ) ) {
 				directories.add( provider );
@@ -677,7 +701,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	public int getResultSize() {
 		if ( resultSize == null ) {
 			//get result size without object initialization
-			SearchFactoryImplementor searchFactoryImplementor = ContextHelper.getSearchFactoryBySFI( session );
+			SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 			IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 			if ( searcher == null ) {
 				resultSize = 0;

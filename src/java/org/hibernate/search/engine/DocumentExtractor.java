@@ -3,13 +3,21 @@ package org.hibernate.search.engine;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FieldSelectorResult;
+import org.apache.lucene.document.MapFieldSelector;
+import org.apache.lucene.document.FieldSelector;
 
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.query.QueryHits;
 
 /**
+ * Helper class to extract <code>EntityInfo</code>s out of the <code>QueryHits</code>.
+ *
  * @author Emmanuel Bernard
  * @author John Griffin
  * @author Hardy Ferentschik
@@ -18,11 +26,42 @@ public class DocumentExtractor {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
 	private final QueryHits queryHits;
+	private FieldSelector fieldSelector;
+	private boolean allowFieldSelection;
 
-	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String... projection) {
+	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.projection = projection;
 		this.queryHits = queryHits;
+		this.allowFieldSelection = allowFieldSelection;
+		initFieldSelection( projection, idFieldNames );
+	}
+
+	private void initFieldSelection(String[] projection, Set<String> idFieldNames) {
+		// if we need to project DOCUMENT do not use fieldSelector as the user might want anything
+		int projectionSize = projection != null && projection.length != 0 ? projection.length : 0;
+		if ( projectionSize != 0 ) {
+			for ( String property : projection ) {
+				if ( ProjectionConstants.DOCUMENT.equals( property ) ) {
+					allowFieldSelection = false;
+					return;
+				}
+			}
+		}
+
+
+		// set up the field selector. CLASS_FIELDNAME and id fields are needed on top of any projected fields
+		Map<String, FieldSelectorResult> fields = new HashMap<String, FieldSelectorResult>( 1 + idFieldNames.size() + projectionSize );
+		fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
+		for ( String idFieldName : idFieldNames ) {
+			fields.put( idFieldName, FieldSelectorResult.LOAD );
+		}
+		if ( projectionSize != 0 ) {
+			for ( String projectedField : projection ) {
+				fields.put( projectedField, FieldSelectorResult.LOAD );
+			}
+		}
+		this.fieldSelector = new MapFieldSelector( fields );
 	}
 
 	private EntityInfo extract(Document document) {
@@ -36,7 +75,13 @@ public class DocumentExtractor {
 	}
 
 	public EntityInfo extract(int index) throws IOException {
-		Document doc = queryHits.doc( index );
+		Document doc;
+		if ( allowFieldSelection ) {
+			doc = queryHits.doc( index, fieldSelector );
+		}
+		else {
+			doc = queryHits.doc( index );
+		}
 		//TODO if we are only looking for score (unlikely), avoid accessing doc (lazy load)
 		EntityInfo entityInfo = extract( doc );
 		Object[] eip = entityInfo.projection;

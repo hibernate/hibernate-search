@@ -12,6 +12,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -39,7 +40,15 @@ public class ProjectionQueryTest extends SearchTestCase {
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
 		// Is the 'FullTextQuery.ID' value correct here? Do we want the Lucene internal document number?
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.DOCUMENT, FullTextQuery.ID );
+		hibQuery.setProjection(
+				"id",
+				"lastname",
+				"dept",
+				FullTextQuery.THIS,
+				FullTextQuery.SCORE,
+				FullTextQuery.DOCUMENT,
+				FullTextQuery.ID
+		);
 
 		ScrollableResults projections = hibQuery.scroll();
 
@@ -78,7 +87,9 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNull( projection );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -97,7 +108,8 @@ public class ProjectionQueryTest extends SearchTestCase {
 		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.ID );
 		hibQuery.setResultTransformer( new ProjectionToDelimStringResultTransformer() );
 
-		List<String> result = (List<String>) hibQuery.list();
+		@SuppressWarnings( "unchecked" )
+		List<String> result = hibQuery.list();
 		assertTrue( "incorrect transformation", result.get( 0 ).startsWith( "1000, Griffin, ITech" ) );
 		assertTrue( "incorrect transformation", result.get( 1 ).startsWith( "1002, Jimenez, ITech" ) );
 
@@ -120,19 +132,29 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.DOCUMENT, FullTextQuery.ID );
+		hibQuery.setProjection(
+				"id",
+				"lastname",
+				"dept",
+				FullTextQuery.THIS,
+				FullTextQuery.SCORE,
+				FullTextQuery.DOCUMENT,
+				FullTextQuery.ID
+		);
 
 		hibQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
 
 		List transforms = hibQuery.list();
-		Map map = (Map) transforms.get( 1 );
+		Map map = ( Map ) transforms.get( 1 );
 		assertEquals( "incorrect transformation", "ITech", map.get( "dept" ) );
 		assertEquals( "incorrect transformation", 1002, map.get( "id" ) );
 		assertTrue( "incorrect transformation", map.get( FullTextQuery.DOCUMENT ) instanceof Document );
-		assertEquals( "incorrect transformation", "1002", ( (Document) map.get( FullTextQuery.DOCUMENT ) ).get( "id" ) );
+		assertEquals(
+				"incorrect transformation", "1002", ( ( Document ) map.get( FullTextQuery.DOCUMENT ) ).get( "id" )
+		);
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) {
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
 			s.delete( element );
 		}
 		tx.commit();
@@ -143,10 +165,10 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "id incorrect", 1000, projection[0] );
 		assertEquals( "lastname incorrect", "Griffin", projection[1] );
 		assertEquals( "dept incorrect", "ITech", projection[2] );
-		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
+		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[5] ).getFields().size() );
+		assertEquals( "DOCUMENT size incorrect", 4, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "legacy ID incorrect", 1000, projection[6] );
 	}
 
@@ -154,10 +176,10 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "id incorrect", 1004, projection[0] );
 		assertEquals( "lastname incorrect", "Whetbrook", projection[1] );
 		assertEquals( "dept incorrect", "ITech", projection[2] );
-		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
+		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[5] ).getFields().size() );
+		assertEquals( "DOCUMENT size incorrect", 4, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "legacy ID incorrect", 1004, projection[6] );
 	}
 
@@ -165,10 +187,10 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "id incorrect", 1003, projection[0] );
 		assertEquals( "lastname incorrect", "Stejskal", projection[1] );
 		assertEquals( "dept incorrect", "ITech", projection[2] );
-		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
+		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
 		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[5] ).getFields().size() );
+		assertEquals( "DOCUMENT size incorrect", 4, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "legacy ID incorrect", 1003, projection[6] );
 	}
 
@@ -183,25 +205,29 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE,
-				FullTextQuery.DOCUMENT, FullTextQuery.ID );
+		hibQuery.setProjection(
+				"id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE,
+				FullTextQuery.DOCUMENT, FullTextQuery.ID
+		);
 
 		int counter = 0;
 
-		for (Iterator iter = hibQuery.iterate(); iter.hasNext();) {
-			Object[] projection = (Object[]) iter.next();
+		for ( Iterator iter = hibQuery.iterate(); iter.hasNext(); ) {
+			Object[] projection = ( Object[] ) iter.next();
 			assertNotNull( projection );
 			counter++;
 			assertEquals( "dept incorrect", "ITech", projection[2] );
-			assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
+			assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
 			assertEquals( "SCORE incorrect", 1.0F, projection[4] );
 			assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
-			assertEquals( "DOCUMENT size incorrect", 4, ( (Document) projection[5] ).getFields().size() );
+			assertEquals( "DOCUMENT size incorrect", 4, ( ( Document ) projection[5] ).getFields().size() );
 		}
 		assertEquals( "incorrect number of results returned", 4, counter );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -217,38 +243,42 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:Accounting" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE,
-				FullTextQuery.DOCUMENT, FullTextQuery.ID, FullTextQuery.DOCUMENT_ID );
+		hibQuery.setProjection(
+				"id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE,
+				FullTextQuery.DOCUMENT, FullTextQuery.ID, FullTextQuery.DOCUMENT_ID
+		);
 
 		List result = hibQuery.list();
 		assertNotNull( result );
 
-		Object[] projection = (Object[]) result.get( 0 );
+		Object[] projection = ( Object[] ) result.get( 0 );
 		assertNotNull( projection );
 		assertEquals( "id incorrect", 1001, projection[0] );
 		assertEquals( "last name incorrect", "Jackson", projection[1] );
 		assertEquals( "dept incorrect", "Accounting", projection[2] );
-		assertEquals( "THIS incorrect", "Jackson", ( (Employee) projection[3] ).getLastname() );
-		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, (Serializable) projection[0] ) );
+		assertEquals( "THIS incorrect", "Jackson", ( ( Employee ) projection[3] ).getLastname() );
+		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
 		assertEquals( "SCORE incorrect", 1.9162908F, projection[4] );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[5] ).getFields().size() );
+		assertEquals( "DOCUMENT size incorrect", 5, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "ID incorrect", 1001, projection[6] );
 		assertNotNull( "Lucene internal doc id", projection[7] );
 
 		// Change the projection order and null one
-		hibQuery.setProjection( FullTextQuery.DOCUMENT, FullTextQuery.THIS, FullTextQuery.SCORE, null, FullTextQuery.ID,
-				"id", "lastname", "dept", "hireDate", FullTextQuery.DOCUMENT_ID );
+		hibQuery.setProjection(
+				FullTextQuery.DOCUMENT, FullTextQuery.THIS, FullTextQuery.SCORE, null, FullTextQuery.ID,
+				"id", "lastname", "dept", "hireDate", FullTextQuery.DOCUMENT_ID
+		);
 
 		result = hibQuery.list();
 		assertNotNull( result );
 
-		projection = (Object[]) result.get( 0 );
+		projection = ( Object[] ) result.get( 0 );
 		assertNotNull( projection );
 
 		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Document );
-		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[0] ).getFields().size() );
-		assertEquals( "THIS incorrect", projection[1], s.get( Employee.class, (Serializable) projection[4] ) );
+		assertEquals( "DOCUMENT size incorrect", 5, ( ( Document ) projection[0] ).getFields().size() );
+		assertEquals( "THIS incorrect", projection[1], s.get( Employee.class, ( Serializable ) projection[4] ) );
 		assertEquals( "SCORE incorrect", 1.9162908F, projection[2] );
 		assertNull( "BOOST not removed", projection[3] );
 		assertEquals( "ID incorrect", 1001, projection[4] );
@@ -259,7 +289,55 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNotNull( "Lucene internal doc id", projection[9] );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
+		tx.commit();
+		s.close();
+	}
+
+	public void testNonLoadedFieldOptmization() throws Exception {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		prepEmployeeIndex( s );
+
+		Transaction tx;
+		s.clear();
+		tx = s.beginTransaction();
+		QueryParser parser = new QueryParser( "dept", new StandardAnalyzer() );
+
+		Query query = parser.parse( "dept:Accounting" );
+		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		hibQuery.setProjection( FullTextQuery.ID, FullTextQuery.DOCUMENT );
+
+		List result = hibQuery.list();
+		assertNotNull( result );
+
+		Object[] projection = ( Object[] ) result.get( 0 );
+		assertNotNull( projection );
+		assertEquals( "id field name not projected", 1001, projection[0] );
+		assertEquals(
+				"Document fields should not be lazy on DOCUMENT projection",
+				"Jackson", ( ( Document ) projection[1] ).getField( "lastname" ).stringValue()
+		);
+		assertEquals( "DOCUMENT size incorrect", 5, ( ( Document ) projection[1] ).getFields().size() );
+
+		// Change the projection order and null one
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SCORE, null, "lastname" );
+
+		result = hibQuery.list();
+		assertNotNull( result );
+
+		projection = ( Object[] ) result.get( 0 );
+		assertNotNull( projection );
+
+		assertTrue( "THIS incorrect", projection[0] instanceof Employee );
+		assertEquals( "SCORE incorrect", 1.9162908F, projection[1] );
+		assertEquals( "last name incorrect", "Jackson", projection[3] );
+
+		//cleanup
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -284,7 +362,11 @@ public class ProjectionQueryTest extends SearchTestCase {
 	public void testProjection() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
 		s.save( book );
 		Book book2 = new Book( 2, "Sous les fleurs il n'y a rien", null );
 		s.save( book2 );
@@ -304,7 +386,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with no explicit criteria", 1, result.size() );
-		Object[] projection = (Object[]) result.get( 0 );
+		Object[] projection = ( Object[] ) result.get( 0 );
 		assertEquals( "id", 1, projection[0] );
 		assertEquals( "summary", "La chute de la petite reine a travers les yeux de Festina", projection[1] );
 		assertEquals( "mainAuthor.name (embedded objects)", "Emmanuel", projection[2] );
@@ -313,10 +395,10 @@ public class ProjectionQueryTest extends SearchTestCase {
 		hibQuery.setProjection( "id", "body", "mainAuthor.name" );
 
 		try {
-			result = hibQuery.list();
+			hibQuery.list();
 			fail( "Projecting an unstored field should raise an exception" );
 		}
-		catch (SearchException e) {
+		catch ( SearchException e ) {
 			//success
 		}
 
@@ -340,12 +422,16 @@ public class ProjectionQueryTest extends SearchTestCase {
 		hibQuery.setProjection( "id", "summary", "mainAuthor.name" );
 		result = hibQuery.list();
 		assertEquals( 1, result.size() );
-		projection = (Object[]) result.get( 0 );
+		projection = ( Object[] ) result.get( 0 );
 		assertEquals( "mainAuthor.name", null, projection[2] );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Book.class.getName() ).list()) s.delete( element );
-		for (Object element : s.createQuery( "from " + Author.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Book.class.getName() ).list() ) {
+			s.delete( element );
+		}
+		for ( Object element : s.createQuery( "from " + Author.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}

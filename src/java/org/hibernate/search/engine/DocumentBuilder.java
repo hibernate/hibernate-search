@@ -2,9 +2,9 @@
 package org.hibernate.search.engine;
 
 import java.io.Serializable;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Method;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,6 +53,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.impl.InitContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -61,7 +62,7 @@ import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ScopedAnalyzer;
 
 /**
- * Set up and provide a manager for indexes classes
+ * Set up and provide a manager for indexed classes.
  *
  * @author Gavin King
  * @author Emmanuel Bernard
@@ -82,6 +83,14 @@ public class DocumentBuilder<T> {
 	 * Flag indicating whether <code>@DocumentId</code> was explicitly specified.
 	 */
 	private boolean explicitDocumentId = false;
+
+	/**
+	 * Flag indicating whether {@link org.apache.lucene.search.Searcher#doc(int, org.apache.lucene.document.FieldSelector)}
+	 * can be used in order to retrieve documents. This is only safe to do if we know that
+	 * all involved bridges are implementing <code>TwoWayStringBridge</code>. See HSEARCH-213.
+	 */
+	private boolean allowFieldSelectionInProjection = false;
+
 	private XMember idGetter;
 	private Float idBoost;
 	public static final String CLASS_FIELDNAME = "_hibernate_class";
@@ -114,28 +123,6 @@ public class DocumentBuilder<T> {
 		init( clazz, context, reflectionManager );
 	}
 
-	private void init(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
-		if ( clazz == null ) throw new AssertionFailure( "Unable to build a DocumentBuilder with a null class" );
-		rootPropertiesMetadata.boost = getBoost( clazz );
-		rootPropertiesMetadata.analyzer = context.getDefaultAnalyzer();
-		Set<XClass> processedClasses = new HashSet<XClass>();
-		processedClasses.add( clazz );
-		initializeMembers( clazz, rootPropertiesMetadata, true, "", processedClasses, context );
-		//processedClasses.remove( clazz ); for the sake of completness
-		this.analyzer.setGlobalAnalyzer( rootPropertiesMetadata.analyzer );
-		if ( entityState == EntityState.INDEXED && idKeywordName == null ) {
-			// if no DocumentId then check if we have a ProvidedId instead
-			ProvidedId provided = findProvidedId( clazz, reflectionManager );
-			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
-
-			idBridge = BridgeFactory.extractTwoWayType( provided.bridge() );
-			idKeywordName = provided.name();
-		}
-		//if composite id, use of (a, b) in ((1,2)TwoWayString2FieldBridgeAdaptor, (3,4)) fails on most database
-		//a TwoWayString2FieldBridgeAdaptor is never a composite id
-		safeFromTupleId = entityState != EntityState.INDEXED || TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
-	}
-
 	/**
 	 * Constructor used on a non @Indexed entity.
 	 */
@@ -155,8 +142,57 @@ public class DocumentBuilder<T> {
 		}
 	}
 
+	private void init(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
+		if ( clazz == null ) throw new AssertionFailure( "Unable to build a DocumentBuilder with a null class" );
+		rootPropertiesMetadata.boost = getBoost( clazz );
+		rootPropertiesMetadata.analyzer = context.getDefaultAnalyzer();
+		Set<XClass> processedClasses = new HashSet<XClass>();
+		processedClasses.add( clazz );
+		initializeMembers( clazz, rootPropertiesMetadata, true, "", processedClasses, context );
+		//processedClasses.remove( clazz ); for the sake of completness
+		this.analyzer.setGlobalAnalyzer( rootPropertiesMetadata.analyzer );
+		if ( entityState == EntityState.INDEXED && idKeywordName == null ) {
+			// if no DocumentId then check if we have a ProvidedId instead
+			ProvidedId provided = findProvidedId( clazz, reflectionManager );
+			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
+
+			idBridge = BridgeFactory.extractTwoWayType( provided.bridge() );
+			idKeywordName = provided.name();
+		}
+
+		//if composite id, use of (a, b) in ((1,2)TwoWayString2FieldBridgeAdaptor, (3,4)) fails on most database
+		//a TwoWayString2FieldBridgeAdaptor is never a composite id
+		safeFromTupleId = entityState != EntityState.INDEXED || TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
+		checkAllowFieldSelection();
+		if ( log.isDebugEnabled() ) {
+			log.debug( "Field selection in projections is set to {} for entity {}.", allowFieldSelectionInProjection, clazz.getName() );
+		}
+	}
+
+	/**
+	 * Checks whether all involved bridges are two way string bridges. If so we can optimize document retrieval
+	 * by using <code>FieldSelector</code>. See HSEARCH-213.
+	 */
+	private void checkAllowFieldSelection() {
+		allowFieldSelectionInProjection = true;
+		if ( ! (idBridge instanceof TwoWayStringBridge || idBridge instanceof TwoWayString2FieldBridgeAdaptor) ) {
+			allowFieldSelectionInProjection = false;
+			return;
+		}
+		for ( FieldBridge bridge : rootPropertiesMetadata.fieldBridges) {
+			if ( !( bridge instanceof TwoWayStringBridge || bridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
+				allowFieldSelectionInProjection = false;
+				return;
+			}
+		}
+	}
+
 	public boolean isRoot() {
 		return isRoot;
+	}
+
+	public boolean allowFieldSelectionInProjection() {
+		return allowFieldSelectionInProjection;
 	}
 
 	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {

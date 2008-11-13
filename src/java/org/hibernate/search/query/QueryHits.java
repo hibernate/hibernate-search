@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2008, Red Hat Middleware LLC, and individual contributors
@@ -20,6 +20,7 @@ package org.hibernate.search.query;
 import java.io.IOException;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.ScoreDoc;
@@ -57,6 +58,10 @@ public class QueryHits {
 
 	public Document doc(int index) throws IOException {
 		return searcher.doc( docId( index ) );
+	}
+
+	public Document doc(int index, FieldSelector selector) throws IOException {
+		return searcher.doc( docId( index ), selector );
 	}
 
 	public ScoreDoc scoreDoc(int index) throws IOException {
