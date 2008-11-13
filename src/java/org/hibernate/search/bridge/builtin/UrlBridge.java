@@ -9,7 +9,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.annotations.common.util.StringHelper;
 
 /**
- * Bridge for <code>URL</code>
+ * Bridge for <code>URL</code>s.
  *
  * @author Emmanuel Bernard
  */
@@ -20,10 +20,10 @@ public class UrlBridge implements TwoWayStringBridge {
 		}
 		else {
 			try {
-				return new URL(stringValue);
+				return new URL( stringValue );
 			}
-			catch (MalformedURLException e) {
-				throw new SearchException("Unable to build URL: " + stringValue, e);
+			catch ( MalformedURLException e ) {
+				throw new SearchException( "Unable to build URL: " + stringValue, e );
 			}
 		}
 	}

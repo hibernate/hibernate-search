@@ -14,8 +14,7 @@ package org.hibernate.search.bridge;
 public interface StringBridge {
 	
 	/**
-	 * convert the object representation to a String
-	 * The return String must not be null, it can be empty though
+	 * {@inheritDoc}
 	 */
 	String objectToString(Object object);
 }

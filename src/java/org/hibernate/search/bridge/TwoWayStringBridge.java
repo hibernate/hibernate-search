@@ -14,8 +14,9 @@ package org.hibernate.search.bridge;
  * @author Emmanuel Bernard
  */
 public interface TwoWayStringBridge extends StringBridge {
+
 	/**
-	 * Convert the string representation to an object
+	 * {@inheritDoc}
 	 */
 	Object stringToObject(String stringValue);
 }
