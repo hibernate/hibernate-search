@@ -10,7 +10,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
  * @author Emmanuel Bernard
- * @deprecated Use fullTextSession.getSearchFactory() instead
+ * @deprecated Use {@link org.hibernate.search.FullTextSession#getSearchFactory()} instead.
  */
 public abstract class ContextHelper {
 
