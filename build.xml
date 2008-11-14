@@ -18,7 +18,7 @@
     <!-- Name of project and version, used to create filenames -->
     <property name="Name" value="Hibernate Search"/>
     <property name="name" value="hibernate-search"/>
-    <property name="version" value="3.1.0.Beta2"/>
+    <property name="version" value="3.1.0.CR1"/>
     <property name="javadoc.packagenames" value="org.hibernate.search.*"/>
     <property name="copy.test" value="true"/>
     <property name="javac.source" value="1.5"/>
