@@ -5,7 +5,22 @@
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search</artifactId>
     <version>3.1.0.CR1</version>
+    <name>Hibernate Search</name>
     <description>Hibernate Search</description>
+    <url>http://search.hibernate.org</url>
+    <issueManagement>
+    	<system>JIRA</system>
+    	<url>http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH</url>
+    </issueManagement>
+    <scm>
+    	<connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/</connection>
+    	<developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/</developerConnection>
+    	<url>http://fisheye.jboss.com/browse/Hibernate/search</url>
+    </scm>
+    <organization>
+    	<name>Hibernate</name>
+    	<url>http://www.hibernate.org</url>
+    </organization>
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
