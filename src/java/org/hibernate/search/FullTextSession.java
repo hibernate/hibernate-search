@@ -42,7 +42,7 @@ public interface FullTextSession extends Session {
 	/**
 	 * Remove the entity with the type <code>entityType</code> and the identifier <code>id</code> from the index.
 	 * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
-	 * case this method behaves like {@link #purgeAll(Class<?>)}.
+	 * case this method behaves like {@link #purgeAll(Class)}.
 	 *
 	 * @param entityType The type of the entity to delete.
 	 * @param id The id of the entity to delete.
