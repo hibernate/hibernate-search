@@ -24,11 +24,11 @@ import org.hibernate.search.util.LoggerFactory;
 
 /**
  * Share readers per <code>SearchFactory</code>, reusing them if they are still valid.
+ * This class contains several bugs including HSEARCH-211. Since it is deprecated we are not going to
+ * fix them right now.
  * 
  * @deprecated replaced by SharingBufferReaderProvider
  * @author Emmanuel Bernard
- * @todo This class contains several bugs including HSEARCH-250. Since it is deprecated we are not going to
- * fix them right now.
  */
 @Deprecated
 public class SharedReaderProvider implements ReaderProvider {
