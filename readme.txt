@@ -15,7 +15,7 @@ queries.
 Hibernate Search is using Apache Lucene(tm) under the cover.
 
 
-Hibernate Requires Hibernate Core 3.3 and above.
+Hibernate Search Requires Hibernate Core 3.3 and above.
 This version runs well with Hibernate Annotations 3.4.x and Hibernate EntityManager 3.4.x
 
 

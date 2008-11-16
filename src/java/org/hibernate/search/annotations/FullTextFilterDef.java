@@ -31,7 +31,6 @@ public @interface FullTextFilterDef {
 	 * If the filter accept parameters, an @Key method must be present as well
 	 *
 	 */
-	@SuppressWarnings("unchecked")
 	Class<?> impl();
 
 	/**

@@ -36,7 +36,6 @@ import org.hibernate.search.util.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-//TODO introduce the notion of read only IndexReader? We cannot enforce it because Lucene uses abstract classes, not interfaces.
 //TODO renaming to "DirectoryWorkspace" would be nice.
 public class Workspace {
 

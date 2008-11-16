@@ -3,8 +3,6 @@ package org.hibernate.search.backend.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -159,12 +157,12 @@ public class MaskedProperty extends Properties implements Serializable {
 				}
 			}
 		}
-		if (fallBack != null) {
+		if ( fallBack != null ) {
 			Enumeration<?> fallBackNames = fallBack.propertyNames();
 			while ( fallBackNames.hasMoreElements() ) {
 				Object key = fallBackNames.nextElement();
 				if ( String.class.isInstance( key ) ) {
-					maskedProperties.add( (String) key );
+					maskedProperties.add( key );
 				}
 			}
 		}

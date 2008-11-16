@@ -166,7 +166,7 @@ public class WeakIdentityHashMap<K,V> /*extends AbstractMap*/ implements Map<K,V
 	 */
 	public WeakIdentityHashMap() {
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		threshold = (int) ( DEFAULT_INITIAL_CAPACITY );
+		threshold = DEFAULT_INITIAL_CAPACITY;
 		table = new Entry[DEFAULT_INITIAL_CAPACITY];
 	}
 

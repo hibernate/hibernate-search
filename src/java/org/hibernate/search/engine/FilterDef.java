@@ -16,7 +16,6 @@ import org.hibernate.search.annotations.FullTextFilterDef;
  * @author Emmanuel Bernard
  */
 //TODO serialization
-@SuppressWarnings("unchecked")
 public class FilterDef {
 	private Method factoryMethod;
 	private Method keyMethod;

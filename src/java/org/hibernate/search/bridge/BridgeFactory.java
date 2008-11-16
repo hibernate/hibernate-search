@@ -133,7 +133,7 @@ public class BridgeFactory {
 								+ impl );
 					}
 					if ( cb.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
-						Map params = new HashMap( cb.params().length );
+						Map<String, String> params = new HashMap<String, String>( cb.params().length );
 						for ( Parameter param : cb.params() ) {
 							params.put( param.name(), param.value() );
 						}
@@ -175,7 +175,7 @@ public class BridgeFactory {
 			bridge = builtInBridges.get( returnType.getName() );
 			if ( bridge == null && returnType.isEnum() ) {
 				bridge = new TwoWayString2FieldBridgeAdaptor(
-						new EnumBridge( (Class<? extends Enum>) reflectionManager.toClass( returnType ) )
+						new EnumBridge( reflectionManager.toClass( returnType ) )
 				);
 			}
 		}
@@ -209,7 +209,7 @@ public class BridgeFactory {
 				);
 			}
 			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
-				Map params = new HashMap( bridgeAnn.params().length );
+				Map<String, String> params = new HashMap<String, String>( bridgeAnn.params().length );
 				for ( Parameter param : bridgeAnn.params() ) {
 					params.put( param.name(), param.value() );
 				}

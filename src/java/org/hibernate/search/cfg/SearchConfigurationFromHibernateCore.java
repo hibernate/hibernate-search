@@ -59,7 +59,6 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 	private static class ClassIterator implements Iterator<Class<?>> {
 		private Iterator hibernatePersistentClassIterator;
 		private Class<?> future;
-		private Class<?> current;
 
 		private ClassIterator(Iterator hibernatePersistentClassIterator) {
 			this.hibernatePersistentClassIterator = hibernatePersistentClassIterator;

@@ -9,7 +9,7 @@ import org.hibernate.Query;
 import org.hibernate.transform.ResultTransformer;
 
 /**
- * The base interface for lucene powered searches.
+ * The base interface for Lucene powered searches.
  *
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -57,8 +56,6 @@ import org.hibernate.search.util.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class SearchFactoryImpl implements SearchFactoryImplementor {
-	private static final ThreadLocal<WeakHashMap<SearchConfiguration, SearchFactoryImpl>> contexts =
-			new ThreadLocal<WeakHashMap<SearchConfiguration, SearchFactoryImpl>>();
 
 	static {
 		Version.touch();
