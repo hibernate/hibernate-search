@@ -60,12 +60,12 @@ public class LuceneIndexingParameters implements Serializable {
 				log.warn( "The max_field_length value configured for transaction is "
 						+ "different than the value configured for batch." );
 			}
-		}
-		Integer useCompoundTransaction = transParams.parameters.get( USE_COMPOUND_FILE );
-		Integer useCompoundBatch = batchParams.parameters.get( USE_COMPOUND_FILE );
-		if ( notEquals( useCompoundTransaction, useCompoundBatch ) ) {
-			throw new SearchException( "The IndexWriter setting \"use_compound_file\" for batch "+
-					"mode can't be different from the transaction setting." );
+			Integer useCompoundTransaction = transParams.parameters.get( USE_COMPOUND_FILE );
+			Integer useCompoundBatch = batchParams.parameters.get( USE_COMPOUND_FILE );
+			if ( notEquals( useCompoundTransaction, useCompoundBatch ) ) {
+				log.warn( "The IndexWriter setting \"use_compound_file\" for batch "+
+						"mode can't be different from the transaction setting." );
+			}
 		}
 	}
 

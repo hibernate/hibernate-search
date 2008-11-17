@@ -4,7 +4,6 @@ package org.hibernate.search.test.configuration;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SerializationTestHelper;
@@ -29,7 +28,8 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		super.configure( cfg );
 		
 		cfg.setProperty( "hibernate.search.default.batch.ram_buffer_size", "1" );
-		cfg.setProperty( "hibernate.search.default.transaction.use_compound_file", "true" );
+		cfg.setProperty( "hibernate.search.default.transaction.use_compound_file", "false" );
+		cfg.setProperty( "hibernate.search.default.batch.use_compound_file", "true" ); //should see a warning about this
 //set by super : cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
 		
 		cfg.setProperty( "hibernate.search.default.transaction.ram_buffer_size", "2" );
@@ -112,13 +112,6 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 			SerializationTestHelper.duplicateBySerialization( param );
 		assertEquals( param.getBatchIndexParameters(), paramCopy.getBatchIndexParameters() );
 		assertEquals( param.getTransactionIndexParameters(), paramCopy.getTransactionIndexParameters() );
-	}
-	
-	public void testInvalidConfiguration() {
-		AnnotationConfiguration configuration = new AnnotationConfiguration();
-		configuration.setProperty( "hibernate.search.default.transaction.use_compound_file", "true" );
-		configuration.setProperty( "hibernate.search.default.batch.use_compound_file", "false" );
-		assertCfgIsInvalid( configuration, getMappings() );
 	}
 	
 	protected Class[] getMappings() {
