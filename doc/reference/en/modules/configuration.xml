@@ -811,7 +811,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             default value for this option is
             <literal>true</literal>.</para></entry>
 
-            <entry>false</entry>
+            <entry>true</entry>
           </row>
         </tbody>
       </tgroup>
