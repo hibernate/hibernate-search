@@ -657,21 +657,27 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
 hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
 hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     This configuration will result in these settings applied to the second
-    shard of Animals index:</para> <itemizedlist>
-        <listitem><para><literal>transaction.max_merge_docs</literal> = 10</para>
-        </listitem>
+    shard of Animals index:</para>
 
-        <listitem><para><literal>batch.max_merge_docs</literal> = 100</para>
-        </listitem>
+    <itemizedlist>
+      <listitem>
+        <para><literal>transaction.max_merge_docs</literal> = 10</para>
+      </listitem>
 
-        <listitem><para><literal>transaction.merge_factor</literal> = 20</para></listitem>
+      <listitem>
+        <para><literal>batch.max_merge_docs</literal> = 100</para>
+      </listitem>
 
-        <listitem><para><literal>batch.merge_factor</literal> = 20</para>
-        </listitem>
-      </itemizedlist>
+      <listitem>
+        <para><literal>transaction.merge_factor</literal> = 20</para>
+      </listitem>
 
-      <para>All other values will use the defaults defined in
-    Lucene.</para>
+      <listitem>
+        <para><literal>batch.merge_factor</literal> = 20</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>All other values will use the defaults defined in Lucene.</para>
 
     <para>The default for all values is to leave them at Lucene's own default,
     so the listed values in the following table actually depend on the version
@@ -794,15 +800,16 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].use_compound_file</literal></entry>
 
-            <entry><para>Leaving this value to false is generally the best
-            performing option. You may need to enable it to have the index
-            written to a single compound file to use less file handlers, but
-            increasing the number of permitted file handlers is usually a
-            preferred solution.</para> <para>Especially when synchronizing
-            indexes using JMS avoid this option as it will copy the complete
-            index each time.</para> <para>Boolean parameter, use
-            "<literal>true</literal>" or
-            "<literal>false</literal>".</para></entry>
+            <entry>The advantage of using the compound file format is that
+            less file descriptors are used. The disadvantage is that indexing
+            takes more time and temporary disk space. You can set this
+            paramter to <literal>false</literal> in an attempt to improve the
+            indexing time, but you risking running out of file descriptors if
+            <literal>mergeFactor</literal> is also
+            large.<para></para><para>Boolean parameter, use
+            "<literal>true</literal>" or "<literal>false</literal>". The
+            default value for this option is
+            <literal>true</literal>.</para></entry>
 
             <entry>false</entry>
           </row>
