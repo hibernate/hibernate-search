@@ -4,6 +4,31 @@ Hibernate Search Changelog
 3.1.0.CR1 (17-10-2008)
 ------------------------
 
+** Bug
+    * [HSEARCH-250] - In ReaderStrategies, ensure that the reader is current AND that the directory returned by the DirectoryProvider are the same
+    * [HSEARCH-293] - AddLuceneWork is not being removed from the queue when DeleteLuceneWork is added for the same entity
+    * [HSEARCH-300] - Fix documentation on use_compound_file
+
+** Improvement
+    * [HSEARCH-213] - Use FieldSelector and doc(int, fieldSelector) to only select the necessary fields
+    * [HSEARCH-224] - Use MultiClassesQueryLoader in ProjectionLoader
+    * [HSEARCH-255] - Create a extensive Analyzer testing suite
+    * [HSEARCH-266] - Do not switch to the current directory in FSSlaveDirectoryProvider if no file has been copied
+    * [HSEARCH-274] - Use Lucene's new readonly IndexReader
+    * [HSEARCH-281] - Work should be Work<T>
+    * [HSEARCH-283] - Replace deprecated Classes and methods calls to Lucene 2.4
+
+** New Feature
+    * [HSEARCH-104] - Make @DocumentId optional and rely on @Id
+    * [HSEARCH-290] - Use IndexReader = readonly on Reader strategies (see Lucene 2.4)
+    * [HSEARCH-294] - Rename INSTANCE_AND_BITSETRESULTS to INSTANCE_AND_DOCIDSETRESULTS
+
+** Task
+    * [HSEARCH-288] - Evaluate changes in Lucene 2.4.0
+    * [HSEARCH-289] - Move to new Lucene Filter DocIdSet
+    * [HSEARCH-291] - improve documentation about thread safety requirements of Bridges.
+    
+
 3.1.0.Beta2 (27-10-2008)
 ------------------------
 
