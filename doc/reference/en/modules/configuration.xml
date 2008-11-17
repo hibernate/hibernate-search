@@ -803,8 +803,8 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             <entry>The advantage of using the compound file format is that
             less file descriptors are used. The disadvantage is that indexing
             takes more time and temporary disk space. You can set this
-            paramter to <literal>false</literal> in an attempt to improve the
-            indexing time, but you risking running out of file descriptors if
+            parameter to <literal>false</literal> in an attempt to improve the
+            indexing time, but you could run out of file descriptors if
             <literal>mergeFactor</literal> is also
             large.<para></para><para>Boolean parameter, use
             "<literal>true</literal>" or "<literal>false</literal>". The
