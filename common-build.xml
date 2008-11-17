@@ -240,14 +240,7 @@
 			</fileset>
 		</copy>
 	</target>
-	
-	<target name="jar" depends="compile"
-		description="Build the distribution .jar file">
-		<mkdir dir="${dist.dir}"/>
-		<jar filesetmanifest="merge" jarfile="${jar.file.name}"
-			basedir="${classes.dir}"/>
-	</target>
-	
+		
 	<target name="jartest" depends="compiletest"
 		description="Build the distribution .jar file">
 		<mkdir dir="${dist.dir}"/>

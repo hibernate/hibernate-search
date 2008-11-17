@@ -284,14 +284,9 @@
             <attribute name="Implementation-Vendor-Id" value="hibernate.org"/>
             <attribute name="Implementation-URL" value="http://search.hibernate.org"/>
         </manifest>
-        <antcall target="common-build.jar"/>
-        <ivy:resolve conf="default"/>
-        <ivy:publish artifactspattern="${dist.dir}/[artifact].[ext]"
-                     resolver="local"
-                     pubrevision="latest"
-                     pubdate="${now}"
-                     status="integration"
-                />
+        <mkdir dir="${dist.dir}"/>
+		<jar filesetmanifest="merge" jarfile="${jar.file.name}"
+			basedir="${classes.dir}"/>
     </target>
 
     <!-- Some of this can probably be moved to common-build... -->
