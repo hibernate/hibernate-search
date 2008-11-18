@@ -10,21 +10,21 @@ import java.lang.annotation.Target;
 import org.apache.solr.analysis.TokenFilterFactory;
 
 /**
- * Define a TokenFilterFactory and its parameters
+ * Define a <code>TokenFilterFactory</code> and its parameters.
  *
  * @author Emmanuel Bernard
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.TYPE, ElementType.FIELD, ElementType.METHOD } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface TokenFilterDef {
 	/**
-	 * Defines the TokenFilterFactory implementation used
+	 * @return the <code>TokenFilterFactory</code> class which shall be instantiated.
 	 */
 	public abstract Class<? extends TokenFilterFactory> factory();
 
 	/**
-	 * optional parameters passed to the TokenFilterFactory
+	 * @return Optional parameters passed to the <code>TokenFilterFactory</code>.
 	 */
-	public abstract Parameter[] params() default {};
+	public abstract Parameter[] params() default { };
 }

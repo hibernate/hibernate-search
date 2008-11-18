@@ -10,21 +10,22 @@ import java.lang.annotation.Documented;
 import org.apache.solr.analysis.TokenizerFactory;
 
 /**
- * Define a TokenizerFactory and its parameters
- * 
+ * Define a <code>TokenizerFactory</code> and its parameters.
+ *
  * @author Emmanuel Bernard
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.TYPE, ElementType.FIELD, ElementType.METHOD} )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface TokenizerDef {
+
 	/**
-	 * Defines the TokenizerFactory implementation used
+	 * @return the <code>TokenizerFactory</code> class which shall be instantiated.
 	 */
 	Class<? extends TokenizerFactory> factory();
 
 	/**
-	 * optional parameters passed to the TokenizerFactory
+	 * @return Optional parameters passed to the <code>TokenizerFactory</code>.
 	 */
-	Parameter[] params() default {};
+	Parameter[] params() default { };
 }

@@ -146,6 +146,11 @@ public class SolrAnalyzerTest extends SearchTestCase {
 				tokens, new String[] { "0", "KK", "BRN", "FKS", "JMPT", "OFR", "0", "LS", "TKS" }
 		);
 
+		analyzer = fts.getSearchFactory().getAnalyzer( "pattern_analyzer" );
+		text = "foo,bar";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "foo", "bar" } );
+
 		fts.close();
 	}
 

@@ -21,6 +21,7 @@ import org.apache.solr.analysis.SynonymFilterFactory;
 import org.apache.solr.analysis.TrimFilterFactory;
 import org.apache.solr.analysis.WordDelimiterFilterFactory;
 import org.apache.solr.analysis.PhoneticFilterFactory;
+import org.apache.solr.analysis.PatternTokenizerFactory;
 
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -52,6 +53,11 @@ import org.hibernate.search.annotations.TokenizerDef;
 								@Parameter(name = "language", value = "English")
 						})
 				}),
+
+		@AnalyzerDef(name = "pattern_analyzer",
+				tokenizer = @TokenizerDef(factory = PatternTokenizerFactory.class, params = {
+						@Parameter(name = "pattern", value = ",")
+				})),
 
 		@AnalyzerDef(name = "standard_analyzer",
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),

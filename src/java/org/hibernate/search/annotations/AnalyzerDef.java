@@ -10,30 +10,32 @@ import java.lang.annotation.Documented;
 /**
  * Reusable analyzer definition.
  * An analyzer definition defines:
- *  - one tokenizer
- *  - optionally some filters
- * Filters are applied in the order they are defined
- *
- * Reuses the Solr Tokenizer and Filter architecture
+ * <ul>
+ * <li>one tokenizer</li>
+ * </li>optionally one or more filters</li>
+ * </ul>
+ * Filters are applied in the order they are defined.
+ * <p/>
+ * Reuses the Solr Tokenizer and Filter architecture.
  *
  * @author Emmanuel Bernard
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.TYPE, ElementType.FIELD, ElementType.METHOD} )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface AnalyzerDef {
 	/**
-	 * Reference name to be used on {#org.hibernate.search.annotations.Analyzer}
+	 * @return Reference name to be used on {#org.hibernate.search.annotations.Analyzer}
 	 */
 	String name();
 
 	/**
-	 * Tokenizer used
+	 * @return Tokenizer used.
 	 */
 	TokenizerDef tokenizer();
 
 	/**
-	 * Filters used. The filters are applied in the defined order
+	 * @return Filters used. The filters are applied in the defined order
 	 */
-	TokenFilterDef[] filters() default {};
+	TokenFilterDef[] filters() default { };
 }
