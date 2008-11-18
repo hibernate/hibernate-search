@@ -245,13 +245,13 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return documentBuilders;
 	}
 
-	@SuppressWarnings( "unckecked" )
+	@SuppressWarnings( "unchecked" )
 	public <T> DocumentBuilder<T> getDocumentBuilder(Class<T> entityType) {
 		if (barrier != 0) { } //read barrier
 		return ( DocumentBuilder<T> ) documentBuilders.get( entityType );
 	}
 
-	@SuppressWarnings( "unckecked" )
+	@SuppressWarnings( "unchecked" )
 	public <T> DocumentBuilder<T> getContainedInOnlyBuilder(Class<T> entityType) {
 		if (barrier != 0) { } //read barrier
 		return ( DocumentBuilder<T> ) containedInOnlyBuilders.get( entityType );
