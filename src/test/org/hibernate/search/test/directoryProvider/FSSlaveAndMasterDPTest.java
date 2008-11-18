@@ -10,7 +10,8 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.slf4j.Logger;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -62,73 +63,85 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 		// assert that the salve index is empty
 		FullTextSession fullTextSession = Search.getFullTextSession( getSlaveSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
 		List result = fullTextSession.createFullTextQuery( parser.parse( "location:texas" ) ).list();
 		assertEquals( "No copy yet, fresh index expected", 0, result.size() );
+		tx.commit();
 		fullTextSession.close();
-		
+
 
 		// create an entity on the master and persist it in order to index it
 		Session session = getMasterSession();
+		tx = session.beginTransaction();
 		SnowStorm sn = new SnowStorm();
 		sn.setDate( new Date() );
 		sn.setLocation( "Dallas, TX, USA" );
 		session.persist( sn );
-		session.flush(); //we don' commit so we need to flush manually
+		tx.commit();
 		session.close();
 
 		int waitPeriodMilli = 2010; // wait  a bit more than 2 refresh periods (one master / one slave)  -  2 * 1 * 1000 + 10
 		Thread.sleep( waitPeriodMilli );
 
 		// assert that the master hass indexed the snowstorm
+		log.info( "Searching master" );
 		fullTextSession = Search.getFullTextSession( getMasterSession() );
+		tx = fullTextSession.beginTransaction();
 		result = fullTextSession.createFullTextQuery( parser.parse( "location:dallas" ) ).list();
 		assertEquals( "Original should get one", 1, result.size() );
+		tx.commit();
 		fullTextSession.close();
 
 		// assert that index got copied to the salve as well
-		log.info("Searching slave");
+		log.info( "Searching slave" );
 		fullTextSession = Search.getFullTextSession( getSlaveSession() );
+		tx = fullTextSession.beginTransaction();
 		result = fullTextSession.createFullTextQuery( parser.parse( "location:dallas" ) ).list();
 		assertEquals( "First copy did not work out", 1, result.size() );
+		tx.commit();
 		fullTextSession.close();
 
 		// add a new snowstorm to the master
 		session = getMasterSession();
+		tx = session.beginTransaction();
 		sn = new SnowStorm();
 		sn.setDate( new Date() );
 		sn.setLocation( "Chennai, India" );
 		session.persist( sn );
-		session.flush(); //we don' commit so we need to flush manually
+		tx.commit();
 		session.close();
 
 		Thread.sleep( waitPeriodMilli ); //wait a bit more than 2 refresh (one master / one slave)
 
 		// assert that the new snowstorm made it into the slave
+		log.info( "Searching slave" );
 		fullTextSession = Search.getFullTextSession( getSlaveSession() );
+		tx = fullTextSession.beginTransaction();
 		result = fullTextSession.createFullTextQuery( parser.parse( "location:chennai" ) ).list();
 		assertEquals( "Second copy did not work out", 1, result.size() );
+		tx.commit();
 		fullTextSession.close();
 
 		session = getMasterSession();
+		tx = session.beginTransaction();
 		sn = new SnowStorm();
 		sn.setDate( new Date() );
 		sn.setLocation( "Melbourne, Australia" );
 		session.persist( sn );
-		session.flush(); //we don' commit so we need to flush manually
+		tx.commit();
 		session.close();
 
 		Thread.sleep( waitPeriodMilli ); //wait a bit more than 2 refresh (one master / one slave)
 
 		// once more - assert that the new snowstorm made it into the slave
-		fullTextSession = Search.getFullTextSession( getSessionFactories()[1].openSession() );
+		log.info( "Searching slave" );
+		fullTextSession = Search.getFullTextSession( getSlaveSession() );
+		tx = fullTextSession.beginTransaction();
 		result = fullTextSession.createFullTextQuery( parser.parse( "location:melbourne" ) ).list();
 		assertEquals( "Third copy did not work out", 1, result.size() );
-
+		tx.commit();
 		fullTextSession.close();
-		for ( SessionFactory sf : getSessionFactories() ) {
-			sf.close();
-		}
 	}
 
 	private Session getMasterSession() {
@@ -140,16 +153,29 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	}
 
 	protected void setUp() throws Exception {
-		root.mkdir();
+
+		if ( root.exists() ) {
+			FileHelper.delete( root );
+		}
+
+		if ( !root.mkdir() ) {
+			throw new HibernateException( "Unable to setup test directories" );
+		}
 
 		File master = new File( root, masterMain );
-		master.mkdirs();
+		if ( !master.mkdirs() ) {
+			throw new HibernateException( "Unable to setup master directory" );
+		}
+
 		master = new File( root, masterCopy );
-		master.mkdirs();
+		if ( !master.mkdirs() ) {
+			throw new HibernateException( "Unable to setup master copy directory" );
+		}
 
 		File slaveFile = new File( root, slave );
-		slaveFile.mkdir();
-
+		if ( !slaveFile.mkdirs() ) {
+			throw new HibernateException( "Unable to setup slave directory" );
+		}
 		super.setUp();
 	}
 

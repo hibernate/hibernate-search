@@ -74,6 +74,12 @@ public abstract class MultipleSFTestCase extends TestCase {
 		}
 	}
 
+	protected void tearDown() throws Exception {
+		for ( SessionFactory sf : getSessionFactories() ) {
+			sf.close();
+		}
+	}
+
 	protected abstract Class[] getMappings();
 
 	protected String[] getAnnotatedPackages() {
