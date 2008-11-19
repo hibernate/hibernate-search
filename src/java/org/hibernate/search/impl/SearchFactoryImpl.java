@@ -497,6 +497,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes) {
+		if ( barrier != 0 ) {
+		} //read barrier
 		return indexHierarchy.getIndexedClasses( classes );
 	}
 
