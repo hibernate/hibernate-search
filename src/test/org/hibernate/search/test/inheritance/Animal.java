@@ -1,6 +1,7 @@
 //$Id$
 package org.hibernate.search.test.inheritance;
 
+import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -15,8 +16,7 @@ import org.hibernate.search.annotations.Store;
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed
-public class Animal extends Being {
+public abstract class Animal extends Being {
     private Long id;
     private String name;
 

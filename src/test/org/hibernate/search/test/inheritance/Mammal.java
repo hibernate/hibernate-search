@@ -1,6 +1,7 @@
 //$Id$
 package org.hibernate.search.test.inheritance;
 
+import java.io.Serializable;
 import javax.persistence.Entity;
 
 import org.hibernate.search.annotations.Field;
@@ -13,15 +14,15 @@ import org.hibernate.search.annotations.Store;
  */
 @Entity
 @Indexed
-public class Mammal extends Animal {
-    private int mammalNbr;
+public class Mammal extends Animal implements Serializable {
+    private boolean hasSweatGlands;
 
     @Field(index= Index.UN_TOKENIZED, store= Store.YES)
-	public int getMammalNbr() {
-        return mammalNbr;
-    }
+	public boolean isHasSweatGlands() {
+		return hasSweatGlands;
+	}
 
-    public void setMammalNbr(int mammalNbr) {
-        this.mammalNbr = mammalNbr;
-    }
+	public void setHasSweatGlands(boolean hasSweatGlands) {
+		this.hasSweatGlands = hasSweatGlands;
+	}
 }

@@ -6,11 +6,19 @@ import java.io.File;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.store.Directory;
 import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.test.inheritance.Animal;
+import org.hibernate.search.test.inheritance.Mammal;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.store.FSDirectoryProvider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +65,18 @@ public abstract class SearchTestCase extends HANTestCase {
         if (listener == null) throw new HibernateException("Lucene event listener not initialized");
         return listener;
     }
+
+	protected void ensureIndexesAreEmpty() {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx;
+		tx = s.beginTransaction();
+		for ( Class clazz : getMappings() ) {
+			if ( clazz.getAnnotation( Indexed.class ) != null ) {
+				s.purgeAll( clazz );
+			}
+		}
+		tx.commit();
+	}
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );

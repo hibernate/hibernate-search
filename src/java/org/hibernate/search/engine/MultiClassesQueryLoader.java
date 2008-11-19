@@ -1,16 +1,15 @@
 // $Id$
 package org.hibernate.search.engine;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
-import java.util.Arrays;
 
-import org.hibernate.Session;
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
 
 /**
@@ -30,13 +29,12 @@ public class MultiClassesQueryLoader implements Loader {
 		this.objectLoader.init( session, searchFactoryImplementor );
 	}
 
-	public void setEntityTypes(Class[] entityTypes) {
-		List<Class> safeEntityTypes;
+	public void setEntityTypes(Set<Class<?>> entityTypes) {
+		List<Class<?>> safeEntityTypes = new ArrayList<Class<?>>();
 		//TODO should we go find the root entity for a given class rather than just checking for it's root status?
 		//     root entity could lead to quite inefficient queries in Hibernate when using table per class
-		if ( entityTypes.length == 0 ) {
+		if ( entityTypes.size() == 0 ) {
 			//support all classes
-			safeEntityTypes = new ArrayList<Class>();
 			for( Map.Entry<Class<?>, DocumentBuilder<?>> entry : searchFactoryImplementor.getDocumentBuilders().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().isRoot() ) {
@@ -45,7 +43,7 @@ public class MultiClassesQueryLoader implements Loader {
 			}
 		}
 		else {
-			safeEntityTypes = Arrays.asList(entityTypes);
+			safeEntityTypes.addAll(entityTypes);
 		}
 		entityMatadata = new ArrayList<RootEntityMetadata>( safeEntityTypes.size() );
 		for (Class clazz :  safeEntityTypes) {

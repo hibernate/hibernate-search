@@ -109,29 +109,33 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		// accessing the document builders is not strictly necessary but a small optimization plus let's make sure the
 		// client didn't mess something up.
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-		DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilder( entityType );
-		if ( builder == null ) {
-			String msg = "Entity to index is not an @Indexed entity: " + entityType.getName();
-			throw new IllegalArgumentException( msg );
-		}
+		Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class[] {entityType} );
 
-		Work<T> work;
-		if ( id == null ) {
-			// purge the main entity
-			work = new Work<T>( entityType, id, WorkType.PURGE_ALL );
-			searchFactoryImplementor.getWorker().performWork( work, transactionContext );
-
-			// purge the subclasses
-			Set<Class<?>> subClasses = builder.getMappedSubclasses();
-			for ( Class clazz : subClasses ) {
-				@SuppressWarnings( "unchecked" )
-				Work subClassWork = new Work( clazz, id, WorkType.PURGE_ALL );
-				searchFactoryImplementor.getWorker().performWork( subClassWork, transactionContext );
+		for ( Class clazz : targetedClasses ) {
+			DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilder( clazz );
+			if ( builder == null ) {
+				String msg = "Entity to index is not an @Indexed entity: " + clazz.getName();
+				throw new IllegalArgumentException( msg );
 			}
-		}
-		else {
-			work = new Work<T>( entityType, id, WorkType.PURGE );
-			searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+
+			Work<T> work;
+			if ( id == null ) {
+				// purge the main entity
+				work = new Work<T>( clazz, id, WorkType.PURGE_ALL );
+				searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+
+				// purge the subclasses
+				Set<Class<?>> subClasses = builder.getMappedSubclasses();
+				for ( Class subClazz : subClasses ) {
+					@SuppressWarnings( "unchecked" )
+					Work subClassWork = new Work( subClazz, id, WorkType.PURGE_ALL );
+					searchFactoryImplementor.getWorker().performWork( subClassWork, transactionContext );
+				}
+			}
+			else {
+				work = new Work<T>( clazz, id, WorkType.PURGE );
+				searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+			}
 		}
 	}
 

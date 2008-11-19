@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -75,8 +76,11 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private Map<String, Analyzer> analyzers;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
+
+	private final PolymorphicIndexHierarchy indexHierarchy = new PolymorphicIndexHierarchy();
+
 	/*
-	 * used as a barrier (piggyback usage) between initialization and subsequent usage of searchFactory in different threads
+	 * Used as a barrier (piggyback usage) between initialization and subsequent usage of searchFactory in different threads
 	 * this is due to our use of the initialize pattern is a few areas
 	 * subsequent reads on volatiles should be very cheap on most platform especially since we don't write after init
 	 *
@@ -90,12 +94,13 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	 * Each directory provider (index) can have its own performance settings.
 	 */
 	private Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams =
-		new HashMap<DirectoryProvider, LuceneIndexingParameters>();
+			new HashMap<DirectoryProvider, LuceneIndexingParameters>();
 	private final String indexingStrategy;
 
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
-		if (barrier != 0) { } //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return backendQueueProcessorFactory;
 	}
 
@@ -113,56 +118,60 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		initDocumentBuilders( cfg, reflectionManager );
 
 		Set<Class<?>> indexedClasses = documentBuilders.keySet();
-		for (DocumentBuilder builder : documentBuilders.values()) {
+		for ( DocumentBuilder builder : documentBuilders.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 		//not really necessary today
-		for (DocumentBuilder builder : containedInOnlyBuilders.values()) {
+		for ( DocumentBuilder builder : containedInOnlyBuilders.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 		this.worker = WorkerFactory.createWorker( cfg, this );
 		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		this.filterCachingStrategy = buildFilterCachingStrategy( cfg.getProperties() );
-		this.cacheBitResultsSize = ConfigurationParseHelper.getIntValue( cfg.getProperties(), Environment.CACHE_BIT_RESULT_SIZE, CachingWrapperFilter.DEFAULT_SIZE );
+		this.cacheBitResultsSize = ConfigurationParseHelper.getIntValue(
+				cfg.getProperties(), Environment.CACHE_BIT_RESULT_SIZE, CachingWrapperFilter.DEFAULT_SIZE
+		);
 		this.barrier = 1; //write barrier
 	}
 
 	private static String defineIndexingStrategy(SearchConfiguration cfg) {
 		String indexingStrategy = cfg.getProperties().getProperty( Environment.INDEXING_STRATEGY, "event" );
-		if ( ! ("event".equals( indexingStrategy ) || "manual".equals( indexingStrategy ) ) ) {
+		if ( !( "event".equals( indexingStrategy ) || "manual".equals( indexingStrategy ) ) ) {
 			throw new SearchException( Environment.INDEXING_STRATEGY + " unknown: " + indexingStrategy );
 		}
 		return indexingStrategy;
 	}
 
 	public String getIndexingStrategy() {
-		if (barrier != 0) { } //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return indexingStrategy;
 	}
 
 	public void close() {
-		if (barrier != 0) { } //read barrier
-		if ( stopped.compareAndSet( false, true) ) {
+		if ( barrier != 0 ) {
+		} //read barrier
+		if ( stopped.compareAndSet( false, true ) ) {
 			try {
 				worker.close();
 			}
-			catch (Exception e) {
+			catch ( Exception e ) {
 				log.error( "Worker raises an exception on close()", e );
 			}
 
 			try {
 				readerProvider.destroy();
 			}
-			catch (Exception e) {
+			catch ( Exception e ) {
 				log.error( "ReaderProvider raises an exception on destroy()", e );
 			}
 
 			//TODO move to DirectoryProviderFactory for cleaner
-			for (DirectoryProvider dp : getDirectoryProviders() ) {
+			for ( DirectoryProvider dp : getDirectoryProviders() ) {
 				try {
 					dp.stop();
 				}
-				catch (Exception e) {
+				catch ( Exception e ) {
 					log.error( "DirectoryProvider raises an exception on stop() ", e );
 				}
 			}
@@ -171,17 +180,18 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	public void addClassToDirectoryProvider(Class<?> clazz, DirectoryProvider<?> directoryProvider) {
 		//no need to set a read barrier, we only use this class in the init thread
-		DirectoryProviderData data = dirProviderData.get(directoryProvider);
-		if (data == null) {
+		DirectoryProviderData data = dirProviderData.get( directoryProvider );
+		if ( data == null ) {
 			data = new DirectoryProviderData();
 			dirProviderData.put( directoryProvider, data );
 		}
-		data.classes.add(clazz);
+		data.classes.add( clazz );
 	}
 
 	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-		if (barrier != 0) { } //read barrier
-		return Collections.unmodifiableSet( dirProviderData.get(directoryProvider).classes );
+		if ( barrier != 0 ) {
+		} //read barrier
+		return Collections.unmodifiableSet( dirProviderData.get( directoryProvider ).classes );
 	}
 
 	private void bindFilterDefs(XClass mappedXClass) {
@@ -190,7 +200,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			bindFilterDef( defAnn, mappedXClass );
 		}
 		FullTextFilterDefs defsAnn = mappedXClass.getAnnotation( FullTextFilterDefs.class );
-		if (defsAnn != null) {
+		if ( defsAnn != null ) {
 			for ( FullTextFilterDef def : defsAnn.value() ) {
 				bindFilterDef( def, mappedXClass );
 			}
@@ -199,35 +209,45 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	private void bindFilterDef(FullTextFilterDef defAnn, XClass mappedXClass) {
 		if ( filterDefinitions.containsKey( defAnn.name() ) ) {
-			throw new SearchException("Multiple definition of @FullTextFilterDef.name=" + defAnn.name() + ": "
-					+ mappedXClass.getName() );
+			throw new SearchException(
+					"Multiple definition of @FullTextFilterDef.name=" + defAnn.name() + ": "
+							+ mappedXClass.getName()
+			);
 		}
 
-		FilterDef filterDef = new FilterDef(defAnn);
+		FilterDef filterDef = new FilterDef( defAnn );
 		try {
 			filterDef.getImpl().newInstance();
 		}
-		catch (IllegalAccessException e) {
-			throw new SearchException("Unable to create Filter class: " + filterDef.getImpl().getName(), e);
+		catch ( IllegalAccessException e ) {
+			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
 		}
-		catch (InstantiationException e) {
-			throw new SearchException("Unable to create Filter class: " + filterDef.getImpl().getName(), e);
+		catch ( InstantiationException e ) {
+			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
 		}
 		for ( Method method : filterDef.getImpl().getMethods() ) {
 			if ( method.isAnnotationPresent( Factory.class ) ) {
 				if ( filterDef.getFactoryMethod() != null ) {
-					throw new SearchException("Multiple @Factory methods found" + defAnn.name() + ": "
-							+ filterDef.getImpl().getName() + "." + method.getName() );
+					throw new SearchException(
+							"Multiple @Factory methods found" + defAnn.name() + ": "
+									+ filterDef.getImpl().getName() + "." + method.getName()
+					);
 				}
-				if ( !method.isAccessible() ) method.setAccessible( true );
+				if ( !method.isAccessible() ) {
+					method.setAccessible( true );
+				}
 				filterDef.setFactoryMethod( method );
 			}
 			if ( method.isAnnotationPresent( Key.class ) ) {
 				if ( filterDef.getKeyMethod() != null ) {
-					throw new SearchException("Multiple @Key methods found" + defAnn.name() + ": "
-							+ filterDef.getImpl().getName() + "." + method.getName() );
+					throw new SearchException(
+							"Multiple @Key methods found" + defAnn.name() + ": "
+									+ filterDef.getImpl().getName() + "." + method.getName()
+					);
 				}
-				if ( !method.isAccessible() ) method.setAccessible( true );
+				if ( !method.isAccessible() ) {
+					method.setAccessible( true );
+				}
 				filterDef.setKeyMethod( method );
 			}
 
@@ -241,36 +261,41 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 
 	public Map<Class<?>, DocumentBuilder<?>> getDocumentBuilders() {
-		if (barrier != 0) { } //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return documentBuilders;
 	}
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public <T> DocumentBuilder<T> getDocumentBuilder(Class<T> entityType) {
-		if (barrier != 0) { } //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return ( DocumentBuilder<T> ) documentBuilders.get( entityType );
 	}
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	public <T> DocumentBuilder<T> getContainedInOnlyBuilder(Class<T> entityType) {
-		if (barrier != 0) { } //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return ( DocumentBuilder<T> ) containedInOnlyBuilders.get( entityType );
 	}
 
 	public Set<DirectoryProvider<?>> getDirectoryProviders() {
-		if (barrier != 0) { } //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return this.dirProviderData.keySet();
 	}
 
 	public Worker getWorker() {
-		if (barrier != 0) { } //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return worker;
 	}
 
 	public void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy) {
 		//no need to set a read barrier, we run this method on the init thread
-		DirectoryProviderData data = dirProviderData.get(provider);
-		if (data == null) {
+		DirectoryProviderData data = dirProviderData.get( provider );
+		if ( data == null ) {
 			data = new DirectoryProviderData();
 			dirProviderData.put( provider, data );
 		}
@@ -283,63 +308,74 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return dirProviderData.get( provider ).optimizerStrategy;
 	}
 
-	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider ) {
-		if (barrier != 0) {} //read barrier
+	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
+		if ( barrier != 0 ) {
+		} //read barrier
 		return dirProviderIndexingParams.get( provider );
 	}
 
 	public ReaderProvider getReaderProvider() {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return readerProvider;
 	}
 
 	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		DocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
 		return documentBuilder == null ? null : documentBuilder.getDirectoryProviders();
 	}
 
 	public void optimize() {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		Set<Class<?>> clazzs = getDocumentBuilders().keySet();
-		for (Class clazz : clazzs) {
+		for ( Class clazz : clazzs ) {
 			optimize( clazz );
 		}
 	}
 
 	public void optimize(Class entityType) {
-		if (barrier != 0) {} //read barrier
-		if ( ! getDocumentBuilders().containsKey( entityType ) ) {
-			throw new SearchException("Entity not indexed: " + entityType);
+		if ( barrier != 0 ) {
+		} //read barrier
+		if ( !getDocumentBuilders().containsKey( entityType ) ) {
+			throw new SearchException( "Entity not indexed: " + entityType );
 		}
-		List<LuceneWork> queue = new ArrayList<LuceneWork>(1);
+		List<LuceneWork> queue = new ArrayList<LuceneWork>( 1 );
 		queue.add( new OptimizeLuceneWork( entityType ) );
 		getBackendQueueProcessorFactory().getProcessor( queue ).run();
 	}
 
 	public Analyzer getAnalyzer(String name) {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		final Analyzer analyzer = analyzers.get( name );
-		if ( analyzer == null) throw new SearchException( "Unknown Analyzer definition: " + name);
+		if ( analyzer == null ) {
+			throw new SearchException( "Unknown Analyzer definition: " + name );
+		}
 		return analyzer;
 	}
-	
+
 	public Analyzer getAnalyzer(Class clazz) {
-		if ( clazz ==  null) {
+		if ( clazz == null ) {
 			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
 		}
-		
+
 		DocumentBuilder<?> builder = documentBuilders.get( clazz );
 		if ( builder == null ) {
-			throw new IllegalArgumentException( "Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName() );
+			throw new IllegalArgumentException(
+					"Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName()
+			);
 		}
-		
+
 		return builder.getAnalyzer();
-	}	
+	}
 
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager) {
 		InitContext context = new InitContext( cfg );
@@ -348,35 +384,48 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 		while ( iter.hasNext() ) {
 			Class mappedClass = iter.next();
-			if (mappedClass != null) {
-				XClass mappedXClass = reflectionManager.toXClass(mappedClass);
-				if ( mappedXClass != null) {
-					if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
-						DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders( mappedXClass, cfg, this, reflectionManager );
-						//FIXME DocumentBuilder needs to be built by a helper method receiving Class<T> to infer T properly
-						//XClass unfortunately is not (yet) genericized: TODO?
-						final DocumentBuilder<?> documentBuilder = new DocumentBuilder(
-								mappedXClass, context, providers.getProviders(), providers.getSelectionStrategy(),
-								reflectionManager
-						);
+			if ( mappedClass == null ) {
+				continue;
+			}
+			@SuppressWarnings( "unchecked" )
+			XClass mappedXClass = reflectionManager.toXClass( mappedClass );
+			if ( mappedXClass == null ) {
+				continue;
+			}
 
-						documentBuilders.put( mappedClass, documentBuilder );
-					}
-					else {
-						//FIXME DocumentBuilder needs to be built by a helper method receiving Class<T> to infer T properly
-						//XClass unfortunately is not (yet) genericized: TODO?
-						final DocumentBuilder<?> documentBuilder = new DocumentBuilder(
-								mappedXClass, context, reflectionManager
-						);
-						//TODO enhance that, I don't like to expose EntityState
-						if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
-							containedInOnlyBuilders.put( mappedClass, documentBuilder );
-						}
-					}
-					bindFilterDefs(mappedXClass);
-					//TODO should analyzer def for classes at tyher sqme level???
+			if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
+
+				if ( mappedXClass.isAbstract() ) {
+					log.warn( "Abstract classes can never insert index documents. Remove @Indexed." );
+					continue;
+				}
+
+				DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders(
+						mappedXClass, cfg, this, reflectionManager
+				);
+				//FIXME DocumentBuilder needs to be built by a helper method receiving Class<T> to infer T properly
+				//XClass unfortunately is not (yet) genericized: TODO?
+				final DocumentBuilder<?> documentBuilder = new DocumentBuilder(
+						mappedXClass, context, providers.getProviders(), providers.getSelectionStrategy(),
+						reflectionManager
+				);
+
+				indexHierarchy.addIndexedClass( mappedClass );
+				documentBuilders.put( mappedClass, documentBuilder );
+			}
+			else {
+				//FIXME DocumentBuilder needs to be built by a helper method receiving Class<T> to infer T properly
+				//XClass unfortunately is not (yet) genericized: TODO?
+				final DocumentBuilder<?> documentBuilder = new DocumentBuilder(
+						mappedXClass, context, reflectionManager
+				);
+				//TODO enhance that, I don't like to expose EntityState
+				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
+					containedInOnlyBuilders.put( mappedClass, documentBuilder );
 				}
 			}
+			bindFilterDefs( mappedXClass );
+			//TODO should analyzer def for classes at tyher sqme level???
 		}
 		analyzers = context.initLazyAnalyzers();
 		factory.startDirectoryProviders();
@@ -390,16 +439,21 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		}
 		else {
 			try {
-				Class filterCachingStrategyClass = org.hibernate.annotations.common.util.ReflectHelper.classForName( impl, SearchFactoryImpl.class );
-				filterCachingStrategy = (FilterCachingStrategy) filterCachingStrategyClass.newInstance();
+				Class filterCachingStrategyClass = org.hibernate
+						.annotations
+						.common
+						.util
+						.ReflectHelper
+						.classForName( impl, SearchFactoryImpl.class );
+				filterCachingStrategy = ( FilterCachingStrategy ) filterCachingStrategyClass.newInstance();
 			}
-			catch (ClassNotFoundException e) {
+			catch ( ClassNotFoundException e ) {
 				throw new SearchException( "Unable to find filterCachingStrategy class: " + impl, e );
 			}
-			catch (IllegalAccessException e) {
+			catch ( IllegalAccessException e ) {
 				throw new SearchException( "Unable to instantiate filterCachingStrategy class: " + impl, e );
 			}
-			catch (InstantiationException e) {
+			catch ( InstantiationException e ) {
 				throw new SearchException( "Unable to instantiate filterCachingStrategy class: " + impl, e );
 			}
 		}
@@ -408,23 +462,26 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public FilterCachingStrategy getFilterCachingStrategy() {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return filterCachingStrategy;
 	}
 
 	public FilterDef getFilterDefinition(String name) {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return filterDefinitions.get( name );
 	}
 
 	private static class DirectoryProviderData {
 		public final ReentrantLock dirLock = new ReentrantLock();
 		public OptimizerStrategy optimizerStrategy;
-		public Set<Class<?>> classes = new HashSet<Class<?>>(2);
+		public Set<Class<?>> classes = new HashSet<Class<?>>( 2 );
 	}
 
 	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return this.dirProviderData.get( dp ).dirLock;
 	}
 
@@ -434,7 +491,58 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public int getFilterCacheBitResultsSize() {
-		if (barrier != 0) {} //read barrier
+		if ( barrier != 0 ) {
+		} //read barrier
 		return cacheBitResultsSize;
+	}
+
+	public Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes) {
+		return indexHierarchy.getIndexedClasses( classes );
+	}
+
+	/**
+	 * Helper class which keeps track of all super classes and interfaces of the indexed entities.
+	 */
+	private static class PolymorphicIndexHierarchy {
+		private Map<Class<?>, Set<Class<?>>> classToIndexedClass;
+
+		PolymorphicIndexHierarchy() {
+			classToIndexedClass = new HashMap<Class<?>, Set<Class<?>>>();
+		}
+
+		void addIndexedClass(Class indexedClass) {
+			addClass( indexedClass, indexedClass );
+			Class superClass = indexedClass.getSuperclass();
+			while ( superClass != null ) {
+				addClass( superClass, indexedClass );
+				superClass = superClass.getSuperclass();
+			}
+			for ( Class clazz : indexedClass.getInterfaces() ) {
+				addClass( clazz, indexedClass );
+			}
+		}
+
+		private void addClass(Class superclass, Class indexedClass) {
+			Set<Class<?>> classesSet = classToIndexedClass.get( superclass );
+			if ( classesSet == null ) {
+				classesSet = new HashSet<Class<?>>();
+				classToIndexedClass.put( superclass, classesSet );
+			}
+			classesSet.add( indexedClass );
+		}
+
+		Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
+			Set<Class<?>> classesSet = new HashSet<Class<?>>();
+			for ( Class clazz : classes ) {
+				Set<Class<?>> set = classToIndexedClass.get( clazz );
+				if ( set != null ) {
+					classesSet.addAll( set );
+				}
+			}
+			if ( log.isTraceEnabled() ) {
+				log.trace( "Targeted indexed classes for {}: {}", Arrays.toString( classes ), classesSet );
+			}
+			return classesSet;
+		}
 	}
 }

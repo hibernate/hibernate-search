@@ -2,6 +2,7 @@
 package org.hibernate.search.test.inheritance;
 
 import java.util.List;
+import java.io.Serializable;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.index.Term;
@@ -26,39 +27,74 @@ public class InheritanceTest extends SearchTestCase {
 
 	public void testInheritance() throws Exception {
 		createTestData();
+
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
+
 		QueryParser parser = new QueryParser( "name", new StopAnalyzer() );
+		Query query = parser.parse( "Elephant" );
+		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
+		assertItsTheElephant( hibQuery.list() );
 
-		Query query;
-		org.hibernate.Query hibQuery;
-
-		query = parser.parse( "Elephant" );
-		hibQuery = s.createFullTextQuery( query, Mammal.class );
-		List result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query subclass by superclass attribute", 1, result.size() );
-
-		query = parser.parse( "mammalNbr:[2 TO 2]" );
+		query = parser.parse( "hasSweatGlands:false" );
 		hibQuery = s.createFullTextQuery( query, Animal.class, Mammal.class );
-		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query subclass by subclass attribute", 1, result.size() );
+		assertItsTheElephant( hibQuery.list() );
 
-		query = parser.parse( "Jr" );
-		hibQuery = s.createFullTextQuery( query, Animal.class );
-		result = hibQuery.list();
+		query = parser.parse( "Elephant OR White Pointer" );
+		hibQuery = s.createFullTextQuery( query, Being.class );
+		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query filtering on superclass return mapped subclasses", 2, result.size() );
 
-		query = new RangeQuery( new Term( "weight", "00200" ), null, true );
+		query = new RangeQuery( new Term( "weight", "04000" ), new Term( "weight", "05000" ), true );
 		hibQuery = s.createFullTextQuery( query, Animal.class );
-		result = hibQuery.list();
-		assertNotNull( result );
-		assertEquals( "Query on non @Indexed superclass property", 1, result.size() );
+		assertItsTheElephant( hibQuery.list() );
+
+		query = parser.parse( "Elephant" );
+		hibQuery = s.createFullTextQuery( query, Being.class );
+		assertItsTheElephant( hibQuery.list() );
 
 		tx.commit();
 		s.close();
+	}
+
+
+	public void testPolymorphicQueries() throws Exception {
+		createTestData();
+
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+		QueryParser parser = new QueryParser( "name", new StopAnalyzer() );
+		Query query = parser.parse( "Elephant" );
+
+		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
+		assertItsTheElephant( hibQuery.list() );
+
+		hibQuery = s.createFullTextQuery( query, Animal.class );
+		assertItsTheElephant( hibQuery.list() );
+
+		hibQuery = s.createFullTextQuery( query, Being.class );
+		assertItsTheElephant( hibQuery.list() );
+
+		hibQuery = s.createFullTextQuery( query, Object.class );
+		assertItsTheElephant( hibQuery.list() );
+
+		hibQuery = s.createFullTextQuery( query, Serializable.class );
+		assertItsTheElephant( hibQuery.list() );
+
+		hibQuery = s.createFullTextQuery( query, Mammal.class, Animal.class, Being.class, Object.class, Serializable.class );
+		assertItsTheElephant( hibQuery.list() );
+
+		tx.commit();
+		s.close();
+	}
+
+	private void assertItsTheElephant(List result) {
+		assertNotNull( result );
+		assertEquals( "Wrong number of results", 1, result.size() );
+		assertTrue( "Wrong result type", result.get( 0 ) instanceof Mammal );
+		Mammal mammal = ( Mammal ) result.get( 0 );
+		assertEquals( "Wrong animal name", "Elephant", mammal.getName() );
 	}
 
 	/**
@@ -72,10 +108,10 @@ public class InheritanceTest extends SearchTestCase {
 		Transaction tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( "name", new StopAnalyzer() );
 
-		Query query = parser.parse( "Jr" );
+		Query query = parser.parse( "Elephant OR White Pointer OR Chimpanzee" );
 		List result = s.createFullTextQuery( query, Animal.class ).list();
 		assertNotNull( result );
-		assertEquals( "Wrong number of hits. There should be one elephant and one shark.", 2, result.size() );
+		assertEquals( "Wrong number of hits. There should be one elephant and one shark.", 3, result.size() );
 
 		s.purgeAll( Animal.class );
 		tx.commit();
@@ -87,38 +123,40 @@ public class InheritanceTest extends SearchTestCase {
 		);
 
 		tx.commit();
-
 		s.close();
 	}
 
 	private void createTestData() {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		Animal a = new Animal();
-		a.setName( "Shark Jr" );
-		s.save( a );
-		Mammal m = new Mammal();
-		m.setMammalNbr( 2 );
-		m.setName( "Elephant Jr" );
-		m.setWeight( 400 );
-		s.save( m );
-		tx.commit();//post commit events for lucene
-		s.clear();
-	}
 
-	private void ensureIndexesAreEmpty() {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx;
-		tx = s.beginTransaction();
-		s.purgeAll( Animal.class );
-		s.purgeAll( Mammal.class );
+		Fish shark = new Fish();
+		shark.setName( "White Pointer" );
+		shark.setNumberOfDorsalFins( 2 );
+		shark.setWeight( 1500 );
+		s.save( shark );
+
+		Mammal elephant = new Mammal();
+		elephant.setName( "Elephant" );
+		elephant.setHasSweatGlands( false );
+		elephant.setWeight( 4500 );
+		s.save( elephant );
+
+		Mammal chimp = new Mammal();
+		chimp.setName( "Chimpanzee" );
+		chimp.setHasSweatGlands( true );
+		chimp.setWeight( 50 );
+		s.save( chimp );
+
 		tx.commit();
+		s.clear();
 	}
 
 	protected Class[] getMappings() {
 		return new Class[] {
 				Animal.class,
-				Mammal.class
+				Mammal.class,
+				Fish.class
 		};
 	}
 }

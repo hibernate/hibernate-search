@@ -96,11 +96,7 @@ public class FilterTest extends SearchTestCase {
 			//success
 		}
 
-
 		s.getTransaction().commit();
-
-
-
 		s.close();
 		deleteData();
 	}

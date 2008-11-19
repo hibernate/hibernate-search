@@ -58,5 +58,7 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	void addDirectoryProvider(DirectoryProvider<?> provider);
 	
-	int getFilterCacheBitResultsSize();	
+	int getFilterCacheBitResultsSize();
+
+	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
 }

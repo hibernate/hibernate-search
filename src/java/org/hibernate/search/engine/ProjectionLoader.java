@@ -3,6 +3,7 @@ package org.hibernate.search.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.transform.ResultTransformer;
@@ -21,7 +22,7 @@ public class ProjectionLoader implements Loader {
 	private Boolean projectThis;
 	private ResultTransformer transformer;
 	private String[] aliases;
-	private Class[] entityTypes;
+	private Set<Class<?>> entityTypes;
 
 	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
 		this.session = session;
@@ -34,7 +35,7 @@ public class ProjectionLoader implements Loader {
 		this.aliases = aliases;
 	}
 
-	public void setEntityTypes(Class[] entityTypes) {
+	public void setEntityTypes(Set<Class<?>> entityTypes) {
 		this.entityTypes = entityTypes;
 	}
 
