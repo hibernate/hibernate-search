@@ -2,6 +2,7 @@
 package org.hibernate.search.test.indexingStrategy;
 
 import org.apache.lucene.index.IndexReader;
+
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.test.AlternateDocument;
@@ -16,7 +17,6 @@ public class ManualIndexingStrategyTest extends SearchTestCase {
 
 	public void testMultipleEntitiesPerIndex() throws Exception {
 
-
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
 		Document document =
@@ -24,7 +24,12 @@ public class ManualIndexingStrategyTest extends SearchTestCase {
 		s.persist( document );
 		s.flush();
 		s.persist(
-				new AlternateDocument( document.getId(), "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" )
+				new AlternateDocument(
+						document.getId(),
+						"Hibernate in Action",
+						"Object/relational mapping with Hibernate",
+						"blah blah blah"
+				)
 		);
 		s.getTransaction().commit();
 		s.close();
