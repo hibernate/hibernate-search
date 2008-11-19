@@ -22,7 +22,6 @@ public class InheritanceTest extends SearchTestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		ensureIndexesAreEmpty();
 	}
 
 	public void testInheritance() throws Exception {

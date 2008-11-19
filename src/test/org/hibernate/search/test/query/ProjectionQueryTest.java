@@ -166,7 +166,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "lastname incorrect", "Griffin", projection[1] );
 		assertEquals( "dept incorrect", "ITech", projection[2] );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
-		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
+		assertTrue( "SCORE incorrect", projection[4] instanceof Float );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 4, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "legacy ID incorrect", 1000, projection[6] );
@@ -177,7 +177,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "lastname incorrect", "Whetbrook", projection[1] );
 		assertEquals( "dept incorrect", "ITech", projection[2] );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
-		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
+		assertTrue( "SCORE incorrect", projection[4] instanceof Float );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 4, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "legacy ID incorrect", 1004, projection[6] );
@@ -188,7 +188,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "lastname incorrect", "Stejskal", projection[1] );
 		assertEquals( "dept incorrect", "ITech", projection[2] );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
-		assertEquals( "SCORE incorrect", 1.0F, projection[4] );
+		assertTrue( "SCORE incorrect", projection[4] instanceof Float );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 4, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "legacy ID incorrect", 1003, projection[6] );
@@ -218,7 +218,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 			counter++;
 			assertEquals( "dept incorrect", "ITech", projection[2] );
 			assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
-			assertEquals( "SCORE incorrect", 1.0F, projection[4] );
+			assertTrue( "SCORE incorrect", projection[4] instanceof Float );
 			assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
 			assertEquals( "DOCUMENT size incorrect", 4, ( ( Document ) projection[5] ).getFields().size() );
 		}
@@ -258,7 +258,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "dept incorrect", "Accounting", projection[2] );
 		assertEquals( "THIS incorrect", "Jackson", ( ( Employee ) projection[3] ).getLastname() );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
-		assertEquals( "SCORE incorrect", 1.9162908F, projection[4] );
+		assertTrue( "SCORE incorrect", projection[4] instanceof Float );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 5, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "ID incorrect", 1001, projection[6] );
@@ -279,7 +279,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertTrue( "DOCUMENT incorrect", projection[0] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 5, ( ( Document ) projection[0] ).getFields().size() );
 		assertEquals( "THIS incorrect", projection[1], s.get( Employee.class, ( Serializable ) projection[4] ) );
-		assertEquals( "SCORE incorrect", 1.9162908F, projection[2] );
+		assertTrue( "SCORE incorrect", projection[2] instanceof Float );
 		assertNull( "BOOST not removed", projection[3] );
 		assertEquals( "ID incorrect", 1001, projection[4] );
 		assertEquals( "id incorrect", 1001, projection[5] );
@@ -331,7 +331,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNotNull( projection );
 
 		assertTrue( "THIS incorrect", projection[0] instanceof Employee );
-		assertEquals( "SCORE incorrect", 1.9162908F, projection[1] );
+		assertTrue( "SCORE incorrect", projection[1] instanceof Float );
 		assertEquals( "last name incorrect", "Jackson", projection[3] );
 
 		//cleanup

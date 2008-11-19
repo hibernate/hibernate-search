@@ -5,6 +5,7 @@ import java.io.File;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.store.Directory;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.event.PostInsertEventListener;
@@ -24,27 +25,28 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Base class for Hibernate Search unit tests.
- * 
+ *
  * @author Emmanuel Bernard
  */
 public abstract class SearchTestCase extends HANTestCase {
-	
-	private static final Logger log = LoggerFactory
-			.getLogger(SearchTestCase.class);
-	
+
+	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
+
 	private static File indexDir;
+
 	static {
-		String buildDir = System.getProperty("build.dir");
-		if (buildDir == null) {
+		String buildDir = System.getProperty( "build.dir" );
+		if ( buildDir == null ) {
 			buildDir = ".";
 		}
 		File current = new File( buildDir );
 		indexDir = new File( current, "indextemp" );
-		log.debug("Using {} as index directory.", indexDir.getAbsolutePath());
+		log.debug( "Using {} as index directory.", indexDir.getAbsolutePath() );
 	}
-	
+
 	protected void setUp() throws Exception {
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
+		ensureIndexesAreEmpty();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -53,20 +55,27 @@ public abstract class SearchTestCase extends HANTestCase {
 	}
 
 	private FullTextIndexEventListener getLuceneEventListener() {
-        PostInsertEventListener[] listeners = ( (SessionFactoryImpl) getSessions() ).getEventListeners().getPostInsertEventListeners();
-        FullTextIndexEventListener listener = null;
-        //FIXME this sucks since we mandante the event listener use
-        for (PostInsertEventListener candidate : listeners) {
-            if (candidate instanceof FullTextIndexEventListener ) {
-                listener = (FullTextIndexEventListener) candidate;
-                break;
-            }
-        }
-        if (listener == null) throw new HibernateException("Lucene event listener not initialized");
-        return listener;
-    }
+		PostInsertEventListener[] listeners = ( ( SessionFactoryImpl ) getSessions() ).getEventListeners()
+				.getPostInsertEventListeners();
+		FullTextIndexEventListener listener = null;
+		//FIXME this sucks since we mandante the event listener use
+		for ( PostInsertEventListener candidate : listeners ) {
+			if ( candidate instanceof FullTextIndexEventListener ) {
+				listener = ( FullTextIndexEventListener ) candidate;
+				break;
+			}
+		}
+		if ( listener == null ) {
+			throw new HibernateException( "Lucene event listener not initialized" );
+		}
+		return listener;
+	}
 
 	protected void ensureIndexesAreEmpty() {
+		if ( "jms".equals( getCfg().getProperty( "hibernate.search.worker.backend" ) ) ) {
+			log.debug( "JMS based test. Skipping index emptying" );
+			return;
+		}
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx;
 		tx = s.beginTransaction();
@@ -76,15 +85,17 @@ public abstract class SearchTestCase extends HANTestCase {
 			}
 		}
 		tx.commit();
+		s.close();
 	}
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
 		cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
 	}
-	
+
 	protected File getBaseIndexDir() {
 		return indexDir;
 	}
