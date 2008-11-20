@@ -154,7 +154,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
 			);
 			for ( int index = first; index <= max; index++ ) {
-				//TODO use indexSearcher.getIndexReader().document( hits.id(index), FieldSelector(indexProjection) );
 				infos.add( extractor.extract( index ) );
 			}
 			Loader loader = getLoader( sess, searchFactoryImplementor );
@@ -342,7 +341,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private QueryHits getQueryHits(Searcher searcher) throws IOException {
 		org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
 		buildFilters();
-		QueryHits queryHits = new QueryHits( searcher, query, filter, sort );
+		QueryHits queryHits;
+		if ( maxResults == null ) { // try to make sure that we get the right amount of top docs
+			queryHits = new QueryHits( searcher, query, filter, sort );
+		} else {
+			queryHits = new QueryHits( searcher, query, filter, sort, first() + maxResults );
+		}
 		resultSize = queryHits.totalHits;
 		return queryHits;
 	}
@@ -573,7 +577,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				firstResult :
 				0;
 	}
-
 
 	/**
 	 * Build the index searcher for this fulltext query.

@@ -45,14 +45,20 @@ public class QueryHits {
 	public final Sort sort;
 	public final int totalHits;
 	public TopDocs topDocs;
-	
+
 	public QueryHits(Searcher searcher, org.apache.lucene.search.Query preparedQuery, Filter filter, Sort sort)
+			throws IOException {
+		this( searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE );
+	}
+
+	public QueryHits(Searcher searcher, org.apache.lucene.search.Query preparedQuery, Filter filter, Sort sort,
+					 Integer n )
 			throws IOException {
 		this.preparedQuery = preparedQuery;
 		this.searcher = searcher;
 		this.filter = filter;
 		this.sort = sort;
-		updateTopDocs( DEFAULT_TOP_DOC_RETRIEVAL_SIZE );
+		updateTopDocs( n );
 		totalHits = topDocs.totalHits;
 	}
 
