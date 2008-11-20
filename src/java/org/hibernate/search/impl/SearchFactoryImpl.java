@@ -534,17 +534,19 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		}
 
 		Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
-			Set<Class<?>> classesSet = new HashSet<Class<?>>();
+			Set<Class<?>> idexedClasses = new HashSet<Class<?>>();
 			for ( Class clazz : classes ) {
 				Set<Class<?>> set = classToIndexedClass.get( clazz );
 				if ( set != null ) {
-					classesSet.addAll( set );
+					// at this point we don't have to care about including indexed subclasses of a indexed class
+					// MultiClassesQueryLoader will take care of this later and optimise the queries
+					idexedClasses.addAll( set );
 				}
 			}
 			if ( log.isTraceEnabled() ) {
-				log.trace( "Targeted indexed classes for {}: {}", Arrays.toString( classes ), classesSet );
+				log.trace( "Targeted indexed classes for {}: {}", Arrays.toString( classes ), idexedClasses );
 			}
-			return classesSet;
+			return idexedClasses;
 		}
 	}
 }

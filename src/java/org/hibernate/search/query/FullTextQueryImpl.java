@@ -104,6 +104,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		super( query.toString(), null, session, parameterMetadata );
 		this.luceneQuery = query;
 		this.targetedEntities = getSearchFactoryImplementor().getIndexedTypesPolymorphic( classes );
+		if ( classes != null && classes.length > 0 && targetedEntities.size() == 0 ) {
+			String msg = "None of the specified entity types or any of their subclasses are indexed.";
+			throw new IllegalArgumentException( msg );
+		}
 	}
 
 	/**

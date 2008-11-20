@@ -106,18 +106,15 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 			return;
 		}
 
-		// accessing the document builders is not strictly necessary but a small optimization plus let's make sure the
-		// client didn't mess something up.
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class[] {entityType} );
+		if ( targetedClasses.isEmpty() ) {
+			String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
+			throw new IllegalArgumentException( msg );
+		}
 
 		for ( Class clazz : targetedClasses ) {
 			DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilder( clazz );
-			if ( builder == null ) {
-				String msg = "Entity to index is not an @Indexed entity: " + clazz.getName();
-				throw new IllegalArgumentException( msg );
-			}
-
 			Work<T> work;
 			if ( id == null ) {
 				// purge the main entity
