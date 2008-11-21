@@ -12,48 +12,60 @@ import org.hibernate.search.SearchFactory;
  * @author Emmanuel Bernard
  */
 public interface FullTextEntityManager extends EntityManager {
+	
 	/**
-	 * Create a Query on top of a native Lucene Query returning the matching objects
+	 * Create a fulltext query on top of a native Lucene query returning the matching objects
 	 * of type <code>entities</code> and their respective subclasses.
-	 * If no entity is provided, no type filtering is done.
+	 *
+	 * @param luceneQuery The native Lucene query to be rn against the Lucene index.
+	 * @param entities List of classes for type filtering. The query result will only return entities of
+	 * the specified types and their respective subtype. If no class is specified no type filtering will take place.
+	 *
+	 * @return A <code>FullTextQuery</code> wrapping around the native Lucene wuery.
+	 *
+	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
-	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class... entities);
+	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
 
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
 	 * Indexation is batched per transaction: if a transaction is active, the operation
 	 * will not affect the index at least until commit.
-	 * 
+	 *
+	 * @param entity The entity to index - must not be <code>null</code>.
+	 *
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
-	void index(Object entity);
+	<T> void index(T entity);
 
 	/**
-	 * return the SearchFactory
+	 * @return the <code>SearchFactory</code> instance.
 	 */
 	SearchFactory getSearchFactory();
-	/**
-	 * Remove a particular entity from a particular class of an index.
-	 *
-	 * @param entityType
-	 * @param id
-	 *
-	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
-	 */
-	public void purge(Class entityType, Serializable id);
 
 	/**
-	 * Remove all entities from a particular class of an index.
+	 * Remove the entity with the type <code>entityType</code> and the identifier <code>id</code> from the index.
+	 * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
+	 * case this method behaves like {@link #purgeAll(Class)}.
 	 *
-	 * @param entityType
+	 * @param entityType The type of the entity to delete.
+	 * @param id The id of the entity to delete.
 	 *
-	 * @throws IllegalArgumentException if entityType is null or not an @Indexed entity type
+	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
-	public void purgeAll(Class entityType);
+	public <T> void purge(Class<T> entityType, Serializable id);
 
 	/**
-	 * flush index change
-	 * Force Hibernate Search to apply all changes to the index no waiting for the batch limit
+	 * Remove all entities from of particular class and all its subclasses from the index.
+	 *
+	 * @param entityType The class of the entities to remove.
+	 *
+	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
+	 */
+	public <T> void purgeAll(Class<T> entityType);
+
+	/**
+	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
 	 */
 	public void flushToIndexes();
 

@@ -11,6 +11,7 @@ import org.hibernate.classic.Session;
  * @author Emmanuel Bernard
  */
 public interface FullTextSession extends Session {
+	
 	/**
 	 * Create a fulltext query on top of a native Lucene query returning the matching objects
 	 * of type <code>entities</code> and their respective subclasses.
@@ -20,6 +21,8 @@ public interface FullTextSession extends Session {
 	 * the specified types and their respective subtype. If no class is specified no type filtering will take place.
 	 *
 	 * @return A <code>FullTextQuery</code> wrapping around the native Lucene wuery.
+	 *
+	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
 	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
 
@@ -47,7 +50,7 @@ public interface FullTextSession extends Session {
 	 * @param entityType The type of the entity to delete.
 	 * @param id The id of the entity to delete.
 	 *
-	 * @throws IllegalArgumentException if entityType is <code>null</codE> or not an @Indexed entity type.
+	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
 	public <T> void purge(Class<T> entityType, Serializable id);
 
@@ -56,13 +59,12 @@ public interface FullTextSession extends Session {
 	 *
 	 * @param entityType The class of the entities to remove.
 	 *
-	 * @throws IllegalArgumentException if entityType is <code>null</code> or not an @Indexed entity type.
+	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
 	public <T> void purgeAll(Class<T> entityType);
 
 	/**
-	 * flush full text changes to the index
-	 * Force Hibernate Search to apply all changes to the index no waiting for the batch limit
+	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
 	 */
 	public void flushToIndexes();
 }
