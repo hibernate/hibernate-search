@@ -15,7 +15,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -44,14 +44,14 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		final Class<?> entityType = work.getEntityClass();
 		log.trace( "Removing {}#{} by query.", entityType, work.getId() );
-		DocumentBuilder<?> builder = workspace.getDocumentBuilder( entityType );
+		DocumentBuilderIndexedEntity<?> builder = workspace.getDocumentBuilder( entityType );
 
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
 		TermQuery idQueryTerm = new TermQuery( builder.getTerm( work.getId() ) );
 		entityDeletionQuery.add( idQueryTerm, BooleanClause.Occur.MUST );
 
-		Term classNameQueryTerm =  new Term( DocumentBuilder.CLASS_FIELDNAME, entityType.getName() );
+		Term classNameQueryTerm =  new Term( DocumentBuilderIndexedEntity.CLASS_FIELDNAME, entityType.getName() );
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
 		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.MUST );
 
@@ -78,7 +78,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		 */
 		final Class<?> entityType = work.getEntityClass();
 		log.trace( "Removing {}#{} from Lucene index.", entityType, work.getId() );
-		DocumentBuilder<?> builder = workspace.getDocumentBuilder( entityType );
+		DocumentBuilderIndexedEntity<?> builder = workspace.getDocumentBuilder( entityType );
 		Term term = builder.getTerm( work.getId() );
 		TermDocs termDocs = null;
 		try {
@@ -88,7 +88,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 			String entityName = entityType.getName();
 			while ( termDocs.next() ) {
 				int docIndex = termDocs.doc();
-				if ( entityName.equals( reader.document( docIndex ).get( DocumentBuilder.CLASS_FIELDNAME ) ) ) {
+				if ( entityName.equals( reader.document( docIndex ).get( DocumentBuilderIndexedEntity.CLASS_FIELDNAME ) ) ) {
 					//remove only the one of the right class
 					//loop all to remove all the matches (defensive code)
 					reader.deleteDocument( docIndex );

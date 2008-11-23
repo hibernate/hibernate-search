@@ -14,12 +14,11 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
@@ -104,7 +103,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
 		SearchFactoryImpl searchFactory = ( SearchFactoryImpl ) fullTextSession.getSearchFactory();
-		DocumentBuilder builder = searchFactory.getDocumentBuilder( SpecialPerson.class );
+		DocumentBuilderIndexedEntity builder = searchFactory.getDocumentBuilderIndexedEntity( SpecialPerson.class );
 
 		// create test entity
 		SpecialPerson person = new SpecialPerson();

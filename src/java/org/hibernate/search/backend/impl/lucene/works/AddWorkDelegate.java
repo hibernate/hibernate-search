@@ -12,7 +12,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -40,7 +40,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 	}
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
-		DocumentBuilder documentBuilder = workspace.getDocumentBuilder( work.getEntityClass() );
+		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( work.getEntityClass() );
 		Analyzer analyzer = documentBuilder.getAnalyzer();
 		Similarity similarity = documentBuilder.getSimilarity();
 		if ( log.isTraceEnabled() ) {

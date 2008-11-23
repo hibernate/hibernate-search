@@ -41,7 +41,7 @@ import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.FilterDef;
@@ -547,10 +547,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			//A query filter is more practical than a manual class filtering post query (esp on scrollable resultsets)
 			//it also probably minimise the memory footprint	
 			BooleanQuery classFilter = new BooleanQuery();
-			//annihilate the scoring impact of DocumentBuilder.CLASS_FIELDNAME
+			//annihilate the scoring impact of DocumentBuilderIndexedEntity.CLASS_FIELDNAME
 			classFilter.setBoost( 0 );
 			for ( Class clazz : classesAndSubclasses ) {
-				Term t = new Term( DocumentBuilder.CLASS_FIELDNAME, clazz.getName() );
+				Term t = new Term( DocumentBuilderIndexedEntity.CLASS_FIELDNAME, clazz.getName() );
 				TermQuery termQuery = new TermQuery( t );
 				classFilter.add( termQuery, BooleanClause.Occur.SHOULD );
 			}
@@ -587,7 +587,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
-		Map<Class<?>, DocumentBuilder<?>> builders = searchFactoryImplementor.getDocumentBuilders();
+		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuilders();
 		List<DirectoryProvider> directories = new ArrayList<DirectoryProvider>();
 		Set<String> idFieldNames = new HashSet<String>();
 
@@ -602,7 +602,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				);
 			}
 
-			for ( DocumentBuilder builder : builders.values() ) {
+			for ( DocumentBuilderIndexedEntity builder : builders.values() ) {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
@@ -618,14 +618,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( targetedEntities.size() );
 			involvedClasses.addAll( targetedEntities );
 			for ( Class<?> clazz : targetedEntities ) {
-				DocumentBuilder<?> builder = builders.get( clazz );
+				DocumentBuilderIndexedEntity<?> builder = builders.get( clazz );
 				if ( builder != null ) {
 					involvedClasses.addAll( builder.getMappedSubclasses() );
 				}
 			}
 
 			for ( Class clazz : involvedClasses ) {
-				DocumentBuilder builder = builders.get( clazz );
+				DocumentBuilderIndexedEntity builder = builders.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
 				if ( builder == null ) {
 					throw new HibernateException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
@@ -685,7 +685,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 	}
 
-	private Similarity checkSimilarity(Similarity similarity, DocumentBuilder builder) {
+	private Similarity checkSimilarity(Similarity similarity, DocumentBuilderIndexedEntity builder) {
 		if ( similarity == null ) {
 			similarity = builder.getSimilarity();
 		}

@@ -46,7 +46,7 @@ public class ObjectLoaderHelper {
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) return;
 
-		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( entityType );
+		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityType );
 		String idName = builder.getIdentifierName();
 		int loop = maxResults / MAX_IN_CLAUSE;
 		boolean exact = maxResults % MAX_IN_CLAUSE == 0;

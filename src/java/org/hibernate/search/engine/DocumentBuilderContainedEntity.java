@@ -4,7 +4,6 @@ package org.hibernate.search.engine;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,13 +39,9 @@ import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
-import org.hibernate.search.backend.AddLuceneWork;
-import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
@@ -55,10 +50,8 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.impl.InitContext;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IndexShardingStrategy;
-import org.hibernate.search.util.BinderHelper;
 import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.ScopedAnalyzer;
 
 /**
@@ -70,19 +63,19 @@ import org.hibernate.search.util.ScopedAnalyzer;
  * @author Richard Hallier
  * @author Hardy Ferentschik
  */
-public class DocumentBuilder<T> {
+public class DocumentBuilderContainedEntity<T> {
 	private static final Logger log = LoggerFactory.make();
 
-	private final PropertiesMetadata rootPropertiesMetadata = new PropertiesMetadata();
-	private final XClass beanClass;
-	private final DirectoryProvider[] directoryProviders;
-	private final IndexShardingStrategy shardingStrategy;
-	private String idKeywordName;
+	public static final String CLASS_FIELDNAME = "_hibernate_class";
+
+	protected final PropertiesMetadata metadata = new PropertiesMetadata();
+	protected final XClass beanClass;
+	protected String idKeywordName;
 
 	/**
 	 * Flag indicating whether <code>@DocumentId</code> was explicitly specified.
 	 */
-	private boolean explicitDocumentId = false;
+	protected boolean explicitDocumentId = false;
 
 	/**
 	 * Flag indicating whether {@link org.apache.lucene.search.Searcher#doc(int, org.apache.lucene.document.FieldSelector)}
@@ -91,81 +84,72 @@ public class DocumentBuilder<T> {
 	 */
 	private boolean allowFieldSelectionInProjection = false;
 
-	private XMember idGetter;
-	private Float idBoost;
-	public static final String CLASS_FIELDNAME = "_hibernate_class";
-	private TwoWayFieldBridge idBridge;
-	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
+	protected XMember idGetter;
+	protected Float idBoost;
+	protected TwoWayFieldBridge idBridge;
+	protected Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private ReflectionManager reflectionManager; //available only during initializationa nd post-initialization
-	private int level = 0;
-	private int maxLevel = Integer.MAX_VALUE;
-	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
-	private Similarity similarity;
-	private boolean isRoot;
+	protected int level = 0;
+	protected int maxLevel = Integer.MAX_VALUE;
+	protected final ScopedAnalyzer analyzer = new ScopedAnalyzer();
+	protected Similarity similarity;
+	protected boolean isRoot;
 	//if composite id, use of (a, b) in ((1,2), (3,4)) fails on most database
 	private boolean safeFromTupleId;
-	private boolean idProvided = false;
-	private EntityState entityState;
+	protected boolean idProvided = false;
+	protected EntityState entityState;
 
 	/**
-	 * Constructor used on an @Indexed entity.
+	 * Constructor used on contained entities not annotated with <code>@Indexed</code> themselves.
+	 *
+	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>.
+	 * @param context Handle to default configuration settings.
+	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */
-	public DocumentBuilder(XClass clazz, InitContext context, DirectoryProvider[] directoryProviders,
-						   IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
-		this.entityState = EntityState.INDEXED;
-		this.beanClass = clazz;
-		this.directoryProviders = directoryProviders;
-		this.shardingStrategy = shardingStrategy;
-		//set to null after post-initialization
-		this.reflectionManager = reflectionManager;
-		this.similarity = context.getDefaultSimilarity();
+	public DocumentBuilderContainedEntity(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
 
-		init( clazz, context, reflectionManager );
-	}
+		if ( clazz == null ) {
+			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
+		}
 
-	/**
-	 * Constructor used on a non @Indexed entity.
-	 */
-	public DocumentBuilder(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanClass = clazz;
-		this.directoryProviders = null;
-		this.shardingStrategy = null;
-
-
 		this.reflectionManager = reflectionManager;
-		this.similarity = context.getDefaultSimilarity();
 
-		init( clazz, context, reflectionManager );
-		if ( rootPropertiesMetadata.containedInGetters.size() == 0 ) {
+		init( clazz, context );
+
+		if ( this.similarity == null ) {
+			this.similarity = context.getDefaultSimilarity();
+		}
+
+		if ( metadata.containedInGetters.size() == 0 ) {
 			this.entityState = EntityState.NON_INDEXABLE;
 		}
 	}
 
-	private void init(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
-		if ( clazz == null ) throw new AssertionFailure( "Unable to build a DocumentBuilder with a null class" );
-		rootPropertiesMetadata.boost = getBoost( clazz );
-		rootPropertiesMetadata.analyzer = context.getDefaultAnalyzer();
+	private void init(XClass clazz, InitContext context) {
+		metadata.boost = getBoost( clazz );
+		metadata.analyzer = context.getDefaultAnalyzer();
+
 		Set<XClass> processedClasses = new HashSet<XClass>();
 		processedClasses.add( clazz );
-		initializeMembers( clazz, rootPropertiesMetadata, true, "", processedClasses, context );
-		//processedClasses.remove( clazz ); for the sake of completness
-		this.analyzer.setGlobalAnalyzer( rootPropertiesMetadata.analyzer );
-		if ( entityState == EntityState.INDEXED && idKeywordName == null ) {
-			// if no DocumentId then check if we have a ProvidedId instead
-			ProvidedId provided = findProvidedId( clazz, reflectionManager );
-			if ( provided == null ) throw new SearchException( "No document id in: " + clazz.getName() );
+		initializeMembers( clazz, metadata, true, "", processedClasses, context );
 
-			idBridge = BridgeFactory.extractTwoWayType( provided.bridge() );
-			idKeywordName = provided.name();
-		}
+		this.analyzer.setGlobalAnalyzer( metadata.analyzer );
 
 		//if composite id, use of (a, b) in ((1,2)TwoWayString2FieldBridgeAdaptor, (3,4)) fails on most database
 		//a TwoWayString2FieldBridgeAdaptor is never a composite id
-		safeFromTupleId = entityState != EntityState.INDEXED || TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
+		safeFromTupleId = entityState != EntityState.INDEXED || TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom(
+				idBridge.getClass()
+		);
+
 		checkAllowFieldSelection();
 		if ( log.isDebugEnabled() ) {
-			log.debug( "Field selection in projections is set to {} for entity {}.", allowFieldSelectionInProjection, clazz.getName() );
+			log.debug(
+					"Field selection in projections is set to {} for entity {}.",
+					allowFieldSelectionInProjection,
+					clazz.getName()
+			);
 		}
 	}
 
@@ -175,11 +159,11 @@ public class DocumentBuilder<T> {
 	 */
 	private void checkAllowFieldSelection() {
 		allowFieldSelectionInProjection = true;
-		if ( ! (idBridge instanceof TwoWayStringBridge || idBridge instanceof TwoWayString2FieldBridgeAdaptor) ) {
+		if ( !( idBridge instanceof TwoWayStringBridge || idBridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
 			allowFieldSelectionInProjection = false;
 			return;
 		}
-		for ( FieldBridge bridge : rootPropertiesMetadata.fieldBridges) {
+		for ( FieldBridge bridge : metadata.fieldBridges ) {
 			if ( !( bridge instanceof TwoWayStringBridge || bridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
 				allowFieldSelectionInProjection = false;
 				return;
@@ -193,16 +177,6 @@ public class DocumentBuilder<T> {
 
 	public boolean allowFieldSelectionInProjection() {
 		return allowFieldSelectionInProjection;
-	}
-
-	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {
-		ProvidedId id = null;
-		XClass currentClass = clazz;
-		while ( id == null && ( !reflectionManager.equals( currentClass, Object.class ) ) ) {
-			id = currentClass.getAnnotation( ProvidedId.class );
-			currentClass = clazz.getSuperclass();
-		}
-		return id;
 	}
 
 	private Analyzer getAnalyzer(XAnnotatedElement annotatedElement, InitContext context) {
@@ -225,15 +199,18 @@ public class DocumentBuilder<T> {
 		}
 		else {
 			try {
-				return (Analyzer) analyzerClass.newInstance();
+				return ( Analyzer ) analyzerClass.newInstance();
 			}
-			catch (ClassCastException e) {
+			catch ( ClassCastException e ) {
 				throw new SearchException(
-						"Lucene analyzer does not implement " + Analyzer.class.getName() + ": " + analyzerClass.getName(), e
+						"Lucene analyzer does not implement " + Analyzer.class.getName() + ": " + analyzerClass.getName(),
+						e
 				);
 			}
-			catch (Exception e) {
-				throw new SearchException( "Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e );
+			catch ( Exception e ) {
+				throw new SearchException(
+						"Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e
+				);
 			}
 		}
 	}
@@ -241,13 +218,12 @@ public class DocumentBuilder<T> {
 	private void initializeMembers(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
 								   Set<XClass> processedClasses, InitContext context) {
 		List<XClass> hierarchy = new ArrayList<XClass>();
-		for (XClass currClass = clazz; currClass != null; currClass = currClass.getSuperclass()) {
+		for ( XClass currClass = clazz; currClass != null; currClass = currClass.getSuperclass() ) {
 			hierarchy.add( currClass );
 		}
-		Class similarityClass = null;
-		for (int index = hierarchy.size() - 1; index >= 0; index--) {
+		for ( int index = hierarchy.size() - 1; index >= 0; index-- ) {
 			XClass currClass = hierarchy.get( index );
-			/**
+			/*
 			 * Override the default analyzer for the properties if the class hold one
 			 * That's the reason we go down the hierarchy
 			 */
@@ -257,11 +233,12 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.analyzer = analyzer;
 			}
 			checkForAnalyzerDefs( currClass, context );
+
 			// Check for any ClassBridges annotation.
 			ClassBridges classBridgesAnn = currClass.getAnnotation( ClassBridges.class );
 			if ( classBridgesAnn != null ) {
 				ClassBridge[] cbs = classBridgesAnn.value();
-				for (ClassBridge cb : cbs) {
+				for ( ClassBridge cb : cbs ) {
 					bindClassAnnotation( prefix, propertiesMetadata, cb, context );
 				}
 			}
@@ -275,42 +252,37 @@ public class DocumentBuilder<T> {
 			//Get similarity
 			//TODO: similarity form @IndexedEmbedded are not taken care of. Exception??
 			if ( isRoot ) {
-				org.hibernate.search.annotations.Similarity similarityAnn = currClass.getAnnotation( org.hibernate.search.annotations.Similarity.class );
-				if ( similarityAnn != null ) {
-					if ( similarityClass != null ) {
-						throw new SearchException( "Multiple Similarities defined in the same class hierarchy: " + beanClass.getName() );
-					}
-					similarityClass = similarityAnn.impl();
-				}
+				checkForSimilarity( currClass );
 			}
 
-			//rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
+			// rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
 			// so indexing a non property does not make sense
 			List<XProperty> methods = currClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
-			for (XProperty method : methods) {
+			for ( XProperty method : methods ) {
 				initializeMember( method, propertiesMetadata, isRoot, prefix, processedClasses, context );
 			}
 
 			List<XProperty> fields = currClass.getDeclaredProperties( XClass.ACCESS_FIELD );
-			for (XProperty field : fields) {
+			for ( XProperty field : fields ) {
 				initializeMember( field, propertiesMetadata, isRoot, prefix, processedClasses, context );
 			}
 		}
-		if ( isRoot && similarityClass != null ) {
-			try {
-				similarity = (Similarity) similarityClass.newInstance();
-			}
-			catch (Exception e) {
-				log.error( "Exception attempting to instantiate Similarity '{}' set for {}",
-						similarityClass.getName(), beanClass.getName() );
-			}
-		}
+	}
+
+	private void initializeMember(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
+								  String prefix, Set<XClass> processedClasses, InitContext context) {
+		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context );
+		checkForField( member, propertiesMetadata, prefix, context );
+		checkForFields( member, propertiesMetadata, prefix, context );
+		checkForAnalyzerDefs( member, context );
+		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context );
+		checkForContainedIn( member, propertiesMetadata );
 	}
 
 	private void checkForAnalyzerDefs(XAnnotatedElement annotatedElement, InitContext context) {
 		AnalyzerDefs defs = annotatedElement.getAnnotation( AnalyzerDefs.class );
 		if ( defs != null ) {
-			for (AnalyzerDef def : defs.value()) {
+			for ( AnalyzerDef def : defs.value() ) {
 				context.addAnalyzerDef( def );
 			}
 		}
@@ -326,23 +298,33 @@ public class DocumentBuilder<T> {
 		return similarity;
 	}
 
-	private void initializeMember(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
-								  String prefix, Set<XClass> processedClasses, InitContext context) {
-
-		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context );
-		checkForField( member, propertiesMetadata, prefix, context );
-		checkForFields( member, propertiesMetadata, prefix, context );
-		checkForAnalyzerDefs( member, context );
-		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context );
-		checkForConstraintIn( member, propertiesMetadata );
-	}
-
 	private void checkForFields(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, InitContext context) {
 		org.hibernate.search.annotations.Fields fieldsAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Fields.class );
 		if ( fieldsAnn != null ) {
-			for (org.hibernate.search.annotations.Field fieldAnn : fieldsAnn.value()) {
+			for ( org.hibernate.search.annotations.Field fieldAnn : fieldsAnn.value() ) {
 				bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, context );
+			}
+		}
+	}
+
+	private void checkForSimilarity(XClass currClass) {
+		org.hibernate.search.annotations.Similarity similarityAnn = currClass.getAnnotation( org.hibernate.search.annotations.Similarity.class );
+		if ( similarityAnn != null ) {
+			if ( similarity != null ) {
+				throw new SearchException(
+						"Multiple Similarities defined in the same class hierarchy: " + beanClass.getName()
+				);
+			}
+			Class similarityClass = similarityAnn.impl();
+			try {
+				similarity = ( Similarity ) similarityClass.newInstance();
+			}
+			catch ( Exception e ) {
+				log.error(
+						"Exception attempting to instantiate Similarity '{}' set for {}",
+						similarityClass.getName(), beanClass.getName()
+				);
 			}
 		}
 	}
@@ -355,10 +337,10 @@ public class DocumentBuilder<T> {
 		}
 	}
 
-	private void checkForConstraintIn(XProperty member, PropertiesMetadata propertiesMetadata) {
+	private void checkForContainedIn(XProperty member, PropertiesMetadata propertiesMetadata) {
 		ContainedIn containedAnn = member.getAnnotation( ContainedIn.class );
 		if ( containedAnn != null ) {
-			setAccessible( member );
+			ReflectionHelper.setAccessible( member );
 			propertiesMetadata.containedInGetters.add( member );
 		}
 	}
@@ -393,7 +375,7 @@ public class DocumentBuilder<T> {
 			if ( level <= maxLevel ) {
 				processedClasses.add( elementClass ); //push
 
-				setAccessible( member );
+				ReflectionHelper.setAccessible( member );
 				propertiesMetadata.embeddedGetters.add( member );
 				PropertiesMetadata metadata = new PropertiesMetadata();
 				propertiesMetadata.embeddedPropertiesMetadata.add( metadata );
@@ -440,25 +422,28 @@ public class DocumentBuilder<T> {
 			String attributeName = getIdAttributeName( member, idAnnotation );
 			if ( isRoot ) {
 				if ( idKeywordName != null && explicitDocumentId ) {
-					throw new AssertionFailure( "Two document id assigned: "
-							+ idKeywordName + " and " + attributeName );
+					throw new AssertionFailure(
+							"Two document id assigned: "
+									+ idKeywordName + " and " + attributeName
+					);
 				}
 				idKeywordName = prefix + attributeName;
 				FieldBridge fieldBridge = BridgeFactory.guessType( null, member, reflectionManager );
 				if ( fieldBridge instanceof TwoWayFieldBridge ) {
-					idBridge = (TwoWayFieldBridge) fieldBridge;
+					idBridge = ( TwoWayFieldBridge ) fieldBridge;
 				}
 				else {
 					throw new SearchException(
-							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName() );
+							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName()
+					);
 				}
 				idBoost = getBoost( member, null );
-				setAccessible( member );
+				ReflectionHelper.setAccessible( member );
 				idGetter = member;
 			}
 			else {
 				//component should index their document id
-				setAccessible( member );
+				ReflectionHelper.setAccessible( member );
 				propertiesMetadata.fieldGetters.add( member );
 				String fieldName = prefix + attributeName;
 				propertiesMetadata.fieldNames.add( fieldName );
@@ -469,8 +454,12 @@ public class DocumentBuilder<T> {
 				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
 				// property > entity analyzer (no field analyzer)
 				Analyzer analyzer = getAnalyzer( member, context );
-				if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
-				if ( analyzer == null ) throw new AssertionFailure( "Analizer should not be undefined" );
+				if ( analyzer == null ) {
+					analyzer = propertiesMetadata.analyzer;
+				}
+				if ( analyzer == null ) {
+					throw new AssertionFailure( "Analizer should not be undefined" );
+				}
 				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 			}
 		}
@@ -483,6 +472,8 @@ public class DocumentBuilder<T> {
 	 * to Hibernate Annotations.
 	 *
 	 * @param member the property to check for the id annotation.
+	 * @param context Handle to default configuration settings.
+	 *
 	 * @return the annotation used as document id or <code>null</code> if id annotation is specified on the property.
 	 */
 	private Annotation getIdAnnotation(XProperty member, InitContext context) {
@@ -498,35 +489,38 @@ public class DocumentBuilder<T> {
 			Class idClass;
 			try {
 				idClass = org.hibernate.util.ReflectHelper.classForName( "javax.persistence.Id", InitContext.class );
-			} catch ( ClassNotFoundException e ) {
+			}
+			catch ( ClassNotFoundException e ) {
 				throw new SearchException( "Unable to load @Id.class even though it should be present ?!" );
 			}
 			documentIdAnn = member.getAnnotation( idClass );
-			if ( documentIdAnn != null )
-					log.debug( "Found JPA id and using it as document id" );
+			if ( documentIdAnn != null ) {
+				log.debug( "Found JPA id and using it as document id" );
+			}
 		}
 		return documentIdAnn;
 	}
 
 	/**
-	 *  Determines the property name for the document id. It is either the name of the property itself or the
-	 *  value of the name attribute of the <code>idAnnotation</code>.
+	 * Determines the property name for the document id. It is either the name of the property itself or the
+	 * value of the name attribute of the <code>idAnnotation</code>.
 	 *
 	 * @param member the property used as id property.
 	 * @param idAnnotation the id annotation
+	 *
 	 * @return property name to be used as document id.
 	 */
 	private String getIdAttributeName(XProperty member, Annotation idAnnotation) {
 		String name = null;
 		try {
 			Method m = idAnnotation.getClass().getMethod( "name" );
-			name = (String) m.invoke( idAnnotation );
+			name = ( String ) m.invoke( idAnnotation );
 		}
 		catch ( Exception e ) {
 			// ignore
 		}
 
-		return BinderHelper.getAttributeName( member, name );
+		return ReflectionHelper.getAttributeName( member, name );
 	}
 
 	private void bindClassAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, InitContext context) {
@@ -540,25 +534,31 @@ public class DocumentBuilder<T> {
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
 
 		Analyzer analyzer = getAnalyzer( ann.analyzer(), context );
-		if ( analyzer == null ) analyzer = propertiesMetadata.analyzer;
-		if ( analyzer == null ) throw new AssertionFailure( "Analyzer should not be undefined" );
+		if ( analyzer == null ) {
+			analyzer = propertiesMetadata.analyzer;
+		}
+		if ( analyzer == null ) {
+			throw new AssertionFailure( "Analyzer should not be undefined" );
+		}
 		this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 	}
 
 	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, InitContext context) {
-		setAccessible( member );
+		ReflectionHelper.setAccessible( member );
 		propertiesMetadata.fieldGetters.add( member );
-		String fieldName = prefix + BinderHelper.getAttributeName( member, fieldAnn.name() );
+		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
 		propertiesMetadata.fieldNames.add( fieldName );
 		propertiesMetadata.fieldStore.add( getStore( fieldAnn.store() ) );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
-		propertiesMetadata.fieldBoosts.add( getBoost(member, fieldAnn) );
+		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
 		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
 		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, member, reflectionManager ) );
 
 		// Field > property > entity analyzer
 		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer(), context );
-		if ( analyzer == null ) analyzer = getAnalyzer( member, context );
+		if ( analyzer == null ) {
+			analyzer = getAnalyzer( member, context );
+		}
 		if ( analyzer != null ) {
 			this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 		}
@@ -567,8 +567,12 @@ public class DocumentBuilder<T> {
 	private Float getBoost(XProperty member, org.hibernate.search.annotations.Field fieldAnn) {
 		float computedBoost = 1.0f;
 		Boost boostAnn = member.getAnnotation( Boost.class );
-		if (boostAnn != null) computedBoost = boostAnn.value();
-		if (fieldAnn != null) computedBoost *= fieldAnn.boost().value();
+		if ( boostAnn != null ) {
+			computedBoost = boostAnn.value();
+		}
+		if ( fieldAnn != null ) {
+			computedBoost *= fieldAnn.boost().value();
+		}
 		return computedBoost;
 	}
 
@@ -630,141 +634,74 @@ public class DocumentBuilder<T> {
 	}
 
 	private Float getBoost(XClass element) {
-		if ( element == null ) return null;
+		if ( element == null ) {
+			return null;
+		}
 		Boost boost = element.getAnnotation( Boost.class );
 		return boost != null ?
 				boost.value() :
 				null;
 	}
 
-	private Object getMemberValue(Object bean, XMember getter) {
-		Object value;
-		try {
-			value = getter.invoke( bean );
-		}
-		catch (Exception e) {
-			throw new IllegalStateException( "Could not get property value", e );
-		}
-		return value;
-	}
-
 	//TODO could we use T instead of EntityClass?
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
-		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition
-		if ( entityState == EntityState.INDEXED ) {
-			List<LuceneWork> toDelete = new ArrayList<LuceneWork>();
-			boolean duplicateDelete = false;
-			for (LuceneWork luceneWork : queue) {
-				//avoid unecessary duplicated work
-				if ( luceneWork.getEntityClass() == entityClass
-						) {
-					Serializable currentId = luceneWork.getId();
-					//currentId != null => either ADD or Delete work
-					if ( currentId != null && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
-						if ( workType == WorkType.DELETE ) { //TODO add PURGE?
-							//DELETE should have precedence over any update before (HSEARCH-257)
-							//if an Add work is here, remove it
-							//if an other delete is here remember but still search for Add
-							if ( luceneWork instanceof AddLuceneWork ) {
-								toDelete.add( luceneWork );
-							}
-							else if ( luceneWork instanceof DeleteLuceneWork ) {
-								duplicateDelete = true;
-							}
-						}
-						else {
-							//we can safely say we are out, the other work is an ADD
-							return;
-						}
-					}
-					//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
-				}
-			}
-			for (LuceneWork luceneWork : toDelete) {
-				queue.remove( luceneWork );
-			}
-			if ( duplicateDelete ) return;
-
-			String idInString = idBridge.objectToString( id );
-			if ( workType == WorkType.ADD ) {
-				Document doc = getDocument( entity, id );
-				queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
-			}
-			else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
-				queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-			}
-			else if ( workType == WorkType.PURGE_ALL ) {
-				queue.add( new PurgeAllLuceneWork( entityClass ) );
-			}
-			else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
-				Document doc = getDocument( entity, id );
-				/**
-				 * even with Lucene 2.1, use of indexWriter to update is not an option
-				 * We can only delete by term, and the index doesn't have a term that
-				 * uniquely identify the entry.
-				 * But essentially the optimization we are doing is the same Lucene is doing, the only extra cost is the
-				 * double file opening.
-				 */
-				queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-				queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
-			}
-			else if ( workType == WorkType.INDEX ) {
-				Document doc = getDocument( entity, id );
-				queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-				queue.add( new AddLuceneWork( id, idInString, entityClass, doc, true ) );
-			}
-			else {
-				throw new AssertionFailure( "Unknown WorkType: " + workType );
-			}
-		}
-
 		/**
 		 * When references are changed, either null or another one, we expect dirty checking to be triggered (both sides
 		 * have to be updated)
 		 * When the internal object is changed, we apply the {Add|Update}Work on containedIns
 		 */
 		if ( workType.searchForContainers() ) {
-			processContainedIn( entity, queue, rootPropertiesMetadata, searchFactoryImplementor );
+			processContainedIn( entity, queue, metadata, searchFactoryImplementor );
 		}
 	}
 
-	private void processContainedIn(Object instance, List<LuceneWork> queue, PropertiesMetadata metadata, SearchFactoryImplementor searchFactoryImplementor) {
-		for (int i = 0; i < metadata.containedInGetters.size(); i++) {
+	protected void processContainedIn(Object instance, List<LuceneWork> queue, PropertiesMetadata metadata, SearchFactoryImplementor searchFactoryImplementor) {
+		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
-			Object value = getMemberValue( instance, member );
-			if ( value == null ) continue;
+			Object value = ReflectionHelper.getMemberValue( instance, member );
+			if ( value == null ) {
+				continue;
+			}
 
 			if ( member.isArray() ) {
-				for (Object arrayValue : (Object[]) value) {
+				for ( Object arrayValue : ( Object[] ) value ) {
 					//highly inneficient but safe wrt the actual targeted class
 					Class<?> valueClass = Hibernate.getClass( arrayValue );
-					DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( valueClass );
-					if ( builder == null ) continue;
-					processContainedInValue( arrayValue, queue, valueClass, builder, searchFactoryImplementor );
+					DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( valueClass );
+					if ( builderIndexedEntity == null ) {
+						continue;
+					}
+					processContainedInValue( arrayValue, queue, valueClass,
+							builderIndexedEntity, searchFactoryImplementor );
 				}
 			}
 			else if ( member.isCollection() ) {
 				Collection collection;
 				if ( Map.class.equals( member.getCollectionClass() ) ) {
 					//hum
-					collection = ( (Map) value ).values();
+					collection = ( ( Map ) value ).values();
 				}
 				else {
-					collection = (Collection) value;
+					collection = ( Collection ) value;
 				}
-				for (Object collectionValue : collection) {
+				for ( Object collectionValue : collection ) {
 					//highly inneficient but safe wrt the actual targeted class
 					Class<?> valueClass = Hibernate.getClass( collectionValue );
-					DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( valueClass );
-					if ( builder == null ) continue;
-					processContainedInValue( collectionValue, queue, valueClass, builder, searchFactoryImplementor );
+					DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( valueClass );
+					if ( builderIndexedEntity == null ) {
+						continue;
+					}
+					processContainedInValue( collectionValue, queue, valueClass,
+							builderIndexedEntity, searchFactoryImplementor );
 				}
 			}
 			else {
 				Class<?> valueClass = Hibernate.getClass( value );
-				DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( valueClass );
-				if ( builder == null ) continue;
-				processContainedInValue( value, queue, valueClass, builder, searchFactoryImplementor );
+				DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( valueClass );
+				if ( builderIndexedEntity == null ) {
+					continue;
+				}
+				processContainedInValue( value, queue, valueClass, builderIndexedEntity, searchFactoryImplementor );
 			}
 		}
 		//an embedded cannot have a useful @ContainedIn (no shared reference)
@@ -772,66 +709,81 @@ public class DocumentBuilder<T> {
 	}
 
 	private void processContainedInValue(Object value, List<LuceneWork> queue, Class<?> valueClass,
-										 DocumentBuilder builder, SearchFactoryImplementor searchFactoryImplementor) {
-		Serializable id = (Serializable) builder.getMemberValue( value, builder.idGetter );
-		builder.addWorkToQueue( valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor );
+										 DocumentBuilderIndexedEntity builderIndexedEntity, SearchFactoryImplementor searchFactoryImplementor) {
+		Serializable id = ( Serializable ) ReflectionHelper.getMemberValue( value, builderIndexedEntity.idGetter );
+		builderIndexedEntity.addWorkToQueue( valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor );
 	}
 
 	public Document getDocument(T instance, Serializable id) {
 		Document doc = new Document();
 		final Class<?> entityType = Hibernate.getClass( instance );
 		//XClass instanceClass = reflectionManager.toXClass( entityType );
-		if ( rootPropertiesMetadata.boost != null ) {
-			doc.setBoost( rootPropertiesMetadata.boost );
+		if ( metadata.boost != null ) {
+			doc.setBoost( metadata.boost );
 		}
 		{
 			Field classField =
-					new Field( CLASS_FIELDNAME, entityType.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED, Field.TermVector.NO );
+					new Field(
+							CLASS_FIELDNAME,
+							entityType.getName(),
+							Field.Store.YES,
+							Field.Index.NOT_ANALYZED,
+							Field.TermVector.NO
+					);
 			doc.add( classField );
-			LuceneOptions luceneOptions = new LuceneOptionsImpl( Field.Store.YES,
-					Field.Index.NOT_ANALYZED, Field.TermVector.NO, idBoost );
+			LuceneOptions luceneOptions = new LuceneOptionsImpl(
+					Field.Store.YES,
+					Field.Index.NOT_ANALYZED, Field.TermVector.NO, idBoost
+			);
 			idBridge.set( idKeywordName, id, doc, luceneOptions );
 		}
-		buildDocumentFields( instance, doc, rootPropertiesMetadata );
+		buildDocumentFields( instance, doc, metadata );
 		return doc;
 	}
 
 	private void buildDocumentFields(Object instance, Document doc, PropertiesMetadata propertiesMetadata) {
-		if ( instance == null ) return;
+		if ( instance == null ) {
+			return;
+		}
 		//needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance );
-		for (int i = 0; i < propertiesMetadata.classBridges.size(); i++) {
+		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
-			fb.set( propertiesMetadata.classNames.get( i ), unproxiedInstance,
-					doc, propertiesMetadata.getClassLuceneOptions( i ) );
+			fb.set(
+					propertiesMetadata.classNames.get( i ), unproxiedInstance,
+					doc, propertiesMetadata.getClassLuceneOptions( i )
+			);
 		}
-		for (int i = 0; i < propertiesMetadata.fieldNames.size(); i++) {
+		for ( int i = 0; i < propertiesMetadata.fieldNames.size(); i++ ) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
-			Object value = getMemberValue( unproxiedInstance, member );
+			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 			propertiesMetadata.fieldBridges.get( i ).set(
 					propertiesMetadata.fieldNames.get( i ), value, doc,
-					propertiesMetadata.getFieldLuceneOptions( i ) );
+					propertiesMetadata.getFieldLuceneOptions( i )
+			);
 		}
-		for (int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++) {
+		for ( int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++ ) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
-			Object value = getMemberValue( unproxiedInstance, member );
+			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 			//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
 
-			if ( value == null ) continue;
+			if ( value == null ) {
+				continue;
+			}
 			PropertiesMetadata embeddedMetadata = propertiesMetadata.embeddedPropertiesMetadata.get( i );
 			switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
 				case ARRAY:
-					for (Object arrayValue : (Object[]) value) {
+					for ( Object arrayValue : ( Object[] ) value ) {
 						buildDocumentFields( arrayValue, doc, embeddedMetadata );
 					}
 					break;
 				case COLLECTION:
-					for (Object collectionValue : (Collection) value) {
+					for ( Object collectionValue : ( Collection ) value ) {
 						buildDocumentFields( collectionValue, doc, embeddedMetadata );
 					}
 					break;
 				case MAP:
-					for (Object collectionValue : ( (Map) value ).values()) {
+					for ( Object collectionValue : ( ( Map ) value ).values() ) {
 						buildDocumentFields( collectionValue, doc, embeddedMetadata );
 					}
 					break;
@@ -839,8 +791,10 @@ public class DocumentBuilder<T> {
 					buildDocumentFields( value, doc, embeddedMetadata );
 					break;
 				default:
-					throw new AssertionFailure( "Unknown embedded container: "
-							+ propertiesMetadata.embeddedContainers.get( i ) );
+					throw new AssertionFailure(
+							"Unknown embedded container: "
+									+ propertiesMetadata.embeddedContainers.get( i )
+					);
 			}
 		}
 	}
@@ -849,7 +803,7 @@ public class DocumentBuilder<T> {
 		//FIXME this service should be part of Core?
 		if ( value instanceof HibernateProxy ) {
 			// .getImplementation() initializes the data by side effect
-			value = ( (HibernateProxy) value ).getHibernateLazyInitializer()
+			value = ( ( HibernateProxy ) value ).getHibernateLazyInitializer()
 					.getImplementation();
 		}
 		return value;
@@ -857,34 +811,14 @@ public class DocumentBuilder<T> {
 
 	public Term getTerm(Serializable id) {
 		if ( idProvided ) {
-			return new Term( idKeywordName, (String) id );
+			return new Term( idKeywordName, ( String ) id );
 		}
 
 		return new Term( idKeywordName, idBridge.objectToString( id ) );
 	}
 
-	public DirectoryProvider[] getDirectoryProviders() {
-		if ( entityState != EntityState.INDEXED ) {
-			throw new AssertionFailure( "Contained in only entity: getDirectoryProvider should not have been called." );
-		}
-		return directoryProviders;
-	}
-
-	public IndexShardingStrategy getDirectoryProviderSelectionStrategy() {
-		if ( entityState != EntityState.INDEXED ) {
-			throw new AssertionFailure( "Contained in only entity: getDirectoryProviderSelectionStrategy should not have been called." );
-		}
-		return shardingStrategy;
-	}
-
 	public Analyzer getAnalyzer() {
 		return analyzer;
-	}
-
-	private static void setAccessible(XMember member) {
-		if ( !Modifier.isPublic( member.getModifiers() ) ) {
-			member.setAccessible( true );
-		}
 	}
 
 	public TwoWayFieldBridge getIdBridge() {
@@ -896,40 +830,45 @@ public class DocumentBuilder<T> {
 	}
 
 	public static Class getDocumentClass(Document document) {
-		String className = document.get( DocumentBuilder.CLASS_FIELDNAME );
+		String className = document.get( DocumentBuilderContainedEntity.CLASS_FIELDNAME );
 		try {
 			return ReflectHelper.classForName( className );
 		}
-		catch (ClassNotFoundException e) {
+		catch ( ClassNotFoundException e ) {
 			throw new SearchException( "Unable to load indexed class: " + className, e );
 		}
 	}
 
 	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document) {
-		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( clazz );
-		if ( builder == null ) throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
-		return (Serializable) builder.getIdBridge().get( builder.getIdKeywordName(), document );
+		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
+		if ( builderIndexedEntity == null ) {
+			throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
+		}
+		return ( Serializable ) builderIndexedEntity.getIdBridge().get( builderIndexedEntity.getIdKeywordName(), document );
 	}
 
 	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields) {
-		DocumentBuilder<?> builder = searchFactoryImplementor.getDocumentBuilder( clazz );
-		if ( builder == null ) throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
+		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
+		if ( builderIndexedEntity == null ) {
+			throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
+		}
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
 
-		if ( builder.idKeywordName != null ) {
-			populateResult( builder.idKeywordName, builder.idBridge, Field.Store.YES, fields, result, document );
+		if ( builderIndexedEntity.idKeywordName != null ) {
+			populateResult( builderIndexedEntity.idKeywordName, builderIndexedEntity.idBridge, Field.Store.YES, fields, result, document );
 		}
 
-		final PropertiesMetadata metadata = builder.rootPropertiesMetadata;
+		final PropertiesMetadata metadata = builderIndexedEntity.metadata;
 		processFieldsForProjection( metadata, fields, result, document );
 		return result;
 	}
 
 	private static void processFieldsForProjection(PropertiesMetadata metadata, String[] fields, Object[] result, Document document) {
 		final int nbrFoEntityFields = metadata.fieldNames.size();
-		for (int index = 0; index < nbrFoEntityFields; index++) {
-			populateResult( metadata.fieldNames.get( index ),
+		for ( int index = 0; index < nbrFoEntityFields; index++ ) {
+			populateResult(
+					metadata.fieldNames.get( index ),
 					metadata.fieldBridges.get( index ),
 					metadata.fieldStore.get( index ),
 					fields,
@@ -938,10 +877,12 @@ public class DocumentBuilder<T> {
 			);
 		}
 		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
-		for (int index = 0; index < nbrOfEmbeddedObjects; index++) {
+		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
 			//there is nothing we can do for collections
 			if ( metadata.embeddedContainers.get( index ) == PropertiesMetadata.Container.OBJECT ) {
-				processFieldsForProjection( metadata.embeddedPropertiesMetadata.get( index ), fields, result, document );
+				processFieldsForProjection(
+						metadata.embeddedPropertiesMetadata.get( index ), fields, result, document
+				);
 			}
 		}
 	}
@@ -952,7 +893,7 @@ public class DocumentBuilder<T> {
 		if ( matchingPosition != -1 ) {
 			//TODO make use of an isTwoWay() method
 			if ( store != Field.Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
-				result[matchingPosition] = ( (TwoWayFieldBridge) fieldBridge ).get( fieldName, document );
+				result[matchingPosition] = ( ( TwoWayFieldBridge ) fieldBridge ).get( fieldName, document );
 				if ( log.isTraceEnabled() ) {
 					log.trace( "Field {} projected as {}", fieldName, result[matchingPosition] );
 				}
@@ -970,21 +911,26 @@ public class DocumentBuilder<T> {
 
 	private static int getFieldPosition(String[] fields, String fieldName) {
 		int fieldNbr = fields.length;
-		for (int index = 0; index < fieldNbr; index++) {
-			if ( fieldName.equals( fields[index] ) ) return index;
+		for ( int index = 0; index < fieldNbr; index++ ) {
+			if ( fieldName.equals( fields[index] ) ) {
+				return index;
+			}
 		}
 		return -1;
 	}
 
 	public void postInitialize(Set<Class<?>> indexedClasses) {
-		if ( entityState == EntityState.NON_INDEXABLE )
+		if ( entityState == EntityState.NON_INDEXABLE ) {
 			throw new AssertionFailure( "A non indexed entity is post processed" );
+		}
 		//this method does not requires synchronization
 		Class plainClass = reflectionManager.toClass( beanClass );
 		Set<Class<?>> tempMappedSubclasses = new HashSet<Class<?>>();
 		//together with the caller this creates a o(2), but I think it's still faster than create the up hierarchy for each class
-		for (Class currentClass : indexedClasses) {
-			if ( plainClass.isAssignableFrom( currentClass ) ) tempMappedSubclasses.add( currentClass );
+		for ( Class currentClass : indexedClasses ) {
+			if ( plainClass.isAssignableFrom( currentClass ) ) {
+				tempMappedSubclasses.add( currentClass );
+			}
 		}
 		this.mappedSubclasses = Collections.unmodifiableSet( tempMappedSubclasses );
 		Class superClass = plainClass.getSuperclass();
@@ -1018,7 +964,7 @@ public class DocumentBuilder<T> {
 	/**
 	 * Wrapper class containing all the meta data extracted out of the entities.
 	 */
-	private static class PropertiesMetadata {
+	protected static class PropertiesMetadata {
 		public Float boost;
 		public Analyzer analyzer;
 		public final List<String> fieldNames = new ArrayList<String>();
@@ -1046,16 +992,19 @@ public class DocumentBuilder<T> {
 			ARRAY
 		}
 
-		private LuceneOptions getClassLuceneOptions(int i) {
-			LuceneOptions options = new LuceneOptionsImpl( classStores.get( i ),
-					classIndexes.get( i ), classTermVectors.get( i ), classBoosts.get( i ) );
-			return options;
+		protected LuceneOptions getClassLuceneOptions(int i) {
+			return new LuceneOptionsImpl(
+					classStores.get( i ),
+					classIndexes.get( i ), classTermVectors.get( i ), classBoosts.get( i )
+			);
 		}
 
-		private LuceneOptions getFieldLuceneOptions(int i) {
+		protected LuceneOptions getFieldLuceneOptions(int i) {
 			LuceneOptions options;
-			options = new LuceneOptionsImpl( fieldStore.get( i ),
-					fieldIndex.get( i ), fieldTermVectors.get( i ), fieldBoosts.get( i ) );
+			options = new LuceneOptionsImpl(
+					fieldStore.get( i ),
+					fieldIndex.get( i ), fieldTermVectors.get( i ), fieldBoosts.get( i )
+			);
 			return options;
 		}
 	}

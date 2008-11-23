@@ -48,7 +48,7 @@ import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.FullTextQueryImpl;
 import org.hibernate.search.util.ContextHelper;
@@ -62,6 +62,7 @@ import org.hibernate.type.Type;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
+@SuppressWarnings( "deprecation" )
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 
 	private final Session session;
@@ -114,7 +115,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		}
 
 		for ( Class clazz : targetedClasses ) {
-			DocumentBuilder builder = searchFactoryImplementor.getDocumentBuilder( clazz );
+			DocumentBuilderIndexedEntity builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
 			Work<T> work;
 			if ( id == null ) {
 				// purge the main entity
@@ -153,7 +154,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//not strictly necessary but a small optimization
-		if ( searchFactoryImplementor.getDocumentBuilder( clazz ) == null ) {
+		if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz ) == null ) {
 			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
 			throw new IllegalArgumentException( msg );
 		}

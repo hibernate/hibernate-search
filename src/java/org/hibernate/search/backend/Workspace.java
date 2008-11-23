@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -77,8 +77,8 @@ public class Workspace {
 		this.lock = searchFactoryImplementor.getDirectoryProviderLock( provider );
 	}
 
-	public <T> DocumentBuilder<T> getDocumentBuilder(Class<T> entity) {
-		return searchFactoryImplementor.getDocumentBuilder( entity );
+	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilder(Class<T> entity) {
+		return searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity );
 	}
 
 	/**
@@ -205,8 +205,6 @@ public class Workspace {
 			throw new AssertionFailure( "No open IndexWriter to commit changes." );
 		}
 	}
-
-
 
 	/**
 	 * Closes a previously opened IndexWriter.

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -39,7 +39,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 		// divide tasks in parts, adding to QueueProcessors by affected Directory.
 		for ( LuceneWork work : queue ) {
 			final Class<?> entityType = work.getEntityClass();
-			DocumentBuilder<?> documentBuilder = searchFactoryImplementor.getDocumentBuilder( entityType );
+			DocumentBuilderIndexedEntity<?> documentBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityType );
 			IndexShardingStrategy shardingStrategy = documentBuilder.getDirectoryProviderSelectionStrategy();
 			work.getWorkDelegate( providerSelectionVisitor ).addAsPayLoadsToQueue( work, shardingStrategy, processors );
 		}

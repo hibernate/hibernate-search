@@ -3,6 +3,8 @@ package org.hibernate.search.backend.impl;
 
 import java.util.Properties;
 
+import javax.transaction.Synchronization;
+
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
@@ -22,16 +24,18 @@ import org.hibernate.search.util.WeakIdentityHashMap;
  */
 public class TransactionalWorker implements Worker {
 	//not a synchronized map since for a given transaction, we have not concurrent access
-	protected final WeakIdentityHashMap synchronizationPerTransaction = new WeakIdentityHashMap();
+	protected final WeakIdentityHashMap<Object, Synchronization> synchronizationPerTransaction = new WeakIdentityHashMap<Object, Synchronization>();
 	private QueueingProcessor queueingProcessor;
 
 	public void performWork(Work work, TransactionContext transactionContext) {
 		if ( transactionContext.isTransactionInProgress() ) {
 			Object transaction = transactionContext.getTransactionIdentifier();
-			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
+			PostTransactionWorkQueueSynchronization txSync = ( PostTransactionWorkQueueSynchronization )
 					synchronizationPerTransaction.get( transaction );
 			if ( txSync == null || txSync.isConsumed() ) {
-				txSync = new PostTransactionWorkQueueSynchronization( queueingProcessor, synchronizationPerTransaction );
+				txSync = new PostTransactionWorkQueueSynchronization(
+						queueingProcessor, synchronizationPerTransaction
+				);
 				transactionContext.registerSynchronization( txSync );
 				synchronizationPerTransaction.put( transaction, txSync );
 			}
@@ -53,11 +57,10 @@ public class TransactionalWorker implements Worker {
 		queueingProcessor.close();
 	}
 
-
 	public void flushWorks(TransactionContext transactionContext) {
 		if ( transactionContext.isTransactionInProgress() ) {
 			Object transaction = transactionContext.getTransactionIdentifier();
-			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
+			PostTransactionWorkQueueSynchronization txSync = ( PostTransactionWorkQueueSynchronization )
 					synchronizationPerTransaction.get( transaction );
 			if ( txSync != null && !txSync.isConsumed() ) {
 				txSync.flushWorks();

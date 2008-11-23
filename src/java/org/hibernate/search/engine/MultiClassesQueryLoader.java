@@ -35,7 +35,7 @@ public class MultiClassesQueryLoader implements Loader {
 		//     root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.size() == 0 ) {
 			//support all classes
-			for( Map.Entry<Class<?>, DocumentBuilder<?>> entry : searchFactoryImplementor.getDocumentBuilders().entrySet() ) {
+			for( Map.Entry<Class<?>, DocumentBuilderIndexedEntity<?>> entry : searchFactoryImplementor.getDocumentBuilders().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().isRoot() ) {
 					safeEntityTypes.add( entry.getKey() );
@@ -113,7 +113,7 @@ public class MultiClassesQueryLoader implements Loader {
 
 		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor, Session session) {
 			this.rootEntity = rootEntity;
-			DocumentBuilder<?> provider = searchFactoryImplementor.getDocumentBuilder( rootEntity );
+			DocumentBuilderIndexedEntity<?> provider = searchFactoryImplementor.getDocumentBuilderIndexedEntity( rootEntity );
 			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
 			this.mappedSubclasses = provider.getMappedSubclasses();
 			this.criteria = session.createCriteria( rootEntity );

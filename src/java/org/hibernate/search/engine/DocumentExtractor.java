@@ -52,7 +52,7 @@ public class DocumentExtractor {
 
 		// set up the field selector. CLASS_FIELDNAME and id fields are needed on top of any projected fields
 		Map<String, FieldSelectorResult> fields = new HashMap<String, FieldSelectorResult>( 1 + idFieldNames.size() + projectionSize );
-		fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
+		fields.put( DocumentBuilderIndexedEntity.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
 		for ( String idFieldName : idFieldNames ) {
 			fields.put( idFieldName, FieldSelectorResult.LOAD );
 		}
@@ -65,11 +65,11 @@ public class DocumentExtractor {
 	}
 
 	private EntityInfo extract(Document document) {
-		Class clazz = DocumentBuilder.getDocumentClass( document );
-		Serializable id = DocumentBuilder.getDocumentId( searchFactoryImplementor, clazz, document );
+		Class clazz = DocumentBuilderIndexedEntity.getDocumentClass( document );
+		Serializable id = DocumentBuilderIndexedEntity.getDocumentId( searchFactoryImplementor, clazz, document );
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
-			projected = DocumentBuilder.getDocumentFields( searchFactoryImplementor, clazz, document, projection );
+			projected = DocumentBuilderIndexedEntity.getDocumentFields( searchFactoryImplementor, clazz, document, projection );
 		}
 		return new EntityInfo( clazz, id, projected );
 	}

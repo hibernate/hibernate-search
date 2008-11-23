@@ -39,10 +39,11 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.cfg.SearchConfiguration;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.engine.EntityState;
+import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
@@ -64,8 +65,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	private static final Logger log = LoggerFactory.make();
 
-	private final Map<Class<?>, DocumentBuilder<?>> documentBuilders = new HashMap<Class<?>, DocumentBuilder<?>>();
-	private final Map<Class<?>, DocumentBuilder<?>> containedInOnlyBuilders = new HashMap<Class<?>, DocumentBuilder<?>>();
+	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = new HashMap<Class<?>, DocumentBuilderIndexedEntity<?>>();
+	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = new HashMap<Class<?>, DocumentBuilderContainedEntity<?>>();
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
 	private final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData = new HashMap<DirectoryProvider<?>, DirectoryProviderData>();
 	private final Worker worker;
@@ -117,12 +118,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.indexingStrategy = defineIndexingStrategy( cfg ); //need to be done before the document builds
 		initDocumentBuilders( cfg, reflectionManager );
 
-		Set<Class<?>> indexedClasses = documentBuilders.keySet();
-		for ( DocumentBuilder builder : documentBuilders.values() ) {
+		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
+		for ( DocumentBuilderIndexedEntity builder : documentBuildersIndexedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 		//not really necessary today
-		for ( DocumentBuilder builder : containedInOnlyBuilders.values() ) {
+		for ( DocumentBuilderContainedEntity builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 		this.worker = WorkerFactory.createWorker( cfg, this );
@@ -260,24 +261,24 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 
-	public Map<Class<?>, DocumentBuilder<?>> getDocumentBuilders() {
+	public Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuilders() {
 		if ( barrier != 0 ) {
 		} //read barrier
-		return documentBuilders;
+		return documentBuildersIndexedEntities;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> DocumentBuilder<T> getDocumentBuilder(Class<T> entityType) {
+	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		return ( DocumentBuilder<T> ) documentBuilders.get( entityType );
+		return ( DocumentBuilderIndexedEntity<T> ) documentBuildersIndexedEntities.get( entityType );
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> DocumentBuilder<T> getContainedInOnlyBuilder(Class<T> entityType) {
+	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		return ( DocumentBuilder<T> ) containedInOnlyBuilders.get( entityType );
+		return ( DocumentBuilderContainedEntity<T> ) documentBuildersContainedEntities.get( entityType );
 	}
 
 	public Set<DirectoryProvider<?>> getDirectoryProviders() {
@@ -328,7 +329,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		DocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
+		DocumentBuilderIndexedEntity<?> documentBuilder = getDocumentBuilderIndexedEntity( entity );
 		return documentBuilder == null ? null : documentBuilder.getDirectoryProviders();
 	}
 
@@ -367,7 +368,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
 		}
 
-		DocumentBuilder<?> builder = documentBuilders.get( clazz );
+		DocumentBuilderIndexedEntity<?> builder = documentBuildersIndexedEntities.get( clazz );
 		if ( builder == null ) {
 			throw new IllegalArgumentException(
 					"Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName()
@@ -403,25 +404,25 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders(
 						mappedXClass, cfg, this, reflectionManager
 				);
-				//FIXME DocumentBuilder needs to be built by a helper method receiving Class<T> to infer T properly
+				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
-				final DocumentBuilder<?> documentBuilder = new DocumentBuilder(
+				final DocumentBuilderIndexedEntity<?> documentBuilder = new DocumentBuilderIndexedEntity(
 						mappedXClass, context, providers.getProviders(), providers.getSelectionStrategy(),
 						reflectionManager
 				);
 
 				indexHierarchy.addIndexedClass( mappedClass );
-				documentBuilders.put( mappedClass, documentBuilder );
+				documentBuildersIndexedEntities.put( mappedClass, documentBuilder );
 			}
 			else {
-				//FIXME DocumentBuilder needs to be built by a helper method receiving Class<T> to infer T properly
+				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
-				final DocumentBuilder<?> documentBuilder = new DocumentBuilder(
+				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
 						mappedXClass, context, reflectionManager
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
-					containedInOnlyBuilders.put( mappedClass, documentBuilder );
+					documentBuildersContainedEntities.put( mappedClass, documentBuilder );
 				}
 			}
 			bindFilterDefs( mappedXClass );

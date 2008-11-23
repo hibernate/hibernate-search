@@ -10,7 +10,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 
 	private final Class managedType;
-	private final DocumentBuilder builder;
+	private final DocumentBuilderIndexedEntity builder;
 	private final Logger log = LoggerFactory.make();
 
 	DeleteExtWorkDelegate(Workspace workspace) {

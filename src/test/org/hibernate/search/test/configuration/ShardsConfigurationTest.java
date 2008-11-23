@@ -56,7 +56,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 	
 	public void testSelectionOfShardingStrategy() throws Exception {
-		IndexShardingStrategy shardingStrategy = getSearchFactory().getDocumentBuilder( Document.class )
+		IndexShardingStrategy shardingStrategy = getSearchFactory().getDocumentBuilderIndexedEntity( Document.class )
 				.getDirectoryProviderSelectionStrategy();
 		assertNotNull( shardingStrategy );
 		assertEquals( shardingStrategy.getClass(), UselessShardingStrategy.class );

@@ -74,7 +74,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Class<?> entityType = event.getEntity().getClass();
 			if ( searchFactoryImplementor.getDocumentBuilders().containsKey( entityType )
-					|| searchFactoryImplementor.getContainedInOnlyBuilder( entityType ) != null ) {
+					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entityType ) != null ) {
 				processWork( event.getEntity(), event.getId(), WorkType.DELETE, event );
 			}
 		}
@@ -83,8 +83,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onPostInsert(PostInsertEvent event) {
 		if ( used ) {
 			final Object entity = event.getEntity();
-			if ( searchFactoryImplementor.getDocumentBuilder( entity.getClass() ) != null
-					|| searchFactoryImplementor.getContainedInOnlyBuilder( entity.getClass() ) != null ) {
+			if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity.getClass() ) != null
+					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entity.getClass() ) != null ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.ADD, event );
 			}
@@ -94,8 +94,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onPostUpdate(PostUpdateEvent event) {
 		if ( used ) {
 			final Object entity = event.getEntity();
-			if ( searchFactoryImplementor.getDocumentBuilder( entity.getClass() ) != null
-					|| searchFactoryImplementor.getContainedInOnlyBuilder( entity.getClass() ) != null ) {
+			if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity.getClass() ) != null
+					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entity.getClass() ) != null ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event );
 			}
@@ -133,8 +133,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			return;
 		}
 		if ( used ) {
-			if ( searchFactoryImplementor.getDocumentBuilder( entity.getClass() ) != null
-					|| searchFactoryImplementor.getContainedInOnlyBuilder( entity.getClass() ) != null ) {
+			if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity.getClass() ) != null
+					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entity.getClass() ) != null ) {
 				Serializable id = getId( entity, event );
 				if ( id == null ) {
 					log.warn(

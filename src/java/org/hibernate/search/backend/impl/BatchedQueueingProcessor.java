@@ -25,13 +25,14 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
- * Batch work until #performWorks is called.
- * The work is then executed synchronously or asynchronously
+ * Batch work until {@link #performWorks} is called.
+ * The work is then executed synchronously or asynchronously.
  *
  * @author Emmanuel Bernard
  */
@@ -148,17 +149,21 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		Class<T> entityClass = work.getEntityClass() != null ?
 				work.getEntityClass() :
 				Hibernate.getClass( work.getEntity() );
-		DocumentBuilder<T> builder = searchFactoryImplementor.getDocumentBuilder( entityClass );
-		if ( builder == null ) {
-			//might be a entity contained in
-			builder = searchFactoryImplementor.getContainedInOnlyBuilder( entityClass );
-		}
-		if ( builder == null ) {
+		DocumentBuilderIndexedEntity<T> entityBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
+		if ( entityBuilder != null ) {
+			entityBuilder.addWorkToQueue(
+					entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor
+			);
 			return;
 		}
-		builder.addWorkToQueue(
-				entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor
-		);
+
+		//might be a entity contained in
+		DocumentBuilderContainedEntity<T> containedInBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity( entityClass );
+		if ( containedInBuilder != null ) {
+			containedInBuilder.addWorkToQueue(
+					entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor
+			);
+		}
 	}
 
 	//TODO implements parallel batchWorkers (one per Directory)
