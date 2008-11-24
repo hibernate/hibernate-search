@@ -50,6 +50,7 @@ import org.hibernate.search.engine.MultiClassesQueryLoader;
 import org.hibernate.search.engine.ProjectionLoader;
 import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
@@ -550,7 +551,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			//annihilate the scoring impact of DocumentBuilderIndexedEntity.CLASS_FIELDNAME
 			classFilter.setBoost( 0 );
 			for ( Class clazz : classesAndSubclasses ) {
-				Term t = new Term( DocumentBuilderIndexedEntity.CLASS_FIELDNAME, clazz.getName() );
+				Term t = new Term( DocumentBuilder.CLASS_FIELDNAME, clazz.getName() );
 				TermQuery termQuery = new TermQuery( t );
 				classFilter.add( termQuery, BooleanClause.Occur.SHOULD );
 			}

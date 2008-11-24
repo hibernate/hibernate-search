@@ -23,10 +23,40 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
+ * Tests several aspects of projection queries.
+ *
  * @author Emmanuel Bernard
  * @author John Griffin
+ * @author Hardy Ferentschik
  */
 public class ProjectionQueryTest extends SearchTestCase {
+
+	/**
+	 * HSEARCH-296
+	 *
+	 * @throws Exception in case the test fails.
+	 */
+	public void testClassProjection() throws Exception {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		prepEmployeeIndex( s );
+
+		s.clear();
+		Transaction tx = s.beginTransaction();
+		QueryParser parser = new QueryParser( "dept", new StandardAnalyzer() );
+		Query query = parser.parse( "dept:ITech" );
+		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		hibQuery.setProjection( FullTextQuery.OBJECT_CLASS );
+
+		List result = hibQuery.list();
+		assertNotNull( result );
+
+		Object[] projection = ( Object[] ) result.get( 0 );
+		assertNotNull( projection );
+		assertEquals( "Wrong projected class", Employee.class, projection[0] );
+
+		tx.commit();
+		s.close();
+	}
 
 	public void testLuceneObjectsProjectionWithScroll() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -108,7 +138,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.ID );
 		hibQuery.setResultTransformer( new ProjectionToDelimStringResultTransformer() );
 
-		@SuppressWarnings( "unchecked" )
+		@SuppressWarnings("unchecked")
 		List<String> result = hibQuery.list();
 		assertTrue( "incorrect transformation", result.get( 0 ).startsWith( "1000, Griffin, ITech" ) );
 		assertTrue( "incorrect transformation", result.get( 1 ).startsWith( "1002, Jimenez, ITech" ) );
@@ -435,7 +465,6 @@ public class ProjectionQueryTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-
 
 	protected Class[] getMappings() {
 		return new Class[] {

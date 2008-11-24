@@ -63,10 +63,8 @@ import org.hibernate.search.util.ScopedAnalyzer;
  * @author Richard Hallier
  * @author Hardy Ferentschik
  */
-public class DocumentBuilderContainedEntity<T> {
+public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	private static final Logger log = LoggerFactory.make();
-
-	public static final String CLASS_FIELDNAME = "_hibernate_class";
 
 	protected final PropertiesMetadata metadata = new PropertiesMetadata();
 	protected final XClass beanClass;
@@ -830,7 +828,7 @@ public class DocumentBuilderContainedEntity<T> {
 	}
 
 	public static Class getDocumentClass(Document document) {
-		String className = document.get( DocumentBuilderContainedEntity.CLASS_FIELDNAME );
+		String className = document.get( CLASS_FIELDNAME );
 		try {
 			return ReflectHelper.classForName( className );
 		}

@@ -2,13 +2,13 @@
 package org.hibernate.search;
 
 /**
- * Define Projection constants
+ * Defined projection constants.
  *
  * @author Emmanuel Bernard
  */
 public interface ProjectionConstants {
 	/**
-	 * Represtnts the Hibernate Entity returned in a search.
+	 * Represents the Hibernate entity returned in a search.
 	 */
 	public String THIS = "__HSearch_This";
 
@@ -53,7 +53,8 @@ public interface ProjectionConstants {
 	public String EXPLANATION = "__HSearch_Explanation";
 
 	/**
-	 * Object class
+	 * Represents the Hibernate entity class returned in a search. In contrast to the other constants this constant
+	 * represents an actual field value of the underlying Lucene document and hence can directly be used in queries.
 	 */
-	//TODO OBJECT CLASS
+	public String OBJECT_CLASS = "_hibernate_class";
 }

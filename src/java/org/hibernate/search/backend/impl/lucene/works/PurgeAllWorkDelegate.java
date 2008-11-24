@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -34,7 +34,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		log.trace( "purgeAll Lucene index using IndexWriter for type: {}", work.getEntityClass() );
 		try {
-			Term term = new Term( DocumentBuilderIndexedEntity.CLASS_FIELDNAME, work.getEntityClass().getName() );
+			Term term = new Term( DocumentBuilder.CLASS_FIELDNAME, work.getEntityClass().getName() );
 			writer.deleteDocuments( term );
 		}
 		catch (Exception e) {
@@ -45,7 +45,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 	public void performWork(LuceneWork work, IndexReader reader) {
 		log.trace( "purgeAll Lucene index using IndexReader for type: {}", work.getEntityClass() );
 		try {
-			Term term = new Term( DocumentBuilderIndexedEntity.CLASS_FIELDNAME, work.getEntityClass().getName() );
+			Term term = new Term( DocumentBuilder.CLASS_FIELDNAME, work.getEntityClass().getName() );
 			reader.deleteDocuments( term );
 		}
 		catch (Exception e) {

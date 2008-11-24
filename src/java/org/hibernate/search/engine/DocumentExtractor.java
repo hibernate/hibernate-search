@@ -13,6 +13,7 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.document.FieldSelector;
 
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.query.QueryHits;
 
 /**
@@ -49,10 +50,9 @@ public class DocumentExtractor {
 			}
 		}
 
-
 		// set up the field selector. CLASS_FIELDNAME and id fields are needed on top of any projected fields
 		Map<String, FieldSelectorResult> fields = new HashMap<String, FieldSelectorResult>( 1 + idFieldNames.size() + projectionSize );
-		fields.put( DocumentBuilderIndexedEntity.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
+		fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
 		for ( String idFieldName : idFieldNames ) {
 			fields.put( idFieldName, FieldSelectorResult.LOAD );
 		}
@@ -69,7 +69,9 @@ public class DocumentExtractor {
 		Serializable id = DocumentBuilderIndexedEntity.getDocumentId( searchFactoryImplementor, clazz, document );
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
-			projected = DocumentBuilderIndexedEntity.getDocumentFields( searchFactoryImplementor, clazz, document, projection );
+			projected = DocumentBuilderIndexedEntity.getDocumentFields(
+					searchFactoryImplementor, clazz, document, projection
+			);
 		}
 		return new EntityInfo( clazz, id, projected );
 	}
@@ -82,10 +84,11 @@ public class DocumentExtractor {
 		else {
 			doc = queryHits.doc( index );
 		}
-		//TODO if we are only looking for score (unlikely), avoid accessing doc (lazy load)
+
 		EntityInfo entityInfo = extract( doc );
 		Object[] eip = entityInfo.projection;
 
+		// TODO - if we are only looking for score (unlikely), avoid accessing doc (lazy load)
 		if ( eip != null && eip.length > 0 ) {
 			for ( int x = 0; x < projection.length; x++ ) {
 				if ( ProjectionConstants.SCORE.equals( projection[x] ) ) {
@@ -105,6 +108,9 @@ public class DocumentExtractor {
 				}
 				else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
 					eip[x] = queryHits.explain( index );
+				}
+				else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
+						eip[x] = entityInfo.clazz;
 				}
 				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 					//THIS could be projected more than once

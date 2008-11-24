@@ -23,7 +23,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
@@ -54,7 +54,7 @@ public class JMSMasterTest extends SearchTestCase {
 		s.close();
 		//create the work queue to send
 		Document doc = new Document();
-		Field field = new Field( DocumentBuilderIndexedEntity.CLASS_FIELDNAME, ts.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED );
+		Field field = new Field( DocumentBuilder.CLASS_FIELDNAME, ts.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED );
 		doc.add( field );
 		field = new Field("id", "1", Field.Store.YES, Field.Index.NOT_ANALYZED );
 		doc.add( field );
