@@ -2,6 +2,7 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -16,11 +17,12 @@ import org.hibernate.search.util.LoggerFactory;
 /**
  * @author Sanne Grinovero
  */
-class PerDPQueueProcessor {
+class PerDPQueueProcessor implements Runnable {
 	
 	private static final Logger log = LoggerFactory.make();
 	private final Workspace workspace;
 	private final LuceneWorkVisitor worker;
+	private final ExecutorService executor;
 	private final List<LuceneWork> workOnWriter = new ArrayList<LuceneWork>();
 	private final List<LuceneWork> workOnReader= new ArrayList<LuceneWork>();
 	
@@ -29,9 +31,10 @@ class PerDPQueueProcessor {
 	private boolean needsWriter = false;
 	private boolean preferReader = false;
 	
-	public PerDPQueueProcessor(LuceneWorkVisitor worker) {
-		this.worker = worker;
-		this.workspace = worker.getWorkspace();
+	public PerDPQueueProcessor(PerDPResources resources) {
+		this.worker = resources.getVisitor();
+		this.workspace = resources.getWorkspace();
+		this.executor = resources.getExecutor();
 	}
 
 	public void addWork(LuceneWork work) {
@@ -56,7 +59,7 @@ class PerDPQueueProcessor {
 		}
 	}
 
-	public void performWorks() {
+	public void run() {
 		// skip "resource optimization mode" when in batch to have all tasks use preferred (optimal) mode.
 		if ( ! batchmode ) {
 			// 	see if we can skip using some resource
@@ -153,5 +156,9 @@ class PerDPQueueProcessor {
 		workOnWriter.addAll( 0, workOnReader );
 		workOnReader.clear();
 	}
-	
+
+	public ExecutorService getOwningExecutor() {
+		return executor;
+	}
+
 }

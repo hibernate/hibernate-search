@@ -17,13 +17,6 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	private final OptimizeWorkDelegate optimizeDelegate;
 	private final PurgeAllWorkDelegate purgeAllDelegate;
 	
-	/**
-	 * The Workspace this visitor has been created for;
-	 * different workspaces could use different Delegates for specific
-	 * needs basing on workspace or DirectoryProvider configuration.
-	 */
-	private final Workspace linkedWorkspace;
-
 	public LuceneWorkVisitor(Workspace workspace) {
 		if ( workspace.getEntitiesInDirectory().size() == 1 ) {
 			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
@@ -34,7 +27,6 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 		this.purgeAllDelegate = new PurgeAllWorkDelegate();
 		this.addDelegate = new AddWorkDelegate( workspace );
 		this.optimizeDelegate = new OptimizeWorkDelegate( workspace );
-		this.linkedWorkspace = workspace;
 	}
 
 	public LuceneWorkDelegate getDelegate(AddLuceneWork addLuceneWork) {
@@ -53,8 +45,4 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 		return purgeAllDelegate;
 	}
 	
-	public Workspace getWorkspace(){
-		return linkedWorkspace;
-	}
-
 }

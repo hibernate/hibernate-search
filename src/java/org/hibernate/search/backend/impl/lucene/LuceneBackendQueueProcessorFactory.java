@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.Workspace;
-import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
+import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 
@@ -34,23 +34,32 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 	 * lifecycle (reused and shared by all transactions);
 	 * the LuceneWorkVisitor(s) are stateless, the Workspace(s) are threadsafe.
 	 */
-	private final Map<DirectoryProvider,LuceneWorkVisitor> visitorsMap = new HashMap<DirectoryProvider,LuceneWorkVisitor>();
+	private final Map<DirectoryProvider,PerDPResources> resourcesMap = new HashMap<DirectoryProvider,PerDPResources>();
+
+	/**
+	 * copy of BatchedQueueingProcessor.sync
+	 */
+	private boolean sync;
 
 	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImp = searchFactoryImplementor;
+		this.sync = BatchedQueueingProcessor.isConfiguredAsSync( props );
 		for (DirectoryProvider dp : searchFactoryImplementor.getDirectoryProviders() ) {
-			Workspace w = new Workspace( searchFactoryImplementor, dp );
-			LuceneWorkVisitor visitor = new LuceneWorkVisitor( w );
-			visitorsMap.put( dp, visitor );
+			PerDPResources resources = new PerDPResources( searchFactoryImplementor, dp );
+			resourcesMap.put( dp, resources );
 		}
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new LuceneBackendQueueProcessor( queue, searchFactoryImp, visitorsMap );
+		return new LuceneBackendQueueProcessor( queue, searchFactoryImp, resourcesMap, sync );
 	}
 
 	public void close() {
-		// no need to release anything
+		// needs to stop all used ThreadPools
+		for (PerDPResources res : resourcesMap.values() ) {
+			ExecutorService executor = res.getExecutor();
+			executor.shutdown();
+		}
 	}
 	
 }

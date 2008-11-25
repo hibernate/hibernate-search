@@ -48,8 +48,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	public BatchedQueueingProcessor(SearchFactoryImplementor searchFactoryImplementor, Properties properties) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
-		//default to sync if none defined
-		this.sync = !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
+		this.sync = isConfiguredAsSync( properties );
 
 		//default to a simple asynchronous operation
 		int min = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
@@ -206,6 +205,15 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			}
 			return this == SECOND && type == WorkType.COLLECTION;
 		}
+	}
+	
+	/**
+	 * @param properties the configuration to parse
+	 * @return true if the configuration uses sync indexing
+	 */
+	public static boolean isConfiguredAsSync(Properties properties){
+		//default to sync if none defined
+		return !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
 	}
 
 }
