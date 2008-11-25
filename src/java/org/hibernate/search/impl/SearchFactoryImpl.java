@@ -261,7 +261,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 
-	public Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuilders() {
+	public Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities() {
 		if ( barrier != 0 ) {
 		} //read barrier
 		return documentBuildersIndexedEntities;
@@ -336,7 +336,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public void optimize() {
 		if ( barrier != 0 ) {
 		} //read barrier
-		Set<Class<?>> clazzs = getDocumentBuilders().keySet();
+		Set<Class<?>> clazzs = getDocumentBuildersIndexedEntities().keySet();
 		for ( Class clazz : clazzs ) {
 			optimize( clazz );
 		}
@@ -345,7 +345,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public void optimize(Class entityType) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		if ( !getDocumentBuilders().containsKey( entityType ) ) {
+		if ( !getDocumentBuildersIndexedEntities().containsKey( entityType ) ) {
 			throw new SearchException( "Entity not indexed: " + entityType );
 		}
 		List<LuceneWork> queue = new ArrayList<LuceneWork>( 1 );

@@ -607,7 +607,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
-		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuilders();
+		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
 		List<DirectoryProvider> directories = new ArrayList<DirectoryProvider>();
 		Set<String> idFieldNames = new HashSet<String>();
 

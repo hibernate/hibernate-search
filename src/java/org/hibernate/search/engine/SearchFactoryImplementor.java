@@ -24,7 +24,7 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 
-	Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuilders();
+	Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities();
 
 	<T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType);
 

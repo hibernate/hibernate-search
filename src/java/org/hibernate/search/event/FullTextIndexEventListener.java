@@ -59,7 +59,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		searchFactoryImplementor = ContextHolder.getOrBuildSearchFactory( cfg );
 		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
 		if ( "event".equals( indexingStrategy ) ) {
-			used = searchFactoryImplementor.getDocumentBuilders().size() != 0;
+			used = searchFactoryImplementor.getDocumentBuildersIndexedEntities().size() != 0;
 		}
 		else if ( "manual".equals( indexingStrategy ) ) {
 			used = false;
@@ -73,7 +73,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onPostDelete(PostDeleteEvent event) {
 		if ( used ) {
 			final Class<?> entityType = event.getEntity().getClass();
-			if ( searchFactoryImplementor.getDocumentBuilders().containsKey( entityType )
+			if ( searchFactoryImplementor.getDocumentBuildersIndexedEntities().containsKey( entityType )
 					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entityType ) != null ) {
 				processWork( event.getEntity(), event.getId(), WorkType.DELETE, event );
 			}
