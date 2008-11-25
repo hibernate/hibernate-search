@@ -144,7 +144,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			return new IteratorImpl( Collections.EMPTY_LIST, noLoader );
 		}
 		try {
-			QueryHits queryHits = getQueryHits( searcher );
+			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
 			Session sess = ( Session ) this.session;
@@ -186,7 +186,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			}
 			if ( criteria instanceof CriteriaImpl ) {
 				String targetEntity = ( ( CriteriaImpl ) criteria ).getEntityOrClassName();
-				if ( targetedEntities.size() == 1 && !targetedEntities.iterator().next().getName().equals( targetEntity ) ) {
+				if ( targetedEntities.size() == 1 && !targetedEntities.iterator()
+						.next()
+						.getName()
+						.equals( targetEntity ) ) {
 					throw new SearchException( "Criteria query entity should match query entity" );
 				}
 				else {
@@ -228,7 +231,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		IndexSearcher searcher = buildSearcher( searchFactory );
 		//FIXME: handle null searcher
 		try {
-			QueryHits queryHits = getQueryHits( searcher );
+			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
 			DocumentExtractor extractor = new DocumentExtractor(
@@ -264,7 +267,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			return Collections.EMPTY_LIST;
 		}
 		try {
-			QueryHits queryHits = getQueryHits( searcher );
+			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
 			Session sess = ( Session ) this.session;
@@ -334,22 +337,38 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * Execute the lucene search and return the machting hits.
 	 *
 	 * @param searcher The index searcher.
+	 * @param n Numer of documents to retrieve
 	 *
 	 * @return An instance of <code>QueryHits</code> wrapping the Lucene query and the matching documents.
 	 *
 	 * @throws IOException in case there is an error executing the lucene search.
 	 */
-	private QueryHits getQueryHits(Searcher searcher) throws IOException {
+	private QueryHits getQueryHits(Searcher searcher, Integer n) throws IOException {
 		org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
 		buildFilters();
 		QueryHits queryHits;
-		if ( maxResults == null ) { // try to make sure that we get the right amount of top docs
+		if ( n == null ) { // try to make sure that we get the right amount of top docs
 			queryHits = new QueryHits( searcher, query, filter, sort );
-		} else {
-			queryHits = new QueryHits( searcher, query, filter, sort, first() + maxResults );
+		}
+		else {
+			queryHits = new QueryHits( searcher, query, filter, sort, n );
 		}
 		resultSize = queryHits.totalHits;
 		return queryHits;
+	}
+
+	/**
+	 * @return Calculates the number of <code>TopDocs</code> which should be retrieved as part of the query. If Hibernate's
+	 * pagination parameters are set returned value is <code>first + maxResults</code>. Otherwise <code>null</code> is
+	 * returned.
+	 */
+	private Integer calculateTopDocsRetrievalSize() {
+		if ( maxResults == null ) {
+			return null;
+		}
+		else {
+			return first() + maxResults;
+		}
 	}
 
 	private void buildFilters() {
@@ -719,7 +738,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			else {
 				TopDocs hits;
 				try {
-					hits = getQueryHits( searcher ).topDocs;
+					hits = getQueryHits( searcher, 1 ).topDocs; // Lucene enforces that at least one top doc will be retrieved.
 					resultSize = hits.totalHits;
 				}
 				catch ( IOException e ) {
