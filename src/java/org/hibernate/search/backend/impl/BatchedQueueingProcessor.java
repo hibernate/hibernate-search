@@ -192,6 +192,8 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 				log.error( "Unable to properly shut down asynchronous indexing work", e );
 			}
 		}
+		//and stop the backend
+		backendQueueProcessorFactory.close();
 	}
 
 	private static enum Layer {
