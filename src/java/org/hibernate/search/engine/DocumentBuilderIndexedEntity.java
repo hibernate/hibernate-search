@@ -328,29 +328,39 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		super.addWorkToQueue( entityClass, entity, id, workType, queue, searchFactoryImplementor );
 	}
 
+	/**
+	 * Builds the Lucene <code>Document</code> for a given entity <code>instance</code> and its <code>id</code>.
+	 *
+	 * @param instance The entity for which to build the matching Lucene <code>Document</code>
+	 * @param id the entity id.
+	 * @return The Lucene <code>Document</code> for the specified entity.
+	 */
 	public Document getDocument(T instance, Serializable id) {
 		Document doc = new Document();
 		final Class<?> entityType = Hibernate.getClass( instance );
-		//XClass instanceClass = reflectionManager.toXClass( entityType );
 		if ( metadata.boost != null ) {
 			doc.setBoost( metadata.boost );
 		}
-		{
-			Field classField =
-					new Field(
-							CLASS_FIELDNAME,
-							entityType.getName(),
-							Field.Store.YES,
-							Field.Index.NOT_ANALYZED,
-							Field.TermVector.NO
-					);
-			doc.add( classField );
-			LuceneOptions luceneOptions = new LuceneOptionsImpl(
-					Field.Store.YES,
-					Field.Index.NOT_ANALYZED, Field.TermVector.NO, idBoost
-			);
-			idBridge.set( idKeywordName, id, doc, luceneOptions );
-		}
+
+		// add the class name of the entity to the document
+		Field classField =
+				new Field(
+						CLASS_FIELDNAME,
+						entityType.getName(),
+						Field.Store.YES,
+						Field.Index.NOT_ANALYZED,
+						Field.TermVector.NO
+				);
+		doc.add( classField );
+
+		// now add the entity id to the document
+		LuceneOptions luceneOptions = new LuceneOptionsImpl(
+				Field.Store.YES,
+				Field.Index.NOT_ANALYZED, Field.TermVector.NO, idBoost
+		);
+		idBridge.set( idKeywordName, id, doc, luceneOptions );
+
+		// finally add all other document fields
 		buildDocumentFields( instance, doc, metadata );
 		return doc;
 	}
