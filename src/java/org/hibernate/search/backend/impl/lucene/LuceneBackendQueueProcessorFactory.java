@@ -48,5 +48,9 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 	public Runnable getProcessor(List<LuceneWork> queue) {
 		return new LuceneBackendQueueProcessor( queue, searchFactoryImp, visitorsMap );
 	}
+
+	public void close() {
+		// no need to release anything
+	}
 	
 }

@@ -13,6 +13,12 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * @author Emmanuel Bernard
  */
 public interface BackendQueueProcessorFactory {
+	
+	/**
+	 * Used at startup, called once as first method.
+	 * @param props all configuration properties
+	 * @param searchFactory the client
+	 */
 	void initialize(Properties props, SearchFactoryImplementor searchFactory);
 
 	/**
@@ -22,4 +28,11 @@ public interface BackendQueueProcessorFactory {
 	 * @return <code>Runnable</code> which processes <code>queue</code> when started.
 	 */
 	Runnable getProcessor(List<LuceneWork> queue);
+	
+	/**
+	 * Used to shutdown and eventually release resources.
+	 * no other method should used after this one.
+	 */
+	void close();
+	
 }

@@ -116,4 +116,8 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 		return result;
 	}
 
+	public void close() {
+		// no need to release anything
+	}
+
 }
