@@ -610,7 +610,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		Set<Class<?>> tempMappedSubclasses = new HashSet<Class<?>>();
 		//together with the caller this creates a o(2), but I think it's still faster than create the up hierarchy for each class
 		for ( Class currentClass : indexedClasses ) {
-			if ( plainClass.isAssignableFrom( currentClass ) ) {
+			if ( plainClass != currentClass && plainClass.isAssignableFrom( currentClass ) ) {
 				tempMappedSubclasses.add( currentClass );
 			}
 		}

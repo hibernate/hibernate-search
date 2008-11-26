@@ -75,7 +75,7 @@ public class MultiClassesQueryLoader implements Loader {
 		for (EntityInfo entityInfo : entityInfos) {
 			boolean found = false;
 			for (RootEntityMetadata rootEntityInfo : entityMatadata) {
-				if ( rootEntityInfo.mappedSubclasses.contains( entityInfo.clazz ) ) {
+				if ( rootEntityInfo.rootEntity == entityInfo.clazz || rootEntityInfo.mappedSubclasses.contains( entityInfo.clazz ) ) {
 					List<EntityInfo> bucket = entityinfoBuckets.get( rootEntityInfo );
 					if ( bucket == null ) {
 						bucket = new ArrayList<EntityInfo>();
