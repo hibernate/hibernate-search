@@ -69,7 +69,7 @@ public final class Environment {
 	public static final String FILTER_CACHING_STRATEGY = "hibernate.search.filter.cache_strategy";
 	
 	/**
-	 * Property name for the hard ref count of our <code>CachingWrapperFilter</code>.
+	 * number of docidresults cached in hard referemnce.
 	 */
-	public static final String CACHE_BIT_RESULT_SIZE = "hibernate.search.filter.cache_bit_results.size";	
+	public static final String CACHE_DOCIDRESULTS_SIZE = "hibernate.search.filter.cache_docidresults.size";	
 }

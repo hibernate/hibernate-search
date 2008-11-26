@@ -671,7 +671,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     <classname>SoftReference</classname>s are used together with a hard
     reference count (see dicussion about filter cache). The hard reference
     count can be adjusted using
-    <literal>hibernate.search.filter.cache_bit_results.size</literal>
+    <literal>hibernate.search.filter.cache_docidresults.size</literal>
     (defaults to 5). The wrapping behaviour can be controlled using the
     <literal>@FullTextFilterDef.cache</literal> parameter. There are three
     differerent values for this parameter:</para>

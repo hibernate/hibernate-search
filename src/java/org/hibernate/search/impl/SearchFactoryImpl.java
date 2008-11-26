@@ -130,7 +130,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		this.filterCachingStrategy = buildFilterCachingStrategy( cfg.getProperties() );
 		this.cacheBitResultsSize = ConfigurationParseHelper.getIntValue(
-				cfg.getProperties(), Environment.CACHE_BIT_RESULT_SIZE, CachingWrapperFilter.DEFAULT_SIZE
+				cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 		);
 		this.barrier = 1; //write barrier
 	}

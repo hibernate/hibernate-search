@@ -185,6 +185,6 @@ public class FilterTest extends SearchTestCase {
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure(cfg);
-		cfg.setProperty( "hibernate.search.filter.cache_bit_results.size", "10" );
+		cfg.setProperty( "hibernate.search.filter.cache_docidresults.size", "10" );
 	}	
 }
