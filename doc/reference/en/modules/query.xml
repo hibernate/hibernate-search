@@ -267,31 +267,35 @@ String authorName = firstResult[2];</programlisting>
         <itemizedlist>
           <listitem>
             <para>FullTextQuery.THIS: returns the intialized and managed
-            entity (as a non projected query would have done)</para>
+            entity (as a non projected query would have done).</para>
           </listitem>
 
           <listitem>
             <para>FullTextQuery.DOCUMENT: returns the Lucene Document related
-            to the object projected</para>
+            to the object projected.</para>
+          </listitem>
+
+          <listitem>
+            <para>FullTextQuery.OBJECT_CLASS: returns the class of the
+            indexded entity.</para>
           </listitem>
 
           <listitem>
             <para>FullTextQuery.SCORE: returns the document score in the
-            query. The score is guatanteed to be between 0 and 1 but the
-            highest score is not necessarily equals to 1. Scores are handy to
-            compare one result against an other for a given query but are
-            useless when comparing the result of different queries.</para>
+            query. Scores are handy to compare one result against an other for
+            a given query but are useless when comparing the result of
+            different queries.</para>
           </listitem>
 
           <listitem>
             <para>FullTextQuery.ID: the id property value of the projected
-            object</para>
+            object.</para>
           </listitem>
 
           <listitem>
             <para>FullTextQuery.DOCUMENT_ID: the Lucene document id. Careful,
             Lucene document id can change overtime between two different
-            IndexReader opening (this feature is experimental)</para>
+            IndexReader opening (this feature is experimental).</para>
           </listitem>
 
           <listitem>
