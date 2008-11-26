@@ -48,7 +48,6 @@ import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.FullTextQueryImpl;
 import org.hibernate.search.util.ContextHelper;
@@ -102,6 +101,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings( "unchecked" )
 	public <T> void purge(Class<T> entityType, Serializable id) {
 		if ( entityType == null ) {
 			return;
@@ -114,21 +114,11 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 			throw new IllegalArgumentException( msg );
 		}
 
+		Work<T> work;
 		for ( Class clazz : targetedClasses ) {
-			DocumentBuilderIndexedEntity builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
-			Work<T> work;
 			if ( id == null ) {
-				// purge the main entity
 				work = new Work<T>( clazz, id, WorkType.PURGE_ALL );
 				searchFactoryImplementor.getWorker().performWork( work, transactionContext );
-
-				// purge the subclasses
-				Set<Class<?>> subClasses = builder.getMappedSubclasses();
-				for ( Class subClazz : subClasses ) {
-					@SuppressWarnings( "unchecked" )
-					Work subClassWork = new Work( subClazz, id, WorkType.PURGE_ALL );
-					searchFactoryImplementor.getWorker().performWork( subClassWork, transactionContext );
-				}
 			}
 			else {
 				work = new Work<T>( clazz, id, WorkType.PURGE );
