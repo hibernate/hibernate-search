@@ -19,22 +19,25 @@ import java.lang.annotation.Documented;
 @Documented
 public @interface FullTextFilterDef {
 	/**
-	 * Filter name. Must be unique across all mappings for a given persistence unit
+	 * @return the filter name. Must be unique across all mappings for a given persistence unit
 	 */
 	String name();
 
 	/**
-	 * Either implements org.apache.lucene.search.Filter
-	 * or contains a @Factory method returning one.
-	 * The Filter generated must be thread-safe
+	 * Either implements {@link org.apache.lucene.search.Filter}
+	 * or contains a <code>@Factory</code> method returning one.
+	 * The generated <code>Filter</code> must be thread-safe.
 	 *
-	 * If the filter accept parameters, an @Key method must be present as well
+	 * If the filter accept parameters, an <code>@Key</code> method must be present as well.
+	 *
+	 * @return a class which either implements <code>Filter</code> directly or contains a method annotated with
+	 * <code>@Factory</code>.
 	 *
 	 */
 	Class<?> impl();
 
 	/**
-	 * Cache mode for the filter. Default to instance and results caching
+	 * @return The cache mode for the filter. Default to instance and results caching
 	 */
 	FilterCacheModeType cache() default FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS;
 }
