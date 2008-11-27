@@ -22,8 +22,8 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"> 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="search-architecture">
   <!--  $Id$ -->
 
@@ -32,14 +32,14 @@
   <section>
     <title>Overview</title>
 
-    <para>Hibernate Search consists of an indexing and an index search engine.
-    Both are backed by Apache Lucene.</para>
+    <para>Hibernate Search consists of an indexing component and an index
+    search component. Both are backed by Apache Lucene.</para>
 
-    <para>When an entity is inserted, updated or removed in/from the database,
-    Hibernate Search keeps track of this event (through the Hibernate event
-    system) and schedules an index update. All the index updates are handled
-    for you without you having to use the Apache Lucene APIs (see <xref
-    linkend="search-configuration-event" />).</para>
+    <para>Each time an entity is inserted, updated or removed in/from the
+    database, Hibernate Search keeps track of this event (through the
+    Hibernate event system) and schedules an index update. All the index
+    updates are handled without you having to use the Apache Lucene APIs (see
+    <xref linkend="search-configuration-event" />).</para>
 
     <para>To interact with Apache Lucene indexes, Hibernate Search has the
     notion of <classname>DirectoryProvider</classname>s. A directory provider
@@ -67,8 +67,8 @@
     <para>It is however recommended, for both your database and Hibernate
     Search, to execute your operation in a transaction be it JDBC or JTA. When
     in a transaction, the index update operation is scheduled for the
-    transaction commit and discarded in case of transaction rollback. The
-    batching scope is the transaction. There are two immediate
+    transaction commit phase and discarded in case of transaction rollback.
+    The batching scope is the transaction. There are two immediate
     benefits:</para>
 
     <itemizedlist>
@@ -113,101 +113,114 @@
     box for two different scenarios.</para>
 
     <section>
-      <title>Lucene</title>
+      <title>Back end types</title>
 
-      <para>In this mode, all index update operations applied on a given node
-      (JVM) will be executed to the Lucene directories (through the directory
-      providers) by the same node. This mode is typically used in non
-      clustered environment or in clustered environments where the directory
-      store is shared.</para>
+      <section>
+        <title>Lucene</title>
 
-      <mediaobject>
-        <imageobject role="html">
-          <imagedata align="center"
-                     fileref="../shared/images/lucene-backend.png"
-                     format="PNG" />
-        </imageobject>
+        <para>In this mode, all index update operations applied on a given
+        node (JVM) will be executed to the Lucene directories (through the
+        directory providers) by the same node. This mode is typically used in
+        non clustered environment or in clustered environments where the
+        directory store is shared.</para>
 
-        <imageobject role="fo">
-          <imagedata align="center" fileref="images/lucene-backend.png"
-                     format="PNG" />
-        </imageobject>
-      </mediaobject>
+        <mediaobject>
+          <imageobject role="html">
+            <imagedata align="center"
+                       fileref="../shared/images/lucene-backend.png"
+                       format="PNG" />
+          </imageobject>
 
-      <para>This mode targets non clustered applications, or clustered
-      applications where the Directory is taking care of the locking
-      strategy.</para>
+          <imageobject role="fo">
+            <imagedata align="center" fileref="images/lucene-backend.png"
+                       format="PNG" />
+          </imageobject>
 
-      <para>The main advantage is simplicity and immediate visibility of the
-      changes in Lucene queries (a requirement is some applications).</para>
+          <caption>
+            <para>Lucene back end configuration.</para>
+          </caption>
+        </mediaobject>
+
+        <para>This mode targets non clustered applications, or clustered
+        applications where the Directory is taking care of the locking
+        strategy.</para>
+
+        <para>The main advantage is simplicity and immediate visibility of the
+        changes in Lucene queries (a requirement in some applications).</para>
+      </section>
+
+      <section>
+        <title>JMS</title>
+
+        <para>All index update operations applied on a given node are sent to
+        a JMS queue. A unique reader will then process the queue and update
+        the master Lucene index. The master index is then replicated on a
+        regular basis to the slave copies. This is known as the master /
+        slaves pattern. The master is the sole responsible for updating the
+        Lucene index. The slaves can accept read as well as write operations.
+        However, they only process the read operation on their local index
+        copy and delegate the update operations to the master.</para>
+
+        <mediaobject>
+          <imageobject role="html">
+            <imagedata align="center"
+                       fileref="../shared/images/jms-backend.png" format="PNG" />
+          </imageobject>
+
+          <imageobject role="fo">
+            <imagedata align="center" fileref="images/jms-backend.png"
+                       format="PNG" />
+          </imageobject>
+
+          <caption>
+            <para>JMS back end configuration.</para>
+          </caption>
+        </mediaobject>
+
+        <para>This mode targets clustered environments where throughput is
+        critical, and index update delays are affordable. Reliability is
+        ensured by the JMS provider and by having the slaves working on a
+        local copy of the index.</para>
+      </section>
+
+      <note>Hibernate Search is an extensible architecture. Feel free to drop
+      ideas for other third party back ends to
+      <literal>hibernate-dev@lists.jboss.org</literal>.</note>
     </section>
 
     <section>
-      <title>JMS</title>
+      <title>Work execution</title>
 
-      <para>All index update operations applied on a given node are sent to a
-      JMS queue. A unique reader will then process the queue and update the
-      master Lucene index. The master index is then replicated on a regular
-      basis to the slave copies. This is known as the master / slaves pattern.
-      The master is the sole responsible for updating the Lucene index. The
-      slaves can accept read as well as write operations. However, they only
-      process the read operation on their local index copy and delegate the
-      update operations to the master.</para>
+      <para>The indexing work (done by the back end) can be executed
+      synchronously with the transaction commit (or update operation if out of
+      transaction), or asynchronously.</para>
 
-      <mediaobject>
-        <imageobject role="html">
-          <imagedata align="center" fileref="../shared/images/jms-backend.png"
-                     format="PNG" />
-        </imageobject>
+      <section>
+        <title>Synchronous</title>
 
-        <imageobject role="fo">
-          <imagedata align="center" fileref="images/jms-backend.png"
-                     format="PNG" />
-        </imageobject>
-      </mediaobject>
+        <para>This is the safe mode where the back end work is executed in
+        concert with the transaction commit. Under highly concurrent
+        environment, this can lead to throughput limitations (due to the
+        Apache Lucene lock mechanism) and it can increase the system response
+        time if the backend is significantly slower than the transactional
+        process and if a lot of IO operations are involved.</para>
+      </section>
 
-      <para>This mode targets clustered environments where throughput is
-      critical, and index update delays are affordable. Reliability is ensured
-      by the JMS provider and by having the slaves working on a local copy of
-      the index.</para>
-    </section>
+      <section>
+        <title>Asynchronous</title>
 
-    <note>Hibernate Search is an extensible architecture. While not yet part
-    of the public API, plugging a third party back end is possible. Feel free
-    to drop ideas to <literal>hibernate-dev@lists.jboss.org</literal>.</note>
-  </section>
+        <para>This mode delegates the work done by the back end to a different
+        thread. That way, throughput and response time are (to a certain
+        extend) decorrelated from the back end performance. The drawback is
+        that a small delay appears between the transaction commit and the
+        index update and a small overhead is introduced to deal with thread
+        management.</para>
 
-  <section>
-    <title>Work execution</title>
-
-    <para>The indexing work (done by the back end) can be executed
-    synchronously with the transaction commit (or update operation if out of
-    transaction), or asynchronously.</para>
-
-    <section>
-      <title>Synchronous</title>
-
-      <para>This is the safe mode where the back end work is executed in
-      concert with the transaction commit. Under highly concurrent
-      environment, this can lead to throughput limitations (due to the Apache
-      Lucene lock mechanism) and it can increase the system response time if
-      the backend is significantly slower than the transactional process and
-      if a lot of IO operations are involved.</para>
-    </section>
-
-    <section>
-      <title>Asynchronous</title>
-
-      <para>This mode delegates the work done by the back end to a different
-      thread. That way, throughput and response time are (to a certain extend)
-      decorrelated from the back end performance. The drawback is that a small
-      delay appears between the transaction commit and the index update and a
-      small overhead is introduced to deal with thread management.</para>
-
-      <para>It is recommended to use synchronous execution first and evaluate
-      asynchronous execution if performance problems occur and after having
-      set up a proper benchmark (ie not a lonely cowboy hitting the system in
-      a completely unrealistic way).</para>
+        <para>It is recommended to use synchronous execution first and
+        evaluate asynchronous execution if performance problems occur and
+        after having set up a proper benchmark (ie not a lonely cowboy hitting
+        the system in a completely unrealistic way).</para>
+      </section>
     </section>
   </section>
 
@@ -228,13 +241,12 @@
       multiple queries and threads provided that the
       <classname>IndexReader</classname> is still up-to-date. If the
       <classname>IndexReader</classname> is not up-to-date, a new one is
-      opened and provided. Each
-      <classname>IndexReader</classname> is made of several
-      <classname>SegmentReader</classname>s. This strategy only reopens
-      segments that have been modified or created after last opening and
-      shares the already loaded segments from the previous instance.
-      This strategy is the default.</para>
-      
+      opened and provided. Each <classname>IndexReader</classname> is made of
+      several <classname>SegmentReader</classname>s. This strategy only
+      reopens segments that have been modified or created after last opening
+      and shares the already loaded segments from the previous instance. This
+      strategy is the default.</para>
+
       <para>The name of this strategy is <literal>shared</literal>.</para>
     </section>
 
