@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 package org.hibernate.search.annotations;
 
 import java.lang.annotation.Documented;
@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target( ElementType.TYPE )
 @Documented
 /**
- * Specifies a similarity implementation to use
+ * Specifies a similarity implementation to use.
  *
  * @author Nick Vincent
  */

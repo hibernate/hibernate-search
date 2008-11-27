@@ -2,7 +2,7 @@
 package org.hibernate.search.annotations;
 
 /**
- * Date indexing resolution
+ * Date indexing resolution.
  *
  * @author Emmanuel Bernard
  */
