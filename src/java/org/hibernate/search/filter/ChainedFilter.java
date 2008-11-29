@@ -12,7 +12,13 @@ import org.apache.lucene.index.IndexReader;
 import org.hibernate.annotations.common.AssertionFailure;
 
 /**
+ * <p>A Filter capable of chaining other filters, so that it's
+ * possible to apply several filters on a Query.</p>
+ * <p>The resulting filter will only enable result Documents
+ * if no filter removed it.</p>
+ * 
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class ChainedFilter extends Filter {
 	
@@ -26,16 +32,6 @@ public class ChainedFilter extends Filter {
 
 	public BitSet bits(IndexReader reader) throws IOException {
 		throw new UnsupportedOperationException();
-		/*
-		if (chainedFilters.size() == 0) throw new AssertionFailure("Chainedfilter has no filters to chain for");
-		//we need to copy the first BitSet because BitSet is modified by .logicalOp
-		Filter filter = chainedFilters.get( 0 );
-		BitSet result = (BitSet) filter.bits( reader ).clone();
-		for (int index = 1 ; index < chainedFilters.size() ; index++) {
-			result.and( chainedFilters.get( index ).bits( reader ) );
-		}
-		return result;
-		*/
 	}
 	
 	@Override
@@ -45,21 +41,25 @@ public class ChainedFilter extends Filter {
 			throw new AssertionFailure( "Chainedfilter has no filters to chain for" );
 		}
 		else if ( size == 1 ) {
-			return chainedFilters.get(0).getDocIdSet(reader);
+			return chainedFilters.get( 0 ).getDocIdSet( reader );
 		}
 		else {
 			List<DocIdSet> subSets = new ArrayList<DocIdSet>( size );
 			for ( Filter f : chainedFilters ) {
 				subSets.add( f.getDocIdSet( reader ) );
 			}
+			subSets = FilterOptimizationHelper.mergeByBitAnds( subSets );
+			if ( subSets.size() == 1 ) {
+				return subSets.get( 0 );
+			}
 			return new AndDocIdSet( subSets, reader.maxDoc() );
 		}
 	}
 
 	public String toString() {
-		StringBuilder sb = new StringBuilder("ChainedFilter [");
+		StringBuilder sb = new StringBuilder( "ChainedFilter [" );
 		for (Filter filter : chainedFilters) {
-			sb.append( "\n  ").append( filter.toString() );
+			sb.append( "\n  " ).append( filter.toString() );
 		}
 		return sb.append("\n]" ).toString();
 	}
