@@ -18,7 +18,7 @@ public class ContextHolder {
 			new ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>>();
 
 	//code doesn't have to be multithreaded because SF creation is not.
-	//this is not a public API, should really only be used during the SessionFActory building
+	//this is not a public API, should really only be used during the SessionFactory building
 	public static SearchFactoryImpl getOrBuildSearchFactory(Configuration cfg) {
 		WeakHashMap<Configuration, SearchFactoryImpl> contextMap = contexts.get();
 		if ( contextMap == null ) {

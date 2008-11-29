@@ -29,22 +29,24 @@ import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.type.Type;
 
 /**
- * Implements scollable and paginated resultsets.
- * Contrary to query#iterate() or query#list(), this implementation is
+ * Implements scrollable and paginated resultsets.
+ * Contrary to Query#iterate() or Query#list(), this implementation is
  * exposed to returned null objects (if the index is out of date).
  * <p/>
  * <p/>
- * +  * The following methods that change the value of 'current' will check
- * +  * and set its value to either 'afterLast' or 'beforeFirst' depending
- * +  * on direction. This is to prevent rogue values from setting it outside
- * +  * the boundaries of the results.
- * +  * <ul>
- * +  * <li>next()</li>
- * +  * <li>previous()</li>
- * +  * <li>scroll(i)</li>
- * +  * <li>last()</li>
- * +  * <li>first()</li>
- * +  * </ul>
+ * The following methods that change the value of 'current' will check
+ * and set its value to either 'afterLast' or 'beforeFirst' depending
+ * on direction. This is to prevent rogue values from setting it outside
+ * the boundaries of the results.
+ * <ul>
+ * <li>next()</li>
+ * <li>previous()</li>
+ * <li>scroll(i)</li>
+ * <li>last()</li>
+ * <li>first()</li>
+ * </ul>
+ * 
+ * @see org.hibernate.Query
  *
  * @author Emmanuel Bernard
  * @author John Griffin
@@ -125,14 +127,12 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	}
 
 	/**
-	 * Increases cursor pointer by one. If this places it >
-	 * max + 1 (afterLast) then set it to afterLast and return
-	 * false.
-	 *
-	 * @return booolean
-	 * @throws HibernateException
+	 * {@inheritDoc}
 	 */
-	public boolean next() throws HibernateException {
+	public boolean next() {
+		//	Increases cursor pointer by one. If this places it >
+		//	max + 1 (afterLast) then set it to afterLast and return
+		//	false.
 		if ( ++current > max ) {
 			afterLast();
 			return false;
@@ -140,15 +140,10 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return true;
 	}
 
-	/**
-	 * Decreases cursor pointer by one. If this places it <
-	 * first - 1 (beforeFirst) then set it to beforeFirst and
-	 * return false.
-	 *
-	 * @return boolean
-	 * @throws HibernateException
-	 */
-	public boolean previous() throws HibernateException {
+	public boolean previous() {
+		//	Decreases cursor pointer by one. If this places it <
+		//	first - 1 (beforeFirst) then set it to beforeFirst and
+		//	return false.
 		if ( --current < first ) {
 			beforeFirst();
 			return false;
@@ -156,16 +151,10 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return true;
 	}
 
-	/**
-	 * Since we have to take into account that we can scroll any
-	 * amount positive or negative, we perform the same tests that
-	 * we performed in next() and previous().
-	 *
-	 * @param i the scroll distance.
-	 * @return boolean
-	 * @throws HibernateException
-	 */
-	public boolean scroll(int i) throws HibernateException {
+	public boolean scroll(int i) {
+		//  Since we have to take into account that we can scroll any
+		//  amount positive or negative, we perform the same tests that
+		//  we performed in next() and previous().
 		current = current + i;
 		if ( current > max ) {
 			afterLast();
@@ -180,7 +169,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		}
 	}
 
-	public boolean last() throws HibernateException {
+	public boolean last() {
 		current = max;
 		if ( current < first ) {
 			beforeFirst();
@@ -189,7 +178,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return max >= first;
 	}
 
-	public boolean first() throws HibernateException {
+	public boolean first() {
 		current = first;
 		if ( current > max ) {
 			afterLast();
@@ -198,23 +187,23 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return max >= first;
 	}
 
-	public void beforeFirst() throws HibernateException {
+	public void beforeFirst() {
 		current = first - 1;
 	}
 
-	public void afterLast() throws HibernateException {
+	public void afterLast() {
 		current = max + 1;
 	}
 
-	public boolean isFirst() throws HibernateException {
+	public boolean isFirst() {
 		return current == first;
 	}
 
-	public boolean isLast() throws HibernateException {
+	public boolean isLast() {
 		return current == max;
 	}
 
-	public void close() throws HibernateException {
+	public void close() {
 		try {
 			searchFactory.getReaderProvider().closeReader( searcher.getIndexReader() );
 		}
@@ -235,96 +224,180 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return resultContext.get( entityInfos[current - first] );
 	}
 
-	public Object get(int i) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Object get(int i) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
 	public Type getType(int i) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Integer getInteger(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Integer getInteger(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Long getLong(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Long getLong(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Float getFloat(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Float getFloat(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Boolean getBoolean(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Boolean getBoolean(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Double getDouble(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Double getDouble(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Short getShort(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Short getShort(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Byte getByte(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Byte getByte(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Character getCharacter(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Character getCharacter(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public byte[] getBinary(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public byte[] getBinary(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public String getText(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public String getText(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Blob getBlob(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Blob getBlob(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Clob getClob(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Clob getClob(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public String getString(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public String getString(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public BigDecimal getBigDecimal(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public BigDecimal getBigDecimal(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public BigInteger getBigInteger(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public BigInteger getBigInteger(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Date getDate(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Date getDate(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Locale getLocale(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Locale getLocale(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public Calendar getCalendar(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public Calendar getCalendar(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public TimeZone getTimeZone(int col) throws HibernateException {
+	/**
+	 * This method is not supported on Lucene based queries
+	 * @throws UnsupportedOperationException always thrown
+	 */
+	public TimeZone getTimeZone(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
-	public int getRowNumber() throws HibernateException {
+	public int getRowNumber() {
 		if ( max < first ) return -1;
 		return current - first;
 	}
 
-	public boolean setRowNumber(int rowNumber) throws HibernateException {
+	public boolean setRowNumber(int rowNumber) {
 		if ( rowNumber >= 0 ) {
 			current = first + rowNumber;
 		}

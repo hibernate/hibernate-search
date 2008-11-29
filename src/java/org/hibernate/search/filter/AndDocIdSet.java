@@ -1,3 +1,4 @@
+// $Id$
 package org.hibernate.search.filter;
 
 import java.io.IOException;
@@ -20,7 +21,6 @@ public class AndDocIdSet extends DocIdSet {
 	
 	private DocIdSet docIdBitSet;
 	private final List<DocIdSet> andedDocIdSets;
-	
 	private final int maxDocNumber;
 	
 	public AndDocIdSet(List<DocIdSet> andedDocIdSets, int maxDocs) {

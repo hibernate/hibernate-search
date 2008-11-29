@@ -1,6 +1,6 @@
+// $Id$
 package org.hibernate.search.filter;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.lucene.search.DocIdSet;
@@ -9,6 +9,7 @@ import org.apache.lucene.search.DocIdSetIterator;
 /**
  * A DocIdSet which is always empty.
  * Stateless and ThreadSafe.
+ * 
  * @author Sanne Grinovero
  */
 public final class EmptyDocIdBitSet extends DocIdSet implements Serializable {
@@ -17,7 +18,7 @@ public final class EmptyDocIdBitSet extends DocIdSet implements Serializable {
 
 	public static final DocIdSet instance = new EmptyDocIdBitSet();
 	
-	private final DocIdSetIterator iterator = new EmptyDocIdSetIterator();
+	private static final DocIdSetIterator iterator = new EmptyDocIdSetIterator();
 	
 	private EmptyDocIdBitSet(){
 		// is singleton
@@ -40,12 +41,12 @@ public final class EmptyDocIdBitSet extends DocIdSet implements Serializable {
 		}
 
 		@Override
-		public final boolean next() throws IOException {
+		public final boolean next() {
 			return false;
 		}
 
 		@Override
-		public final boolean skipTo(int target) throws IOException {
+		public final boolean skipTo(int target) {
 			return false;
 		}
 
