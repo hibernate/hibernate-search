@@ -810,6 +810,99 @@ public class Team {
         your IDE to see the implementations available.</para>
       </section>
 
+      <section>
+        <title>Analyzer discriminator (experimental)</title>
+
+        <para>So far all the different ways to specify an analyzer were
+        static. However, there are usecases where it is useful to select an
+        analyzer depending on the current state of the entity to be indexed,
+        for example in multi language enabled applications. For an BlogEntry
+        class for example the analyzer could depend on the language property
+        of the entry. Depending on this property the correct stemmer can be
+        chosen to index the actual text. </para>
+
+        <para>To enable this dynamic analyzer selection Hibernate Search
+        introduces the <classname>AnalyzerDiscriminator</classname>
+        annotation. The following example demonstrates the usage of this
+        annotation:</para>
+
+        <para><example>
+            <title>Usage of @AnalyzerDiscriminator in order to select an
+            analyzer depending on the entity state</title>
+
+            <programlisting>@Entity
+@Indexed
+@AnalyzerDefs({
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class
+      )
+    }),
+  @AnalyzerDef(name = "de",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = GermanStemFilterFactory.class)
+    })
+})
+public class BlogEntry {
+
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Integer id;
+
+    @Field
+    @AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
+    private String language;
+    
+    @Field
+    private String text;
+    
+    private Set&lt;BlogEntry&gt; references;
+
+    // standard getter/setter
+    ...
+}</programlisting>
+
+            <programlisting>public class LanguageDiscriminator implements Discriminator {
+
+    public String getAnanyzerDefinitionName(Object value, Object entity, String field) {
+        if ( value == null || !( entity instanceof Article ) ) {
+            return null;
+        }
+        return (String) value;
+    }
+}</programlisting>
+          </example>The prerequisite for using
+        <classname>@AnalyzerDiscriminator</classname> is that all analyzer
+        which are going to be used are predefined via
+        <classname>@AnalyzerDef</classname> definitions. If this is the case
+        one can place the <classname>@AnalyzerDiscriminator</classname>
+        annotation either on the class or on a specific property of the entity
+        for which to dynamically select an analyzer. Via the
+        <literal>impl</literal> parameter of the
+        <classname>AnalyzerDiscriminator</classname> you specify a concrete
+        implementation of the <classname>Discriminator</classname> interface.
+        It is up to you to provide an implementation for this interface. The
+        only method you have to implement is
+        <classname>getAnanyzerDefinitionName()</classname> which gets called
+        for each field added to the Lucene document. The entity which is
+        getting indexed is also passed at each call to the interface method.
+        The <literal>value</literal> parameter is only set if the
+        <classname>AnalyzerDiscriminator</classname> is placed on a property
+        instead of class level. In this case the value represents the current
+        value of this property.</para>
+
+        <para>The implemention of the interface has to return the name of an
+        existing analyzer definition if the analyzer should be set dynamically
+        or <classname>null</classname> if the default analyzer should be
+        applied. The given example assumes that the language paramter is
+        either 'de' or 'en'.</para>
+      </section>
+
       <section id="analyzer-retrievinganalyzer">
         <title>Retrieving an analyzer</title>
 
