@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -23,6 +26,7 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.ProvidedId;
@@ -295,8 +299,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 
 		String idInString = idBridge.objectToString( id );
 		if ( workType == WorkType.ADD ) {
-			Document doc = getDocument( entity, id );
-			queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
 		}
 		else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
@@ -305,7 +308,6 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			queue.add( new PurgeAllLuceneWork( entityClass ) );
 		}
 		else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
-			Document doc = getDocument( entity, id );
 			/**
 			 * even with Lucene 2.1, use of indexWriter to update is not an option
 			 * We can only delete by term, and the index doesn't have a term that
@@ -314,12 +316,11 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			 * double file opening.
 			 */
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-			queue.add( new AddLuceneWork( id, idInString, entityClass, doc ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
 		}
 		else if ( workType == WorkType.INDEX ) {
-			Document doc = getDocument( entity, id );
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-			queue.add( new AddLuceneWork( id, idInString, entityClass, doc, true ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, true ) );
 		}
 		else {
 			throw new AssertionFailure( "Unknown WorkType: " + workType );
@@ -328,14 +329,34 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		super.addWorkToQueue( entityClass, entity, id, workType, queue, searchFactoryImplementor );
 	}
 
+	private AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, boolean isBatch) {
+		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap );
+		AddLuceneWork addWork;
+		if ( fieldToAnalyzerMap.isEmpty() ) {
+			addWork = new AddLuceneWork( id, idInString, entityClass, doc, isBatch );
+		}
+		else {
+			addWork = new AddLuceneWork( id, idInString, entityClass, doc, fieldToAnalyzerMap, isBatch );
+		}
+		return addWork;
+	}
+
 	/**
 	 * Builds the Lucene <code>Document</code> for a given entity <code>instance</code> and its <code>id</code>.
 	 *
 	 * @param instance The entity for which to build the matching Lucene <code>Document</code>
 	 * @param id the entity id.
+	 * @param fieldToAnalyzerMap this maps gets populated while generateing the <code>Document</code>.
+	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
+	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
-	public Document getDocument(T instance, Serializable id) {
+	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap) {
+		if ( fieldToAnalyzerMap == null ) {
+			throw new IllegalArgumentException( "fieldToAnalyzerMap cannot be null" );
+		}
+
 		Document doc = new Document();
 		final Class<?> entityType = Hibernate.getClass( instance );
 		if ( metadata.boost != null ) {
@@ -361,16 +382,21 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		idBridge.set( idKeywordName, id, doc, luceneOptions );
 
 		// finally add all other document fields
-		buildDocumentFields( instance, doc, metadata );
+		Set<String> processedFieldNames = new HashSet<String>();
+		buildDocumentFields( instance, doc, metadata, fieldToAnalyzerMap, processedFieldNames );
 		return doc;
 	}
 
-	private void buildDocumentFields(Object instance, Document doc, PropertiesMetadata propertiesMetadata) {
+	private void buildDocumentFields(Object instance, Document doc, PropertiesMetadata propertiesMetadata, Map<String, String> fieldToAnalyzerMap,
+									 Set<String> processedFieldNames) {
 		if ( instance == null ) {
 			return;
 		}
-		//needed for field access: I cannot work in the proxied version
+
+		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance );
+
+		// process the class bridges
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
 			fb.set(
@@ -378,6 +404,8 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 					doc, propertiesMetadata.getClassLuceneOptions( i )
 			);
 		}
+
+		// process the indexed fields
 		for ( int i = 0; i < propertiesMetadata.fieldNames.size(); i++ ) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
@@ -386,6 +414,13 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 					propertiesMetadata.getFieldLuceneOptions( i )
 			);
 		}
+
+		// allow analyzer override for the fields added by the class and field bridges
+		allowAnalyzerDiscriminatorOverride(
+				doc, propertiesMetadata, fieldToAnalyzerMap, processedFieldNames, unproxiedInstance
+		);
+
+		// recursively process embedded objects
 		for ( int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++ ) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
@@ -398,27 +433,67 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
 				case ARRAY:
 					for ( Object arrayValue : ( Object[] ) value ) {
-						buildDocumentFields( arrayValue, doc, embeddedMetadata );
+						buildDocumentFields(
+								arrayValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames
+						);
 					}
 					break;
 				case COLLECTION:
 					for ( Object collectionValue : ( Collection ) value ) {
-						buildDocumentFields( collectionValue, doc, embeddedMetadata );
+						buildDocumentFields(
+								collectionValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames
+						);
 					}
 					break;
 				case MAP:
 					for ( Object collectionValue : ( ( Map ) value ).values() ) {
-						buildDocumentFields( collectionValue, doc, embeddedMetadata );
+						buildDocumentFields(
+								collectionValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames
+						);
 					}
 					break;
 				case OBJECT:
-					buildDocumentFields( value, doc, embeddedMetadata );
+					buildDocumentFields( value, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames );
 					break;
 				default:
 					throw new AssertionFailure(
 							"Unknown embedded container: "
 									+ propertiesMetadata.embeddedContainers.get( i )
 					);
+			}
+		}
+	}
+
+	/**
+	 * Allows a analyzer discriminator to override the analyzer used for any field in the Lucene document.
+	 *
+	 * @param doc The Lucene <code>Document</code> which shall be indexed.
+	 * @param propertiesMetadata The metadata for the entity we currently add to the document.
+	 * @param fieldToAnalyzerMap This map contains the actual override data. It is a map between document fields names and
+	 * analyzer definition names. This map will be added to the <code>Work</code> instance and processed at actual indexing time.
+	 * @param processedFieldNames A list of field names we have already processed.
+	 * @param unproxiedInstance The entity we currently "add" to the document.
+	 */
+	private void allowAnalyzerDiscriminatorOverride(Document doc, PropertiesMetadata propertiesMetadata, Map<String, String> fieldToAnalyzerMap, Set<String> processedFieldNames, Object unproxiedInstance) {
+		Discriminator discriminator = propertiesMetadata.discriminator;
+		if ( discriminator == null ) {
+			return;
+		}
+
+		Object value = null;
+		if ( propertiesMetadata.discriminatorGetter != null ) {
+			value = ReflectionHelper.getMemberValue( unproxiedInstance, propertiesMetadata.discriminatorGetter );
+		}
+
+		// now we give the discriminator the oppertunity to specify a analyzer per field level
+		for ( Object o : doc.getFields() ) {
+			Field field = ( Field ) o;
+			if ( !processedFieldNames.contains( field.name() ) ) {
+				String analyzerName = discriminator.getAnanyzerDefinitionName( value, unproxiedInstance, field.name() );
+				if ( analyzerName != null ) {
+					fieldToAnalyzerMap.put( field.name(), analyzerName );
+				}
+				processedFieldNames.add( field.name() );
 			}
 		}
 	}

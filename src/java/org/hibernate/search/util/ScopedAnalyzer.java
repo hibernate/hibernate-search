@@ -16,11 +16,18 @@ import org.apache.lucene.analysis.TokenStream;
  * @author Emmanuel Bernard
  */
 public class ScopedAnalyzer extends Analyzer {
+	private Analyzer globalAnalyzer;
+	private Map<String, Analyzer> scopedAnalyzers = new HashMap<String, Analyzer>();
+
 	public ScopedAnalyzer() {
 	}
 
-	private Analyzer globalAnalyzer;
-	private Map<String, Analyzer> scopedAnalyzers = new HashMap<String, Analyzer>();
+	private ScopedAnalyzer( Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
+		this.globalAnalyzer = globalAnalyzer;
+		for ( Map.Entry<String, Analyzer> entry : scopedAnalyzers.entrySet() ) {
+			addScopedAnalyzer( entry.getKey(), entry.getValue() );
+		}
+	}
 
 	public void setGlobalAnalyzer( Analyzer globalAnalyzer ) {
 		this.globalAnalyzer = globalAnalyzer;
@@ -44,5 +51,10 @@ public class ScopedAnalyzer extends Analyzer {
 			analyzer = globalAnalyzer;
 		}
 		return analyzer;
+	}
+
+	public ScopedAnalyzer clone() {
+		ScopedAnalyzer clone = new ScopedAnalyzer( globalAnalyzer, scopedAnalyzers );
+		return clone;
 	}
 }

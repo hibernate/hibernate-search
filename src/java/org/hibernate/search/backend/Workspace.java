@@ -81,6 +81,10 @@ public class Workspace {
 		return searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity );
 	}
 
+	public Analyzer getAnalyzer(String name) {
+		return searchFactoryImplementor.getAnalyzer( name );
+	}
+
 	/**
 	 * If optimization has not been forced give a change to configured OptimizerStrategy
 	 * to optimize the index.

@@ -26,8 +26,10 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.AnalyzerDiscriminator;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
@@ -101,7 +103,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 
 		Set<XClass> processedClasses = new HashSet<XClass>();
 		processedClasses.add( clazz );
-		initializeMembers( clazz, metadata, true, "", processedClasses, context );
+		initializeClass( clazz, metadata, true, "", processedClasses, context );
 
 		this.analyzer.setGlobalAnalyzer( metadata.analyzer );
 
@@ -115,8 +117,8 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		return isRoot;
 	}
 
-	private void initializeMembers(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
-								   Set<XClass> processedClasses, InitContext context) {
+	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
+								 Set<XClass> processedClasses, InitContext context) {
 		List<XClass> hierarchy = new ArrayList<XClass>();
 		for ( XClass currClass = clazz; currClass != null; currClass = currClass.getSuperclass() ) {
 			hierarchy.add( currClass );
@@ -149,14 +151,24 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	/**
-	 * Checks for class level annotations.
+	 * Check and initialize class level annotations.
+	 *
+	 * @param clazz The class to process.
+	 * @param propertiesMetadata The meta data holder.
+	 * @param isRoot Flag indicating if the specified class is a root entity, meaning the start of a chain of indexed
+	 * entities.
+	 * @param prefix The current prefix used for the <code>Document</code> field names.
+	 * @param context Handle to default configuration settings.
 	 */
 	private void initalizeClassLevelAnnotations(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
-		Analyzer analyzer = getAnalyzer( clazz, context );
 
+		// check for a class level specified analyzer
+		Analyzer analyzer = getAnalyzer( clazz, context );
 		if ( analyzer != null ) {
 			propertiesMetadata.analyzer = analyzer;
 		}
+
+		// check for AnalyzerDefs annotations
 		checkForAnalyzerDefs( clazz, context );
 
 		// Check for any ClassBridges annotation.
@@ -164,15 +176,17 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		if ( classBridgesAnn != null ) {
 			ClassBridge[] cbs = classBridgesAnn.value();
 			for ( ClassBridge cb : cbs ) {
-				bindClassAnnotation( prefix, propertiesMetadata, cb, context );
+				bindClassBridgeAnnotation( prefix, propertiesMetadata, cb, context );
 			}
 		}
 
 		// Check for any ClassBridge style of annotations.
 		ClassBridge classBridgeAnn = clazz.getAnnotation( ClassBridge.class );
 		if ( classBridgeAnn != null ) {
-			bindClassAnnotation( prefix, propertiesMetadata, classBridgeAnn, context );
+			bindClassBridgeAnnotation( prefix, propertiesMetadata, classBridgeAnn, context );
 		}
+
+		checkForAnalyzerDiscriminator( clazz, propertiesMetadata );
 
 		// Get similarity
 		//TODO: similarity form @IndexedEmbedded are not taken care of. Exception??
@@ -190,6 +204,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		checkForField( member, propertiesMetadata, prefix, context );
 		checkForFields( member, propertiesMetadata, prefix, context );
 		checkForAnalyzerDefs( member, context );
+		checkForAnalyzerDiscriminator( member, propertiesMetadata );
 		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context );
 		checkForContainedIn( member, propertiesMetadata );
 	}
@@ -241,7 +256,30 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		context.addAnalyzerDef( def );
 	}
 
+	private void checkForAnalyzerDiscriminator(XAnnotatedElement annotatedElement, PropertiesMetadata propertiesMetadata) {
+		AnalyzerDiscriminator discriminiatorAnn = annotatedElement.getAnnotation( AnalyzerDiscriminator.class );
+		if ( discriminiatorAnn != null ) {
+			if ( propertiesMetadata.discriminator != null ) {
+				throw new SearchException(
+						"Multiple AnalyzerDiscriminator defined in the same class hierarchy: " + beanClass.getName()
+				);
+			}
+						
+			Class<? extends Discriminator> discriminatorClass = discriminiatorAnn.impl();
+			try {
+				propertiesMetadata.discriminator = discriminatorClass.newInstance();
+			}
+			catch ( Exception e ) {
+				throw new SearchException(
+						"Unable to instantiate analyzer discriminator implementation: " + discriminatorClass.getName()
+				);
+			}
 
+			if ( annotatedElement instanceof XMember ) {
+				propertiesMetadata.discriminatorGetter = ( XMember ) annotatedElement;
+			}
+		}
+	}
 
 	public Similarity getSimilarity() {
 		return similarity;
@@ -333,7 +371,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 				Analyzer analyzer = getAnalyzer( member, context );
 				metadata.analyzer = analyzer != null ? analyzer : propertiesMetadata.analyzer;
 				String localPrefix = buildEmbeddedPrefix( prefix, embeddedAnn, member );
-				initializeMembers( elementClass, metadata, false, localPrefix, processedClasses, context );
+				initializeClass( elementClass, metadata, false, localPrefix, processedClasses, context );
 				/**
 				 * We will only index the "expected" type but that's OK, HQL cannot do downcasting either
 				 */
@@ -396,8 +434,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		return ReflectionHelper.getAttributeName( member, name );
 	}
 
-	private void bindClassAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, InitContext context) {
-		//FIXME name should be prefixed
+	private void bindClassBridgeAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, InitContext context) {
 		String fieldName = prefix + ann.name();
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( getStore( ann.store() ) );
@@ -641,6 +678,8 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	protected static class PropertiesMetadata {
 		public Float boost;
 		public Analyzer analyzer;
+		public Discriminator discriminator;
+		public XMember discriminatorGetter;
 		public final List<String> fieldNames = new ArrayList<String>();
 		public final List<XMember> fieldGetters = new ArrayList<XMember>();
 		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();

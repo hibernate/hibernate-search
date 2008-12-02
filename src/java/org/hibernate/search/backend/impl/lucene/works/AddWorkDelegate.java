@@ -1,6 +1,7 @@
 package org.hibernate.search.backend.impl.lucene.works;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
@@ -9,14 +10,16 @@ import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.ScopedAnalyzer;
 
 /**
- * Stateless implementation that performs a AddLuceneWork.
+ * Stateless implementation that performs a <code>AddLuceneWork</code>.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -40,8 +43,11 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 	}
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
+		@SuppressWarnings("unchecked")
 		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( work.getEntityClass() );
-		Analyzer analyzer = documentBuilder.getAnalyzer();
+		Map<String, String> fieldToAnalyzerMap = ( ( AddLuceneWork ) work ).getFieldToAnalyzerMap();
+		ScopedAnalyzer analyzer = ( ScopedAnalyzer ) documentBuilder.getAnalyzer();
+		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap, workspace );
 		Similarity similarity = documentBuilder.getSimilarity();
 		if ( log.isTraceEnabled() ) {
 			log.trace(
@@ -64,8 +70,37 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		}
 	}
 
+	/**
+	 * Allows to override the otherwise static field to analyzer mapping in <code>scopedAnalyzer</code>.
+	 *
+	 * @param scopedAnalyzer The scoped analyzer created at startup time.
+	 * @param fieldToAnalyzerMap A map of <code>Document</code> field names for analyzer names. This map gets creates
+	 * when the Lucene <code>Document</code> gets created and uses the state of the entiy to index to determine analyzers
+	 * dynamically at index time.
+	 * @param workspace The current workspace.
+	 * @return <code>scopedAnalyzer</code> in case <code>fieldToAnalyzerMap</code> is <code>null</code> or empty. Otherwise
+	 * a clone of <code>scopedAnalyzer</code> is created where the analyzers get overriden according to <code>fieldToAnalyzerMap</code>.
+	 */
+	private ScopedAnalyzer updateAnalyzerMappings(ScopedAnalyzer scopedAnalyzer, Map<String, String> fieldToAnalyzerMap, Workspace workspace) {
+		// for backwards compatability
+		if ( fieldToAnalyzerMap == null || fieldToAnalyzerMap.isEmpty() ) {
+			return scopedAnalyzer;
+		}
+
+		ScopedAnalyzer analyzerClone = scopedAnalyzer.clone();
+		for ( Map.Entry<String, String> entry : fieldToAnalyzerMap.entrySet() ) {
+			Analyzer analyzer = workspace.getAnalyzer( entry.getValue() );
+			if ( analyzer == null ) {
+				log.warn( "Unable to retrieve named analyzer: " + entry.getValue() );
+			}
+			else {
+				analyzerClone.addScopedAnalyzer( entry.getKey(), analyzer );
+			}
+		}
+		return analyzerClone;
+	}
+
 	public void performWork(LuceneWork work, IndexReader reader) {
 		throw new UnsupportedOperationException();
 	}
-
 }
