@@ -3,5 +3,5 @@
   <groupId>org.hibernate</groupId>
   <artifactId>hibernate-search-quickstart</artifactId>
   <packaging>jar</packaging>
-  <version>3.1.0.CR1</version>
+  <version>3.1.0.GA</version>
 </project>
