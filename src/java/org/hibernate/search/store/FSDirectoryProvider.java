@@ -13,9 +13,15 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
- * Use a Lucene FSDirectory
- * The base directory is represented by hibernate.search.<index>.indexBase
- * The index is created in <base directory>/<index name>
+ * Use a Lucene {@link FSDirectory}. The base directory is represented by the property <i>hibernate.search.default.indexBase</i>
+ * or <i>hibernate.search.&lt;index&gt;.indexBase</i>. The former defines the default base directory for all indexes whereas the
+ * latter allows to override the base directory on a per index basis.<i> &lt;index&gt;</i> has to be replaced with the fully qualified
+ * classname of the indexed class or the value of the <i>index</i> property of the <code>@Indexed</code> annotation.
+ * <p>
+ * The actual index files are then created in <i>&lt;indexBase&gt;/&lt;index name&gt;</i>, <i>&lt;index name&gt;</i> is
+ * per default the name of the indexed entity, or the value of the <i>index</i> property of the <code>@Indexed</code> or can be specified
+ * as property in the configuration file using <i>hibernate.search.&lt;index&gt;.indexName</i>.
+ * </p>
  *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot

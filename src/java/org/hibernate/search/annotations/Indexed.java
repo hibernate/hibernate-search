@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  */
 public @interface Indexed {
 	/**
-	 * The filename of the index
+	 * @return The filename of the index
 	 */
 	String index() default "";
 }

@@ -22,20 +22,16 @@ import org.hibernate.util.ReflectHelper;
 import org.hibernate.util.StringHelper;
 
 /**
- * Create a Lucene directory provider
- * <p/>
- * Lucene directory providers are configured through properties
+ * Create a Lucene directory provider which can be configured
+ * through the following properties:
  * <ul>
- * <li>hibernate.search.default.* and</li>
- * <li>hibernate.search.&lt;indexname&gt;.*</li>
- * </ul>
- * <p/>
- * &lt;indexname&gt; properties have precedence over default
+ * <li><i>hibernate.search.default.*</i></li>
+ * <li><i>hibernate.search.&lt;indexname&gt;.*</i>,</li>
+ * </ul>where <i>&lt;indexname&gt;</i> properties have precedence over default ones.
  * <p/>
  * The implementation is described by
- * hibernate.search.[default|indexname].directory_provider
- * <p/>
- * If none is defined the default value is FSDirectory
+ * <i>hibernate.search.[default|indexname].directory_provider</i>.
+ * If none is defined the default value is FSDirectory.
  *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
