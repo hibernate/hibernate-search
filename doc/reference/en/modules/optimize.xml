@@ -22,23 +22,23 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"> 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="search-optimize">
   <!--  $Id$ -->
 
   <title>Index Optimization</title>
 
   <para>From time to time, the Lucene index needs to be optimized. The process
-  is essentially a defragmentation: until the optimization occurs deleted
-  documents are just marked as such, no physical deletion is applied; the
-  optimization can also adjust the number of files in the Lucene
-  Directory.</para>
+  is essentially a defragmentation. Until an optimization is triggered Lucene
+  only marks deleted documents as such, no physical deletions are applied.
+  During the optimization process the deletions will be applied which also
+  effects the number of files in the Lucene Directory.</para>
 
-  <para>The optimization speeds up searches but in no way speeds up indexation
-  (update). During an optimization, searches can be performed (but will most
-  likely be slowed down), and all index updates will be stopped. Prefer
-  optimizing:</para>
+  <para>Optimising the Lucene index speeds up searches but has no effect on
+  the indexation (update) performance. During an optimization, searches can be
+  performed, but will most likely be slowed down. All index updates will be
+  stopped. It is recommended to schedule optimization:</para>
 
   <itemizedlist>
     <listitem>
@@ -46,40 +46,42 @@
     </listitem>
 
     <listitem>
-      <para>after a lot of index modifications (doing so before will not speed
-      up the indexation process)</para>
+      <para>after a lot of index modifications</para>
     </listitem>
   </itemizedlist>
 
   <section>
     <title>Automatic optimization</title>
 
-    <para>Hibernate Search can optimize automatically an index after:</para>
+    <para>Hibernate Search can automatically optimize an index after:</para>
 
     <itemizedlist>
       <listitem>
-        <para>a certain amount of operations have been applied (insertion,
-        deletion)</para>
+        <para>a certain amount of operations (insertion, deletion)</para>
       </listitem>
 
       <listitem>
-        <para>or a certain amout of transactions have been applied</para>
+        <para>or a certain amout of transactions </para>
       </listitem>
     </itemizedlist>
 
-    <para>The configuration can be global or defined at the index
-    level:</para>
+    <para>The configuration for automatic index optimization can be defined on
+    a global level or per index:</para>
 
-    <programlisting>hibernate.search.default.optimizer.operation_limit.max = 1000
+    <example>
+      <title>Defining automatic optimization parameters</title>
+
+      <programlisting>hibernate.search.default.optimizer.operation_limit.max = 1000
 hibernate.search.default.optimizer.transaction_limit.max = 100
 hibernate.search.Animal.optimizer.transaction_limit.max = 50</programlisting>
+    </example>
 
     <para>An optimization will be triggered to the <literal>Animal</literal>
     index as soon as either:</para>
 
     <itemizedlist>
       <listitem>
-        <para>the number of addition and deletion reaches 1000</para>
+        <para>the number of additions and deletions reaches 1000</para>
       </listitem>
 
       <listitem>
@@ -100,22 +102,25 @@ hibernate.search.Animal.optimizer.transaction_limit.max = 50</programlisting>
     <para>You can programmatically optimize (defragment) a Lucene index from
     Hibernate Search through the <classname>SearchFactory</classname>:</para>
 
-    <programlisting>searchFactory.optimize(Order.class);</programlisting>
+    <example>
+      <title>Programmatic index optimization</title>
 
-    <programlisting>searchFactory.optimize();</programlisting>
+      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
+SearchFactory searchFactory = fullTextSession.getSearchFactory();
+
+searchFactory.optimize(Order.class);
+// or
+searchFactory.optimize();</programlisting>
+    </example>
 
     <para>The first example optimizes the Lucene index holding
     <classname>Order</classname>s; the second, optimizes all indexes.</para>
 
-    <para>The <classname>SearchFactory</classname> can be accessed from a
-    <classname>FullTextSession</classname>:</para>
-
-    <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
-SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
-
-    <para>Note that <literal>searchFactory.optimize()</literal> has no effect
-    on a JMS backend. You must apply the optimize operation on the Master
-    node.</para>
+    <note>
+      <para><literal>searchFactory.optimize()</literal> has no effect on a JMS
+      backend. You must apply the optimize operation on the Master
+      node.</para>
+    </note>
   </section>
 
   <section>

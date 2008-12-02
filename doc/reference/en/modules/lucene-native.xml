@@ -22,8 +22,8 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"> 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="search-lucene-native">
   <!--  $Id$ -->
 
@@ -37,8 +37,12 @@
     way to access Lucene natively. The <classname>SearchFactory</classname>
     can be accessed from a <classname>FullTextSession</classname>:</para>
 
-    <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
+    <example>
+      <title>Accessing the <classname>SearchFactory</classname></title>
+
+      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
 SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
+    </example>
   </section>
 
   <section>
@@ -51,12 +55,16 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlistin
     <classname>DirectoryProvider</classname>s per indexed class. One directory
     provider can be shared amongst several indexed classes if the classes
     share the same underlying index directory. While usually not the case, a
-    given entity can have several <classname>DirectoryProvider</classname>s is
+    given entity can have several <classname>DirectoryProvider</classname>s if
     the index is sharded (see <xref
     linkend="search-configuration-directory-sharding" />).</para>
 
-    <programlisting>DirectoryProvider[] provider = searchFactory.getDirectoryProviders(Order.class);
+    <example>
+      <title>Accessing the Lucene <classname>Directory</classname></title>
+
+      <programlisting>DirectoryProvider[] provider = searchFactory.getDirectoryProviders(Order.class);
 org.apache.lucene.store.Directory directory = provider[0].getDirectory();</programlisting>
+    </example>
 
     <para>In this example, directory points to the lucene index storing
     <classname>Order</classname>s information. Note that the obtained Lucene
@@ -68,11 +76,14 @@ org.apache.lucene.store.Directory directory = provider[0].getDirectory();</progr
     <title>Using an IndexReader</title>
 
     <para>Queries in Lucene are executed on an <literal>IndexReader</literal>.
-    Hibernate Search caches such index readers to maximize performances. Your
-    code can access such cached / shared resources. You will just have to
-    follow some "good citizen" rules.</para>
+    Hibernate Search caches all index readers to maximize performance. Your
+    code can access this cached resources, but you have to follow some "good
+    citizen" rules.</para>
 
-    <programlisting>DirectoryProvider orderProvider = searchFactory.getDirectoryProviders(Order.class)[0];
+    <example>
+      <title>Accesing an <classname>IndexReader</classname></title>
+
+      <programlisting>DirectoryProvider orderProvider = searchFactory.getDirectoryProviders(Order.class)[0];
 DirectoryProvider clientProvider = searchFactory.getDirectoryProviders(Client.class)[0];
 
 ReaderProvider readerProvider = searchFactory.getReaderProvider();
@@ -84,24 +95,26 @@ try {
 finally {
     readerProvider.closeReader(reader);
 }</programlisting>
+    </example>
 
     <para>The ReaderProvider (described in <xref
     linkend="search-architecture-readerstrategy" />), will open an IndexReader
-    on top of the index(es) referenced by the directory providers. This
-    IndexReader being shared amongst several clients, you must adhere to the
-    following rules:</para>
+    on top of the index(es) referenced by the directory providers. Because
+    this <classname>IndexReader</classname> is shared amongst several clients,
+    you must adhere to the following rules:</para>
 
     <itemizedlist>
       <listitem>
         <para>Never call indexReader.close(), but always call
-        readerProvider.closeReader(reader); (a finally block is the best
-        area).</para>
+        readerProvider.closeReader(reader), preferably in a finally
+        block.</para>
       </listitem>
 
       <listitem>
-        <para>This indexReader can't be used for modification operations
-        (you would get an exception). If you want to use a read/write index reader,
-        open one from the Lucene Directory object.</para>
+        <para>Don't use this <classname>IndexReader</classname> for
+        modification operations (you would get an exception). If you want to
+        use a read/write index reader, open one from the Lucene Directory
+        object.</para>
       </listitem>
     </itemizedlist>
 
@@ -156,10 +169,10 @@ finally {
             </row>
 
             <row>
-              <entry align="left">queryNorm(q) </entry>
+              <entry align="left">queryNorm(q)</entry>
 
               <entry>Normalizing factor used to make scores between queries
-              comparable. </entry>
+              comparable.</entry>
             </row>
 
             <row>
@@ -178,7 +191,7 @@ finally {
         </tgroup>
       </informaltable>It is beyond the scope of this manual to explain this
     formula in more detail. Please refer to
-    <classname>Similarity</classname>'s Javadocs for more information. </para>
+    <classname>Similarity</classname>'s Javadocs for more information.</para>
 
     <para>Hibernate Search provides two ways to modify Lucene's similarity
     calculation. First you can set the default similarity by specifying the
@@ -196,6 +209,6 @@ public class Book {
     term appears in a document. Documents with a single occurrence of the term
     should be scored the same as documents with multiple occurrences. In this
     case your custom implementation of the method <methodname>tf(float
-    freq)</methodname> should return 1.0. </para>
+    freq)</methodname> should return 1.0.</para>
   </section>
 </chapter>
