@@ -31,86 +31,109 @@
 
   <para>The second most important capability of Hibernate Search is the
   ability to execute a Lucene query and retrieve entities managed by an
-  Hibernate session, providing the power of Lucene without living the
+  Hibernate session, providing the power of Lucene without leaving the
   Hibernate paradigm, and giving another dimension to the Hibernate classic
-  search mechanisms (HQL, Criteria query, native SQL query).</para>
+  search mechanisms (HQL, Criteria query, native SQL query). Preparing and
+  executing a query consists of four simple steps:</para>
 
-  <para>To access the <productname>Hibernate Search</productname> querying
-  facilities, you have to use an Hibernate
-  <classname>FullTextSession</classname> . A Search Session wraps a regular
-  <classname>org.hibernate.Session</classname> to provide query and indexing
-  capabilities.</para>
+  <itemizedlist>
+    <listitem>
+      <para>Creating a <classname>FullTextSession</classname></para>
+    </listitem>
 
-  <programlisting>Session session = sessionFactory.openSession();
+    <listitem>
+      <para>Creating a Lucene query</para>
+    </listitem>
+
+    <listitem>
+      <para>Wrapping the Lucene query using a
+      <classname>org.hibernate.Query</classname></para>
+    </listitem>
+
+    <listitem>
+      <para>Executing the search by calling for example
+      <methodname>list()</methodname> or
+      <methodname>scroll()</methodname></para>
+    </listitem>
+  </itemizedlist>
+
+  <para>To access the querying facilities, you have to use an
+  <classname>FullTextSession</classname> . This Search specfic session wraps a
+  regular <classname>org.hibernate.Session</classname> to provide query and
+  indexing capabilities.</para>
+
+  <example>
+    <title>Creating a FullTextSession</title>
+
+    <programlisting>Session session = sessionFactory.openSession();
 ...
 FullTextSession fullTextSession = Search.getFullTextSession(session);    </programlisting>
+  </example>
 
-  <para>The search facility is built on native Lucene queries.</para>
+  <para>The actual search facility is built on native Lucene queries which the
+  following example illustrates.</para>
 
-  <programlisting>org.apache.lucene.queryParser.QueryParser parser = new QueryParser("title", new StopAnalyzer() );
+  <example>
+    <title>Creating a Lucene query</title>
+
+    <programlisting>org.apache.lucene.queryParser.QueryParser parser = 
+    new QueryParser("title", new StopAnalyzer() );
 
 org.apache.lucene.search.Query luceneQuery = parser.parse( "summary:Festina Or brand:Seiko" );
 <emphasis role="bold">org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
         </emphasis>
-
 List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
+  </example>
 
   <para>The Hibernate query built on top of the Lucene query is a regular
-  <literal>org.hibernate.Query</literal> , you are in the same paradigm as the
-  other Hibernate query facilities (HQL, Native or Criteria). The regular
-  <literal>list()</literal> , <literal>uniqueResult()</literal> ,
-  <literal>iterate()</literal> and <literal>scroll()</literal> can be
+  <literal>org.hibernate.Query</literal>, which means you are in the same
+  paradigm as the other Hibernate query facilities (HQL, Native or Criteria).
+  The regular <literal>list()</literal> , <literal>uniqueResult()</literal>,
+  <literal>iterate()</literal> and <literal>scroll()</literal> methods can be
   used.</para>
 
-  <para>For people using Java Persistence (aka EJB 3.0 Persistence) APIs of
-  Hibernate, the same extensions exist:</para>
+  <para>In case you are using the Java Persistence APIs of Hibernate (aka EJB
+  3.0 Persistence), the same extensions exist:</para>
 
-  <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
+  <example>
+    <title>Creating a Search query using the JPA API</title>
+
+    <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
 
 FullTextEntityManager fullTextEntityManager = 
     org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 
 ...
-org.apache.lucene.queryParser.QueryParser parser = new QueryParser("title", new StopAnalyzer() );
+org.apache.lucene.queryParser.QueryParser parser = 
+    new QueryParser("title", new StopAnalyzer() );
 
 org.apache.lucene.search.Query luceneQuery = parser.parse( "summary:Festina Or brand:Seiko" );
 <emphasis role="bold">javax.persistence.Query fullTextQuery = fullTextEntityManager.createFullTextQuery( luceneQuery );</emphasis>
 
 List result = fullTextQuery.getResultList(); //return a list of managed objects  </programlisting>
+  </example>
 
-  <para>The following examples show the Hibernate APIs but the same example
-  can be easily rewritten with the Java Persistence API by just adjusting the
-  way the FullTextQuery is retrieved.</para>
+  <para>The following examples we will use the Hibernate APIs but the same
+  example can be easily rewritten with the Java Persistence API by just
+  adjusting the way the <classname>FullTextQuery</classname> is
+  retrieved.</para>
 
   <section>
     <title>Building queries</title>
 
-    <para>Hibernate Search queries are built on top of Lucene queries. It
-    gives you a total freedom on the kind of Lucene queries you are willing to
-    execute. However, once built, Hibernate Search abstract the query
-    processing from your application using org.hibernate.Query as your primary
-    query manipulation API.</para>
+    <para>Hibernate Search queries are built on top of Lucene queries which
+    gives you total freedom on the type of Lucene query you want to execute.
+    However, once built, Hibernate Search wraps further query processing using
+    <classname>org.hibernate.Query</classname> as your primary query
+    manipulation API. </para>
 
     <section>
       <title>Building a Lucene query</title>
 
-      <para>This subject is generally speaking out of the scope of this
-      documentation. Please refer to the Lucene documentation Lucene In Action
-      or Hibernate Search in Action from Manning.</para>
-
-      <para>It is essential to use the same analyzer when indexing a field and
-      when querying that field. Hibernate Search gives you access to the
-      analyzers used during indexing time (see <xref
-      linkend="analyzer-retrievinganalyzer" /> for more information).</para>
-
-      <programlisting>//retrieve an analyzer by name
-Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("phonetic-analyzer");
-
-//or the scoped analyzer for a given entity
-Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer(Song.class);</programlisting>
-
-      <para>Using the same analyzer at indexing and querying time is
-      important. See <xref linkend="analyzer" /> for more information.</para>
+      <para>It is out of the scope of this documentation on how to exactly
+      build a Lucene query. Please refer to the online Lucene documentation or
+      get hold of a copy of either Lucene In Action or Hibernate Search in
+      Action.</para>
     </section>
 
     <section>
@@ -122,39 +145,58 @@ Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer(Song.class);<
         <para>Once the Lucene query is built, it needs to be wrapped into an
         Hibernate Query.</para>
 
-        <programlisting>FullTextSession fullTextSession = Search.getFullTextSession( session );
+        <example>
+          <title>Wrapping a Lucene query into a Hibernate Query</title>
+
+          <programlisting>FullTextSession fullTextSession = Search.getFullTextSession( session );
 org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );</programlisting>
+        </example>
 
         <para>If not specified otherwise, the query will be executed against
         all indexed entities, potentially returning all types of indexed
         classes. It is advised, from a performance point of view, to restrict
         the returned types:</para>
 
-        <programlisting>org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
-//or
-fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
+        <example>
+          <title>Filtering the search result by entity type</title>
 
-        <para>The first example returns only matching customers, the second
-        returns matching actors and items.</para>
+          <programlisting>org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+// or
+fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
+        </example>
+
+        <para>The first example returns only matching
+        <classname>Customer</classname>s, the second returns matching
+        <classname>Actor</classname>s and <classname>Item</classname>s. The
+        type restriction is fully polymorphic which means that if there are
+        two indexed subclasses <classname>Salesman</classname> and
+        <classname>Customer</classname> of the baseclass
+        <classname>Person</classname>, it is possible to just specify
+        <classname>Person.class</classname> in order to filter on result
+        types. </para>
       </section>
 
       <section>
         <title>Pagination</title>
 
-        <para>It is recommended to restrict the number of returned objects per
-        query. It is a very common use case as well, the user usually navigate
-        from one page to an other. The way to define pagination is exactly the
-        way you would define pagination in a plain HQL or Criteria
-        query.</para>
+        <para>Out of performace reasons it is recommended to restrict the
+        number of returned objects per query. In fact is a very common use
+        case anyway that the user navigates from one page to an other. The way
+        to define pagination is exactly the way you would define pagination in
+        a plain HQL or Criteria query.</para>
 
-        <programlisting>org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+        <example>
+          <title>Defining pagination for a search query</title>
+
+          <programlisting>org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
 fullTextQuery.setFirstResult(15); //start from the 15th element
 fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
+        </example>
 
         <note>
           <para>It is still possible to get the total number of matching
-          elements regardless of the pagination. See
-          <methodname>getResultSize()</methodname> below</para>
+          elements regardless of the pagination via
+          <methodname>fulltextQuery.</methodname><methodname>getResultSize()</methodname></para>
         </note>
       </section>
 
@@ -163,22 +205,24 @@ fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
 
         <para>Apache Lucene provides a very flexible and powerful way to sort
         results. While the default sorting (by relevance) is appropriate most
-        of the time, it can interesting to sort by one or several
-        properties.</para>
+        of the time, it can be interesting to sort by one or several other
+        properties. In order to do so set the Lucene Sort object to apply a
+        Lucene sorting strategy.</para>
 
-        <para>Inject the Lucene Sort object to apply a Lucene sorting strategy
-        to an Hibernate Search.</para>
+        <example>
+          <title>Specifying a Lucene <classname>Sort</classname> in order to
+          sort the results</title>
 
-        <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
+          <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
 org.apache.lucene.search.Sort sort = new Sort(new SortField("title"));
 <emphasis role="bold">query.setSort(sort);</emphasis>
 List results = query.list();</programlisting>
+        </example>
 
         <para>One can notice the <classname>FullTextQuery</classname>
         interface which is a sub interface of
-        <classname>org.hibernate.Query</classname>.</para>
-
-        <para>Fields used for sorting must not be tokenized.</para>
+        <classname>org.hibernate.Query</classname>. Be aware that fields used
+        for sorting must not be tokenized.</para>
       </section>
 
       <section>
@@ -191,8 +235,13 @@ List results = query.list();</programlisting>
         <para>It is often useful, however, to refine the fetching strategy for
         a specific use case.</para>
 
-        <programlisting>Criteria criteria = s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN );
+        <example>
+          <title>Specifying <classname>FetchMode</classname> on a
+          query</title>
+
+          <programlisting>Criteria criteria = s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN );
 s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisting>
+        </example>
 
         <para>In this example, the query will return all Books matching the
         luceneQuery. The authors collection will be loaded from the same query
@@ -215,7 +264,11 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
         overkill. Only a small subset of the properties is necessary.
         Hibernate Search allows you to return a subset of properties:</para>
 
-        <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+        <example>
+          <title>Using projection instead of returning the full domain
+          object</title>
+
+          <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
 query.<emphasis role="bold">setProjection( "id", "summary", "body", "mainAuthor.name" )</emphasis>;
 List results = query.list();
 Object[] firstResult = (Object[]) results.get(0);
@@ -223,6 +276,7 @@ Integer id = firstResult[0];
 String summary = firstResult[1];
 String body = firstResult[2];
 String authorName = firstResult[3];</programlisting>
+        </example>
 
         <para>Hibernate Search extracts the properties from the Lucene index
         and convert them back to their object representation, returning a list
@@ -246,6 +300,17 @@ String authorName = firstResult[3];</programlisting>
             the latter being the simpler version. All Hibernate Search
             built-in types are two-way.</para>
           </listitem>
+
+          <listitem>
+            <para>you can only project simple properties of the indexed entity
+            or its embedded associations. This means you cannot project a
+            whole embedded entity.</para>
+          </listitem>
+
+          <listitem>
+            <para>projection does not work on collections or maps which are
+            indexed via <classname>@IndexedEmbedded</classname></para>
+          </listitem>
         </itemizedlist>
 
         <para>Projection is useful for another kind of usecases. Lucene
@@ -253,13 +318,17 @@ String authorName = firstResult[3];</programlisting>
         using some special placeholders, the projection mechanism can retrieve
         them:</para>
 
-        <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+        <example>
+          <title>Using projection in order to retrieve meta data</title>
+
+          <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
 query.<emphasis role="bold">setProjection( FullTextQuery.SCORE, FullTextQuery.THIS, "mainAuthor.name" )</emphasis>;
 List results = query.list();
 Object[] firstResult = (Object[]) results.get(0);
 float score = firstResult[0];
 Book book = firstResult[1];
 String authorName = firstResult[2];</programlisting>
+        </example>
 
         <para>You can mix and match regular fields and special placeholders.
         Here is the list of available placeholders:</para>
@@ -315,7 +384,7 @@ String authorName = firstResult[2];</programlisting>
 
     <para>Once the Hibernate Search query is built, executing it is in no way
     different than executing a HQL or Criteria query. The same paradigm and
-    object semantic apply. All the common operations are available:
+    object semantic applies. All the common operations are available:
     <methodname>list()</methodname>, <methodname>uniqueResult()</methodname>,
     <methodname>iterate()</methodname>,
     <methodname>scroll()</methodname>.</para>
@@ -338,8 +407,8 @@ String authorName = firstResult[2];</programlisting>
       <methodname>scroll()</methodname> is more appropriate. Don't forget to
       close the <classname>ScrollableResults</classname> object when you're
       done, since it keeps Lucene resources. If you expect to use
-      <methodname>scroll</methodname> but wish to load objects in batch, you
-      can use <methodname>query.setFetchSize()</methodname>: When an object is
+      <methodname>scroll,</methodname> but wish to load objects in batch, you
+      can use <methodname>query.setFetchSize()</methodname>. When an object is
       accessed, and if not already loaded, Hibernate Search will load the next
       <literal>fetchSize</literal> objects in one pass.</para>
 
@@ -367,21 +436,23 @@ String authorName = firstResult[2];</programlisting>
         </listitem>
       </itemizedlist>
 
-      <para>But it would be costly to retrieve all the matching
-      documents.</para>
-
-      <para>Hibernate Search allows you to retrieve the total number of
+      <para>Of course it would be too costly to retrieve all the matching
+      documents. Hibernate Search allows you to retrieve the total number of
       matching documents regardless of the pagination parameters. Even more
       interesting, you can retrieve the number of matching elements without
       triggering a single object load.</para>
 
-      <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+      <example>
+        <title>Determining the result size of a query</title>
+
+        <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
 assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return the number of matching books without loading a single one
 
 org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
 query.setMaxResult(10);
 List results = query.list();
 assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return the total number of matching books regardless of pagination</programlisting>
+      </example>
 
       <note>
         <para>Like Google, the number of results is approximative if the index
@@ -399,7 +470,10 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return 
       <classname>ResultTransformer</classname> operation post query to match
       the targeted data structure:</para>
 
-      <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+      <example>
+        <title>Using ResultTransformer in conjuncton with projections</title>
+
+        <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
 query.setProjection( "title", "mainAuthor.name" );
 
 <emphasis role="bold">query.setResultTransformer( 
@@ -409,6 +483,7 @@ List&lt;BookView&gt; results = (List&lt;BookView&gt;) query.list();
 for(BookView view : results) {
     log.info( "Book: " + view.getTitle() + ", " + view.getAuthor() );
 }</programlisting>
+      </example>
 
       <para>Examples of <classname>ResultTransformer</classname>
       implementations can be found in the Hibernate Core codebase.</para>
@@ -419,12 +494,12 @@ for(BookView view : results) {
 
       <para>You will find yourself sometimes puzzled by a result showing up in
       a query or a result not showing up in a query. Luke is a great tool to
-      understand those mysteries. But Hibernate Search also let's you access
-      to the Lucene <classname>Explanation</classname> object for a given
-      result (in a given query). This class is considered fairly advanced to
-      Lucene users but can provide a good understanding of the scoring of an
-      object. You have two ways to access the Explanation object for a given
-      result:</para>
+      understand those mysteries. However, Hibernate Search also gives you
+      access to the Lucene <classname>Explanation</classname> object for a
+      given result (in a given query). This class is considered fairly
+      advanced to Lucene users but can provide a good understanding of the
+      scoring of an object. You have two ways to access the Explanation object
+      for a given result:</para>
 
       <itemizedlist>
         <listitem>
@@ -443,21 +518,26 @@ for(BookView view : results) {
       constant.</para>
 
       <warning>
-        <para>The Document id has nothing to do with the entity id. do not
-        mess up the two notions.</para>
+        <para>The Document id has nothing to do with the entity id. Do not
+        mess up these two notions.</para>
       </warning>
 
       <para>The second approach let's you project the
       <classname>Explanation</classname> object using the
       <literal>FullTextQuery.EXPLANATION</literal> constant.</para>
 
-      <programlisting>FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )
+      <example>
+        <title>Retrieving the Lucene Explanation object using
+        projection</title>
+
+        <programlisting>FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )
         .setProjection( FullTextQuery.DOCUMENT_ID, <emphasis role="bold">FullTextQuery.EXPLANATION</emphasis>, FullTextQuery.THIS );
 @SuppressWarnings("unchecked") List&lt;Object[]&gt; results = ftQuery.list();
 for (Object[] result : results) {
     Explanation e = (Explanation) result[1];
     display( e.toString() );
 }</programlisting>
+      </example>
 
       <para>Be careful, building the explanation object is quite expensive, it
       is roughly as expensive as running the Lucene query again. Don't do it
@@ -497,10 +577,14 @@ for (Object[] result : results) {
     For people familiar with the notion of Hibernate Core filters, the API is
     very similar:</para>
 
-    <programlisting>fullTextQuery = s.createFullTextQuery( query, Driver.class );
+    <example>
+      <title>Enabling fulltext filters for a given query</title>
+
+      <programlisting>fullTextQuery = s.createFullTextQuery( query, Driver.class );
 fullTextQuery.enableFullTextFilter("bestDriver");
 fullTextQuery.enableFullTextFilter("security").setParameter( "login", "andre" );
 fullTextQuery.list(); //returns only best drivers where andre has credentials</programlisting>
+    </example>
 
     <para>In this example we enabled two filters on top of the query. You can
     enable (or disable) as many filters as you like.</para>
@@ -515,7 +599,10 @@ fullTextQuery.list(); //returns only best drivers where andre has credentials</p
     are defined. Each named filter has to specify its actual filter
     implementation.</para>
 
-    <programlisting>@Entity
+    <example>
+      <title>Defining and implementing a Filter</title>
+
+      <programlisting>@Entity
 @Indexed
 @FullTextFilterDefs( {
     <emphasis role="bold">@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class)</emphasis>, 
@@ -523,8 +610,8 @@ fullTextQuery.list(); //returns only best drivers where andre has credentials</p
 })
 public class Driver { ... }</programlisting>
 
-    <programlisting>public class BestDriversFilter extends <emphasis
-        role="bold">org.apache.lucene.search.Filter</emphasis> {
+      <programlisting>public class BestDriversFilter extends <emphasis
+          role="bold">org.apache.lucene.search.Filter</emphasis> {
 
     public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
         OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
@@ -535,6 +622,7 @@ public class Driver { ... }</programlisting>
         return bitSet;
     }
 }</programlisting>
+    </example>
 
     <para><classname>BestDriversFilter</classname> is an example of a simple
     Lucene filter which reduces the result set to drivers whose score is 5. In
@@ -546,7 +634,10 @@ public class Driver { ... }</programlisting>
     you want to use does not have a no-arg constructor, you can use the
     factory pattern:</para>
 
-    <programlisting>@Entity
+    <example>
+      <title>Creating a filter using the factory pattern</title>
+
+      <programlisting>@Entity
 @Indexed
 @FullTextFilterDef(name = "bestDriver", impl = BestDriversFilterFactory.class)
 public class Driver { ... }
@@ -560,6 +651,7 @@ public class BestDriversFilterFactory {
         return new CachingWrapperFilter(bestDriversFilter);
     }
 }</programlisting>
+    </example>
 
     <para>Hibernate Search will look for a <literal>@Factory</literal>
     annotated method and use it to build the filter instance. The factory must
@@ -571,13 +663,20 @@ public class BestDriversFilterFactory {
     the filter. For example a security filter might want to know which
     security level you want to apply:</para>
 
-    <programlisting>fullTextQuery = s.createFullTextQuery( query, Driver.class );
+    <example>
+      <title>Passing parameters to a defined filter</title>
+
+      <programlisting>fullTextQuery = s.createFullTextQuery( query, Driver.class );
 fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParameter( "level", 5 )</emphasis>;</programlisting>
+    </example>
 
     <para>Each parameter name should have an associated setter on either the
     filter or filter factory of the targeted named filter definition.</para>
 
-    <programlisting>public class SecurityFilterFactory {
+    <example>
+      <title>Using paramters in the actual filter implementation</title>
+
+      <programlisting>public class SecurityFilterFactory {
     private Integer level;
 
     /**
@@ -600,6 +699,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
         return new CachingWrapperFilter( new QueryWrapperFilter(query) );
     }
 }</programlisting>
+    </example>
 
     <para>Note the method annotated <classname>@Key</classname> returning a
     <classname>FilterKey</classname> object. The returned object has a special
