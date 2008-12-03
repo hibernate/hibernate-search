@@ -47,29 +47,26 @@
     configure directory providers to adjust the directory target (see <xref
     linkend="search-configuration-directory" />).</para>
 
-    <para>Hibernate Search can also use the Lucene index to search an entity
-    and return a list of managed entities saving you the tedious object to
-    Lucene document mapping. The same persistence context is shared between
-    Hibernate and Hibernate Search; as a matter of fact, the Search Session is
-    built on top of the Hibernate Session. The application code use the
-    unified <classname>org.hibernate.Query</classname> or
+    <para>Hibernate Search uses the Lucene index to search an entity and
+    return a list of managed entities saving you the tedious object to Lucene
+    document mapping. The same persistence context is shared between Hibernate
+    and Hibernate Search. As a matter of fact, the
+    <classname>FullTextSession</classname> is built on top of the Hibernate
+    Session. so that the application code can use the unified
+    <classname>org.hibernate.Query</classname> or
     <classname>javax.persistence.Query</classname> APIs exactly the way a HQL,
     JPA-QL or native queries would do.</para>
 
     <para>To be more efficient, Hibernate Search batches the write
     interactions with the Lucene index. There is currently two types of
-    batching depending on the expected scope.</para>
-
-    <para>Outside a transaction, the index update operation is executed right
-    after the actual database operation. This scope is really a no scoping
-    setup and no batching is performed.</para>
-
-    <para>It is however recommended, for both your database and Hibernate
-    Search, to execute your operation in a transaction be it JDBC or JTA. When
-    in a transaction, the index update operation is scheduled for the
-    transaction commit phase and discarded in case of transaction rollback.
-    The batching scope is the transaction. There are two immediate
-    benefits:</para>
+    batching depending on the expected scope. Outside a transaction, the index
+    update operation is executed right after the actual database operation.
+    This scope is really a no scoping setup and no batching is performed.
+    However, it is recommended - for both your database and Hibernate Search -
+    to execute your operation in a transaction be it JDBC or JTA. When in a
+    transaction, the index update operation is scheduled for the transaction
+    commit phase and discarded in case of transaction rollback. The batching
+    scope is the transaction. There are two immediate benefits:</para>
 
     <itemizedlist>
       <listitem>
@@ -80,20 +77,16 @@
       <listitem>
         <para>ACIDity: The work executed has the same scoping as the one
         executed by the database transaction and is executed if and only if
-        the transaction is committed.</para>
-
-        <note>
-          <para>Disclaimer, the work in not ACID in the strict sense of it,
-          but ACID behavior is rarely useful for full text search indexes
-          since they can be rebuilt from the source at any time.</para>
-        </note>
+        the transaction is committed. This is not ACID in the strict sense of
+        it, but ACID behavior is rarely useful for full text search indexes
+        since they can be rebuilt from the source at any time.</para>
       </listitem>
     </itemizedlist>
 
     <para>You can think of those two scopes (no scope vs transactional) as the
     equivalent of the (infamous) autocommit vs transactional behavior. From a
     performance perspective, the <emphasis>in transaction</emphasis> mode is
-    recommended. The scoping choice is made transparently: Hibernate Search
+    recommended. The scoping choice is made transparently. Hibernate Search
     detects the presence of a transaction and adjust the scoping.</para>
 
     <note>
@@ -154,12 +147,12 @@
 
         <para>All index update operations applied on a given node are sent to
         a JMS queue. A unique reader will then process the queue and update
-        the master Lucene index. The master index is then replicated on a
-        regular basis to the slave copies. This is known as the master /
-        slaves pattern. The master is the sole responsible for updating the
-        Lucene index. The slaves can accept read as well as write operations.
-        However, they only process the read operation on their local index
-        copy and delegate the update operations to the master.</para>
+        the master index. The master index is then replicated on a regular
+        basis to the slave copies. This is known as the master/slaves pattern.
+        The master is the sole responsible for updating the Lucene index. The
+        slaves can accept read as well as write operations. However, they only
+        process the read operation on their local index copy and delegate the
+        update operations to the master.</para>
 
         <mediaobject>
           <imageobject role="html">
