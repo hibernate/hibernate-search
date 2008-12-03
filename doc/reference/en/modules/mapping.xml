@@ -48,11 +48,16 @@
       entities not annotated with <literal>@Indexed</literal> will be ignored
       by the indexing process):</para>
 
-      <programlisting>@Entity
+      <example>
+        <title>Making a class indexable using the
+        <classname>@Indexed</classname> annotation</title>
+
+        <programlisting>@Entity
 <emphasis role="bold">@Indexed(index="indexes/essays")</emphasis>
 public class Essay {
     ...
 }</programlisting>
+      </example>
 
       <para>The <literal>index</literal> attribute tells Hibernate what the
       Lucene directory name is (usually a directory on your file system). It
@@ -189,7 +194,11 @@ public class Essay {
       can omit @DocumentId. The chosen entity id will also be used as document
       id.</para>
 
-      <programlisting>@Entity
+      <example>
+        <title>Adding <classname>@DocumentId</classname> ad
+        <classname>@Field</classname> annotations to an indexed entity</title>
+
+        <programlisting>@Entity
 @Indexed(index="indexes/essays")
 public class Essay {
     ...
@@ -205,6 +214,7 @@ public class Essay {
     <emphasis role="bold">@Field(index=Index.TOKENIZED)</emphasis>
     public String getText() { return text; }
 }</programlisting>
+      </example>
 
       <para>The above annotations define an index with three fields:
       <literal>id</literal> , <literal>Abstract</literal> and
@@ -222,7 +232,10 @@ public class Essay {
       index it twice - once tokenized and once untokenized. @Fields allows to
       achieve this goal.</para>
 
-      <programlisting>@Entity
+      <example>
+        <title>Using @Fields to map a property multiple times</title>
+
+        <programlisting>@Entity
 @Indexed(index = "Book" )
 public class Book {
     <emphasis role="bold">@Fields( {</emphasis>
@@ -235,6 +248,7 @@ public class Book {
 
     ...
 }</programlisting>
+      </example>
 
       <para>The field <literal>summary</literal> is indexed twice, once as
       <literal>summary</literal> in a tokenized way, and once as
@@ -267,7 +281,10 @@ public class Book {
       (In the Lucene query parser language, it would translate into
       <code>address.city:Atlanta</code>).</para>
 
-      <programlisting>@Entity
+      <example>
+        <title>Using @IndexedEmbedded to index associations</title>
+
+        <programlisting>@Entity
 @Indexed
 public class Place {
     @Id
@@ -301,6 +318,7 @@ public class Address {
     private Set&lt;Place&gt; places;
     ...
 }</programlisting>
+      </example>
 
       <para>In this example, the place fields will be indexed in the
       <literal>Place</literal> index. The <literal>Place</literal> index
@@ -325,7 +343,11 @@ public class Address {
 
       <para>Let's make our example a bit more complex:</para>
 
-      <programlisting>@Entity
+      <example>
+        <title>Nested usage of <classname>@IndexedEmbedded</classname> and
+        <classname>@ContainedIn</classname></title>
+
+        <programlisting>@Entity
 @Indexed
 public class Place {
     @Id
@@ -369,6 +391,7 @@ public class Owner {
     private String name;
    ...
 }</programlisting>
+      </example>
 
       <para>Any <literal>@*ToMany, @*ToOne</literal> and
       <literal>@Embedded</literal> attribute can be annotated with
@@ -464,7 +487,11 @@ public class Owner {
       can override the object type targeted by Hibernate Search using the
       <methodname>targetElement</methodname> parameter.</para>
 
-      <programlisting>@Entity
+      <example>
+        <title>Using the <literal>targetElement</literal> property of
+        <classname>@IndexedEmbedded</classname></title>
+
+        <programlisting>@Entity
 @Indexed
 public class Address {
     @Id
@@ -485,6 +512,7 @@ public class Address {
 
 @Embeddable
 public class Owner implements Person { ... }</programlisting>
+      </example>
     </section>
 
     <section>
@@ -495,7 +523,11 @@ public class Owner implements Person { ... }</programlisting>
       during the indexation process. You can use <literal>@Boost</literal> at
       the @Field, method or class level.</para>
 
-      <programlisting>@Entity
+      <example>
+        <title>Using different ways of increasing the weight of an indexed
+        element using a boost factor</title>
+
+        <programlisting>@Entity
 @Indexed(index="indexes/essays")
 <emphasis role="bold">@Boost(1.7f)</emphasis>
 public class Essay {
@@ -506,7 +538,7 @@ public class Essay {
     public Long getId() { return id; }
 
     @Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES, boost=<emphasis
-          role="bold">@Boost(2f)</emphasis>)
+            role="bold">@Boost(2f)</emphasis>)
     <emphasis role="bold">@Boost(1.5f)</emphasis>
     public String getSummary() { return summary; }
 
@@ -518,6 +550,7 @@ public class Essay {
     public String getISBN() { return isbn; }
 
 }        </programlisting>
+      </example>
 
       <para>In our example, <classname>Essay</classname>'s probability to
       reach the top of the search list will be multiplied by 1.7. The
@@ -545,7 +578,10 @@ public class Essay {
       even per @Field (useful when multiple fields are indexed from a single
       property).</para>
 
-      <programlisting>@Entity
+      <example>
+        <title>Different ways of specifying an analyzer</title>
+
+        <programlisting>@Entity
 @Indexed
 <emphasis role="bold">@Analyzer(impl = EntityAnalyzer.class)</emphasis>
 public class MyEntity {
@@ -566,6 +602,7 @@ public class MyEntity {
 
     ...
 }</programlisting>
+      </example>
 
       <para>In this example, <classname>EntityAnalyzer</classname> is used to
       index all tokenized properties (eg. <literal>name</literal>), except
@@ -627,7 +664,11 @@ public class MyEntity {
         distribution of Hibernate Search provides these dependecies in its
         <filename>lib</filename> directory.</para>
 
-        <programlisting>@AnalyzerDef(name="customanalyzer",
+        <example>
+          <title><classname>@AnalyzerDef</classname> and the Solr
+          framework</title>
+
+          <programlisting>@AnalyzerDef(name="customanalyzer",
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
         filters = {
                 @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
@@ -640,6 +681,7 @@ public class MyEntity {
 public class Team {
     ...
 }</programlisting>
+        </example>
 
         <para>A tokenizer is defined by its factory which is responsible for
         building the tokenizer and using the optional list of parameters. This
@@ -660,7 +702,10 @@ public class Team {
         <classname>@Analyzer</classname> declaration using the definition name
         rather than declaring an implementation class.</para>
 
-        <programlisting>@Entity
+        <example>
+          <title>Referencing an analyzer by name</title>
+
+          <programlisting>@Entity
 @Indexed
 @AnalyzerDef(name="customanalyzer", ... )
 public class Team {
@@ -678,6 +723,7 @@ public class Team {
     @Field <emphasis role="bold">@Analyzer(definition = "customanalyzer")</emphasis>
     private String description;
 }</programlisting>
+        </example>
 
         <para>Analyzer instances declared by
         <classname>@AnalyzerDef</classname> are available by their name in the
@@ -1093,7 +1139,11 @@ public class Meeting {
         interface. All implementations have to be thread-safe as they are used
         concurrently.</para>
 
-        <programlisting>/**
+        <example>
+          <title>Implementing your own
+          <classname>StringBridge</classname></title>
+
+          <programlisting>/**
  * Padding Integer bridge.
  * All numbers will be padded with 0 to match 5 digits
  *
@@ -1114,6 +1164,7 @@ public class PaddedIntegerBridge implements <emphasis role="bold">StringBridge</
         return paddedInteger.append( rawInteger ).toString();
     }
 }                </programlisting>
+        </example>
 
         <para>Then any property or field can use this bridge thanks to the
         <literal>@FieldBridge</literal> annotation</para>
@@ -1127,8 +1178,11 @@ private Integer length;                </programlisting>
         parameters are passed through the <literal>@FieldBridge</literal>
         annotation.</para>
 
-        <programlisting>public class PaddedIntegerBridge implements StringBridge, <emphasis
-            role="bold">ParameterizedBridge</emphasis> {
+        <example>
+          <title>Passing parameters to your bridge implementation</title>
+
+          <programlisting>public class PaddedIntegerBridge implements StringBridge, <emphasis
+              role="bold">ParameterizedBridge</emphasis> {
 
     public static String PADDING_PROPERTY = "padding";
     private int padding = 5; //default
@@ -1156,6 +1210,7 @@ private Integer length;                </programlisting>
              <emphasis role="bold">params = @Parameter(name="padding", value="10")</emphasis>
             )
 private Integer length;                </programlisting>
+        </example>
 
         <para>The <classname>ParameterizedBridge</classname> interface can be
         implemented by <classname>StringBridge</classname> ,
@@ -1174,7 +1229,11 @@ private Integer length;                </programlisting>
         the object out of it. There is not difference in the way the
         <literal>@FieldBridge</literal> annotation is used.</para>
 
-        <programlisting>public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
+        <example>
+          <title>Implementing a TwoWayStringBridge which can for example be
+          used for id properties</title>
+
+          <programlisting>public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
 
     public static String PADDING_PROPERTY = "padding";
     private int padding = 5; //default
@@ -1207,6 +1266,7 @@ private Integer length;                </programlisting>
              params = @Parameter(name="padding", value="10") 
 private Integer id;
                 </programlisting>
+        </example>
 
         <para>It is critically important for the two-way process to be
         idempotent (ie object = stringToObject( objectToString( object ) )
@@ -1227,7 +1287,11 @@ private Integer id;
         <para>You can for example store a given property in two different
         document fields:</para>
 
-        <programlisting>/**
+        <example>
+          <title>Implementing the FieldBridge interface in order to a given
+          property into multiple document fields</title>
+
+          <programlisting>/**
  * Store the date in 3 different fields - year, month, day - to ease Range Query per
  * year, month or day (eg get all the elements of December for the last 5 years).
  * 
@@ -1271,6 +1335,7 @@ public class DateSplitBridge implements FieldBridge {
 //property
 <emphasis role="bold">@FieldBridge(impl = DateSplitBridge.class)</emphasis>
 private Date date;                </programlisting>
+        </example>
       </section>
 
       <section>
@@ -1287,7 +1352,10 @@ private Date date;                </programlisting>
         <methodname>termVector</methodname> attribute discussed in section
         <xref linkend="basic-mapping" />.</para>
 
-        <programlisting>@Entity
+        <example>
+          <title>Implementing a class bridge</title>
+
+          <programlisting>@Entity
 @Indexed
 <emphasis role="bold">@ClassBridge</emphasis>(name="branchnetwork",
              index=Index.TOKENIZED,
@@ -1331,6 +1399,7 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
         document.add( field );
    }
 }</programlisting>
+        </example>
 
         <para>In this example, the particular
         <classname>CatFieldsClassBridge</classname> is applied to the
@@ -1366,13 +1435,17 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
       sure however, to <emphasis>not</emphasis> use this annotation with
       @DocumentId as your system will break.</para>
 
-      <programlisting>@ProvidedId (bridge = org.my.own.package.MyCustomBridge)
+      <example>
+        <title>Providing your own id</title>
+
+        <programlisting>@ProvidedId (bridge = org.my.own.package.MyCustomBridge)
 @Indexed
 public class MyClass{
     @Field
     String MyString;
     ...
 }</programlisting>
+      </example>
     </section>
   </section>
 </chapter>
