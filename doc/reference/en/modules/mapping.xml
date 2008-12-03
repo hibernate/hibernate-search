@@ -813,13 +813,14 @@ public class Team {
       <section>
         <title>Analyzer discriminator (experimental)</title>
 
-        <para>So far all the different ways to specify an analyzer were
+        <para>So far all the introduced ways to specify an analyzer were
         static. However, there are usecases where it is useful to select an
         analyzer depending on the current state of the entity to be indexed,
-        for example in multi language enabled applications. For an BlogEntry
-        class for example the analyzer could depend on the language property
-        of the entry. Depending on this property the correct stemmer can be
-        chosen to index the actual text. </para>
+        for example in multilingual application. For an
+        <classname>BlogEntry</classname> class for example the analyzer could
+        depend on the language property of the entry. Depending on this
+        property the correct language specific stemmer should be chosen to
+        index the actual text. </para>
 
         <para>To enable this dynamic analyzer selection Hibernate Search
         introduces the <classname>AnalyzerDiscriminator</classname>
@@ -877,7 +878,7 @@ public class BlogEntry {
     }
 }</programlisting>
           </example>The prerequisite for using
-        <classname>@AnalyzerDiscriminator</classname> is that all analyzer
+        <classname>@AnalyzerDiscriminator</classname> is that all analyzers
         which are going to be used are predefined via
         <classname>@AnalyzerDef</classname> definitions. If this is the case
         one can place the <classname>@AnalyzerDiscriminator</classname>
@@ -890,17 +891,26 @@ public class BlogEntry {
         only method you have to implement is
         <classname>getAnanyzerDefinitionName()</classname> which gets called
         for each field added to the Lucene document. The entity which is
-        getting indexed is also passed at each call to the interface method.
-        The <literal>value</literal> parameter is only set if the
-        <classname>AnalyzerDiscriminator</classname> is placed on a property
-        instead of class level. In this case the value represents the current
-        value of this property.</para>
+        getting indexed is also passed to the interface method. The
+        <literal>value</literal> parameter is only set if the
+        <classname>AnalyzerDiscriminator</classname> is placed on property
+        level instead of class level. In this case the value represents the
+        current value of this property.</para>
 
-        <para>The implemention of the interface has to return the name of an
-        existing analyzer definition if the analyzer should be set dynamically
-        or <classname>null</classname> if the default analyzer should be
-        applied. The given example assumes that the language paramter is
-        either 'de' or 'en'.</para>
+        <para>An implemention of the <classname>Discriminator</classname>
+        interface has to return the name of an existing analyzer definition if
+        the analyzer should be set dynamically or <classname>null</classname>
+        if the default analyzer should not be overridden. The given example
+        assumes that the language paramter is either 'de' or 'en' which
+        matches the specified names in the
+        <classname>@AnalyzerDef</classname>s.</para>
+
+        <note>
+          <para>The <classname>@AnalyzerDiscriminator</classname> is currently
+          still experimental and the API might still change. We are hoping for
+          some feedback from the community about the usefulness and usability
+          of this feature.</para>
+        </note>
       </section>
 
       <section id="analyzer-retrievinganalyzer">

@@ -38,7 +38,7 @@ public class AnalyzerTest extends SearchTestCase {
 	public void testAnalyzerDiscriminator() throws Exception {
 		Article germanArticle = new Article();
 		germanArticle.setLanguage( "de" );
-		germanArticle.setText( "aufeinanderschlügen" );
+		germanArticle.setText( "aufeinanderschl\u00FCgen" );
 		Set<Article> references = new HashSet<Article>();
 		references.add( germanArticle );
 
