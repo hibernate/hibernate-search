@@ -33,14 +33,17 @@
     <title>Directory configuration</title>
 
     <para>Apache Lucene has a notion of <literal>Directory</literal> to store
-    the index files. The Directory implementation can be customized, but
-    Lucene comes bundled with a file system
-    (<literal>FSDirectoryProvider</literal>) and a in memory
-    (<literal>RAMDirectoryProvider</literal>) implementation. Hibernate Search
-    has the notion of <literal>DirectoryProvider</literal> that handles the
-    configuration and the initialization of the Lucene Directory.</para>
+    the index files. The <classname>Directory</classname> implementation can
+    be customized, but Lucene comes bundled with a file system
+    (<literal>FSDirectoryProvider</literal>) and an in memory
+    (<literal>RAMDirectoryProvider</literal>) implementation.
+    <literal>DirectoryProvider</literal>s are the Hibernate Search abstraction
+    around a Lucene <classname>Directory</classname> and handle the
+    configuration and the initialization of the underlying Lucene resources.
+    <xref linkend="directory-provider-table" /> shows the list of the
+    directory providers bundled with Hibernate Search.</para>
 
-    <table>
+    <table id="directory-provider-table">
       <title>List of built-in Directory Providers</title>
 
       <tgroup cols="3">
@@ -59,8 +62,7 @@
             <entry>org.hibernate.search.store.FSDirectoryProvider</entry>
 
             <entry>File system based directory. The directory used will be
-            &lt;indexBase&gt;/&lt; <literal>@Indexed.index</literal>
-            &gt;</entry>
+            &lt;indexBase&gt;/&lt; indexName &gt;</entry>
 
             <entry><para><literal>indexBase</literal> : Base
             directory</para><para><literal>indexName</literal>: override
@@ -142,7 +144,7 @@
       </tgroup>
     </table>
 
-    <para>If the built-in directory providers does not fit your needs, you can
+    <para>If the built-in directory providers do not fit your needs, you can
     write your own directory provider by implementing the
     <classname>org.hibernate.store.DirectoryProvider</classname>
     interface.</para>
@@ -158,17 +160,26 @@
     <constant>hibernate.search.<replaceable>indexname</replaceable>.directory_provider
     </constant></para>
 
-    <programlisting>hibernate.search.default.directory_provider org.hibernate.search.store.FSDirectoryProvider
+    <example>
+      <title>Configuring directory providers</title>
+
+      <programlisting>hibernate.search.default.directory_provider org.hibernate.search.store.FSDirectoryProvider
 hibernate.search.default.indexBase=/usr/lucene/indexes
 hibernate.search.Rules.directory_provider org.hibernate.search.store.RAMDirectoryProvider</programlisting>
+    </example>
 
     <para>applied on</para>
 
-    <programlisting>@Indexed(index="Status")
+    <example>
+      <title>Specifying the index name using the <literal>index</literal>
+      parameter of <classname>@Indexed</classname></title>
+
+      <programlisting>@Indexed(index="Status")
 public class Status { ... }
 
 @Indexed(index="Rules")
 public class Rule { ... }</programlisting>
+    </example>
 
     <para>will create a file system directory in
     <filename>/usr/lucene/indexes/Status</filename> where the Status entities
@@ -176,7 +187,7 @@ public class Rule { ... }</programlisting>
     <literal>Rules</literal> where Rule entities will be indexed.</para>
 
     <para>You can easily define common rules like the directory provider and
-    base directory, and override those default later on on a per index
+    base directory, and override those defaults later on on a per index
     basis.</para>
 
     <para>Writing your own <classname>DirectoryProvider</classname>, you can
@@ -189,10 +200,10 @@ public class Rule { ... }</programlisting>
     <para>In some extreme cases involving huge indexes (in size), it is
     necessary to split (shard) the indexing data of a given entity type into
     several Lucene indexes. This solution is not recommended until you reach
-    significant index sizes and index update time are slowing down. The main
-    drawback of index sharding is that searches will end up being slower since
-    more files have to be opened for a single search. In other words don't do
-    it until you have problems :)</para>
+    significant index sizes and index update times are slowing the application
+    down. The main drawback of index sharding is that searches will end up
+    being slower since more files have to be opened for a single search. In
+    other words don't do it until you have problems :)</para>
 
     <para>Despite this strong warning, Hibernate Search allows you to index a
     given entity type into several sub indexes. Data is sharded into the
@@ -201,7 +212,12 @@ public class Rule { ... }</programlisting>
     strategy is enabled, unless the number of shards is configured. To
     configure the number of shards use the following property</para>
 
-    <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards 5</programlisting>
+    <example>
+      <title>Enabling index sharding by specifying nbr_of_shards for a
+      specific index</title>
+
+      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards 5</programlisting>
+    </example>
 
     <para>This will use 5 different shards.</para>
 
@@ -212,7 +228,11 @@ public class Rule { ... }</programlisting>
     <literal>IndexShardingStrategy</literal> and by setting the following
     property</para>
 
-    <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy.Implementation</programlisting>
+    <example>
+      <title>Specifying a custom sharding strategy</title>
+
+      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy.Implementation</programlisting>
+    </example>
 
     <para>Each shard has an independent directory provider configuration as
     described in <xref linkend="search-configuration-directory" />. The
@@ -222,18 +242,23 @@ public class Rule { ... }</programlisting>
     name of it's owning index followed by <constant>.</constant> (dot) and its
     index number.</para>
 
-    <programlisting>hibernate.search.default.indexBase /usr/lucene/indexes
+    <example>
+      <title>Configuring the sharding configuration for an example entity
+      <classname>Animal</classname></title>
+
+      <programlisting>hibernate.search.default.indexBase /usr/lucene/indexes
 
 hibernate.search.Animal.sharding_strategy.nbr_of_shards 5
 hibernate.search.Animal.directory_provider org.hibernate.search.store.FSDirectoryProvider
 hibernate.search.Animal.0.indexName Animal00
 hibernate.search.Animal.3.indexBase /usr/lucene/sharded
 hibernate.search.Animal.3.indexName Animal03</programlisting>
+    </example>
 
     <para>This configuration uses the default id string hashing strategy and
     shards the Animal index into 5 subindexes. All subindexes are
-    FSDirectoryProvider instances and the directory where each subindex is
-    stored is as followed:</para>
+    <classname>FSDirectoryProvider</classname> instances and the directory
+    where each subindex is stored is as followed:</para>
 
     <itemizedlist>
       <listitem>
@@ -266,28 +291,26 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
   <section>
     <title>Sharing indexes (two entities into the same directory)</title>
 
-    <para>It is possible to store more than one entity index information into
-    a single Lucene index.</para>
-
     <note>
       <para>This is only presented here so that you know the option is
       available. There is really not much benefit in sharing indexes.</para>
     </note>
 
-    <para>There are actually two ways to accomplish merging an index:</para>
+    <para>It is technically possible to store the information of more than one
+    entity into a single Lucene index. There are two ways to accomplish
+    this:</para>
 
     <itemizedlist>
       <listitem>
         <para>Configuring the underlying directory providers to point to the
         same physical index directory. In practice, you set the property
         <literal>hibernate.search.[fully qualified entity
-        name].indexName=(relative directory from indexBase)</literal> to the
-        same value.</para>
-
-        <para>For example, let’s say that we want the Furniture entity to
-        actually be stored in the same directory as the Animal entity. We
-        would have the configuration setting set to “Animal”. Both entities
-        will then be stored in the Animal directory</para>
+        name].indexName</literal> to the same value. As an example let’s use
+        the same index (directory) for the <classname>Furniture</classname>
+        and <classname>Animal</classname> entity. We just set
+        <literal>indexName</literal> for both entities to for example
+        “Animal”. Both entities will then be stored in the Animal
+        directory</para>
 
         <para><programlisting><code>hibernate.search.org.hibernate.search.test.shards.Furniture.indexName = Aninal
 hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</code></programlisting></para>
@@ -296,10 +319,10 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</cod
       <listitem>
         <para>Setting the <code>@Indexed</code> annotation’s
         <methodname>index</methodname> attribute of the entities you want to
-        merge to the same value.</para>
-
-        <para>If we wanted all Furniture instances to be indexed in the Animal
-        index along with all instances of Animal we would specify
+        merge to the same value. If we again wanted all
+        <classname>Furniture</classname> instances to be indexed in the
+        <classname>Animal</classname> index along with all instances of
+        <classname>Animal</classname> we would specify
         <code>@Indexed(index=”Animal”)</code> on both
         <classname>Animal</classname> and <classname>Furniture</classname>
         classes.</para>
@@ -311,7 +334,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</cod
     <title>Worker configuration</title>
 
     <para>It is possible to refine how Hibernate Search interacts with Lucene
-    through the worker configuration. The work can be exected to the Lucene
+    through the worker configuration. The work can be executed to the Lucene
     directory or sent to a JMS queue for later processing. When processed to
     the Lucene directory, the work can be processed synchronously or
     asynchronously to the transaction commit.</para>
@@ -399,13 +422,31 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</cod
     <para>This section describes in greater detail how to configure the Master
     / Slaves Hibernate Search architecture.</para>
 
+    <para><mediaobject>
+        <imageobject role="html">
+          <imagedata align="center" fileref="../shared/images/jms-backend.png"
+                     format="PNG" />
+        </imageobject>
+
+        <imageobject role="fo">
+          <imagedata align="center" fileref="images/jms-backend.png"
+                     format="PNG" />
+        </imageobject>
+
+        <caption><para>JMS Master/Slave architecture
+        overview.</para></caption>
+      </mediaobject></para>
+
     <section>
       <title>Slave nodes</title>
 
       <para>Every index update operation is sent to a JMS queue. Index quering
       operations are executed on a local index copy.</para>
 
-      <programlisting>### slave configuration
+      <example>
+        <title>JMS Slave configuration</title>
+
+        <programlisting>### slave configuration
 
 ## DirectoryProvider
 # (remote) master location
@@ -430,6 +471,7 @@ hibernate.search.worker.jms.queue = queue/hibernatesearch
 # hibernate.search.worker.execution = async
 # hibernate.search.worker.thread_pool.size = 2
 # hibernate.search.worker.buffer_queue.max = 50</programlisting>
+      </example>
 
       <para>A file system local copy is recommended for faster search
       results.</para>
@@ -442,9 +484,12 @@ hibernate.search.worker.jms.queue = queue/hibernatesearch
       <title>Master node</title>
 
       <para>Every index update operation is taken from a JMS queue and
-      executed. The master index(es) is(are) copied on a regular basis.</para>
+      executed. The master index is copied on a regular basis.</para>
 
-      <programlisting>### master configuration
+      <example>
+        <title>JMS Master configuration</title>
+
+        <programlisting>### master configuration
 
 ## DirectoryProvider
 # (remote) master location where information is copied to
@@ -461,15 +506,19 @@ hibernate.search.default.directory_provider = org.hibernate.search.store.FSMaste
 
 ## Backend configuration
 #Backend is the default lucene one</programlisting>
+      </example>
 
       <para>The refresh period should be higher that the expected time
       copy.</para>
 
       <para>In addition to the Hibernate Search framework configuration, a
-      Message Driven Bean should be written and set up to process index works
-      queue through JMS.</para>
+      Message Driven Bean should be written and set up to process the index
+      works queue through JMS.</para>
 
-      <programlisting>@MessageDriven(activationConfig = {
+      <example>
+        <title>Message Driven Bean processing the indexing queue</title>
+
+        <programlisting>@MessageDriven(activationConfig = {
       @ActivationConfigProperty(propertyName="destinationType", propertyValue="javax.jms.Queue"),
       @ActivationConfigProperty(propertyName="destination", propertyValue="queue/hibernatesearch"),
       @ActivationConfigProperty(propertyName="DLQMaxResent", propertyValue="1")
@@ -486,22 +535,17 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     protected void cleanSessionIfNeeded(Session session) 
     }
 }</programlisting>
+      </example>
 
-      <para>This example inherit the abstract JMS controller class available
-      and implements a JavaEE 5 MDB. This implementation is given as an
-      example and, while most likely more complex, can be adjusted to make use
-      of non Java EE Message Driven Beans. For more information about the
+      <para>This example inherits from the abstract JMS controller class
+      available in the Hibernate Search source code and implements a JavaEE 5
+      MDB. This implementation is given as an example and, while most likely
+      be more complex, can be adjusted to make use of non Java EE Message
+      Driven Beans. For more information about the
       <methodname>getSession()</methodname> and
       <methodname>cleanSessionIfNeeded()</methodname>, please check
       <classname>AbstractJMSHibernateSearchController</classname>'s
       javadoc.</para>
-
-      <note>
-        <para>Hibernate Search test suite makes use of JBoss Embedded to test
-        the JMS integration. It allows the unit test to run both the MDB
-        container and JBoss Messaging (JMS provider) in a standalone way
-        (marketed by some as "lightweight").</para>
-      </note>
     </section>
   </section>
 
@@ -550,17 +594,19 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
       Annotations or Hibernate EntityManager. If, for some reason you need to
       disable it, set
       <literal>hibernate.search.autoregister_listeners</literal> to false.
-      Note that there is no performance runtime when the listeners are enabled
-      while no entity is indexable.</para>
+      Note that there is no performance penalty when the listeners are enabled
+      even though no entities are indexed.</para>
 
       <para>To enable Hibernate Search in Hibernate Core (ie. if you don't use
       Hibernate Annotations), add the
-      <literal>FullTextIndexEventListener</literal> for the six Hibernate
-      events that occur after changes are executed to the database. Once
-      again, such a configuration is not useful with Hibernate Annotations or
-      Hibernate EntityManager.</para>
+      <literal>FullTextIndexEventListener</literal> for the following six
+      Hibernate events.</para>
 
-      <programlisting>&lt;hibernate-configuration&gt;
+      <example>
+        <title>Explicitly enabling Hibernate Search by configuring the
+        <classname>FullTextIndexEventListener</classname></title>
+
+        <programlisting>&lt;hibernate-configuration&gt;
      &lt;session-factory&gt;
         ...
         &lt;event type="post-update"/&gt;
@@ -583,27 +629,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         &lt;/event&gt;
     &lt;/session-factory&gt;
 &lt;/hibernate-configuration&gt;</programlisting>
-
-      <para>Be sure to add the appropriate jar files in your classpath. Check
-      <literal>lib/README.TXT</literal> for the list of third party libraries.
-      A typical installation on top of Hibernate Annotations will add:</para>
-
-      <itemizedlist>
-        <listitem>
-          <para><filename>hibernate-search.jar</filename>: the core
-          engine</para>
-        </listitem>
-
-        <listitem>
-          <para><filename>lucene-core.jar</filename>: Lucene core
-          engine</para>
-        </listitem>
-
-        <listitem>
-          <para><filename>solr-core.jar</filename>, solr-common.jar:
-          Additional analyzer infrastructure</para>
-        </listitem>
-      </itemizedlist>
+      </example>
     </section>
 
     <section>
