@@ -54,18 +54,20 @@
           <row>
             <entry>Hibernate Search</entry>
 
-            <entry><literal>hibernate-search.jar</literal> and all the
+            <entry><literal>hibernate-search.jar</literal> and all runtime
             dependencies from the <literal>lib</literal> directory of the
-            Hibernate Search distribution, especially lucene.</entry>
+            Hibernate Search distribution. Please refer to
+            <filename>README.txt </filename>in the lib directory to understand
+            which dependencies are required.</entry>
           </row>
 
           <row>
             <entry>Hibernate Core</entry>
 
             <entry>This instructions have been tested against Hibernate 3.3.x.
-            Next to the main <literal>hibernate3.jar</literal> you will need
-            all required libaries from the <literal>lib</literal> directory of
-            the distribution. Refer to <literal>README.txt</literal> in the
+            You will need <literal>hibernate-core.jar</literal> and its
+            transitive dependencies from the <literal>lib</literal> directory
+            of the distribution. Refer to <literal>README.txt</literal> in the
             <literal>lib</literal> directory of the distribution to determine
             the minimum runtime requirements.</entry>
           </row>
@@ -95,7 +97,7 @@
   </section>
 
   <section>
-    <title>Maven</title>
+    <title>Using Maven</title>
 
     <para>Instead of managing all dependencies manually, maven users have the
     possibility to use the <ulink
@@ -104,7 +106,11 @@
     section of your <filename>pom.xml</filename> or
     <filename>settings.xml</filename>:</para>
 
-    <programlisting>
+    <example>
+      <title>Adding the JBoss maven repository to
+      <filename>settings.xml</filename></title>
+
+      <programlisting>
 &lt;repository&gt;
   &lt;id&gt;repository.jboss.org&lt;/id&gt;
   &lt;name&gt;JBoss Maven Repository&lt;/name&gt;
@@ -112,10 +118,14 @@
   &lt;layout&gt;default&lt;/layout&gt;
 &lt;/repository&gt;
       </programlisting>
+    </example>
 
     <para>Then add the following dependencies to your pom.xml:</para>
 
-    <programlisting>
+    <example>
+      <title>Maven dependencies for Hibernate Search</title>
+
+      <programlisting>
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
@@ -147,6 +157,7 @@
    &lt;version&gt;2.4.0&lt;/version&gt;
 &lt;/dependency&gt;
       </programlisting>
+    </example>
 
     <para>Not all dependencies are required. Only the
     <emphasis>hibernate-search</emphasis> dependeny is mandatory. This
@@ -159,16 +170,17 @@
     with the hibernate-search jar file, to configure your Lucene index.
     Currently there is no XML configuration available for Hibernate Search.
     <emphasis>hibernate-entitymanager</emphasis> is required if you want to
-    use Hibernate Search in conjunction with JPA. Finally, the Solr
-    dependencies are needed if you want to utilize Solr's analyzer framework.
-    More about this later.</para>
+    use Hibernate Search in conjunction with JPA. The Solr dependencies are
+    needed if you want to utilize Solr's analyzer framework. More about this
+    later. And finally, the <literal>lucene-snowball</literal> dependency is
+    needed if you want to utililze Lucene's snowball stemmer.</para>
   </section>
 
   <section>
     <title>Configuration</title>
 
     <para>Once you have downloaded and added all required dependencies to your
-    application you have to add a few properties to your hibernate
+    application you have to add a couple of properties to your hibernate
     configuration file. If you are using Hibernate directly this can be done
     in <literal>hibernate.properties</literal> or
     <literal>hibernate.cfg.xml</literal>. If you are using Hibernate via JPA
@@ -177,14 +189,23 @@
     default. An example <filename>persistence.xml</filename> configuration
     could look like this:</para>
 
-    <para><programlisting>
+    <example>
+      <title>Basic configuration options to be added to
+      <literal><filename>hibernate.properties</filename></literal>,
+      <literal><filename>hibernate.cfg.xml</filename></literal> or
+      <filename>persistence.xml</filename></title>
+
+      <programlisting>
 ...
 &lt;property name="hibernate.search.default.directory_provider" 
    value="org.hibernate.search.store.FSDirectoryProvider"/&gt; 
 
 &lt;property name="hibernate.search.default.indexBase" value="/var/lucene/indexes"/&gt; 
 ...
-    </programlisting>First you have to tell Hibernate Search which
+    </programlisting>
+    </example>
+
+    <para>First you have to tell Hibernate Search which
     <classname>DirectoryProvider</classname> to use. This can be achieved by
     setting the <literal>hibernate.search.default.directory_provider</literal>
     property. Apache Lucene has the notion of a <literal>Directory</literal>
@@ -207,7 +228,11 @@
     capabilities to your application in order to search the books contained in
     your database.</para>
 
-    <programlisting>
+    <example>
+      <title>Example entities Book and Author before adding Hibernate Search
+      specific annotatons</title>
+
+      <programlisting>
 package example;
 ...
 @Entity
@@ -234,7 +259,7 @@ public class Book {
 } 
     </programlisting>
 
-    <para><programlisting>
+      <programlisting>
 package example;
 ...
 @Entity
@@ -253,7 +278,8 @@ public class Author {
   ...
 }
 
-</programlisting></para>
+</programlisting>
+    </example>
 
     <para>To achieve this you have to add a few annotations to the
     <classname>Book</classname> and <classname>Author</classname> class. The
@@ -262,7 +288,7 @@ public class Author {
     to store an untokenized id in the index to ensure index unicity for a
     given entity. <literal>@DocumentId</literal> marks the property to use for
     this purpose and is in most cases the same as the database primary key. In
-    fact since the latest release of Hibernate Search
+    fact since the 3.1.0 release of Hibernate Search
     <literal>@DocumentId</literal> is optional in the case where an
     <classname>@Id</classname> annotation exists.</para>
 
@@ -276,15 +302,19 @@ public class Author {
     talk more about analyzers a little later on. The second parameter we
     specify within <literal>@Field</literal>,<literal>
     store=Store.NO</literal>, ensures that the actual data will not be stored
-    in the index. This is the default setting and probably a good choice
-    unless you want to avoid database roundtrips and retrieve the indexed data
-    via projections (<xref linkend="projections" />). Without projections,
-    Hibernate Search will per default execute the Lucene query in order to
-    find the database identifiers of the entities matching the query critera
-    and use these identifiers to retrieve managed objects from the database.
-    The decision for or against projection has to be made on a case to case
-    basis. The default behaviour is recommended since it returns managed
-    objects whereas projections only returns object arrays. </para>
+    in the index. Whether this data is stored in the index or not has nothing
+    to do with the ability to search for it. From Lucene's perspective it is
+    not necessary to keep the data once the index is created. The benefit of
+    storing it is the ability to retrieve it via projections (<xref
+    linkend="projections" />). </para>
+
+    <para>Without projections, Hibernate Search will per default execute a
+    Lucene query in order to find the database identifiers of the entities
+    matching the query critera and use these identifiers to retrieve managed
+    objects from the database. The decision for or against projection has to
+    be made on a case to case basis. The default behaviour -
+    <literal>Store.NO</literal> - is recommended since it returns managed
+    objects whereas projections only return object arrays.</para>
 
     <para>After this short look under the hood let's go back to annotating the
     <classname>Book</classname> class. Another annotation we have not yet
@@ -302,7 +332,7 @@ public class Author {
     (<literal>@ManyToMany</literal>, <literal>@*ToOne</literal> and
     <literal>@Embedded</literal>) as part of the owning entity. This is needed
     since a Lucene index document is a flat data structure which does not know
-    anything about object relations. To ensure that the author's name wil be
+    anything about object relations. To ensure that the authors' name wil be
     searchable you have to make sure that the names are indexed as part of the
     book itself. On top of <literal>@IndexedEmbedded</literal> you will also
     have to mark all fields of the associated entity you want to have included
@@ -312,7 +342,11 @@ public class Author {
     <para>These settings should be sufficient for now. For more details on
     entity mapping refer to <xref linkend="search-mapping-entity" />.</para>
 
-    <programlisting>
+    <example>
+      <title>Example entities after adding Hibernate Search
+      annotations</title>
+
+      <programlisting>
 package example;
 ...
 @Entity
@@ -346,7 +380,7 @@ public class Book {
 }
   </programlisting>
 
-    <programlisting>
+      <programlisting>
 package example;
 ...
 @Entity
@@ -366,6 +400,7 @@ public class Author {
   ...
 }
   </programlisting>
+    </example>
   </section>
 
   <section>
@@ -379,28 +414,41 @@ public class Author {
     achieve this by using one of the following code snipplets (see also <xref
     linkend="search-batchindex" />):</para>
 
-    <para>Example using Hibernate Session:</para>
+    <example>
+      <title>Using Hibernate Session to index data</title>
 
-    <programlisting>
+      <programlisting>
 FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
+
 List books = session.createQuery("from Book as book").list();
 for (Book book : books) {
-    fullTextSession.index(book);
+    <emphasis role="bold">fullTextSession.index(book);</emphasis>
 }
+
 tx.commit(); //index is written at commit time       
     </programlisting>
+    </example>
 
-    <para>Example using JPA:</para>
+    <example>
+      <title>Using JPA to index data</title>
 
-    <programlisting>
+      <programlisting>
 EntityManager em = entityManagerFactory.createEntityManager();
 FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
+em.getTransaction().begin();
+
 List books = em.createQuery("select book from Book as book").getResultList();
 for (Book book : books) {
-    fullTextEntityManager.index(book);
+    <emphasis role="bold">fullTextEntityManager.index(book);</emphasis>
 } 
+
+em.getTransaction().commit();
+em.close();
+
+
     </programlisting>
+    </example>
 
     <para>After executing the above code, you should be able to see a Lucene
     index under <literal>/var/lucene/indexes/example.Book</literal>. Go ahead
@@ -412,40 +460,62 @@ for (Book book : books) {
   <section>
     <title>Searching</title>
 
-    <para>Now it is time to execute a first search. The following code will
-    prepare a query against the indexed fields, execute it and return a list
-    of <classname>Book</classname>s:</para>
+    <para>Now it is time to execute a first search. The general approach is to
+    create a native Lucene query and then wrap this query into a
+    org.hibernate.Query in order to get all the functionality one is used to
+    from the Hibernate API. The following code will prepare a query against
+    the indexed fields, execute it and return a list of
+    <classname>Book</classname>s. </para>
 
-    <para>Example using Hibernate Session:</para>
+    <example>
+      <title>Using Hibernate Session to create and execute a search</title>
 
-    <programlisting>
+      <programlisting>
 FullTextSession fullTextSession = Search.getFullTextSession(session);
-
 Transaction tx = fullTextSession.beginTransaction();
 
+// create native Lucene query
 String[] fields = new String[]{"title", "subtitle", "authors.name", "publicationDate"};
 MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
 Query query = parser.parse( "Java rocks!" );
+
+// wrap Lucene query in a org.hibernate.Query
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery(query, Book.class);
+
+// execute search
 List result = hibQuery.list();
   
 tx.commit();
 session.close();  
     </programlisting>
+    </example>
 
-    <para>Example using JPA:</para>
+    <example>
+      <title>Using JPA to create and execute a search</title>
 
-    <programlisting>
+      <programlisting>
 EntityManager em = entityManagerFactory.createEntityManager();
-
 FullTextEntityManager fullTextEntityManager = 
     org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);
+em.getTransaction().begin();
+
+// create native Lucene query
 String[] fields = new String[]{"title", "subtitle", "authors.name", "publicationDate"};
 MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
 Query query = parser.parse( "Java rocks!" );
+
+// wrap Lucene query in a org.hibernate.Query
 org.hibernate.Query hibQuery = fullTextEntityManager.createFullTextQuery(query, Book.class);
+
+// execute search
 List result = hibQuery.list();
+
+em.getTransaction().commit();
+em.close();
+
+
     </programlisting>
+    </example>
   </section>
 
   <section>
@@ -456,9 +526,9 @@ List result = hibQuery.list();
     Design of Existing Code" and you want to get hits for all of the following
     queries: "refactor", "refactors", "refactored" and "refactoring". In
     Lucene this can be achieved by choosing an analyzer class which applies
-    word stemming during the indexing <emphasis role="bold">and</emphasis>
-    search process. Hibernate Search offers several ways to configure the
-    analyzer to use (see <xref linkend="analyzer" />):</para>
+    word stemming during the indexing <emphasis role="bold">as well
+    as</emphasis> search process. Hibernate Search offers several ways to
+    configure the analyzer to use (see <xref linkend="analyzer" />):</para>
 
     <itemizedlist>
       <listitem>
@@ -497,14 +567,18 @@ List result = hibQuery.list();
     <classname>SnowballPorterFilterFactory</classname>. The standard tokenizer
     splits words at punctuation characters and hyphens while keeping email
     addresses and internet hostnames intact. It is a good general purpose
-    tokenizer. The lowercase filter lowercases then the letters in each token
-    whereas the snowball filter finally applies the actual language
+    tokenizer. The lowercase filter lowercases the letters in each token
+    whereas the snowball filter finally applies language specific
     stemming.</para>
 
     <para>Generally, when using the Solr framework you have to start with a
     tokenizer followed by an arbitrary number of filters.</para>
 
-    <programlisting>
+    <example>
+      <title>Using <classname>@AnalyzerDef</classname> and the Solr framework
+      to define and use an analyzer</title>
+
+      <programlisting>
 
 package example;
 ...
@@ -549,6 +623,7 @@ public class Book {
 }
 
   </programlisting>
+    </example>
   </section>
 
   <section>
@@ -559,20 +634,25 @@ public class Book {
     command you can create an initial runnable maven project structure
     populated with the example code of this tutorial.</para>
 
-    <para><programlisting>mvn archetype:create \ 
+    <example>
+      <title>Using the maven achetype to create tutorial sources</title>
+
+      <programlisting>mvn archetype:create \ 
     -DarchetypeGroupId=org.hibernate \
     -DarchetypeArtifactId=hibernate-search-quickstart \ 
     -DarchetypeVersion=3.1.0.GA \
-    -DgroupId=my.company -DartifactId=quickstart</programlisting>Using the
-    maven project you can execute the examples, inspect the file system based
-    index and search and retrieve a list of managed objects. Just run
-    <emphasis>mvn package</emphasis> to compile the sources and run the unit
-    tests.</para>
+    -DgroupId=my.company -DartifactId=quickstart</programlisting>
+    </example>
+
+    <para>Using the maven project you can execute the examples, inspect the
+    file system based index and search and retrieve a list of managed objects.
+    Just run <emphasis>mvn package</emphasis> to compile the sources and run
+    the unit tests.</para>
 
     <para>The next step after this tutorial is to get more familiar with the
     overall architecture of Hibernate Search (<xref
     linkend="search-architecture" />) and explore the basic features in more
-    detail. Two topics which where only briefly touched in this tutorial were
+    detail. Two topics which were only briefly touched in this tutorial were
     analyzer configuration (<xref linkend="analyzer" />) and field bridges
     (<xref linkend="search-mapping-bridge" />), both important features
     required for more fine-grained indexing. More advanced topics cover

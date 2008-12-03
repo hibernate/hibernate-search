@@ -1274,7 +1274,7 @@ private Date date;                </programlisting>
       </section>
 
       <section>
-        <title>@ClassBridge</title>
+        <title>ClassBridge</title>
 
         <para>It is sometimes useful to combine more than one property of a
         given entity and index this combination in a specific way into the
