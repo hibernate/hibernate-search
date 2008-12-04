@@ -427,7 +427,7 @@ public class Owner {
       <literal>ownedBy</literal> property.</para>
 
       <note>
-        <para>The prefix cannot be set to the empty string. </para>
+        <para>The prefix cannot be set to the empty string.</para>
       </note>
 
       <para>The<literal> depth</literal> property is necessary when the object
@@ -439,7 +439,7 @@ public class Owner {
       an example of cyclic dependency. In our example, because
       <literal>depth</literal> is set to 1, any
       <literal>@IndexedEmbedded</literal> attribute in Owner (if any) will be
-      ignored. </para>
+      ignored.</para>
 
       <para>Using <literal>@IndexedEmbedded</literal> for object associations
       allows you to express queries such as:</para>
@@ -866,7 +866,7 @@ public class Team {
         <classname>BlogEntry</classname> class for example the analyzer could
         depend on the language property of the entry. Depending on this
         property the correct language specific stemmer should be chosen to
-        index the actual text. </para>
+        index the actual text.</para>
 
         <para>To enable this dynamic analyzer selection Hibernate Search
         introduces the <classname>AnalyzerDiscriminator</classname>
@@ -1424,7 +1424,7 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
     document id is required in the constructor.</para>
 
     <section id="ProvidedId">
-      <title>The @ProvidedId annotation</title>
+      <title>The ProvidedId annotation</title>
 
       <para>Unlike conventional Hibernate Search API and @DocumentId, this
       annotation is used on the class and not a field. You also can provide
