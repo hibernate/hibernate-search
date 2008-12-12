@@ -21,9 +21,6 @@ import org.hibernate.search.util.LoggerFactory;
  * Implement the Hibernate Search controller responsible for processing the
  * work send through JMS by the slave nodes.
  *
- * Note the subclass implementation has to implement javax.jms.MessageListener
- * //TODO Ask Bill why it is required
- *
  * @author Emmanuel Bernard
  */
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {

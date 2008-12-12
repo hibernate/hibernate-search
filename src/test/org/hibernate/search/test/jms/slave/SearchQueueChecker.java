@@ -6,19 +6,16 @@ import javax.jms.MessageListener;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.JMSException;
-import javax.ejb.MessageDriven;
-import javax.ejb.ActivationConfigProperty;
+
 
 import org.hibernate.search.backend.LuceneWork;
 
 /**
+ * Helper class to verify that the Slave places messages onto the queue.
+ *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-@MessageDriven(activationConfig = {
-      @ActivationConfigProperty(propertyName="destinationType", propertyValue="javax.jms.Queue"),
-      @ActivationConfigProperty(propertyName="destination", propertyValue="queue/searchtest"),
-      @ActivationConfigProperty(propertyName="DLQMaxResent", propertyValue="1")
-   } )
 public class SearchQueueChecker implements MessageListener {
 	public static int queues;
 	public static int works;
@@ -28,22 +25,24 @@ public class SearchQueueChecker implements MessageListener {
 		works = 0;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void onMessage(Message message) {
-		if (! (message instanceof ObjectMessage ) ) {
+		if ( !( message instanceof ObjectMessage ) ) {
 			return;
 		}
-		ObjectMessage objectMessage = (ObjectMessage) message;
+		ObjectMessage objectMessage = ( ObjectMessage ) message;
+
 		List<LuceneWork> queue;
 		try {
-			queue = (List<LuceneWork>) objectMessage.getObject();
+			queue = ( List<LuceneWork> ) objectMessage.getObject();
 		}
-		catch (JMSException e) {
+		catch ( JMSException e ) {
 			return;
 		}
-		catch( ClassCastException e ) {
+		catch ( ClassCastException e ) {
 			return;
 		}
 		queues++;
-		works+=queue.size();
+		works += queue.size();
 	}
 }
