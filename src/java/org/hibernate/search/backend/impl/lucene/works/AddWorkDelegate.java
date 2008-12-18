@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
-import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ScopedAnalyzer;
@@ -38,13 +36,10 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		this.workspace = workspace;
 	}
 
-	public IndexInteractionType getIndexInteractionType() {
-		return IndexInteractionType.NEEDS_INDEXWRITER;
-	}
-
 	public void performWork(LuceneWork work, IndexWriter writer) {
+		final Class<?> entityType = work.getEntityClass();
 		@SuppressWarnings("unchecked")
-		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( work.getEntityClass() );
+		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = ( ( AddLuceneWork ) work ).getFieldToAnalyzerMap();
 		ScopedAnalyzer analyzer = ( ScopedAnalyzer ) documentBuilder.getAnalyzer();
 		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap, workspace );
@@ -52,12 +47,12 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		if ( log.isTraceEnabled() ) {
 			log.trace(
 					"add to Lucene index: {}#{}:{}",
-					new Object[] { work.getEntityClass(), work.getId(), work.getDocument() }
+					new Object[] { entityType, work.getId(), work.getDocument() }
 			);
 		}
 		try {
 			//TODO the next two operations should be atomic to enable concurrent usage of IndexWriter
-			// make a wrapping Similarity based on ThreadLocals? or having it autoselect implementation basing on entity?
+			// make a wrapping Similarity based on ThreadLocals? or have it autoselect implementation basing on entity?
 			writer.setSimilarity( similarity );
 			writer.addDocument( work.getDocument(), analyzer );
 			workspace.incrementModificationCounter( 1 );
@@ -65,7 +60,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		catch ( IOException e ) {
 			throw new SearchException(
 					"Unable to add to Lucene index: "
-							+ work.getEntityClass() + "#" + work.getId(), e
+							+ entityType + "#" + work.getId(), e
 			);
 		}
 	}
@@ -100,7 +95,4 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		return analyzerClone;
 	}
 
-	public void performWork(LuceneWork work, IndexReader reader) {
-		throw new UnsupportedOperationException();
-	}
 }

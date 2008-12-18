@@ -2,14 +2,12 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
-import org.hibernate.search.backend.impl.lucene.IndexInteractionType;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -32,23 +30,16 @@ class OptimizeWorkDelegate implements LuceneWorkDelegate {
 		this.workspace = workspace;
 	}
 
-	public IndexInteractionType getIndexInteractionType() {
-		return IndexInteractionType.NEEDS_INDEXWRITER;
-	}
-
 	public void performWork(LuceneWork work, IndexWriter writer) {
-		log.trace( "optimize Lucene index: {}", work.getEntityClass() );
+		final Class<?> entityType = work.getEntityClass();
+		log.trace( "optimize Lucene index: {}", entityType );
 		try {
 			writer.optimize();
 			workspace.optimize();
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to optimize Lucene index: " + work.getEntityClass(), e );
+			throw new SearchException( "Unable to optimize Lucene index: " + entityType, e );
 		}
-	}
-
-	public void performWork(LuceneWork work, IndexReader reader) {
-		throw new UnsupportedOperationException();
 	}
 
 }

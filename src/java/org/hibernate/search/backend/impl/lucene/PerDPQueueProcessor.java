@@ -4,17 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.slf4j.Logger;
 
-import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
+ * A Runnable containing a unit of changes to be applied to a specific index.
+ * After creation, use addWork(LuceneWork) to fill the changes queue and then
+ * run it to apply all changes. After run() this object should be discarded.
+ * @see Runnable
+ * @see #addWork(LuceneWork)
  * @author Sanne Grinovero
  */
 class PerDPQueueProcessor implements Runnable {
@@ -24,79 +27,36 @@ class PerDPQueueProcessor implements Runnable {
 	private final LuceneWorkVisitor worker;
 	private final ExecutorService executor;
 	private final List<LuceneWork> workOnWriter = new ArrayList<LuceneWork>();
-	private final List<LuceneWork> workOnReader= new ArrayList<LuceneWork>();
 	
-	// if any work passed to addWork needs one, set corresponding flag to true:
+	// if any work needs batchmode, set corresponding flag to true:
 	private boolean batchmode = false;
-	private boolean needsWriter = false;
-	private boolean preferReader = false;
 	
+	/**
+	 * @param resources All resources for the given DirectoryProvider are collected
+	 *  from this wrapping object.
+	 */
 	public PerDPQueueProcessor(PerDPResources resources) {
 		this.worker = resources.getVisitor();
 		this.workspace = resources.getWorkspace();
 		this.executor = resources.getExecutor();
 	}
 
+	/**
+	 * adds a LuceneWork to the internal queue. Can't remove them.
+	 * @param work
+	 */
 	public void addWork(LuceneWork work) {
 		if ( work.isBatch() ) {
 			batchmode = true;
 			log.debug( "Batch mode enabled" );
 		}
-		IndexInteractionType type = work.getWorkDelegate( worker ).getIndexInteractionType();
-		switch ( type ) {
-			case PREFER_INDEXREADER :
-				preferReader = true;
-				workOnReader.add( work );
-				break;
-			case NEEDS_INDEXWRITER :
-				needsWriter = true;
-				//fall through:
-			case PREFER_INDEXWRITER :
-				workOnWriter.add( work );
-				break;
-			default :
-				throw new AssertionFailure( "Uncovered switch case for type " + type );
-		}
-	}
-
-	public void run() {
-		// skip "resource optimization mode" when in batch to have all tasks use preferred (optimal) mode.
-		if ( ! batchmode ) {
-			// 	see if we can skip using some resource
-			if ( ! needsWriter ) { // no specific need:
-				if ( preferReader ) {
-					useReaderOnly();
-				}
-				else {
-					useWriterOnly();
-				}
-			}
-			else {
-				useWriterOnly();
-			}
-			if ( ! (workOnWriter.isEmpty() || workOnReader.isEmpty() ) ) {
-				throw new AssertionFailure(
-					"During non-batch mode performWorks tries to use both IndexWriter and IndexReader." );
-			}
-		}
-		// apply changes to index:
-		log.trace( "Locking Workspace (or waiting to...)" );
-		workspace.lock();
-		log.trace( "Workspace lock aquired." );
-		try {
-			performReaderWorks();
-			performWriterWorks();
-		}
-		finally {
-			workspace.unlock();
-			log.trace( "Unlocking Workspace" );
-		}
+		workOnWriter.add( work );
 	}
 
 	/**
 	 * Do all workOnWriter on an IndexWriter.
 	 */
-	private void performWriterWorks() {
+	public void run() {
 		if ( workOnWriter.isEmpty() ) {
 			return;
 		}
@@ -107,56 +67,37 @@ class PerDPQueueProcessor implements Runnable {
 				lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
 			}
 			workspace.commitIndexWriter();
-			//TODO next line is assuming the OptimizerStrategy will need an IndexWriter;
-			// would be nicer to have the strategy put an OptimizeWork on the queue,
-			// or just return "yes please" (true) to some method?
-			//FIXME will not have a chance to trigger when no writer activity is done.
-			// this is currently ok, until we enable mod.counts for deletions too.
-			workspace.optimizerPhase();
+			//TODO skip this when indexing in batches:
+			performOptimizations();
 		}
 		finally {
 			workspace.closeIndexWriter();
 		}
 	}
-
-	/**
-	 * Do all workOnReader on an IndexReader.
-	 */
-	private void performReaderWorks() {
-		if ( workOnReader.isEmpty() ) {
-			return;
-		}
-		log.debug( "Opening an IndexReader for update" );
-		IndexReader indexReader = workspace.getIndexReader();
+	
+	private void performOptimizations() {
+		log.trace( "Locking Workspace (or waiting to...)" );
+		workspace.lock();
 		try {
-			for (LuceneWork lw : workOnReader) {
-				lw.getWorkDelegate( worker ).performWork( lw, indexReader );
-			}
+			log.trace( "Workspace lock aquired." );
+			//TODO next line is assuming the OptimizerStrategy will need an IndexWriter;
+			// would be nicer to have the strategy put an OptimizeWork on the queue,
+			// or just return "yes please" (true) to some method?
+			//FIXME will not have a chance to trigger when no "add" activity is done.
+			// this is correct until we enable modification counts for deletions too.
+			workspace.optimizerPhase();
 		}
 		finally {
-			workspace.closeIndexReader();
+			workspace.unlock();
+			log.trace( "Unlocked Workspace" );
 		}
 	}
 
 	/**
-	 * forces all work to be done using only an IndexReader
+	 * Each PerDPQueueProcessor is owned by an Executor,
+	 * which contains the threads allowed to execute this.
+	 * @return the Executor which should run this Runnable.
 	 */
-	private void useReaderOnly() {
-		log.debug( "Skipping usage of an IndexWriter for updates" );
-		workOnReader.addAll( workOnWriter );
-		workOnWriter.clear();
-	}
-
-	/**
-	 * forces all work to be done using only an IndexWriter
-	 */
-	private void useWriterOnly() {
-		log.debug( "Skipping usage of an IndexReader for updates" );
-		//position 0 needed to maintain correct ordering of Work: delete operations first.
-		workOnWriter.addAll( 0, workOnReader );
-		workOnReader.clear();
-	}
-
 	public ExecutorService getOwningExecutor() {
 		return executor;
 	}
