@@ -34,7 +34,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
 		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
+		book = new Book( 2, "La gloire de mon pï¿½re", "Les deboires de mon pï¿½re en vï¿½lo" );
 		s.save( book );
 		tx.commit();
 		s.clear();
@@ -89,7 +89,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
 		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
+		book = new Book( 2, "La gloire de mon pï¿½re", "Les deboires de mon pï¿½re en vï¿½lo" );
 		s.save( book );
 		tx.commit();
 		s.clear();
@@ -125,7 +125,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
 		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
+		book = new Book( 2, "La gloire de mon pï¿½re", "Les deboires de mon pï¿½re en vï¿½lo" );
 		s.save( book );
 		tx.commit();
 		s.clear();
@@ -171,7 +171,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
 		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
+		book = new Book( 2, "La gloire de mon pï¿½re", "Les deboires de mon pï¿½re en vï¿½lo" );
 		s.save( book );
 		tx.commit();//post commit events for lucene
 		s.clear();
@@ -217,7 +217,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
 		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
+		book = new Book( 2, "La gloire de mon pï¿½re", "Les deboires de mon pï¿½re en vï¿½lo" );
 		s.save( book );
 		tx.commit();//post commit events for lucene
 		s.clear();
@@ -235,7 +235,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
 		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
 		result = hibQuery.scroll();
-		assertEquals( 0, result.getRowNumber() );
+		assertEquals( -1, result.getRowNumber() );
 		result.beforeFirst();
 		assertEquals( true, result.next() );
 		assertTrue( result.isFirst() );

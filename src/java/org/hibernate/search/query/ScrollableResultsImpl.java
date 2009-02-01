@@ -2,6 +2,8 @@
 package org.hibernate.search.query;
 
 import java.io.IOException;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
@@ -9,10 +11,8 @@ import java.sql.Clob;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.lucene.search.IndexSearcher;
@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.ScrollableResults;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentExtractor;
@@ -50,82 +51,76 @@ import org.hibernate.type.Type;
  *
  * @author Emmanuel Bernard
  * @author John Griffin
+ * @author Sanne Grinovero
  */
 public class ScrollableResultsImpl implements ScrollableResults {
+	
 	private static final Logger log = LoggerFactory.make();
+	
 	private final SearchFactory searchFactory;
 	private final IndexSearcher searcher;
 	private final int first;
 	private final int max;
 	private final int fetchSize;
-	private int current;
-	private final EntityInfo[] entityInfos;
 	private final Loader loader;
 	private final DocumentExtractor documentExtractor;
-	private final Map<EntityInfo, Object[]> resultContext;
+	private final SessionImplementor session;
+	
+	/**
+	 * Caches result rows and EntityInfo from
+	 * <code>first</code> to <code>max</code>
+	 */
+	private final LoadedObject[] resultsContext;
+	
+	private int current;
 
 	public ScrollableResultsImpl( IndexSearcher searcher, int first, int max, int fetchSize, DocumentExtractor extractor,
-			Loader loader, SearchFactory searchFactory
+			Loader loader, SearchFactory searchFactory, SessionImplementor sessionImplementor
 	) {
 		this.searchFactory = searchFactory;
 		this.searcher = searcher;
 		this.first = first;
 		this.max = max;
-		this.current = first;
 		this.loader = loader;
 		this.documentExtractor = extractor;
-		int size = max - first + 1 > 0 ? max - first + 1 : 0;
-		this.entityInfos = new EntityInfo[size];
-		this.resultContext = new HashMap<EntityInfo, Object[]>( size );
 		this.fetchSize = fetchSize;
+		this.session = sessionImplementor;
+		int size = Math.max( max - first + 1, 0 );
+		this.resultsContext = new LoadedObject[size];
+		beforeFirst();
 	}
 
-	// The 'cache' is a sliding window of size fetchSize that
-	// moves back and forth over entityInfos as directed loading
-	// values as necessary.
-	private EntityInfo loadCache(int windowStart) {
-		int windowStop;
-
-		EntityInfo info = entityInfos[windowStart - first];
-		if ( info != null ) {
-			//data has already been loaded
-			return info;
+	private LoadedObject ensureCurrentLoaded() {
+		LoadedObject currentCacheRef = resultsContext[current - first];
+		if ( currentCacheRef != null ) {
+			return currentCacheRef;
 		}
-
-		if ( windowStart + fetchSize > max ) {
-			windowStop = max;
-		}
-		else {
-			windowStop = windowStart + fetchSize - 1;
-		}
-
-		List<EntityInfo> entityInfosLoaded = new ArrayList<EntityInfo>( windowStop - windowStart + 1 );
-		for (int x = windowStart; x <= windowStop; x++) {
-			try {
-				if ( entityInfos[x - first] == null ) {
-					//FIXME should check that clazz match classes but this complicates a lot the firstResult/maxResult
-					entityInfos[x - first] = documentExtractor.extract( x );
-					entityInfosLoaded.add( entityInfos[x - first] );
-				}
-			}
-			catch (IOException e) {
-				throw new HibernateException( "Unable to read Lucene topDocs[" + x + "]", e );
-			}
-
-		}
-		//preload efficiently first
-		loader.load( entityInfosLoaded.toArray( new EntityInfo[entityInfosLoaded.size()] ) );
-		//load one by one to inject null results if needed
-		for (EntityInfo slidingInfo : entityInfosLoaded) {
-			if ( !resultContext.containsKey( slidingInfo ) ) {
-				Object loaded = loader.load( slidingInfo );
-				if ( !loaded.getClass().isArray() ) loaded = new Object[] { loaded };
-				resultContext.put( slidingInfo, (Object[]) loaded );
+		// the loading window is optimized for scrolling in both directions:
+		int windowStop = Math.min( max + 1 , current + fetchSize );
+		int windowStart = Math.max( first, current - fetchSize + 1 );
+		List<EntityInfo> entityInfosToLoad = new ArrayList<EntityInfo>( fetchSize );
+		int sizeToLoad = 0;
+		for (int x = windowStart; x < windowStop; x++) {
+			int arrayIdx = x - first;
+			LoadedObject lo = resultsContext[arrayIdx];
+			if ( lo == null ) {
+				lo = new LoadedObject();
+				// makes hard references and extract EntityInfos:
+				entityInfosToLoad.add( lo.getEntityInfo( x ) );
+				resultsContext[arrayIdx] = lo;
+				sizeToLoad++;
+				if ( sizeToLoad >= fetchSize )
+					break;
 			}
 		}
-		return entityInfos[windowStart - first];
+		//preload efficiently by batches:
+		if ( sizeToLoad > 1 ) {
+			loader.load( entityInfosToLoad.toArray( new EntityInfo[sizeToLoad] ) );
+			//(no references stored at this point: they still need to be loaded one by one to inject null results)
+		}
+		return resultsContext[ current - first ];
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -193,6 +188,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 
 	public void afterLast() {
 		current = max + 1;
+		//TODO help gc by clearing all structures when using forwardonly scrollmode.
 	}
 
 	public boolean isFirst() {
@@ -220,8 +216,8 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		// do that since we have to make up for
 		// an Object[]. J.G
 		if ( current < first || current > max ) return null;
-		loadCache( current );
-		return resultContext.get( entityInfos[current - first] );
+		LoadedObject cacheEntry = ensureCurrentLoaded();
+		return cacheEntry.getManagedResult( current );
 	}
 
 	/**
@@ -406,4 +402,70 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		}
 		return current >= first && current <= max;
 	}
+	
+	private final class LoadedObject {
+		
+		private Reference<Object[]> entity; //never==null but Reference.get can return null
+		private Reference<EntityInfo> einfo; //never==null but Reference.get can return null
+		
+		/**
+		 * Gets the objects from cache if it is available and attached to session,
+		 * or reload them and update the cache entry.
+		 * @param x absolute position in fulltext result.
+		 * @return the managed objects
+		 */
+		private Object[] getManagedResult(int x) {
+			EntityInfo entityInfo = getEntityInfo( x );
+			Object[] objects = entity==null ? null : entity.get();
+			if ( objects!=null && areAllEntitiesManaged( objects, entityInfo ) ) {
+				return objects;
+			}
+			else {
+				Object loaded = loader.load( entityInfo );
+				if ( ! loaded.getClass().isArray() ) loaded = new Object[] { loaded };
+				objects = (Object[]) loaded;
+				this.entity = new SoftReference<Object[]>( objects );
+				return objects;
+			}
+		}
+
+		/**
+		 * Extract an entityInfo, either from cache or from the index.
+		 * @param x the position in the index.
+		 * @return
+		 */
+		private EntityInfo getEntityInfo(int x) {
+			EntityInfo entityInfo = einfo==null ? null : einfo.get();
+			if ( entityInfo==null ) {
+				try {
+					entityInfo = documentExtractor.extract( x );
+				}
+				catch (IOException e) {
+					throw new SearchException( "Unable to read Lucene topDocs[" + x + "]", e );
+				}
+				einfo = new SoftReference<EntityInfo>( entityInfo );
+			}
+			return entityInfo;
+		}
+
+	}
+	
+	private boolean areAllEntitiesManaged(Object[] objects,	EntityInfo entityInfo) {
+		//check if all entities are session-managed and skip the check on projected values
+		org.hibernate.Session hibSession = (org.hibernate.Session) session;
+		if ( entityInfo.projection != null ) {
+			// using projection: test only for entities
+			for ( int idx : entityInfo.indexesOfThis ) {
+				Object o = objects[idx];
+				//TODO improve: is it useful to check for proxies and have them reassociated to persistence context?
+				if ( ! hibSession.contains( o ) )
+					return false;
+			}
+			return true;
+		}
+		else {
+			return hibSession.contains( objects[0] );
+		}
+	}
+	
 }

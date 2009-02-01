@@ -239,7 +239,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			);
 			Loader loader = getLoader( ( Session ) this.session, searchFactory );
 			return new ScrollableResultsImpl(
-					searcher, first, max, fetchSize, extractor, loader, searchFactory
+					searcher, first, max, fetchSize, extractor, loader, searchFactory, this.session
 			);
 		}
 		catch ( IOException e ) {
@@ -334,7 +334,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	/**
-	 * Execute the lucene search and return the machting hits.
+	 * Execute the lucene search and return the matching hits.
 	 *
 	 * @param searcher The index searcher.
 	 * @param n Numer of documents to retrieve
