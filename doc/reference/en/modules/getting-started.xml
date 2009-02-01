@@ -477,7 +477,7 @@ Transaction tx = fullTextSession.beginTransaction();
 // create native Lucene query
 String[] fields = new String[]{"title", "subtitle", "authors.name", "publicationDate"};
 MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-Query query = parser.parse( "Java rocks!" );
+org.apache.lucene.search.Query query = parser.parse( "Java rocks!" );
 
 // wrap Lucene query in a org.hibernate.Query
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery(query, Book.class);
@@ -502,17 +502,16 @@ em.getTransaction().begin();
 // create native Lucene query
 String[] fields = new String[]{"title", "subtitle", "authors.name", "publicationDate"};
 MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-Query query = parser.parse( "Java rocks!" );
+org.apache.lucene.search.Query query = parser.parse( "Java rocks!" );
 
-// wrap Lucene query in a org.hibernate.Query
-org.hibernate.Query hibQuery = fullTextEntityManager.createFullTextQuery(query, Book.class);
+// wrap Lucene query in a javax.persistence.Query
+javax.persistence.Query persistenceQuery = fullTextEntityManager.createFullTextQuery(query, Book.class);
 
 // execute search
-List result = hibQuery.list();
+List result = persistenceQuery.getResultList();
 
 em.getTransaction().commit();
 em.close();
-
 
     </programlisting>
     </example>

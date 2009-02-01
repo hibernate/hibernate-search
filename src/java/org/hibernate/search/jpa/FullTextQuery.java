@@ -46,8 +46,8 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * Caution:
 	 * The number of results might be slightly different from
-	 * <code>list().size()</code> because list() if the index is
-	 * not in sync with the database at the time of query.
+	 * <code>getResultList().size()</code> because getResultList()
+	 * may be not in sync with the database at the time of query.
 	 */
 	int getResultSize();
 
