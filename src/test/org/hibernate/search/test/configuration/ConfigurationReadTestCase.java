@@ -101,7 +101,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 			configuration.buildSessionFactory();
 			fail();
 		} catch (HibernateException e) {
-			//thrown exceptions means the test is ok when cause by a SearchException
+			//thrown exceptions means the test is ok when caused by a SearchException
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof SearchException );
 		}

@@ -1,4 +1,4 @@
-//$Id
+// $Id$
 package org.hibernate.search.test.util;
 
 import org.apache.lucene.analysis.StopAnalyzer;

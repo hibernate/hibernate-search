@@ -69,7 +69,7 @@ public final class Environment {
 	public static final String FILTER_CACHING_STRATEGY = "hibernate.search.filter.cache_strategy";
 	
 	/**
-	 * number of docidresults cached in hard referemnce.
+	 * number of docidresults cached in hard reference.
 	 */
 	public static final String CACHE_DOCIDRESULTS_SIZE = "hibernate.search.filter.cache_docidresults.size";	
 }

@@ -14,14 +14,10 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.test.inheritance.Animal;
-import org.hibernate.search.test.inheritance.Mammal;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.RAMDirectoryProvider;
-import org.hibernate.search.store.FSDirectoryProvider;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for Hibernate Search unit tests.

@@ -1,4 +1,4 @@
-//$Id
+// $Id$
 package org.hibernate.search.test.query;
 
 import org.apache.lucene.index.Term;
