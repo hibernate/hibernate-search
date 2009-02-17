@@ -60,7 +60,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		log.debug( "Index directory: {}", indexDir.getPath() );
 		try {
 			indexName = indexDir.getCanonicalPath();
-			directory = DirectoryProviderHelper.createFSIndex( indexDir );
+			directory = DirectoryProviderHelper.createFSIndex( indexDir, properties );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );

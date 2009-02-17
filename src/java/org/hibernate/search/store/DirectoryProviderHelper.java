@@ -9,6 +9,11 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.LockFactory;
+import org.apache.lucene.store.NativeFSLockFactory;
+import org.apache.lucene.store.NoLockFactory;
+import org.apache.lucene.store.SimpleFSLockFactory;
+import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.util.StringHelper;
@@ -68,13 +73,15 @@ public class DirectoryProviderHelper {
 	}
 	
 	/**
-	 * Creates an FSDirectory in provided directory if not already existing.
+	 * Creates an FSDirectory in provided directory and initializes
+	 * an index if not already existing.
 	 * @param indexDir The directory where to write a new index
 	 * @return the created FSDirectory
 	 * @throws IOException
 	 */
-	public static FSDirectory createFSIndex(File indexDir) throws IOException {
-		FSDirectory fsDirectory = FSDirectory.getDirectory( indexDir );
+	public static FSDirectory createFSIndex(File indexDir, Properties dirConfiguration) throws IOException {
+		LockFactory lockFactory = createLockFactory(indexDir, dirConfiguration);
+		FSDirectory fsDirectory = FSDirectory.getDirectory( indexDir, lockFactory );
 		if ( ! IndexReader.indexExists( fsDirectory ) ) {
 			log.debug( "Initialize index: '{}'", indexDir.getAbsolutePath() );
 			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
@@ -82,6 +89,39 @@ public class DirectoryProviderHelper {
 			iw.close();
 		}
 		return fsDirectory;
+	}
+	
+	/**
+	 * Creates a LockFactory as selected in the configuration for the
+	 * DirectoryProvider.
+	 * The SimpleFSLockFactory and NativeFSLockFactory need a File to know
+	 * were to stock the filesystem based locks; other implementations
+	 * ignore this parameter.
+	 * @param indexDir the directory to use to store locks, if needed by implementation
+	 * @param dirConfiguration the configuration of current DirectoryProvider
+	 * @return the LockFactory as configured, or a SimpleFSLockFactory
+	 * in case of configuration errors or as a default.
+	 * @throws IOException
+	 */
+	public static LockFactory createLockFactory(File indexDir, Properties dirConfiguration) throws IOException {
+		String lockFactoryName = dirConfiguration.getProperty( "locking_strategy", "simple" );
+		if ( "simple".equals( lockFactoryName ) ) {
+			return new SimpleFSLockFactory( indexDir );
+		}
+		else if ( "native".equals( lockFactoryName ) ) {
+			return new NativeFSLockFactory( indexDir );
+		}
+		else if ( "single".equals( lockFactoryName ) ) {
+			return new SingleInstanceLockFactory();
+		}
+		else if ( "none".equals( lockFactoryName ) ) {
+			return new NoLockFactory();
+		}
+		else {
+			log.warn( "Invalid configuration setting for option locking_strategy \"{}\"; option ignored!",
+					lockFactoryName );
+			return new SimpleFSLockFactory( indexDir );
+		}
 	}
 
 	/**

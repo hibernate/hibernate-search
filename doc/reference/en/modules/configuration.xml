@@ -58,6 +58,16 @@
         </thead>
 
         <tbody>
+        <row>
+            <entry>org.hibernate.search.store.RAMDirectoryProvider</entry>
+
+            <entry>Memory based directory, the directory will be uniquely
+            identified (in the same deployment unit) by the
+            <literal>@Indexed.index</literal> element</entry>
+
+            <entry>none</entry>
+          </row>
+          
           <row>
             <entry>org.hibernate.search.store.FSDirectoryProvider</entry>
 
@@ -66,7 +76,9 @@
 
             <entry><para><literal>indexBase</literal> : Base
             directory</para><para><literal>indexName</literal>: override
-            @Indexed.index (useful for sharded indexes)</para></entry>
+            @Indexed.index (useful for sharded indexes)</para><para><literal>
+            locking_strategy</literal> : optional, see <xref linkend="search-configuration-directory-lockfactories" />
+            </para></entry>
           </row>
 
           <row>
@@ -97,7 +109,9 @@
             (the copy will take place every refresh seconds).</para><para>
             <literal>buffer_size_on_copy</literal>: The amount of MegaBytes to
             move in a single low level copy instruction; defaults to
-            16MB.</para></entry>
+            16MB.</para><para><literal>
+            locking_strategy</literal> : optional, see <xref linkend="search-configuration-directory-lockfactories" />
+            </para></entry>
           </row>
 
           <row>
@@ -128,18 +142,11 @@
             (the copy will take place every refresh seconds).</para><para>
             <literal>buffer_size_on_copy</literal>: The amount of MegaBytes to
             move in a single low level copy instruction; defaults to
-            16MB.</para></entry>
+            16MB.</para><para><literal>
+            locking_strategy</literal> : optional, see <xref linkend="search-configuration-directory-lockfactories" />
+            </para></entry>
           </row>
 
-          <row>
-            <entry>org.hibernate.search.store.RAMDirectoryProvider</entry>
-
-            <entry>Memory based directory, the directory will be uniquely
-            identified (in the same deployment unit) by the
-            <literal>@Indexed.index</literal> element</entry>
-
-            <entry>none</entry>
-          </row>
         </tbody>
       </tgroup>
     </table>
@@ -843,4 +850,78 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
       </tgroup>
     </table>
   </section>
+  
+  <section id="search-configuration-directory-lockfactories" revision="1">
+	<title>LockFactory configuration</title>
+	<para>Lucene Directories have default locking strategies which work well for most cases,
+	but it's possible to specify for each index managed by Hibernate Search which LockingFactory
+	you want to use.</para><para>Some of these locking strategies require a filesystem level lock and may be used
+	even on RAM based indexes, but this is not recommended and of no practical use.</para>
+	<para>To select a locking factory, set the <literal>hibernate.search.&lt;index&gt;.locking_strategy</literal> option to
+	one of <literal>simple</literal>, <literal>native</literal>, <literal>single</literal>
+	or <literal>none</literal>.
+	
+	<table id="search-configuration-directory-lockfactories-table">
+      <title>List of available LockFactory implementations</title>
+
+      <tgroup cols="3">
+        <thead>
+          <row>
+            <entry align="center">name</entry>
+            <entry align="center">Class</entry>
+            <entry align="center">Description</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          	<row>
+            <entry>simple</entry>
+            <entry>org.apache.lucene.store.SimpleFSLockFactory</entry>
+            <entry>
+            	<para>Safe implementation based on Java's File API, it marks the usage of the index by creating a marker file.</para>
+            	<para>If for some reason you had to kill your application, you will need to remove this file before restarting it.</para>
+            	<para>This is the default implementation for <literal>FSDirectoryProvider</literal>,<literal>FSMasterDirectoryProvider</literal> and
+            	<literal>FSSlaveDirectoryProvider</literal>.</para>
+            </entry>
+            </row>
+            <row>
+            <entry>native</entry>
+            <entry>org.apache.lucene.store.NativeFSLockFactory</entry>
+            <entry>
+            	<para>As does <literal>simple</literal> this also marks the usage of the index by creating a marker file, but this one
+            	is using native OS file 	locks so that even if your application crashes the locks will be cleaned up.</para>
+            	<para>This implementation has known problems on NFS.</para>
+            </entry>
+            </row>
+            <row>
+            <entry>single</entry>
+            <entry>org.apache.lucene.store.SingleInstanceLockFactory</entry>
+            <entry>
+            	<para>This LockFactory doesn't use a file marker but is a Java object lock held in memory; therefore
+            	it's possible to use it only when you are sure the index is not going to be shared by any other process.</para>
+            	<para>This is the default implementation for <literal>RAMDirectoryProvider</literal>.</para>
+            </entry>
+            </row>
+            <row>
+            <entry>none</entry>
+            <entry>org.apache.lucene.store.NoLockFactory</entry>
+            <entry>
+            	<para>All changes to this index are not coordinated by any lock; test your application carefully
+            	and make sure you know what it means.</para>
+            </entry>
+            </row>
+            </tbody>
+         </tgroup>
+         </table>
+         
+         </para>Configuration example:
+         <programlisting>hibernate.search.default simple
+hibernate.search.Animals native</programlisting>
+         <para>
+         </para>
+         
+         <para>If you need more flexibility it is possible to use your own LockFactory when implementing a custom DirectoryProvider.</para>
+	
+  </section>
+  
 </chapter>

@@ -75,8 +75,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		int readCurrentState = current; //Unneeded value, but ensure visibility of state protected by memory barrier
 		int currentToBe = 0;
 		try {
-			directory1 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "1" ) );
-			directory2 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "2" ) );
+			directory1 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "1" ), properties );
+			directory2 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "2" ), properties );
 			File currentMarker = new File( indexDir, "current1" );
 			File current2Marker = new File( indexDir, "current2" );
 			if ( currentMarker.exists() ) {
