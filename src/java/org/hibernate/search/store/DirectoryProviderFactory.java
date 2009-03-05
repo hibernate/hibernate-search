@@ -82,18 +82,18 @@ public class DirectoryProviderFactory {
 				shardingStrategy = (IndexShardingStrategy) shardigStrategyClass.newInstance();
 			}
 			catch (ClassNotFoundException e) {
-				throw new SearchException( "Unable to find ShardingStrategy class " + shardingStrategyName + " for " + directoryProviderName, e );
+				throw new SearchException( "Unable to find IndexShardingStrategy class " + shardingStrategyName + " for " + directoryProviderName, e );
 			}
 			catch (IllegalAccessException e) {
-				throw new SearchException( "Unable to create instance of ShardingStrategy class " + shardingStrategyName
+				throw new SearchException( "Unable to create instance of IndexShardingStrategy class " + shardingStrategyName
 						+ " Be sure to have a no-arg constructor", e );
 			}
 			catch (InstantiationException e) {
-				throw new SearchException( "Unable to create instance of ShardingStrategy class " + shardingStrategyName
+				throw new SearchException( "Unable to create instance of IndexShardingStrategy class " + shardingStrategyName
 						+ " Be sure to have a no-arg constructor", e );
 			}
 			catch (ClassCastException e) {
-				throw new SearchException( "ShardingStrategy class does not implements DirecotryProviderShardingStrategy: "
+				throw new SearchException( "ShardingStrategy class does not implement IndexShardingStrategy: "
 						+ shardingStrategyName, e );
 			}
 		}
