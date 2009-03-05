@@ -859,7 +859,9 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
 	even on RAM based indexes, but this is not recommended and of no practical use.</para>
 	<para>To select a locking factory, set the <literal>hibernate.search.&lt;index&gt;.locking_strategy</literal> option to
 	one of <literal>simple</literal>, <literal>native</literal>, <literal>single</literal>
-	or <literal>none</literal>.
+	or <literal>none</literal>, or set it to the fully qualified name of an implementation of
+	<literal>org.hibernate.search.store.LockFactoryFactory</literal>; Implementing this interface you can provide
+	a custom <literal>org.apache.lucene.store.LockFactory</literal>.
 	
 	<table id="search-configuration-directory-lockfactories-table">
       <title>List of available LockFactory implementations</title>
@@ -915,13 +917,12 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
          </table>
          
          </para>Configuration example:
-         <programlisting>hibernate.search.default simple
-hibernate.search.Animals native</programlisting>
+         <programlisting>hibernate.search.default.locking_strategy simple
+hibernate.search.Animals.locking_strategy native
+hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</programlisting>
          <para>
          </para>
          
-         <para>If you need more flexibility it is possible to use your own LockFactory when implementing a custom DirectoryProvider.</para>
-	
   </section>
   
 </chapter>

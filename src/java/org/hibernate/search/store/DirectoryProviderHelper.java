@@ -20,6 +20,7 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -95,7 +96,7 @@ public class DirectoryProviderHelper {
 	 * Creates a LockFactory as selected in the configuration for the
 	 * DirectoryProvider.
 	 * The SimpleFSLockFactory and NativeFSLockFactory need a File to know
-	 * were to stock the filesystem based locks; other implementations
+	 * where to stock the filesystem based locks; other implementations
 	 * ignore this parameter.
 	 * @param indexDir the directory to use to store locks, if needed by implementation
 	 * @param dirConfiguration the configuration of current DirectoryProvider
@@ -103,13 +104,29 @@ public class DirectoryProviderHelper {
 	 * in case of configuration errors or as a default.
 	 * @throws IOException
 	 */
-	public static LockFactory createLockFactory(File indexDir, Properties dirConfiguration) throws IOException {
-		String lockFactoryName = dirConfiguration.getProperty( "locking_strategy", "simple" );
+	public static LockFactory createLockFactory(File indexDir, Properties dirConfiguration) {
+		//For FS-based indexes default to "simple", default to "single" otherwise.
+		String defaultStrategy = indexDir==null ? "single" : "simple";
+		String lockFactoryName = dirConfiguration.getProperty( "locking_strategy", defaultStrategy );
 		if ( "simple".equals( lockFactoryName ) ) {
-			return new SimpleFSLockFactory( indexDir );
+			if ( indexDir==null ) {
+				throw new SearchException( "To use \"simple\" as a LockFactory strategy an indexBase path must be set");
+			}
+			try {
+				return new SimpleFSLockFactory( indexDir );
+			} catch (IOException e) {
+				throw new SearchException( "Could not initialize SimpleFSLockFactory", e);
+			}
 		}
 		else if ( "native".equals( lockFactoryName ) ) {
-			return new NativeFSLockFactory( indexDir );
+			if ( indexDir==null ) {
+				throw new SearchException( "To use \"native\" as a LockFactory strategy an indexBase path must be set");
+			}
+			try {
+				return new NativeFSLockFactory( indexDir );
+			} catch (IOException e) {
+				throw new SearchException( "Could not initialize NativeFSLockFactory", e);
+			}
 		}
 		else if ( "single".equals( lockFactoryName ) ) {
 			return new SingleInstanceLockFactory();
@@ -118,9 +135,27 @@ public class DirectoryProviderHelper {
 			return new NoLockFactory();
 		}
 		else {
-			log.warn( "Invalid configuration setting for option locking_strategy \"{}\"; option ignored!",
-					lockFactoryName );
-			return new SimpleFSLockFactory( indexDir );
+			LockFactoryFactory lockFactoryFactory;
+			try {
+				Class lockFactoryClass = ReflectHelper.classForName( lockFactoryName, dirConfiguration.getClass() );
+				lockFactoryFactory = (LockFactoryFactory) lockFactoryClass.newInstance();
+			}
+			catch (ClassNotFoundException e) {
+				throw new SearchException( "Unable to find LockFactoryFactory class " + lockFactoryName, e );
+			}
+			catch (IllegalAccessException e) {
+				throw new SearchException( "Unable to create instance of LockFactoryFactory class " + lockFactoryName
+						+ " Be sure to have a no-arg constructor", e );
+			}
+			catch (InstantiationException e) {
+				throw new SearchException( "Unable to create instance of LockFactoryFactory class " + lockFactoryName
+						+ " Be sure to have a no-arg constructor", e );
+			}
+			catch (ClassCastException e) {
+				throw new SearchException( "Class does not implement LockFactoryFactory: "
+						+ lockFactoryName, e );
+			}
+			return lockFactoryFactory.createLockFactory( indexDir, dirConfiguration );
 		}
 	}
 

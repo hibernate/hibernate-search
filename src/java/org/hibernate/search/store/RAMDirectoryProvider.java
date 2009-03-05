@@ -18,15 +18,15 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  */
 public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 
-	private RAMDirectory directory;
+	private final RAMDirectory directory = new RAMDirectory();
 	private String indexName;
 
 	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
 		indexName = directoryProviderName;
+		directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties ) );
 	}
 
 	public void start() {
-		directory = new RAMDirectory();
 		try {
 			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
 			IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), true, fieldLength );
@@ -42,7 +42,9 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 		return directory;
 	}
 
-	public void stop() {}
+	public void stop() {
+		directory.close();
+	}
 
 	@Override
 	public boolean equals(Object obj) {
