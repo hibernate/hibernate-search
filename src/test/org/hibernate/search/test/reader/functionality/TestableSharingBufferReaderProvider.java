@@ -55,7 +55,7 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 		private final DirectoryProvider dp = new RAMDirectoryProvider();
 
 		public TestManipulatorPerDP(int seed) {
-			dp.initialize( "dp" + seed, null, null );
+			dp.initialize( "dp" + seed, new Properties(), null );
 			dp.start();
 		}
 
