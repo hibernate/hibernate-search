@@ -25,6 +25,7 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.UnknownProfileException;
 import org.hibernate.classic.Session;
 import org.hibernate.collection.PersistentCollection;
 import org.hibernate.engine.EntityKey;
@@ -32,6 +33,7 @@ import org.hibernate.engine.PersistenceContext;
 import org.hibernate.engine.QueryParameters;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.LoadQueryInfluencers;
 import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.engine.query.sql.NativeSQLQuerySpecification;
 import org.hibernate.event.EventListeners;
@@ -571,6 +573,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.isClosed();
 	}
 
+	public LoadQueryInfluencers getLoadQueryInfluencers() {
+		return sessionImplementor.getLoadQueryInfluencers();
+	}
+
 	public org.hibernate.Session getSession(EntityMode entityMode) {
 		return session.getSession( entityMode );
 	}
@@ -705,5 +711,17 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public void update(Object object) throws HibernateException {
 		session.update( object );
+	}
+
+	public boolean isFetchProfileEnabled(String name) throws UnknownProfileException {
+		return session.isFetchProfileEnabled( name );
+	}
+
+	public void enableFetchProfile(String name) throws UnknownProfileException {
+		session.enableFetchProfile( name );
+	}
+
+	public void disableFetchProfile(String name) throws UnknownProfileException {
+		session.disableFetchProfile( name );
 	}
 }

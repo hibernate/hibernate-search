@@ -2,8 +2,8 @@
 package org.hibernate.search.cfg;
 
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -54,6 +54,10 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 			}
 		}
 		return reflectionManager;
+	}
+
+	public SearchMapping getProgrammaticMapping() {
+		return ( SearchMapping ) getProperties().get( "hibernate.search.mapping_model" );
 	}
 
 	private static class ClassIterator implements Iterator<Class<?>> {

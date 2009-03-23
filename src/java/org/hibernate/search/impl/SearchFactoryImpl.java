@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.annotations.common.reflection.MetadataProvider;
+import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
@@ -39,6 +41,7 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -111,10 +114,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public SearchFactoryImpl(SearchConfiguration cfg) {
-		ReflectionManager reflectionManager = cfg.getReflectionManager();
-		if ( reflectionManager == null ) {
-			reflectionManager = new JavaReflectionManager();
-		}
+		ReflectionManager reflectionManager = getReflectionManager(cfg);
+
 		this.indexingStrategy = defineIndexingStrategy( cfg ); //need to be done before the document builds
 		initDocumentBuilders( cfg, reflectionManager );
 
@@ -133,6 +134,25 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 		);
 		this.barrier = 1; //write barrier
+	}
+
+	private ReflectionManager getReflectionManager(SearchConfiguration cfg) {
+		ReflectionManager reflectionManager = cfg.getReflectionManager();
+		if ( reflectionManager == null ) {
+			reflectionManager = new JavaReflectionManager();
+		}
+		final SearchMapping mapping = cfg.getProgrammaticMapping();
+		if ( mapping != null) {
+			if ( ! ( reflectionManager instanceof MetadataProviderInjector)) {
+				throw new SearchException("Programmatic mapping model used but ReflectionManager does not implement "
+						+ MetadataProviderInjector.class.getName() );
+			}
+			MetadataProviderInjector injector = (MetadataProviderInjector) reflectionManager;
+			MetadataProvider original = injector.getMetadataProvider();
+			injector.setMetadataProvider( new MappingModelMetadataProvider( original, mapping ) );
+			
+		}
+		return reflectionManager;
 	}
 
 	private static String defineIndexingStrategy(SearchConfiguration cfg) {

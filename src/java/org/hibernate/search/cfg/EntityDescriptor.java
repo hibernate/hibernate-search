@@ -1,0 +1,79 @@
+package org.hibernate.search.cfg;
+
+import java.lang.annotation.ElementType;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author Emmanuel Bernard
+ */
+public class EntityDescriptor {
+	private Class<?> entityType;
+	private Map<String, Object> indexed;
+	private Map<PropertyKey, PropertyDescriptor> properties = new HashMap<PropertyKey, PropertyDescriptor>();
+
+	public Map<String, Object> getIndexed() {
+		return indexed;
+	}
+
+	public EntityDescriptor(Class<?> entityType) {
+		this.entityType = entityType;
+	}
+
+	public void setIndexed(Map<String, Object> indexed) {
+		this.indexed = indexed;
+	}
+
+	PropertyDescriptor getProperty(String name, ElementType type) {
+		PropertyKey propertyKey = new PropertyKey( name, type );
+		PropertyDescriptor descriptor = properties.get( propertyKey );
+		if (descriptor == null) {
+			descriptor = new PropertyDescriptor(name, type);
+			properties.put(propertyKey, descriptor);
+		}
+		return descriptor;
+	}
+
+	public PropertyDescriptor getPropertyDescriptor(String name, ElementType type) {
+		return properties.get( new PropertyKey( name, type ) );
+	}
+
+
+	private static class PropertyKey {
+		private String name;
+		private ElementType type;
+
+		PropertyKey(String name, ElementType type) {
+			this.name = name;
+			this.type = type;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+
+			PropertyKey property = ( PropertyKey ) o;
+
+			if ( name != null ? !name.equals( property.name ) : property.name != null ) {
+				return false;
+			}
+			if ( type != property.type ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = name != null ? name.hashCode() : 0;
+			result = 31 * result + ( type != null ? type.hashCode() : 0 );
+			return result;
+		}
+	}
+}
