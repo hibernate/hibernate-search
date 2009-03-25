@@ -24,6 +24,31 @@
         <url>http://www.hibernate.org</url>
     </organization>
 
+    <licenses>
+        <license>
+            <name>LGPL</name>
+            <url>lgpl.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>epbernard</id>
+            <name>Emmanuel Bernard</name>
+            <email>emmanuel@hibernate.org</email>
+            <url>http://in.relation.to/Bloggers/Emmanuel</url>
+        </developer>
+        <developer>
+            <id>hardy.ferentschik</id>
+            <name>Hardy Ferentschik</name>
+            <url>http://in.relation.to/Bloggers/Hardy</url>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <name>Sanne Grinovero</name>
+        </contributor>
+    </contributors>
 
     <dependencies>
         <!-- =============================== -->
@@ -90,8 +115,6 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>./src/java</sourceDirectory>
-        <testSourceDirectory>./src/test</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -108,14 +131,101 @@
                     <forkMode>pertest</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <systemProperties>
-                      <property>
-                        <name>build.dir</name>
-                        <value>${basedir}/target</value>
-                      </property>
+                        <property>
+                            <name>build.dir</name>
+                            <value>${basedir}/target</value>
+                        </property>
                     </systemProperties>
                     <excludes>
                         <exclude>**/*.java</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-jdocbook-plugin</artifactId>
+                <version>2.1.0</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-jdocbook-style</artifactId>
+                        <version>1.0.2</version>
+                        <type>jdocbook-style</type>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <sourceDocumentName>master.xml</sourceDocumentName>
+                    <sourceDirectory>${basedir}/doc/reference/en</sourceDirectory>
+                    <masterTranslation>en-US</masterTranslation>
+                    <imageResource>
+                        <directory>${basedir}/doc/reference/en/images</directory>
+                    </imageResource>
+                    <formats>
+                        <format>
+                            <formatName>pdf</formatName>
+                            <stylesheetResource>classpath:/xslt/hibernate/pdf/main-pdf.xsl</stylesheetResource>
+                            <finalName>hibernate-validator-legacy-guide.pdf</finalName>
+                        </format>
+                        <format>
+                            <formatName>html_single</formatName>
+                            <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl
+                            </stylesheetResource>
+                            <finalName>index.html</finalName>
+                        </format>
+                        <format>
+                            <formatName>html</formatName>
+                            <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl
+                            </stylesheetResource>
+                            <finalName>index.html</finalName>
+                        </format>
+                    </formats>
+                    <options>
+                        <xincludeSupported>true</xincludeSupported>
+                        <localeSeparator>-</localeSeparator>
+                        <useRelativeImageUris>true</useRelativeImageUris>
+                    </options>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-doc</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>resources</goal>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <stylesheetfile>${basedir}/doc/api/jdstyle.css</stylesheetfile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-javadoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/dist.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>package site assembly:assembly</goals>
                 </configuration>
             </plugin>
         </plugins>
@@ -125,7 +235,7 @@
         <testResources>
             <testResource>
                 <filtering>true</filtering>
-                <directory>src/test-resources</directory>
+                <directory>src/test/resources</directory>
                 <includes>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
@@ -168,7 +278,7 @@
                 <filter.file>src/filters/postgresql.filter</filter.file>
             </properties>
         </profile>
-       <profile>
+        <profile>
             <id>mysql</id>
             <dependencies>
                 <dependency>
@@ -298,93 +408,6 @@
                                 <include>**/classloading/*Test.java</include>
                             </includes>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>dist-build</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/assembly/dist.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <stylesheetfile>${basedir}/doc/api/jdstyle.css</stylesheetfile>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>make-javadoc</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>javadoc</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.jboss.maven.plugins</groupId>
-                        <artifactId>maven-jdocbook-plugin</artifactId>
-                        <version>2.1.0</version>
-                        <extensions>true</extensions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.hibernate</groupId>
-                                <artifactId>hibernate-jdocbook-style</artifactId>
-                                <version>1.0.2</version>
-                                <type>jdocbook-style</type>
-                            </dependency>
-                        </dependencies>
-                        <configuration>
-                            <sourceDocumentName>master.xml</sourceDocumentName>
-                            <sourceDirectory>${basedir}/doc/reference/en</sourceDirectory>
-                            <masterTranslation>en-US</masterTranslation>
-                            <imageResource>
-                                <directory>${basedir}/doc/reference/en/images</directory>
-                            </imageResource>
-                            <formats>
-                                <format>
-                                    <formatName>pdf</formatName>
-                                    <stylesheetResource>classpath:/xslt/hibernate/pdf/main-pdf.xsl</stylesheetResource>
-                                    <finalName>hibernate-validator-legacy-guide.pdf</finalName>
-                                </format>
-                                <format>
-                                    <formatName>html_single</formatName>
-                                    <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl
-                                    </stylesheetResource>
-                                    <finalName>index.html</finalName>
-                                </format>
-                                <format>
-                                    <formatName>html</formatName>
-                                    <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl
-                                    </stylesheetResource>
-                                    <finalName>index.html</finalName>
-                                </format>
-                            </formats>
-                            <options>
-                                <xincludeSupported>true</xincludeSupported>
-                                <localeSeparator>-</localeSeparator>
-                                <useRelativeImageUris>true</useRelativeImageUris>
-                            </options>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>make-doc</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>resources</goal>
-                                    <goal>generate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
