@@ -119,14 +119,13 @@
 
         <mediaobject>
           <imageobject role="html">
-            <imagedata align="center"
-                       fileref="lucene-backend.png"
+            <imagedata align="center" fileref="lucene-backend.png"
                        format="PNG" />
           </imageobject>
 
           <imageobject role="fo">
-            <imagedata align="center" fileref="lucene-backend.png"
-                       format="PNG" />
+            <imagedata align="center" depth="" fileref="lucene-backend.png"
+                       format="PNG" scalefit="1" width="12cm" />
           </imageobject>
 
           <caption>
@@ -156,13 +155,12 @@
 
         <mediaobject>
           <imageobject role="html">
-            <imagedata align="center"
-                       fileref="jms-backend.png" format="PNG" />
+            <imagedata align="center" fileref="jms-backend.png" format="PNG" />
           </imageobject>
 
           <imageobject role="fo">
-            <imagedata align="center" fileref="jms-backend.png"
-                       format="PNG" />
+            <imagedata align="center" depth="" fileref="jms-backend.png"
+                       format="PNG" scalefit="1" width="12cm" />
           </imageobject>
 
           <caption>

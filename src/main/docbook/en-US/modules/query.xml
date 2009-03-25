@@ -125,7 +125,7 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
     gives you total freedom on the type of Lucene query you want to execute.
     However, once built, Hibernate Search wraps further query processing using
     <classname>org.hibernate.Query</classname> as your primary query
-    manipulation API. </para>
+    manipulation API.</para>
 
     <section>
       <title>Building a Lucene query</title>
@@ -173,7 +173,7 @@ fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Ac
         <classname>Customer</classname> of the baseclass
         <classname>Person</classname>, it is possible to just specify
         <classname>Person.class</classname> in order to filter on result
-        types. </para>
+        types.</para>
       </section>
 
       <section>
@@ -778,8 +778,6 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
     <para><informaltable align="left" width="">
         <tgroup cols="2">
-          <colspec align="center" />
-
           <thead>
             <row>
               <entry align="center">Value</entry>
