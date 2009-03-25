@@ -57,11 +57,12 @@ public class FileHelperTest extends TestCase {
 	}
 
 	protected void tearDown() throws Exception {
-		super.setUp();
+		super.tearDown();
 		File dir = new File( root, srcDir );
 		FileHelper.delete( dir );
 		dir = new File( root, destDir );
 		FileHelper.delete( dir );
+		FileHelper.delete( root );
 	}
 
 	public void testSynchronize() throws Exception {
