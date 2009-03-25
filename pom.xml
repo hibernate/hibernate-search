@@ -260,7 +260,7 @@
                 </dependency>
             </dependencies>
             <properties>
-                <filter.file>src/filters/hsqldb.filter</filter.file>
+                <filter.file>src/main/filters/hsqldb.filter</filter.file>
             </properties>
         </profile>
         <profile>
@@ -273,7 +273,7 @@
                 </dependency>
             </dependencies>
             <properties>
-                <filter.file>src/filters/postgresql.filter</filter.file>
+                <filter.file>src/main/filters/postgresql.filter</filter.file>
             </properties>
         </profile>
         <profile>
@@ -286,7 +286,7 @@
                 </dependency>
             </dependencies>
             <properties>
-                <filter.file>src/filters/mysql.filter</filter.file>
+                <filter.file>src/main/filters/mysql.filter</filter.file>
             </properties>
         </profile>
 
