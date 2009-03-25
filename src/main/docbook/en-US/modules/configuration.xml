@@ -431,12 +431,12 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</cod
 
     <para><mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="../shared/images/jms-backend.png"
+          <imagedata align="center" fileref="jms-backend.png"
                      format="PNG" />
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/jms-backend.png"
+          <imagedata align="center" fileref="jms-backend.png"
                      format="PNG" />
         </imageobject>
 

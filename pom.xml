@@ -156,27 +156,25 @@
                 </dependencies>
                 <configuration>
                     <sourceDocumentName>master.xml</sourceDocumentName>
-                    <sourceDirectory>${basedir}/doc/reference/en</sourceDirectory>
+                    <sourceDirectory>${basedir}/src/main/docbook/en-US</sourceDirectory>
                     <masterTranslation>en-US</masterTranslation>
                     <imageResource>
-                        <directory>${basedir}/doc/reference/en/images</directory>
+                        <directory>${basedir}/src/main/docbook/en-US/images</directory>
                     </imageResource>
                     <formats>
                         <format>
                             <formatName>pdf</formatName>
                             <stylesheetResource>classpath:/xslt/hibernate/pdf/main-pdf.xsl</stylesheetResource>
-                            <finalName>hibernate-validator-legacy-guide.pdf</finalName>
+                            <finalName>hibernate-search-guide.pdf</finalName>
                         </format>
                         <format>
                             <formatName>html_single</formatName>
-                            <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/hibernate/html/main-single.xsl</stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                         <format>
                             <formatName>html</formatName>
-                            <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/hibernate/html/main-chunk.xsl</stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                     </formats>
@@ -201,7 +199,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <stylesheetfile>${basedir}/doc/api/jdstyle.css</stylesheetfile>
+                    <stylesheetfile>${basedir}/src/main/javadoc/jdstyle.css</stylesheetfile>
                 </configuration>
                 <executions>
                     <execution>
@@ -225,7 +223,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <releaseProfiles>release</releaseProfiles>
-                    <goals>package site assembly:assembly</goals>
+                    <goals>package javadoc:javadoc assembly:assembly</goals>
                 </configuration>
             </plugin>
         </plugins>

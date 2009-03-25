@@ -120,12 +120,12 @@
         <mediaobject>
           <imageobject role="html">
             <imagedata align="center"
-                       fileref="../shared/images/lucene-backend.png"
+                       fileref="lucene-backend.png"
                        format="PNG" />
           </imageobject>
 
           <imageobject role="fo">
-            <imagedata align="center" fileref="images/lucene-backend.png"
+            <imagedata align="center" fileref="lucene-backend.png"
                        format="PNG" />
           </imageobject>
 
@@ -157,11 +157,11 @@
         <mediaobject>
           <imageobject role="html">
             <imagedata align="center"
-                       fileref="../shared/images/jms-backend.png" format="PNG" />
+                       fileref="jms-backend.png" format="PNG" />
           </imageobject>
 
           <imageobject role="fo">
-            <imagedata align="center" fileref="images/jms-backend.png"
+            <imagedata align="center" fileref="jms-backend.png"
                        format="PNG" />
           </imageobject>
 
