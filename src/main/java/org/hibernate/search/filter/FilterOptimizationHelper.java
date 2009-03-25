@@ -44,10 +44,10 @@ public class FilterOptimizationHelper {
 			return docIdSets;
 		}
 		if ( openBitSets.size() > 0 ) {
-			nonMergeAble.add( mergeByBitAnds( openBitSets ) );
+			nonMergeAble.add( mergeByBitAndsForOpenBitSet( openBitSets ) );
 		}
 		if ( docIdBitSets.size() > 0 ) {
-			nonMergeAble.add( mergeByBitAnds( docIdBitSets ) );
+			nonMergeAble.add( mergeByBitAndsForDocIdBitSet( docIdBitSets ) );
 		}
 		return nonMergeAble;
 	}
@@ -60,7 +60,7 @@ public class FilterOptimizationHelper {
 	 * @return a new DocIdBitSet, or the first element if only
 	 * one element was found in the list.
 	 */
-	public static DocIdBitSet mergeByBitAnds(List<DocIdBitSet> docIdBitSets) {
+	private static DocIdBitSet mergeByBitAndsForDocIdBitSet(List<DocIdBitSet> docIdBitSets) {
 		int listSize = docIdBitSets.size();
 		if ( listSize == 1 ) {
 			return docIdBitSets.get( 0 );
@@ -82,7 +82,7 @@ public class FilterOptimizationHelper {
 	 * @return a new OpenBitSet, or the first element if only
 	 * one element was found in the list.
 	 */
-	public static OpenBitSet mergeByBitAnds(List<OpenBitSet> openBitSets) {
+	private static OpenBitSet mergeByBitAndsForOpenBitSet(List<OpenBitSet> openBitSets) {
 		int listSize = openBitSets.size();
 		if ( listSize == 1 ) {
 			return openBitSets.get( 0 );
