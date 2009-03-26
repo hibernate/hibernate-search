@@ -223,7 +223,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <releaseProfiles>release</releaseProfiles>
-                    <goals>package javadoc:javadoc assembly:assembly</goals>
+                    <goals>package javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.1.0:resources org.jboss.maven.plugins:maven-jdocbook-plugin:2.1.0:generate assembly:assembly</goals>
                 </configuration>
             </plugin>
         </plugins>
