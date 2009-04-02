@@ -33,6 +33,8 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Key;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.LuceneWork;
@@ -403,6 +405,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		Iterator<Class<?>> iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
+		initProgrammaticAnalyzers(context, reflectionManager);
+
 		while ( iter.hasNext() ) {
 			Class mappedClass = iter.next();
 			if ( mappedClass == null ) {
@@ -450,6 +454,17 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		}
 		analyzers = context.initLazyAnalyzers();
 		factory.startDirectoryProviders();
+	}
+
+	private void initProgrammaticAnalyzers(InitContext context, ReflectionManager reflectionManager) {
+		final Map defaults = reflectionManager.getDefaults();
+
+		if (defaults != null) {
+			AnalyzerDef[] defs = (AnalyzerDef[]) defaults.get( AnalyzerDefs.class );
+			for (AnalyzerDef def : defs) {
+				context.addAnalyzerDef( def );
+			}
+		}
 	}
 
 	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {

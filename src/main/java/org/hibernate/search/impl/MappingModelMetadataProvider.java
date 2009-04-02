@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Collection;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -25,6 +26,11 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Fields;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
 
 /**
  * @author Emmanuel Bernard
@@ -44,13 +50,22 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	private final MetadataProvider delegate;
 	private final SearchMapping mapping;
 	private final Map<AnnotatedElement, AnnotationReader> cache = new HashMap<AnnotatedElement, AnnotationReader>(100);
+	private Map<Object, Object> defaults;
 
 	public MappingModelMetadataProvider(MetadataProvider delegate, SearchMapping mapping) {
 		this.delegate = delegate;
 		this.mapping = mapping;
 	}
+
 	public Map<Object, Object> getDefaults() {
-		return delegate.getDefaults();
+		if (defaults == null) {
+			final Map<Object, Object> delegateDefaults = delegate.getDefaults();
+			defaults = delegateDefaults == null ?
+					new HashMap<Object, Object>() :
+					new HashMap<Object, Object>(delegateDefaults);
+			defaults.put( AnalyzerDefs.class, createAnalyzerDefArray() );
+		}
+		return defaults;
 	}
 
 	public AnnotationReader getAnnotationReader(AnnotatedElement annotatedElement) {
@@ -60,6 +75,78 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			cache.put( annotatedElement, reader );
 		}
 		return reader;
+	}
+
+	private AnalyzerDef[] createAnalyzerDefArray() {
+		AnalyzerDef[] defs = new AnalyzerDef[ mapping.getAnalyzerDefs().size() ];
+		int index = 0;
+		for ( Map<String, Object> analyzerDef : mapping.getAnalyzerDefs() ) {
+			defs[index] = createAnalyzerDef( analyzerDef );
+			index++;
+		}
+		return defs;
+	}
+
+	private AnalyzerDef createAnalyzerDef(Map<String, Object> analyzerDef) {
+		AnnotationDescriptor analyzerDefAnnotation = new AnnotationDescriptor( AnalyzerDef.class );
+		for ( Map.Entry<String, Object> entry : analyzerDef.entrySet() ) {
+			if ( entry.getKey().equals( "tokenizer" ) ) {
+				AnnotationDescriptor tokenizerAnnotation = new AnnotationDescriptor( TokenizerDef.class );
+				@SuppressWarnings( "unchecked" )
+				Map<String, Object> tokenizer = (Map<String, Object>) entry.getValue();
+				for( Map.Entry<String, Object> tokenizerEntry : tokenizer.entrySet() ) {
+					if ( tokenizerEntry.getKey().equals( "params" ) ) {
+						Parameter[] paramsArray = createParams( (List<Map<String, Object>>) tokenizerEntry.getValue() );
+						tokenizerAnnotation.setValue( "params", paramsArray );
+					}
+					else {
+						tokenizerAnnotation.setValue( tokenizerEntry.getKey(), tokenizerEntry.getValue() );
+					}
+				}
+				analyzerDefAnnotation.setValue( "tokenizer", AnnotationFactory.create( tokenizerAnnotation ) );
+			}
+			else if ( entry.getKey().equals( "filters" ) ) {
+				TokenFilterDef[] filtersArray = createFilters( (List<Map<String, Object>>) entry.getValue() );
+				analyzerDefAnnotation.setValue( "filters", filtersArray );
+			}
+			else {
+				analyzerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
+			}
+		}
+		return AnnotationFactory.create( analyzerDefAnnotation );
+	}
+
+	private TokenFilterDef[] createFilters(List<Map<String, Object>> filters) {
+		TokenFilterDef[] filtersArray = new TokenFilterDef[filters.size()];
+		int index = 0;
+		for (Map<String, Object> filter : filters) {
+			AnnotationDescriptor filterAnn = new AnnotationDescriptor( TokenFilterDef.class );
+			for ( Map.Entry<String, Object> filterEntry : filter.entrySet() ) {
+				if ( filterEntry.getKey().equals( "params" ) ) {
+					Parameter[] paramsArray = createParams( (List<Map<String, Object>>) filterEntry.getValue() );
+					filterAnn.setValue( "params", paramsArray );
+				}
+				else {
+					filterAnn.setValue( filterEntry.getKey(), filterEntry.getValue() );
+				}
+			}
+			filtersArray[index] = AnnotationFactory.create( filterAnn );
+			index++;
+		}
+		return filtersArray;
+	}
+
+	private Parameter[] createParams(List<Map<String, Object>> params) {
+		Parameter[] paramArray = new Parameter[ params.size() ];
+		int index = 0;
+		for ( Map<String, Object> entry : params) {
+			AnnotationDescriptor paramAnnotation = new AnnotationDescriptor( Parameter.class );
+			paramAnnotation.setValue( "name", entry.get("name") );
+			paramAnnotation.setValue( "value", entry.get("value") );
+			paramArray[index] = AnnotationFactory.create( paramAnnotation );
+			index++;
+		}
+		return paramArray;
 	}
 
 	private static class MappingModelAnnotationReader implements AnnotationReader {
@@ -147,7 +234,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		}
 
 		private void createFields(PropertyDescriptor property) {
-			final Set<Map<String,Object>> fields = property.getFields();
+			final Collection<Map<String,Object>> fields = property.getFields();
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
 			for(Map<String, Object> field : fields) {
@@ -172,7 +259,8 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 			final org.hibernate.search.annotations.Field[] fieldArray =
 					new org.hibernate.search.annotations.Field[fieldAnnotations.size()];
-			fieldsAnnotation.setValue( "value", fieldAnnotations.toArray( fieldArray ));
+			final org.hibernate.search.annotations.Field[] fieldAsArray = fieldAnnotations.toArray( fieldArray );
+			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
 		}
 

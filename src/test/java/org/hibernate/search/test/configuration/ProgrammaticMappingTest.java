@@ -7,6 +7,7 @@ import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import org.hibernate.search.cfg.SearchMapping;
@@ -17,6 +18,8 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.Transaction;
 
@@ -39,7 +42,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:peachtree" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( "idx_street2", FullTextQuery.THIS );
 		assertEquals( "Not properly indexed", 1, query.getResultSize() );
@@ -52,16 +55,49 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 	}
 
+	public void testAnalyzerDef() throws Exception{
+		Address address = new Address();
+		address.setStreet1( "3340 Peachtree Rd NE" );
+		address.setStreet2( "JBoss" );
+
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+		s.persist( address );
+		tx.commit();
+
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		org.apache.lucene.search.Query luceneQuery =  parser.parse( "street1_ngram:pea" );
+		System.out.print( luceneQuery.toString() );
+		final FullTextQuery query = s.createFullTextQuery( luceneQuery );
+		assertEquals( "Analyzer inoperant", 1, query.getResultSize() );
+
+		s.delete( query.list().get( 0 ));
+		tx.commit();
+		s.close();
+
+	}
+
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
+		//cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		SearchMapping mapping = new SearchMapping();
-		mapping.indexedClass( Address.class )
-				.property( "street1", ElementType.FIELD )
-					.field()
-				.property( "street2", ElementType.METHOD )
-					.field().name( "idx_street2" )
-							.store( Store.YES );
+		mapping.analyzerDef( "ngram", StandardTokenizerFactory.class )
+					.filter( LowerCaseFilterFactory.class )
+					.filter( NGramFilterFactory.class )
+						.param( "minGramSize", "3" )
+						.param( "maxGramSize", "3" )
+
+				.indexedClass( Address.class )
+					.property( "street1", ElementType.FIELD )
+						.field()
+						.field().name( "street1_ngram" ).analyzer( "ngram" )
+					.property( "street2", ElementType.METHOD )
+						.field().name( "idx_street2" ).store( Store.YES );
 		cfg.getProperties().put( "hibernate.search.mapping_model", mapping );
 	}
 
