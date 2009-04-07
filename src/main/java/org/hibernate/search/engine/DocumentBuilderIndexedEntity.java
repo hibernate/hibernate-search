@@ -295,28 +295,24 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			return;
 		}
 
-		String idInString = idBridge.objectToString( id );
 		if ( workType == WorkType.ADD ) {
+			String idInString = idBridge.objectToString( id );
 			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
 		}
 		else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
+			String idInString = idBridge.objectToString( id );
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		else if ( workType == WorkType.PURGE_ALL ) {
 			queue.add( new PurgeAllLuceneWork( entityClass ) );
 		}
 		else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
-			/**
-			 * even with Lucene 2.1, use of indexWriter to update is not an option
-			 * We can only delete by term, and the index doesn't have a term that
-			 * uniquely identify the entry.
-			 * But essentially the optimization we are doing is the same Lucene is doing, the only extra cost is the
-			 * double file opening.
-			 */
+			String idInString = idBridge.objectToString( id );
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
 		}
 		else if ( workType == WorkType.INDEX ) {
+			String idInString = idBridge.objectToString( id );
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 			queue.add( createAddWork( entityClass, entity, id, idInString, true ) );
 		}
