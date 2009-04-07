@@ -51,7 +51,7 @@ public @interface Field {
 
 
 	/**
-	 * Field bridge used. Default is autowired.
+	 * Boost factor, default 1
 	 */
 	Boost boost() default @Boost( value = 1.0F );
 

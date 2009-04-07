@@ -1,84 +1,85 @@
 package org.hibernate.search.cfg;
 
-import java.lang.annotation.ElementType;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import java.lang.annotation.ElementType;
 
 import org.apache.solr.analysis.TokenizerFactory;
 
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.TermVector;
 
 /**
  * @author Emmanuel Bernard
  */
-public class FieldMapping {
+public class FieldBridgeMapping {
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
 	private final PropertyDescriptor property;
-	private final Map<String, Object> field = new HashMap<String, Object>();
+	private final FieldMapping fieldMapping;
+	private final Map<String, Object> bridge = new HashMap<String, Object>();;
 
-	public FieldMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
+	public FieldBridgeMapping(Class<?> impl, Map<String, Object> field,
+							  FieldMapping fieldMapping,
+							  PropertyDescriptor property,
+							  EntityDescriptor entity,
+							  SearchMapping mapping) {
 		this.mapping = mapping;
 		this.entity = entity;
 		this.property = property;
-		property.addField(field);
+		this.fieldMapping = fieldMapping;
+		bridge.put( "impl", impl );
+		field.put( "bridge", bridge );
 	}
 
-	public FieldMapping name(String fieldName) {
-		field.put( "name", fieldName );
+	public FieldBridgeMapping param(String name, String value) {
+		Map<String, Object> param = SearchMapping.addElementToAnnotationArray(bridge, "params");
+		param.put("name", name);
+		param.put("value", value);
 		return this;
+	}
+
+	//FieldMapping level
+	public FieldMapping name(String fieldName) {
+		return fieldMapping.name( fieldName );
 	}
 
 	public FieldMapping store(Store store) {
-		field.put( "store", store );
-		return this;
+		return fieldMapping.store( store );
 	}
 
 	public FieldMapping index(Index index) {
-		field.put( "index", index );
-		return this;
+		return fieldMapping.index( index );
 	}
 
 	public FieldMapping termVector(TermVector termVector) {
-		field.put( "termVector", termVector );
-		return this;
+		return fieldMapping.termVector( termVector );
 	}
 
 	public FieldMapping boost(float boost) {
-		final Map<String, Object> boostAnn = new HashMap<String, Object>();
-		boostAnn.put( "value", boost );
-		field.put( "boost", boostAnn );
-		return this;
-	}
-
-	public FieldBridgeMapping bridge(Class<?> impl) {
-		return new FieldBridgeMapping( impl, field, this, property, entity, mapping );
+		return fieldMapping.boost( boost );
 	}
 
 	public FieldMapping analyzer(Class<?> analyzerClass) {
-		final Map<String, Object> analyzer = new HashMap<String, Object>();
-		analyzer.put( "impl", analyzerClass );
-		field.put( "analyzer", analyzer );
-		return this;
+		return fieldMapping.analyzer( analyzerClass );
 	}
 
 	public FieldMapping analyzer(String analyzerDef) {
-		final Map<String, Object> analyzer = new HashMap<String, Object>();
-		analyzer.put( "definition", analyzerDef );
-		field.put( "analyzer", analyzer );
-		return this;
+		return fieldMapping.analyzer( analyzerDef );
 	}
 
+	//PropertyMapping level
 	public FieldMapping field() {
 		return new FieldMapping(property, entity, mapping);
 	}
 
+	//EntityMapping level
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping(name, type, entity, mapping);
 	}
 
+	//Global level
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
 	}
@@ -90,5 +91,4 @@ public class FieldMapping {
 	public EntityMapping indexedClass(Class<?> entityType, String indexName) {
 		return new EntityMapping(entityType, indexName,  mapping);
 	}
-
 }

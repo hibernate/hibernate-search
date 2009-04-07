@@ -1,6 +1,7 @@
 package org.hibernate.search.test.configuration;
 
 import java.lang.annotation.ElementType;
+import java.util.List;
 
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
@@ -11,6 +12,7 @@ import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.ConcatStringBridge;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.test.analyzer.inheritance.ISOLatin1Analyzer;
@@ -18,6 +20,7 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.bridge.builtin.StringBridge;
 import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.cfg.Configuration;
@@ -52,7 +55,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.delete( firstResult[1] );
 		tx.commit();
 		s.close();
-
 	}
 
 	public void testAnalyzerDef() throws Exception{
@@ -71,7 +73,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
 		org.apache.lucene.search.Query luceneQuery =  parser.parse( "street1_ngram:pea" );
-		System.out.print( luceneQuery.toString() );
+
 		final FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( "Analyzer inoperant", 1, query.getResultSize() );
 
@@ -79,6 +81,71 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 
+	}
+
+	public void testBridgeMapping() throws Exception{
+		Address address = new Address();
+		address.setStreet1( "Peachtree Rd NE" );
+		address.setStreet2( "JBoss" );
+
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+		s.persist( address );
+		tx.commit();
+
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:peac" );
+		FullTextQuery query = s.createFullTextQuery( luceneQuery );
+		assertEquals( "PrefixQuery should not be on", 0, query.getResultSize() );
+
+		luceneQuery = parser.parse( "street1_abridged:peac" );
+		query = s.createFullTextQuery( luceneQuery );
+		assertEquals( "Bridge not used", 1, query.getResultSize() );
+
+		s.delete( query.list().get( 0 ) );
+		tx.commit();
+		s.close();
+	}
+
+	public void testBoost() throws Exception{
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+
+		Address address = new Address();
+		address.setStreet1( "Peachtree Rd NE" );
+		address.setStreet2( "Peachtnot Rd NE" );
+		s.persist( address );
+
+		address = new Address();
+		address.setStreet1( "Peachtnot Rd NE" );
+		address.setStreet2( "Peachtree Rd NE" );
+		s.persist( address );
+
+		tx.commit();
+
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:peachtree OR idx_street2:peachtree" );
+		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
+		assertEquals( "expecting two results", 2, query.getResultSize() );
+
+		@SuppressWarnings( "unchecked" )
+		List<Object[]> results = query.list();
+
+		assertTrue( "first result should be strictly higher", (Float) results.get( 0 )[1] > (Float) results.get( 1 )[1]*1.9f );
+		assertEquals( "Wrong result ordered", address.getStreet1(), ( (Address) results.get( 0 )[0] ).getStreet1() );
+		for( Object[] result : results ) {
+			s.delete( result[0] );
+		}
+		tx.commit();
+		s.close();
 	}
 
 	@Override
@@ -96,8 +163,11 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 					.property( "street1", ElementType.FIELD )
 						.field()
 						.field().name( "street1_ngram" ).analyzer( "ngram" )
+						.field()
+							.name( "street1_abridged" )
+							.bridge( ConcatStringBridge.class ).param( ConcatStringBridge.SIZE, "4" )
 					.property( "street2", ElementType.METHOD )
-						.field().name( "idx_street2" ).store( Store.YES );
+						.field().name( "idx_street2" ).store( Store.YES ).boost( 2 );
 		cfg.getProperties().put( "hibernate.search.mapping_model", mapping );
 	}
 

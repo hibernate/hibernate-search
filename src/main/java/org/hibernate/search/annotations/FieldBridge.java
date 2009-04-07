@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface FieldBridge {
 	//default to embed @FieldBridge in @Field
-	public Class impl() default void.class;
+	public Class<?> impl() default void.class;
 
 	public Parameter[] params() default {};
 }

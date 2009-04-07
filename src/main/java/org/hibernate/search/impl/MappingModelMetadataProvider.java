@@ -2,7 +2,6 @@ package org.hibernate.search.impl;
 
 import java.util.Map;
 import java.util.List;
-import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Collection;
@@ -31,6 +30,8 @@ import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.Boost;
+import org.hibernate.search.annotations.FieldBridge;
 
 /**
  * @author Emmanuel Bernard
@@ -96,8 +97,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				Map<String, Object> tokenizer = (Map<String, Object>) entry.getValue();
 				for( Map.Entry<String, Object> tokenizerEntry : tokenizer.entrySet() ) {
 					if ( tokenizerEntry.getKey().equals( "params" ) ) {
-						Parameter[] paramsArray = createParams( (List<Map<String, Object>>) tokenizerEntry.getValue() );
-						tokenizerAnnotation.setValue( "params", paramsArray );
+						addParamsToAnnotation( tokenizerAnnotation, tokenizerEntry );
 					}
 					else {
 						tokenizerAnnotation.setValue( tokenizerEntry.getKey(), tokenizerEntry.getValue() );
@@ -116,6 +116,11 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		return AnnotationFactory.create( analyzerDefAnnotation );
 	}
 
+	static private void addParamsToAnnotation(AnnotationDescriptor annotationDescriptor, Map.Entry<String, Object> entry) {
+		Parameter[] paramsArray = createParams( ( List<Map<String, Object>> ) entry.getValue() );
+		annotationDescriptor.setValue( "params", paramsArray );
+	}
+
 	private TokenFilterDef[] createFilters(List<Map<String, Object>> filters) {
 		TokenFilterDef[] filtersArray = new TokenFilterDef[filters.size()];
 		int index = 0;
@@ -123,8 +128,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor filterAnn = new AnnotationDescriptor( TokenFilterDef.class );
 			for ( Map.Entry<String, Object> filterEntry : filter.entrySet() ) {
 				if ( filterEntry.getKey().equals( "params" ) ) {
-					Parameter[] paramsArray = createParams( (List<Map<String, Object>>) filterEntry.getValue() );
-					filterAnn.setValue( "params", paramsArray );
+					addParamsToAnnotation( filterAnn, filterEntry );
 				}
 				else {
 					filterAnn.setValue( filterEntry.getKey(), filterEntry.getValue() );
@@ -136,7 +140,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		return filtersArray;
 	}
 
-	private Parameter[] createParams(List<Map<String, Object>> params) {
+	private static Parameter[] createParams(List<Map<String, Object>> params) {
 		Parameter[] paramArray = new Parameter[ params.size() ];
 		int index = 0;
 		for ( Map<String, Object> entry : params) {
@@ -248,6 +252,29 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 							analyzerAnnotation.setValue( analyzerEntry.getKey(), analyzerEntry.getValue() );
 						}
 						fieldAnnotation.setValue( "analyzer", AnnotationFactory.create( analyzerAnnotation ) );
+					}
+					else if ( entry.getKey().equals( "boost" ) ) {
+						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
+						@SuppressWarnings( "unchecked" )
+						Map<String, Object> boost = (Map<String, Object>) entry.getValue();
+						for( Map.Entry<String, Object> boostEntry : boost.entrySet() ) {
+							boostAnnotation.setValue( boostEntry.getKey(), boostEntry.getValue() );
+						}
+						fieldAnnotation.setValue( "boost", AnnotationFactory.create( boostAnnotation ) );
+					}
+					else if ( entry.getKey().equals( "bridge" ) ) {
+						AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
+						@SuppressWarnings( "unchecked" )
+						Map<String, Object> bridge = (Map<String, Object>) entry.getValue();
+						for( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
+							if ( bridgeEntry.getKey().equals( "params" ) ) {
+								addParamsToAnnotation( bridgeAnnotation, bridgeEntry );
+							}
+							else {
+								bridgeAnnotation.setValue( bridgeEntry.getKey(), bridgeEntry.getValue() );
+							}
+						}
+						fieldAnnotation.setValue( "bridge", AnnotationFactory.create( bridgeAnnotation ) );
 					}
 					else {
 						fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
