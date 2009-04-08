@@ -94,7 +94,13 @@ public class EventListenerRegister {
 						new PostCollectionUpdateEventListener[] { searchListener }
 				)
 		);
-
+		// Adding IndexWorkFlushEventListener to manage events out-of-transaction
+		if ( ! isFlushEventListenerRegistered( listeners.getFlushEventListeners() ) ) {
+			listeners.setFlushEventListeners( appendToArray(
+					listeners.getFlushEventListeners(),
+					new IndexWorkFlushEventListener()
+					) );
+		}
 	}
 
 	/**
@@ -159,4 +165,19 @@ public class EventListenerRegister {
 		}
 		return false;
 	}
+	
+	/**
+	 * Verifies if an IndexWorkFlushEventListener is contained in the array of listeners.
+	 * @param listeners
+	 * @return true if it found in the listeners, false otherwise.
+	 */
+	private static boolean isFlushEventListenerRegistered(Object[] listeners) {
+		for ( Object eventListener : listeners ) {
+			if ( IndexWorkFlushEventListener.class == eventListener.getClass() ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }

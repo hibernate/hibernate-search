@@ -13,6 +13,9 @@ import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.event.FlushEventListener;
+import org.hibernate.event.def.DefaultFlushEventListener;
+import org.hibernate.search.event.IndexWorkFlushEventListener;
 
 /**
  * A modified base class for tests without annotations.
@@ -143,9 +146,15 @@ public abstract class TestCase extends junit.framework.TestCase {
 	}
 
 	protected void configure(Configuration cfg) {
+		//needs to register all event listeners:
 		cfg.setListener( "post-update", "org.hibernate.search.event.FullTextIndexEventListener" );
 		cfg.setListener( "post-insert", "org.hibernate.search.event.FullTextIndexEventListener" );
 		cfg.setListener( "post-delete", "org.hibernate.search.event.FullTextIndexEventListener" );
+		cfg.setListener( "post-collection-recreate", "org.hibernate.search.event.FullTextIndexEventListener" );
+		cfg.setListener( "post-collection-remove", "org.hibernate.search.event.FullTextIndexEventListener" );
+		cfg.setListener( "post-collection-update", "org.hibernate.search.event.FullTextIndexEventListener" );
+		
+		cfg.setListeners( "flush", new FlushEventListener[]{new DefaultFlushEventListener(), new IndexWorkFlushEventListener()} );
 
 		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
