@@ -12,11 +12,15 @@ import javax.persistence.ManyToOne;
 public class Address {
 	@Id
 	@GeneratedValue
-	private Long id;
+	private Long addressId;
 	private String street1;
 	private String street2;
 	@ManyToOne
 	private Country country;
+
+	public Long getAddressId() {
+		return addressId;
+	}
 
 	public String getStreet1() {
 		return street1;

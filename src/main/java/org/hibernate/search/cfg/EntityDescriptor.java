@@ -11,6 +11,7 @@ public class EntityDescriptor {
 	private Class<?> entityType;
 	private Map<String, Object> indexed;
 	private Map<PropertyKey, PropertyDescriptor> properties = new HashMap<PropertyKey, PropertyDescriptor>();
+	private Map<String, Object> similarity;
 
 	public Map<String, Object> getIndexed() {
 		return indexed;
@@ -38,6 +39,13 @@ public class EntityDescriptor {
 		return properties.get( new PropertyKey( name, type ) );
 	}
 
+	public void setSimilariy(Map<String, Object> similarity) {
+		this.similarity = similarity;
+	}
+
+	public Map<String, Object> getSimilarity() {
+		return similarity;
+	}
 
 	private static class PropertyKey {
 		private String name;

@@ -32,6 +32,8 @@ import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Similarity;
+import org.hibernate.search.annotations.DocumentId;
 
 /**
  * @author Emmanuel Bernard
@@ -224,6 +226,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 							final PropertyDescriptor property = entity.getPropertyDescriptor( propertyName, elementType );
 							if (property != null) {
 								// property name overriding
+								createDocumentId( property );
 								createFields( property );
 							}
 						}
@@ -234,6 +237,17 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 
 				populateAnnotationArray();
+			}
+		}
+
+		private void createDocumentId(PropertyDescriptor property) {
+			Map<String, Object> documentId = property.getDocumentId();
+			if (documentId != null) {
+				AnnotationDescriptor documentIdAnnotation = new AnnotationDescriptor( DocumentId.class );
+				for ( Map.Entry<String, Object> entry : documentId.entrySet() ) {
+					documentIdAnnotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( DocumentId.class, AnnotationFactory.create( documentIdAnnotation ) );	
 			}
 		}
 
@@ -291,6 +305,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
 		}
 
+		//TODO add something around Similarity
 		private void createIndexed(EntityDescriptor entity) {
 			Class<? extends Annotation> annotationType = Indexed.class;
 			AnnotationDescriptor annotation = new AnnotationDescriptor( annotationType );
@@ -298,6 +313,14 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				annotation.setValue( entry.getKey(), entry.getValue() );
 			}
 			annotations.put( annotationType, AnnotationFactory.create( annotation ) );
+
+			if ( entity.getSimilarity() != null ) {
+				annotation = new AnnotationDescriptor( Similarity.class );
+				for ( Map.Entry<String, Object> entry : entity.getSimilarity().entrySet() ) {
+					annotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( annotationType, AnnotationFactory.create( annotation ) );
+			}
 		}
 
 		private void populateAnnotationArray() {

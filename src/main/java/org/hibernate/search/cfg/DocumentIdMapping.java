@@ -6,28 +6,33 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TermVector;
 
 /**
  * @author Emmanuel Bernard
  */
-public class EntityMapping {
-	private SearchMapping mapping;
-	private EntityDescriptor entity;
+public class DocumentIdMapping {
+	private final SearchMapping mapping;
+	private final EntityDescriptor entity;
+	private final PropertyDescriptor property;
+	private final Map<String, Object> documentId = new HashMap<String, Object>();
 
-	public EntityMapping(Class<?> entityType, String name, SearchMapping mapping) {
+	public DocumentIdMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this.mapping = mapping;
-		entity = mapping.getEntity(entityType);
-		Map<String, Object> indexed = new HashMap<String, Object>();
-		if (name != null) indexed.put( "index", name );
-		entity.setIndexed(indexed);
+		this.entity = entity;
+		this.property = property;
+		property.setDocumentId( documentId );
 	}
 
-	public EntityMapping similarity(Class<?> impl) {
-		Map<String, Object> similarity = new HashMap<String, Object>(1);
-		similarity.put( "impl", impl );
-		entity.setSimilariy(similarity);
+	public DocumentIdMapping name(String fieldName) {
+		documentId.put( "name", fieldName );
 		return this;
+	}
+
+	public FieldMapping field() {
+		return new FieldMapping(property, entity, mapping);
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
@@ -45,4 +50,5 @@ public class EntityMapping {
 	public EntityMapping indexedClass(Class<?> entityType, String indexName) {
 		return new EntityMapping(entityType, indexName,  mapping);
 	}
+
 }

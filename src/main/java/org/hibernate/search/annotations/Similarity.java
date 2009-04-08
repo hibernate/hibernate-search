@@ -11,10 +11,10 @@ import java.lang.annotation.Target;
 @Target( ElementType.TYPE )
 @Documented
 /**
- * Specifies a similarity implementation to use.
+ * Specifies a similarity implementation to use for a given class
  *
  * @author Nick Vincent
  */
 public @interface Similarity {
-	public Class impl();
+	public Class<?> impl();
 }

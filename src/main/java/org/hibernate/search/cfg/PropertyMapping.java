@@ -18,6 +18,10 @@ public class PropertyMapping {
 		property = entity.getProperty(name, type);
 	}
 
+	public DocumentIdMapping documentId() {
+		return new DocumentIdMapping( property, entity, mapping );
+	}
+
 	public FieldMapping field() {
 		return new FieldMapping(property, entity, mapping);
 	}

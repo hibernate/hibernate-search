@@ -46,8 +46,13 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx = s.beginTransaction();
 
 		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
-		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:peachtree" );
-		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( "idx_street2", FullTextQuery.THIS );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "" + address.getAddressId() );
+		System.out.println(luceneQuery.toString(  ));
+		FullTextQuery query = s.createFullTextQuery( luceneQuery );
+		assertEquals( "documenId does not work properly", 1, query.getResultSize() );
+
+		luceneQuery = parser.parse( "street1:peachtree" );
+		query = s.createFullTextQuery( luceneQuery ).setProjection( "idx_street2", FullTextQuery.THIS );
 		assertEquals( "Not properly indexed", 1, query.getResultSize() );
 		Object[] firstResult = (Object[]) query.list().get( 0 );
 		assertEquals( "@Field.store not respected", "JBoss", firstResult[0] );
@@ -160,6 +165,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 						.param( "maxGramSize", "3" )
 
 				.indexedClass( Address.class )
+					.property( "addressId", ElementType.FIELD ).documentId().name( "id" )
 					.property( "street1", ElementType.FIELD )
 						.field()
 						.field().name( "street1_ngram" ).analyzer( "ngram" )
