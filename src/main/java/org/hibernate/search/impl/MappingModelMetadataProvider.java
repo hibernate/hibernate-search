@@ -305,7 +305,6 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
 		}
 
-		//TODO add something around Similarity
 		private void createIndexed(EntityDescriptor entity) {
 			Class<? extends Annotation> annotationType = Indexed.class;
 			AnnotationDescriptor annotation = new AnnotationDescriptor( annotationType );
@@ -319,7 +318,15 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Map.Entry<String, Object> entry : entity.getSimilarity().entrySet() ) {
 					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( annotationType, AnnotationFactory.create( annotation ) );
+				annotations.put( Similarity.class, AnnotationFactory.create( annotation ) );
+			}
+
+			if ( entity.getBoost() != null ) {
+				annotation = new AnnotationDescriptor( Boost.class );
+				for ( Map.Entry<String, Object> entry : entity.getBoost().entrySet() ) {
+					annotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( Boost.class, AnnotationFactory.create( annotation ) );
 			}
 		}
 

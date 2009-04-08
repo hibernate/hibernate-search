@@ -10,6 +10,7 @@ import org.apache.solr.analysis.NGramFilterFactory;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.search.DefaultSimilarity;
 
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.ConcatStringBridge;
@@ -165,6 +166,8 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 						.param( "maxGramSize", "3" )
 
 				.indexedClass( Address.class )
+					.similarity( DefaultSimilarity.class )
+					.boost( 2 )
 					.property( "addressId", ElementType.FIELD ).documentId().name( "id" )
 					.property( "street1", ElementType.FIELD )
 						.field()

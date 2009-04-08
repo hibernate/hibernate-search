@@ -30,6 +30,13 @@ public class EntityMapping {
 		return this;
 	}
 
+	public EntityMapping boost(float boost) {
+		final Map<String, Object> boostAnn = new HashMap<String, Object>();
+		boostAnn.put( "value", boost );
+		entity.setBoost(boostAnn);
+		return this;
+	}
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping(name, type, entity, mapping);
 	}
