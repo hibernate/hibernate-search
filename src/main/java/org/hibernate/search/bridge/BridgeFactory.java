@@ -113,7 +113,7 @@ public class BridgeFactory {
 		FieldBridge bridge = null;
 
 		if ( cb != null ) {
-			Class impl = cb.impl();
+			Class<?> impl = cb.impl();
 			//TODO better error information ( see guessType() )
 			if (impl != null) {
 				try {
@@ -141,7 +141,7 @@ public class BridgeFactory {
 					}
 				}
 				catch (Exception e) {
-					throw new HibernateException( "Unable to instantiate FieldBridge for " + ClassBridge.class.getName(), e );
+					throw new HibernateException( "Unable to instantiate ClassBridge for " + impl.getName(), e );
 				}
 			}
 		}

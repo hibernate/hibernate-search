@@ -458,6 +458,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	private void initProgrammaticAnalyzers(InitContext context, ReflectionManager reflectionManager) {
 		final Map defaults = reflectionManager.getDefaults();
+
 		if (defaults != null) {
 			AnalyzerDef[] defs = (AnalyzerDef[]) defaults.get( AnalyzerDefs.class );
 			if ( defs != null ) {

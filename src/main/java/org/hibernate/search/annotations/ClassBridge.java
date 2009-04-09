@@ -57,7 +57,7 @@ public @interface ClassBridge {
 	 * User supplied class to manipulate document in
 	 * whatever mysterious ways they wish to.
 	 */
-	public Class impl() default void.class;
+	public Class<?> impl();
 
 	/**
 	 * Array of fields to work with. The impl class
