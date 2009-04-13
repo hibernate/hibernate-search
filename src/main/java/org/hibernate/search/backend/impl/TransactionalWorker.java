@@ -30,8 +30,8 @@ public class TransactionalWorker implements Worker {
 	
 	private static final Logger log = LoggerFactory.make();
 	
-	//FIXME: discuss the next line! it looks like there actually is concurrent access
-	//not a synchronized map since for a given transaction, we have not concurrent access
+	//this is being used from different threads, but doesn't need a
+	//synchronized map since for a given transaction, we have not concurrent access
 	protected final WeakIdentityHashMap<Object, Synchronization> synchronizationPerTransaction = new WeakIdentityHashMap<Object, Synchronization>();
 	private QueueingProcessor queueingProcessor;
 

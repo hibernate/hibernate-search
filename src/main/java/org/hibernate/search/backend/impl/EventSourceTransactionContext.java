@@ -5,12 +5,12 @@ import java.io.Serializable;
 
 import javax.transaction.Synchronization;
 
-import org.hibernate.AssertionFailure;
 import org.hibernate.Transaction;
 import org.hibernate.event.EventSource;
 import org.hibernate.event.FlushEventListener;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.event.IndexWorkFlushEventListener;
+import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -26,7 +26,9 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	private static final Logger log = LoggerFactory.make();
 	
 	private final EventSource eventSource;
-	private final IndexWorkFlushEventListener flushListener;
+	
+	//this transient is required to break recursive serialization
+	private transient FullTextIndexEventListener flushListener;
 
 	//constructor time is too early to define the value of realTxInProgress,
 	//postpone it, otherwise doing
@@ -36,7 +38,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	
 	public EventSourceTransactionContext(EventSource eventSource) {
 		this.eventSource = eventSource;
-		this.flushListener = findIndexWorkFlushEventListener();
+		this.flushListener = getIndexWorkFlushEventListener();
 	}
 
 	public Object getTransactionIdentifier() {
@@ -54,25 +56,32 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			transaction.registerSynchronization( synchronization );
 		}
 		else {
-			if ( flushListener != null ) {
+			//registerSynchronization is only called if isRealTransactionInProgress or if
+			// a flushListener was found; still we might need to find the listener again
+			// as it might have been cleared by serialization (is transient).
+			FullTextIndexEventListener flushList = getIndexWorkFlushEventListener();
+			if ( flushList != null ) {
 				flushListener.addSynchronization( eventSource, synchronization );
 			}
 			else {
-				//It appears we are flushing out of transaction and have no way to perform the index update
-				//Not expected: see check in isTransactionInProgress()
-				throw new AssertionFailure( "On flush out of transaction: IndexWorkFlushEventListener not registered" );
+				//shouldn't happen if the code about serialization is fine:
+				throw new SearchException( "AssertionFailure: flushListener not registered any more.");
 			}
 		}
 	}
 	
-	private IndexWorkFlushEventListener findIndexWorkFlushEventListener() {
+	private FullTextIndexEventListener getIndexWorkFlushEventListener() {
+		if ( this.flushListener != null) {
+			//for the "transient" case: might have been nullified.
+			return flushListener;
+		}
 		FlushEventListener[] flushEventListeners = eventSource.getListeners().getFlushEventListeners();
 		for (FlushEventListener listener : flushEventListeners) {
-			if ( listener.getClass().equals( IndexWorkFlushEventListener.class ) ) {
-				return (IndexWorkFlushEventListener) listener;
+			if ( listener.getClass().equals( FullTextIndexEventListener.class ) ) {
+				return (FullTextIndexEventListener) listener;
 			}
 		}
-		log.debug( "No IndexWorkFlushEventListener was registered" );
+		log.debug( "No FullTextIndexEventListener was registered" );
 		return null;
 	}
 
@@ -81,7 +90,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	//This is because we want to behave as "inTransaction" if the flushListener is registered.
 	public boolean isTransactionInProgress() {
 		// either it is a real transaction, or if we are capable to manage this in the IndexWorkFlushEventListener
-		return isRealTransactionInProgress() || flushListener != null;
+		return getIndexWorkFlushEventListener() != null || isRealTransactionInProgress();
 	}
 	
 	private boolean isRealTransactionInProgress() {

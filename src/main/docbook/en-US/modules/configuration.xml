@@ -605,8 +605,8 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
       <para>To enable Hibernate Search in Hibernate Core (ie. if you don't use
       Hibernate Annotations), add the
       <literal>FullTextIndexEventListener</literal> for the following six
-      Hibernate events and add the <literal>IndexWorkFlushEventListener</literal> after
-      the default <literal>DefaultFlushEventListener</literal>, as in the following example.</para>
+      Hibernate events and also add it after the default 
+      <literal>DefaultFlushEventListener</literal>, as in the following example.</para>
 
       <example>
         <title>Explicitly enabling Hibernate Search by configuring the
@@ -635,7 +635,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
         &lt;/event&gt;
         &lt;event type="flush"&gt;
             &lt;listener class="org.hibernate.event.def.DefaultFlushEventListener"/&gt;
-            &lt;listener class="org.hibernate.search.event.IndexWorkFlushEventListener"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
         &lt;/event&gt;
     &lt;/session-factory&gt;
 &lt;/hibernate-configuration&gt;</programlisting>

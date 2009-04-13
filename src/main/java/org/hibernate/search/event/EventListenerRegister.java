@@ -6,6 +6,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 
 import org.hibernate.event.EventListeners;
+import org.hibernate.event.FlushEventListener;
 import org.hibernate.event.PostCollectionRecreateEventListener;
 import org.hibernate.event.PostCollectionRemoveEventListener;
 import org.hibernate.event.PostCollectionUpdateEventListener;
@@ -14,7 +15,6 @@ import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.Environment;
 import org.hibernate.search.util.LoggerFactory;
-
 
 /**
  * Helper methods initializing Hibernate Search event listeners.
@@ -94,13 +94,14 @@ public class EventListenerRegister {
 						new PostCollectionUpdateEventListener[] { searchListener }
 				)
 		);
-		// Adding IndexWorkFlushEventListener to manage events out-of-transaction
-		if ( ! isFlushEventListenerRegistered( listeners.getFlushEventListeners() ) ) {
-			listeners.setFlushEventListeners( appendToArray(
-					listeners.getFlushEventListeners(),
-					new IndexWorkFlushEventListener()
-					) );
-		}
+		// Adding also as FlushEventListener to manage events out-of-transaction
+		listeners.setFlushEventListeners(
+				addIfNeeded(
+						listeners.getFlushEventListeners(),
+						searchListener,
+						new FlushEventListener[] { searchListener }
+				)
+		);
 	}
 
 	/**
@@ -160,20 +161,6 @@ public class EventListenerRegister {
 				return true;
 			}
 			if ( FullTextIndexCollectionEventListener.class == eventListener.getClass() ) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Verifies if an IndexWorkFlushEventListener is contained in the array of listeners.
-	 * @param listeners
-	 * @return true if it found in the listeners, false otherwise.
-	 */
-	private static boolean isFlushEventListenerRegistered(Object[] listeners) {
-		for ( Object eventListener : listeners ) {
-			if ( IndexWorkFlushEventListener.class == eventListener.getClass() ) {
 				return true;
 			}
 		}

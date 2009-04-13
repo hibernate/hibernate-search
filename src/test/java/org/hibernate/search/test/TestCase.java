@@ -15,7 +15,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.event.FlushEventListener;
 import org.hibernate.event.def.DefaultFlushEventListener;
-import org.hibernate.search.event.IndexWorkFlushEventListener;
+import org.hibernate.search.event.FullTextIndexEventListener;
 
 /**
  * A modified base class for tests without annotations.
@@ -154,7 +154,7 @@ public abstract class TestCase extends junit.framework.TestCase {
 		cfg.setListener( "post-collection-remove", "org.hibernate.search.event.FullTextIndexEventListener" );
 		cfg.setListener( "post-collection-update", "org.hibernate.search.event.FullTextIndexEventListener" );
 		
-		cfg.setListeners( "flush", new FlushEventListener[]{new DefaultFlushEventListener(), new IndexWorkFlushEventListener()} );
+		cfg.setListeners( "flush", new FlushEventListener[]{new DefaultFlushEventListener(), new FullTextIndexEventListener()} );
 
 		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
