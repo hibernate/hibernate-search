@@ -33,7 +33,7 @@ import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.util.ReflectHelper;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.impl.AbstractQueryImpl;

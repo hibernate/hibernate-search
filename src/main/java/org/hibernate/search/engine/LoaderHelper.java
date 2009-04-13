@@ -4,7 +4,7 @@ package org.hibernate.search.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * @author Emmanuel Bernard

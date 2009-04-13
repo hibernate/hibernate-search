@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.common.util.ReflectHelper;
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.util.ReflectHelper;
+import org.hibernate.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;

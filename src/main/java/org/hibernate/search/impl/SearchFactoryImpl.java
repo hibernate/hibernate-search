@@ -24,7 +24,8 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.util.ReflectHelper;
+import org.hibernate.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
@@ -477,11 +478,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		}
 		else {
 			try {
-				Class filterCachingStrategyClass = org.hibernate
-						.annotations
-						.common
-						.util
-						.ReflectHelper
+				Class filterCachingStrategyClass = ReflectHelper
 						.classForName( impl, SearchFactoryImpl.class );
 				filterCachingStrategy = ( FilterCachingStrategy ) filterCachingStrategyClass.newInstance();
 			}

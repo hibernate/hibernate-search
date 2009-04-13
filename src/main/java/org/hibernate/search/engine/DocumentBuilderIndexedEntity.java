@@ -23,7 +23,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.util.ReflectHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
