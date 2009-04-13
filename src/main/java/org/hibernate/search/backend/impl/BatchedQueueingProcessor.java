@@ -23,6 +23,7 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
+import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
@@ -82,6 +83,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessorFactory = new JMSBackendQueueProcessorFactory();
+		}
+		else if ( "blackhole".equalsIgnoreCase( backend ) ) {
+			backendQueueProcessorFactory = new BlackHoleBackendQueueProcessorFactory();
 		}
 		else {
 			try {

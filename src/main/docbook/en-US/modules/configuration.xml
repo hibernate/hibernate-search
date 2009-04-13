@@ -367,7 +367,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</cod
 
             <entry>Out of the box support for the Apache Lucene back end and
             the JMS back end. Default to <literal>lucene</literal>. Supports
-            also <literal>jms</literal>.</entry>
+            also <literal>jms</literal> and <literal>blackhole</literal>.</entry>
           </row>
 
           <row>
@@ -852,6 +852,24 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
         </tbody>
       </tgroup>
     </table>
+    
+    <para>To tune the indexing speed it might be useful to time the
+    object loading from database in isolation from the writes to the index.
+    To achieve this set the <literal>blackhole</literal> as worker backend and start
+    you indexing routines.
+    This backend does not disable Hibernate Search: it will still generate the needed
+    changesets to the index, but will discard them instead of flushing them to the index.
+    As opposite to setting the <literal>hibernate.search.indexing_strategy</literal>
+    to <literal>manual</literal> when using <literal>blackhole</literal> it will possibly load
+    more data to rebuild the index from associated entities.</para>
+    
+    <programlisting>hibernate.search.worker.backend blackhole</programlisting>
+    
+    <para>The recommended approach is to focus first on optimizing the object loading, and then
+    use the timings you achieve as a baseline to tune the indexing process.</para>
+    <para>The <literal>blackhole</literal> backend is not meant to be used in production, only
+    as a tool to identify indexing bottlenecks.</para>
+    
   </section>
 
   <section id="search-configuration-directory-lockfactories" revision="1">
