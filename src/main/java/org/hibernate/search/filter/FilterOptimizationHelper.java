@@ -21,7 +21,7 @@ public class FilterOptimizationHelper {
 	 * Returns a new list of DocIdSet, applying binary AND
 	 * on all DocIdSet implemented by using BitSet or OpenBitSet.
 	 * @param docIdSets
-	 * @return the same list if not change was done
+	 * @return the same list if no changes were done
 	 */
 	public static List<DocIdSet> mergeByBitAnds(List<DocIdSet> docIdSets) {
 		int size = docIdSets.size();

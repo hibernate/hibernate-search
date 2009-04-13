@@ -21,7 +21,7 @@ import org.hibernate.search.util.HibernateSearchResourceLoader;
 /**
  * Instances of this class are used to build Lucene analyzers which are defined using the solr <code>TokenFilterFactory</code>.
  * To make the dependency to the solr framework optional only this class has direct dependecies to solr. Solr dependencies
- * are not supposed to be used anywhere else (except the actual configuration of the analzers in the domain model).
+ * are not supposed to be used anywhere else (except the actual configuration of the analyzers in the domain model).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

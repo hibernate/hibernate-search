@@ -76,7 +76,7 @@ public class Workspace {
 	}
 
 	/**
-	 * If optimization has not been forced give a change to configured OptimizerStrategy
+	 * If optimization has not been forced give a chance to configured OptimizerStrategy
 	 * to optimize the index.
 	 * To enter the optimization phase you need to acquire the lock first.
 	 * @throws AssertionFailure if the lock is not owned.

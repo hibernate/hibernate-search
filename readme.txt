@@ -6,7 +6,7 @@ Description
 -----------
 
 Full text search engines like Apache Lucene(tm) are a very powerful technology to
-bring free text/efficient queries to applications. If suffers several mismatches
+bring free text/efficient queries to applications. It suffers several mismatches
 when dealing with a object domain model (keeping the index up to date, mismatch
 between the index structure and the domain model, ...)
 Hibernate Search indexes your domain model thanks to a few annotations, takes

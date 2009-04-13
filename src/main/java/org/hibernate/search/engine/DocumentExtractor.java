@@ -13,7 +13,6 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.document.FieldSelector;
 
 import org.hibernate.search.ProjectionConstants;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.query.QueryHits;
 
 /**

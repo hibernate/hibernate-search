@@ -119,7 +119,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		Work<T> work;
 		for ( Class clazz : targetedClasses ) {
 			if ( id == null ) {
-				work = new Work<T>( clazz, id, WorkType.PURGE_ALL );
+				work = new Work<T>( clazz, null, WorkType.PURGE_ALL );
 				searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 			}
 			else {

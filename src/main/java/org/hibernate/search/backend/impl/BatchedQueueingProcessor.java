@@ -169,7 +169,6 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		}
 	}
 
-	//TODO implements parallel batchWorkers (one per Directory)
 	public void performWorks(WorkQueue workQueue) {
 		Runnable processor = backendQueueProcessorFactory.getProcessor( workQueue.getSealedQueue() );
 		if ( sync ) {

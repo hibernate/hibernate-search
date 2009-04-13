@@ -341,7 +341,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	 *
 	 * @param instance The entity for which to build the matching Lucene <code>Document</code>
 	 * @param id the entity id.
-	 * @param fieldToAnalyzerMap this maps gets populated while generateing the <code>Document</code>.
+	 * @param fieldToAnalyzerMap this maps gets populated while generating the <code>Document</code>.
 	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
@@ -479,7 +479,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			value = ReflectionHelper.getMemberValue( unproxiedInstance, propertiesMetadata.discriminatorGetter );
 		}
 
-		// now we give the discriminator the oppertunity to specify a analyzer per field level
+		// now we give the discriminator the opportunity to specify a analyzer per field level
 		for ( Object o : doc.getFields() ) {
 			Field field = ( Field ) o;
 			if ( !processedFieldNames.contains( field.name() ) ) {

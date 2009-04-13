@@ -8,6 +8,12 @@ import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 
+/**
+ * Collects all resources needed to apply changes to one index,
+ * and are reused across several WorkQueues.
+ *
+ * @author Sanne Grinovero
+ */
 class PerDPResources {
 	
 	private final ExecutorService executor;

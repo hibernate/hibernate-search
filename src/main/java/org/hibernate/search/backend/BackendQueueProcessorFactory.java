@@ -31,7 +31,7 @@ public interface BackendQueueProcessorFactory {
 	
 	/**
 	 * Used to shutdown and eventually release resources.
-	 * no other method should used after this one.
+	 * No other method should be used after this one.
 	 */
 	void close();
 	

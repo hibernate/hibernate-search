@@ -9,7 +9,6 @@ import java.util.List;
  *
  * @author Emmanuel Bernard
  */
-//TODO Move to egine?
 public class EntityInfo {
 	
 	public final Class clazz;

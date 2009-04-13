@@ -123,7 +123,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		}
 	}
 
-	protected <T> void  processWork(T entity, Serializable id, WorkType workType, AbstractEvent event) {
+	protected <T> void processWork(T entity, Serializable id, WorkType workType, AbstractEvent event) {
 		Work<T> work = new Work<T>( entity, id, workType );
 		final EventSourceTransactionContext transactionContext = new EventSourceTransactionContext( event.getSession() );
 		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
