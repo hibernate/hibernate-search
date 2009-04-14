@@ -15,6 +15,13 @@ import org.hibernate.search.util.WeakIdentityHashMap;
  * @author Emmanuel Bernard
  */
 public class PostTransactionWorkQueueSynchronization implements Synchronization {
+	
+	/**
+	 * FullTextIndexEventListener is using a WeakIdentityHashMap<Session,Synchronization>
+	 * So make sure all Synchronization implementations don't have any
+	 * (direct or indirect) reference to the Session.
+	 */
+	
 	private final QueueingProcessor queueingProcessor;
 	private boolean consumed;
 	private final WeakIdentityHashMap queuePerTransaction;

@@ -196,6 +196,16 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		}
 	}
 
+	/**
+	 * Adds a synchronization to be performed in the onFlush method;
+	 * should only be used as workaround for the case a flush is happening
+	 * out of transaction.
+	 * Warning: if the synchronization contains a hard reference
+	 * to the Session proper cleanup is not guaranteed and memory leaks
+	 * will happen.
+	 * @param eventSource should be the Session doing the flush
+	 * @param synchronization
+	 */
 	public void addSynchronization(EventSource eventSource, Synchronization synchronization) {
 		this.flushSynch.put( eventSource, synchronization );
 	}
