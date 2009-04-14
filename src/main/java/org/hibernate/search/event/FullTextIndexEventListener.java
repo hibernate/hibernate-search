@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
@@ -40,6 +40,7 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.WeakIdentityHashMap;
 
 /**
  * This listener supports setting a parent directory for all generated index files.
@@ -66,11 +67,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
 	// transient because it's not serializable (and state doesn't need to live longer than a flush).
 	// final because it's initialization should be published to other threads.
-	// T.Local because different threads could be flushing on this listener, still the reference
-	// to session should be weak so that sessions which had errors on flush can be discarded.
 	// ! update the readObject() method in case of name changes !
-	// It's not static as we couldn't properly cleanup otherwise.
-	private transient final ThreadLocal<FlushContextContainer> flushSynch = new ThreadLocal<FlushContextContainer>();
+	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
+	private transient final Map<Session,Synchronization> flushSynch = new WeakIdentityHashMap<Session,Synchronization>(0);
 
 	/**
 	 * Initialize method called by Hibernate Core when the SessionFactory starts
@@ -186,28 +185,19 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onFlush(FlushEvent event) {
 		if ( used ) {
 			Session session = event.getSession();
-			FlushContextContainer flushContextContainer = this.flushSynch.get();
-			if ( flushContextContainer != null ) {
-				//first cleanup the ThreadLocal
-				this.flushSynch.set( null );
-				EventSource registeringEventSource = flushContextContainer.eventSource.get();
-				//check that we are still in the same session which registered the flushSync:
-				if ( registeringEventSource != null && registeringEventSource == session ) {
-					log.debug( "flush event causing index update out of transaction" );
-					Synchronization synchronization = flushContextContainer.synchronization;
-					synchronization.beforeCompletion();
-					synchronization.afterCompletion( Status.STATUS_COMMITTED );
-				}
+			Synchronization synchronization = flushSynch.get( session );
+			if ( synchronization != null ) {
+				//first cleanup
+				flushSynch.remove( session );
+				log.debug( "flush event causing index update out of transaction" );
+				synchronization.beforeCompletion();
+				synchronization.afterCompletion( Status.STATUS_COMMITTED );
 			}
 		}
 	}
 
 	public void addSynchronization(EventSource eventSource, Synchronization synchronization) {
-		//no need to check for "unused" state, as this method is used by Search itself only.
-		FlushContextContainer flushContext = new FlushContextContainer(eventSource, synchronization);
-		//ignoring previously set data: if there was something, it's coming from a previous thread
-		//which had some error when flushing and couldn't cleanup.
-		this.flushSynch.set( flushContext );
+		this.flushSynch.put( eventSource, synchronization );
 	}
 
 	/* Might want to implement AutoFlushEventListener in future?
@@ -216,18 +206,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		// when out of transaction.
 	}
 	*/
-
-	private static class FlushContextContainer {
-		
-		private final WeakReference<EventSource> eventSource;
-		private final Synchronization synchronization;
-
-		public FlushContextContainer(EventSource eventSource, Synchronization synchronization) {
-			this.eventSource = new WeakReference<EventSource>( eventSource );
-			this.synchronization = synchronization;
-		}
-		
-	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException {
 		os.defaultWriteObject();
@@ -239,7 +217,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		Class<FullTextIndexEventListener> cl = FullTextIndexEventListener.class;
 		Field f = cl.getDeclaredField("flushSynch");
 		f.setAccessible( true );
-		ThreadLocal<FlushContextContainer> flushSynch = new ThreadLocal<FlushContextContainer>();
+		Map<Session,Synchronization> flushSynch = new WeakIdentityHashMap<Session,Synchronization>(0);
 		// setting a final field by reflection during a readObject is considered as safe as in a constructor:
 		f.set( this, flushSynch );
 	}
