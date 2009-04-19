@@ -59,8 +59,8 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			//registerSynchronization is only called if isRealTransactionInProgress or if
 			// a flushListener was found; still we might need to find the listener again
 			// as it might have been cleared by serialization (is transient).
-			FullTextIndexEventListener flushList = getIndexWorkFlushEventListener();
-			if ( flushList != null ) {
+			flushListener = getIndexWorkFlushEventListener();
+			if ( flushListener != null ) {
 				flushListener.addSynchronization( eventSource, synchronization );
 			}
 			else {
