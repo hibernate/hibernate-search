@@ -1,7 +1,0 @@
-## Derby
-
-hibernate.dialect org.hibernate.dialect.DerbyDialect
-hibernate.connection.driver_class org.apache.derby.jdbc.EmbeddedDriver
-hibernate.connection.url jdbc:derby:hibernate;create=true
-hibernate.connection.username hibernate
-hibernate.connection.password hibernate

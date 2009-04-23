@@ -224,13 +224,12 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <releaseProfiles>release</releaseProfiles>
-                    <goals>package javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.1.0:resources org.jboss.maven.plugins:maven-jdocbook-plugin:2.1.0:generate assembly:assembly</goals>
+                    <goals>package javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.1.0:resources
+                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.1.0:generate assembly:assembly
+                    </goals>
                 </configuration>
             </plugin>
         </plugins>
-        <filters>
-            <filter>${filter.file}</filter>
-        </filters>
         <testResources>
             <testResource>
                 <filtering>true</filtering>
@@ -261,7 +260,12 @@
                 </dependency>
             </dependencies>
             <properties>
-                <filter.file>src/main/filters/hsqldb.filter</filter.file>
+                <db.dialect>org.hibernate.dialect.HSQLDialect</db.dialect>
+                <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
+                <jdbc.url>jdbc:hsqldb:.</jdbc.url>
+                <jdbc.user>sa</jdbc.user>
+                <jdbc.pass/>
+                <jdbc.isolation/>
             </properties>
         </profile>
         <profile>
@@ -274,7 +278,12 @@
                 </dependency>
             </dependencies>
             <properties>
-                <filter.file>src/main/filters/postgresql.filter</filter.file>
+                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jdbc.url>jdbc:postgresql://localhost:5432/hibernate</jdbc.url>
+                <jdbc.user>hibernate</jdbc.user>
+                <jdbc.pass>hibernate</jdbc.pass>
+                <jdbc.isolation/>
             </properties>
         </profile>
         <profile>
@@ -287,7 +296,12 @@
                 </dependency>
             </dependencies>
             <properties>
-                <filter.file>src/main/filters/mysql.filter</filter.file>
+                <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
+                <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
+                <jdbc.url>jdbc:mysql://localhost/hibernate</jdbc.url>
+                <jdbc.user>hibernate</jdbc.user>
+                <jdbc.pass>hibernate</jdbc.pass>
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -328,27 +342,27 @@
                     <version>1.3.0</version>
                     <optional>true</optional>
                     <exclusions>
-						<exclusion>
-							<groupId>commons-httpclient</groupId>
-							<artifactId>commons-httpclient</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.apache.solr</groupId>
-							<artifactId>solr-solrj</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>woodstox</groupId>
-							<artifactId>wstx-asl</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>net.java.dev.stax-utils</groupId>
-							<artifactId>stax-utils</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>commons-logging</groupId>
-							<artifactId>commons-logging</artifactId>
-                		</exclusion>
-					</exclusions>
+                        <exclusion>
+                            <groupId>commons-httpclient</groupId>
+                            <artifactId>commons-httpclient</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.apache.solr</groupId>
+                            <artifactId>solr-solrj</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>woodstox</groupId>
+                            <artifactId>wstx-asl</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>net.java.dev.stax-utils</groupId>
+                            <artifactId>stax-utils</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.lucene</groupId>
@@ -434,11 +448,11 @@
             </build>
         </profile>
     </profiles>
-    
+
     <properties>
         <slf4jVersion>1.5.6</slf4jVersion>
         <luceneVersion>2.4.1</luceneVersion>
         <hibernateVersion>3.5.0-SNAPSHOT</hibernateVersion>
     </properties>
-    
+
 </project>

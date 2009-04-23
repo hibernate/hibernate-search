@@ -2,12 +2,16 @@
 package org.hibernate.search.test;
 
 import java.io.File;
+import java.io.InputStream;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.store.Directory;
+import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.search.Environment;
@@ -16,15 +20,14 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.RAMDirectoryProvider;
-
-import org.slf4j.Logger;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 /**
  * Base class for Hibernate Search unit tests.
  *
  * @author Emmanuel Bernard
  */
-public abstract class SearchTestCase extends HANTestCase {
+public abstract class SearchTestCase extends TestCase {
 
 	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
 
@@ -43,6 +46,11 @@ public abstract class SearchTestCase extends HANTestCase {
 	protected void setUp() throws Exception {
 		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
 		ensureIndexesAreEmpty();
+	}
+
+	protected void tearDown() throws Exception {
+		SchemaExport export = new SchemaExport( cfg );
+		export.drop( false, true );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -94,5 +102,40 @@ public abstract class SearchTestCase extends HANTestCase {
 
 	protected File getBaseIndexDir() {
 		return indexDir;
+	}
+
+	protected void buildSessionFactory(Class[] classes, String[] packages, String[] xmlFiles) throws Exception {
+		if ( getSessions() != null ) {
+			getSessions().close();
+		}
+		try {
+			setCfg( new AnnotationConfiguration() );
+			configure( cfg );
+			if ( recreateSchema() ) {
+				cfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
+			}
+			for ( String aPackage : packages ) {
+				( ( AnnotationConfiguration ) getCfg() ).addPackage( aPackage );
+			}
+			for ( Class aClass : classes ) {
+				( ( AnnotationConfiguration ) getCfg() ).addAnnotatedClass( aClass );
+			}
+			for ( String xmlFile : xmlFiles ) {
+				InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );
+				getCfg().addInputStream( is );
+			}
+			setDialect( Dialect.getDialect() );
+			setSessions( getCfg().buildSessionFactory( /*new TestInterceptor()*/ ) );
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
+	protected abstract Class[] getMappings();
+
+	protected String[] getAnnotatedPackages() {
+		return new String[] { };
 	}
 }
