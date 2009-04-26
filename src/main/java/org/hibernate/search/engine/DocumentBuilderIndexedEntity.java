@@ -259,16 +259,22 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	//TODO could we use T instead of EntityClass?
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
 		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition
-
+		
+		boolean sameIdWasSetToBeDeleted = false;
 		List<LuceneWork> toDelete = new ArrayList<LuceneWork>();
 		boolean duplicateDelete = false;
 		for ( LuceneWork luceneWork : queue ) {
-			//avoid unecessary duplicated work
-			if ( luceneWork.getEntityClass() == entityClass
-					) {
+			if ( luceneWork.getEntityClass() == entityClass ) {
 				Serializable currentId = luceneWork.getId();
-				//currentId != null => either ADD or Delete work
 				if ( currentId != null && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
+					if ( luceneWork instanceof DeleteLuceneWork ) {
+						//flag this work as related to a to-be-deleted entity
+						sameIdWasSetToBeDeleted = true;
+					}
+					else if ( luceneWork instanceof AddLuceneWork ) {
+						//if a later work in the queue is adding it back, undo deletion flag:
+						sameIdWasSetToBeDeleted = false;
+					}
 					if ( workType == WorkType.DELETE ) { //TODO add PURGE?
 						//DELETE should have precedence over any update before (HSEARCH-257)
 						//if an Add work is here, remove it
@@ -280,14 +286,23 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 							duplicateDelete = true;
 						}
 					}
-					else {
-						//we can safely say we are out, the other work is an ADD
-						return;
+					if ( workType == WorkType.ADD ) {
+						if ( luceneWork instanceof AddLuceneWork ) {
+							//embedded objects may issue an "UPDATE" right before the "ADD",
+							//leading to double insertions in the index
+							toDelete.add( luceneWork );
+						}
 					}
+					//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
 				}
-				//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
 			}
 		}
+
+		if ( sameIdWasSetToBeDeleted && workType == WorkType.COLLECTION ) {
+			//avoid updating (and thus adding) objects which are going to be deleted
+			return;
+		}
+		
 		for ( LuceneWork luceneWork : toDelete ) {
 			queue.remove( luceneWork );
 		}
