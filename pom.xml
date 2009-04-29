@@ -304,6 +304,25 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
+        <profile>
+            <id>sqlserver</id>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.jtds</groupId>
+                    <artifactId>jtds</artifactId>
+                    <version>1.2</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <db.dialect>org.hibernate.dialect.SQLServerDialect</db.dialect>
+                <jdbc.driver>net.sourceforge.jtds.jdbc.Driver</jdbc.driver>
+                <jdbc.url>jdbc:jtds:sqlserver://ec2-67-202-7-25.compute-1.amazonaws.com:1433;DatabaseName=hibernate</jdbc.url>
+                <jdbc.user>hibernate</jdbc.user>
+                <jdbc.pass>hibernate</jdbc.pass>
+                <jdbc.isolation/>
+            </properties>
+        </profile>
+
 
         <!-- ================================ -->
         <!-- Dependecy profiles to test w and -->
