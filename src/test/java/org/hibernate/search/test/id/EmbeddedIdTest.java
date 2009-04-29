@@ -3,48 +3,92 @@ package org.hibernate.search.test.id;
 
 import java.util.List;
 
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.Search;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.index.Term;
+import org.hibernate.search.Search;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Emmanuel Bernard
  */
 public class EmbeddedIdTest extends SearchTestCase {
 	public void testFieldBridge() throws Exception {
-		PersonPK emmPk = new PersonPK();
-		emmPk.setFirstName( "Emmanuel" );
-		emmPk.setLastName( "Bernard" );
-		Person emm = new Person();
-		emm.setFavoriteColor( "Blue" );
-		emm.setId( emmPk );
-		Session s = openSession(  );
+		PersonPK emmanuelPk = new PersonPK();
+		emmanuelPk.setFirstName( "Emmanuel" );
+		emmanuelPk.setLastName( "Bernard" );
+		Person emmanuel = new Person();
+		emmanuel.setFavoriteColor( "Blue" );
+		emmanuel.setId( emmanuelPk );
+
+		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		s.save(emm);
+		s.save( emmanuel );
 		tx.commit();
 		s.clear();
+
 		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term("id.lastName", "Bernard" ) ) ).list();
+				new TermQuery( new Term( "id.lastName", "Bernard" ) )
+		).list();
 		assertEquals( 1, results.size() );
-		emm = (Person) results.get(0);
-		emm.setFavoriteColor( "Red" );
+		emmanuel = ( Person ) results.get( 0 );
+		emmanuel.setFavoriteColor( "Red" );
 		tx.commit();
 		s.clear();
+
 		tx = s.beginTransaction();
 		results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term("id.lastName", "Bernard" ) ) ).list();
+				new TermQuery( new Term( "id.lastName", "Bernard" ) )
+		).list();
 		assertEquals( 1, results.size() );
-		emm = (Person) results.get(0);
-		assertEquals( "Red", emm.getFavoriteColor() );
+		emmanuel = ( Person ) results.get( 0 );
+		assertEquals( "Red", emmanuel.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();
 		s.close();
-
 	}
+
+	/**
+	 * HSEARCH-HSEARCH-306, HSEARCH-248
+	 *
+	 * @throws Exception throws exception in case the test fails.
+	 */
+	public void testSafeFromTupleId() throws Exception {
+		PersonPK emmanuelPk = new PersonPK();
+		emmanuelPk.setFirstName( "Emmanuel" );
+		emmanuelPk.setLastName( "Bernard" );
+		Person emmanuel = new Person();
+		emmanuel.setFavoriteColor( "Blue" );
+		emmanuel.setId( emmanuelPk );
+
+		PersonPK johnPk = new PersonPK();
+		johnPk.setFirstName( "John" );
+		johnPk.setLastName( "Doe" );
+		Person john = new Person();
+		john.setFavoriteColor( "Blue" );
+		john.setId( johnPk );
+
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.save( emmanuel );
+		s.save( john );
+		tx.commit();
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		// we need a query which has at least the size of two. 
+		List results = Search.getFullTextSession( s ).createFullTextQuery(
+				new TermQuery( new Term( "favoriteColor", "blue" ) )
+		).list();
+		assertEquals( 2, results.size() );
+		tx.commit();
+		s.close();
+	}
+
 	protected Class[] getMappings() {
 		return new Class[] {
 				Person.class

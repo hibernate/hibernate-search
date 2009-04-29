@@ -160,7 +160,6 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		}
 	}
 
-
 	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
 		Annotation idAnnotation = getIdAnnotation( member, context );
 		if ( idAnnotation != null ) {
