@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.impl.SessionFactoryImpl;
@@ -92,7 +93,7 @@ public abstract class SearchTestCase extends TestCase {
 		s.close();
 	}
 
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
+	protected void configure(Configuration cfg) {
 		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
 		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );

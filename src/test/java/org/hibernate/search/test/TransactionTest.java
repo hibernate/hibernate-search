@@ -3,8 +3,10 @@ package org.hibernate.search.test;
 
 import java.io.IOException;
 
-import org.hibernate.Session;
 import org.apache.lucene.index.IndexReader;
+
+import org.hibernate.Session;
+import org.hibernate.cfg.Configuration;
 
 /**
  * @author Emmanuel Bernard
@@ -31,19 +33,24 @@ public class TransactionTest extends SearchTestCase {
 		s = getSessions().openSession();
 		s.getTransaction().begin();
 		s.persist(
-				new Document( "Java Persistence with Hibernate", "Object/relational mapping with Hibernate", "blah blah blah" )
+				new Document(
+						"Java Persistence with Hibernate", "Object/relational mapping with Hibernate", "blah blah blah"
+				)
 		);
 		s.flush();
 		s.getTransaction().rollback();
 		s.close();
 
 		assertEquals( "rollback() should not index", 3, getDocumentNumber() );
-
+		
 		s = getSessions().openSession();
+		s.connection().setAutoCommit( true );  // www.hibernate.org/403.html
 		s.persist(
-				new Document( "Java Persistence with Hibernate", "Object/relational mapping with Hibernate", "blah blah blah" )
+				new Document(
+						"Java Persistence with Hibernate", "Object/relational mapping with Hibernate", "blah blah blah"
+				)
 		);
-		s.flush();
+		s.flush();	
 		s.close();
 
 		assertEquals( "no transaction should index", 4, getDocumentNumber() );
@@ -60,8 +67,7 @@ public class TransactionTest extends SearchTestCase {
 		}
 	}
 
-
 	protected Class[] getMappings() {
-		return new Class[]{Document.class};
+		return new Class[] { Document.class };
 	}
 }
