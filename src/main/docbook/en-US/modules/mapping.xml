@@ -916,7 +916,7 @@ public class BlogEntry {
 
             <programlisting>public class LanguageDiscriminator implements Discriminator {
 
-    public String getAnanyzerDefinitionName(Object value, Object entity, String field) {
+    public String getAnalyzerDefinitionName(Object value, Object entity, String field) {
         if ( value == null || !( entity instanceof Article ) ) {
             return null;
         }
@@ -935,7 +935,7 @@ public class BlogEntry {
         implementation of the <classname>Discriminator</classname> interface.
         It is up to you to provide an implementation for this interface. The
         only method you have to implement is
-        <classname>getAnanyzerDefinitionName()</classname> which gets called
+        <classname>getAnalyzerDefinitionName()</classname> which gets called
         for each field added to the Lucene document. The entity which is
         getting indexed is also passed to the interface method. The
         <literal>value</literal> parameter is only set if the

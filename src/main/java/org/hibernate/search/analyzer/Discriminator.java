@@ -19,5 +19,5 @@ public interface Discriminator {
 	 * default analyzer for this field should be used.
 	 * @see org.hibernate.search.annotations.AnalyzerDef
 	 */
-	String getAnanyzerDefinitionName(Object value, Object entity, String field);
+	String getAnalyzerDefinitionName(Object value, Object entity, String field);
 }

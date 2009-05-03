@@ -497,7 +497,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		for ( Object o : doc.getFields() ) {
 			Field field = ( Field ) o;
 			if ( !processedFieldNames.contains( field.name() ) ) {
-				String analyzerName = discriminator.getAnanyzerDefinitionName( value, unproxiedInstance, field.name() );
+				String analyzerName = discriminator.getAnalyzerDefinitionName( value, unproxiedInstance, field.name() );
 				if ( analyzerName != null ) {
 					fieldToAnalyzerMap.put( field.name(), analyzerName );
 				}
