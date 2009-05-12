@@ -33,7 +33,6 @@ import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.util.ReflectHelper;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.impl.AbstractQueryImpl;
@@ -41,6 +40,7 @@ import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
@@ -50,7 +50,6 @@ import org.hibernate.search.engine.MultiClassesQueryLoader;
 import org.hibernate.search.engine.ProjectionLoader;
 import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
@@ -62,6 +61,7 @@ import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}.
@@ -359,15 +359,22 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	/**
 	 * @return Calculates the number of <code>TopDocs</code> which should be retrieved as part of the query. If Hibernate's
-	 * pagination parameters are set returned value is <code>first + maxResults</code>. Otherwise <code>null</code> is
-	 * returned.
+	 *         pagination parameters are set returned value is <code>first + maxResults</code>. Otherwise <code>null</code> is
+	 *         returned.
 	 */
 	private Integer calculateTopDocsRetrievalSize() {
 		if ( maxResults == null ) {
 			return null;
 		}
 		else {
-			return first() + maxResults;
+			long tmpMaxResult = (long) first() + maxResults;
+			if ( tmpMaxResult >= Integer.MAX_VALUE ) {
+				// don't return just Integer.MAX_VALUE due to a bug in Lucene - see HSEARCH-330
+				return Integer.MAX_VALUE - 1;
+			}
+			else {
+				return (int) tmpMaxResult;
+			}
 		}
 	}
 
@@ -738,7 +745,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			else {
 				TopDocs hits;
 				try {
-					hits = getQueryHits( searcher, 1 ).topDocs; // Lucene enforces that at least one top doc will be retrieved.
+					hits = getQueryHits(
+							searcher, 1
+					).topDocs; // Lucene enforces that at least one top doc will be retrieved.
 					resultSize = hits.totalHits;
 				}
 				catch ( IOException e ) {
