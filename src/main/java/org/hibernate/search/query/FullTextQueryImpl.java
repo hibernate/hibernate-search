@@ -4,6 +4,7 @@ package org.hibernate.search.query;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,12 +69,13 @@ import org.hibernate.util.ReflectHelper;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @todo Implements setParameter()
  */
-//TODO implements setParameter()
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
 	private static final Logger log = LoggerFactory.make();
 	private final org.apache.lucene.search.Query luceneQuery;
-	private Set<Class<?>> targetedEntities;
+	private Set<Class<?>> indexedTargetedEntities;
+	private List<Class<?>> targetedEntities;
 	private Set<Class<?>> classesAndSubclasses;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
@@ -99,13 +101,15 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * @param session Access to the Hibernate session.
 	 * @param parameterMetadata Additional query metadata.
 	 */
-	public FullTextQueryImpl(org.apache.lucene.search.Query query, Class[] classes, SessionImplementor session,
+	public FullTextQueryImpl(org.apache.lucene.search.Query query, Class<?>[] classes, SessionImplementor session,
 							 ParameterMetadata parameterMetadata) {
 		//TODO handle flushMode
 		super( query.toString(), null, session, parameterMetadata );
 		this.luceneQuery = query;
-		this.targetedEntities = getSearchFactoryImplementor().getIndexedTypesPolymorphic( classes );
-		if ( classes != null && classes.length > 0 && targetedEntities.size() == 0 ) {
+		this.targetedEntities = Arrays.asList( classes );
+		searchFactoryImplementor = getSearchFactoryImplementor();
+		this.indexedTargetedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( classes );
+		if ( classes != null && classes.length > 0 && indexedTargetedEntities.size() == 0 ) {
 			String msg = "None of the specified entity types or any of their subclasses are indexed.";
 			throw new IllegalArgumentException( msg );
 		}
@@ -137,7 +141,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//user stop using it
 		//scrollable is better in this area
 
-		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
@@ -157,7 +160,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
 			}
-			Loader loader = getLoader( sess, searchFactoryImplementor );
+			Loader loader = getLoader();
 			return new IteratorImpl( infos, loader );
 		}
 		catch ( IOException e ) {
@@ -173,79 +176,100 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 	}
 
-	private Loader getLoader(Session session, SearchFactoryImplementor searchFactoryImplementor) {
+	/**
+	 * Decide which object loader to use depending on the targeted entities. If there is only a single entity targeted
+	 * a <code>QueryLoader</code> can be used which will only execute a single query to load the entities. If more than
+	 * one entity is targeted a <code>MultiClassesQueryLoader</code> must be used. We also have to consider whether
+	 * projections or <code>Criteria</code> are used.
+	 *
+	 * @return The loader instance to use to load the results of the query.
+	 */
+	private Loader getLoader() {
+		Loader loader;
 		if ( indexProjection != null ) {
-			ProjectionLoader loader = new ProjectionLoader();
-			loader.init( session, searchFactoryImplementor, resultTransformer, indexProjection );
-			loader.setEntityTypes( targetedEntities );
-			return loader;
+			loader = getProjectionLoader();
 		}
-		if ( criteria != null ) {
-			if ( targetedEntities.size() > 1 ) {
-				throw new SearchException( "Cannot mix criteria and multiple entity types" );
-			}
-			if ( criteria instanceof CriteriaImpl ) {
-				String targetEntity = ( ( CriteriaImpl ) criteria ).getEntityOrClassName();
-				if ( targetedEntities.size() == 1 && !targetedEntities.iterator()
-						.next()
-						.getName()
-						.equals( targetEntity ) ) {
-					throw new SearchException( "Criteria query entity should match query entity" );
-				}
-				else {
-					try {
-						Class entityType = ReflectHelper.classForName( targetEntity );
-						targetedEntities = new HashSet<Class<?>>( 1 );
-						targetedEntities.add( entityType );
-					}
-					catch ( ClassNotFoundException e ) {
-						throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
-					}
-				}
-			}
-			QueryLoader loader = new QueryLoader();
-			loader.init( session, searchFactoryImplementor );
-			loader.setEntityType( targetedEntities.iterator().next() );
-			loader.setCriteria( criteria );
-			return loader;
+		else if ( criteria != null ) {
+			loader = getCriteriaLoader();
 		}
 		else if ( targetedEntities.size() == 1 ) {
-			final QueryLoader loader = new QueryLoader();
-			loader.init( session, searchFactoryImplementor );
-			loader.setEntityType( targetedEntities.iterator().next() );
-			return loader;
+			loader = getSingleEntityLoader();
 		}
 		else {
-			final MultiClassesQueryLoader loader = new MultiClassesQueryLoader();
-			loader.init( session, searchFactoryImplementor );
-			loader.setEntityTypes( targetedEntities );
-			return loader;
+			loader = getMultipleEntitiesLoader();
 		}
+		return loader;
+	}
+
+	private Loader getMultipleEntitiesLoader() {
+		final MultiClassesQueryLoader multiClassesLoader = new MultiClassesQueryLoader();
+		multiClassesLoader.init( ( Session ) session, searchFactoryImplementor );
+		multiClassesLoader.setEntityTypes( indexedTargetedEntities );
+		return multiClassesLoader;
+	}
+
+	private Loader getSingleEntityLoader() {
+		final QueryLoader queryLoader = new QueryLoader();
+		queryLoader.init( ( Session ) session, searchFactoryImplementor );
+		queryLoader.setEntityType( targetedEntities.iterator().next() );
+		return queryLoader;
+	}
+
+	private Loader getCriteriaLoader() {
+		if ( targetedEntities.size() > 1 ) {
+			throw new SearchException( "Cannot mix criteria and multiple entity types" );
+		}
+		Class entityType = targetedEntities.size() == 0 ? null : targetedEntities.iterator().next();
+		if ( criteria instanceof CriteriaImpl ) {
+			String targetEntity = ( ( CriteriaImpl ) criteria ).getEntityOrClassName();
+			if ( entityType != null && !entityType.getName().equals( targetEntity ) ) {
+				throw new SearchException( "Criteria query entity should match query entity" );
+			}
+			else {
+				try {
+					entityType = ReflectHelper.classForName( targetEntity );
+				}
+				catch ( ClassNotFoundException e ) {
+					throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
+				}
+			}
+		}
+		QueryLoader queryLoader = new QueryLoader();
+		queryLoader.init( ( Session ) session, searchFactoryImplementor );
+		queryLoader.setEntityType( entityType );
+		queryLoader.setCriteria( criteria );
+		return queryLoader;
+	}
+
+	private Loader getProjectionLoader() {
+		ProjectionLoader loader = new ProjectionLoader();
+		loader.init( ( Session ) session, searchFactoryImplementor, resultTransformer, indexProjection );
+		loader.setEntityTypes( indexedTargetedEntities );
+		return loader;
 	}
 
 	public ScrollableResults scroll() throws HibernateException {
 		//keep the searcher open until the resultset is closed
-		SearchFactoryImplementor searchFactory = getSearchFactoryImplementor();
 
 		//find the directories
-		IndexSearcher searcher = buildSearcher( searchFactory );
+		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		//FIXME: handle null searcher
 		try {
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
 			DocumentExtractor extractor = new DocumentExtractor(
-					queryHits, searchFactory, indexProjection, idFieldNames, allowFieldSelectionInProjection
+					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
 			);
-			Loader loader = getLoader( ( Session ) this.session, searchFactory );
+			Loader loader = getLoader();
 			return new ScrollableResultsImpl(
-					searcher, first, max, fetchSize, extractor, loader, searchFactory, this.session
+					searcher, first, max, fetchSize, extractor, loader, searchFactoryImplementor, this.session
 			);
 		}
 		catch ( IOException e ) {
 			//close only in case of exception
 			try {
-				closeSearcher( searcher, searchFactory.getReaderProvider() );
+				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
 			}
 			catch ( SearchException ee ) {
 				//we have the initial issue already
@@ -260,7 +284,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public List list() throws HibernateException {
-		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
@@ -280,7 +303,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
 			}
-			Loader loader = getLoader( sess, searchFactoryImplementor );
+			Loader loader = getLoader();
 			List list = loader.load( infos.toArray( new EntityInfo[infos.size()] ) );
 			if ( resultTransformer == null || loader instanceof ProjectionLoader ) {
 				//stay consistent with transformTuple which can only be executed during a projection
@@ -305,7 +328,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public Explanation explain(int documentId) {
 		Explanation explanation = null;
-		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		Searcher searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
 			throw new SearchException(
@@ -367,13 +389,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			return null;
 		}
 		else {
-			long tmpMaxResult = (long) first() + maxResults;
+			long tmpMaxResult = ( long ) first() + maxResults;
 			if ( tmpMaxResult >= Integer.MAX_VALUE ) {
 				// don't return just Integer.MAX_VALUE due to a bug in Lucene - see HSEARCH-330
 				return Integer.MAX_VALUE - 1;
 			}
 			else {
-				return (int) tmpMaxResult;
+				return ( int ) tmpMaxResult;
 			}
 		}
 	}
@@ -404,8 +426,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * @return the Lucene filter mapped to the filter definition
 	 */
 	private Filter buildLuceneFilter(FullTextFilterImpl fullTextFilter) {
-
-		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 
 		/*
 		 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
@@ -484,7 +504,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 */
 	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
 		if ( cacheResults( def.getCacheMode() ) ) {
-			int cachingWrapperFilterSize = getSearchFactoryImplementor().getFilterCacheBitResultsSize();
+			int cachingWrapperFilterSize = searchFactoryImplementor.getFilterCacheBitResultsSize();
 			filter = new org.hibernate.search.filter.CachingWrapperFilter( filter, cachingWrapperFilterSize );
 		}
 
@@ -619,9 +639,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		Set<String> idFieldNames = new HashSet<String>();
 
 		Similarity searcherSimilarity = null;
-		//TODO check if caching this work for the last n list of targetedEntities makes a perf boost
-		if ( targetedEntities.size() == 0 ) {
-			// empty targetedEntities array means search over all indexed enities,
+		//TODO check if caching this work for the last n list of indexedTargetedEntities makes a perf boost
+		if ( indexedTargetedEntities.size() == 0 ) {
+			// empty indexedTargetedEntities array means search over all indexed enities,
 			// but we have to make sure there is at least one
 			if ( builders.isEmpty() ) {
 				throw new HibernateException(
@@ -642,9 +662,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			classesAndSubclasses = null;
 		}
 		else {
-			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( targetedEntities.size() );
-			involvedClasses.addAll( targetedEntities );
-			for ( Class<?> clazz : targetedEntities ) {
+			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities.size() );
+			involvedClasses.addAll( indexedTargetedEntities );
+			for ( Class<?> clazz : indexedTargetedEntities ) {
 				DocumentBuilderIndexedEntity<?> builder = builders.get( clazz );
 				if ( builder != null ) {
 					involvedClasses.addAll( builder.getMappedSubclasses() );
@@ -737,7 +757,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	public int getResultSize() {
 		if ( resultSize == null ) {
 			//get result size without object initialization
-			SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 			IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 			if ( searcher == null ) {
 				resultSize = 0;
@@ -838,7 +857,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 		filterDefinition = new FullTextFilterImpl();
 		filterDefinition.setName( name );
-		FilterDef filterDef = getSearchFactoryImplementor().getFilterDefinition( name );
+		FilterDef filterDef = searchFactoryImplementor.getFilterDefinition( name );
 		if ( filterDef == null ) {
 			throw new SearchException( "Unkown @FullTextFilter: " + name );
 		}

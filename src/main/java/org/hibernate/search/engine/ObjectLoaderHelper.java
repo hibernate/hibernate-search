@@ -4,6 +4,7 @@ package org.hibernate.search.engine;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 
@@ -46,7 +47,8 @@ public class ObjectLoaderHelper {
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) return;
 
-		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityType );
+		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[]{entityType} );
+		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( indexedEntities.iterator().next() );
 		String idName = builder.getIdentifierName();
 		int loop = maxResults / MAX_IN_CLAUSE;
 		boolean exact = maxResults % MAX_IN_CLAUSE == 0;
