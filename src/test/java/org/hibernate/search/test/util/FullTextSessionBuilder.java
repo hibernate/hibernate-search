@@ -16,38 +16,24 @@ import org.hibernate.search.store.RAMDirectoryProvider;
  * which need to use several differently configured SessionFactories.
  * 
  * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  */
 public class FullTextSessionBuilder {
 	
-	private AnnotationConfiguration cfg = new AnnotationConfiguration();
+	private AnnotationConfiguration cfg;
 	private SessionFactory sessionFactory;
 	private Session session;
 	
 	public FullTextSessionBuilder() {
+		cfg = new AnnotationConfiguration();
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
-		//DB type:
-		cfg.setProperty( Environment.URL, "jdbc:hsqldb:mem:." );
-		cfg.setProperty( Environment.DRIVER,
-				org.hsqldb.jdbcDriver.class.getCanonicalName() );
-		cfg.setProperty( Environment.DIALECT,
-				org.hibernate.dialect.HSQLDialect.class.getCanonicalName() );
-		//connection:
-		cfg.setProperty( Environment.USER, "sa" );
-		cfg.setProperty( Environment.PASS, "" );
-		cfg.setProperty( Environment.ISOLATION, "2" );
-		cfg.setProperty( Environment.POOL_SIZE, "1" );
-		cfg.setProperty( Environment.ORDER_UPDATES, "true" );
+		
 		//cache:
 		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
 		cfg.setProperty( Environment.CACHE_PROVIDER,
 				org.hibernate.cache.HashtableCacheProvider.class.getCanonicalName() );
 		cfg.setProperty( Environment.USE_QUERY_CACHE, "true" );
-		//debugging/logging:
-		cfg.setProperty( Environment.SHOW_SQL, "false" );
-		cfg.setProperty( Environment.USE_SQL_COMMENTS, "true" );
-		cfg.setProperty( Environment.FORMAT_SQL, "true" );
-		cfg.setProperty( Environment.USE_STRUCTURED_CACHE, "true" );
-		cfg.setProperty( Environment.GENERATE_STATISTICS, "true" );
+		
 		//search specific:
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS,
 				StopAnalyzer.class.getName() );
@@ -57,9 +43,9 @@ public class FullTextSessionBuilder {
 	
 	/**
 	 * Override before building any parameter, or add new ones.
-	 * @param key
-	 * @param value
-	 * @return the same builder (this)
+	 * @param key Property name.
+	 * @param value Property value.
+	 * @return the same builder (this).
 	 */
 	public FullTextSessionBuilder setProperty(String key, String value) {
 		cfg.setProperty( key, value );
@@ -67,8 +53,8 @@ public class FullTextSessionBuilder {
 	}
 	
 	/**
-	 * Adds classes to the SessionFactory being built
-	 * @param annotatedClass
+	 * Adds classes to the SessionFactory being built.
+	 * @param annotatedClass The annotated class to add to the configuration.
 	 * @return the same builder (this)
 	 */
 	public FullTextSessionBuilder addAnnotatedClass(Class annotatedClass) {
@@ -78,7 +64,7 @@ public class FullTextSessionBuilder {
 	
 	/**
 	 * Creates a new FullTextSession based upon the configuration built so far.
-	 * @return
+	 * @return new FullTextSession based upon the configuration built so far.
 	 */
 	public FullTextSession build() {
 		if ( session != null || sessionFactory != null ) {
@@ -101,5 +87,4 @@ public class FullTextSessionBuilder {
 		sessionFactory.close();
 		sessionFactory = null;
 	}
-
 }
