@@ -1,8 +1,6 @@
 //$Id$
 package org.hibernate.search.test.jms.master;
 
-import javax.jms.MessageListener;
-
 import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

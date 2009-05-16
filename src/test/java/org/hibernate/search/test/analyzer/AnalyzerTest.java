@@ -3,7 +3,6 @@ package org.hibernate.search.test.analyzer;
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.print.attribute.HashAttributeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
@@ -20,7 +19,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.impl.InitContext;
-import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.test.SearchTestCase;

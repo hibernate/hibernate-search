@@ -9,7 +9,6 @@ import javax.persistence.OneToOne;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Hardy Ferentschik

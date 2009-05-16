@@ -441,7 +441,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertTrue( "Should not trigger projection", result.get( 0 ) instanceof Book );
 
 		hibQuery = s.createFullTextQuery( query, Book.class );
-		hibQuery.setProjection( null );
+		hibQuery.setProjection( (String[]) null );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( 1, result.size() );

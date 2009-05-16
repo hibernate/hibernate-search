@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.Session;
-import org.hibernate.cfg.Configuration;
 
 /**
  * @author Emmanuel Bernard

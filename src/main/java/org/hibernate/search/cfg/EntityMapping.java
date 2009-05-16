@@ -6,8 +6,6 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 
-import org.hibernate.search.annotations.Indexed;
-
 /**
  * @author Emmanuel Bernard
  */

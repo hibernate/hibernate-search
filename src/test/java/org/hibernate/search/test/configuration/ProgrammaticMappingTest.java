@@ -8,7 +8,6 @@ import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.DefaultSimilarity;
 
@@ -21,9 +20,6 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.bridge.builtin.StringBridge;
-import org.hibernate.search.store.RAMDirectoryProvider;
-import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.Transaction;
 

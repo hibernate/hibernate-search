@@ -6,10 +6,6 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.TermVector;
-
 /**
  * @author Emmanuel Bernard
  */

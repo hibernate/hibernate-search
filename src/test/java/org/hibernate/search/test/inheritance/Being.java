@@ -6,7 +6,6 @@ import javax.persistence.MappedSuperclass;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
 /**

@@ -150,7 +150,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
-			Session sess = ( Session ) this.session;
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
@@ -293,7 +292,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
-			Session sess = ( Session ) this.session;
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );

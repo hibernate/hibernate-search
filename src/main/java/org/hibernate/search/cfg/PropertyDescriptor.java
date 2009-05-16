@@ -1,9 +1,7 @@
 package org.hibernate.search.cfg;
 
 import java.lang.annotation.ElementType;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Collection;
 import java.util.ArrayList;
 
