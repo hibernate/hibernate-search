@@ -321,8 +321,8 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
         “Animal”. Both entities will then be stored in the Animal
         directory</para>
 
-        <para><programlisting><code>hibernate.search.org.hibernate.search.test.shards.Furniture.indexName = Aninal
-hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</code></programlisting></para>
+        <para><programlisting><code>hibernate.search.org.hibernate.search.test.shards.Furniture.indexName = Animal
+hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</code></programlisting></para>
       </listitem>
 
       <listitem>
@@ -373,7 +373,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</cod
           <row>
             <entry><literal>hibernate.search.worker.execution</literal></entry>
 
-            <entry>Supports synchronous and asynchrounous execution. Default
+            <entry>Supports synchronous and asynchronous execution. Default
             to <literal><literal>sync</literal></literal>. Supports also
             <literal>async</literal>.</entry>
           </row>
@@ -382,14 +382,14 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</cod
             <entry><literal>hibernate.search.worker.thread_pool.size</literal></entry>
 
             <entry>Defines the number of threads in the pool. useful only for
-            asynchrounous execution. Default to 1.</entry>
+            asynchronous execution. Default to 1.</entry>
           </row>
 
           <row>
             <entry><literal>hibernate.search.worker.buffer_queue.max</literal></entry>
 
             <entry>Defines the maximal number of work queue if the thread poll
-            is starved. Useful only for asynchrounous execution. Default to
+            is starved. Useful only for asynchronous execution. Default to
             infinite. If the limit is reached, the work is done by the main
             thread.</entry>
           </row>
@@ -445,7 +445,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Aninal</cod
     <section>
       <title>Slave nodes</title>
 
-      <para>Every index update operation is sent to a JMS queue. Index quering
+      <para>Every index update operation is sent to a JMS queue. Index querying
       operations are executed on a local index copy.</para>
 
       <example>
@@ -768,7 +768,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             terms.</para> <para>This silently truncates large documents,
             excluding from the index all terms that occur further in the
             document. If you know your source documents are large, be sure to
-            set this value high enough to accomodate the expected size. If you
+            set this value high enough to accommodate the expected size. If you
             set it to Integer.MAX_VALUE, then the only limit is your memory,
             but you should anticipate an OutOfMemoryError. </para> <para>If
             setting this value in <literal>batch</literal> differently than in
@@ -794,13 +794,13 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].merge_factor</literal></entry>
 
             <entry><para>Controls segment merge frequency and size. </para>
-            <para>Determines how often segment indices are merged when
+            <para>Determines how often segment indexes are merged when
             insertion occurs. With smaller values, less RAM is used while
-            indexing, and searches on unoptimized indices are faster, but
+            indexing, and searches on unoptimized indexes are faster, but
             indexing speed is slower. With larger values, more RAM is used
-            during indexing, and while searches on unoptimized indices are
+            during indexing, and while searches on unoptimized indexes are
             slower, indexing is faster. Thus larger values (&gt; 10) are best
-            for batch index creation, and smaller values (&lt; 10) for indices
+            for batch index creation, and smaller values (&lt; 10) for indexes
             that are interactively maintained. The value must no be lower than
             2.</para></entry>
 

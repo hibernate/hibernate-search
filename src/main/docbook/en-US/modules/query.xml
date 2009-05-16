@@ -58,7 +58,7 @@
   </itemizedlist>
 
   <para>To access the querying facilities, you have to use an
-  <classname>FullTextSession</classname> . This Search specfic session wraps a
+  <classname>FullTextSession</classname>. This Search specific session wraps a
   regular <classname>org.hibernate.Session</classname> to provide query and
   indexing capabilities.</para>
 
@@ -179,7 +179,7 @@ fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Ac
       <section>
         <title>Pagination</title>
 
-        <para>Out of performace reasons it is recommended to restrict the
+        <para>Out of performance reasons it is recommended to restrict the
         number of returned objects per query. In fact is a very common use
         case anyway that the user navigates from one page to an other. The way
         to define pagination is exactly the way you would define pagination in
@@ -313,8 +313,8 @@ String authorName = firstResult[3];</programlisting>
           </listitem>
         </itemizedlist>
 
-        <para>Projection is useful for another kind of usecases. Lucene
-        provides some metadata informations to the user about the results. By
+        <para>Projection is useful for another kind of use cases. Lucene
+        provides some metadata information to the user about the results. By
         using some special placeholders, the projection mechanism can retrieve
         them:</para>
 
@@ -335,7 +335,7 @@ String authorName = firstResult[2];</programlisting>
 
         <itemizedlist>
           <listitem>
-            <para>FullTextQuery.THIS: returns the intialized and managed
+            <para>FullTextQuery.THIS: returns the initialized and managed
             entity (as a non projected query would have done).</para>
           </listitem>
 
@@ -346,7 +346,7 @@ String authorName = firstResult[2];</programlisting>
 
           <listitem>
             <para>FullTextQuery.OBJECT_CLASS: returns the class of the
-            indexded entity.</para>
+            indexed entity.</para>
           </listitem>
 
           <listitem>
@@ -471,7 +471,7 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return 
       the targeted data structure:</para>
 
       <example>
-        <title>Using ResultTransformer in conjuncton with projections</title>
+        <title>Using ResultTransformer in conjunction with projections</title>
 
         <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
 query.setProjection( "title", "mainAuthor.name" );
@@ -551,7 +551,7 @@ for (Object[] result : results) {
     <para>Apache Lucene has a powerful feature that allows to filter query
     results according to a custom filtering process. This is a very powerful
     way to apply additional data restrictions, especially since filters can be
-    cached and reused. Some interesting usecases are:</para>
+    cached and reused. Some interesting use cases are:</para>
 
     <itemizedlist>
       <listitem>
@@ -674,7 +674,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     filter or filter factory of the targeted named filter definition.</para>
 
     <example>
-      <title>Using paramters in the actual filter implementation</title>
+      <title>Using parameters in the actual filter implementation</title>
 
       <programlisting>public class SecurityFilterFactory {
     private Integer level;
@@ -704,7 +704,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     <para>Note the method annotated <classname>@Key</classname> returning a
     <classname>FilterKey</classname> object. The returned object has a special
     contract: the key object must implement <methodname>equals()</methodname>
-    / <methodname>hashcode()</methodname> so that 2 keys are equal if and only
+    / <methodname>hashCode()</methodname> so that 2 keys are equal if and only
     if the given <classname>Filter</classname> types are the same and the set
     of parameters are the same. In other words, 2 filter keys are equal if and
     only if the filters from which the keys are generated can be interchanged.
@@ -725,7 +725,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
     <para>In most cases, using the <literal>StandardFilterKey</literal>
     implementation will be good enough. It delegates the
-    <methodname>equals()</methodname> / <methodname>hashcode()</methodname>
+    <methodname>equals()</methodname> / <methodname>hashCode()</methodname>
     implementation to each of the parameters equals and hashcode
     methods.</para>
 
@@ -734,11 +734,11 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     of memory when needed. The hard reference cache keeps track of the most
     recently used filters and transforms the ones least used to
     <classname>SoftReferences</classname> when needed. Once the limit of the
-    hard reference cache is reached addtional filters are cached as
+    hard reference cache is reached additional filters are cached as
     <classname>SoftReferences</classname>. To adjust the size of the hard
     reference cache, use
     <literal>hibernate.search.filter.cache_strategy.size</literal> (defaults
-    to 128). For advance use of filter caching, you can implement your own
+    to 128). For advanced use of filter caching, you can implement your own
     <classname>FilterCachingStrategy</classname>. The classname is defined by
     <literal>hibernate.search.filter.cache_strategy</literal>.</para>
 
@@ -769,12 +769,12 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     (<classname>org.hibernate.search.filter.CachingWrapperFilter</classname>).
     In contrast to Lucene's version of this class
     <classname>SoftReference</classname>s are used together with a hard
-    reference count (see dicussion about filter cache). The hard reference
+    reference count (see discussion about filter cache). The hard reference
     count can be adjusted using
     <literal>hibernate.search.filter.cache_docidresults.size</literal>
     (defaults to 5). The wrapping behaviour can be controlled using the
     <literal>@FullTextFilterDef.cache</literal> parameter. There are three
-    differerent values for this parameter:</para>
+    different values for this parameter:</para>
 
     <para><informaltable align="left" width="">
         <tgroup cols="2">
@@ -864,6 +864,6 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
     <para>If you wish to use some specific features of Lucene, you can always
     run Lucene specific queries. Check <xref linkend="search-lucene-native" />
-    for more informations.</para>
+    for more information.</para>
   </section>
 </chapter>

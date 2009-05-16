@@ -160,7 +160,7 @@
     </example>
 
     <para>Not all dependencies are required. Only the
-    <emphasis>hibernate-search</emphasis> dependeny is mandatory. This
+    <emphasis>hibernate-search</emphasis> dependency is mandatory. This
     dependency, together with its required transitive dependencies, contain
     all required classes needed to use Hibernate Search.
     <emphasis>hibernate-annotations</emphasis> is only needed if you want to
@@ -173,7 +173,7 @@
     use Hibernate Search in conjunction with JPA. The Solr dependencies are
     needed if you want to utilize Solr's analyzer framework. More about this
     later. And finally, the <literal>lucene-snowball</literal> dependency is
-    needed if you want to utililze Lucene's snowball stemmer.</para>
+    needed if you want to use Lucene's snowball stemmer.</para>
   </section>
 
   <section>
@@ -230,7 +230,7 @@
 
     <example>
       <title>Example entities Book and Author before adding Hibernate Search
-      specific annotatons</title>
+      specific annotations</title>
 
       <programlisting>
 package example;
@@ -336,7 +336,7 @@ public class Author {
     searchable you have to make sure that the names are indexed as part of the
     book itself. On top of <literal>@IndexedEmbedded</literal> you will also
     have to mark all fields of the associated entity you want to have included
-    in the index with <literal>@Indexed</literal>. For more dedails see <xref
+    in the index with <literal>@Indexed</literal>. For more details see <xref
     linkend="search-mapping-associated" />.</para>
 
     <para>These settings should be sufficient for now. For more details on
@@ -408,10 +408,10 @@ public class Author {
 
     <para>Hibernate Search will transparently index every entity persisted,
     updated or removed through Hibernate Core. However, you have to trigger an
-    inital indexing to populate the Lucene index with the data already present
+    initial indexing to populate the Lucene index with the data already present
     in your database. Once you have added the above properties and annotations
     it is time to trigger an initial batch index of your books. You can
-    achieve this by using one of the following code snipplets (see also <xref
+    achieve this by using one of the following code snippets (see also <xref
     linkend="search-batchindex" />):</para>
 
     <example>
@@ -634,7 +634,7 @@ public class Book {
     populated with the example code of this tutorial.</para>
 
     <example>
-      <title>Using the maven achetype to create tutorial sources</title>
+      <title>Using the Maven archetype to create tutorial sources</title>
 
       <programlisting>mvn archetype:create \ 
     -DarchetypeGroupId=org.hibernate \

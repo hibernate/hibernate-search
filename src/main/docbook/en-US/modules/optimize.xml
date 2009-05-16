@@ -35,7 +35,7 @@
   During the optimization process the deletions will be applied which also
   effects the number of files in the Lucene Directory.</para>
 
-  <para>Optimising the Lucene index speeds up searches but has no effect on
+  <para>Optimizing the Lucene index speeds up searches but has no effect on
   the indexation (update) performance. During an optimization, searches can be
   performed, but will most likely be slowed down. All index updates will be
   stopped. It is recommended to schedule optimization:</para>
@@ -61,7 +61,7 @@
       </listitem>
 
       <listitem>
-        <para>or a certain amout of transactions </para>
+        <para>or a certain amount of transactions </para>
       </listitem>
     </itemizedlist>
 
@@ -129,7 +129,7 @@ searchFactory.optimize();</programlisting>
     <para>Apache Lucene has a few parameters to influence how optimization is
     performed. Hibernate Search exposes those parameters.</para>
 
-    <para>Further index optimisation parameters include: <itemizedlist>
+    <para>Further index optimization parameters include: <itemizedlist>
         <listitem>
           <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_buffered_docs</literal>
         </listitem>

@@ -81,7 +81,7 @@ org.apache.lucene.store.Directory directory = provider[0].getDirectory();</progr
     citizen" rules.</para>
 
     <example>
-      <title>Accesing an <classname>IndexReader</classname></title>
+      <title>Accessing an <classname>IndexReader</classname></title>
 
       <programlisting>DirectoryProvider orderProvider = searchFactory.getDirectoryProviders(Order.class)[0];
 DirectoryProvider clientProvider = searchFactory.getDirectoryProviders(Client.class)[0];
@@ -129,7 +129,7 @@ finally {
 
     <para>Lucene allows the user to customize its scoring formula by extending
     <classname>org.apache.lucene.search.Similarity</classname>. The abstract
-    methods defined in this class match the factors of the follownig formula
+    methods defined in this class match the factors of the following formula
     calculating the score of query q for document d:</para>
 
     <para><emphasis role="bold">score(q,d) = coord(q,d) · queryNorm(q) ·
@@ -205,7 +205,7 @@ finally {
 <emphasis role="bold">@Similarity(impl = DummySimilarity.class)</emphasis>
 public class Book {
    ...
-}</programlisting>As an exmaple, let's assume it is not important how often a
+}</programlisting>As an example, let's assume it is not important how often a
     term appears in a document. Documents with a single occurrence of the term
     should be scored the same as documents with multiple occurrences. In this
     case your custom implementation of the method <methodname>tf(float

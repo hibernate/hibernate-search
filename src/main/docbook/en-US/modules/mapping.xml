@@ -73,7 +73,7 @@ public class Essay {
 
       <para>For each property (or attribute) of your entity, you have the
       ability to describe how it will be indexed. The default (no annotation
-      present) means that the property is completly ignored by the indexing
+      present) means that the property is completely ignored by the indexing
       process. <literal>@Field</literal> does declare a property as indexed.
       When indexing an element to a Lucene document you can specify how it is
       indexed:</para>
@@ -88,7 +88,7 @@ public class Essay {
         <listitem>
           <para><literal>store</literal> : describe whether or not the
           property is stored in the Lucene index. You can store the value
-          <literal>Store.YES</literal> (comsuming more space in the index but
+          <literal>Store.YES</literal> (consuming more space in the index but
           allowing projection, see <xref linkend="projections" /> for more
           information), store it in a compressed way
           <literal>Store.COMPRESS</literal> (this does consume more CPU), or
@@ -103,8 +103,8 @@ public class Essay {
           information store. The different values are
           <literal>Index.NO</literal> (no indexing, ie cannot be found by a
           query), <literal>Index.TOKENIZED</literal> (use an analyzer to
-          process the property), <literal>Index.UN_TOKENISED</literal> (no
-          analyzer pre processing), <literal>Index.NO_NORM</literal> (do not
+          process the property), <literal>Index.UN_TOKENIZED</literal> (no
+          analyzer pre-processing), <literal>Index.NO_NORMS</literal> (do not
           store the normalization data). The default value is
           <literal>TOKENIZED</literal>.</para>
         </listitem>
@@ -162,7 +162,7 @@ public class Essay {
 
                 <row>
                   <entry
-                  align="left">TermVector.WITH_POSITIONS_OFFSETS</entry>
+                  align="left">TermVector.WITH_POSITION_OFFSETS</entry>
 
                   <entry>Store the term vector, token position and offset
                   information. This is a combination of the YES, WITH_OFFSETS
@@ -275,7 +275,7 @@ public class Book {
       <title>Embedded and associated objects</title>
 
       <para>Associated objects as well as embedded objects can be indexed as
-      part of the root entity index. This is ueful if you expect to search a
+      part of the root entity index. This is useful if you expect to search a
       given entity based on properties of associated objects. In the following
       example the aim is to return places where the associated city is Atlanta
       (In the Lucene query parser language, it would translate into
@@ -334,7 +334,7 @@ public class Address {
       <classname>Address</classname> object to keep the index up to date. To
       make sure the <literal><classname>Place</classname></literal> Lucene
       document is updated when it's <classname>Address</classname> changes,
-      you need to mark the other side of the birirectional relationship with
+      you need to mark the other side of the bidirectional relationship with
       <classname>@ContainedIn</classname>.</para>
 
       <para><literal>@ContainedIn</literal> is only useful on associations
@@ -417,7 +417,7 @@ public class Owner {
         </listitem>
 
         <listitem>
-          <para>addess.ownedBy_name</para>
+          <para>address.ownedBy_name</para>
         </listitem>
       </itemizedlist>
 
@@ -434,7 +434,7 @@ public class Owner {
       graph contains a cyclic dependency of classes (not instances). For
       example, if <classname>Owner</classname> points to
       <classname>Place</classname>. Hibernate Search will stop including
-      Indexed embedded atttributes after reaching the expected depth (or the
+      Indexed embedded attributes after reaching the expected depth (or the
       object graph boundaries are reached). A class having a self reference is
       an example of cyclic dependency. In our example, because
       <literal>depth</literal> is set to 1, any
@@ -519,7 +519,7 @@ public class Owner implements Person { ... }</programlisting>
       <title>Boost factor</title>
 
       <para>Lucene has the notion of <emphasis>boost factor</emphasis>. It's a
-      way to give more weigth to a field or to an indexed element over others
+      way to give more weight to a field or to an indexed element over others
       during the indexation process. You can use <literal>@Boost</literal> at
       the @Field, method or class level.</para>
 
@@ -649,7 +649,7 @@ public class MyEntity {
         <para>This separation of tasks - a tokenizer followed by a list of
         filters - allows for easy reuse of each individual component and let
         you build your customized analyzer in a very flexible way (just like
-        lego). Generally speaking the <classname>Tokenizer</classname> starts
+        Lego). Generally speaking the <classname>Tokenizer</classname> starts
         the analysis process by turning the character input into tokens which
         are then further processed by the <classname>TokenFilter</classname>s.
         Hibernate Search supports this infrastructure by utilizing the Solr
@@ -661,7 +661,7 @@ public class MyEntity {
         depend on more libraries. For example, the
         <classname>PhoneticFilterFactory</classname> depends on <ulink
         url="http://commons.apache.org/codec">commons-codec</ulink>. Your
-        distribution of Hibernate Search provides these dependecies in its
+        distribution of Hibernate Search provides these dependencies in its
         <filename>lib</filename> directory.</para>
 
         <example>
@@ -749,7 +749,7 @@ public class Team {
         Let check a few of them.</para>
 
         <table>
-          <title>Some of the tokenizers avalable</title>
+          <title>Some of the available tokenizers</title>
 
           <tgroup cols="3">
             <thead>
@@ -784,7 +784,7 @@ public class Team {
         </table>
 
         <table>
-          <title>Some of the filters avalable</title>
+          <title>Some of the available filters</title>
 
           <tgroup cols="3">
             <thead>
@@ -860,7 +860,7 @@ public class Team {
         <title>Analyzer discriminator (experimental)</title>
 
         <para>So far all the introduced ways to specify an analyzer were
-        static. However, there are usecases where it is useful to select an
+        static. However, there are use cases where it is useful to select an
         analyzer depending on the current state of the entity to be indexed,
         for example in multilingual application. For an
         <classname>BlogEntry</classname> class for example the analyzer could
@@ -947,7 +947,7 @@ public class BlogEntry {
         interface has to return the name of an existing analyzer definition if
         the analyzer should be set dynamically or <classname>null</classname>
         if the default analyzer should not be overridden. The given example
-        assumes that the language paramter is either 'de' or 'en' which
+        assumes that the language parameter is either 'de' or 'en' which
         matches the specified names in the
         <classname>@AnalyzerDef</classname>s.</para>
 
@@ -1076,7 +1076,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
             important is that when using a DateRange Query, you should know
             that the dates have to be expressed in GMT time.</para>
 
-            <para>Usually, storing the date up to the milisecond is not
+            <para>Usually, storing the date up to the millisecond is not
             necessary. <literal>@DateBridge</literal> defines the appropriate
             resolution you are willing to store in the index ( <literal>
             <literal>@DateBridge(resolution=Resolution.DAY)</literal>
@@ -1213,8 +1213,8 @@ private Integer length;                </programlisting>
         </example>
 
         <para>The <classname>ParameterizedBridge</classname> interface can be
-        implemented by <classname>StringBridge</classname> ,
-        <classname>TwoWayStringBridge</classname> ,
+        implemented by <classname>StringBridge</classname>,
+        <classname>TwoWayStringBridge</classname>,
         <classname>FieldBridge</classname> implementations.</para>
 
         <para>All implementations have to be thread-safe, but the parameters
@@ -1276,13 +1276,13 @@ private Integer id;
       <section>
         <title>FieldBridge</title>
 
-        <para>Some usecases require more than a simple object to string
+        <para>Some use cases require more than a simple object to string
         translation when mapping a property to a Lucene index. To give you the
         greatest possible flexibility you can also implement a bridge as a
         <classname>FieldBridge</classname>. This interface gives you a
         property value and let you map it the way you want in your Lucene
         <classname>Document</classname>.The interface is very similar in its
-        concept to the Hibernate<classname> UserType</classname>'s.</para>
+        concept to the Hibernate<classname> UserType</classname>s.</para>
 
         <para>You can for example store a given property in two different
         document fields:</para>

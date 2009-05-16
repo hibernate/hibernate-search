@@ -219,7 +219,7 @@
     <title>Reader strategy</title>
 
     <para>When executing a query, Hibernate Search interacts with the Apache
-    Lucene indexes through a reader strategy. chosing a reader strategy will
+    Lucene indexes through a reader strategy. Choosing a reader strategy will
     depend on the profile of the application (frequent updates, read mostly,
     asynchronous index update etc). See also <xref
     linkend="configuration-reader-strategy" /></para>
