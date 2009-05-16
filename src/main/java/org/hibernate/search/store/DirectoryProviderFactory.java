@@ -129,7 +129,7 @@ public class DirectoryProviderFactory {
 			provider.initialize( directoryProviderName, indexProps, searchFactoryImplementor );
 		}
 		catch (Exception e) {
-			throw new SearchException( "Unable to initialize: " + directoryProviderName, e );
+			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
 		}
 		int index = providers.indexOf( provider );
 		if ( index != -1 ) {

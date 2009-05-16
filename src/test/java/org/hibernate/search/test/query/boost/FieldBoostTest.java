@@ -140,7 +140,6 @@ public class FieldBoostTest extends SearchTestCase {
 		l.setDescription( "Scientist discovers invisibility and becomes insane." );
 		session.save( l );
 
-		session.save( l );
 		l = new BoostedDescriptionLibrary();
 		l.setAuthor( "H.G. Wells" );
 		l.setTitle( "War of the Worlds" );
@@ -158,7 +157,6 @@ public class FieldBoostTest extends SearchTestCase {
 		l.setDescription( "Scientist discovers invisibility and becomes insane." );
 		session.save( l );
 
-		session.save( l );
 		l = new BoostedFieldDescriptionLibrary();
 		l.setAuthor( "H.G. Wells" );
 		l.setTitle( "War of the Worlds" );
@@ -176,7 +174,6 @@ public class FieldBoostTest extends SearchTestCase {
 		l.setDescription( "Scientist discovers invisibility and becomes insane." );
 		session.save( l );
 
-		session.save( l );
 		l = new BoostedGetDescriptionLibrary();
 		l.setAuthor( "H.G. Wells" );
 		l.setTitle( "War of the Worlds" );
