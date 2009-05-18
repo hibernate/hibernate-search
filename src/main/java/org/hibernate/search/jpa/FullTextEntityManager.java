@@ -4,6 +4,7 @@ package org.hibernate.search.jpa;
 import java.io.Serializable;
 import javax.persistence.EntityManager;
 
+import org.hibernate.search.Indexer;
 import org.hibernate.search.SearchFactory;
 
 /**
@@ -68,5 +69,14 @@ public interface FullTextEntityManager extends EntityManager {
 	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
 	 */
 	public void flushToIndexes();
+	
+	/**
+	 * Creates an Indexer to rebuild the indexes of some
+	 * or all indexed entity types.
+	 * Instances cannot be reused.
+	 * @param types optionally restrict the operation to selected types
+	 * @return
+	 */
+	public Indexer createIndexer(Class<?>... types);
 
 }

@@ -105,7 +105,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 
 	/**
 	 * Flag indicating whether there is an explicit id (@DocumentId or @Id) or not. When Search is used as make
-	 * for example JBoss Cache searchable the <code>idKeywordName</code> wil be provided.
+	 * for example using JBoss Cache Searchable the <code>idKeywordName</code> will be provided.
 	 */
 	private boolean idProvided = false;
 
@@ -337,7 +337,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		super.addWorkToQueue( entityClass, entity, id, workType, queue, searchFactoryImplementor );
 	}
 
-	private AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, boolean isBatch) {
+	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, boolean isBatch) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap );
 		AddLuceneWork addWork;

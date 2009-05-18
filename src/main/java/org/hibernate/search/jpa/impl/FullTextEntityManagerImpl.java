@@ -10,6 +10,7 @@ import javax.persistence.EntityTransaction;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.Indexer;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.FullTextSession;
@@ -176,4 +177,9 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	public EntityTransaction getTransaction() {
 		return em.getTransaction();
 	}
+	
+	public Indexer createIndexer(Class<?>... types) {
+		return getFullTextSession().createIndexer( types );
+	}
+	
 }
