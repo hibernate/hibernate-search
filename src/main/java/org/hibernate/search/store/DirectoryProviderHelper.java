@@ -82,7 +82,10 @@ public class DirectoryProviderHelper {
 	 */
 	public static FSDirectory createFSIndex(File indexDir, Properties dirConfiguration) throws IOException {
 		LockFactory lockFactory = createLockFactory(indexDir, dirConfiguration);
-		FSDirectory fsDirectory = FSDirectory.getDirectory( indexDir, lockFactory );
+		FSDirectory fsDirectory = FSDirectory.getDirectory( indexDir, null );
+		// must use the setter (instead of using the constructor) to set the lockFactory, or Lucene will
+		// throw an exception if it's different than a previous setting.
+		fsDirectory.setLockFactory( lockFactory );
 		if ( ! IndexReader.indexExists( fsDirectory ) ) {
 			log.debug( "Initialize index: '{}'", indexDir.getAbsolutePath() );
 			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
