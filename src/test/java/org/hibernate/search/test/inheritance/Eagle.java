@@ -1,4 +1,4 @@
-//$Id: Fish.java 15592 2008-11-19 14:17:48Z hardy.ferentschik $
+//$Id$
 package org.hibernate.search.test.inheritance;
 
 import javax.persistence.Entity;

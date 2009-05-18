@@ -1,4 +1,4 @@
-// $Id: NoAnnotationsTest.java 15532 2008-11-07 16:06:17Z hardy.ferentschik $
+// $Id$
 package org.hibernate.search.test.classloading;
 
 import java.util.List;

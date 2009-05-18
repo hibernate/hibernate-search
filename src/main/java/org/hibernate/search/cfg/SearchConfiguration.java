@@ -1,4 +1,4 @@
-// $Id: SearchConfiguration.java 14954 2008-07-17 20:43:10Z sannegrinovero $
+// $Id$
 package org.hibernate.search.cfg;
 
 import java.util.Iterator;

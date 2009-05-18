@@ -1,4 +1,4 @@
-// $Id: AbstractTestAnalyzer.java 15547 2008-11-11 12:57:47Z hardy.ferentschik $
+// $Id$
 package org.hibernate.search.test.analyzer.solr;
 
 import java.io.IOException;

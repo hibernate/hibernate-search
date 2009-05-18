@@ -1,4 +1,4 @@
-//$Id: HANTestCase.java 14687 2008-05-22 18:21:01Z epbernard $
+//$Id$
 package org.hibernate.search.test;
 
 import java.io.InputStream;
