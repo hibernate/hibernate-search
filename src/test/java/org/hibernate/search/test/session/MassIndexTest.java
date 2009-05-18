@@ -2,6 +2,7 @@
 package org.hibernate.search.test.session;
 
 import java.sql.Statement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Iterator;
 
@@ -143,27 +144,27 @@ public class MassIndexTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 
-		s = openSession();
+		s = getSessionWithAutoCommit();
 		FullTextSession session = Search.getFullTextSession( s );
 		Query luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		List result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
 		assertEquals( 1, result.size() );
 		s.close();
 
-		s = openSession();
+		s = getSessionWithAutoCommit();
 		ent = (Entite) s.get( Entite.class, ent.getId() );
 		session = Search.getFullTextSession( s );
 		session.index( ent );
 		s.close();
 
-		s = openSession();
+		s = getSessionWithAutoCommit();
 		session = Search.getFullTextSession( s );
 		luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
 		assertEquals( "test lazy loading and indexing", 1, result.size() );
 		s.close();
 
-		s = openSession();
+		s = getSessionWithAutoCommit();
 		Iterator it = s.createQuery( "from Entite where id = :id").setParameter( "id", ent.getId() ).iterate();
 		session = Search.getFullTextSession( s );
 		while ( it.hasNext() ) {
@@ -172,17 +173,19 @@ public class MassIndexTest extends SearchTestCase {
 		}
 		s.close();
 
-		s = openSession();
+		s = getSessionWithAutoCommit();
 		session = Search.getFullTextSession( s );
 		luceneQuery = new TermQuery( new Term( "categorie.nom", "livre" ) );
 		result = session.createFullTextQuery( luceneQuery, Entite.class ).list();
 		assertEquals( "test lazy loading and indexing", 1, result.size() );
-		ent = (Entite) result.get( 0 );
-		cat = ent.getCategorie();
-		ent.setCategorie( null );
-		session.delete( cat );
-		session.delete( ent );
 		s.close();
+	}
+
+	private Session getSessionWithAutoCommit() throws SQLException {
+		Session s;
+		s = openSession();
+		s.connection().setAutoCommit( true );
+		return s;
 	}
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
