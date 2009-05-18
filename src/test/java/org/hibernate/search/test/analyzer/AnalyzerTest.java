@@ -157,7 +157,7 @@ public class AnalyzerTest extends SearchTestCase {
 		session.close();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] { MyEntity.class, Article.class };
 	}
 }

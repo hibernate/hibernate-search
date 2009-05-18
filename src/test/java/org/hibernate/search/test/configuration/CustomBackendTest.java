@@ -26,8 +26,9 @@ public class CustomBackendTest extends TestCase {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.worker.backend", name )
-			.build();
+			.openFullTextSession();
 		SearchFactoryImpl searchFactory = (SearchFactoryImpl) ftSession.getSearchFactory();
+		ftSession.close();
 		assertEquals( backendType, searchFactory.getBackendQueueProcessorFactory().getClass() );
 		builder.close();
 	}

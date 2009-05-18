@@ -1,6 +1,8 @@
 // $Id$
 package org.hibernate.search.test.util;
 
+import java.io.File;
+
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -8,7 +10,10 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.util.FileHelper;
+import org.slf4j.Logger;
 
 /**
  * Use the builder pattern to provide a SessionFactory.
@@ -20,9 +25,22 @@ import org.hibernate.search.store.RAMDirectoryProvider;
  */
 public class FullTextSessionBuilder {
 	
+	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
+
+	private static File indexDir;
+
 	private AnnotationConfiguration cfg;
 	private SessionFactory sessionFactory;
-	private Session session;
+	
+	static {
+		String buildDir = System.getProperty( "build.dir" );
+		if ( buildDir == null ) {
+			buildDir = ".";
+		}
+		File current = new File( buildDir );
+		indexDir = new File( current, "indextemp" );
+		log.debug( "Using {} as index directory.", indexDir.getAbsolutePath() );
+	}
 	
 	public FullTextSessionBuilder() {
 		cfg = new AnnotationConfiguration();
@@ -37,8 +55,23 @@ public class FullTextSessionBuilder {
 		//search specific:
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS,
 				StopAnalyzer.class.getName() );
-		cfg.setProperty( "hibernate.search.default.directory_provider",
-				RAMDirectoryProvider.class.getName() );
+		useRAMDirectoryProvider( true );
+	}
+	
+	/**
+	 * @param use if true, use indexes in RAM otherwise use FSDirectoryProvider
+	 * @return the same builder (this).
+	 */
+	public FullTextSessionBuilder useRAMDirectoryProvider(boolean use) {
+		 if ( use ) {
+			 cfg.setProperty( "hibernate.search.default.directory_provider",
+						RAMDirectoryProvider.class.getName() );
+		 }
+		 else {
+			 cfg.setProperty( "hibernate.search.default.directory_provider",
+						FSDirectoryProvider.class.getName() );
+		 }
+		return this;
 	}
 	
 	/**
@@ -63,28 +96,35 @@ public class FullTextSessionBuilder {
 	}
 	
 	/**
-	 * Creates a new FullTextSession based upon the configuration built so far.
-	 * @return new FullTextSession based upon the configuration built so far.
+	 * @return a new FullTextSession based upon the built configuration.
 	 */
-	public FullTextSession build() {
-		if ( session != null || sessionFactory != null ) {
-			throw new java.lang.IllegalStateException( "session is open already" );
+	public FullTextSession openFullTextSession() {
+		if ( sessionFactory == null ) {
+			build();
 		}
-		sessionFactory = cfg.buildSessionFactory();
-		session = sessionFactory.openSession();
+		Session session = sessionFactory.openSession();
 		return Search.getFullTextSession( session );
 	}
 	
 	/**
-	 * Closes the provided FullTextSession and the SessionFactory
+	 * Closes the SessionFactory.
+	 * Make sure you close all sessions first
 	 */
 	public void close() {
-		if ( session == null || sessionFactory == null ) {
-			throw new java.lang.IllegalStateException( "session not yet built" );
+		if ( sessionFactory == null ) {
+			throw new java.lang.IllegalStateException( "sessionFactory not yet built" );
 		}
-		session.close();
-		session = null;
 		sessionFactory.close();
+		FileHelper.delete( indexDir );
 		sessionFactory = null;
 	}
+
+	/**
+	 * Builds the sessionFactory as configured so far.
+	 */
+	public FullTextSessionBuilder build() {
+		sessionFactory = cfg.buildSessionFactory();
+		return this;
+	}
+	
 }

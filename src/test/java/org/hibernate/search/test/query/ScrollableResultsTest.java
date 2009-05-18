@@ -28,11 +28,12 @@ public class ScrollableResultsTest extends TestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 		builder = new FullTextSessionBuilder();
-		sess = builder
+		builder
 			.addAnnotatedClass( AlternateBook.class )
 			.addAnnotatedClass( Employee.class )
 			.setProperty( "hibernate.default_batch_fetch_size", "10" )
 			.build();
+		sess = builder.openFullTextSession();
 		Transaction tx = sess.beginTransaction();
 		//create some entities to query:
 		for ( int i = 0; i < 324; i++ ) {

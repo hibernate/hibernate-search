@@ -9,6 +9,7 @@ import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
@@ -18,6 +19,7 @@ import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.RAMDirectoryProvider;
@@ -33,6 +35,8 @@ public abstract class SearchTestCase extends TestCase {
 	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
 
 	private static File indexDir;
+	
+	private SearchFactory searchFactory;
 
 	static {
 		String buildDir = System.getProperty( "build.dir" );
@@ -52,10 +56,10 @@ public abstract class SearchTestCase extends TestCase {
 	protected void tearDown() throws Exception {
 		SchemaExport export = new SchemaExport( cfg );
 		export.drop( false, true );
+		searchFactory = null;
 	}
 
-	@SuppressWarnings("unchecked")
-	protected Directory getDirectory(Class clazz) {
+	protected Directory getDirectory(Class<?> clazz) {
 		return getLuceneEventListener().getSearchFactoryImplementor().getDirectoryProviders( clazz )[0].getDirectory();
 	}
 
@@ -84,13 +88,23 @@ public abstract class SearchTestCase extends TestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx;
 		tx = s.beginTransaction();
-		for ( Class clazz : getMappings() ) {
+		for ( Class<?> clazz : getMappings() ) {
 			if ( clazz.getAnnotation( Indexed.class ) != null ) {
 				s.purgeAll( clazz );
 			}
 		}
 		tx.commit();
 		s.close();
+	}
+	
+	protected SearchFactory getSearchFactory() {
+		if ( searchFactory == null ) {
+			Session session = openSession();
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			searchFactory = fullTextSession.getSearchFactory();
+			fullTextSession.close();
+		}
+		return searchFactory;
 	}
 
 	protected void configure(Configuration cfg) {
@@ -105,7 +119,7 @@ public abstract class SearchTestCase extends TestCase {
 		return indexDir;
 	}
 
-	protected void buildSessionFactory(Class[] classes, String[] packages, String[] xmlFiles) throws Exception {
+	protected void buildSessionFactory(Class<?>[] classes, String[] packages, String[] xmlFiles) throws Exception {
 		if ( getSessions() != null ) {
 			getSessions().close();
 		}
@@ -118,7 +132,7 @@ public abstract class SearchTestCase extends TestCase {
 			for ( String aPackage : packages ) {
 				( ( AnnotationConfiguration ) getCfg() ).addPackage( aPackage );
 			}
-			for ( Class aClass : classes ) {
+			for ( Class<?> aClass : classes ) {
 				( ( AnnotationConfiguration ) getCfg() ).addAnnotatedClass( aClass );
 			}
 			for ( String xmlFile : xmlFiles ) {
@@ -134,7 +148,7 @@ public abstract class SearchTestCase extends TestCase {
 		}
 	}
 
-	protected abstract Class[] getMappings();
+	protected abstract Class<?>[] getMappings();
 
 	protected String[] getAnnotatedPackages() {
 		return new String[] { };
