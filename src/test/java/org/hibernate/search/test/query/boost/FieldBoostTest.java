@@ -1,3 +1,4 @@
+//$Id$
 package org.hibernate.search.test.query.boost;
 
 import java.util.List;
@@ -7,16 +8,20 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+import org.slf4j.Logger;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author John Griffin
  */
-public class FieldBoostTest extends SearchTestCase {
+public class  FieldBoostTest extends SearchTestCase {
+
+	private static final Logger log = LoggerFactory.make();
 
 	public void testBoostedGetDesc() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -33,14 +38,14 @@ public class FieldBoostTest extends SearchTestCase {
 		BooleanQuery query = new BooleanQuery();
 		query.add( author, BooleanClause.Occur.SHOULD );
 		query.add( desc, BooleanClause.Occur.SHOULD );
-		//System.out.println( query.toString() );
+		log.debug( query.toString() );
 
 		org.hibernate.search.FullTextQuery hibQuery =
 				fullTextSession.createFullTextQuery( query, BoostedGetDescriptionLibrary.class );
 		List results = hibQuery.list();
 
-		//System.out.println( hibQuery.explain( 0 ) );
-		//System.out.println( hibQuery.explain( 1 ) );
+		log.debug( hibQuery.explain( 0 ).toString() );
+		log.debug( hibQuery.explain( 1 ).toString() );
 
 		assertTrue(
 				"incorrect document returned",
@@ -71,7 +76,7 @@ public class FieldBoostTest extends SearchTestCase {
 		BooleanQuery query = new BooleanQuery();
 		query.add( author, BooleanClause.Occur.SHOULD );
 		query.add( desc, BooleanClause.Occur.SHOULD );
-		//System.out.println( query.toString() );
+		log.debug( query.toString() );
 
 		org.hibernate.search.FullTextQuery hibQuery =
 				fullTextSession.createFullTextQuery( query, BoostedFieldDescriptionLibrary.class );
@@ -82,8 +87,8 @@ public class FieldBoostTest extends SearchTestCase {
 				( ( BoostedFieldDescriptionLibrary ) results.get( 0 ) ).getDescription().startsWith( "Martians" )
 		);
 
-		//System.out.println( hibQuery.explain( 0 ) );
-		//System.out.println( hibQuery.explain( 1 ) );
+		log.debug( hibQuery.explain( 0 ).toString() );
+		log.debug( hibQuery.explain( 1 ).toString() );
 
 		//cleanup
 		for ( Object element : fullTextSession.createQuery( "from " + BoostedFieldDescriptionLibrary.class.getName() )
@@ -109,14 +114,14 @@ public class FieldBoostTest extends SearchTestCase {
 		BooleanQuery query = new BooleanQuery();
 		query.add( author, BooleanClause.Occur.SHOULD );
 		query.add( desc, BooleanClause.Occur.SHOULD );
-		//System.out.println( query.toString() );
+		log.debug( query.toString() );
 
 		org.hibernate.search.FullTextQuery hibQuery =
 				fullTextSession.createFullTextQuery( query, BoostedDescriptionLibrary.class );
 		List results = hibQuery.list();
 
-		//System.out.println( hibQuery.explain( 0 ) );
-		//System.out.println( hibQuery.explain( 1 ) );
+		log.debug( hibQuery.explain( 0 ).toString() );
+		log.debug( hibQuery.explain( 1 ).toString() );
 
 		assertTrue(
 				"incorrect document returned",

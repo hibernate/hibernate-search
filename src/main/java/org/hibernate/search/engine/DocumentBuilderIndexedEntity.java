@@ -23,7 +23,6 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.util.ReflectHelper;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
@@ -48,6 +47,7 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
+import org.hibernate.util.ReflectHelper;
 
 /**
  * Set up and provide a manager for classes which are directly annotated with <code>@Indexed</code>.
@@ -196,6 +196,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
 				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
+				propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
 				// property > entity analyzer (no field analyzer)
 				Analyzer analyzer = getAnalyzer( member, context );
 				if ( analyzer == null ) {
@@ -221,28 +222,34 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	 * @return the annotation used as document id or <code>null</code> if id annotation is specified on the property.
 	 */
 	private Annotation getIdAnnotation(XProperty member, InitContext context) {
+		Annotation idAnnotation = null;
+
 		// check for explicit DocumentId
-		Annotation documentIdAnn = member.getAnnotation( DocumentId.class );
+		DocumentId documentIdAnn = member.getAnnotation( DocumentId.class );
 		if ( documentIdAnn != null ) {
 			explicitDocumentId = true;
-			return documentIdAnn;
+			idAnnotation = documentIdAnn;
 		}
-
 		// check for JPA @Id
-		if ( !explicitDocumentId && context.isJpaPresent() ) {
-			Class idClass;
+		else if ( !explicitDocumentId && context.isJpaPresent() ) {
+			Annotation jpaId;
 			try {
-				idClass = org.hibernate.util.ReflectHelper.classForName( "javax.persistence.Id", InitContext.class );
+				@SuppressWarnings("unchecked")
+				Class<? extends Annotation> jpaIdClass = org.hibernate
+						.util
+						.ReflectHelper
+						.classForName( "javax.persistence.Id", InitContext.class );
+				jpaId = member.getAnnotation( jpaIdClass );
 			}
 			catch ( ClassNotFoundException e ) {
 				throw new SearchException( "Unable to load @Id.class even though it should be present ?!" );
 			}
-			documentIdAnn = member.getAnnotation( idClass );
-			if ( documentIdAnn != null ) {
+			if ( jpaId != null ) {
 				log.debug( "Found JPA id and using it as document id" );
+				idAnnotation = jpaId;
 			}
 		}
-		return documentIdAnn;
+		return idAnnotation;
 	}
 
 	private ProvidedId findProvidedId(XClass clazz, ReflectionManager reflectionManager) {
@@ -258,7 +265,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	//TODO could we use T instead of EntityClass?
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
 		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition
-		
+
 		boolean sameIdWasSetToBeDeleted = false;
 		List<LuceneWork> toDelete = new ArrayList<LuceneWork>();
 		boolean duplicateDelete = false;
@@ -301,7 +308,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			//avoid updating (and thus adding) objects which are going to be deleted
 			return;
 		}
-		
+
 		for ( LuceneWork luceneWork : toDelete ) {
 			queue.remove( luceneWork );
 		}
@@ -367,9 +374,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 
 		Document doc = new Document();
 		final Class<?> entityType = Hibernate.getClass( instance );
-		if ( metadata.boost != null ) {
-			doc.setBoost( metadata.boost );
-		}
+		doc.setBoost( metadata.getClassBoost( instance ) );
 
 		// add the class name of the entity to the document
 		Field classField =
@@ -419,7 +424,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 			propertiesMetadata.fieldBridges.get( i ).set(
 					propertiesMetadata.fieldNames.get( i ), value, doc,
-					propertiesMetadata.getFieldLuceneOptions( i )
+					propertiesMetadata.getFieldLuceneOptions( i, value )
 			);
 		}
 

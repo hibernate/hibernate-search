@@ -24,7 +24,6 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -35,6 +34,7 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -48,6 +48,7 @@ import org.hibernate.search.impl.InitContext;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.ScopedAnalyzer;
+import org.hibernate.util.StringHelper;
 
 /**
  * Set up and provide a manager for classes which are indexed via <code>@IndexedEmbedded</code>, but themselves do not
@@ -99,6 +100,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 
 	protected void init(XClass clazz, InitContext context) {
 		metadata.boost = getBoost( clazz );
+		metadata.classBoostStrategy = getDynamicBoost( clazz );
 		metadata.analyzer = context.getDefaultAnalyzer();
 
 		Set<XClass> processedClasses = new HashSet<XClass>();
@@ -195,9 +197,6 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 	}
 
-	/**
-	 * Check for field and method level annotations.
-	 */
 	protected void initializeMemberLevelAnnotations(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
 													String prefix, Set<XClass> processedClasses, InitContext context) {
 		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context );
@@ -264,7 +263,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 						"Multiple AnalyzerDiscriminator defined in the same class hierarchy: " + beanClass.getName()
 				);
 			}
-						
+
 			Class<? extends Discriminator> discriminatorClass = discriminiatorAnn.impl();
 			try {
 				propertiesMetadata.discriminator = discriminatorClass.newInstance();
@@ -461,6 +460,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		propertiesMetadata.fieldStore.add( getStore( fieldAnn.store() ) );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
 		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
+		propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
 		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
 		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, member, reflectionManager ) );
 
@@ -484,6 +484,25 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 			computedBoost *= fieldAnn.boost().value();
 		}
 		return computedBoost;
+	}
+
+	protected BoostStrategy getDynamicBoost(XProperty member) {
+		DynamicBoost boostAnnotation = member.getAnnotation( DynamicBoost.class );
+		if ( boostAnnotation == null ) {
+			return new DefaultBoostStrategy();
+		}
+
+		Class<? extends BoostStrategy> boostStrategyClass = boostAnnotation.impl();
+		BoostStrategy strategy;
+		try {
+			strategy = boostStrategyClass.newInstance();
+		}
+		catch ( Exception e ) {
+			throw new SearchException(
+					"Unable to instantiate boost strategy implementation: " + boostStrategyClass.getName()
+			);
+		}
+		return strategy;
 	}
 
 	private String buildEmbeddedPrefix(String prefix, IndexedEmbedded embeddedAnn, XProperty member) {
@@ -544,14 +563,39 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	protected Float getBoost(XClass element) {
+		float boost = 1.0f;
+		if ( element == null ) {
+			return boost;
+		}
+		Boost boostAnnotation = element.getAnnotation( Boost.class );
+		if ( boostAnnotation != null ) {
+			boost = boostAnnotation.value();
+		}
+		return boost;
+	}
+
+	protected BoostStrategy getDynamicBoost(XClass element) {
 		if ( element == null ) {
 			return null;
 		}
-		Boost boost = element.getAnnotation( Boost.class );
-		return boost != null ?
-				boost.value() :
-				null;
+		DynamicBoost boostAnnotation = element.getAnnotation( DynamicBoost.class );
+		if ( boostAnnotation == null ) {
+			return new DefaultBoostStrategy();
+		}
+
+		Class<? extends BoostStrategy> boostStrategyClass = boostAnnotation.impl();
+		BoostStrategy strategy;
+		try {
+			strategy = boostStrategyClass.newInstance();
+		}
+		catch ( Exception e ) {
+			throw new SearchException(
+					"Unable to instantiate boost strategy implementation: " + boostStrategyClass.getName()
+			);
+		}
+		return strategy;
 	}
+
 
 	//TODO could we use T instead of EntityClass?
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
@@ -673,24 +717,31 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	/**
-	 * Wrapper class containing all the meta data extracted out of the entities.
+	 * Wrapper class containing all the meta data extracted out of a single entity.
+	 * All field/property related properties are kept in lists. Retrieving all metadata for a given
+	 * property/field means accessing all the lists with the same index.
 	 */
 	protected static class PropertiesMetadata {
-		public Float boost;
+		public float boost;
 		public Analyzer analyzer;
 		public Discriminator discriminator;
 		public XMember discriminatorGetter;
+		public BoostStrategy classBoostStrategy;
+		
 		public final List<String> fieldNames = new ArrayList<String>();
 		public final List<XMember> fieldGetters = new ArrayList<XMember>();
 		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
 		public final List<Field.Store> fieldStore = new ArrayList<Field.Store>();
 		public final List<Field.Index> fieldIndex = new ArrayList<Field.Index>();
 		public final List<Float> fieldBoosts = new ArrayList<Float>();
+		public final List<BoostStrategy> dynamicFieldBoosts = new ArrayList<BoostStrategy>();
+
 		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
 		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
 		public final List<PropertiesMetadata> embeddedPropertiesMetadata = new ArrayList<PropertiesMetadata>();
 		public final List<Container> embeddedContainers = new ArrayList<Container>();
 		public final List<XMember> containedInGetters = new ArrayList<XMember>();
+
 		public final List<String> classNames = new ArrayList<String>();
 		public final List<Field.Store> classStores = new ArrayList<Field.Store>();
 		public final List<Field.Index> classIndexes = new ArrayList<Field.Index>();
@@ -712,13 +763,19 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 			);
 		}
 
-		protected LuceneOptions getFieldLuceneOptions(int i) {
+		protected LuceneOptions getFieldLuceneOptions(int i, Object value) {
 			LuceneOptions options;
 			options = new LuceneOptionsImpl(
 					fieldStore.get( i ),
-					fieldIndex.get( i ), fieldTermVectors.get( i ), fieldBoosts.get( i )
+					fieldIndex.get( i ),
+					fieldTermVectors.get( i ),
+					fieldBoosts.get( i ) * dynamicFieldBoosts.get( i ).defineBoost( value )
 			);
 			return options;
+		}
+
+		protected float getClassBoost(Object value) {
+			return boost * classBoostStrategy.defineBoost( value );
 		}
 	}
 }
