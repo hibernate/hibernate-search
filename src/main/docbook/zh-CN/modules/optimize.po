@@ -1,0 +1,215 @@
+# Chinese translations for PACKAGE package.
+# Automatically generated, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2009-05-26 15:46+0000\n"
+"PO-Revision-Date: 2009-05-26 15:46+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: optimize.xml:30
+#, no-c-format
+msgid "Index Optimization"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:32
+#, no-c-format
+msgid ""
+"From time to time, the Lucene index needs to be optimized. The process is "
+"essentially a defragmentation. Until an optimization is triggered Lucene "
+"only marks deleted documents as such, no physical deletions are applied. "
+"During the optimization process the deletions will be applied which also "
+"effects the number of files in the Lucene Directory."
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:38
+#, no-c-format
+msgid ""
+"Optimizing the Lucene index speeds up searches but has no effect on the "
+"indexation (update) performance. During an optimization, searches can be "
+"performed, but will most likely be slowed down. All index updates will be "
+"stopped. It is recommended to schedule optimization:"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:45
+#, no-c-format
+msgid "on an idle system or when the searches are less frequent"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:49
+#, no-c-format
+msgid "after a lot of index modifications"
+msgstr ""
+
+#. Tag: title
+#: optimize.xml:54
+#, no-c-format
+msgid "Automatic optimization"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:56
+#, no-c-format
+msgid "Hibernate Search can automatically optimize an index after:"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:60
+#, no-c-format
+msgid "a certain amount of operations (insertion, deletion)"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:64
+#, no-c-format
+msgid "or a certain amount of transactions"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:68
+#, no-c-format
+msgid ""
+"The configuration for automatic index optimization can be defined on a "
+"global level or per index:"
+msgstr ""
+
+#. Tag: title
+#: optimize.xml:72
+#, no-c-format
+msgid "Defining automatic optimization parameters"
+msgstr ""
+
+#. Tag: programlisting
+#: optimize.xml:74
+#, no-c-format
+msgid ""
+"hibernate.search.default.optimizer.operation_limit.max = 1000\n"
+"hibernate.search.default.optimizer.transaction_limit.max = 100\n"
+"hibernate.search.Animal.optimizer.transaction_limit.max = 50"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:77
+#, no-c-format
+msgid ""
+"An optimization will be triggered to the <literal>Animal</literal> index as "
+"soon as either:"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:82
+#, no-c-format
+msgid "the number of additions and deletions reaches 1000"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:86
+#, no-c-format
+msgid ""
+"the number of transactions reaches 50 (<constant>hibernate.search.Animal."
+"optimizer.transaction_limit.max</constant> having priority over "
+"<constant>hibernate.search.default.optimizer.transaction_limit.max</"
+"constant>)"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:93
+#, no-c-format
+msgid ""
+"If none of these parameters are defined, no optimization is processed "
+"automatically."
+msgstr ""
+
+#. Tag: title
+#: optimize.xml:98
+#, no-c-format
+msgid "Manual optimization"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:100
+#, no-c-format
+msgid ""
+"You can programmatically optimize (defragment) a Lucene index from Hibernate "
+"Search through the <classname>SearchFactory</classname>:"
+msgstr ""
+
+#. Tag: title
+#: optimize.xml:104
+#, no-c-format
+msgid "Programmatic index optimization"
+msgstr ""
+
+#. Tag: programlisting
+#: optimize.xml:106
+#, no-c-format
+msgid ""
+"FullTextSession fullTextSession = Search.getFullTextSession"
+"(regularSession);\n"
+"SearchFactory searchFactory = fullTextSession.getSearchFactory();\n"
+"\n"
+"searchFactory.optimize(Order.class);\n"
+"// or\n"
+"searchFactory.optimize();"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:109
+#, no-c-format
+msgid ""
+"The first example optimizes the Lucene index holding <classname>Order</"
+"classname>s; the second, optimizes all indexes."
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:113
+#, no-c-format
+msgid ""
+"<literal>searchFactory.optimize()</literal> has no effect on a JMS backend. "
+"You must apply the optimize operation on the Master node."
+msgstr ""
+
+#. Tag: title
+#: optimize.xml:120
+#, no-c-format
+msgid "Adjusting optimization"
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:122
+#, no-c-format
+msgid ""
+"Apache Lucene has a few parameters to influence how optimization is "
+"performed. Hibernate Search exposes those parameters."
+msgstr ""
+
+#. Tag: para
+#: optimize.xml:125
+#, no-c-format
+msgid ""
+"Further index optimization parameters include: <itemizedlist> <listitem> "
+"<literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|"
+"transaction].max_buffered_docs</literal> </listitem> <listitem> "
+"<literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|"
+"transaction].max_field_length</literal> </listitem> <listitem> "
+"<literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|"
+"transaction].max_merge_docs</literal> </listitem> <listitem> "
+"<literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|"
+"transaction].merge_factor</literal> </listitem> <listitem> "
+"<literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|"
+"transaction].ram_buffer_size</literal> </listitem> <listitem> "
+"<literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|"
+"transaction].term_index_interval</literal> </listitem> </itemizedlist> See "
+"<xref linkend=\"lucene-indexing-performance\"/> for more details."
+msgstr ""

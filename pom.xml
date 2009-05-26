@@ -145,7 +145,7 @@
             <plugin>
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-jdocbook-plugin</artifactId>
-                <version>2.1.0</version>
+                <version>2.1.2</version>
                 <extensions>true</extensions>
                 <dependencies>
                     <dependency>
@@ -157,8 +157,11 @@
                 </dependencies>
                 <configuration>
                     <sourceDocumentName>master.xml</sourceDocumentName>
-                    <sourceDirectory>${basedir}/src/main/docbook/en-US</sourceDirectory>
+                    <sourceDirectory>${basedir}/src/main/docbook</sourceDirectory>
                     <masterTranslation>en-US</masterTranslation>
+                    <translations>
+                        <translation>zh-CN</translation>
+                    </translations>                         
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
                     </imageResource>
@@ -190,6 +193,7 @@
                         <id>make-doc</id>
                         <phase>site</phase>
                         <goals>
+                            <goal>translate</goal>
                             <goal>resources</goal>
                             <goal>generate</goal>
                         </goals>

@@ -161,8 +161,7 @@ public class Essay {
                 </row>
 
                 <row>
-                  <entry
-                  align="left">TermVector.WITH_POSITION_OFFSETS</entry>
+                  <entry align="left">TermVector.WITH_POSITION_OFFSETS</entry>
 
                   <entry>Store the term vector, token position and offset
                   information. This is a combination of the YES, WITH_OFFSETS
@@ -833,10 +832,9 @@ public class Team {
                 protect, protects, protection share the same root). Using such
                 a filter allows searches matching related words.</entry>
 
-                <entry><para><literal>language</literal>: Danish, Dutch,
-                English, Finnish, French, German, Italian, Norwegian,
-                Portuguese, Russian, Spanish, Swedish</para>and a few
-                more</entry>
+                <entry><literal>language</literal>: Danish, Dutch, English,
+                Finnish, French, German, Italian, Norwegian, Portuguese,
+                Russian, Spanish, Swedish and a few more</entry>
               </row>
 
               <row>
@@ -923,7 +921,9 @@ public class BlogEntry {
         return (String) value;
     }
 }</programlisting>
-          </example>The prerequisite for using
+          </example></para>
+
+        <para>The prerequisite for using
         <classname>@AnalyzerDiscriminator</classname> is that all analyzers
         which are going to be used are predefined via
         <classname>@AnalyzerDef</classname> definitions. If this is the case

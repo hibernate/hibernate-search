@@ -1,0 +1,1605 @@
+# Chinese translations for PACKAGE package.
+# Automatically generated, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2009-05-26 15:46+0000\n"
+"PO-Revision-Date: 2009-05-26 15:46+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: configuration.xml:30
+#, no-c-format
+msgid "Configuration"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:33
+#, no-c-format
+msgid "Directory configuration"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:35
+#, no-c-format
+msgid ""
+"Apache Lucene has a notion of <literal>Directory</literal> to store the "
+"index files. The <classname>Directory</classname> implementation can be "
+"customized, but Lucene comes bundled with a file system "
+"(<literal>FSDirectoryProvider</literal>) and an in memory "
+"(<literal>RAMDirectoryProvider</literal>) implementation. "
+"<literal>DirectoryProvider</literal>s are the Hibernate Search abstraction "
+"around a Lucene <classname>Directory</classname> and handle the "
+"configuration and the initialization of the underlying Lucene resources. "
+"<xref linkend=\"directory-provider-table\"/> shows the list of the directory "
+"providers bundled with Hibernate Search."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:47
+#, no-c-format
+msgid "List of built-in Directory Providers"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:52 configuration.xml:811
+#, no-c-format
+msgid "Class"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:54 configuration.xml:349 configuration.xml:635
+#: configuration.xml:813
+#, no-c-format
+msgid "Description"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:56
+#, no-c-format
+msgid "Properties"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:62
+#, no-c-format
+msgid "org.hibernate.search.store.RAMDirectoryProvider"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:64
+#, no-c-format
+msgid ""
+"Memory based directory, the directory will be uniquely identified (in the "
+"same deployment unit) by the <literal>@Indexed.index</literal> element"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:68 configuration.xml:868
+#, no-c-format
+msgid "none"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:72
+#, no-c-format
+msgid "org.hibernate.search.store.FSDirectoryProvider"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:74
+#, no-c-format
+msgid ""
+"File system based directory. The directory used will be &lt;indexBase&gt;/"
+"&lt; indexName &gt;"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:77
+#, no-c-format
+msgid "<literal>indexBase</literal> : Base directory"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:78 configuration.xml:102 configuration.xml:136
+#, no-c-format
+msgid ""
+"<literal>indexName</literal>: override @Indexed.index (useful for sharded "
+"indexes)"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:79 configuration.xml:113 configuration.xml:147
+#, no-c-format
+msgid "<literal> locking_strategy</literal> : optional, see"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:86
+#, no-c-format
+msgid "org.hibernate.search.store.FSMasterDirectoryProvider"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:88
+#, no-c-format
+msgid ""
+"File system based directory. Like FSDirectoryProvider. It also copies the "
+"index to a source directory (aka copy directory) on a regular basis."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:91 configuration.xml:125
+#, no-c-format
+msgid ""
+"The recommended value for the refresh period is (at least) 50% higher that "
+"the time to copy the information (default 3600 seconds - 60 minutes)."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:93 configuration.xml:127
+#, no-c-format
+msgid ""
+"Note that the copy is based on an incremental copy mechanism reducing the "
+"average copy time."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:95
+#, no-c-format
+msgid ""
+"DirectoryProvider typically used on the master node in a JMS back end "
+"cluster."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:96 configuration.xml:130
+#, no-c-format
+msgid ""
+"The <literal> buffer_size_on_copy</literal> optimum depends on your "
+"operating system and available RAM; most people reported good results using "
+"values between 16 and 64MB."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:101 configuration.xml:135
+#, no-c-format
+msgid "<literal>indexBase</literal>: Base directory"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:104 configuration.xml:138
+#, no-c-format
+msgid "<literal>sourceBase</literal>: Source (copy) base directory."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:105 configuration.xml:139
+#, no-c-format
+msgid ""
+"<literal>source</literal>: Source directory suffix (default to "
+"<literal>@Indexed.index</literal>). The actual source directory name being "
+"<filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:109 configuration.xml:143
+#, no-c-format
+msgid ""
+"<literal>refresh</literal>: refresh period in second (the copy will take "
+"place every refresh seconds)."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:110 configuration.xml:144
+#, no-c-format
+msgid ""
+"<literal>buffer_size_on_copy</literal>: The amount of MegaBytes to move in a "
+"single low level copy instruction; defaults to 16MB."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:120
+#, no-c-format
+msgid "org.hibernate.search.store.FSSlaveDirectoryProvider"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:122
+#, no-c-format
+msgid ""
+"File system based directory. Like FSDirectoryProvider, but retrieves a "
+"master version (source) on a regular basis. To avoid locking and "
+"inconsistent search results, 2 local copies are kept."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:129
+#, no-c-format
+msgid "DirectoryProvider typically used on slave nodes using a JMS back end."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:156
+#, no-c-format
+msgid ""
+"If the built-in directory providers do not fit your needs, you can write "
+"your own directory provider by implementing the <classname>org.hibernate."
+"store.DirectoryProvider</classname> interface."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:161
+#, no-c-format
+msgid ""
+"Each indexed entity is associated to a Lucene index (an index can be shared "
+"by several entities but this is not usually the case). You can configure the "
+"index through properties prefixed by <constant>hibernate.search.</"
+"constant><replaceable>indexname</replaceable> . Default properties inherited "
+"to all indexes can be defined using the prefix <constant>hibernate.search."
+"default.</constant>"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:168
+#, no-c-format
+msgid ""
+"To define the directory provider of a given index, you use the "
+"<constant>hibernate.search.<replaceable>indexname</replaceable>."
+"directory_provider </constant>"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:173
+#, no-c-format
+msgid "Configuring directory providers"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:175
+#, no-c-format
+msgid ""
+"hibernate.search.default.directory_provider org.hibernate.search.store."
+"FSDirectoryProvider\n"
+"hibernate.search.default.indexBase=/usr/lucene/indexes\n"
+"hibernate.search.Rules.directory_provider org.hibernate.search.store."
+"RAMDirectoryProvider"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:178
+#, no-c-format
+msgid "applied on"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:181
+#, no-c-format
+msgid ""
+"Specifying the index name using the <literal>index</literal> parameter of "
+"<classname>@Indexed</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:184
+#, no-c-format
+msgid ""
+"@Indexed(index=\"Status\")\n"
+"public class Status { ... }\n"
+"\n"
+"@Indexed(index=\"Rules\")\n"
+"public class Rule { ... }"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:187
+#, no-c-format
+msgid ""
+"will create a file system directory in <filename>/usr/lucene/indexes/Status</"
+"filename> where the Status entities will be indexed, and use an in memory "
+"directory named <literal>Rules</literal> where Rule entities will be indexed."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:192
+#, no-c-format
+msgid ""
+"You can easily define common rules like the directory provider and base "
+"directory, and override those defaults later on on a per index basis."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:196
+#, no-c-format
+msgid ""
+"Writing your own <classname>DirectoryProvider</classname>, you can utilize "
+"this configuration mechanism as well."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:201
+#, no-c-format
+msgid "Sharding indexes"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:203
+#, no-c-format
+msgid ""
+"In some extreme cases involving huge indexes (in size), it is necessary to "
+"split (shard) the indexing data of a given entity type into several Lucene "
+"indexes. This solution is not recommended until you reach significant index "
+"sizes and index update times are slowing the application down. The main "
+"drawback of index sharding is that searches will end up being slower since "
+"more files have to be opened for a single search. In other words don't do it "
+"until you have problems :)"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:211
+#, no-c-format
+msgid ""
+"Despite this strong warning, Hibernate Search allows you to index a given "
+"entity type into several sub indexes. Data is sharded into the different sub "
+"indexes thanks to an <classname>IndexShardingStrategy</classname>. By "
+"default, no sharding strategy is enabled, unless the number of shards is "
+"configured. To configure the number of shards use the following property"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:219
+#, no-c-format
+msgid ""
+"Enabling index sharding by specifying nbr_of_shards for a specific index"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:222
+#, no-c-format
+msgid "hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards 5"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:225
+#, no-c-format
+msgid "This will use 5 different shards."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:227
+#, no-c-format
+msgid ""
+"The default sharding strategy, when shards are set up, splits the data "
+"according to the hash value of the id string representation (generated by "
+"the Field Bridge). This ensures a fairly balanced sharding. You can replace "
+"the strategy by implementing <literal>IndexShardingStrategy</literal> and by "
+"setting the following property"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:235
+#, no-c-format
+msgid "Specifying a custom sharding strategy"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:237
+#, no-c-format
+msgid ""
+"hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy."
+"Implementation"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:240
+#, no-c-format
+msgid ""
+"Each shard has an independent directory provider configuration as described "
+"in <xref linkend=\"search-configuration-directory\"/>. The DirectoryProvider "
+"default name for the previous example are <literal>&lt;indexName&gt;.0</"
+"literal> to <literal>&lt;indexName&gt;.4</literal>. In other words, each "
+"shard has the name of it's owning index followed by <constant>.</constant> "
+"(dot) and its index number."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:249
+#, no-c-format
+msgid ""
+"Configuring the sharding configuration for an example entity "
+"<classname>Animal</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:252
+#, no-c-format
+msgid ""
+"hibernate.search.default.indexBase /usr/lucene/indexes\n"
+"\n"
+"hibernate.search.Animal.sharding_strategy.nbr_of_shards 5\n"
+"hibernate.search.Animal.directory_provider org.hibernate.search.store."
+"FSDirectoryProvider\n"
+"hibernate.search.Animal.0.indexName Animal00\n"
+"hibernate.search.Animal.3.indexBase /usr/lucene/sharded\n"
+"hibernate.search.Animal.3.indexName Animal03"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:255
+#, no-c-format
+msgid ""
+"This configuration uses the default id string hashing strategy and shards "
+"the Animal index into 5 subindexes. All subindexes are "
+"<classname>FSDirectoryProvider</classname> instances and the directory where "
+"each subindex is stored is as followed:"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:262
+#, no-c-format
+msgid ""
+"for subindex 0: /usr/lucene/indexes/Animal00 (shared indexBase but "
+"overridden indexName)"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:267
+#, no-c-format
+msgid ""
+"for subindex 1: /usr/lucene/indexes/Animal.1 (shared indexBase, default "
+"indexName)"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:272
+#, no-c-format
+msgid ""
+"for subindex 2: /usr/lucene/indexes/Animal.2 (shared indexBase, default "
+"indexName)"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:277
+#, no-c-format
+msgid ""
+"for subindex 3: /usr/lucene/shared/Animal03 (overridden indexBase, "
+"overridden indexName)"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:282
+#, no-c-format
+msgid ""
+"for subindex 4: /usr/lucene/indexes/Animal.4 (shared indexBase, default "
+"indexName)"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:289
+#, no-c-format
+msgid "Sharing indexes (two entities into the same directory)"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:292
+#, no-c-format
+msgid ""
+"This is only presented here so that you know the option is available. There "
+"is really not much benefit in sharing indexes."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:296
+#, no-c-format
+msgid ""
+"It is technically possible to store the information of more than one entity "
+"into a single Lucene index. There are two ways to accomplish this:"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:302
+#, no-c-format
+msgid ""
+"Configuring the underlying directory providers to point to the same physical "
+"index directory. In practice, you set the property <literal>hibernate.search."
+"[fully qualified entity name].indexName</literal> to the same value. As an "
+"example let’s use the same index (directory) for the <classname>Furniture</"
+"classname> and <classname>Animal</classname> entity. We just set "
+"<literal>indexName</literal> for both entities to for example “Animal”. Both "
+"entities will then be stored in the Animal directory"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:312
+#, no-c-format
+msgid ""
+"<code>hibernate.search.org.hibernate.search.test.shards.Furniture.indexName "
+"= Animal\n"
+"hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</"
+"code>"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:316
+#, no-c-format
+msgid ""
+"Setting the <code>@Indexed</code> annotation’s <methodname>index</"
+"methodname> attribute of the entities you want to merge to the same value. "
+"If we again wanted all <classname>Furniture</classname> instances to be "
+"indexed in the <classname>Animal</classname> index along with all instances "
+"of <classname>Animal</classname> we would specify <code>@Indexed"
+"(index=”Animal”)</code> on both <classname>Animal</classname> and "
+"<classname>Furniture</classname> classes."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:330
+#, no-c-format
+msgid "Worker configuration"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:332
+#, no-c-format
+msgid ""
+"It is possible to refine how Hibernate Search interacts with Lucene through "
+"the worker configuration. The work can be executed to the Lucene directory "
+"or sent to a JMS queue for later processing. When processed to the Lucene "
+"directory, the work can be processed synchronously or asynchronously to the "
+"transaction commit."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:338
+#, no-c-format
+msgid "You can define the worker configuration using the following properties"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:342
+#, no-c-format
+msgid "worker configuration"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:347 configuration.xml:633
+#, no-c-format
+msgid "Property"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:353
+#, no-c-format
+msgid "hibernate.search.worker.backend"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:355
+#, no-c-format
+msgid ""
+"Out of the box support for the Apache Lucene back end and the JMS back end. "
+"Default to <literal>lucene</literal>. Supports also <literal>jms</literal> "
+"and <literal>blackhole</literal>."
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:361
+#, no-c-format
+msgid "hibernate.search.worker.execution"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:363
+#, no-c-format
+msgid ""
+"Supports synchronous and asynchronous execution. Default to "
+"<literal><literal>sync</literal></literal>. Supports also <literal>async</"
+"literal>."
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:369
+#, no-c-format
+msgid "hibernate.search.worker.thread_pool.size"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:371
+#, no-c-format
+msgid ""
+"Defines the number of threads in the pool. useful only for asynchronous "
+"execution. Default to 1."
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:376
+#, no-c-format
+msgid "hibernate.search.worker.buffer_queue.max"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:378
+#, no-c-format
+msgid ""
+"Defines the maximal number of work queue if the thread poll is starved. "
+"Useful only for asynchronous execution. Default to infinite. If the limit is "
+"reached, the work is done by the main thread."
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:385
+#, no-c-format
+msgid "hibernate.search.worker.jndi.*"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:387
+#, no-c-format
+msgid ""
+"Defines the JNDI properties to initiate the InitialContext (if needed). JNDI "
+"is only used by the JMS back end."
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:392
+#, no-c-format
+msgid "hibernate.search.worker.jms.connection_factory"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:395
+#, no-c-format
+msgid ""
+"Mandatory for the JMS back end. Defines the JNDI name to lookup the JMS "
+"connection factory from (<literal>/ConnectionFactory</literal> by default in "
+"JBoss AS)"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:402
+#, no-c-format
+msgid "hibernate.search.worker.jms.queue"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:404
+#, no-c-format
+msgid ""
+"Mandatory for the JMS back end. Defines the JNDI name to lookup the JMS "
+"queue from. The queue will be used to post work messages."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:414
+#, no-c-format
+msgid "JMS Master/Slave configuration"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:416
+#, no-c-format
+msgid ""
+"This section describes in greater detail how to configure the Master / "
+"Slaves Hibernate Search architecture."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:429
+#, no-c-format
+msgid "JMS back end configuration."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:433
+#, no-c-format
+msgid "Slave nodes"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:435
+#, no-c-format
+msgid ""
+"Every index update operation is sent to a JMS queue. Index querying "
+"operations are executed on a local index copy."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:439
+#, no-c-format
+msgid "JMS Slave configuration"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:441
+#, no-c-format
+msgid ""
+"### slave configuration\n"
+"\n"
+"## DirectoryProvider\n"
+"# (remote) master location\n"
+"hibernate.search.default.sourceBase = /mnt/mastervolume/lucenedirs/"
+"mastercopy\n"
+"\n"
+"# local copy location\n"
+"hibernate.search.default.indexBase = /Users/prod/lucenedirs\n"
+"\n"
+"# refresh every half hour\n"
+"hibernate.search.default.refresh = 1800\n"
+"\n"
+"# appropriate directory provider\n"
+"hibernate.search.default.directory_provider = org.hibernate.search.store."
+"FSSlaveDirectoryProvider\n"
+"\n"
+"## Backend configuration\n"
+"hibernate.search.worker.backend = jms\n"
+"hibernate.search.worker.jms.connection_factory = /ConnectionFactory\n"
+"hibernate.search.worker.jms.queue = queue/hibernatesearch\n"
+"#optional jndi configuration (check your JMS provider for more information)\n"
+"\n"
+"## Optional asynchronous execution strategy\n"
+"# hibernate.search.worker.execution = async\n"
+"# hibernate.search.worker.thread_pool.size = 2\n"
+"# hibernate.search.worker.buffer_queue.max = 50"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:444
+#, no-c-format
+msgid "A file system local copy is recommended for faster search results."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:447 configuration.xml:463
+#, no-c-format
+msgid "The refresh period should be higher that the expected time copy."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:452
+#, no-c-format
+msgid "Master node"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:454
+#, no-c-format
+msgid ""
+"Every index update operation is taken from a JMS queue and executed. The "
+"master index is copied on a regular basis."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:458
+#, no-c-format
+msgid "JMS Master configuration"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:460
+#, no-c-format
+msgid ""
+"### master configuration\n"
+"\n"
+"## DirectoryProvider\n"
+"# (remote) master location where information is copied to\n"
+"hibernate.search.default.sourceBase = /mnt/mastervolume/lucenedirs/"
+"mastercopy\n"
+"\n"
+"# local master location\n"
+"hibernate.search.default.indexBase = /Users/prod/lucenedirs\n"
+"\n"
+"# refresh every half hour\n"
+"hibernate.search.default.refresh = 1800\n"
+"\n"
+"# appropriate directory provider\n"
+"hibernate.search.default.directory_provider = org.hibernate.search.store."
+"FSMasterDirectoryProvider\n"
+"\n"
+"## Backend configuration\n"
+"#Backend is the default lucene one"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:466
+#, no-c-format
+msgid ""
+"In addition to the Hibernate Search framework configuration, a Message "
+"Driven Bean should be written and set up to process the index works queue "
+"through JMS."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:471
+#, no-c-format
+msgid "Message Driven Bean processing the indexing queue"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:473
+#, no-c-format
+msgid ""
+"@MessageDriven(activationConfig = {\n"
+"      @ActivationConfigProperty(propertyName=\"destinationType\", "
+"propertyValue=\"javax.jms.Queue\"),\n"
+"      @ActivationConfigProperty(propertyName=\"destination\", propertyValue="
+"\"queue/hibernatesearch\"),\n"
+"      @ActivationConfigProperty(propertyName=\"DLQMaxResent\", propertyValue="
+"\"1\")\n"
+"   } )\n"
+"public class MDBSearchController extends "
+"AbstractJMSHibernateSearchController implements MessageListener {\n"
+"    @PersistenceContext EntityManager em;\n"
+"    \n"
+"    //method retrieving the appropriate session\n"
+"    protected Session getSession() {\n"
+"        return (Session) em.getDelegate();\n"
+"    }\n"
+"\n"
+"    //potentially close the session opened in #getSession(), not needed "
+"here\n"
+"    protected void cleanSessionIfNeeded(Session session) \n"
+"    }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:476
+#, no-c-format
+msgid ""
+"This example inherits from the abstract JMS controller class available in "
+"the Hibernate Search source code and implements a JavaEE 5 MDB. This "
+"implementation is given as an example and, while most likely be more "
+"complex, can be adjusted to make use of non Java EE Message Driven Beans. "
+"For more information about the <methodname>getSession()</methodname> and "
+"<methodname>cleanSessionIfNeeded()</methodname>, please check "
+"<classname>AbstractJMSHibernateSearchController</classname>'s javadoc."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:489
+#, no-c-format
+msgid "Reader strategy configuration"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:491
+#, no-c-format
+msgid ""
+"The different reader strategies are described in <xref linkend=\"search-"
+"architecture-readerstrategy\"/>. Out of the box strategies are:"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:497
+#, no-c-format
+msgid ""
+"<literal>shared</literal>: share index readers across several queries. This "
+"strategy is the most efficient."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:502
+#, no-c-format
+msgid ""
+"<literal>not-shared</literal>: create an index reader for each individual "
+"query"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:507
+#, no-c-format
+msgid ""
+"The default reader strategy is <literal>shared</literal>. This can be "
+"adjusted:"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:510
+#, no-c-format
+msgid "hibernate.search.reader.strategy = not-shared"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:512
+#, no-c-format
+msgid ""
+"Adding this property switches to the <literal>not-shared</literal> strategy."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:515
+#, no-c-format
+msgid "Or if you have a custom reader strategy:"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:517
+#, no-c-format
+msgid "hibernate.search.reader.strategy = my.corp.myapp.CustomReaderProvider"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:519
+#, no-c-format
+msgid ""
+"where <classname>my.corp.myapp.CustomReaderProvider</classname> is the "
+"custom strategy implementation."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:524
+#, no-c-format
+msgid "Enabling Hibernate Search and automatic indexing"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:527
+#, no-c-format
+msgid "Enabling Hibernate Search"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:529
+#, no-c-format
+msgid ""
+"Hibernate Search is enabled out of the box when using Hibernate Annotations "
+"or Hibernate EntityManager. If, for some reason you need to disable it, set "
+"<literal>hibernate.search.autoregister_listeners</literal> to false. Note "
+"that there is no performance penalty when the listeners are enabled even "
+"though no entities are indexed."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:536
+#, no-c-format
+msgid ""
+"To enable Hibernate Search in Hibernate Core (ie. if you don't use Hibernate "
+"Annotations), add the <literal>FullTextIndexEventListener</literal> for the "
+"following six Hibernate events and also add it after the default "
+"<literal>DefaultFlushEventListener</literal>, as in the following example."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:543
+#, no-c-format
+msgid ""
+"Explicitly enabling Hibernate Search by configuring the "
+"<classname>FullTextIndexEventListener</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:546
+#, no-c-format
+msgid ""
+"&lt;hibernate-configuration&gt;\n"
+"     &lt;session-factory&gt;\n"
+"        ...\n"
+"        &lt;event type=\"post-update\"&gt;\n"
+"            &lt;listener class=\"org.hibernate.search.event."
+"FullTextIndexEventListener\"/&gt;\n"
+"        &lt;/event&gt;\n"
+"        &lt;event type=\"post-insert\"&gt;\n"
+"            &lt;listener class=\"org.hibernate.search.event."
+"FullTextIndexEventListener\"/&gt;\n"
+"        &lt;/event&gt;\n"
+"        &lt;event type=\"post-delete\"&gt;\n"
+"            &lt;listener class=\"org.hibernate.search.event."
+"FullTextIndexEventListener\"/&gt;\n"
+"        &lt;/event&gt;\n"
+"        &lt;event type=\"post-collection-recreate\"&gt;\n"
+"            &lt;listener class=\"org.hibernate.search.event."
+"FullTextIndexEventListener\"/&gt;\n"
+"        &lt;/event&gt;\n"
+"        &lt;event type=\"post-collection-remove\"&gt;\n"
+"            &lt;listener class=\"org.hibernate.search.event."
+"FullTextIndexEventListener\"/&gt;\n"
+"        &lt;/event&gt;\n"
+"        &lt;event type=\"post-collection-update\"&gt;\n"
+"            &lt;listener class=\"org.hibernate.search.event."
+"FullTextIndexEventListener\"/&gt;\n"
+"        &lt;/event&gt;\n"
+"        &lt;event type=\"flush\"&gt;\n"
+"            &lt;listener class=\"org.hibernate.event.def."
+"DefaultFlushEventListener\"/&gt;\n"
+"            &lt;listener class=\"org.hibernate.search.event."
+"FullTextIndexEventListener\"/&gt;\n"
+"        &lt;/event&gt;\n"
+"    &lt;/session-factory&gt;\n"
+"&lt;/hibernate-configuration&gt;"
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:551
+#, no-c-format
+msgid "Automatic indexing"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:553
+#, no-c-format
+msgid ""
+"By default, every time an object is inserted, updated or deleted through "
+"Hibernate, Hibernate Search updates the according Lucene index. It is "
+"sometimes desirable to disable that features if either your index is read-"
+"only or if index updates are done in a batch way (see <xref linkend=\"search-"
+"batchindex\"/>)."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:559
+#, no-c-format
+msgid "To disable event based indexing, set"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:561
+#, no-c-format
+msgid "hibernate.search.indexing_strategy manual"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:564
+#, no-c-format
+msgid ""
+"In most case, the JMS backend provides the best of both world, a lightweight "
+"event based system keeps track of all changes in the system, and the "
+"heavyweight indexing process is done by a separate process or machine."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:573
+#, no-c-format
+msgid "Tuning Lucene indexing performance"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:575
+#, no-c-format
+msgid ""
+"Hibernate Search allows you to tune the Lucene indexing performance by "
+"specifying a set of parameters which are passed through to underlying Lucene "
+"<literal>IndexWriter</literal> such as <literal>mergeFactor</literal>, "
+"<literal>maxMergeDocs</literal> and <literal>maxBufferedDocs</literal>. You "
+"can specify these parameters either as default values applying for all "
+"indexes, on a per index basis, or even per shard."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:583
+#, no-c-format
+msgid ""
+"There are two sets of parameters allowing for different performance settings "
+"depending on the use case. During indexing operations triggered by database "
+"modifications, the parameters are grouped by the <literal>transaction</"
+"literal> keyword: <programlisting>hibernate.search.[default|&lt;"
+"indexname&gt;].indexwriter.transaction.&lt;parameter_name&gt;</"
+"programlisting> When indexing occurs via <literal>FullTextSession.index()</"
+"literal> (see <xref linkend=\"search-batchindex\"/>), the used properties "
+"are those grouped under the <literal>batch</literal> keyword:"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:589
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;"
+"parameter_name&gt;"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:591
+#, no-c-format
+msgid ""
+"Unless the corresponding <literal>.batch</literal> property is explicitly "
+"set, the value will default to the <literal>.transaction</literal> property. "
+"If no value is set for a <literal>.batch</literal> value in a specific shard "
+"configuration, Hibernate Search will look at the index section, then at the "
+"default section and after that it will look for a <literal>.transaction</"
+"literal> in the same order: <programlisting>hibernate.search.Animals.2."
+"indexwriter.transaction.max_merge_docs 10\n"
+"hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20\n"
+"hibernate.search.default.indexwriter.batch.max_merge_docs 100</"
+"programlisting> This configuration will result in these settings applied to "
+"the second shard of Animals index:"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:603
+#, no-c-format
+msgid "<literal>transaction.max_merge_docs</literal> = 10"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:607
+#, no-c-format
+msgid "<literal>batch.max_merge_docs</literal> = 100"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:611
+#, no-c-format
+msgid "<literal>transaction.merge_factor</literal> = 20"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:615
+#, no-c-format
+msgid "<literal>batch.merge_factor</literal> = 20"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:619
+#, no-c-format
+msgid "All other values will use the defaults defined in Lucene."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:621
+#, no-c-format
+msgid ""
+"The default for all values is to leave them at Lucene's own default, so the "
+"listed values in the following table actually depend on the version of "
+"Lucene you are using; values shown are relative to version <literal>2.4</"
+"literal>. For more information about Lucene indexing performances, please "
+"refer to the Lucene documentation."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:628
+#, no-c-format
+msgid "List of indexing performance and behavior properties"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:637
+#, no-c-format
+msgid "Default Value"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:643
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch]."
+"max_buffered_delete_terms"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:645
+#, no-c-format
+msgid ""
+"Determines the minimal number of delete terms required before the buffered "
+"in-memory delete terms are applied and flushed. If there are documents "
+"buffered in memory at the time, they are merged and a new segment is created."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:650 configuration.xml:660
+#, no-c-format
+msgid "Disabled (flushes by RAM usage)"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:654
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch]."
+"max_buffered_docs"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:656
+#, no-c-format
+msgid ""
+"Controls the amount of documents buffered in memory during indexing. The "
+"bigger the more RAM is consumed."
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:664
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch]."
+"max_field_length"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:666
+#, no-c-format
+msgid ""
+"The maximum number of terms that will be indexed for a single field. This "
+"limits the amount of memory required for indexing so that very large data "
+"will not crash the indexing process by running out of memory. This setting "
+"refers to the number of running terms, not to the number of different terms."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:671
+#, no-c-format
+msgid ""
+"This silently truncates large documents, excluding from the index all terms "
+"that occur further in the document. If you know your source documents are "
+"large, be sure to set this value high enough to accommodate the expected "
+"size. If you set it to Integer.MAX_VALUE, then the only limit is your "
+"memory, but you should anticipate an OutOfMemoryError."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:676
+#, no-c-format
+msgid ""
+"If setting this value in <literal>batch</literal> differently than in "
+"<literal>transaction</literal> you may get different data (and results) in "
+"your index depending on the indexing mode."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:682
+#, no-c-format
+msgid "10000"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:686
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch]."
+"max_merge_docs"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:688
+#, no-c-format
+msgid ""
+"Defines the largest number of documents allowed in a segment. Larger values "
+"are best for batched indexing and speedier searches. Small values are best "
+"for transaction indexing."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:693
+#, no-c-format
+msgid "Unlimited (Integer.MAX_VALUE)"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:697
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch]."
+"merge_factor"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:699
+#, no-c-format
+msgid "Controls segment merge frequency and size."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:700
+#, no-c-format
+msgid ""
+"Determines how often segment indexes are merged when insertion occurs. With "
+"smaller values, less RAM is used while indexing, and searches on unoptimized "
+"indexes are faster, but indexing speed is slower. With larger values, more "
+"RAM is used during indexing, and while searches on unoptimized indexes are "
+"slower, indexing is faster. Thus larger values (&gt; 10) are best for batch "
+"index creation, and smaller values (&lt; 10) for indexes that are "
+"interactively maintained. The value must no be lower than 2."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:710
+#, no-c-format
+msgid "<entry>10</entry>"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:714
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch]."
+"ram_buffer_size"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:716
+#, no-c-format
+msgid ""
+"Controls the amount of RAM in MB dedicated to document buffers. When used "
+"together max_buffered_docs a flush occurs for whichever event happens first."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:718
+#, no-c-format
+msgid ""
+"Generally for faster indexing performance it's best to flush by RAM usage "
+"instead of document count and use as large a RAM buffer as you can."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:723
+#, no-c-format
+msgid "16 MB"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:727
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch]."
+"term_index_interval"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:729
+#, no-c-format
+msgid "Expert: Set the interval between indexed terms."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:730
+#, no-c-format
+msgid ""
+"Large values cause less memory to be used by IndexReader, but slow random-"
+"access to terms. Small values cause more memory to be used by an "
+"IndexReader, and speed random-access to terms. See Lucene documentation for "
+"more details."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:736
+#, no-c-format
+msgid "<entry>128</entry>"
+msgstr ""
+
+#. Tag: literal
+#: configuration.xml:740
+#, no-c-format
+msgid ""
+"hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch]."
+"use_compound_file"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:742
+#, no-c-format
+msgid ""
+"The advantage of using the compound file format is that less file "
+"descriptors are used. The disadvantage is that indexing takes more time and "
+"temporary disk space. You can set this parameter to <literal>false</literal> "
+"in an attempt to improve the indexing time, but you could run out of file "
+"descriptors if <literal>mergeFactor</literal> is also large."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:748
+#, no-c-format
+msgid ""
+"Boolean parameter, use \"<literal>true</literal>\" or \"<literal>false</"
+"literal>\". The default value for this option is <literal>true</literal>."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:753
+#, no-c-format
+msgid "true"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:759
+#, no-c-format
+msgid ""
+"To tune the indexing speed it might be useful to time the object loading "
+"from database in isolation from the writes to the index. To achieve this set "
+"the <literal>blackhole</literal> as worker backend and start you indexing "
+"routines. This backend does not disable Hibernate Search: it will still "
+"generate the needed changesets to the index, but will discard them instead "
+"of flushing them to the index. As opposite to setting the <literal>hibernate."
+"search.indexing_strategy</literal> to <literal>manual</literal> when using "
+"<literal>blackhole</literal> it will possibly load more data to rebuild the "
+"index from associated entities."
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:769
+#, no-c-format
+msgid "hibernate.search.worker.backend blackhole"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:771
+#, no-c-format
+msgid ""
+"The recommended approach is to focus first on optimizing the object loading, "
+"and then use the timings you achieve as a baseline to tune the indexing "
+"process."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:773
+#, no-c-format
+msgid ""
+"The <literal>blackhole</literal> backend is not meant to be used in "
+"production, only as a tool to identify indexing bottlenecks."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:781
+#, no-c-format
+msgid "LockFactory configuration"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:785
+#, no-c-format
+msgid ""
+"Lucene Directories have default locking strategies which work well for most "
+"cases, but it's possible to specify for each index managed by Hibernate "
+"Search which LockingFactory you want to use."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:789
+#, no-c-format
+msgid ""
+"Some of these locking strategies require a filesystem level lock and may be "
+"used even on RAM based indexes, but this is not recommended and of no "
+"practical use."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:795
+#, no-c-format
+msgid ""
+"To select a locking factory, set the <literal>hibernate.search.&lt;index&gt;."
+"locking_strategy</literal> option to one of <literal>simple</literal>, "
+"<literal>native</literal>, <literal>single</literal> or <literal>none</"
+"literal>, or set it to the fully qualified name of an implementation of "
+"<literal>org.hibernate.search.store.LockFactoryFactory</literal>; "
+"Implementing this interface you can provide a custom <literal>org.apache."
+"lucene.store.LockFactory</literal>."
+msgstr ""
+
+#. Tag: title
+#: configuration.xml:804
+#, no-c-format
+msgid "List of available LockFactory implementations"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:809
+#, no-c-format
+msgid "name"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:819
+#, no-c-format
+msgid "simple"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:821
+#, no-c-format
+msgid "org.apache.lucene.store.SimpleFSLockFactory"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:824
+#, no-c-format
+msgid ""
+"Safe implementation based on Java's File API, it marks the usage of the "
+"index by creating a marker file."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:827
+#, no-c-format
+msgid ""
+"If for some reason you had to kill your application, you will need to remove "
+"this file before restarting it."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:830
+#, no-c-format
+msgid ""
+"This is the default implementation for <literal>FSDirectoryProvider</"
+"literal>,<literal>FSMasterDirectoryProvider</literal> and "
+"<literal>FSSlaveDirectoryProvider</literal>."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:837
+#, no-c-format
+msgid "native"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:839
+#, no-c-format
+msgid "org.apache.lucene.store.NativeFSLockFactory"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:842
+#, no-c-format
+msgid ""
+"As does <literal>simple</literal> this also marks the usage of the index by "
+"creating a marker file, but this one is using native OS file locks so that "
+"even if your application crashes the locks will be cleaned up."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:847
+#, no-c-format
+msgid "This implementation has known problems on NFS."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:852
+#, no-c-format
+msgid "single"
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:854
+#, no-c-format
+msgid "org.apache.lucene.store.SingleInstanceLockFactory"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:857
+#, no-c-format
+msgid ""
+"This LockFactory doesn't use a file marker but is a Java object lock held in "
+"memory; therefore it's possible to use it only when you are sure the index "
+"is not going to be shared by any other process."
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:862
+#, no-c-format
+msgid ""
+"This is the default implementation for <literal>RAMDirectoryProvider</"
+"literal>."
+msgstr ""
+
+#. Tag: entry
+#: configuration.xml:870
+#, no-c-format
+msgid "org.apache.lucene.store.NoLockFactory"
+msgstr ""
+
+#. Tag: para
+#: configuration.xml:873
+#, no-c-format
+msgid ""
+"All changes to this index are not coordinated by any lock; test your "
+"application carefully and make sure you know what it means."
+msgstr ""
+
+#. Tag: section
+#: configuration.xml:880
+#, no-c-format
+msgid "Configuration example:"
+msgstr ""
+
+#. Tag: programlisting
+#: configuration.xml:884
+#, no-c-format
+msgid ""
+"hibernate.search.default.locking_strategy simple\n"
+"hibernate.search.Animals.locking_strategy native\n"
+"hibernate.search.Books.locking_strategy org.custom.components."
+"MyLockingFactory"
+msgstr ""
