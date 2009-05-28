@@ -127,6 +127,21 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>              
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>${name}</Implementation-Title>
+                            <Implementation-Version>${version}</Implementation-Version>
+                            <Implementation-Vendor>hibernate.org</Implementation-Vendor>
+                            <Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
+                            <Implementation-URL>http://search.hibernate.org</Implementation-URL>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <forkMode>pertest</forkMode>
