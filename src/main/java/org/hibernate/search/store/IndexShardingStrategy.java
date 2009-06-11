@@ -6,6 +6,8 @@ import java.util.Properties;
 
 import org.apache.lucene.document.Document;
 
+import org.hibernate.search.filter.FullTextFilterImplementor;
+
 /**
  * Defines how a given virtual index shards data into different DirectoryProviders
  *
@@ -32,4 +34,13 @@ public interface IndexShardingStrategy {
 	 * id and idInString can be null. If null, all the directory providers containing entity types should be returned
 	 */
 	DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString);
+
+	/**
+	 * return the set of DirectoryProvider(s) where the entities matching the filters are stored
+	 * this optional optimization allows queries to hit a subset of all shards, which may be useful for some datasets
+	 * if this optimization is not needed, return getDirectoryProvidersForAllShards()
+	 *
+	 * fullTextFilters can be empty if no filter is applied
+	 */
+	DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters);
 }

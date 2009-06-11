@@ -345,8 +345,8 @@ String authorName = firstResult[2];</programlisting>
           </listitem>
 
           <listitem>
-            <para>FullTextQuery.OBJECT_CLASS: returns the class of the
-            indexed entity.</para>
+            <para>FullTextQuery.OBJECT_CLASS: returns the class of the indexed
+            entity.</para>
           </listitem>
 
           <listitem>
@@ -545,7 +545,7 @@ for (Object[] result : results) {
     </section>
   </section>
 
-  <section>
+  <section id="query-filter">
     <title>Filters</title>
 
     <para>Apache Lucene has a powerful feature that allows to filter query
@@ -833,6 +833,105 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
         time spent to execute the query)</para>
       </listitem>
     </itemizedlist>
+
+    <section id="query-filter-shard">
+      <title>Using filters in a sharded environment</title>
+
+      <para>It is possible, in a sharded environment to execute queries on a
+      subset of the available shards. This can be done in two steps:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>create a sharding strategy that does select a subset of
+          <classname>DirectoryProvider</classname>s depending on sone filter
+          configuration</para>
+        </listitem>
+
+        <listitem>
+          <para>activate the proper filter at query time</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Let's first look at an example of sharding strategy that query on
+      a specific customer shard if the customer filter is activated.</para>
+
+      <programlisting>public class CustomerShardingStrategy implements IndexShardingStrategy {
+
+	// stored DirectoryProviders in a array indexed by customerID
+	private DirectoryProvider&lt;?&gt;[] providers;
+	
+	public void initialize(Properties properties, DirectoryProvider&lt;?&gt;[] providers) {
+		this.providers = providers;
+	}
+
+	public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForAllShards() {
+		return providers;
+	}
+
+	public DirectoryProvider&lt;?&gt; getDirectoryProviderForAddition(Class&lt;?&gt; entity, Serializable id, String idInString, Document document) {
+		Integer customerID = Integer.parseInt(document.getField("customerID").stringValue());
+		return providers[customerID];
+	}
+
+	public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForDeletion(Class&lt;?&gt; entity, Serializable id, String idInString) {
+		return getDirectoryProvidersForAllShards();
+	}
+
+<emphasis role="bold">	/**
+	 * Optimization; don't search ALL shards and union the results; in this case, we 
+	 * can be certain that all the data for a particular customer Filter is in a single
+	 * shard; simply return that shard by customerID.
+	 */
+	public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
+		FFullTextFilter filter = getCustomerFilter(filters, "customer");
+		if (filter == null) {
+			return getDirectoryProvidersForAllShards();
+		}
+		else {
+			return new DirectoryProvider[] { providers[Integer.parseInt(filter.getParameter("customerID").toString())] };
+		}
+	}
+
+	private FullTextFilter getFilter(FullTextFilterImplementor[] filters, String name) {
+		for (FullTextFilterImplementor filter: filters) {
+			if (filter.getName().equals(name)) return filter;
+		}
+		return null;
+	}</emphasis>
+
+}</programlisting>
+
+      <para>In this example, if the filter named <literal>customer</literal>
+      is present, we make sure to only use the shard dedicated to this
+      customer. Otherwise, we return all shards. A given Sharding strategy can
+      react to one or more filters and depends on their parameters.</para>
+
+      <para>The second step is simply to activate the filter at query time.
+      While the filter can be a regular filter (as defined in <xref
+      linkend="query-filter" />) which also filters Lucene results after the
+      query, you can make use of a special filter that will only be passed to
+      the sharding strategy and otherwise ignored for the rest of the query.
+      Simply use the <classname>ShardSensitiveOnlyFilter</classname> class
+      when declaring your filter.</para>
+
+      <programlisting>@Entity @Indexed
+<emphasis role="bold">@FullTextFilterDef(name="customer", impl=ShardSensitiveOnlyFilter.class)</emphasis>
+public class Customer {
+   ...
+}
+
+
+FullTextQuery query = ftEm.createFullTextQuery(luceneQuery, Customer.class);
+<emphasis role="bold">query.enableFulltextFilter("customer").setParameter("CustomerID", 5);</emphasis>
+@SuppressWarnings("unchecked")
+List&lt;Customer&gt; results = query.getResultList();</programlisting>
+
+      <para>Note that by using the
+      <classname>ShardSensitiveOnlyFilter</classname>, you do not have to
+      implement any Lucene filter. Using filters and sharding strategy
+      reacting to these filters is recommended to speed up queries in a
+      sharded environment.</para>
+    </section>
   </section>
 
   <section>

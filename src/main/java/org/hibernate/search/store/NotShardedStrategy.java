@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.filter.FullTextFilterImplementor;
 
 /**
  * @author Emmanuel Bernard
@@ -28,6 +29,10 @@ public class NotShardedStrategy implements IndexShardingStrategy {
 	}
 
 	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+		return directoryProvider;
+	}
+
+	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return directoryProvider;
 	}
 

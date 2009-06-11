@@ -206,20 +206,32 @@ public class Rule { ... }</programlisting>
   <section id="search-configuration-directory-sharding" revision="1">
     <title>Sharding indexes</title>
 
-    <para>In some extreme cases involving huge indexes (in size), it is
-    necessary to split (shard) the indexing data of a given entity type into
-    several Lucene indexes. This solution is not recommended until you reach
-    significant index sizes and index update times are slowing the application
-    down. The main drawback of index sharding is that searches will end up
-    being slower since more files have to be opened for a single search. In
+    <para>In some cases, it is necessary to split (shard) the indexing data of
+    a given entity type into several Lucene indexes. This solution is not
+    recommended unless there is a pressing need because by default, searches
+    will be slower as all shards have to be opened for a single search. In
     other words don't do it until you have problems :)</para>
 
-    <para>Despite this strong warning, Hibernate Search allows you to index a
-    given entity type into several sub indexes. Data is sharded into the
-    different sub indexes thanks to an
-    <classname>IndexShardingStrategy</classname>. By default, no sharding
-    strategy is enabled, unless the number of shards is configured. To
-    configure the number of shards use the following property</para>
+    <para>For example, sharding may be desirable if:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>A single index is so huge that index update times are slowing
+        the application down.</para>
+      </listitem>
+
+      <listitem>
+        <para>A typical search will only hit a sub-set of the index, such as
+        when data is naturally segmented by customer, region or
+        application.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Hibernate Search allows you to index a given entity type into
+    several sub indexes. Data is sharded into the different sub indexes thanks
+    to an <classname>IndexShardingStrategy</classname>. By default, no
+    sharding strategy is enabled, unless the number of shards is configured.
+    To configure the number of shards use the following property</para>
 
     <example>
       <title>Enabling index sharding by specifying nbr_of_shards for a
@@ -243,10 +255,21 @@ public class Rule { ... }</programlisting>
       <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy.Implementation</programlisting>
     </example>
 
+    <para>Using a custom <classname>IndexShardingStrategy</classname>
+    implementation, it's possible to define what shard a given entity is
+    indexed to. </para>
+
+    <para>It also allows for optimizing searches by selecting which shard to
+    run the query onto. By activating a filter (see <xref
+    linkend="query-filter-shard" />), a sharding strategy can select a subset
+    of the shards used to answer a query
+    (<classname>IndexShardingStrategy.getDirectoryProvidersForQuery</classname>)
+    and thus speed up the query execution.</para>
+
     <para>Each shard has an independent directory provider configuration as
     described in <xref linkend="search-configuration-directory" />. The
-    DirectoryProvider default name for the previous example are
-    <literal>&lt;indexName&gt;.0</literal> to
+    <classname>DirectoryProvider</classname> default name for the previous
+    example are <literal>&lt;indexName&gt;.0</literal> to
     <literal>&lt;indexName&gt;.4</literal>. In other words, each shard has the
     name of it's owning index followed by <constant>.</constant> (dot) and its
     index number.</para>
@@ -367,14 +390,15 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</cod
 
             <entry>Out of the box support for the Apache Lucene back end and
             the JMS back end. Default to <literal>lucene</literal>. Supports
-            also <literal>jms</literal> and <literal>blackhole</literal>.</entry>
+            also <literal>jms</literal> and
+            <literal>blackhole</literal>.</entry>
           </row>
 
           <row>
             <entry><literal>hibernate.search.worker.execution</literal></entry>
 
-            <entry>Supports synchronous and asynchronous execution. Default
-            to <literal><literal>sync</literal></literal>. Supports also
+            <entry>Supports synchronous and asynchronous execution. Default to
+            <literal><literal>sync</literal></literal>. Supports also
             <literal>async</literal>.</entry>
           </row>
 
@@ -445,8 +469,8 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</cod
     <section>
       <title>Slave nodes</title>
 
-      <para>Every index update operation is sent to a JMS queue. Index querying
-      operations are executed on a local index copy.</para>
+      <para>Every index update operation is sent to a JMS queue. Index
+      querying operations are executed on a local index copy.</para>
 
       <example>
         <title>JMS Slave configuration</title>
@@ -605,8 +629,9 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
       <para>To enable Hibernate Search in Hibernate Core (ie. if you don't use
       Hibernate Annotations), add the
       <literal>FullTextIndexEventListener</literal> for the following six
-      Hibernate events and also add it after the default 
-      <literal>DefaultFlushEventListener</literal>, as in the following example.</para>
+      Hibernate events and also add it after the default
+      <literal>DefaultFlushEventListener</literal>, as in the following
+      example.</para>
 
       <example>
         <title>Explicitly enabling Hibernate Search by configuring the
@@ -768,13 +793,13 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             terms.</para> <para>This silently truncates large documents,
             excluding from the index all terms that occur further in the
             document. If you know your source documents are large, be sure to
-            set this value high enough to accommodate the expected size. If you
-            set it to Integer.MAX_VALUE, then the only limit is your memory,
-            but you should anticipate an OutOfMemoryError. </para> <para>If
-            setting this value in <literal>batch</literal> differently than in
-            <literal>transaction</literal> you may get different data (and
-            results) in your index depending on the indexing
-            mode.</para></entry>
+            set this value high enough to accommodate the expected size. If
+            you set it to Integer.MAX_VALUE, then the only limit is your
+            memory, but you should anticipate an OutOfMemoryError. </para>
+            <para>If setting this value in <literal>batch</literal>
+            differently than in <literal>transaction</literal> you may get
+            different data (and results) in your index depending on the
+            indexing mode.</para></entry>
 
             <entry>10000</entry>
           </row>
@@ -852,24 +877,26 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
         </tbody>
       </tgroup>
     </table>
-    
-    <para>To tune the indexing speed it might be useful to time the
-    object loading from database in isolation from the writes to the index.
-    To achieve this set the <literal>blackhole</literal> as worker backend and start
-    you indexing routines.
-    This backend does not disable Hibernate Search: it will still generate the needed
-    changesets to the index, but will discard them instead of flushing them to the index.
-    As opposite to setting the <literal>hibernate.search.indexing_strategy</literal>
-    to <literal>manual</literal> when using <literal>blackhole</literal> it will possibly load
-    more data to rebuild the index from associated entities.</para>
-    
+
+    <para>To tune the indexing speed it might be useful to time the object
+    loading from database in isolation from the writes to the index. To
+    achieve this set the <literal>blackhole</literal> as worker backend and
+    start you indexing routines. This backend does not disable Hibernate
+    Search: it will still generate the needed changesets to the index, but
+    will discard them instead of flushing them to the index. As opposite to
+    setting the <literal>hibernate.search.indexing_strategy</literal> to
+    <literal>manual</literal> when using <literal>blackhole</literal> it will
+    possibly load more data to rebuild the index from associated
+    entities.</para>
+
     <programlisting>hibernate.search.worker.backend blackhole</programlisting>
-    
-    <para>The recommended approach is to focus first on optimizing the object loading, and then
-    use the timings you achieve as a baseline to tune the indexing process.</para>
-    <para>The <literal>blackhole</literal> backend is not meant to be used in production, only
-    as a tool to identify indexing bottlenecks.</para>
-    
+
+    <para>The recommended approach is to focus first on optimizing the object
+    loading, and then use the timings you achieve as a baseline to tune the
+    indexing process.</para>
+
+    <para>The <literal>blackhole</literal> backend is not meant to be used in
+    production, only as a tool to identify indexing bottlenecks.</para>
   </section>
 
   <section id="search-configuration-directory-lockfactories" revision="1">
@@ -882,6 +909,8 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     <para>Lucene Directories have default locking strategies which work well
     for most cases, but it's possible to specify for each index managed by
     Hibernate Search which LockingFactory you want to use.</para>
+
+     
 
     <para>Some of these locking strategies require a filesystem level lock and
     may be used even on RAM based indexes, but this is not recommended and of
@@ -976,7 +1005,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
         </tgroup>
       </table></para>
 
-    Configuration example: 
+     Configuration example: 
 
     <programlisting>hibernate.search.default.locking_strategy simple
 hibernate.search.Animals.locking_strategy native

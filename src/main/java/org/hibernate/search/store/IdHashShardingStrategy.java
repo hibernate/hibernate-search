@@ -6,6 +6,8 @@ import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
 
+import org.hibernate.search.filter.FullTextFilterImplementor;
+
 /**
  * This implementation use idInString as the hashKey.
  * 
@@ -29,6 +31,10 @@ public class IdHashShardingStrategy implements IndexShardingStrategy {
 	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		if ( idInString == null ) return providers;
 		return new DirectoryProvider[] { providers[hashKey( idInString )] };
+	}
+
+	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+		return getDirectoryProvidersForAllShards();
 	}
 
 	private int hashKey(String key) {

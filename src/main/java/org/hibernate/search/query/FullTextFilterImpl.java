@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.filter.FullTextFilterImplementor;
 
 /**
  * @author Emmanuel Bernard
  */
-public class FullTextFilterImpl implements FullTextFilter {
+public class FullTextFilterImpl implements FullTextFilterImplementor {
 	private final Map<String, Object> parameters = new HashMap<String, Object>();
 	private String name;
 

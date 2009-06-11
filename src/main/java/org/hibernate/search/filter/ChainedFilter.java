@@ -30,6 +30,10 @@ public class ChainedFilter extends Filter {
 		this.chainedFilters.add( filter );
 	}
 
+	public boolean isEmpty() {
+		return chainedFilters.size() == 0;
+	}
+
 	public BitSet bits(IndexReader reader) throws IOException {
 		throw new UnsupportedOperationException();
 	}

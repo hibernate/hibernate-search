@@ -54,9 +54,12 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
+import org.hibernate.search.filter.FullTextFilterImplementor;
+import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.reader.ReaderProvider;
 import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.ContextHelper;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
@@ -84,6 +87,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private Integer resultSize;
 	private Sort sort;
 	private Filter filter;
+	private Filter userFilter;
 	private Criteria criteria;
 	private String[] indexProjection;
 	private Set<String> idFieldNames;
@@ -92,6 +96,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Map<String, FullTextFilterImpl> filterDefinitions;
 	private int fetchSize = 1;
+	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
+
 
 	/**
 	 * Constructs a  <code>FullTextQueryImpl</code> instance.
@@ -127,7 +133,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * {@inheritDoc}
 	 */
 	public FullTextQuery setFilter(Filter filter) {
-		this.filter = filter;
+		this.userFilter = filter;
 		return this;
 	}
 
@@ -399,20 +405,27 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private void buildFilters() {
-		if ( filterDefinitions == null || filterDefinitions.size() == 0 ) {
-			return; // there is nothing to do if we don't have any filter definitions
+		ChainedFilter chainedFilter = null;
+		if ( ! ( filterDefinitions == null || filterDefinitions.size() == 0 ) ) {
+			chainedFilter = new ChainedFilter();
+			for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
+				Filter filter = buildLuceneFilter( fullTextFilter );
+				if (filter != null) chainedFilter.addFilter( filter );
+			}
 		}
 
-		ChainedFilter chainedFilter = new ChainedFilter();
-		for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
-			Filter filter = buildLuceneFilter( fullTextFilter );
-			chainedFilter.addFilter( filter );
+		if ( userFilter != null ) {
+			//chainedFilter is not always necessary here but the code is easier to read
+			if (chainedFilter == null) chainedFilter = new ChainedFilter();
+			chainedFilter.addFilter( userFilter );
 		}
 
-		if ( filter != null ) {
-			chainedFilter.addFilter( filter );
+		if ( chainedFilter == null || chainedFilter.isEmpty() ) {
+			filter = null;
 		}
-		filter = chainedFilter;
+		else {
+			filter = chainedFilter;
+		}
 	}
 
 	/**
@@ -430,6 +443,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
 		 */
 		FilterDef def = searchFactoryImplementor.getFilterDefinition( fullTextFilter.getName() );
+		//def can never be null, ti's guarded by enableFullTextFilter(String)
+
+		if ( isPreQueryFilterOnly(def) ) return null;
+
 		Object instance = createFilterInstance( fullTextFilter, def );
 		FilterKey key = createFilterKey( def, instance );
 
@@ -447,6 +464,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			}
 		}
 		return filter;
+	}
+
+	private boolean isPreQueryFilterOnly(FilterDef def) {
+		return def.getImpl().equals( ShardSensitiveOnlyFilter.class );
 	}
 
 	private Filter createFilter(FilterDef def, Object instance) {
@@ -633,7 +654,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 */
 	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
 		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
-		List<DirectoryProvider> directories = new ArrayList<DirectoryProvider>();
+		List<DirectoryProvider> targetedDirectories = new ArrayList<DirectoryProvider>();
 		Set<String> idFieldNames = new HashSet<String>();
 
 		Similarity searcherSimilarity = null;
@@ -653,9 +674,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
-				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy()
-						.getDirectoryProvidersForAllShards();
-				populateDirectories( directories, directoryProviders );
+				populateDirectories( targetedDirectories, builder );
 			}
 			classesAndSubclasses = null;
 		}
@@ -679,10 +698,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
-				final DirectoryProvider[] directoryProviders = builder.getDirectoryProviderSelectionStrategy()
-						.getDirectoryProvidersForAllShards();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
-				populateDirectories( directories, directoryProviders );
+				populateDirectories( targetedDirectories, builder );
 			}
 			this.classesAndSubclasses = involvedClasses;
 		}
@@ -691,7 +708,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//compute optimization needClassFilterClause
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
 		if ( classesAndSubclasses != null ) {
-			for ( DirectoryProvider dp : directories ) {
+			for ( DirectoryProvider dp : targetedDirectories ) {
 				final Set<Class<?>> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider(
 						dp
 				);
@@ -712,7 +729,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 
 		//set up the searcher
-		final DirectoryProvider[] directoryProviders = directories.toArray( new DirectoryProvider[directories.size()] );
+		final DirectoryProvider[] directoryProviders = targetedDirectories.toArray( new DirectoryProvider[targetedDirectories.size()] );
 		IndexSearcher is = new IndexSearcher(
 				searchFactoryImplementor.getReaderProvider().openReader(
 						directoryProviders
@@ -722,7 +739,19 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return is;
 	}
 
-	private void populateDirectories(List<DirectoryProvider> directories, DirectoryProvider[] directoryProviders) {
+	private void populateDirectories(List<DirectoryProvider> directories, DocumentBuilderIndexedEntity builder) {
+		final IndexShardingStrategy indexShardingStrategy = builder.getDirectoryProviderSelectionStrategy();
+		final DirectoryProvider[] directoryProviders;
+		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
+			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery(
+				filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] )
+			);
+		}
+		else {
+			//no filter get all shards
+			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery( EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR );
+		}
+		
 		for ( DirectoryProvider provider : directoryProviders ) {
 			if ( !directories.contains( provider ) ) {
 				directories.add( provider );

@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.filter.FullTextFilterImplementor;
 
 /**
  * Used to test the configuration of a third-party strategy
@@ -24,6 +25,10 @@ public class UselessShardingStrategy implements IndexShardingStrategy {
 	}
 
 	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+		return null;
+	}
+
+	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return null;
 	}
 
