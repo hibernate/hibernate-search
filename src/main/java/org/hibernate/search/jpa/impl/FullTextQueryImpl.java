@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.FlushModeType;
@@ -16,6 +17,7 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
+import javax.persistence.LockModeType;
 
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
@@ -216,6 +218,10 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return this;
 	}
 
+	public int getMaxResults() {
+		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public Query setFirstResult(int firstResult) {
 		if ( firstResult < 0 ) {
 			throw new IllegalArgumentException(
@@ -228,6 +234,10 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return this;
 	}
 
+	public int getFirstResult() {
+		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public Explanation explain(int documentId) {
 		return query.explain( documentId );
 	}
@@ -238,6 +248,14 @@ public class FullTextQueryImpl implements FullTextQuery {
 
 	public Query setHint(String hintName, Object value) {
 		return this;
+	}
+
+	public Map<String, Object> getHints() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public Set<String> getSupportedHints() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	public Query setParameter(String name, Object value) {
@@ -264,6 +282,14 @@ public class FullTextQueryImpl implements FullTextQuery {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
+	public Map<String, Object> getNamedParameters() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public List getPositionalParameters() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public Query setFlushMode(FlushModeType flushMode) {
 		if ( flushMode == FlushModeType.AUTO ) {
 			query.setFlushMode( FlushMode.AUTO );
@@ -272,5 +298,21 @@ public class FullTextQueryImpl implements FullTextQuery {
 			query.setFlushMode( FlushMode.COMMIT );
 		}
 		return this;
+	}
+
+	public FlushModeType getFlushMode() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public Query setLockMode(LockModeType lockModeType) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public LockModeType getLockMode() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public <T> T unwrap(Class<T> tClass) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 }

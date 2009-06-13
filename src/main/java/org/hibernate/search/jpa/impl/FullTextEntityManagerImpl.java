@@ -2,11 +2,17 @@
 package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.metamodel.Metamodel;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.QueryBuilder;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -65,7 +71,7 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		return ftSession;
 	}
 
-	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class... entities) {
+	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
 		FullTextSession ftSession = getFullTextSession();
 		return new FullTextQueryImpl( ftSession.createFullTextQuery( luceneQuery, entities ), ftSession );
 	}
@@ -106,6 +112,18 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		return em.find( entityClass, primaryKey );
 	}
 
+	public <T> T find(Class<T> tClass, Object o, Map<String, Object> stringObjectMap) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public <T> T find(Class<T> tClass, Object o, LockModeType lockModeType) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public <T> T find(Class<T> tClass, Object o, LockModeType lockModeType, Map<String, Object> stringObjectMap) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public <T> T getReference(Class<T> entityClass, Object primaryKey) {
 		return em.getReference( entityClass, primaryKey );
 	}
@@ -126,20 +144,60 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		em.lock( entity, lockMode );
 	}
 
+	public void lock(Object o, LockModeType lockModeType, Map<String, Object> stringObjectMap) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public void refresh(Object entity) {
 		em.refresh( entity );
+	}
+
+	public void refresh(Object o, Map<String, Object> stringObjectMap) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public void refresh(Object o, LockModeType lockModeType) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public void refresh(Object o, LockModeType lockModeType, Map<String, Object> stringObjectMap) {
+		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	public void clear() {
 		em.clear();
 	}
 
+	public void detach(Object o) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public boolean contains(Object entity) {
 		return em.contains( entity );
 	}
 
+	public LockModeType getLockMode(Object o) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public void setProperty(String s, Object o) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public Map<String, Object> getProperties() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public Set<String> getSupportedProperties() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public Query createQuery(String ejbqlString) {
 		return em.createQuery( ejbqlString );
+	}
+
+	public Query createQuery(CriteriaQuery criteriaQuery) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	public Query createNamedQuery(String name) {
@@ -162,6 +220,10 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		em.joinTransaction();
 	}
 
+	public <T> T unwrap(Class<T> tClass) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public Object getDelegate() {
 		return em.getDelegate();
 	}
@@ -177,7 +239,19 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	public EntityTransaction getTransaction() {
 		return em.getTransaction();
 	}
-	
+
+	public EntityManagerFactory getEntityManagerFactory() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public QueryBuilder getQueryBuilder() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public Metamodel getMetamodel() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public Indexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );
 	}
