@@ -53,6 +53,7 @@ import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
+import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
@@ -240,6 +241,11 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		}
 
 		FilterDef filterDef = new FilterDef( defAnn );
+		if ( filterDef.getImpl().equals( ShardSensitiveOnlyFilter.class ) ) {
+			//this is a placeholder don't process regularly
+			filterDefinitions.put( defAnn.name(), filterDef );
+			return;
+		}
 		try {
 			filterDef.getImpl().newInstance();
 		}
