@@ -12,9 +12,7 @@ import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 
 @Entity
 @Indexed(index="Email")
-@FullTextFilterDefs( {
-    @FullTextFilterDef(name="shard", impl= ShardSensitiveOnlyFilter.class)
-})
+@FullTextFilterDef(name="shard", impl= ShardSensitiveOnlyFilter.class)
 public class Email {
 	
 	@Id
