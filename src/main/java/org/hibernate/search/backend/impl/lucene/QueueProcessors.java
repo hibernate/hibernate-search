@@ -18,7 +18,7 @@ import org.hibernate.search.store.DirectoryProvider;
  * them concurrently.
  * @author Sanne Grinovero
  */
-class QueueProcessors {
+class QueueProcessors implements PerDirectoryWorkProcessor {
 	
 	private final Map<DirectoryProvider, PerDPResources> resourcesMap;
 	private final Map<DirectoryProvider, PerDPQueueProcessor> dpProcessors = new HashMap<DirectoryProvider, PerDPQueueProcessor>();
@@ -27,7 +27,7 @@ class QueueProcessors {
 		this.resourcesMap = resourcesMap;
 	}
 
-	void addWorkToDpProcessor(DirectoryProvider dp, LuceneWork work) {
+	public void addWorkToDpProcessor(DirectoryProvider dp, LuceneWork work) {
 		if ( ! dpProcessors.containsKey( dp ) ) {
 			dpProcessors.put( dp, new PerDPQueueProcessor( resourcesMap.get( dp ) ) );
 		}

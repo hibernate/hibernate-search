@@ -76,21 +76,12 @@ class PerDPQueueProcessor implements Runnable {
 	}
 	
 	private void performOptimizations() {
-		log.trace( "Locking Workspace (or waiting to...)" );
-		workspace.lock();
-		try {
-			log.trace( "Workspace lock aquired." );
-			//TODO next line is assuming the OptimizerStrategy will need an IndexWriter;
-			// would be nicer to have the strategy put an OptimizeWork on the queue,
-			// or just return "yes please" (true) to some method?
-			//FIXME will not have a chance to trigger when no "add" activity is done.
-			// this is correct until we enable modification counts for deletions too.
-			workspace.optimizerPhase();
-		}
-		finally {
-			workspace.unlock();
-			log.trace( "Unlocked Workspace" );
-		}
+		//TODO next line is assuming the OptimizerStrategy will need an IndexWriter;
+		// would be nicer to have the strategy put an OptimizeWork on the queue,
+		// or just return "yes please" (true) to some method?
+		//FIXME will not have a chance to trigger when no "add" activity is done.
+		// this is correct until we enable modification counts for deletions too.
+		workspace.optimizerPhase();
 	}
 
 	/**

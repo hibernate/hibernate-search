@@ -12,6 +12,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.batchindexing.IndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ScopedAnalyzer;
@@ -93,6 +94,10 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 			}
 		}
 		return analyzerClone;
+	}
+
+	public void logWorkDone(LuceneWork work, IndexerProgressMonitor monitor) {
+		monitor.documentsAdded( 1 );
 	}
 
 }

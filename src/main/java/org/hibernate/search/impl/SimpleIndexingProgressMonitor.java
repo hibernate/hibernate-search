@@ -42,14 +42,14 @@ public class SimpleIndexingProgressMonitor implements IndexerProgressMonitor {
 	}
 	
 	protected int getStatusMessagePeriod() {
-		return 1000;
+		return 50;
 	}
 	
 	protected void printStatusMessage(long starttimems, long totalTodoCount, long doneCount) {
 		long elapsedMs = System.currentTimeMillis() - starttimems;
 		log.info( "{} documents indexed in {} ms", doneCount, elapsedMs );
-		double estimateSpeed = ( (double) doneCount * 1000f ) / elapsedMs ;
-		double estimatePercentileComplete = ( (double) doneCount*100 ) / (double)totalTodoCount ;
+		float estimateSpeed = (float) doneCount * 1000f / elapsedMs ;
+		float estimatePercentileComplete = (float) doneCount * 100f / (float) totalTodoCount ;
 		log.info( "Indexing speed: {} documents/second; progress: {}%", estimateSpeed, estimatePercentileComplete );
 	}
 

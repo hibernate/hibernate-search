@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.batchindexing.IndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -35,6 +36,11 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 		catch (Exception e) {
 			throw new SearchException( "Unable to purge all from Lucene index: " + entityType, e );
 		}
+	}
+
+	public void logWorkDone(LuceneWork work, IndexerProgressMonitor monitor) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

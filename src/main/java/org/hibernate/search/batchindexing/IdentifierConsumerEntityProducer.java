@@ -26,16 +26,16 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 	
 	private static final Logger log = LoggerFactory.make();
 
-	private final ProducerConsumerQueue source;
-	private final ProducerConsumerQueue destination;
+	private final ProducerConsumerQueue<List<Serializable>> source;
+	private final ProducerConsumerQueue<Object> destination;
 	private final SessionFactory sessionFactory;
 	private final CacheMode cacheMode;
 	private final Class<?> type;
 	private final IndexerProgressMonitor monitor;
 
 	public IdentifierConsumerEntityProducer(
-			ProducerConsumerQueue fromIdentifierListToEntities,
-			ProducerConsumerQueue fromEntityToAddwork,
+			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
+			ProducerConsumerQueue<Object> fromEntityToAddwork,
 			IndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CacheMode cacheMode, Class<?> type) {
@@ -70,6 +70,7 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 			do {
 				take = source.take();
 				if ( take != null ) {
+					@SuppressWarnings("unchecked")
 					List<Serializable> listIds = (List<Serializable>) take;
 					log.trace( "received list of ids {}", listIds );
 					loadList( listIds, session );
@@ -79,6 +80,7 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 		}
 		catch (InterruptedException e) {
 			// just quit
+			Thread.currentThread().interrupt();
 		}
 		finally {
 			destination.producerStopping();

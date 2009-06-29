@@ -89,7 +89,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		}
 		else {
 			try {
-				Class processorFactoryClass = ReflectHelper.classForName( backend, BatchedQueueingProcessor.class );
+				Class<?> processorFactoryClass = ReflectHelper.classForName( backend, BatchedQueueingProcessor.class );
 				backendQueueProcessorFactory = ( BackendQueueProcessorFactory ) processorFactoryClass.newInstance();
 			}
 			catch ( ClassNotFoundException e ) {

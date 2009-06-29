@@ -17,7 +17,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * 
  * @author Sanne Grinovero
  */
-class DpSelectionVisitor implements WorkVisitor<DpSelectionDelegate> {
+public class DpSelectionVisitor implements WorkVisitor<DpSelectionDelegate> {
 	
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
@@ -43,8 +43,8 @@ class DpSelectionVisitor implements WorkVisitor<DpSelectionDelegate> {
 	private static class AddSelectionDelegate implements DpSelectionDelegate {
 
 		public void addAsPayLoadsToQueue(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, QueueProcessors queues) {
-			DirectoryProvider provider = shardingStrategy.getDirectoryProviderForAddition(
+				IndexShardingStrategy shardingStrategy, PerDirectoryWorkProcessor queues) throws InterruptedException {
+			DirectoryProvider<?> provider = shardingStrategy.getDirectoryProviderForAddition(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString(),
@@ -58,13 +58,13 @@ class DpSelectionVisitor implements WorkVisitor<DpSelectionDelegate> {
 	private static class DeleteSelectionDelegate implements DpSelectionDelegate {
 
 		public void addAsPayLoadsToQueue(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, QueueProcessors queues) {
-			DirectoryProvider[] providers = shardingStrategy.getDirectoryProvidersForDeletion(
+				IndexShardingStrategy shardingStrategy, PerDirectoryWorkProcessor queues) throws InterruptedException {
+			DirectoryProvider<?>[] providers = shardingStrategy.getDirectoryProvidersForDeletion(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString()
 			);
-			for (DirectoryProvider provider : providers) {
+			for (DirectoryProvider<?> provider : providers) {
 				queues.addWorkToDpProcessor( provider, work );
 			}
 		}
@@ -74,9 +74,9 @@ class DpSelectionVisitor implements WorkVisitor<DpSelectionDelegate> {
 	private static class OptimizeSelectionDelegate implements DpSelectionDelegate {
 
 		public void addAsPayLoadsToQueue(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, QueueProcessors queues) {
-			DirectoryProvider[] providers = shardingStrategy.getDirectoryProvidersForAllShards();
-			for (DirectoryProvider provider : providers) {
+				IndexShardingStrategy shardingStrategy, PerDirectoryWorkProcessor queues) throws InterruptedException {
+			DirectoryProvider<?>[] providers = shardingStrategy.getDirectoryProvidersForAllShards();
+			for (DirectoryProvider<?> provider : providers) {
 				queues.addWorkToDpProcessor( provider, work );
 			}
 		}
@@ -86,13 +86,13 @@ class DpSelectionVisitor implements WorkVisitor<DpSelectionDelegate> {
 	private static class PurgeAllSelectionDelegate implements DpSelectionDelegate {
 
 		public void addAsPayLoadsToQueue(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, QueueProcessors queues) {
-			DirectoryProvider[] providers = shardingStrategy.getDirectoryProvidersForDeletion(
+				IndexShardingStrategy shardingStrategy, PerDirectoryWorkProcessor queues) throws InterruptedException {
+			DirectoryProvider<?>[] providers = shardingStrategy.getDirectoryProvidersForDeletion(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString()
 			);
-			for (DirectoryProvider provider : providers) {
+			for (DirectoryProvider<?> provider : providers) {
 				queues.addWorkToDpProcessor( provider, work );
 			}
 		}

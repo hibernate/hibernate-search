@@ -43,6 +43,10 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
+import org.hibernate.search.backend.configuration.MaskedProperty;
+import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
+import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
+import org.hibernate.search.batchindexing.IndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
@@ -84,6 +88,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private Map<String, Analyzer> analyzers;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
+	private final Properties configurationProperties;
 
 	private final PolymorphicIndexHierarchy indexHierarchy = new PolymorphicIndexHierarchy();
 
@@ -137,6 +142,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.cacheBitResultsSize = ConfigurationParseHelper.getIntValue(
 				cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 		);
+		this.configurationProperties = cfg.getProperties();
 		this.barrier = 1; //write barrier
 	}
 
@@ -541,6 +547,34 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		if ( barrier != 0 ) {
 		} //read barrier
 		return indexHierarchy.getIndexedClasses( classes );
+	}
+	
+	public BatchBackend makeBatchBackend(IndexerProgressMonitor progressMonitor) {
+		BatchBackend batchBackend;
+		String impl = configurationProperties.getProperty( Environment.BATCH_BACKEND );
+		if ( StringHelper.isEmpty( impl ) || "LuceneBatch".equalsIgnoreCase( impl ) ) {
+			batchBackend = new LuceneBatchBackend();
+		}
+		else {
+			try {
+				Class batchBackendClass = ReflectHelper
+						.classForName( impl, SearchFactoryImpl.class );
+				batchBackend = ( BatchBackend ) batchBackendClass.newInstance();
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new SearchException( "Unable to find batchbackend implementation class: " + impl, e );
+			}
+			catch ( IllegalAccessException e ) {
+				throw new SearchException( "Unable to instantiate batchbackend class: " + impl, e );
+			}
+			catch ( InstantiationException e ) {
+				throw new SearchException( "Unable to instantiate batchbackend class: " + impl, e );
+			}
+		}
+		Properties batchBackendConfiguration = new MaskedProperty(
+				this.configurationProperties, Environment.BATCH_BACKEND );
+		batchBackend.initialize( batchBackendConfiguration, progressMonitor, this );
+		return batchBackend;
 	}
 
 	/**

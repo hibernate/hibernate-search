@@ -11,11 +11,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author Sanne Grinovero
  */
-public class ProducerConsumerQueue {
+public class ProducerConsumerQueue<T> {
 	
 	private static final int DEFAULT_BUFF_LENGHT = 1000;
 	private static final Object exitToken = new Object();
 	
+	//doesn't use generics here as exitToken needs to be put in the queue too:
+	@SuppressWarnings("unchecked")
 	private final BlockingQueue queue;
 	private final AtomicInteger producersToWaitFor;
 	
@@ -26,6 +28,7 @@ public class ProducerConsumerQueue {
 		this( DEFAULT_BUFF_LENGHT, producersToWaitFor );
 	}
 	
+	@SuppressWarnings("unchecked")
 	public ProducerConsumerQueue( int queueLenght, int producersToWaitFor ) {
 		queue = new ArrayBlockingQueue( queueLenght );
 		this.producersToWaitFor = new AtomicInteger( producersToWaitFor );
@@ -37,7 +40,8 @@ public class ProducerConsumerQueue {
 	 * @return the next object in the queue, or null to exit
 	 * @throws InterruptedException
 	 */
-	public Object take() throws InterruptedException {
+	@SuppressWarnings("unchecked")
+	public T take() throws InterruptedException {
 		Object obj = queue.take();
 		if ( obj == exitToken ) {
 			//restore exit signal for other threads
@@ -45,7 +49,7 @@ public class ProducerConsumerQueue {
 			return null;
 		}
 		else {
-			return obj;
+			return (T)obj;
 		}
 	}
 	
@@ -55,7 +59,8 @@ public class ProducerConsumerQueue {
 	 * @param obj
 	 * @throws InterruptedException
 	 */
-	public void put(Object obj) throws InterruptedException {
+	@SuppressWarnings("unchecked")
+	public void put(T obj) throws InterruptedException {
 		queue.put( obj );
 	}
 
@@ -64,9 +69,10 @@ public class ProducerConsumerQueue {
 	 * finished. After doing it can safely terminate.
 	 * After all producer threads have called producerStopping()
 	 * a token will be inserted in the blocking queue to eventually
-	 * awake sleaping consumers and have them quit, after the
+	 * awake sleeping consumers and have them quit, after the
 	 * queue has been processed.
 	 */
+	@SuppressWarnings("unchecked")
 	public void producerStopping() {
 		int activeProducers = producersToWaitFor.decrementAndGet();
 		//last producer must close consumers

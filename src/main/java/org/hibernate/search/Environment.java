@@ -64,12 +64,19 @@ public final class Environment {
 	public static final String READER_STRATEGY = READER_PREFIX + "strategy";
 	
 	/**
-	 * filter caching strategy class (must have a no-arg constructor and implements FilterCachingStrategy)
+	 * filter caching strategy class (must have a no-arg constructor and implement FilterCachingStrategy)
 	 */
 	public static final String FILTER_CACHING_STRATEGY = "hibernate.search.filter.cache_strategy";
 	
 	/**
 	 * number of docidresults cached in hard reference.
 	 */
-	public static final String CACHE_DOCIDRESULTS_SIZE = "hibernate.search.filter.cache_docidresults.size";	
+	public static final String CACHE_DOCIDRESULTS_SIZE = "hibernate.search.filter.cache_docidresults.size";
+	
+	/**
+	 * batch backend implementation class (must have a no-arg constructor and implement BatchBackend)
+	 * also prefix for configuration settings of the batch backend
+	 */
+	public static final String BATCH_BACKEND = "hibernate.search.batchbackend";
+	
 }

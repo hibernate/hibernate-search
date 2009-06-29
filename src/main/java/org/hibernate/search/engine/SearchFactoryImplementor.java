@@ -9,6 +9,8 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.Worker;
+import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
+import org.hibernate.search.batchindexing.IndexerProgressMonitor;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -61,4 +63,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	int getFilterCacheBitResultsSize();
 
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
+	
+	BatchBackend makeBatchBackend(IndexerProgressMonitor progressMonitor);
 }

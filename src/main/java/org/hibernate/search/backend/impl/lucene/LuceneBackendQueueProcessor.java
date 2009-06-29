@@ -43,13 +43,13 @@ class LuceneBackendQueueProcessor implements Runnable {
 	public void run() {
 		QueueProcessors processors = new QueueProcessors( resourcesMap );
 		// divide the queue in tasks, adding to QueueProcessors by affected Directory.
-		for ( LuceneWork work : queue ) {
-			final Class<?> entityType = work.getEntityClass();
-			DocumentBuilderIndexedEntity<?> documentBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityType );
-			IndexShardingStrategy shardingStrategy = documentBuilder.getDirectoryProviderSelectionStrategy();
-			work.getWorkDelegate( providerSelectionVisitor ).addAsPayLoadsToQueue( work, shardingStrategy, processors );
-		}
 		try {
+			for ( LuceneWork work : queue ) {
+				final Class<?> entityType = work.getEntityClass();
+				DocumentBuilderIndexedEntity<?> documentBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityType );
+				IndexShardingStrategy shardingStrategy = documentBuilder.getDirectoryProviderSelectionStrategy();
+				work.getWorkDelegate( providerSelectionVisitor ).addAsPayLoadsToQueue( work, shardingStrategy, processors );
+			}
 			//this Runnable splits tasks in more runnables and then runs them:
 			processors.runAll( sync );
 		} catch (InterruptedException e) {

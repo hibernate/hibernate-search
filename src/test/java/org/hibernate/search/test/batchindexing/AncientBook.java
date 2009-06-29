@@ -10,4 +10,12 @@ public class AncientBook extends Book {
 	
 	public String catalogueGroupName = "";
 
+	public String getCatalogueGroupName() {
+		return catalogueGroupName;
+	}
+
+	public void setCatalogueGroupName(String catalogueGroupName) {
+		this.catalogueGroupName = catalogueGroupName;
+	}
+	
 }

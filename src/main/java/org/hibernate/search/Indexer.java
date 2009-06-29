@@ -1,6 +1,6 @@
 package org.hibernate.search;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 
@@ -29,7 +29,13 @@ public interface Indexer {
 	 */
 	Indexer documentBuilderThreads(int numberOfThreads);
 	
-	//not supported yet
+	/**
+	 * Sets the number of threads to be used to analyze the documents
+	 * and write to the index.
+	 * @param numberOfThreads
+	 * @return
+	 */
+	//TODO not yet implemented
 	//Indexer indexWriterThreads(int numberOfThreads);
 	
 	/**
@@ -68,21 +74,28 @@ public interface Indexer {
 	Indexer purgeAllAtStart(boolean purgeAll);
 	
 	/**
+	 * Will stop indexing after having indexed this amount of objects.
+	 * As a results the index will not be consistent
+	 * with the database: use only for testing.
+	 * @param maximum
+	 * @return
+	 */
+	Indexer limitObjects(int maximum);
+
+	/**
 	 * Starts the indexing process in background (asynchronous).
 	 * Can be called only once.
+	 * @return a Future to control task canceling. get() will always return null,
+	 * blocking until completion.
 	 */
-	void start();
+	Future<?> start();
 	
 	/**
 	 * Starts the indexing process, and then block until it's finished.
 	 * Can be called only once.
-	 * @param timeout the maximum time to wait
-	 * @param unit the time unit of the <tt>timeout</tt> argument.
-	 * @return <tt>true</tt> if the process finished and <tt>false</tt>
-     * if the waiting time elapsed before the process was finished.
 	 * @throws InterruptedException if the current thread is interrupted
      * while waiting.
 	 */
-	boolean startAndWait( long timeout, TimeUnit unit ) throws InterruptedException;
+	void startAndWait() throws InterruptedException;
 
 }

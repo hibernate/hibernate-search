@@ -2,6 +2,7 @@ package org.hibernate.search.batchindexing;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
@@ -11,6 +12,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -28,26 +30,30 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 	
 	private static final Logger log = LoggerFactory.make();
 	
-	private final ProducerConsumerQueue source;
-	private final ProducerConsumerQueue destination;
+	private final ProducerConsumerQueue<Object> source;
 	private final SessionFactory sessionFactory;
 	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuilders;
 	private final IndexerProgressMonitor monitor;
 	
 	private static final int CLEAR_PERIOD = 50;
 	private final CacheMode cacheMode;
+
+	private final CountDownLatch producerEndSignal;
+
+	private final BatchBackend backend;
 	
 	public EntityConsumerLuceneworkProducer(
-			ProducerConsumerQueue entitySource,
-			ProducerConsumerQueue fromAddworkToIndex,
+			ProducerConsumerQueue<Object> entitySource,
 			IndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
-			SearchFactoryImplementor searchFactory, CacheMode cacheMode) {
+			CountDownLatch producerEndSignal,
+			SearchFactoryImplementor searchFactory, CacheMode cacheMode, BatchBackend backend) {
 		this.source = entitySource;
-		this.destination = fromAddworkToIndex;
 		this.monitor = monitor;
 		this.sessionFactory = sessionFactory;
+		this.producerEndSignal = producerEndSignal;
 		this.cacheMode = cacheMode;
+		this.backend = backend;
 		this.documentBuilders = searchFactory.getDocumentBuildersIndexedEntities();
 	}
 
@@ -61,6 +67,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 			transaction.commit();
 		}
 		finally {
+			producerEndSignal.countDown();
 			session.close();
 		}
 		log.debug( "finished" );
@@ -89,9 +96,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 		}
 		catch (InterruptedException e) {
 			// just quit
-		}
-		finally {
-			destination.producerStopping();
+			Thread.currentThread().interrupt();
 		}
 	}
 
@@ -105,7 +110,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
 		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, true );
-		destination.put( addWork );
+		backend.enqueueAsyncWork( addWork );
 	}
 	
 }

@@ -1,7 +1,6 @@
 package org.hibernate.search.test.batchindexing;
 
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -18,6 +17,10 @@ import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 public class SearchIndexerTest extends TestCase {
 	
+	/**
+	 * test that the Indexer is properly identifying the root entities
+	 * from the selection of classes to be indexed.
+	 */
 	public void testEntityHierarchy() {
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
 			.addAnnotatedClass( ModernBook.class )
@@ -56,7 +59,7 @@ public class SearchIndexerTest extends TestCase {
 		}
 	}
 	
-	private class TestableSearchIndexerImpl extends IndexerImpl {
+	private static class TestableSearchIndexerImpl extends IndexerImpl {
 		
 		protected TestableSearchIndexerImpl(SearchFactoryImplementor searchFactory, Class<?>... types) {
 			super( searchFactory, null, types );
@@ -68,6 +71,10 @@ public class SearchIndexerTest extends TestCase {
 		
 	}
 	
+	/**
+	 * Test to verify that the identifier loading works even when
+	 * the property is not called "id" 
+	 */
 	public void testIdentifierNaming() throws InterruptedException {
 		//disable automatic indexing, to test manual index creation.
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
@@ -95,7 +102,7 @@ public class SearchIndexerTest extends TestCase {
 		{
 			FullTextSession fullTextSession = ftsb.openFullTextSession();
 			fullTextSession.createIndexer( Dvd.class )
-				.startAndWait( 10, TimeUnit.SECONDS );
+				.startAndWait();
 			fullTextSession.close();
 		}
 		{	
@@ -104,8 +111,9 @@ public class SearchIndexerTest extends TestCase {
 		}
 	}
 	
-	public int countResults( Term termForQuery, FullTextSessionBuilder ftSessionBuilder, Class<?> type ) {
-		TermQuery fullTextQuery = new TermQuery( new Term( "title", "trek" ) );
+	//helper method
+	private int countResults( Term termForQuery, FullTextSessionBuilder ftSessionBuilder, Class<?> type ) {
+		TermQuery fullTextQuery = new TermQuery( termForQuery );
 		FullTextSession fullTextSession = ftSessionBuilder.openFullTextSession();
 		Transaction transaction = fullTextSession.beginTransaction();
 		FullTextQuery query = fullTextSession.createFullTextQuery( fullTextQuery, type );

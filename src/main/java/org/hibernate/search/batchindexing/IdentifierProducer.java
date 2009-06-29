@@ -30,11 +30,13 @@ public class IdentifierProducer implements Runnable {
 	
 	private static final Logger log = LoggerFactory.make();
 
-	private final ProducerConsumerQueue destination;
+	private final ProducerConsumerQueue<List<Serializable>> destination;
 	private final SessionFactory sessionFactory;
 	private final int batchSize;
 	private final Class<?> indexedType;
 	private final IndexerProgressMonitor monitor;
+
+	private final int objectsLimit;
 
 	/**
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
@@ -42,17 +44,20 @@ public class IdentifierProducer implements Runnable {
 	 * @param objectLoadingBatchSize affects mostly the next consumer: IdentifierConsumerEntityProducer
 	 * @param indexedType the entity type to be loaded
 	 * @param monitor to monitor indexing progress
+	 * @param objectsLimit if not zero
 	 */
 	public IdentifierProducer(
-			ProducerConsumerQueue fromIdentifierListToEntities,
+			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
-			Class<?> indexedType, IndexerProgressMonitor monitor) {
+			Class<?> indexedType, IndexerProgressMonitor monitor,
+			int objectsLimit) {
 				this.destination = fromIdentifierListToEntities;
 				this.sessionFactory = sessionFactory;
 				this.batchSize = objectLoadingBatchSize;
 				this.indexedType = indexedType;
 				this.monitor = monitor;
+				this.objectsLimit = objectsLimit;
 				log.trace( "created" );
 	}
 	
@@ -82,14 +87,17 @@ public class IdentifierProducer implements Runnable {
 	}
 
 	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
-		Integer count = (Integer) session
+		Integer totalCount = (Integer) session
 			.createCriteria( indexedType )
 			.setProjection( Projections.count( "id" ) )
 			.setCacheable( false )
 			.uniqueResult();
-
-		log.debug( "going to fetch {} primary keys", count);
-		monitor.addToTotalCount( count );
+		
+		if ( objectsLimit != 0 && objectsLimit < totalCount.intValue() ) {
+			totalCount = objectsLimit;
+		}
+		log.debug( "going to fetch {} primary keys", totalCount);
+		monitor.addToTotalCount( totalCount );
 		
 		Criteria criteria = session
 			.createCriteria( indexedType )
@@ -99,6 +107,7 @@ public class IdentifierProducer implements Runnable {
 		
 		ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY );
 		ArrayList<Serializable> destinationList = new ArrayList<Serializable>( batchSize );
+		int counter = 0;
 		try {
 			while ( results.next() ) {
 				Serializable id = (Serializable) results.get( 0 );
@@ -106,6 +115,10 @@ public class IdentifierProducer implements Runnable {
 				if ( destinationList.size() == batchSize ) {
 					enqueueList( destinationList );
 					destinationList = new ArrayList<Serializable>( batchSize ); 
+				}
+				counter++;
+				if ( counter == totalCount ) {
+					break;
 				}
 			}
 		}

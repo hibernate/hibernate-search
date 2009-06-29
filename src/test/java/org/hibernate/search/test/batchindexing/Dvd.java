@@ -9,7 +9,7 @@ import org.hibernate.search.annotations.Indexed;
 
 @Indexed
 @Entity
-public class Dvd {
+public class Dvd implements TitleAble {
 	
 	public long unusuallyNamedIdentifier;
 	public String title;

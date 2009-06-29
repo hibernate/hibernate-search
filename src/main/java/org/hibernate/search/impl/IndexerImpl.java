@@ -1,16 +1,15 @@
 package org.hibernate.search.impl;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.Indexer;
-import org.hibernate.search.batchindexing.BatchIndexingWorkspace;
+import org.hibernate.search.batchindexing.BatchCoordinator;
+import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.batchindexing.IndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
@@ -30,15 +29,13 @@ public class IndexerImpl implements Indexer {
 	private final SessionFactory sessionFactory;
 
 	protected Set<Class<?>> rootEntities = new HashSet<Class<?>>();
-	protected List<BatchIndexingWorkspace> indexers = new LinkedList<BatchIndexingWorkspace>();
-	boolean started = false; 
-	private CountDownLatch endAllSignal;
 	
 	// default settings defined here:
 	private int objectLoadingThreads = 2; //loading the main entity
 	private int collectionLoadingThreads = 4; //also responsible for loading of lazy @IndexedEmbedded collections
 	private int writerThreads = 1; //also running the Analyzers
 	private int objectLoadingBatchSize = 10;
+	private int objectsLimit = 0; //means no limit at all
 	private CacheMode cacheMode = CacheMode.IGNORE;
 	private boolean optimizeAtEnd = true;
 	private boolean purgeAtStart = true;
@@ -87,9 +84,7 @@ public class IndexerImpl implements Indexer {
 			}
 		}
 		cleaned.removeAll( toRemove );
-		if ( log.isDebugEnabled() ) {
-			log.debug( "Targets for indexing job: {}", cleaned );
-		}
+		log.debug( "Targets for indexing job: {}", cleaned );
 		return cleaned;
 	}
 
@@ -143,30 +138,37 @@ public class IndexerImpl implements Indexer {
 		return this;
 	}
 	
-	public void start() {
-		if ( started ) {
-			throw new IllegalStateException( "Can be started only once" );
+	public Future<?> start() {
+		BatchCoordinator coordinator = createCoordinator();
+		ExecutorService executor = Executors.newFixedThreadPool( 1, "batch coordinator" );
+		try {
+			Future<?> submit = executor.submit( coordinator );
+			return submit;
 		}
-		else {
-			started = true;
-			endAllSignal = new CountDownLatch( rootEntities.size() );
-			for ( Class<?> type : rootEntities ) {
-				indexers.add( new BatchIndexingWorkspace(
-						searchFactoryImplementor, sessionFactory, type,
-						objectLoadingThreads, collectionLoadingThreads, writerThreads,
-						cacheMode, objectLoadingBatchSize,
-						optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-						endAllSignal, monitor) );
-			}
-			for ( BatchIndexingWorkspace batcher : indexers ) {
-				new Thread( batcher ).start();
-			}
+		finally {
+			executor.shutdown();
 		}
 	}
+	
+	public void startAndWait() throws InterruptedException {
+		BatchCoordinator coordinator = createCoordinator();
+		coordinator.run();
+		if ( Thread.currentThread().isInterrupted() ) {
+			throw new InterruptedException();
+		}
+	}
+	
+	protected BatchCoordinator createCoordinator() {
+		return new BatchCoordinator( rootEntities, searchFactoryImplementor, sessionFactory,
+				objectLoadingThreads, collectionLoadingThreads,
+				cacheMode, objectLoadingBatchSize, objectsLimit,
+				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
+				monitor );
+	}
 
-	public boolean startAndWait(long timeout, TimeUnit unit) throws InterruptedException {
-		start();
-		return endAllSignal.await( timeout, unit );
+	public Indexer limitObjects(int maximum) {
+		this.objectsLimit = maximum;
+		return this;
 	}
 
 }

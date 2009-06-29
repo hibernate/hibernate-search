@@ -11,7 +11,6 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.slf4j.Logger;
 
-import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
@@ -78,15 +77,18 @@ public class Workspace {
 	/**
 	 * If optimization has not been forced give a chance to configured OptimizerStrategy
 	 * to optimize the index.
-	 * To enter the optimization phase you need to acquire the lock first.
-	 * @throws AssertionFailure if the lock is not owned.
 	 */
 	public void optimizerPhase() {
-		assertOwnLock();
-		// used getAndSet(0) because Workspace is going to be reused by next transaction.
-		synchronized (optimizerStrategy) {
-			optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
-			optimizerStrategy.optimize( this );
+		lock.lock();
+		try {
+			// used getAndSet(0) because Workspace is going to be reused by next transaction.
+			synchronized ( optimizerStrategy ) {
+				optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
+				optimizerStrategy.optimize( this );
+			}
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 	
@@ -98,9 +100,15 @@ public class Workspace {
 	 * @see SearchFactory#optimize(Class)
 	 */
 	public void optimize() {
-		// Needs to ensure the optimizerStrategy is accessed in threadsafe way
-		synchronized (optimizerStrategy) {
-			optimizerStrategy.optimizationForced();
+		lock.lock();
+		try {
+			//Needs to ensure the optimizerStrategy is accessed in threadsafe way
+			synchronized (optimizerStrategy) {
+				optimizerStrategy.optimizationForced();
+			}
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -108,7 +116,6 @@ public class Workspace {
 	 * Gets the IndexWriter, opening one if needed.
 	 * @param batchmode when true the indexWriter settings for batch mode will be applied.
 	 * Ignored if IndexWriter is open already.
-	 * @throws AssertionFailure if the lock is not owned.
 	 * @throws SearchException on a IOException during index opening.
 	 * @return a new IndexWriter or one already open.
 	 */
@@ -130,8 +137,8 @@ public class Workspace {
 	/**
 	 * Commits changes to a previously opened IndexWriter.
 	 *
-	 * @throws SearchException on IOException during Lucene close operation.
-	 * @throws AssertionFailure if there is no IndexWriter to close.
+	 * @throws SearchException on IOException during Lucene close operation,
+	 * or if there is no IndexWriter to close.
 	 */
 	public synchronized void commitIndexWriter() {
 		if ( writer != null ) {
@@ -143,15 +150,11 @@ public class Workspace {
 				throw new SearchException( "Exception while commiting index changes", e );
 			}
 		}
-		else {
-			throw new AssertionFailure( "No open IndexWriter to commit changes." );
-		}
 	}
 
 	/**
 	 * Closes a previously opened IndexWriter.
-	 * @throws SearchException on IOException during Lucene close operation.
-	 * @throws AssertionFailure if there is no IndexWriter to close.
+	 * @throws SearchException on IOException during Lucene close operation
 	 */
 	public synchronized void closeIndexWriter() {
 		IndexWriter toClose = writer;
@@ -164,9 +167,6 @@ public class Workspace {
 			catch ( IOException e ) {
 				throw new SearchException( "Exception while closing IndexWriter", e );
 			}
-		}
-		else {
-			throw new AssertionFailure( "No open IndexWriter to close" );
 		}
 	}
 
@@ -185,28 +185,6 @@ public class Workspace {
 	 */
 	public Set<Class<?>> getEntitiesInDirectory() {
 		return entitiesInDirectory;
-	}
-	
-	/**
-	 * Acquires a lock on the DirectoryProvider backing this Workspace;
-	 * this is required to use optimizerPhase()
-	 * @see #optimizerPhase()
-	 */
-	public void lock() {
-		lock.lock();
-	}
-
-	/**
-	 * Releases the lock obtained by calling lock(). The caller must own the lock.
-	 * @see #lock()
-	 */
-	public void unlock() {
-		lock.unlock();
-	}
-
-	private void assertOwnLock() {
-		if ( ! lock.isHeldByCurrentThread() )
-			throw new AssertionFailure( "Not owning DirectoryProvider Lock" );
 	}
 
 }

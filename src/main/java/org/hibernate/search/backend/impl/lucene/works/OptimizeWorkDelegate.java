@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.batchindexing.IndexerProgressMonitor;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -40,6 +41,11 @@ class OptimizeWorkDelegate implements LuceneWorkDelegate {
 		catch ( IOException e ) {
 			throw new SearchException( "Unable to optimize Lucene index: " + entityType, e );
 		}
+	}
+
+	public void logWorkDone(LuceneWork work, IndexerProgressMonitor monitor) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
