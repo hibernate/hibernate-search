@@ -1,8 +1,33 @@
 Hibernate Search Changelog
 ==========================
 
+3.1.1.GA (28-05-2009)
+---------------------
+
+** Bug
+    * [HSEARCH-178] - Out of transaction work causes collection lazy loading to throw AssertionFailure
+    * [HSEARCH-310] - Out of Memory on ScrollableResults
+    * [HSEARCH-325] - FullTextQuery.iterate() skips last result.
+    * [HSEARCH-330] - NegativeArraySizeException if you use FullTextQuery.setMaxResults(Integer.MAX_VALUE)
+    * [HSEARCH-338] - ScrollableResults initial position not coherent to core Hibernate
+    * [HSEARCH-339] - ScrollableResults may return unmanaged entities from it's own cache
+    * [HSEARCH-342] - Delete on unindexed entities referenced by indexed entities with ContainedIn annotation failed
+    * [HSEARCH-355] - FilterOptimizationHelper was improperly using method overloading
+    * [HSEARCH-357] - IdBridge being applied on null entity during purgeAll()
+    * [HSEARCH-360] - Hibernate Search 3.1.0GA Bugs after HSEARCH-160
+
+
+** Improvement
+    * [HSEARCH-340] - ScrollableResults exploits batch loading for backwards and random order scrolling
+    * [HSEARCH-369] - typos in documentation
+
+
+** Task
+    * [HSEARCH-348] - Upgrade to Lucene 2.4.1
+
+
 3.1.0.GA (4-12-2008)
-------------------------
+--------------------
 
 ** Bug
     * [HSEARCH-233] - EntityNotFoundException during indexing
