@@ -4,13 +4,29 @@ import org.hibernate.search.SearchException;
 import org.hibernate.util.ReflectHelper;
 
 /**
+ * Utility class to load instances of other classes by using a fully qualified name,
+ * or from a class type.
+ * Uses reflection and throws SearchException(s) with proper descriptions of the error,
+ * like the target class is missing a proper constructor, is an interface, is not found...
  * 
  * @author Sanne Grinovero
- *
- * @param <T>
  */
 public class PluginLoader {
 	
+	/**
+	 * Creates an instance of a target class designed by fully qualified name
+	 * 
+	 * @param <T> matches the type of targetSuperType: defines the return type
+	 * @param targetSuperType the return type of the function, the classNameToLoad will be checked
+	 * to be assignable to this type.
+	 * @param classNameToLoad a fully qualified class name, whose type is assignable to targetSuperType
+	 * @param caller the class of the caller, needed for classloading purposes
+	 * @param componentDescription a meaningful description of the role the instance will have,
+	 * used to enrich error messages to describe the context of the error
+	 * @return a new instance of classNameToLoad
+	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
+	 * classNotFound, missing proper constructor, wrong type, security errors.
+	 */
 	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad,
 			Class<?> caller, String componentDescription) {
 		final Class<?> clazzDef;
@@ -23,6 +39,16 @@ public class PluginLoader {
 		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
 	}
 	
+	/**
+	 * Creates an instance of target class
+	 * @param <T> the type of targetSuperType: defines the return type
+	 * @param targetSuperType the created instance will be checked to be assignable to this type
+	 * @param classToLoad the class to be instantiated
+	 * @param componentDescription a role name/description to contextualize error messages
+	 * @return a new instance of classToLoad
+	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
+	 * missing proper constructor, wrong type, security errors.
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription) {
 		checkClassType( classToLoad, componentDescription );
@@ -66,6 +92,13 @@ public class PluginLoader {
 		}
 	}
 
+	/**
+	 * Verifies if target class has a no-args constructor, and that it is
+	 * accessible in current security manager.
+	 * @param classToLoad the class type to check
+	 * @param componentDescription adds a meaningful description to the type to describe in the
+	 * 	exception message
+	 */
 	public static void checkHasValidconstructor(Class<?> classToLoad, String componentDescription) {
 		try {
 			classToLoad.getConstructor();
