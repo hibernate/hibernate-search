@@ -16,7 +16,11 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.util.DelegateNamedAnalyzer;
+import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.PluginLoader;
 import org.hibernate.util.ReflectHelper;
+import org.hibernate.util.StringHelper;
+import org.slf4j.Logger;
 
 /**
  * Provides access to some default configuration settings (eg default <code>Analyzer</code> or default
@@ -27,6 +31,9 @@ import org.hibernate.util.ReflectHelper;
  * @author Hardy Ferentschik
  */
 public class InitContext {
+	
+	private static final Logger log = LoggerFactory.make();
+	
 	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
@@ -69,26 +76,18 @@ public class InitContext {
 	 */
 	private Analyzer initAnalyzer(SearchConfiguration cfg) {
 		Class analyzerClass;
-		String analyzerClassName = cfg.getProperty( Environment.ANALYZER_CLASS);
-		if (analyzerClassName != null) {
+		String analyzerClassName = cfg.getProperty( Environment.ANALYZER_CLASS );
+		if ( analyzerClassName != null ) {
 			try {
-				analyzerClass = ReflectHelper.classForName(analyzerClassName);
+				analyzerClass = ReflectHelper.classForName( analyzerClassName );
 			} catch (Exception e) {
 				return buildLazyAnalyzer( analyzerClassName );
 			}
 		} else {
 			analyzerClass = StandardAnalyzer.class;
 		}
-		// Initialize analyzer
-		Analyzer defaultAnalyzer;
-		try {
-			defaultAnalyzer = (Analyzer) analyzerClass.newInstance();
-		} catch (ClassCastException e) {
-			throw new SearchException("Lucene analyzer does not implement " + Analyzer.class.getName() + ": "
-					+ analyzerClassName, e);
-		} catch (Exception e) {
-			throw new SearchException("Failed to instantiate lucene analyzer with type " + analyzerClassName, e);
-		}
+		Analyzer defaultAnalyzer = PluginLoader.instanceFromClass( Analyzer.class,
+				analyzerClass, "Lucene analyzer" );
 		return defaultAnalyzer;
 	}
 
@@ -99,36 +98,17 @@ public class InitContext {
 	 * @return returns the default similarity class.
 	 */
 	private Similarity initSimilarity(SearchConfiguration cfg) {
-		Class similarityClass;
 		String similarityClassName = cfg.getProperty(Environment.SIMILARITY_CLASS);
-		if (similarityClassName != null) {
-			try {
-				similarityClass = ReflectHelper.classForName(similarityClassName);
-			} catch (Exception e) {
-				throw new SearchException("Lucene Similarity class '" + similarityClassName + "' defined in property '"
-						+ Environment.SIMILARITY_CLASS + "' could not be found.", e);
-			}
+		Similarity defaultSimilarity;
+		if ( StringHelper.isEmpty( similarityClassName ) ) {
+			defaultSimilarity =  Similarity.getDefault();
 		}
 		else {
-			similarityClass = null;
+			defaultSimilarity = PluginLoader.instanceFromName(
+					Similarity.class, similarityClassName, InitContext.class, "default similarity" );
 		}
-
-		// Initialize similarity
-		if ( similarityClass == null ) {
-			return Similarity.getDefault();
-		}
-		else {
-			Similarity defaultSimilarity;
-			try {
-				defaultSimilarity = (Similarity) similarityClass.newInstance();
-			} catch (ClassCastException e) {
-				throw new SearchException("Lucene similarity does not extend " + Similarity.class.getName() + ": "
-						+ similarityClassName, e);
-			} catch (Exception e) {
-				throw new SearchException("Failed to instantiate lucene similarity with type " + similarityClassName, e);
-			}
-			return defaultSimilarity;
-		}
+		log.debug( "Using default similarity implementation: {}", defaultSimilarity.getClass().getName() );		
+		return defaultSimilarity;
 	}
 
 	public Analyzer getDefaultAnalyzer() {
@@ -176,7 +156,7 @@ public class InitContext {
 		// SolrAnalyzerBuilder references Solr classes.
 		// InitContext should not (directly or indirectly) load a Solr class to avoid hard dependency
 		// unless necessary
-		// the curent mecanism (check sor class presence and call SolrAnalyzerBuilder if needed
+		// the current mechanism (check Solr class presence and call SolrAnalyzerBuilder if needed
 		// seems to be sufficient on Apple VM (derived from Sun's
 		// TODO check on other VMs and be ready for a more reflexive approach
 		return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef );

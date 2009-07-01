@@ -5,11 +5,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.TransactionalWorker;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.search.util.PluginLoader;
 import org.hibernate.util.StringHelper;
 
 /**
@@ -41,21 +40,11 @@ public abstract class WorkerFactory {
 			worker = new TransactionalWorker();
 		}
 		else {
-			try {
-				Class workerClass = ReflectHelper.classForName( impl, WorkerFactory.class );
-				worker = (Worker) workerClass.newInstance();
-			}
-			catch (ClassNotFoundException e) {
-				throw new SearchException( "Unable to find worker class: " + impl, e );
-			}
-			catch (IllegalAccessException e) {
-				throw new SearchException( "Unable to instanciate worker class: " + impl, e );
-			}
-			catch (InstantiationException e) {
-				throw new SearchException( "Unable to instanciate worker class: " + impl, e );
-			}
+			worker = PluginLoader.instanceFromName( Worker.class,
+					impl, WorkerFactory.class, "worker" );
 		}
 		worker.initialize( props, searchFactoryImplementor );
 		return worker;
 	}
+	
 }

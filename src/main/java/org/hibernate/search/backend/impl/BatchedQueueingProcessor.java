@@ -12,10 +12,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 
 import org.hibernate.Hibernate;
-import org.hibernate.util.ReflectHelper;
 import org.hibernate.util.StringHelper;
 import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.QueueingProcessor;
@@ -30,6 +28,7 @@ import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.PluginLoader;
 
 /**
  * Batch work until {@link #performWorks} is called.
@@ -88,19 +87,8 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			backendQueueProcessorFactory = new BlackHoleBackendQueueProcessorFactory();
 		}
 		else {
-			try {
-				Class<?> processorFactoryClass = ReflectHelper.classForName( backend, BatchedQueueingProcessor.class );
-				backendQueueProcessorFactory = ( BackendQueueProcessorFactory ) processorFactoryClass.newInstance();
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new SearchException( "Unable to find processor class: " + backend, e );
-			}
-			catch ( IllegalAccessException e ) {
-				throw new SearchException( "Unable to instanciate processor class: " + backend, e );
-			}
-			catch ( InstantiationException e ) {
-				throw new SearchException( "Unable to instanciate processor class: " + backend, e );
-			}
+			backendQueueProcessorFactory = PluginLoader.instanceFromName( BackendQueueProcessorFactory.class,
+					backend, BatchedQueueingProcessor.class, "processor" );
 		}
 		backendQueueProcessorFactory.initialize( properties, searchFactoryImplementor );
 		searchFactoryImplementor.setBackendQueueProcessorFactory( backendQueueProcessorFactory );

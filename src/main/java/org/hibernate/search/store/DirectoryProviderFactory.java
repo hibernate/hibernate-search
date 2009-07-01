@@ -18,7 +18,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.search.util.PluginLoader;
 import org.hibernate.util.StringHelper;
 
 /**
@@ -41,7 +41,6 @@ import org.hibernate.util.StringHelper;
 public class DirectoryProviderFactory {
 
 	private final List<DirectoryProvider<?>> providers = new ArrayList<DirectoryProvider<?>>();
-	private static final String DEFAULT_DIRECTORY_PROVIDER = FSDirectoryProvider.class.getName();
 
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
@@ -77,25 +76,8 @@ public class DirectoryProviderFactory {
 			}
 		}
 		else {
-			try {
-				Class shardigStrategyClass = ReflectHelper.classForName( shardingStrategyName, this.getClass() );
-				shardingStrategy = (IndexShardingStrategy) shardigStrategyClass.newInstance();
-			}
-			catch (ClassNotFoundException e) {
-				throw new SearchException( "Unable to find IndexShardingStrategy class " + shardingStrategyName + " for " + directoryProviderName, e );
-			}
-			catch (IllegalAccessException e) {
-				throw new SearchException( "Unable to create instance of IndexShardingStrategy class " + shardingStrategyName
-						+ " Be sure to have a no-arg constructor", e );
-			}
-			catch (InstantiationException e) {
-				throw new SearchException( "Unable to create instance of IndexShardingStrategy class " + shardingStrategyName
-						+ " Be sure to have a no-arg constructor", e );
-			}
-			catch (ClassCastException e) {
-				throw new SearchException( "ShardingStrategy class does not implement IndexShardingStrategy: "
-						+ shardingStrategyName, e );
-			}
+			shardingStrategy = PluginLoader.instanceFromName( IndexShardingStrategy.class,
+					shardingStrategyName, DirectoryProviderFactory.class, "IndexShardingStrategy" );
 		}
 		shardingStrategy.initialize(
 				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers );
@@ -111,19 +93,13 @@ public class DirectoryProviderFactory {
 	private DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps,
 														 Class entity, SearchFactoryImplementor searchFactoryImplementor) {
 		String className = indexProps.getProperty( "directory_provider" );
-		if ( StringHelper.isEmpty( className ) ) {
-			className = DEFAULT_DIRECTORY_PROVIDER;
-		}
 		DirectoryProvider<?> provider;
-		try {
-			@SuppressWarnings( "unchecked" )
-			Class<DirectoryProvider> directoryClass = ReflectHelper.classForName(
-					className, DirectoryProviderFactory.class
-			);
-			provider = directoryClass.newInstance();
+		if ( StringHelper.isEmpty( className ) ) {
+			provider = new FSDirectoryProvider();
 		}
-		catch (Exception e) {
-			throw new SearchException( "Unable to instantiate directory provider: " + className, e );
+		else {
+			provider = PluginLoader.instanceFromName( DirectoryProvider.class, className,
+					DirectoryProviderFactory.class, "directory provider" );
 		}
 		try {
 			provider.initialize( directoryProviderName, indexProps, searchFactoryImplementor );

@@ -24,7 +24,6 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.util.ReflectHelper;
 import org.hibernate.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
@@ -64,6 +63,7 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.PluginLoader;
 
 /**
  * @author Emmanuel Bernard
@@ -489,20 +489,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			filterCachingStrategy = new MRUFilterCachingStrategy();
 		}
 		else {
-			try {
-				Class filterCachingStrategyClass = ReflectHelper
-						.classForName( impl, SearchFactoryImpl.class );
-				filterCachingStrategy = ( FilterCachingStrategy ) filterCachingStrategyClass.newInstance();
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new SearchException( "Unable to find filterCachingStrategy class: " + impl, e );
-			}
-			catch ( IllegalAccessException e ) {
-				throw new SearchException( "Unable to instantiate filterCachingStrategy class: " + impl, e );
-			}
-			catch ( InstantiationException e ) {
-				throw new SearchException( "Unable to instantiate filterCachingStrategy class: " + impl, e );
-			}
+			filterCachingStrategy = PluginLoader.instanceFromName( FilterCachingStrategy.class,
+					impl, SearchFactoryImpl.class, "filterCachingStrategy" );
 		}
 		filterCachingStrategy.initialize( properties );
 		return filterCachingStrategy;
@@ -556,20 +544,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			batchBackend = new LuceneBatchBackend();
 		}
 		else {
-			try {
-				Class batchBackendClass = ReflectHelper
-						.classForName( impl, SearchFactoryImpl.class );
-				batchBackend = ( BatchBackend ) batchBackendClass.newInstance();
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new SearchException( "Unable to find batchbackend implementation class: " + impl, e );
-			}
-			catch ( IllegalAccessException e ) {
-				throw new SearchException( "Unable to instantiate batchbackend class: " + impl, e );
-			}
-			catch ( InstantiationException e ) {
-				throw new SearchException( "Unable to instantiate batchbackend class: " + impl, e );
-			}
+			batchBackend = PluginLoader.instanceFromName( BatchBackend.class, impl, SearchFactoryImpl.class,
+					"batchbackend" );
 		}
 		Properties batchBackendConfiguration = new MaskedProperty(
 				this.configurationProperties, Environment.BATCH_BACKEND );
