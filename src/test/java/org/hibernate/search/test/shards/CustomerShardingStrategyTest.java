@@ -1,3 +1,4 @@
+//$Id$
 package org.hibernate.search.test.shards;
 
 import junit.framework.TestCase;

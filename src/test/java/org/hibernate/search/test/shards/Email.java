@@ -1,3 +1,4 @@
+//$Id$
 package org.hibernate.search.test.shards;
 
 import javax.persistence.Entity;
@@ -6,7 +7,6 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FullTextFilterDef;
-import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 

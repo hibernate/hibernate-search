@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
@@ -26,18 +27,17 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 		// from the name field of the ClassBridge Annotation. This is not
 		// a requirement. It just works that way in this instance. The
 		// actual name could be supplied by hard coding it below.
-		Departments deps = (Departments) value;
-		Field field = null;
+		Departments deps = ( Departments ) value;
+		Field field;
 		String fieldValue1 = deps.getManufacturer();
 
-		if ( fieldValue1 == null ) {
-			fieldValue1 = "";
-		}
-		else {
-			String fieldValue = (String) equips.get( fieldValue1 );
-			field = new Field( name, fieldValue, luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
+		if ( fieldValue1 != null ) {
+			String fieldValue = ( String ) equips.get( fieldValue1 );
+			field = new Field(
+					name, fieldValue, luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector()
+			);
 			field.setBoost( luceneOptions.getBoost() );
+			document.add( field );
 		}
-		document.add( field );
 	}
 }

@@ -1,3 +1,4 @@
+//$Id$
 package org.hibernate.search.batchindexing;
 
 import java.util.Set;

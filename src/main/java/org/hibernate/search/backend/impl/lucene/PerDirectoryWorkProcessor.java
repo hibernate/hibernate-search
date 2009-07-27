@@ -1,3 +1,4 @@
+//$Id$
 package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.backend.LuceneWork;

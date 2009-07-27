@@ -1,27 +1,22 @@
-// $Id: ShardsTest.java 16210 2009-03-25 10:07:47Z hardy.ferentschik $
+// $Id$
 package org.hibernate.search.test.shards;
 
 import java.io.File;
 import java.util.List;
 
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
-import org.hibernate.search.store.RAMDirectoryProvider;
-import org.hibernate.search.store.FSDirectoryProvider;
-import org.hibernate.search.store.IdHashShardingStrategy;
-import org.hibernate.search.store.DirectoryProvider;
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.queryParser.QueryParser;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.index.Term;
+import org.hibernate.search.store.FSDirectoryProvider;
+import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Chase Seibert

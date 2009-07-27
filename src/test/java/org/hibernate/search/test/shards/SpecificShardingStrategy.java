@@ -1,9 +1,6 @@
+//$Id$
 package org.hibernate.search.test.shards;
 
-import java.io.Serializable;
-import java.util.Properties;
-
-import org.apache.lucene.document.Document;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.store.DirectoryProvider;

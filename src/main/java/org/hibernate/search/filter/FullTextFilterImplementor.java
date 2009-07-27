@@ -1,3 +1,4 @@
+//$Id$
 package org.hibernate.search.filter;
 
 import org.hibernate.search.FullTextFilter;
@@ -7,7 +8,7 @@ import org.hibernate.search.FullTextFilter;
  */
 public interface FullTextFilterImplementor extends FullTextFilter {
 	/**
-	 * Returns the Filter name
+	 * @return Returns the Filter name
 	 */
 	String getName();
 

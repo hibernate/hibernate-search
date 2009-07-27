@@ -1,3 +1,4 @@
+//$Id$
 package org.hibernate.search.backend.impl.batchlucene;
 
 import java.util.concurrent.ExecutorService;
