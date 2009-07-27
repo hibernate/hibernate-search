@@ -22,6 +22,7 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.builtin.BigDecimalBridge;
 import org.hibernate.search.bridge.builtin.BigIntegerBridge;
 import org.hibernate.search.bridge.builtin.BooleanBridge;
+import org.hibernate.search.bridge.builtin.CharacterBridge;
 import org.hibernate.search.bridge.builtin.DateBridge;
 import org.hibernate.search.bridge.builtin.DoubleBridge;
 import org.hibernate.search.bridge.builtin.EnumBridge;
@@ -44,6 +45,8 @@ public class BridgeFactory {
 
 	private BridgeFactory() {
 	}
+
+	public static final TwoWayFieldBridge CHARACTER = new TwoWayString2FieldBridgeAdaptor( new CharacterBridge() );
 
 	public static final TwoWayFieldBridge DOUBLE = new TwoWayString2FieldBridgeAdaptor( new DoubleBridge() );
 
@@ -79,6 +82,8 @@ public class BridgeFactory {
 			new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MILLISECOND );
 
 	static {
+		builtInBridges.put( Character.class.getName(), CHARACTER );
+		builtInBridges.put( char.class.getName(), CHARACTER );
 		builtInBridges.put( Double.class.getName(), DOUBLE );
 		builtInBridges.put( double.class.getName(), DOUBLE );
 		builtInBridges.put( Float.class.getName(), FLOAT );

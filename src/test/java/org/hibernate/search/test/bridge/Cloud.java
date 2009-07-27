@@ -44,6 +44,8 @@ public class Cloud {
     private Date dateMillisecond;
     private String customFieldBridge;
     private String customStringBridge;
+    private Character char1;
+    private char char2;
 	private CloudType type;
 	private boolean storm;
 	private Class clazz;
@@ -284,5 +286,23 @@ public class Cloud {
 
 	public void setStorm(boolean storm) {
 		this.storm = storm;
+	}
+	
+	@Field(index = Index.TOKENIZED, store = Store.YES)
+	public Character getChar1() {
+		return char1;
+	}
+
+	public void setChar1(Character char1) {
+		this.char1 = char1;
+	}
+
+	@Field(index = Index.TOKENIZED, store = Store.YES)
+	public char getChar2() {
+		return char2;
+	}
+
+	public void setChar2(char char2) {
+		this.char2 = char2;
 	}
 }
