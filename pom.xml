@@ -50,6 +50,12 @@
         </contributor>
     </contributors>
 
+    <properties>
+        <slf4jVersion>1.5.6</slf4jVersion>
+        <luceneVersion>2.4.1</luceneVersion>
+        <hibernateVersion>3.5.0-SNAPSHOT</hibernateVersion>
+    </properties>
+
     <dependencies>
         <!-- =============================== -->
         <!-- Required Dependencies -->
@@ -72,7 +78,7 @@
         <dependency>
             <groupId>org.hibernate.java-persistence</groupId>
             <artifactId>jpa-api</artifactId>
-            <version>2.0.Beta2</version>
+            <version>2.0.Beta-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -132,7 +138,7 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>              
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -181,7 +187,7 @@
                     <masterTranslation>en-US</masterTranslation>
                     <translations>
                         <translation>zh-CN</translation>
-                    </translations>                         
+                    </translations>
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
                     </imageResource>
@@ -279,7 +285,7 @@
             </testResource>
         </testResources>
     </build>
-    
+
     <distributionManagement>
         <repository>
             <!-- Copy the dist to the local checkout of the JBoss maven2 repo ${maven.repository.root} -->
@@ -293,7 +299,7 @@
             <name>JBoss Snapshot Repository</name>
             <url>dav:https://snapshots.jboss.org/maven2</url>
         </snapshotRepository>
-    </distributionManagement>    
+    </distributionManagement>
 
     <profiles>
         <!-- =============================== -->
@@ -369,7 +375,8 @@
             <properties>
                 <db.dialect>org.hibernate.dialect.SQLServerDialect</db.dialect>
                 <jdbc.driver>net.sourceforge.jtds.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:jtds:sqlserver://ec2-67-202-7-25.compute-1.amazonaws.com:1433;DatabaseName=hibernate</jdbc.url>
+                <jdbc.url>jdbc:jtds:sqlserver://ec2-67-202-7-25.compute-1.amazonaws.com:1433;DatabaseName=hibernate
+                </jdbc.url>
                 <jdbc.user>hibernate</jdbc.user>
                 <jdbc.pass>hibernate</jdbc.pass>
                 <jdbc.isolation/>
@@ -400,7 +407,7 @@
                 <jdbc.url>jdbc:mysql://dev02.qa.atl.jboss.com/hibbrtru</jdbc.url>
                 <jdbc.user>hibbrtru</jdbc.user>
                 <jdbc.pass>hibbrtru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -421,7 +428,7 @@
                 <jdbc.url>jdbc:postgresql://dev01.qa.atl.jboss.com:5432:hibbrtru</jdbc.url>
                 <jdbc.user>hibbrtru</jdbc.user>
                 <jdbc.pass>hibbrtru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -452,7 +459,7 @@
                 <jdbc.url>jdbc:db2://dev32.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>hibbrtru</jdbc.user>
                 <jdbc.pass>hibbrtru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -477,7 +484,7 @@
                 <jdbc.url>jdbc:db2://dev67.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>hibbrtru</jdbc.user>
                 <jdbc.pass>hibbrtru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -498,7 +505,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev20.qa.atl.jboss.com:1521:qa</jdbc.url>
                 <jdbc.user>hibbrtru</jdbc.user>
                 <jdbc.pass>hibbrtru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -519,7 +526,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev01.qa.atl.jboss.com:1521:qadb01</jdbc.url>
                 <jdbc.user>hibbrtru</jdbc.user>
                 <jdbc.pass>hibbrtru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -539,7 +546,7 @@
                 <jdbc.url>jdbc:sybase:Tds:dev77.qa.atl2.redhat.com:5000/hibbrtru</jdbc.url>
                 <jdbc.user>hibbrtru</jdbc.user>
                 <jdbc.pass>hibbrtru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -621,8 +628,8 @@
                             <artifactId>commons-logging</artifactId>
                         </exclusion>
                         <exclusion>
-                        	<groupId>org.apache.solr</groupId>
-                        	<artifactId>solr-lucene-core</artifactId>
+                            <groupId>org.apache.solr</groupId>
+                            <artifactId>solr-lucene-core</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -710,11 +717,4 @@
             </build>
         </profile>
     </profiles>
-
-    <properties>
-        <slf4jVersion>1.5.6</slf4jVersion>
-        <luceneVersion>2.4.1</luceneVersion>
-        <hibernateVersion>3.5.0-SNAPSHOT</hibernateVersion>
-    </properties>
-
 </project>
