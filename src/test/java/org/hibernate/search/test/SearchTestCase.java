@@ -153,4 +153,8 @@ public abstract class SearchTestCase extends TestCase {
 	protected String[] getAnnotatedPackages() {
 		return new String[] { };
 	}
+
+	protected static File getIndexDir() {
+		return indexDir;
+	}
 }

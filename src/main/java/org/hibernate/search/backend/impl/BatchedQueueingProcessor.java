@@ -22,6 +22,8 @@ import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
@@ -86,6 +88,12 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		else if ( "blackhole".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessorFactory = new BlackHoleBackendQueueProcessorFactory();
 		}
+		else if ( "jgroupsMaster".equals( backend ) ) {
+				backendQueueProcessorFactory = new MasterJGroupsBackendQueueProcessorFactory();
+		}
+		else if ( "jgroupsSlave".equals( backend ) ) {
+				backendQueueProcessorFactory = new SlaveJGroupsBackendQueueProcessorFactory();
+		}
 		else {
 			backendQueueProcessorFactory = PluginLoader.instanceFromName( BackendQueueProcessorFactory.class,
 					backend, BatchedQueueingProcessor.class, "processor" );
@@ -104,7 +112,6 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			performWorks( subQueue );
 		}
 	}
-
 
 	public void prepareWorks(WorkQueue workQueue) {
 		List<Work> queue = workQueue.getQueue();
