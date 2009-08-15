@@ -10,6 +10,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.QueryBuilder;
@@ -196,12 +197,20 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		return em.createQuery( ejbqlString );
 	}
 
-	public Query createQuery(CriteriaQuery criteriaQuery) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public <T> TypedQuery<T> createQuery(CriteriaQuery<T> criteriaQuery) {
+		return em.createQuery( criteriaQuery );
+	}
+
+	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
+		return em.createQuery( qlString, resultClass );
 	}
 
 	public Query createNamedQuery(String name) {
 		return em.createNamedQuery( name );
+	}
+
+	public <T> TypedQuery<T> createNamedQuery(String name, Class<T> resultClass) {
+		return em.createNamedQuery( name, resultClass );
 	}
 
 	public Query createNativeQuery(String sqlString) {

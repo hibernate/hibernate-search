@@ -18,6 +18,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.LockModeType;
+import javax.persistence.Parameter;
 
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
@@ -282,11 +283,58 @@ public class FullTextQueryImpl implements FullTextQuery {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
+	//FIXME remove old JPA 2 contract
 	public Map<String, Object> getNamedParameters() {
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
+	//FIXME remove old JPA 2 contract
 	public List getPositionalParameters() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public Set<Parameter<?>> getParameters() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public Parameter<?> getParameter(String name) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public Parameter<?> getParameter(int position) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public <T> Parameter<T> getParameter(String name, Class<T> type) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public <T> Parameter<T> getParameter(int position, Class<T> type) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public boolean isBound(Parameter<?> param) {
+		return false;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public <T> T getParameterValue(Parameter<T> param) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public Object getParameterValue(String name) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	//FIXME
+	public Object getParameterValue(int position) {
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
