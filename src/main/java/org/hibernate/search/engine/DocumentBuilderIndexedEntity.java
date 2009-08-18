@@ -130,21 +130,21 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		this.entityState = EntityState.INDEXED;
 		this.directoryProviders = directoryProviders;
 		this.shardingStrategy = shardingStrategy;
-
-		if ( idKeywordName == null ) {
-			// if no DocumentId then check if we have a ProvidedId instead
-			ProvidedId provided = findProvidedId( clazz, reflectionManager );
-			if ( provided == null ) {
-				throw new SearchException( "No document id in: " + clazz.getName() );
-			}
-
-			idBridge = BridgeFactory.extractTwoWayType( provided.bridge() );
-			idKeywordName = provided.name();
-		}
 	}
 
 	protected void init(XClass clazz, InitContext context) {
 		super.init( clazz, context );
+
+		// special case @ProvidedId
+		ProvidedId provided = findProvidedId( clazz, reflectionManager );
+		if ( provided != null ) {
+			idBridge = BridgeFactory.extractTwoWayType( provided.bridge() );
+			idKeywordName = provided.name();
+		}
+
+		if ( idKeywordName == null ) {
+			throw new SearchException( "No document id in: " + clazz.getName() );
+		}
 
 		//if composite id, use of (a, b) in ((1,2),(3,4)) fails on most database
 		//a TwoWayString2FieldBridgeAdaptor is never a composite id
@@ -257,7 +257,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		XClass currentClass = clazz;
 		while ( id == null && ( !reflectionManager.equals( currentClass, Object.class ) ) ) {
 			id = currentClass.getAnnotation( ProvidedId.class );
-			currentClass = clazz.getSuperclass();
+			currentClass = currentClass.getSuperclass();
 		}
 		return id;
 	}

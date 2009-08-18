@@ -20,8 +20,7 @@ public class ProvidedIdPerson implements Serializable {
 	@Id
 	@GeneratedValue
 	private long id;
-
-
+	
 	@Field(index = Index.TOKENIZED, store = Store.YES)
 	private String name;
 	@Field(index = Index.TOKENIZED, store = Store.YES)
