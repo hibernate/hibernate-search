@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -47,7 +48,6 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
-import org.hibernate.util.ReflectHelper;
 
 /**
  * Set up and provide a manager for classes which are directly annotated with <code>@Indexed</code>.
@@ -235,10 +235,9 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			Annotation jpaId;
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends Annotation> jpaIdClass = org.hibernate
-						.util
-						.ReflectHelper
-						.classForName( "javax.persistence.Id", InitContext.class );
+				Class<? extends Annotation> jpaIdClass =
+						org.hibernate.annotations.common.util.ReflectHelper
+							.classForName( "javax.persistence.Id", InitContext.class );
 				jpaId = member.getAnnotation( jpaIdClass );
 			}
 			catch ( ClassNotFoundException e ) {

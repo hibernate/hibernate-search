@@ -32,6 +32,7 @@ public class Country {
 	private String name;
 
 	@OneToMany(fetch = FetchType.LAZY)
+	//FIXME with JPA 2, move to @OrderColumn
 	@IndexColumn(name = "list_position")
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	@IndexedEmbedded

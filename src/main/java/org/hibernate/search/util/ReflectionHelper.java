@@ -4,7 +4,7 @@ package org.hibernate.search.util;
 import java.lang.reflect.Modifier;
 
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.util.StringHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 
 /**
  * @author Emmanuel Bernard
