@@ -46,7 +46,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.Indexer;
+import org.hibernate.search.MassIndexer;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
@@ -164,12 +164,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		//this is an open discussion
 	}
 	
-	public Indexer createIndexer(Class<?>... types) {
+	public MassIndexer createIndexer(Class<?>... types) {
 		if ( types.length == 0 ) {
-			return new IndexerImpl( getSearchFactoryImplementor(), getSessionFactory(), Object.class );
+			return new MassIndexerImpl( getSearchFactoryImplementor(), getSessionFactory(), Object.class );
 		}
 		else {
-			return new IndexerImpl( getSearchFactoryImplementor(), getSessionFactory(), types );
+			return new MassIndexerImpl( getSearchFactoryImplementor(), getSessionFactory(), types );
 		}
 	}
 

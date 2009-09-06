@@ -5,7 +5,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.batchindexing.IndexerProgressMonitor;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
@@ -23,7 +23,7 @@ public interface BatchBackend {
 	 * @param props all configuration properties
 	 * @param searchFactory the client
 	 */
-	void initialize(Properties props, IndexerProgressMonitor monitor, SearchFactoryImplementor searchFactory);
+	void initialize(Properties props, MassIndexerProgressMonitor monitor, SearchFactoryImplementor searchFactory);
 
 	/**
 	 * Enqueues one work to be processed asynchronously

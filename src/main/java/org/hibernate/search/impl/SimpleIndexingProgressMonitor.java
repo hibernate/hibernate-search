@@ -2,16 +2,16 @@ package org.hibernate.search.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.hibernate.search.batchindexing.IndexerProgressMonitor;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
 /**
- * A very simple implementation of IndexerProgressMonitor
+ * A very simple implementation of MassIndexerProgressMonitor
  * 
  * @author Sanne Grinovero
  */
-public class SimpleIndexingProgressMonitor implements IndexerProgressMonitor {
+public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor {
 	
 	private static final Logger log = LoggerFactory.make();
 	private final AtomicLong documentsDoneCounter = new AtomicLong();

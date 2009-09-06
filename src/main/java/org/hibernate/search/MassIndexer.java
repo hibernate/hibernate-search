@@ -4,7 +4,15 @@ import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 
-public interface Indexer {
+/**
+ * A MassIndexer is useful to rebuild the indexes from the
+ * data contained in the database.
+ * This process is expensive: all indexed entities and their
+ * indexedEmbedded properties are scrolled from database.
+ * 
+ * @author Sanne Grinovero
+ */
+public interface MassIndexer {
 	
 	/**
 	 * Set the number of threads to be used to load
@@ -12,14 +20,14 @@ public interface Indexer {
 	 * @param numberOfThreads
 	 * @return <tt>this</tt> for method chaining
 	 */
-	Indexer objectLoadingThreads(int numberOfThreads);
+	MassIndexer threadsToLoadObjects(int numberOfThreads);
 	
 	/**
 	 * Sets the batch size used to load the root entities.
 	 * @param batchSize
 	 * @return <tt>this</tt> for method chaining
 	 */
-	Indexer objectLoadingBatchSize(int batchSize);
+	MassIndexer batchSizeToLoadObjects(int batchSize);
 	
 	/**
 	 * Sets the number of threads used to load the lazy collections
@@ -27,7 +35,7 @@ public interface Indexer {
 	 * @param numberOfThreads
 	 * @return <tt>this</tt> for method chaining
 	 */
-	Indexer documentBuilderThreads(int numberOfThreads);
+	MassIndexer threadsForSubsequentFetching(int numberOfThreads);
 	
 	/**
 	 * Sets the number of threads to be used to analyze the documents
@@ -35,15 +43,16 @@ public interface Indexer {
 	 * @param numberOfThreads
 	 * @return
 	 */
-	//TODO not yet implemented
-	//Indexer indexWriterThreads(int numberOfThreads);
+	//TODO implement? performance improvement was found to be
+	//interesting in unusual setups only.
+	//MassIndexer threadsForIndexWriter(int numberOfThreads);
 	
 	/**
 	 * Sets the cache interaction mode for the data loading tasks.
 	 * Defaults to <tt>CacheMode.IGNORE</tt>.
 	 * @return <tt>this</tt> for method chaining
 	 */
-	Indexer cacheMode(CacheMode cacheMode);
+	MassIndexer cacheMode(CacheMode cacheMode);
 	
 	/**
 	 * If index optimization has to be started at the end
@@ -52,7 +61,7 @@ public interface Indexer {
 	 * @param optimize
 	 * @return <tt>this</tt> for method chaining
 	 */
-	Indexer optimizeAtEnd(boolean optimize);
+	MassIndexer optimizeOnFinish(boolean optimize);
 	
 	/**
 	 * If index optimization should be run before starting,
@@ -61,32 +70,35 @@ public interface Indexer {
 	 * @param optimize
 	 * @return <tt>this</tt> for method chaining
 	 */
-	Indexer optimizeAfterPurge(boolean optimize);
+	MassIndexer optimizeAfterPurge(boolean optimize);
 	
 	/**
 	 * If all entities should be removed from the index before starting
-	 * using purgeAll. Set it only to false if you know there are no
+	 * using purgeAll. Set it to false only if you know there are no
 	 * entities in the index: otherwise search results may be duplicated.
 	 * Defaults to true.
 	 * @param purgeAll
 	 * @return <tt>this</tt> for method chaining
 	 */
-	Indexer purgeAllAtStart(boolean purgeAll);
+	MassIndexer purgeAllOnStart(boolean purgeAll);
 	
 	/**
-	 * Will stop indexing after having indexed this amount of objects.
+	 * EXPERIMENTAL method: will probably change
+	 * 
+	 * Will stop indexing after having indexed a set amount of objects.
 	 * As a results the index will not be consistent
-	 * with the database: use only for testing.
+	 * with the database: use only for testing on an (undefined) subset of database data.
 	 * @param maximum
 	 * @return
 	 */
-	Indexer limitObjects(int maximum);
+	MassIndexer limitIndexedObjectsTo(int maximum);
 
 	/**
 	 * Starts the indexing process in background (asynchronous).
 	 * Can be called only once.
-	 * @return a Future to control task canceling. get() will always return null,
-	 * blocking until completion.
+	 * @return a Future to control task canceling.
+	 * get() will block until completion.
+	 * cancel() is currently not implemented.
 	 */
 	Future<?> start();
 	

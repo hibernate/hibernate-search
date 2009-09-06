@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 package org.hibernate.search.test.worker.duplication;
 
 import java.io.Serializable;

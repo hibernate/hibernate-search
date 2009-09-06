@@ -49,6 +49,13 @@
       <para>after a lot of index modifications</para>
     </listitem>
   </itemizedlist>
+  
+  <para>When using a <classname>MassIndexer</classname> (see
+  <xref linkend="search-batchindex-massindexer"/>) it will optimize involved
+  indexes by default at the start and at the end of processing; you can change
+  this behavior by using respectively
+  <classname>MassIndexer</classname>.<methodname>optimizeAfterPurge</methodname>
+  and <classname>MassIndexer</classname>.<methodname>optimizeOnFinish</methodname>.</para>
 
   <section>
     <title>Automatic optimization</title>

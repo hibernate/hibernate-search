@@ -34,7 +34,7 @@ public class IdentifierProducer implements Runnable {
 	private final SessionFactory sessionFactory;
 	private final int batchSize;
 	private final Class<?> indexedType;
-	private final IndexerProgressMonitor monitor;
+	private final MassIndexerProgressMonitor monitor;
 
 	private final int objectsLimit;
 
@@ -50,7 +50,7 @@ public class IdentifierProducer implements Runnable {
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
-			Class<?> indexedType, IndexerProgressMonitor monitor,
+			Class<?> indexedType, MassIndexerProgressMonitor monitor,
 			int objectsLimit) {
 				this.destination = fromIdentifierListToEntities;
 				this.sessionFactory = sessionFactory;

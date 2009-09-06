@@ -1,4 +1,4 @@
-// $Id:$
+// $Id$
 package org.hibernate.search.test.embedded;
 
 import javax.persistence.CascadeType;

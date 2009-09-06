@@ -42,7 +42,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final CountDownLatch endAllSignal; //released when we release all locks and IndexWriter
 	
 	// progress monitor
-	private final IndexerProgressMonitor monitor;
+	private final MassIndexerProgressMonitor monitor;
 
 	// loading options
 	private final CacheMode cacheMode;
@@ -57,7 +57,7 @@ public class BatchIndexingWorkspace implements Runnable {
 			int objectLoadingThreads, int collectionLoadingThreads,
 			CacheMode cacheMode, int objectLoadingBatchSize,
 			CountDownLatch endAllSignal,
-			IndexerProgressMonitor monitor, BatchBackend backend,
+			MassIndexerProgressMonitor monitor, BatchBackend backend,
 			int objectsLimit) {
 		
 		this.indexedType = entityType;

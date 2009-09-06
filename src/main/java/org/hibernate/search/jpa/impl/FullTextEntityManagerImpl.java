@@ -17,7 +17,7 @@ import javax.persistence.criteria.QueryBuilder;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
-import org.hibernate.search.Indexer;
+import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.FullTextSession;
@@ -261,7 +261,7 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
-	public Indexer createIndexer(Class<?>... types) {
+	public MassIndexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );
 	}
 	

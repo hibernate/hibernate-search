@@ -81,9 +81,9 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		try {
 			fullTextSession.createIndexer( Object.class )
-				.documentBuilderThreads( 8 )
-				.objectLoadingThreads( 4 )
-				.objectLoadingBatchSize( 30 )
+				.threadsForSubsequentFetching( 8 )
+				.threadsToLoadObjects( 4 )
+				.batchSizeToLoadObjects( 30 )
 				.startAndWait();
 		}	
 		finally {

@@ -24,112 +24,49 @@
   -->
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<chapter id="search-batchindex">
+<chapter id="manual-index-changes">
   <!--  $Id$ -->
 
-  <title>Manual indexing</title>
+  <title>Manual index changes</title>
+  
+  <para>As Hibernate core applies changes to the Database, Hibernate Search
+  detects these changes and will update the index automatically (unless the
+  EventListeners are disabled).
+  Sometimes changes are made to the database without using Hibernate, as when
+  backup is restored or your data is otherwise affected;
+  for these cases Hibernate Search exposes the Manual Index APIs to explicitly
+  update or remove a single entity from the index, or rebuild the index for
+  the whole database, or remove all references to a specific type.</para>
+  <para>All these methods affect the Lucene Index only, no changes are applied
+  to the Database.</para>
 
-  <section id="search-batchindex-indexing">
-    <title>Indexing</title>
+  <section>
+    <title>Adding instances to the Index</title>
 
-    <para>It is sometimes useful to index an entity even if this entity is not
-    inserted or updated to the database. This is for example the case when you
-    want to build your index for the first time.
-    <classname>FullTextSession</classname>.<methodname>index()</methodname>
-    allows you to do so.</para>
+    <para>Using <classname>FullTextSession</classname>.<methodname>index(T entity)</methodname>
+    you can directly add or update a specific object instance to the index.
+    If this entity was already indexed, then the index will be updated.
+    Changes to the index are only applied at transaction commit.</para>
 
     <example>
       <title>Indexing an entity via
-      <methodname>FullTextSession.index()</methodname></title>
+      <methodname>FullTextSession.index(T entity)</methodname></title>
 
       <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
-for (Customer customer : customers) {
-    <emphasis role="bold">fullTextSession.index(customer);</emphasis>
-}
-tx.commit(); //index are written at commit time    </programlisting>
+Object customer = fullTextSession.load( Customer.class, 8 );
+<emphasis role="bold">fullTextSession.index(customer);</emphasis>
+tx.commit(); //index only updated at commit time</programlisting>
     </example>
-
-    <para>For maximum efficiency, Hibernate Search batches index operations
-    and executes them at commit time. If you expect to index a lot of data,
-    however, you need to be careful about memory consumption since all
-    documents are kept in a queue until the transaction commit. You can
-    potentially face an <classname>OutOfMemoryException</classname>. To avoid
-    this exception, you can use
-    <methodname>fullTextSession.flushToIndexes()</methodname>. Every time
-    <methodname>fullTextSession.flushToIndexes()</methodname> is called (or if
-    the transaction is committed), the batch queue is processed (freeing
-    memory) applying all index changes. Be aware that once flushed changes
-    cannot be rolled back.</para>
-
-    <note>
-      <para><literal>hibernate.search.worker.batch_size</literal> has been
-      deprecated in favor of this explicit API which provides better
-      control</para>
-    </note>
-
-    <para>Other parameters which also can affect indexing time and memory
-    consumption are:</para>
-
-    <itemizedlist>
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_buffered_docs</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_field_length</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_merge_docs</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].merge_factor</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].ram_buffer_size</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].term_index_interval</literal>
-      </listitem>
-    </itemizedlist>
-
-    <para>These parameters are Lucene specific and Hibernate Search is just
-    passing these parameters through - see <xref
-    linkend="lucene-indexing-performance" /> for more details.</para>
-
-    <example>
-      <title>Efficiently indexing a given class (useful for index
-      (re)initialization)</title>
-
-      <programlisting>fullTextSession.setFlushMode(FlushMode.MANUAL);
-fullTextSession.setCacheMode(CacheMode.IGNORE);
-transaction = fullTextSession.beginTransaction();
-//Scrollable results will avoid loading too many objects in memory
-ScrollableResults results = fullTextSession.createCriteria( Email.class )
-    .setFetchSize(BATCH_SIZE)
-    .scroll( ScrollMode.FORWARD_ONLY );
-int index = 0;
-while( results.next() ) {
-    index++;
-    fullTextSession.index( results.get(0) ); //index each element
-    if (index % BATCH_SIZE == 0) {
-        fullTextSession.flushToIndexes(); //apply changes to indexes
-        fullTextSession.clear(); //clear since the queue is processed
-    }
-}
-transaction.commit();</programlisting>
-    </example>
-
-    <para>Try to use a batch size that guarantees that your application will
-    not run out of memory.</para>
+    
+    <para>In case you want to add all instances for a type, or for all indexed types,
+    the recommended approach is to use a <classname>MassIndexer</classname>: see
+    <xref linkend="search-batchindex-massindexer" /> for more details.</para>
+    
   </section>
-
+  
   <section>
-    <title>Purging</title>
+    <title>Deleting instances from the Index: Purging</title>
 
     <para>It is equally possible to remove an entity or all entities of a
     given type from a Lucene index without the need to physically remove them
@@ -144,14 +81,14 @@ Transaction tx = fullTextSession.beginTransaction();
 for (Customer customer : customers) {
     <emphasis role="bold">fullTextSession.purge( Customer.class, customer.getId() );</emphasis>
 }
-tx.commit(); //index are written at commit time    </programlisting>
+tx.commit(); //index is updated at commit time</programlisting>
     </example>
 
     <para>Purging will remove the entity with the given id from the Lucene
     index but will not touch the database.</para>
 
     <para>If you need to remove all entities of a given type, you can use the
-    <methodname>purgeAll</methodname> method. This operation remove all
+    <methodname>purgeAll</methodname> method. This operation removes all
     entities of the type passed as a parameter as well as all its
     subtypes.</para>
 
@@ -163,7 +100,7 @@ Transaction tx = fullTextSession.beginTransaction();
 <emphasis role="bold">fullTextSession.purgeAll( Customer.class );</emphasis>
 //optionally optimize the index
 //fullTextSession.getSearchFactory().optimize( Customer.class );
-tx.commit(); //index are written at commit time    </programlisting>
+tx.commit(); //index changes are applied at commit time    </programlisting>
     </example>
 
     <para>It is recommended to optimize the index after such an
@@ -175,5 +112,183 @@ tx.commit(); //index are written at commit time    </programlisting>
       available on <classname>FullTextEntityManager</classname> as
       well.</para>
     </note>
+    <note>
+      <para>All manual indexing methods (<methodname>index</methodname>,
+      <methodname>purge</methodname> and <methodname>purgeAll</methodname>) only
+      affect the index, not the database, nevertheless they are
+      transactional and as such they won't be applied until the transaction
+      is successfully committed, or you make use of
+      <methodname>flushToIndexes</methodname>.</para>
+    </note>
   </section>
-</chapter>
+    
+  <section id="search-batchindex">
+  	<title>Rebuilding the whole Index</title>
+
+    <para>If you change the entity mapping to the index, chances are that
+    the whole Index needs to be updated; For example if you decide to index
+    a an existing field using a different analyzer you'll need to rebuild the
+    index for affected types. Also if the Database is replaced (like restored
+    from a backup, imported from a legacy system) you'll want to be able
+    to rebuild the index from existing data.
+    Hibernate Search provides two main strategies to choose from:</para> 
+    
+    <itemizedlist>
+    <listitem>
+      <para>Using <classname>FullTextSession</classname>.<methodname>flushToIndexes()</methodname>
+      periodically, while using <classname>FullTextSession</classname>.<methodname>index()</methodname>
+      on all entities.</para>
+    </listitem>
+    <listitem>
+    <para>Use a <classname>MassIndexer</classname>.</para>
+    </listitem>
+    </itemizedlist>
+    
+    <section id="search-batchindex-flushtoindexes">
+    <title>Using flushToIndexes()</title>
+    
+    <para>
+    This strategy consists in removing the existing index and then adding
+    all entities back to the index using <classname>FullTextSession</classname>.<methodname>purgeAll()</methodname>
+    and <classname>FullTextSession</classname>.<methodname>index()</methodname>,
+    however there are some memory and efficiency contraints.
+    For maximum efficiency Hibernate Search batches index operations
+    and executes them at commit time. If you expect to index a lot of data
+    you need to be careful about memory consumption since all
+    documents are kept in a queue until the transaction commit. You can
+    potentially face an <classname>OutOfMemoryException</classname> if you
+    don't empty the queue periodically: to do this you can use
+    <methodname>fullTextSession.flushToIndexes()</methodname>. Every time
+    <methodname>fullTextSession.flushToIndexes()</methodname> is called (or if
+    the transaction is committed), the batch queue is processed
+    applying all index changes. Be aware that, once flushed, the changes
+    cannot be rolled back.</para>
+    
+        <example>
+      <title>Index rebuilding using index() and flushToIndexes()</title>
+
+      <programlisting>fullTextSession.setFlushMode(FlushMode.MANUAL);
+fullTextSession.setCacheMode(CacheMode.IGNORE);
+transaction = fullTextSession.beginTransaction();
+//Scrollable results will avoid loading too many objects in memory
+ScrollableResults results = fullTextSession.createCriteria( Email.class )
+    .setFetchSize(BATCH_SIZE)
+    .scroll( ScrollMode.FORWARD_ONLY );
+int index = 0;
+while( results.next() ) {
+    index++;
+    fullTextSession.index( results.get(0) ); //index each element
+    if (index % BATCH_SIZE == 0) {
+        fullTextSession.flushToIndexes(); //apply changes to indexes
+        fullTextSession.clear(); //free memory since the queue is processed
+    }
+}
+transaction.commit();</programlisting>
+    </example>
+    
+    <note>
+      <para><literal>hibernate.search.worker.batch_size</literal> has been
+      deprecated in favor of this explicit API which provides better
+      control</para>
+    </note>
+    <para>Try to use a batch size that guarantees that your application will
+    not run out of memory: with a bigger batch size objects are fetched faster
+    from database but more memory is needed.</para>
+
+    </section>
+    
+    <section id="search-batchindex-massindexer">
+    <title>Using a MassIndexer</title>
+    <para>Hibernate Search's <classname>MassIndexer</classname> uses several
+    parallel threads to rebuild the index; you can optionally select which entities
+    need to be reloaded or have it reindex all entities. This approach is optimized
+    for best performance but requires to set the application in maintenance mode:
+    making queries to the index is not recommended when a MassIndexer is busy.</para>
+
+	<example>
+      <title>Index rebuilding using a MassIndexer</title>
+      <programlisting>fullTextSession.createIndexer().startAndWait();</programlisting>
+	  <para>This will rebuild the index, deleting it and then reloading all entities
+      from the database. Although it's simple to use, some tweaking is recommended
+      to speed up the process: there are several parameters configurable.</para>
+    </example>
+    
+    <warning><para>During the progress of a MassIndexer the content of the index is undefined,
+    make sure that nobody will try to make some query during index rebuilding!
+    If somebody should query the index it will not corrupt but most results will
+    likely be missing.</para></warning>
+    
+    <example>
+      <title>Using a tuned MassIndexer</title>
+      <programlisting>fullTextSession
+	.createIndexer( User.class )
+	.batchSizeToLoadObjects( 25 )
+	.cacheMode( CacheMode.NORMAL )
+	.threadsToLoadObjects( 5 )
+	.threadsForSubsequentFetching( 20 )
+	.startAndWait();</programlisting>
+	  <para>This will rebuild the index of all User instances (and subtypes), and will
+	  create 5 parallel threads to load the User instances using batches of 25 objects
+	  per query; these loaded User instances are then pipelined to 20 parallel threads
+	  to load the attached lazy collections of User containing some information needed
+	  for the index.</para>
+	  <para>It is recommended to leave cacheMode to <literal>CacheMode.IGNORE</literal> (the default), as
+	  in most reindexing situations the cache will be a useless additional overhead;
+	  it might be useful to enable some other <literal>CacheMode</literal> depending on your data: it might increase
+	  performance if the main entity is relating to enum-like data included in the index.</para>
+    </example>
+    
+    <tip>The "sweet spot" of number of threads to achieve best performance is
+    highly dependent on your overall architecture, database design and even data
+    values.
+    To find out the best number of threads for your application it is recommended
+    to use a profiler: all internal thread groups have meaningful names
+    to be easily identified with most tools.
+    </tip>
+    
+    <note>
+      <para>The MassIndexer was designed for speed and is unaware of transactions,
+      so there is no need to begin one or committing. Also because it is not transactional
+      it is not recommended to let users use the system during it's processing,
+      as it is unlikely people will be able to find results and the system load
+      might be too high anyway.</para>
+    </note>
+    
+    </section>
+    
+    <para>Other parameters which also can affect indexing time and memory
+    consumption are:</para>
+
+    <itemizedlist>
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_buffered_docs</literal>
+      </listitem>
+
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_field_length</literal>
+      </listitem>
+
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_merge_docs</literal>
+      </listitem>
+
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.merge_factor</literal>
+      </listitem>
+
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.ram_buffer_size</literal>
+      </listitem>
+
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.term_index_interval</literal>
+      </listitem>
+    </itemizedlist>
+
+    <para>These parameters are Lucene specific and Hibernate Search is just
+    passing these parameters through - see <xref
+    linkend="lucene-indexing-performance" /> for more details.</para>
+
+  </section>
+
+  </chapter>

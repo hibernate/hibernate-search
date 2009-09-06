@@ -1,18 +1,18 @@
 package org.hibernate.search.batchindexing;
 
 /**
- * As an indexer can take some time to finish,
- * an IndexerProgressMonitor can be defined in
- * the configuration property
- * hibernate.search.worker.indexing.monitor
- * implementing this interface to track indexing
- * performance.
- * Implementors must be threadsafe and have a
- * no-arg constructor.
+ * As a MassIndexer can take some time to finish it's job,
+ * a MassIndexerProgressMonitor can be defined in the configuration
+ * property hibernate.search.worker.indexing.monitor
+ * implementing this interface to track indexing performance.
+ * 
+ * Implementors must:
+ * 	be threadsafe
+ *  have a no-arg constructor.
  * 
  * @author Sanne Grinovero
  */
-public interface IndexerProgressMonitor {
+public interface MassIndexerProgressMonitor {
 
 	/**
 	 * The number of documents sent to the backend;

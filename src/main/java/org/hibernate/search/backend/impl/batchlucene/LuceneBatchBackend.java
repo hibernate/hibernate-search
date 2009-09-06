@@ -12,7 +12,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.PerDirectoryWorkProcessor;
-import org.hibernate.search.batchindexing.IndexerProgressMonitor;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
@@ -36,7 +36,7 @@ public class LuceneBatchBackend implements BatchBackend {
 	private final PerDirectoryWorkProcessor asyncWorker = new AsyncBatchPerDirectoryWorkProcessor();
 	private final PerDirectoryWorkProcessor syncWorker = new SyncBatchPerDirectoryWorkProcessor();
 
-	public void initialize(Properties cfg, IndexerProgressMonitor monitor, SearchFactoryImplementor searchFactoryImplementor) {
+	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		int maxThreadsPerIndex = ConfigurationParseHelper.getIntValue( cfg, "concurrent_writers", 2 );
 		if ( maxThreadsPerIndex < 1 ) {
@@ -85,7 +85,7 @@ public class LuceneBatchBackend implements BatchBackend {
 			}
 		}
 		if ( error != null ) {
-			throw new SearchException( "Error while closing batch indexer", error );
+			throw new SearchException( "Error while closing massindexer", error );
 		}
 	}
 	

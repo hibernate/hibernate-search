@@ -11,7 +11,7 @@ import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.batchindexing.Executors;
-import org.hibernate.search.batchindexing.IndexerProgressMonitor;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
@@ -34,11 +34,11 @@ class DirectoryProviderWorkspace {
 	private final ExecutorService executor;
 	private final LuceneWorkVisitor visitor;
 	private final Workspace workspace;
-	private final IndexerProgressMonitor monitor;
+	private final MassIndexerProgressMonitor monitor;
 	
 	private final AtomicBoolean closed = new AtomicBoolean( false );
 	
-	DirectoryProviderWorkspace(SearchFactoryImplementor searchFactoryImp, DirectoryProvider<?> dp, IndexerProgressMonitor monitor, int maxThreads) {
+	DirectoryProviderWorkspace(SearchFactoryImplementor searchFactoryImp, DirectoryProvider<?> dp, MassIndexerProgressMonitor monitor, int maxThreads) {
 		if ( maxThreads < 1 ) {
 			throw new IllegalArgumentException( "maxThreads needs to be at least 1" );
 		}

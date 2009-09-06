@@ -2,7 +2,7 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.batchindexing.IndexerProgressMonitor;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 
 /**
  * @author Sanne Grinovero
@@ -23,6 +23,6 @@ public interface LuceneWorkDelegate {
 	 * @param work the work which was done.
 	 * @param monitor the monitor tracking activity.
 	 */
-	void logWorkDone(LuceneWork work, IndexerProgressMonitor monitor);
+	void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor);
 	
 }

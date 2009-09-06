@@ -31,12 +31,12 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 	private final SessionFactory sessionFactory;
 	private final CacheMode cacheMode;
 	private final Class<?> type;
-	private final IndexerProgressMonitor monitor;
+	private final MassIndexerProgressMonitor monitor;
 
 	public IdentifierConsumerEntityProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			ProducerConsumerQueue<Object> fromEntityToAddwork,
-			IndexerProgressMonitor monitor,
+			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CacheMode cacheMode, Class<?> type) {
 				this.source = fromIdentifierListToEntities;

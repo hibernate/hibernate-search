@@ -419,15 +419,7 @@ public class Author {
 
       <programlisting>
 FullTextSession fullTextSession = Search.getFullTextSession(session);
-Transaction tx = fullTextSession.beginTransaction();
-
-List books = session.createQuery("from Book as book").list();
-for (Book book : books) {
-    <emphasis role="bold">fullTextSession.index(book);</emphasis>
-}
-
-tx.commit(); //index is written at commit time       
-    </programlisting>
+fullTextSession.createIndexer().startAndWait();</programlisting>
     </example>
 
     <example>
@@ -436,18 +428,7 @@ tx.commit(); //index is written at commit time
       <programlisting>
 EntityManager em = entityManagerFactory.createEntityManager();
 FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
-em.getTransaction().begin();
-
-List books = em.createQuery("select book from Book as book").getResultList();
-for (Book book : books) {
-    <emphasis role="bold">fullTextEntityManager.index(book);</emphasis>
-} 
-
-em.getTransaction().commit();
-em.close();
-
-
-    </programlisting>
+fullTextEntityManager.createIndexer().startAndWait();</programlisting>
     </example>
 
     <para>After executing the above code, you should be able to see a Lucene

@@ -704,7 +704,8 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     settings depending on the use case. During indexing operations triggered
     by database modifications, the parameters are grouped by the
     <literal>transaction</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.transaction.&lt;parameter_name&gt;</programlisting>
-    When indexing occurs via <literal>FullTextSession.index()</literal> (see
+    When indexing occurs via <literal>FullTextSession.index()</literal> or
+    via a <classname>MassIndexer</classname> (see
     <xref linkend="search-batchindex" />), the used properties are those
     grouped under the <literal>batch</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting></para>
 

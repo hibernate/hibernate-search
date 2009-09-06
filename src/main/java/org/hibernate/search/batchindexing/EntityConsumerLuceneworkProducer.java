@@ -33,7 +33,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 	private final ProducerConsumerQueue<Object> source;
 	private final SessionFactory sessionFactory;
 	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuilders;
-	private final IndexerProgressMonitor monitor;
+	private final MassIndexerProgressMonitor monitor;
 	
 	private static final int CLEAR_PERIOD = 50;
 	private final CacheMode cacheMode;
@@ -44,7 +44,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 	
 	public EntityConsumerLuceneworkProducer(
 			ProducerConsumerQueue<Object> entitySource,
-			IndexerProgressMonitor monitor,
+			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CountDownLatch producerEndSignal,
 			SearchFactoryImplementor searchFactory, CacheMode cacheMode, BatchBackend backend) {

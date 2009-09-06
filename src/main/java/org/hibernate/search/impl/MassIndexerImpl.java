@@ -7,21 +7,23 @@ import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.Indexer;
+import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.BatchCoordinator;
 import org.hibernate.search.batchindexing.Executors;
-import org.hibernate.search.batchindexing.IndexerProgressMonitor;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
 /**
  * Prepares and configures a BatchIndexingWorkspace to start rebuilding
- * the indexes for all entities in the database.
+ * the indexes for all entity instances in the database.
+ * The type of these entities is either all indexed entities or a
+ * subset, always including all subtypes.
  * 
  * @author Sanne Grinovero
  */
-public class IndexerImpl implements Indexer {
+public class MassIndexerImpl implements MassIndexer {
 	
 	private static final Logger log = LoggerFactory.make();
 	
@@ -33,16 +35,16 @@ public class IndexerImpl implements Indexer {
 	// default settings defined here:
 	private int objectLoadingThreads = 2; //loading the main entity
 	private int collectionLoadingThreads = 4; //also responsible for loading of lazy @IndexedEmbedded collections
-	private int writerThreads = 1; //also running the Analyzers
+//	private int writerThreads = 1; //also running the Analyzers
 	private int objectLoadingBatchSize = 10;
 	private int objectsLimit = 0; //means no limit at all
 	private CacheMode cacheMode = CacheMode.IGNORE;
 	private boolean optimizeAtEnd = true;
 	private boolean purgeAtStart = true;
 	private boolean optimizeAfterPurge = true;
-	private IndexerProgressMonitor monitor = new SimpleIndexingProgressMonitor();
+	private MassIndexerProgressMonitor monitor = new SimpleIndexingProgressMonitor();
 
-	protected IndexerImpl(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory, Class<?>...entities) {
+	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory, Class<?>...entities) {
 		this.searchFactoryImplementor = searchFactory;
 		this.sessionFactory = sessionFactory;
 		rootEntities = toRootEntities( searchFactoryImplementor, entities );
@@ -88,52 +90,53 @@ public class IndexerImpl implements Indexer {
 		return cleaned;
 	}
 
-	public Indexer cacheMode(CacheMode cacheMode) {
+	public MassIndexer cacheMode(CacheMode cacheMode) {
 		if ( cacheMode == null )
 			throw new IllegalArgumentException( "cacheMode must not be null" );
 		this.cacheMode = cacheMode;
 		return this;
 	}
 
-	public Indexer objectLoadingThreads(int numberOfThreads) {
+	public MassIndexer threadsToLoadObjects(int numberOfThreads) {
 		if ( numberOfThreads < 1 )
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		this.objectLoadingThreads = numberOfThreads;
 		return this;
 	}
 	
-	public Indexer objectLoadingBatchSize(int batchSize) {
+	public MassIndexer batchSizeToLoadObjects(int batchSize) {
 		if ( batchSize < 1 )
 			throw new IllegalArgumentException( "batchSize must be at least 1" );
 		this.objectLoadingBatchSize = batchSize;
 		return this;
 	}
 	
-	public Indexer documentBuilderThreads(int numberOfThreads) {
+	public MassIndexer threadsForSubsequentFetching(int numberOfThreads) {
 		if ( numberOfThreads < 1 )
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		this.collectionLoadingThreads = numberOfThreads;
 		return this;
 	}
 	
-	public Indexer indexWriterThreads(int numberOfThreads) {
-		if ( numberOfThreads < 1 )
-			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
-		this.writerThreads = numberOfThreads;
-		return this;
-	}
+	//TODO see MassIndexer interface
+//	public MassIndexer threadsForIndexWriter(int numberOfThreads) {
+//		if ( numberOfThreads < 1 )
+//			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
+//		this.writerThreads = numberOfThreads;
+//		return this;
+//	}
 	
-	public Indexer optimizeAtEnd(boolean optimize) {
+	public MassIndexer optimizeOnFinish(boolean optimize) {
 		this.optimizeAtEnd = optimize;
 		return this;
 	}
 
-	public Indexer optimizeAfterPurge(boolean optimize) {
+	public MassIndexer optimizeAfterPurge(boolean optimize) {
 		this.optimizeAfterPurge = optimize;
 		return this;
 	}
 
-	public Indexer purgeAllAtStart(boolean purgeAll) {
+	public MassIndexer purgeAllOnStart(boolean purgeAll) {
 		this.purgeAtStart = purgeAll;
 		return this;
 	}
@@ -166,7 +169,7 @@ public class IndexerImpl implements Indexer {
 				monitor );
 	}
 
-	public Indexer limitObjects(int maximum) {
+	public MassIndexer limitIndexedObjectsTo(int maximum) {
 		this.objectsLimit = maximum;
 		return this;
 	}

@@ -45,7 +45,7 @@ import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
-import org.hibernate.search.batchindexing.IndexerProgressMonitor;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
@@ -537,7 +537,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return indexHierarchy.getIndexedClasses( classes );
 	}
 	
-	public BatchBackend makeBatchBackend(IndexerProgressMonitor progressMonitor) {
+	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
 		BatchBackend batchBackend;
 		String impl = configurationProperties.getProperty( Environment.BATCH_BACKEND );
 		if ( StringHelper.isEmpty( impl ) || "LuceneBatch".equalsIgnoreCase( impl ) ) {

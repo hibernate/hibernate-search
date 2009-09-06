@@ -26,7 +26,7 @@ public class BatchCoordinator implements Runnable {
 	
 	private static final Logger log = LoggerFactory.make();
 	
-	private final Class<?>[] rootEntities;
+	private final Class<?>[] rootEntities; //entity types to reindex exluding all subtypes of each-other
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final SessionFactory sessionFactory;
 	private final int objectLoadingThreads;
@@ -37,7 +37,7 @@ public class BatchCoordinator implements Runnable {
 	private final boolean purgeAtStart;
 	private final boolean optimizeAfterPurge;
 	private final CountDownLatch endAllSignal;
-	private final IndexerProgressMonitor monitor;
+	private final MassIndexerProgressMonitor monitor;
 	private final int objectsLimit;
 	
 	private BatchBackend backend;
@@ -49,7 +49,7 @@ public class BatchCoordinator implements Runnable {
 			int objectLoadingBatchSize, int objectsLimit,
 			boolean optimizeAtEnd,
 			boolean purgeAtStart, boolean optimizeAfterPurge,
-			IndexerProgressMonitor monitor) {
+			MassIndexerProgressMonitor monitor) {
 				this.rootEntities = rootEntities.toArray( new Class<?>[ rootEntities.size() ] );
 				this.searchFactoryImplementor = searchFactoryImplementor;
 				this.sessionFactory = sessionFactory;
@@ -82,6 +82,11 @@ public class BatchCoordinator implements Runnable {
 		}
 	}
 
+	/**
+	 * Will spawn a thread for each type in rootEntities, they will all re-join
+	 * on endAllSignal when finished.
+	 * @throws InterruptedException if interrupted while waiting for endAllSignal.
+	 */
 	private void doBatchWork() throws InterruptedException {
 		ExecutorService executor = Executors.newFixedThreadPool( rootEntities.length, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
@@ -95,6 +100,9 @@ public class BatchCoordinator implements Runnable {
 		endAllSignal.await(); //waits for the executor to finish
 	}
 
+	/**
+	 * Operations to do after all subthreads finished their work on index
+	 */
 	private void afterBatch() {
 		if ( this.optimizeAtEnd ) {
 			Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( rootEntities );
@@ -102,6 +110,9 @@ public class BatchCoordinator implements Runnable {
 		}
 	}
 
+	/**
+	 * Optional operations to do before the multiple-threads start indexing
+	 */
 	private void beforeBatch() {
 		if ( this.purgeAtStart ) {
 			//purgeAll for affected entities

@@ -12,13 +12,13 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.impl.IndexerImpl;
+import org.hibernate.search.impl.MassIndexerImpl;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 public class SearchIndexerTest extends TestCase {
 	
 	/**
-	 * test that the Indexer is properly identifying the root entities
+	 * test that the MassIndexer is properly identifying the root entities
 	 * from the selection of classes to be indexed.
 	 */
 	public void testEntityHierarchy() {
@@ -31,26 +31,26 @@ public class SearchIndexerTest extends TestCase {
 		FullTextSession fullTextSession = ftsb.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 		{
-			TestableSearchIndexerImpl tsii = new TestableSearchIndexerImpl( searchFactory, Book.class );
+			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, Book.class );
 			assertTrue( tsii.getRootEntities().contains( Book.class ) );
 			assertFalse( tsii.getRootEntities().contains( ModernBook.class ) );
 			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		{
-			TestableSearchIndexerImpl tsii = new TestableSearchIndexerImpl( searchFactory, ModernBook.class, AncientBook.class, Book.class );
+			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, ModernBook.class, AncientBook.class, Book.class );
 			assertTrue( tsii.getRootEntities().contains( Book.class ) );
 			assertFalse( tsii.getRootEntities().contains( ModernBook.class ) );
 			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		{
-			TestableSearchIndexerImpl tsii = new TestableSearchIndexerImpl( searchFactory, ModernBook.class, AncientBook.class );
+			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, ModernBook.class, AncientBook.class );
 			assertFalse( tsii.getRootEntities().contains( Book.class ) );
 			assertTrue( tsii.getRootEntities().contains( ModernBook.class ) );
 			assertTrue( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		//verify that indexing Object will result in one separate indexer working per root indexed entity
 		{
-			TestableSearchIndexerImpl tsii = new TestableSearchIndexerImpl( searchFactory, Object.class );
+			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, Object.class );
 			assertTrue( tsii.getRootEntities().contains( Book.class ) );
 			assertTrue( tsii.getRootEntities().contains( Dvd.class ) );
 			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
@@ -59,9 +59,9 @@ public class SearchIndexerTest extends TestCase {
 		}
 	}
 	
-	private static class TestableSearchIndexerImpl extends IndexerImpl {
+	private static class TestableMassIndexerImpl extends MassIndexerImpl {
 		
-		protected TestableSearchIndexerImpl(SearchFactoryImplementor searchFactory, Class<?>... types) {
+		protected TestableMassIndexerImpl(SearchFactoryImplementor searchFactory, Class<?>... types) {
 			super( searchFactory, null, types );
 		}
 
