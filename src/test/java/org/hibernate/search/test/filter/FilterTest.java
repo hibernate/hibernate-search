@@ -33,7 +33,8 @@ public class FilterTest extends SearchTestCase {
 		assertEquals("No filter should happen", 3, ftQuery.getResultSize() );
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );
-		ftQuery.enableFullTextFilter( "bestDriver");
+		ftQuery.disableFullTextFilter( "bestDriver" ); //was not enabled, but should be harmless
+		ftQuery.enableFullTextFilter( "bestDriver" );
 		assertEquals("Should filter out Gavin", 2, ftQuery.getResultSize() );
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );

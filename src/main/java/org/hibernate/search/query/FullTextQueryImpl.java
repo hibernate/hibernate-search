@@ -94,7 +94,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private boolean allowFieldSelectionInProjection = true;
 	private ResultTransformer resultTransformer;
 	private SearchFactoryImplementor searchFactoryImplementor;
-	private Map<String, FullTextFilterImpl> filterDefinitions;
+	private final Map<String, FullTextFilterImpl> filterDefinitions = new HashMap<String, FullTextFilterImpl>();
 	private int fetchSize = 1;
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
@@ -406,7 +406,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	private void buildFilters() {
 		ChainedFilter chainedFilter = null;
-		if ( ! ( filterDefinitions == null || filterDefinitions.size() == 0 ) ) {
+		if ( ! filterDefinitions.isEmpty() ) {
 			chainedFilter = new ChainedFilter();
 			for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
 				Filter filter = buildLuceneFilter( fullTextFilter );
@@ -874,9 +874,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public FullTextFilter enableFullTextFilter(String name) {
-		if ( filterDefinitions == null ) {
-			filterDefinitions = new HashMap<String, FullTextFilterImpl>();
-		}
 		FullTextFilterImpl filterDefinition = filterDefinitions.get( name );
 		if ( filterDefinition != null ) {
 			return filterDefinition;
