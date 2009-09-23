@@ -66,7 +66,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	protected final PropertiesMetadata metadata = new PropertiesMetadata();
 	protected final XClass beanClass;
 	protected Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
-	protected ReflectionManager reflectionManager; //available only during initializationa and post-initialization
+	protected ReflectionManager reflectionManager; //available only during initialization and post-initialization
 	protected int level = 0;
 	protected int maxLevel = Integer.MAX_VALUE;
 	protected final ScopedAnalyzer analyzer = new ScopedAnalyzer();
@@ -122,28 +122,28 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
 								 Set<XClass> processedClasses, InitContext context) {
 		List<XClass> hierarchy = new ArrayList<XClass>();
-		for ( XClass currClass = clazz; currClass != null; currClass = currClass.getSuperclass() ) {
-			hierarchy.add( currClass );
+		for ( XClass currentClass = clazz; currentClass != null; currentClass = currentClass.getSuperclass() ) {
+			hierarchy.add( currentClass );
 		}
 
 		/*
 		* Iterate the class hierarchy top down. This allows to override the default analyzer for the properties if the class holds one
 		*/
 		for ( int index = hierarchy.size() - 1; index >= 0; index-- ) {
-			XClass currClass = hierarchy.get( index );
+			XClass currentClass = hierarchy.get( index );
 
-			initalizeClassLevelAnnotations( currClass, propertiesMetadata, isRoot, prefix, context );
+			initializeClassLevelAnnotations( currentClass, propertiesMetadata, isRoot, prefix, context );
 
 			// rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
 			// so indexing a non property does not make sense
-			List<XProperty> methods = currClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
+			List<XProperty> methods = currentClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 			for ( XProperty method : methods ) {
 				initializeMemberLevelAnnotations(
 						method, propertiesMetadata, isRoot, prefix, processedClasses, context
 				);
 			}
 
-			List<XProperty> fields = currClass.getDeclaredProperties( XClass.ACCESS_FIELD );
+			List<XProperty> fields = currentClass.getDeclaredProperties( XClass.ACCESS_FIELD );
 			for ( XProperty field : fields ) {
 				initializeMemberLevelAnnotations(
 						field, propertiesMetadata, isRoot, prefix, processedClasses, context
@@ -162,7 +162,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	 * @param prefix The current prefix used for the <code>Document</code> field names.
 	 * @param context Handle to default configuration settings.
 	 */
-	private void initalizeClassLevelAnnotations(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
+	private void initializeClassLevelAnnotations(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
 
 		// check for a class level specified analyzer
 		Analyzer analyzer = getAnalyzer( clazz, context );
@@ -176,8 +176,8 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		// Check for any ClassBridges annotation.
 		ClassBridges classBridgesAnn = clazz.getAnnotation( ClassBridges.class );
 		if ( classBridgesAnn != null ) {
-			ClassBridge[] cbs = classBridgesAnn.value();
-			for ( ClassBridge cb : cbs ) {
+			ClassBridge[] classBridges = classBridgesAnn.value();
+			for ( ClassBridge cb : classBridges ) {
 				bindClassBridgeAnnotation( prefix, propertiesMetadata, cb, context );
 			}
 		}
@@ -256,15 +256,15 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	private void checkForAnalyzerDiscriminator(XAnnotatedElement annotatedElement, PropertiesMetadata propertiesMetadata) {
-		AnalyzerDiscriminator discriminiatorAnn = annotatedElement.getAnnotation( AnalyzerDiscriminator.class );
-		if ( discriminiatorAnn != null ) {
+		AnalyzerDiscriminator discriminatorAnn = annotatedElement.getAnnotation( AnalyzerDiscriminator.class );
+		if ( discriminatorAnn != null ) {
 			if ( propertiesMetadata.discriminator != null ) {
 				throw new SearchException(
 						"Multiple AnalyzerDiscriminator defined in the same class hierarchy: " + beanClass.getName()
 				);
 			}
 
-			Class<? extends Discriminator> discriminatorClass = discriminiatorAnn.impl();
+			Class<? extends Discriminator> discriminatorClass = discriminatorAnn.impl();
 			try {
 				propertiesMetadata.discriminator = discriminatorClass.newInstance();
 			}
@@ -372,7 +372,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 				String localPrefix = buildEmbeddedPrefix( prefix, embeddedAnn, member );
 				initializeClass( elementClass, metadata, false, localPrefix, processedClasses, context );
 				/**
-				 * We will only index the "expected" type but that's OK, HQL cannot do downcasting either
+				 * We will only index the "expected" type but that's OK, HQL cannot do down-casting either
 				 */
 				if ( member.isArray() ) {
 					propertiesMetadata.embeddedContainers.add( PropertiesMetadata.Container.ARRAY );
@@ -596,8 +596,6 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		return strategy;
 	}
 
-
-	//TODO could we use T instead of EntityClass?
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
 		/**
 		 * When references are changed, either null or another one, we expect dirty checking to be triggered (both sides
@@ -605,75 +603,101 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		 * When the internal object is changed, we apply the {Add|Update}Work on containedIns
 		 */
 		if ( workType.searchForContainers() ) {
-			processContainedIn( entity, queue, metadata, searchFactoryImplementor );
+			processContainedInInstances( entity, queue, metadata, searchFactoryImplementor );
 		}
 	}
 
-	private void processContainedIn(Object instance, List<LuceneWork> queue, PropertiesMetadata metadata, SearchFactoryImplementor searchFactoryImplementor) {
+	/**
+	 * If we have a work instance we have to check whether the intance to be indexed is contained in any other indexed entities.
+	 *
+	 * @param instance The instance to be indexed
+	 * @param queue the current work queue
+	 * @param metadata metadata
+	 * @param searchFactoryImplementor the current session
+	 */
+	private <T> void processContainedInInstances(Object instance, List<LuceneWork> queue, PropertiesMetadata metadata, SearchFactoryImplementor searchFactoryImplementor) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
 			Object value = ReflectionHelper.getMemberValue( instance, member );
+
 			if ( value == null ) {
 				continue;
 			}
 
 			if ( member.isArray() ) {
-				for ( Object arrayValue : ( Object[] ) value ) {
-					//highly inneficient but safe wrt the actual targeted class
-					Class<?> valueClass = Hibernate.getClass( arrayValue );
-					DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-							valueClass
-					);
-					if ( builderIndexedEntity == null ) {
-						continue;
-					}
-					processContainedInValue(
-							arrayValue, queue, valueClass,
-							builderIndexedEntity, searchFactoryImplementor
-					);
+				@SuppressWarnings("unchecked")
+				T[] array = ( T[] ) value;
+				for ( T arrayValue : array ) {
+					processSingleContainedInInstance( queue, searchFactoryImplementor, arrayValue );
 				}
 			}
 			else if ( member.isCollection() ) {
-				Collection collection;
-				if ( Map.class.equals( member.getCollectionClass() ) ) {
-					//hum
-					collection = ( ( Map ) value ).values();
-				}
-				else {
-					collection = ( Collection ) value;
-				}
-				for ( Object collectionValue : collection ) {
-					//highly inneficient but safe wrt the actual targeted class
-					Class<?> valueClass = Hibernate.getClass( collectionValue );
-					DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-							valueClass
-					);
-					if ( builderIndexedEntity == null ) {
-						continue;
-					}
-					processContainedInValue(
-							collectionValue, queue, valueClass,
-							builderIndexedEntity, searchFactoryImplementor
-					);
+				Collection<T> collection = getActualCollection( member, value );
+				for ( T collectionValue : collection ) {
+					processSingleContainedInInstance( queue, searchFactoryImplementor, collectionValue );
 				}
 			}
 			else {
-				Class<?> valueClass = Hibernate.getClass( value );
-				DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-						valueClass
-				);
-				if ( builderIndexedEntity == null ) {
-					continue;
-				}
-				processContainedInValue( value, queue, valueClass, builderIndexedEntity, searchFactoryImplementor );
+				processSingleContainedInInstance( queue, searchFactoryImplementor, value );
 			}
 		}
-		//an embedded cannot have a useful @ContainedIn (no shared reference)
-		//do not walk through them
 	}
 
-	private void processContainedInValue(Object value, List<LuceneWork> queue, Class<?> valueClass,
-										 DocumentBuilderIndexedEntity builderIndexedEntity, SearchFactoryImplementor searchFactoryImplementor) {
+	/**
+	 * A {@code XMember } instance treats a map as a collection as well in which case the map values are returned as
+	 * collection.
+	 *
+	 * @param member The member instance
+	 * @param value The value
+	 *
+	 * @return The {@code value} casted to collection or in case of {@code value} being a map the map values as collection.
+	 */
+	private <T> Collection<T> getActualCollection(XMember member, Object value) {
+		Collection<T> collection;
+		if ( Map.class.equals( member.getCollectionClass() ) ) {
+			//hum
+			@SuppressWarnings("unchecked")
+			Collection<T> tmpCollection = ( ( Map<?, T> ) value ).values();
+			collection = tmpCollection;
+		}
+		else {
+			@SuppressWarnings("unchecked")
+			Collection<T> tmpCollection = ( Collection<T> ) value;
+			collection = tmpCollection;
+		}
+		return collection;
+	}
+
+	private <T> void processSingleContainedInInstance(List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor, T value) {
+		@SuppressWarnings("unchecked")
+		Class<T> valueClass = Hibernate.getClass( value );
+		DocumentBuilderIndexedEntity<T> builderIndexedEntity =
+				searchFactoryImplementor.getDocumentBuilderIndexedEntity( valueClass );
+
+		// it could be we have a nested @IndexedEmbedded chain in which case we have to find the top level @Indexed entities
+		if ( builderIndexedEntity == null ) {
+			DocumentBuilderContainedEntity<T> builderContainedEntity =
+					searchFactoryImplementor.getDocumentBuilderContainedEntity( valueClass );
+			if ( builderContainedEntity != null ) {
+				processContainedInInstances( value, queue, builderContainedEntity.metadata, searchFactoryImplementor );
+			}
+		}
+		else {
+			addWorkForEmbeddedValue( value, queue, valueClass, builderIndexedEntity, searchFactoryImplementor );
+		}
+	}
+
+	/**
+	 * Create a {@code LuceneWork} instance of the entity which needs updating due to the embedded instance change.
+	 *
+	 * @param value The value to index
+	 * @param queue The current (Lucene) work queue
+	 * @param valueClass The class of the value
+	 * @param builderIndexedEntity the document builder for the entity which needs updating due to a update event of the embedded instance
+	 * @param searchFactoryImplementor the search factory.
+	 */
+	private <T> void addWorkForEmbeddedValue(T value, List<LuceneWork> queue, Class<T> valueClass,
+											 DocumentBuilderIndexedEntity<T> builderIndexedEntity, SearchFactoryImplementor searchFactoryImplementor) {
 		Serializable id = ( Serializable ) ReflectionHelper.getMemberValue( value, builderIndexedEntity.idGetter );
 		builderIndexedEntity.addWorkToQueue( valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor );
 	}
@@ -727,7 +751,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		public Discriminator discriminator;
 		public XMember discriminatorGetter;
 		public BoostStrategy classBoostStrategy;
-		
+
 		public final List<String> fieldNames = new ArrayList<String>();
 		public final List<XMember> fieldGetters = new ArrayList<XMember>();
 		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
