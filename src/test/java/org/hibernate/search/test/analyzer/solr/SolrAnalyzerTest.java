@@ -1,4 +1,27 @@
-// $Id$
+/* $Id$
+ * 
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
+ * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ * 
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+ */
 package org.hibernate.search.test.analyzer.solr;
 
 import org.apache.lucene.index.Term;
@@ -29,7 +52,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 	public void testAnalyzerDef() throws Exception {
 		// create the test instance
 		Team team = new Team();
-		team.setDescription( "This is a D\u00E0scription" );  // \u00E0 == ˆ - ISOLatin1AccentFilterFactory should strip of diacritic 
+		team.setDescription( "This is a D\u00E0scription" );  // \u00E0 == ï¿½ - ISOLatin1AccentFilterFactory should strip of diacritic 
 		team.setLocation( "Atlanta" );
 		team.setName( "ATL team" );
 
@@ -44,7 +67,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		tx = fts.beginTransaction();
 		TermQuery query = new TermQuery( new Term( "description", "D\u00E0scription" ) );
 		assertEquals(
-				"iso latin filter should work.  ˆ should be a now", 0, fts.createFullTextQuery( query ).list().size()
+				"iso latin filter should work.  ï¿½ should be a now", 0, fts.createFullTextQuery( query ).list().size()
 		);
 
 		query = new TermQuery( new Term( "description", "is" ) );
