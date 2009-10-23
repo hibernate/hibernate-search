@@ -25,7 +25,7 @@
 package org.hibernate.search.analyzer;
 
 /**
- * Allows to choose a by name defines analyzer at runtime.
+ * Returs the expected discriminator name to use on the element evaluated
  *
  * @author Hardy Ferentschik
  */

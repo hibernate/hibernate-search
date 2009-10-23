@@ -30,6 +30,8 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 
+import org.hibernate.search.analyzer.Discriminator;
+
 /**
  * @author Emmanuel Bernard
  */
@@ -56,6 +58,13 @@ public class EntityMapping {
 		final Map<String, Object> boostAnn = new HashMap<String, Object>();
 		boostAnn.put( "value", boost );
 		entity.setBoost(boostAnn);
+		return this;
+	}
+
+	public EntityMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
+		final Map<String, Object> discriminatorAnn = new HashMap<String, Object>();
+		discriminatorAnn.put( "impl", discriminator );
+		entity.setAnalyzerDiscriminator(discriminatorAnn);
 		return this;
 	}
 

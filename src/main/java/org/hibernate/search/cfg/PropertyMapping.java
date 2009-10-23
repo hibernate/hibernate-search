@@ -25,8 +25,12 @@
 package org.hibernate.search.cfg;
 
 import java.lang.annotation.ElementType;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.solr.analysis.TokenizerFactory;
+
+import org.hibernate.search.analyzer.Discriminator;
 
 /**
  * @author Emmanuel Bernard
@@ -48,6 +52,13 @@ public class PropertyMapping {
 
 	public FieldMapping field() {
 		return new FieldMapping(property, entity, mapping);
+	}
+
+	public PropertyMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
+		Map<String, Object> analyzerDiscriminatorAnn = new HashMap<String, Object>();
+		analyzerDiscriminatorAnn.put( "impl", discriminator );
+		property.setAnalyzerDiscriminator(analyzerDiscriminatorAnn);
+		return this;
 	}
 
 	public PropertyMapping property(String name, ElementType type) {

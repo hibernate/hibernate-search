@@ -860,7 +860,7 @@ public class Team {
         <para>So far all the introduced ways to specify an analyzer were
         static. However, there are use cases where it is useful to select an
         analyzer depending on the current state of the entity to be indexed,
-        for example in multilingual application. For an
+        for example in multilingual applications. For an
         <classname>BlogEntry</classname> class for example the analyzer could
         depend on the language property of the entry. Depending on this
         property the correct language specific stemmer should be chosen to

@@ -31,7 +31,10 @@ import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
+import org.apache.solr.analysis.EnglishPorterFilterFactory;
+import org.apache.solr.analysis.GermanStemFilterFactory;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.DefaultSimilarity;
 
@@ -174,6 +177,49 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	public void testAnalyzerDiscriminator() throws Exception{
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+
+		BlogEntry deEntry = new BlogEntry();
+		deEntry.setTitle( "aufeinanderschl\u00FCgen" );
+		deEntry.setDescription( "aufeinanderschl\u00FCgen" );
+		deEntry.setLanguage( "de" );
+		s.persist( deEntry );
+		
+		BlogEntry enEntry = new BlogEntry();
+		enEntry.setTitle( "acknowledgment" );
+		enEntry.setDescription( "acknowledgment" );
+		enEntry.setLanguage( "en" );
+		s.persist( enEntry );
+
+		tx.commit();
+
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		// at query time we use a standard analyzer. We explicitly search for tokens which can only be found if the
+		// right language specific stemmer was used at index time
+		assertEquals( 1, nbrOfMatchingResults( "description", "aufeinanderschlug", s ) );
+		assertEquals( 1, nbrOfMatchingResults( "description", "acknowledg", s ) );
+		assertEquals( 0, nbrOfMatchingResults( "title", "aufeinanderschlug", s ) );
+		assertEquals( 1, nbrOfMatchingResults( "title", "acknowledgment", s ) );
+
+		for( Object result : s.createQuery( "from " + BlogEntry.class.getName() ).list() ) {
+			s.delete( result );
+		}
+		tx.commit();
+		s.close();
+	}
+
+	private int nbrOfMatchingResults(String field, String token, FullTextSession s) throws ParseException {
+		QueryParser parser = new QueryParser( field, new StandardAnalyzer() );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( token );
+		FullTextQuery query = s.createFullTextQuery( luceneQuery );
+		return query.getResultSize();
+	}
+
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
@@ -184,6 +230,12 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 					.filter( NGramFilterFactory.class )
 						.param( "minGramSize", "3" )
 						.param( "maxGramSize", "3" )
+				.analyzerDef( "en", StandardTokenizerFactory.class )
+					.filter( LowerCaseFilterFactory.class )
+					.filter( EnglishPorterFilterFactory.class )
+				.analyzerDef( "de", StandardTokenizerFactory.class )
+					.filter( LowerCaseFilterFactory.class )
+					.filter( GermanStemFilterFactory.class )
 
 				.indexedClass( Address.class )
 					.similarity( DefaultSimilarity.class )
@@ -196,7 +248,15 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 							.name( "street1_abridged" )
 							.bridge( ConcatStringBridge.class ).param( ConcatStringBridge.SIZE, "4" )
 					.property( "street2", ElementType.METHOD )
-						.field().name( "idx_street2" ).store( Store.YES ).boost( 2 );
+						.field().name( "idx_street2" ).store( Store.YES ).boost( 2 )
+				.indexedClass( BlogEntry.class )
+					.property( "title", ElementType.METHOD )
+						.field()
+					.property( "description", ElementType.METHOD )
+						.field()
+					.property( "language", ElementType.METHOD )
+						.analyzerDiscriminator(BlogEntry.BlogLangDiscriminator.class)
+				;
 		cfg.getProperties().put( "hibernate.search.mapping_model", mapping );
 	}
 
@@ -236,7 +296,8 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 	protected Class[] getMappings() {
 		return new Class[] {
 				Address.class,
-				Country.class
+				Country.class,
+				BlogEntry.class
 		};
 	}
 }

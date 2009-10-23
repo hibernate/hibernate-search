@@ -58,6 +58,7 @@ import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Similarity;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.AnalyzerDiscriminator;
 
 /**
  * @author Emmanuel Bernard
@@ -251,6 +252,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 							if (property != null) {
 								// property name overriding
 								createDocumentId( property );
+								createAnalyzerDiscriminator( property );
 								createFields( property );
 							}
 						}
@@ -272,6 +274,17 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					documentIdAnnotation.setValue( entry.getKey(), entry.getValue() );
 				}
 				annotations.put( DocumentId.class, AnnotationFactory.create( documentIdAnnotation ) );	
+			}
+		}
+
+		private void createAnalyzerDiscriminator(PropertyDescriptor property) {
+			Map<String, Object> analyzerDiscriminator = property.getAnalyzerDiscriminator();
+			if (analyzerDiscriminator != null) {
+				AnnotationDescriptor analyzerDiscriminatorAnn = new AnnotationDescriptor( AnalyzerDiscriminator.class );
+				for ( Map.Entry<String, Object> entry : analyzerDiscriminator.entrySet() ) {
+					analyzerDiscriminatorAnn.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( AnalyzerDiscriminator.class, AnnotationFactory.create( analyzerDiscriminatorAnn ) );
 			}
 		}
 
@@ -351,6 +364,14 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
 				annotations.put( Boost.class, AnnotationFactory.create( annotation ) );
+			}
+
+			if ( entity.getAnalyzerDiscriminator() != null ) {
+				annotation = new AnnotationDescriptor( AnalyzerDiscriminator.class );
+				for ( Map.Entry<String, Object> entry : entity.getAnalyzerDiscriminator().entrySet() ) {
+					annotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( AnalyzerDiscriminator.class, AnnotationFactory.create( annotation ) );
 			}
 		}
 

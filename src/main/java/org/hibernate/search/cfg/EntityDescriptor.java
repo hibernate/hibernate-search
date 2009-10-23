@@ -37,6 +37,7 @@ public class EntityDescriptor {
 	private Map<PropertyKey, PropertyDescriptor> properties = new HashMap<PropertyKey, PropertyDescriptor>();
 	private Map<String, Object> similarity;
 	private Map<String, Object> boost;
+	private Map<String, Object> analyzerDiscriminator;
 
 	public Map<String, Object> getIndexed() {
 		return indexed;
@@ -78,6 +79,14 @@ public class EntityDescriptor {
 
 	public Map<String, Object> getBoost() {
 		return boost;
+	}
+
+	public void setAnalyzerDiscriminator(Map<String, Object> analyzerDiscriminator) {
+		this.analyzerDiscriminator = analyzerDiscriminator;
+	}
+
+	public Map<String, Object> getAnalyzerDiscriminator() {
+		return analyzerDiscriminator;
 	}
 
 	private static class PropertyKey {

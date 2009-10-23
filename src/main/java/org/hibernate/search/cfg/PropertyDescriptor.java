@@ -37,6 +37,7 @@ public class PropertyDescriptor {
 	private String name;
 	private Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
 	private Map<String, Object> documentId;
+	private Map<String, Object> analyzerDiscriminator;
 
 	public PropertyDescriptor(String name, ElementType type) {
 		this.name = name;
@@ -57,5 +58,13 @@ public class PropertyDescriptor {
 
 	public Map<String, Object> getDocumentId() {
 		return documentId;
+	}
+
+	public Map<String, Object> getAnalyzerDiscriminator() {
+		return analyzerDiscriminator;
+	}
+
+	public void setAnalyzerDiscriminator(Map<String, Object> analyzerDiscriminator) {
+		this.analyzerDiscriminator = analyzerDiscriminator;
 	}
 }
