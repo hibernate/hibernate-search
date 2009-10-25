@@ -127,30 +127,31 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings( "unchecked" )
 	public <T> void purge(Class<T> entityType, Serializable id) {
 		if ( entityType == null ) {
 			return;
 		}
 
-		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-		Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class[] {entityType} );
+		Set<Class<?>> targetedClasses = getSearchFactoryImplementor().getIndexedTypesPolymorphic( new Class[] {entityType} );
 		if ( targetedClasses.isEmpty() ) {
 			String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
 			throw new IllegalArgumentException( msg );
 		}
 
-		Work<T> work;
-		for ( Class clazz : targetedClasses ) {
+		for ( Class<?> clazz : targetedClasses ) {
 			if ( id == null ) {
-				work = new Work<T>( clazz, null, WorkType.PURGE_ALL );
-				searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+				createAndPerformWork( clazz, null, WorkType.PURGE_ALL );
 			}
 			else {
-				work = new Work<T>( clazz, id, WorkType.PURGE );
-				searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+				createAndPerformWork( clazz, id, WorkType.PURGE );
 			}
 		}
+	}
+
+	private <T> void createAndPerformWork(Class<T> clazz, Serializable id, WorkType workType) {
+		Work<T> work;
+		work = new Work<T>( clazz, id, workType );
+		getSearchFactoryImplementor().getWorker().performWork( work, transactionContext );
 	}
 
 	/**
@@ -197,10 +198,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	public SearchFactory getSearchFactory() {
-		if ( searchFactory == null ) {
-			searchFactory = ContextHelper.getSearchFactory( session );
-		}
-		return searchFactory;
+		return getSearchFactoryImplementor();
 	}
 
 	private SearchFactoryImplementor getSearchFactoryImplementor() {

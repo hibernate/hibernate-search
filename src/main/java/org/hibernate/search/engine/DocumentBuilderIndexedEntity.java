@@ -600,6 +600,19 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		return idKeywordName;
 	}
 
+	/**
+	 * Return the entity id if possible
+	 * An IllegalStateException otherwise
+	 *
+	 * If the id is provided, we can't extract it from the entity
+	 *
+	 * @return entity id
+	 */
+	public Serializable getId(Object entity) {
+		if( entity == null || idGetter == null) throw new IllegalStateException( "Cannot guess id form entity");
+		return ( Serializable ) ReflectionHelper.getMemberValue( entity, idGetter );
+	}
+
 	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document) {
 		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
 				clazz
