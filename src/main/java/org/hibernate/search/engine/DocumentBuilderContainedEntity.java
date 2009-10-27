@@ -93,7 +93,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	protected int level = 0;
 	protected int maxLevel = Integer.MAX_VALUE;
 	protected final ScopedAnalyzer analyzer = new ScopedAnalyzer();
-	protected Similarity similarity;
+	protected Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	protected boolean isRoot;
 	protected EntityState entityState;
 
@@ -214,7 +214,6 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		checkForAnalyzerDiscriminator( clazz, propertiesMetadata );
 
 		// Get similarity
-		//TODO: similarity form @IndexedEmbedded are not taken care of. Exception??
 		if ( isRoot ) {
 			checkForSimilarity( clazz );
 		}
@@ -585,7 +584,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 	}
 
-	protected Float getBoost(XClass element) {
+	protected float getBoost(XClass element) {
 		float boost = 1.0f;
 		if ( element == null ) {
 			return boost;
@@ -631,7 +630,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	/**
-	 * If we have a work instance we have to check whether the intance to be indexed is contained in any other indexed entities.
+	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
 	 *
 	 * @param instance The instance to be indexed
 	 * @param queue the current work queue

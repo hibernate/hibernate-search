@@ -29,7 +29,6 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
@@ -42,7 +41,7 @@ import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ScopedAnalyzer;
 
 /**
- * Stateless implementation that performs a <code>AddLuceneWork</code>.
+ * Stateless implementation that performs an <code>AddLuceneWork</code>.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -67,8 +66,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = ( ( AddLuceneWork ) work ).getFieldToAnalyzerMap();
 		ScopedAnalyzer analyzer = ( ScopedAnalyzer ) documentBuilder.getAnalyzer();
-		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap, workspace );
-		Similarity similarity = documentBuilder.getSimilarity();
+		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap );
 		if ( log.isTraceEnabled() ) {
 			log.trace(
 					"add to Lucene index: {}#{}:{}",
@@ -76,9 +74,6 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 			);
 		}
 		try {
-			//TODO the next two operations should be atomic to enable concurrent usage of IndexWriter
-			// make a wrapping Similarity based on ThreadLocals? or have it autoselect implementation basing on entity?
-			writer.setSimilarity( similarity );
 			writer.addDocument( work.getDocument(), analyzer );
 			workspace.incrementModificationCounter( 1 );
 		}
@@ -95,14 +90,13 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 	 *
 	 * @param scopedAnalyzer The scoped analyzer created at startup time.
 	 * @param fieldToAnalyzerMap A map of <code>Document</code> field names for analyzer names. This map gets creates
-	 * when the Lucene <code>Document</code> gets created and uses the state of the entiy to index to determine analyzers
+	 * when the Lucene <code>Document</code> gets created and uses the state of the entity to index to determine analyzers
 	 * dynamically at index time.
-	 * @param workspace The current workspace.
 	 * @return <code>scopedAnalyzer</code> in case <code>fieldToAnalyzerMap</code> is <code>null</code> or empty. Otherwise
 	 * a clone of <code>scopedAnalyzer</code> is created where the analyzers get overriden according to <code>fieldToAnalyzerMap</code>.
 	 */
-	private ScopedAnalyzer updateAnalyzerMappings(ScopedAnalyzer scopedAnalyzer, Map<String, String> fieldToAnalyzerMap, Workspace workspace) {
-		// for backwards compatability
+	private ScopedAnalyzer updateAnalyzerMappings(ScopedAnalyzer scopedAnalyzer, Map<String, String> fieldToAnalyzerMap) {
+		// for backwards compatibility
 		if ( fieldToAnalyzerMap == null || fieldToAnalyzerMap.isEmpty() ) {
 			return scopedAnalyzer;
 		}

@@ -34,12 +34,12 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Similarity;
 
 /**
- * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 @Entity
 @Indexed(index="garbageIndex")
-@Similarity(impl = DummySimilarity.class)
-public class Trash {
+@Similarity(impl = DummySimilarity2.class)
+public class Sink {
 	@Id
 	@DocumentId
 	@GeneratedValue
@@ -64,3 +64,4 @@ public class Trash {
 		this.name = name;
 	}
 }
+

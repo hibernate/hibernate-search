@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.lucene.search.Similarity;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
@@ -88,4 +89,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
 	
 	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
+
+	Similarity getSimilarity(DirectoryProvider<?> directoryProvider);
 }

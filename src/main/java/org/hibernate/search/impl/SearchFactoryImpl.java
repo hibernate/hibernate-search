@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -159,6 +160,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		for ( DocumentBuilderContainedEntity builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
+		fillSimilarityMapping();
 		this.worker = WorkerFactory.createWorker( cfg, this );
 		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		this.filterCachingStrategy = buildFilterCachingStrategy( cfg.getProperties() );
@@ -167,6 +169,24 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		);
 		this.configurationProperties = cfg.getProperties();
 		this.barrier = 1; //write barrier
+	}
+
+	private void fillSimilarityMapping() {
+		for ( DirectoryProviderData directoryConfiguration : dirProviderData.values() ) {
+			for (Class<?> indexedType : directoryConfiguration.classes) {
+				DocumentBuilderIndexedEntity<?> documentBuilder = documentBuildersIndexedEntities.get( indexedType );
+				Similarity similarity = documentBuilder.getSimilarity();
+				Similarity prevSimilarity = directoryConfiguration.similarity;
+				if ( prevSimilarity != null && ! prevSimilarity.getClass().equals( similarity.getClass() ) ) {
+					throw new SearchException( "Multiple entities are sharing the same index but are declaring an " + 
+							"inconsistent Similarity. When overrriding default Similarity make sure that all types sharing a same index " +
+							"declare the same Similarity implementation." );
+				}
+				else {
+					directoryConfiguration.similarity = similarity;
+				}
+			}
+		}
 	}
 
 	private ReflectionManager getReflectionManager(SearchConfiguration cfg) {
@@ -421,7 +441,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return analyzer;
 	}
 
-	public Analyzer getAnalyzer(Class clazz) {
+	public Analyzer getAnalyzer(Class<?> clazz) {
 		if ( clazz == null ) {
 			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
 		}
@@ -534,7 +554,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private static class DirectoryProviderData {
 		public final ReentrantLock dirLock = new ReentrantLock();
 		public OptimizerStrategy optimizerStrategy;
-		public Set<Class<?>> classes = new HashSet<Class<?>>( 2 );
+		public final Set<Class<?>> classes = new HashSet<Class<?>>( 2 );
+		public Similarity similarity = null;
 	}
 
 	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
@@ -623,4 +644,13 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			return idexedClasses;
 		}
 	}
+
+	public Similarity getSimilarity(DirectoryProvider<?> provider) {
+		if ( barrier != 0 ) {
+		} //read barrier
+		Similarity similarity = dirProviderData.get( provider ).similarity;
+		if ( similarity == null ) throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
+		return similarity;
+	}
+
 }

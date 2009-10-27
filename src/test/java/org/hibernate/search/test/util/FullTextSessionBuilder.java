@@ -50,7 +50,7 @@ public class FullTextSessionBuilder {
 	
 	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
 
-	private static File indexDir;
+	private static final File indexDir;
 
 	private AnnotationConfiguration cfg;
 	private SessionFactory sessionFactory;

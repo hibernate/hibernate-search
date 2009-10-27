@@ -32,6 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
@@ -67,6 +68,7 @@ public class Workspace {
 	private final ReentrantLock lock;
 	private final Set<Class<?>> entitiesInDirectory;
 	private final LuceneIndexingParameters indexingParams;
+	private final Similarity similarity;
 
 	// variable state:
 	
@@ -87,6 +89,7 @@ public class Workspace {
 		this.entitiesInDirectory = searchFactoryImplementor.getClassesInDirectoryProvider( provider );
 		this.indexingParams = searchFactoryImplementor.getIndexingParameters( directoryProvider );
 		this.lock = searchFactoryImplementor.getDirectoryProviderLock( provider );
+		this.similarity = searchFactoryImplementor.getSimilarity( directoryProvider );
 	}
 
 	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilder(Class<T> entity) {
@@ -126,7 +129,7 @@ public class Workspace {
 		lock.lock();
 		try {
 			//Needs to ensure the optimizerStrategy is accessed in threadsafe way
-			synchronized (optimizerStrategy) {
+			synchronized ( optimizerStrategy ) {
 				optimizerStrategy.optimizationForced();
 			}
 		}
@@ -148,6 +151,7 @@ public class Workspace {
 		try {
 			writer = new IndexWriter( directoryProvider.getDirectory(), SIMPLE_ANALYZER, false, maxFieldLength ); // has been created at init time
 			indexingParams.applyToWriter( writer, batchmode );
+			writer.setSimilarity( similarity );
 			log.trace( "IndexWriter opened" );
 		}
 		catch ( IOException e ) {

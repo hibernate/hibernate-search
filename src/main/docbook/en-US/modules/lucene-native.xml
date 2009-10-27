@@ -210,5 +210,11 @@ public class Book {
     should be scored the same as documents with multiple occurrences. In this
     case your custom implementation of the method <methodname>tf(float
     freq)</methodname> should return 1.0.</para>
+    
+    <warning><para>When two entities share the same index they must declare the
+    same <classname>Similarity</classname> implementation. Classes in the same
+    class hierarchy always share the index, so it's not allowed to override the
+    <classname>Similarity</classname> implementation in a subtype.</para></warning>
+    
   </section>
 </chapter>
