@@ -53,9 +53,6 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 
 	DeleteExtWorkDelegate(Workspace workspace) {
 		super( workspace );
-		if ( workspace.getEntitiesInDirectory().size() != 1 ) {
-			throw new AssertionFailure( "Can't use this delegate on shared indexes" );
-		}
 		managedType = workspace.getEntitiesInDirectory().iterator().next();
 		builder = workspace.getDocumentBuilder( managedType );
 	}

@@ -78,10 +78,9 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 	}
 
 	public void close() {
-		// needs to stop all used ThreadPools
+		// needs to stop all used ThreadPools and cleanup locks
 		for (PerDPResources res : resourcesMap.values() ) {
-			ExecutorService executor = res.getExecutor();
-			executor.shutdown();
+			res.shutdown();
 		}
 	}
 	

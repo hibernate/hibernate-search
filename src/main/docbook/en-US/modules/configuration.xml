@@ -762,6 +762,18 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
         </thead>
 
         <tbody>
+        
+        <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].enable_greedy_locking</literal></entry>
+
+            <entry><para>Set to <literal>true</literal> when no other
+            application uses the same index, this will enable
+            Hibernate Search to work in exlusive mode on the index and
+            improve performance in writing changes to the index.</para></entry>
+
+            <entry><literal>false</literal> (releases locks as soon as possible)</entry>
+          </row>
+        
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_delete_terms</literal></entry>
 
@@ -878,6 +890,11 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
         </tbody>
       </tgroup>
     </table>
+    
+    <tip><para>When your architecture permits it, always set
+    <literal>hibernate.search.default.enable_greedy_locking=true</literal>
+    as it greatly improves efficiency in index writing.</para>
+    </tip>
 
     <para>To tune the indexing speed it might be useful to time the object
     loading from database in isolation from the writes to the index. To

@@ -31,6 +31,7 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
@@ -131,20 +132,18 @@ public class DirectoryProviderFactory {
 			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
 		}
 		int index = providers.indexOf( provider );
+		boolean useGreedyLocking = isGreedyLockingEnabled( directoryProviderName, indexProps );
 		if ( index != -1 ) {
 			//share the same Directory provider for the same underlying store
 			final DirectoryProvider<?> directoryProvider = providers.get( index );
-			searchFactoryImplementor.addClassToDirectoryProvider( entity, directoryProvider );
+			searchFactoryImplementor.addClassToDirectoryProvider( entity, directoryProvider, useGreedyLocking);
 			return directoryProvider;
 		}
 		else {
 			configureOptimizerStrategy( searchFactoryImplementor, indexProps, provider );
 			configureIndexingParameters( searchFactoryImplementor, indexProps, provider );
 			providers.add( provider );
-			searchFactoryImplementor.addClassToDirectoryProvider( entity, provider );
-			if ( !searchFactoryImplementor.getDirectoryProviders().contains( provider ) ) {
-				searchFactoryImplementor.addDirectoryProvider( provider );
-			}
+			searchFactoryImplementor.addClassToDirectoryProvider( entity, provider, useGreedyLocking );
 			return provider;
 		}
 	}
@@ -264,6 +263,13 @@ public class DirectoryProviderFactory {
 		public DirectoryProvider[] getProviders() {
 			return providers;
 		}
+	}
+	
+	private static boolean isGreedyLockingEnabled(String directoryProviderName, Properties indexProps) {
+		String usesGreedyLockingProperty = indexProps.getProperty( Environment.ENABLE_GREEDY_LOCKING, "false" );
+		boolean usesGreedyLocking = ConfigurationParseHelper.parseBoolean( usesGreedyLockingProperty,
+			"Illegal value for property " + Environment.ENABLE_GREEDY_LOCKING + " on index " + directoryProviderName );
+		return usesGreedyLocking;
 	}
 
 }

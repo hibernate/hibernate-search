@@ -71,10 +71,6 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		super.setUp();
 	}
 	
-	public void testFakeTest(){
-		//to make JUnit happy when disabling performance test
-	}
-
 	private void buildBigIndex() throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
 		System.out.println( "Going to create fake index..." );
 		FSDirectory directory = FSDirectory.getDirectory(new File(getBaseIndexDir(), Detective.class.getCanonicalName()));
@@ -111,14 +107,14 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.default.optimizer.transaction_limit.max", "10" ); // workaround too many open files
+		cfg.setProperty( "hibernate.search.default." + Environment.ENABLE_GREEDY_LOCKING, "true" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		cfg.setProperty( Environment.READER_STRATEGY, getReaderStrategyName() );
 	}
 
 	protected abstract String getReaderStrategyName();
 	
-	//this test is disabled as it is very slow (and someone should read the output)
-	public final void disabled_testPerformance() throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
+	public final void testPerformance() throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
 		buildBigIndex();
 		for (int i=0; i<WARMUP_CYCLES; i++) {
 			timeMs();

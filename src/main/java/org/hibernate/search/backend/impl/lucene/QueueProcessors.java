@@ -74,7 +74,7 @@ class QueueProcessors implements PerDirectoryWorkProcessor {
 	}
 	
 	/**
-	 * Runs all PerDPQueueProcessor and don't wait fot them to finish.
+	 * Runs all PerDPQueueProcessor and don't wait for them to finish.
 	 */
 	private void runAllAsync() {
 		// execute all work in parallel on each DirectoryProvider;

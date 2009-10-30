@@ -238,12 +238,12 @@ transaction.commit();</programlisting>
 	  performance if the main entity is relating to enum-like data included in the index.</para>
     </example>
     
-    <tip>The "sweet spot" of number of threads to achieve best performance is
+    <tip><para>The "sweet spot" of number of threads to achieve best performance is
     highly dependent on your overall architecture, database design and even data
     values.
     To find out the best number of threads for your application it is recommended
     to use a profiler: all internal thread groups have meaningful names
-    to be easily identified with most tools.
+    to be easily identified with most tools.</para>
     </tip>
     
     <note>
@@ -256,10 +256,14 @@ transaction.commit();</programlisting>
     
     </section>
     
-    <para>Other parameters which also can affect indexing time and memory
+    <para>Other parameters which also affect indexing time and memory
     consumption are:</para>
 
     <itemizedlist>
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].enable_greedy_locking</literal>
+      </listitem>
+      
       <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_buffered_docs</literal>
       </listitem>
@@ -285,8 +289,8 @@ transaction.commit();</programlisting>
       </listitem>
     </itemizedlist>
 
-    <para>These parameters are Lucene specific and Hibernate Search is just
-    passing these parameters through - see <xref
+    <para>All <literal>.indexwriter</literal> parameters are Lucene specific and
+    Hibernate Search is just passing these parameters through - see <xref
     linkend="lucene-indexing-performance" /> for more details.</para>
 
   </section>

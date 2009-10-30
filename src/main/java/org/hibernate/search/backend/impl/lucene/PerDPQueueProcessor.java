@@ -50,6 +50,7 @@ class PerDPQueueProcessor implements Runnable {
 	private final Workspace workspace;
 	private final LuceneWorkVisitor worker;
 	private final ExecutorService executor;
+	private final boolean useGreedyLocks;
 	private final List<LuceneWork> workOnWriter = new ArrayList<LuceneWork>();
 	
 	// if any work needs batchmode, set corresponding flag to true:
@@ -63,6 +64,7 @@ class PerDPQueueProcessor implements Runnable {
 		this.worker = resources.getVisitor();
 		this.workspace = resources.getWorkspace();
 		this.executor = resources.getExecutor();
+		this.useGreedyLocks = resources.isLockingGreedy();
 	}
 
 	/**
@@ -91,11 +93,11 @@ class PerDPQueueProcessor implements Runnable {
 				lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
 			}
 			workspace.commitIndexWriter();
-			//TODO skip this when indexing in batches:
 			performOptimizations();
 		}
 		finally {
-			workspace.closeIndexWriter();
+			if ( ! useGreedyLocks )
+				workspace.closeIndexWriter();
 		}
 	}
 	

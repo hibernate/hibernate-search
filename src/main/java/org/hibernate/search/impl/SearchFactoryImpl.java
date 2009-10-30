@@ -252,7 +252,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		}
 	}
 
-	public void addClassToDirectoryProvider(Class<?> clazz, DirectoryProvider<?> directoryProvider) {
+	public void addClassToDirectoryProvider(Class<?> clazz, DirectoryProvider<?> directoryProvider, boolean useGreedyLocking) {
 		//no need to set a read barrier, we only use this class in the init thread
 		DirectoryProviderData data = dirProviderData.get( directoryProvider );
 		if ( data == null ) {
@@ -260,6 +260,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			dirProviderData.put( directoryProvider, data );
 		}
 		data.classes.add( clazz );
+		data.usesGreedyLocking = useGreedyLocking;
 	}
 
 	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
@@ -556,6 +557,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		public OptimizerStrategy optimizerStrategy;
 		public final Set<Class<?>> classes = new HashSet<Class<?>>( 2 );
 		public Similarity similarity = null;
+		private boolean usesGreedyLocking;
 	}
 
 	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
@@ -564,9 +566,11 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return this.dirProviderData.get( dp ).dirLock;
 	}
 
-	public void addDirectoryProvider(DirectoryProvider<?> provider) {
+	public void addDirectoryProvider(DirectoryProvider<?> provider, boolean usesGreedyLocking) {
 		//no need to set a barrier we use this method in the init thread
-		this.dirProviderData.put( provider, new DirectoryProviderData() );
+		DirectoryProviderData dirConfiguration = new DirectoryProviderData();
+		dirConfiguration.usesGreedyLocking = usesGreedyLocking;
+		this.dirProviderData.put( provider, dirConfiguration );
 	}
 
 	public int getFilterCacheBitResultsSize() {
@@ -651,6 +655,12 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		Similarity similarity = dirProviderData.get( provider ).similarity;
 		if ( similarity == null ) throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
 		return similarity;
+	}
+
+	public boolean isLockingGreedy(DirectoryProvider<?> provider) {
+		if ( barrier != 0 ) {
+		} //read barrier
+		return dirProviderData.get( provider ).usesGreedyLocking;
 	}
 
 }

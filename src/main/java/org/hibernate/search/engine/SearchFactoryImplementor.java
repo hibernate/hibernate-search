@@ -74,7 +74,7 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	void close();
 
-	void addClassToDirectoryProvider(Class<?> clazz, DirectoryProvider<?> directoryProvider);
+	void addClassToDirectoryProvider(Class<?> clazz, DirectoryProvider<?> directoryProvider, boolean useGreedyLocking);
 
 	Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider);
 
@@ -82,7 +82,7 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp);
 
-	void addDirectoryProvider(DirectoryProvider<?> provider);
+	void addDirectoryProvider(DirectoryProvider<?> provider, boolean usesGreedyLocking);
 	
 	int getFilterCacheBitResultsSize();
 
@@ -91,4 +91,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
 
 	Similarity getSimilarity(DirectoryProvider<?> directoryProvider);
+
+	boolean isLockingGreedy(DirectoryProvider<?> provider);
 }
