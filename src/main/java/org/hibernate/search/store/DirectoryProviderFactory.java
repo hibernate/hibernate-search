@@ -132,18 +132,18 @@ public class DirectoryProviderFactory {
 			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
 		}
 		int index = providers.indexOf( provider );
-		boolean useGreedyLocking = isGreedyLockingEnabled( directoryProviderName, indexProps );
+		boolean exclusiveIndexUsage = isExclusiveIndexUsageEnabled( directoryProviderName, indexProps );
 		if ( index != -1 ) {
 			//share the same Directory provider for the same underlying store
 			final DirectoryProvider<?> directoryProvider = providers.get( index );
-			searchFactoryImplementor.addClassToDirectoryProvider( entity, directoryProvider, useGreedyLocking);
+			searchFactoryImplementor.addClassToDirectoryProvider( entity, directoryProvider, exclusiveIndexUsage);
 			return directoryProvider;
 		}
 		else {
 			configureOptimizerStrategy( searchFactoryImplementor, indexProps, provider );
 			configureIndexingParameters( searchFactoryImplementor, indexProps, provider );
 			providers.add( provider );
-			searchFactoryImplementor.addClassToDirectoryProvider( entity, provider, useGreedyLocking );
+			searchFactoryImplementor.addClassToDirectoryProvider( entity, provider, exclusiveIndexUsage );
 			return provider;
 		}
 	}
@@ -265,11 +265,11 @@ public class DirectoryProviderFactory {
 		}
 	}
 	
-	private static boolean isGreedyLockingEnabled(String directoryProviderName, Properties indexProps) {
-		String usesGreedyLockingProperty = indexProps.getProperty( Environment.ENABLE_GREEDY_LOCKING, "false" );
-		boolean usesGreedyLocking = ConfigurationParseHelper.parseBoolean( usesGreedyLockingProperty,
-			"Illegal value for property " + Environment.ENABLE_GREEDY_LOCKING + " on index " + directoryProviderName );
-		return usesGreedyLocking;
+	private static boolean isExclusiveIndexUsageEnabled(String directoryProviderName, Properties indexProps) {
+		String exclusiveIndexUsageProperty = indexProps.getProperty( Environment.EXCLUSIVE_INDEX_USE, "false" );
+		boolean exclusiveIndexUsage = ConfigurationParseHelper.parseBoolean( exclusiveIndexUsageProperty,
+			"Illegal value for property " + Environment.EXCLUSIVE_INDEX_USE + " on index " + directoryProviderName );
+		return exclusiveIndexUsage;
 	}
 
 }

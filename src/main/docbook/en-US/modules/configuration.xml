@@ -764,10 +764,10 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
         <tbody>
         
         <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].enable_greedy_locking</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].exclusive_index_use</literal></entry>
 
             <entry><para>Set to <literal>true</literal> when no other
-            application uses the same index, this will enable
+            process will need to write to the same index: this will enable
             Hibernate Search to work in exlusive mode on the index and
             improve performance in writing changes to the index.</para></entry>
 
@@ -892,7 +892,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     </table>
     
     <tip><para>When your architecture permits it, always set
-    <literal>hibernate.search.default.enable_greedy_locking=true</literal>
+    <literal>hibernate.search.default.exclusive_index_use=true</literal>
     as it greatly improves efficiency in index writing.</para>
     </tip>
 

@@ -43,13 +43,13 @@ class PerDPResources {
 	private final ExecutorService executor;
 	private final LuceneWorkVisitor visitor;
 	private final Workspace workspace;
-	private final boolean lockingIsGreedy;
+	private final boolean exclusiveIndexUsage;
 	
 	PerDPResources(SearchFactoryImplementor searchFactoryImp, DirectoryProvider<?> dp) {
 		workspace = new Workspace( searchFactoryImp, dp );
 		visitor = new LuceneWorkVisitor( workspace );
 		executor = Executors.newFixedThreadPool( 1 );
-		lockingIsGreedy = searchFactoryImp.isLockingGreedy( dp );
+		exclusiveIndexUsage = searchFactoryImp.isExclusiveIndexUsageEnabled( dp );
 	}
 
 	public ExecutorService getExecutor() {
@@ -64,13 +64,13 @@ class PerDPResources {
 		return workspace;
 	}
 
-	public boolean isLockingGreedy() {
-		return lockingIsGreedy;
+	public boolean isExclusiveIndexUsageEnabled() {
+		return exclusiveIndexUsage;
 	}
 
 	public void shutdown() {
 		//sets the index to be closed after all current jobs are processed:
-		if ( lockingIsGreedy ) {
+		if ( exclusiveIndexUsage ) {
 			executor.execute( new CloseIndexRunnable( workspace ) );
 		}
 		executor.shutdown();

@@ -109,6 +109,6 @@ public final class Environment {
 	 * can access the index in write mode while Hibernate Search is running.
 	 * This is an index-scoped property and defaults to false.
 	 */
-	public static final String ENABLE_GREEDY_LOCKING = "enable_greedy_locking";
+	public static final String EXCLUSIVE_INDEX_USE = "exclusive_index_use";
 	
 }

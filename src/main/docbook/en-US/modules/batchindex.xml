@@ -261,7 +261,7 @@ transaction.commit();</programlisting>
 
     <itemizedlist>
       <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].enable_greedy_locking</literal>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].exclusive_index_use</literal>
       </listitem>
       
       <listitem>
