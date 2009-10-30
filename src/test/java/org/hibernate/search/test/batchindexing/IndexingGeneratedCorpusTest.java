@@ -29,7 +29,6 @@ import junit.framework.TestCase;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
-import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
@@ -44,9 +43,9 @@ import org.hibernate.search.test.util.textbuilder.SentenceInventor;
  */
 public class IndexingGeneratedCorpusTest extends TestCase {
 	
-	private final int BOOK_NUM = 3000;
-	private final int ANCIENTBOOK_NUM = 200;
-	private final int DVD_NUM = 2000;
+	private final int BOOK_NUM = 300;
+	private final int ANCIENTBOOK_NUM = 60;
+	private final int DVD_NUM = 200;
 	
 	private SentenceInventor sentenceInventor = new SentenceInventor( 7L, 10000 );
 	private FullTextSessionBuilder builder;

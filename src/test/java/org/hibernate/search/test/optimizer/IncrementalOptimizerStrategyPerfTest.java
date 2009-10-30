@@ -27,7 +27,8 @@ package org.hibernate.search.test.optimizer;
 /**
  * @author Emmanuel Bernard
  */
-public class IncrementalOptimizerStrategyTest extends OptimizerTestCase {
+//having name end in *PerfTest disables it from functional tests
+public class IncrementalOptimizerStrategyPerfTest extends OptimizerPerfTest {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.optimizer.transaction_limit.max", "10" );

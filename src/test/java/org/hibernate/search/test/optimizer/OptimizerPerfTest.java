@@ -45,7 +45,8 @@ import org.hibernate.search.util.FileHelper;
 /**
  * @author Emmanuel Bernard
  */
-public class OptimizerTestCase extends SearchTestCase {
+//having name end in *PerfTest disables it from functional tests
+public class OptimizerPerfTest extends SearchTestCase {
 	protected void setUp() throws Exception {
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );

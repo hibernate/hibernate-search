@@ -51,7 +51,7 @@
     </contributors>
 
     <properties>
-        <slf4jVersion>1.5.6</slf4jVersion>
+        <slf4jVersion>1.5.8</slf4jVersion>
         <luceneVersion>2.4.1</luceneVersion>
         <hibernateVersion>3.5.0.Beta-1</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Beta1</hibernateCommonsAnnotationVersion>
@@ -799,6 +799,7 @@
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <excludes>
                                 <exclude>**/classloading/*.java</exclude>
+                                <exclude>**/*PerfTest.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -825,6 +826,7 @@
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <excludes>
                                 <exclude>none</exclude>
+                                <exclude>**/*PerfTest.java</exclude>
                             </excludes>
                             <includes>
                                 <include>**/classloading/*Test.java</include>
