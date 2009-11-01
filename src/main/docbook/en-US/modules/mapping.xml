@@ -33,9 +33,9 @@
   through annotations. There is no need for xml mapping files. In fact there
   is currently no xml configuration option available (see <ulink
   url="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-210">HSEARCH-210</ulink>).
-  You can still use hibernate mapping files for the basic Hibernate
-  configuration, but the Search specific configuration has to be expressed via
-  annotations.</para>
+  You can still use Hibernate mapping files for the basic Hibernate
+  configuration, but the Hibernate Search specific configuration has to be
+  expressed via annotations.</para>
 
   <section id="search-mapping-entity" revision="3">
     <title>Mapping an entity</title>
@@ -73,9 +73,9 @@ public class Essay {
 
       <para>For each property (or attribute) of your entity, you have the
       ability to describe how it will be indexed. The default (no annotation
-      present) means that the property is completely ignored by the indexing
-      process. <literal>@Field</literal> does declare a property as indexed.
-      When indexing an element to a Lucene document you can specify how it is
+      present) means that the property is ignored by the indexing process.
+      <literal>@Field</literal> does declare a property as indexed. When
+      indexing an element to a Lucene document you can specify how it is
       indexed:</para>
 
       <itemizedlist>
@@ -181,9 +181,10 @@ public class Essay {
 
       <para>Whether or not you want to tokenize a property depends on whether
       you wish to search the element as is, or by the words it contains. It
-      make sense to tokenize a text field, but tokenizing a date field
-      probably not. Note that fields used for sorting must not be
-      tokenized.</para>
+      make sense to tokenize a text field, but probably not a date field.
+      <note>
+          <para>Fields used for sorting must not be tokenized.</para>
+        </note></para>
 
       <para>Finally, the id property of an entity is a special property used
       by Hibernate Search to ensure index unicity of a given entity. By
@@ -193,7 +194,7 @@ public class Essay {
       can omit @DocumentId. The chosen entity id will also be used as document
       id.</para>
 
-      <example>
+      <example id="example-annotated-entity">
         <title>Adding <classname>@DocumentId</classname> ad
         <classname>@Field</classname> annotations to an indexed entity</title>
 
@@ -215,8 +216,8 @@ public class Essay {
 }</programlisting>
       </example>
 
-      <para>The above annotations define an index with three fields:
-      <literal>id</literal> , <literal>Abstract</literal> and
+      <para><xref linkend="example-annotated-entity" /> define an index with
+      three fields: <literal>id</literal> , <literal>Abstract</literal> and
       <literal>text</literal> . Note that by default the field name is
       decapitalized, following the JavaBean specification</para>
     </section>
@@ -231,7 +232,7 @@ public class Essay {
       index it twice - once tokenized and once untokenized. @Fields allows to
       achieve this goal.</para>
 
-      <example>
+      <example id="example-fields-annotation">
         <title>Using @Fields to map a property multiple times</title>
 
         <programlisting>@Entity
@@ -249,7 +250,8 @@ public class Book {
 }</programlisting>
       </example>
 
-      <para>The field <literal>summary</literal> is indexed twice, once as
+      <para>In <xref linkend="example-fields-annotation" /> the field
+      <literal>summary</literal> is indexed twice, once as
       <literal>summary</literal> in a tokenized way, and once as
       <literal>summary_forSort</literal> in an untokenized way. @Field
       supports 2 attributes useful when @Fields is used:</para>
@@ -514,7 +516,7 @@ public class Owner implements Person { ... }</programlisting>
       </example>
     </section>
 
-    <section>
+    <section id="section-boost-annotation">
       <title>Boost factor</title>
 
       <para>Lucene has the notion of <emphasis>boost factor</emphasis>. It's a
@@ -563,6 +565,63 @@ public class Essay {
       reality for all practical purposes. Please check the Lucene
       documentation or the excellent <citetitle>Lucene In Action </citetitle>
       from Otis Gospodnetic and Erik Hatcher.</para>
+    </section>
+
+    <section>
+      <title id="section-dynamic-boost">Dynamic boost factor</title>
+
+      <para>The <literal>@Boost </literal>annotation used in <xref
+      linkend="section-boost-annotation" /> defines a static boost factor
+      which is is independent of the state of of the indexed entity at
+      runtime. However, there are usecases in which the boost factor may
+      depends on the actual state of the entity. In this case you can use the
+      <literal>@DynamicBoost </literal>annotation together with an
+      accompanying custom <classname>BoostStrategy</classname>.<example
+          id="example-dynamic-boosting">
+          <title>Dynamic boost examle</title>
+
+          <programlisting>public enum PersonType {
+    NORMAL,
+    VIP
+}
+
+@Entity
+@Indexed
+<emphasis role="bold">@DynamicBoost(impl = VIPBoostStrategy.class)</emphasis>
+public class Person {
+    private PersonType type;   
+    
+    // ....
+}
+
+public class VIPBoostStrategy implements BoostStrategy {
+    <emphasis role="bold">public float defineBoost(Object value)</emphasis> {
+        Person person = ( Person ) value;
+        if ( person.getType().equals( PersonType.VIP ) ) {
+            return 2.0f;
+        }
+        else {
+            return 1.0f;
+        }
+    }
+}</programlisting>
+        </example>In <xref linkend="example-dynamic-boosting" /> a dynamic
+      boost is defined on class level specifying
+      <classname>VIPBoostStrategy</classname> as implementation of the
+      <classname>BoostStrategy</classname> interface to be used at indexing
+      time. You can place the <literal>@DynamicBoost</literal> either at class
+      or field level. Depending on the placement of the annotation either the
+      whole entity is passed to the <methodname>defineBoost</methodname>
+      method or just the annotated field/property value. It's up to you to
+      cast the passed object to the correct type. In the example all indexed
+      values of a VIP person would be double as important as the values of a
+      normal person.<note>
+          <para>The specified <classname>BoostStrategy</classname>
+          implementation must define a public no-arg constructor.</para>
+        </note>Of course you can mix and match <literal>@Boost</literal> and
+      <literal>@DynamicBoost</literal> annotations in your entity. All defined
+      boost factors are cummulative as described in <xref
+      linkend="section-boost-annotation" />.</para>
     </section>
 
     <section id="analyzer">
