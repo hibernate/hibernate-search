@@ -709,13 +709,10 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     <xref linkend="search-batchindex" />), the used properties are those
     grouped under the <literal>batch</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting></para>
 
-    <para>Unless the corresponding <literal>.batch</literal> property is
-    explicitly set, the value will default to the
-    <literal>.transaction</literal> property. If no value is set for a
+    <para>If no value is set for a
     <literal>.batch</literal> value in a specific shard configuration,
     Hibernate Search will look at the index section, then at the default
-    section and after that it will look for a <literal>.transaction</literal>
-    in the same order: <programlisting>hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
+    section: <programlisting>hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
 hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
 hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     This configuration will result in these settings applied to the second
@@ -735,7 +732,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
       </listitem>
 
       <listitem>
-        <para><literal>batch.merge_factor</literal> = 20</para>
+        <para><literal>batch.merge_factor</literal> = Lucene default</para>
       </listitem>
     </itemizedlist>
 
@@ -746,6 +743,10 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     of Lucene you are using; values shown are relative to version
     <literal>2.4</literal>. For more information about Lucene indexing
     performances, please refer to the Lucene documentation.</para>
+    
+    <warning><para>Previous versions had the <literal>batch</literal>
+    parameters inherit from <literal>transaction</literal> properties.
+    This needs now to be explicitly set.</para></warning>
 
     <table>
       <title>List of indexing performance and behavior properties</title>

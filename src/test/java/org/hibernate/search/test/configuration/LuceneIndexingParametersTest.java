@@ -80,7 +80,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		cfg.setProperty( "hibernate.search.Documents.batch.max_field_length", "9" );
 	}
 	
-	public void testDefaultIndexProviderParameters() throws Exception {
+	public void testDefaultIndexProviderParameters() {
 		assertValueIsSet( Author.class, BATCH, USE_COMPOUND_FILE, 1 );
 		assertValueIsSet( Author.class, TRANSACTION, RAM_BUFFER_SIZE, 2 );
 		assertValueIsSet( Author.class, TRANSACTION, MAX_MERGE_DOCS, 9 );
@@ -88,43 +88,37 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Author.class, TRANSACTION, MERGE_FACTOR,  100 );
 	}
 	
-	public void testBatchParametersGlobals() throws Exception {
+	public void testBatchParametersGlobals() {
 		assertValueIsSet( Author.class, BATCH, RAM_BUFFER_SIZE, 1 );
-		assertValueIsSet( Author.class, BATCH, MAX_MERGE_DOCS, 9 );
+		assertValueIsDefault( Author.class, BATCH, MAX_MERGE_DOCS );
 		assertValueIsSet( Author.class, BATCH, MAX_BUFFERED_DOCS, 1000 );
-		assertValueIsSet( Author.class, BATCH, MERGE_FACTOR, 100 );
 	}
 	
-	public void testUnsetBatchValueTakesTransaction() throws Exception {
-		assertValueIsSet( Document.class, BATCH, MERGE_FACTOR, 6 );
-		assertValueIsSet( Document.class, BATCH, MAX_BUFFERED_DOCS, 1000 );
-	}
-	
-	public void testMaxFieldLength() throws Exception {
+	public void testMaxFieldLength() {
 		// there should also be logged a warning being logged about these:
 		assertValueIsSet( Document.class, TRANSACTION, MAX_FIELD_LENGTH, 7 );
 		assertValueIsSet( Document.class, BATCH, MAX_FIELD_LENGTH, 9 );
 	}
 	
-	public void testExplicitBatchParameters() throws Exception {
+	public void testExplicitBatchParameters() {
 		assertValueIsSet( Book.class, BATCH, MAX_MERGE_DOCS, 12 );
 		assertValueIsSet( Book.class, BATCH, MAX_BUFFERED_DOCS, 14 );
 		assertValueIsSet( Book.class, BATCH, MERGE_FACTOR, 13 );
 		assertValueIsSet( Book.class, TRANSACTION, USE_COMPOUND_FILE, 0 );
 	}
 	
-	public void testInheritedBatchParametersFromTranscation() throws Exception {
+	public void testInheritedBatchParameters() {
 		assertValueIsSet( Book.class, BATCH, RAM_BUFFER_SIZE, 1 );
 	}
 	
-	public void testTransactionParameters() throws Exception {
+	public void testTransactionParameters() {
 		assertValueIsSet( Book.class, TRANSACTION, RAM_BUFFER_SIZE, 4 );
 		assertValueIsSet( Book.class, TRANSACTION, MAX_MERGE_DOCS, 15 );
 		assertValueIsSet( Book.class, TRANSACTION, MAX_BUFFERED_DOCS, 17 );
 		assertValueIsSet( Book.class, TRANSACTION, MERGE_FACTOR, 16 );
 	}
 	
-	public void testDefaultKeywordOverwritesInherited() throws Exception {
+	public void testDefaultKeywordOverwritesInherited() {
 		assertValueIsDefault( Document.class, TRANSACTION, RAM_BUFFER_SIZE );
 		assertValueIsDefault( Document.class, TRANSACTION, RAM_BUFFER_SIZE );
 	}
@@ -137,7 +131,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertEquals( param.getTransactionIndexParameters(), paramCopy.getTransactionIndexParameters() );
 	}
 	
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Book.class,
 				Author.class,

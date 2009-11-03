@@ -68,8 +68,8 @@ public class LuceneIndexingParameters implements Serializable {
 		Properties indexingParameters = new MaskedProperty( sourceProps, PROP_GROUP, sourceProps );
 		//get keys for "transaction"
 		Properties transactionProps = new MaskedProperty( indexingParameters, TRANSACTION );
-		//get keys for "batch" (defaulting to transaction)
-		Properties batchProps = new MaskedProperty( indexingParameters, BATCH, transactionProps ); //TODO to close HSEARCH-201 just remove 3° parameter
+		//get keys for "batch"
+		Properties batchProps = new MaskedProperty( indexingParameters, BATCH );
 		transactionIndexParameters = new ParameterSet( transactionProps, TRANSACTION );
 		batchIndexParameters = new ParameterSet( batchProps, BATCH );
 		doSanityChecks( transactionIndexParameters, batchIndexParameters );
