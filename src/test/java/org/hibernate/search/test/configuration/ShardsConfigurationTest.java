@@ -90,6 +90,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertTrue( docDirProviders[0] instanceof RAMDirectoryProvider );
 		assertTrue( docDirProviders[1] instanceof FSDirectoryProvider );
 		assertTrue( docDirProviders[2] instanceof RAMDirectoryProvider );
+		assertValueIsSet( Document.class, 0, BATCH, MAX_BUFFERED_DOCS, 4 );
 	}
 	
 	public void testShardN2UsesDefaults() throws Exception {
@@ -99,18 +100,13 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertValueIsDefault( Document.class, 2, TRANSACTION, RAM_BUFFER_SIZE );
 		assertValueIsSet( Document.class, 2, BATCH, MAX_BUFFERED_DOCS, 4 );
 		assertValueIsSet( Document.class, 2, BATCH, MAX_MERGE_DOCS, 5 );
-		assertValueIsSet( Document.class, 2, BATCH, MERGE_FACTOR, 100 );
+		assertValueIsDefault( Document.class, 2, BATCH, MERGE_FACTOR );
 		assertValueIsDefault( Document.class, 2, BATCH, RAM_BUFFER_SIZE );
 	}
 	
 	public void testShardN1_ExplicitParams() throws Exception {
 		assertValueIsSet( Document.class, 1, TRANSACTION, MAX_BUFFERED_DOCS, 12 );
 		assertValueIsSet( Document.class, 1, BATCH, MAX_MERGE_DOCS, 11 );
-	}
-	
-	public void testShard_BatchInheritedFromTransaction() throws Exception {
-		assertValueIsSet( Document.class, 1, BATCH, TERM_INDEX_INTERVAL, 12 );
-		assertValueIsSet( Document.class, 0, BATCH, MAX_BUFFERED_DOCS, 4 );
 	}
 	
 	protected Class[] getMappings() {
