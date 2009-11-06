@@ -649,7 +649,7 @@
                 <dependency>
                     <groupId>com.microsoft.sqlserver</groupId>
                     <artifactId>msjdbc</artifactId>
-                    <version>1.1</version>
+                    <version>2.0.1008.2</version>
                 </dependency>
             </dependencies>
             <properties>
@@ -669,7 +669,7 @@
                 <dependency>
                     <groupId>com.microsoft.sqlserver</groupId>
                     <artifactId>msjdbc</artifactId>
-                    <version>1.1</version>
+                    <version>2.0.1008.2</version>
                 </dependency>
             </dependencies>
             <properties>
