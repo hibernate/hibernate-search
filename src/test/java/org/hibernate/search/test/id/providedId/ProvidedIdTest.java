@@ -38,7 +38,7 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
- * @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
+ * @author Navin Surtani
  */
 public class ProvidedIdTest extends SearchTestCase {
 

@@ -24,24 +24,25 @@
  */
 package org.hibernate.search.test.id.providedId;
 
-import org.hibernate.search.annotations.*;
-import org.hibernate.search.bridge.builtin.LongBridge;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.ProvidedId;
+import org.hibernate.search.annotations.Store;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import java.io.Serializable;
 
 
 /**
- * @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
+ * @author Navin Surtani
  */
 @Entity
-@ProvidedId(bridge = @FieldBridge(impl = LongBridge.class))
+@ProvidedId
 @Indexed
 public class ProvidedIdPerson implements Serializable {
 
-	@Id
 	@GeneratedValue
 	private long id;
 	
