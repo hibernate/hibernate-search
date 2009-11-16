@@ -207,6 +207,55 @@ public class BridgeTest extends SearchTestCase {
 
 	}
 
+
+    public void testCalendarBridge() throws Exception {
+		Cloud cloud = new Cloud();
+		Calendar c = GregorianCalendar.getInstance();
+		c.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
+		c.set( 2000, 11, 15, 3, 43, 2 );
+		c.set( Calendar.MILLISECOND, 5 );
+
+
+		cloud.setMyCalendar(c); //5 millisecond
+		cloud.setCalendarDay(c);
+		cloud.setCalendarHour( c );
+		cloud.setCalendarMillisecond( c );
+		cloud.setCalendarMinute( c );
+		cloud.setCalendarMonth( c );
+		cloud.setCalendarSecond( c );
+		cloud.setCalendarYear( c );
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( cloud );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.getFullTextSession( s );
+		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		Query query;
+		List result;
+
+		query = parser.parse(
+				"myCalendar:[19900101 TO 20060101]"
+						+ " AND calendarDay:[20001214 TO 2000121501]"
+						+ " AND calendarMonth:[200012 TO 20001201]"
+						+ " AND calendarYear:[2000 TO 200001]"
+						+ " AND calendarHour:[20001214 TO 2000121503]"
+						+ " AND calendarMinute:[20001214 TO 200012150343]"
+						+ " AND calendarSecond:[20001214 TO 20001215034302]"
+						+ " AND calendarMillisecond:[20001214 TO 20001215034302005]"
+		);
+		result = session.createFullTextQuery( query ).list();
+		assertEquals( "Calendar not found or not property truncated", 1, result.size() );
+
+		s.delete( s.get( Cloud.class, cloud.getId() ) );
+		tx.commit();
+		s.close();
+
+	}
+
+
 	protected Class[] getMappings() {
 		return new Class[] {
 				Cloud.class

@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Calendar;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
@@ -42,20 +43,21 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.bridge.builtin.BigDecimalBridge;
-import org.hibernate.search.bridge.builtin.BigIntegerBridge;
-import org.hibernate.search.bridge.builtin.BooleanBridge;
+import org.hibernate.search.bridge.builtin.StringBridge;
 import org.hibernate.search.bridge.builtin.CharacterBridge;
-import org.hibernate.search.bridge.builtin.DateBridge;
 import org.hibernate.search.bridge.builtin.DoubleBridge;
-import org.hibernate.search.bridge.builtin.EnumBridge;
 import org.hibernate.search.bridge.builtin.FloatBridge;
+import org.hibernate.search.bridge.builtin.ShortBridge;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
 import org.hibernate.search.bridge.builtin.LongBridge;
-import org.hibernate.search.bridge.builtin.ShortBridge;
-import org.hibernate.search.bridge.builtin.StringBridge;
-import org.hibernate.search.bridge.builtin.UriBridge;
+import org.hibernate.search.bridge.builtin.BigIntegerBridge;
+import org.hibernate.search.bridge.builtin.BigDecimalBridge;
+import org.hibernate.search.bridge.builtin.BooleanBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
+import org.hibernate.search.bridge.builtin.UriBridge;
+import org.hibernate.search.bridge.builtin.DateBridge;
+import org.hibernate.search.bridge.builtin.CalendarBridge;
+import org.hibernate.search.bridge.builtin.EnumBridge;
 
 /**
  * This factory is responsible for creating and initializing build-in and custom <i>FieldBridges</i>.
@@ -101,8 +103,20 @@ public class BridgeFactory {
 	public static final FieldBridge DATE_HOUR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_HOUR );
 	public static final FieldBridge DATE_MINUTE = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MINUTE );
 	public static final FieldBridge DATE_SECOND = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_SECOND );
-	public static final TwoWayFieldBridge DATE_MILLISECOND =
+
+    public static final FieldBridge CALENDAR_YEAR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_YEAR );
+	public static final FieldBridge CALENDAR_MONTH = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MONTH );
+	public static final FieldBridge CALENDAR_DAY = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_DAY );
+	public static final FieldBridge CALENDAR_HOUR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_HOUR );
+	public static final FieldBridge CALENDAR_MINUTE = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MINUTE );
+	public static final FieldBridge CALENDAR_SECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_SECOND );
+
+    public static final TwoWayFieldBridge DATE_MILLISECOND =
 			new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MILLISECOND );
+
+    public static final TwoWayFieldBridge CALENDAR_MILLISECOND =
+			new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MILLISECOND );
+
 
 	static {
 		builtInBridges.put( Character.class.getName(), CHARACTER );
@@ -127,6 +141,7 @@ public class BridgeFactory {
 		builtInBridges.put( URI.class.getName(), Uri );
 
 		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
+        builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND);
 	}
 
 	/**
@@ -193,18 +208,21 @@ public class BridgeFactory {
 			bridge = doExtractType( bridgeAnn, memberName );
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
-			Resolution resolution =
-					member.getAnnotation( org.hibernate.search.annotations.DateBridge.class ).resolution();
-			bridge = getDateField( resolution );
+			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.DateBridge.class ).resolution();
+        	bridge = getDateField( resolution );
 		}
+		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
+            Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class ).resolution();
+			bridge = getCalendarField( resolution );
+       	}
 		else {
 			//find in built-ins
 			XClass returnType = member.getType();
 			bridge = builtInBridges.get( returnType.getName() );
 			if ( bridge == null && returnType.isEnum() ) {
-				bridge = new TwoWayString2FieldBridgeAdaptor(
-						new EnumBridge( reflectionManager.toClass( returnType ) )
-				);
+				@SuppressWarnings( "unchecked" )
+				final Class<? extends Enum> enumClass = reflectionManager.toClass( returnType );
+				bridge = new TwoWayString2FieldBridgeAdaptor( new EnumBridge( enumClass ) );
 			}
 		}
 		//TODO add classname
@@ -267,6 +285,28 @@ public class BridgeFactory {
 				return DATE_SECOND;
 			case MILLISECOND:
 				return DATE_MILLISECOND;
+			default:
+				throw new AssertionFailure( "Unknown Resolution: " + resolution );
+		}
+	}
+
+
+    public static FieldBridge getCalendarField(Resolution resolution) {
+		switch (resolution) {
+			case YEAR:
+				return CALENDAR_YEAR;
+			case MONTH:
+				return CALENDAR_MONTH;
+			case DAY:
+				return CALENDAR_DAY;
+			case HOUR:
+				return CALENDAR_HOUR;
+			case MINUTE:
+				return CALENDAR_MINUTE;
+			case SECOND:
+				return CALENDAR_SECOND;
+			case MILLISECOND:
+				return CALENDAR_MILLISECOND;
 			default:
 				throw new AssertionFailure( "Unknown Resolution: " + resolution );
 		}

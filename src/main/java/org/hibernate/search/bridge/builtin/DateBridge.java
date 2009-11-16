@@ -69,7 +69,7 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 	}
 
 	public DateBridge(Resolution resolution) {
-		setResolution( resolution );
+		this.resolution = DateResolutionUtil.getLuceneResolution(resolution);
 	}
 
 	public Object stringToObject(String stringValue) {
@@ -97,35 +97,8 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 		else {
 			hibResolution = (Resolution) resolution;
 		}
-		setResolution( hibResolution );
+		this.resolution = DateResolutionUtil.getLuceneResolution(hibResolution );
 	}
 
-	private void setResolution(Resolution hibResolution) {
-		switch (hibResolution) {
-			case YEAR:
-				this.resolution = DateTools.Resolution.YEAR;
-				break;
-			case MONTH:
-				this.resolution = DateTools.Resolution.MONTH;
-				break;
-			case DAY:
-				this.resolution = DateTools.Resolution.DAY;
-				break;
-			case HOUR:
-				this.resolution = DateTools.Resolution.HOUR;
-				break;
-			case MINUTE:
-				this.resolution = DateTools.Resolution.MINUTE;
-				break;
-			case SECOND:
-				this.resolution = DateTools.Resolution.SECOND;
-				break;
-			case MILLISECOND:
-				this.resolution = DateTools.Resolution.MILLISECOND;
-				break;
-			default:
-				throw new AssertionFailure( "Unknown Resolution: " + hibResolution );
-
-		}
-	}
+	
 }

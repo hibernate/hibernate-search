@@ -25,21 +25,14 @@
 package org.hibernate.search.test.bridge;
 
 import java.util.Date;
+import java.util.Calendar;
 import java.net.URL;
 import java.net.URI;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.DateBridge;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.*;
 
 /**
  * @author Emmanuel Bernard
@@ -74,6 +67,17 @@ public class Cloud {
 	private Class clazz;
 	private URL url;
 	private URI uri;
+    private Calendar myCalendar;
+    private Calendar calendarYear;
+    private Calendar calendarMonth;
+    private Calendar calendarDay;
+    private Calendar calendarMinute;
+    private Calendar calendarSecond;
+    private Calendar calendarHour;
+    private Calendar calendarMillisecond;
+
+
+
 
 	@Field(index=Index.UN_TOKENIZED, store=Store.YES)
 	public URL getUrl() {
@@ -328,4 +332,88 @@ public class Cloud {
 	public void setChar2(char char2) {
 		this.char2 = char2;
 	}
+
+
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
+    public Calendar getMyCalendar() {
+        return myCalendar;
+    }
+
+    public void setMyCalendar(Calendar myCalendar) {
+        this.myCalendar = myCalendar;
+    }
+
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
+    @CalendarBridge(resolution = Resolution.YEAR )
+    public Calendar getCalendarYear() {
+        return calendarYear;
+    }
+
+    public void setCalendarYear(Calendar calendarYear) {
+        this.calendarYear = calendarYear;
+    }
+
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
+    @CalendarBridge( resolution = Resolution.MONTH )
+    public Calendar getCalendarMonth() {
+        return calendarMonth;
+    }
+
+    public void setCalendarMonth(Calendar calendarMonth) {
+        this.calendarMonth = calendarMonth;
+    }
+
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
+    @CalendarBridge( resolution = Resolution.DAY )
+    public Calendar getCalendarDay() {
+        return calendarDay;
+    }
+
+    public void setCalendarDay(Calendar calendarDay) {
+        this.calendarDay = calendarDay;
+    }
+
+
+
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
+    @CalendarBridge( resolution = Resolution.MINUTE )
+    public Calendar getCalendarMinute() {
+        return calendarMinute;
+    }
+
+    public void setCalendarMinute(Calendar calendarMinute) {
+        this.calendarMinute = calendarMinute;
+    }
+
+
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
+    @CalendarBridge( resolution = Resolution.HOUR )
+    public Calendar getCalendarHour() {
+        return calendarHour;
+    }
+
+    public void setCalendarHour(Calendar calendarHour) {
+        this.calendarHour = calendarHour;
+    }
+
+
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
+    @CalendarBridge( resolution = Resolution.MILLISECOND )
+    public Calendar getCalendarMillisecond() {
+        return calendarMillisecond;
+    }
+
+    public void setCalendarMillisecond(Calendar calendarMillisecond) {
+        this.calendarMillisecond = calendarMillisecond;
+    }
+
+    @Field(index=Index.UN_TOKENIZED, store=Store.YES)
+    @CalendarBridge( resolution = Resolution.SECOND )
+    public Calendar getCalendarSecond() {
+        return calendarSecond;
+    }
+
+    public void setCalendarSecond(Calendar calendarSecond) {
+        this.calendarSecond = calendarSecond;
+    }
 }
