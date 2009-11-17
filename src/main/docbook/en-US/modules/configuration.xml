@@ -390,8 +390,8 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</cod
 
             <entry>Out of the box support for the Apache Lucene back end and
             the JMS back end. Default to <literal>lucene</literal>. Supports
-            also <literal>jms</literal> and
-            <literal>blackhole</literal>.</entry>
+            also <literal>jms</literal>, <literal>blackhole</literal>,
+            <literal>jgroupsMaster</literal> and <literal>jgroupsSlave</literal>.</entry>
           </row>
 
           <row>
@@ -442,6 +442,34 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</cod
             lookup the JMS queue from. The queue will be used to post work
             messages.</entry>
           </row>
+          
+          <row>
+           <entry><literal>hibernate.search.worker.jgroups.clusterName</literal></entry>
+
+           <entry>Optional for JGroups back end. Defines the name of JGroups channel.</entry>
+          </row>
+          
+          <row>
+           <entry><literal>hibernate.search.worker.jgroups.configurationFile</literal></entry>
+
+           <entry>Optional JGroups network stack configuration. Defines the name of a JGroups
+           configuration file, which must exist on classpath.</entry>
+          </row>
+
+          <row>
+           <entry><literal>hibernate.search.worker.jgroups.configurationXml</literal></entry>
+
+           <entry>Optional JGroups network stack configuration.
+           Defines a String representing JGroups configuration as XML.</entry>
+           </row>
+           
+           <row>
+            <entry><literal>hibernate.search.worker.jgroups.configurationString</literal></entry>
+
+            <entry>Optional JGroups network stack configuration.
+            Provides JGroups configuration in plain text.</entry>
+           </row>
+
         </tbody>
       </tgroup>
     </table>
@@ -578,6 +606,102 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     </section>
   </section>
 
+    <section id="jgroups-backend">
+        <title>JGroups Master/Slave configuration</title>
+        <para>Describes how to configure JGroups Master/Slave back end.
+            Configuration examples illustrated in JMS Master/Slave configuration
+            section (<xref linkend="jms-backend" />) also apply here, only
+            a different backend needs to be set.
+        </para>
+        <section>
+            <title>Slave nodes</title>
+            <para>Every index update operation is sent through a JGroups channel to the master node. Index
+                querying operations are executed on a local index copy.
+            </para>
+            <example><title>JGroups Slave configuration</title>
+       <programlisting>
+### slave configuration
+## Backend configuration
+hibernate.search.worker.backend = jgroupsSlave
+       </programlisting>
+            </example>
+        </section>
+
+        <section>
+            <title>Master node</title>
+            <para>Every index update operation is taken from a JGroups channel and
+                executed. The master index is copied on a regular basis.
+            </para>
+            <example><title>JGroups Master configuration</title>
+     <programlisting>
+### master configuration
+## Backend configuration
+hibernate.search.worker.backend = jgroupsMaster
+     </programlisting>
+            </example>
+        </section>
+         <section>
+            <title>JGroups channel configuration</title>
+            <para>Optionally configuration for JGroups transport protocols
+            (UDP, TCP) and channel name can be defined. It can be applied to both master and slave nodes.
+            There are several ways to configure JGroups transport details.
+            If it is not defined explicity, configuration found in the <literal>
+            flush-udp.xml</literal> file is used.</para>
+             <example><title>JGroups transport protocols configuration</title>
+     <programlisting>
+## configuration
+#udp.xml file needs to be located in the classpath
+hibernate.search.worker.backend.jgroups.configurationFile = udp.xml
+
+#protocol stack configuration provided in XML format
+hibernate.search.worker.backend.jgroups.configurationXml =
+
+&lt;config xmlns="urn:org:jgroups"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="urn:org:jgroups file:schema/JGroups-2.8.xsd"&gt;
+&lt;UDP
+mcast_addr="${jgroups.udp.mcast_addr:228.10.10.10}"
+mcast_port="${jgroups.udp.mcast_port:45588}"
+tos="8"
+thread_naming_pattern="pl"
+thread_pool.enabled="true"
+thread_pool.min_threads="2"
+thread_pool.max_threads="8"
+thread_pool.keep_alive_time="5000"
+thread_pool.queue_enabled="false"
+thread_pool.queue_max_size="100"
+thread_pool.rejection_policy="Run"/&gt;
+&lt;PING timeout="1000" num_initial_members="3"/&gt;
+&lt;MERGE2 max_interval="30000" min_interval="10000"/&gt;
+&lt;FD_SOCK/&gt;
+&lt;FD timeout="3000" max_tries="3"/&gt;
+&lt;VERIFY_SUSPECT timeout="1500"/&gt;
+&lt;pbcast.STREAMING_STATE_TRANSFER/&gt;
+&lt;pbcast.FLUSH timeout="0"/&gt;
+&lt;/config&gt;
+
+#protocol stack configuration provided in "old style" jgroups format
+hibernate.search.worker.backend.jgroups.configurationString =
+
+UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):PING(timeout=3000;
+num_initial_members=6):FD(timeout=5000):VERIFY_SUSPECT(timeout=1500):
+pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):UNICAST(timeout=5000):
+FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true)
+
+    </programlisting>
+            </example>
+            <para>Master and slave nodes communicate over JGroups channel
+                  that is identified by this same name. Name of the channel can be defined
+                  explicity, if not default <literal>HSearchCluster</literal> is used.</para>
+            <example><title>JGroups channel name configuration</title>
+                <programlisting>
+## Backend configuration
+hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
+                </programlisting>
+            </example>
+        </section>
+    </section>
+    
   <section id="configuration-reader-strategy">
     <title>Reader strategy configuration</title>
 

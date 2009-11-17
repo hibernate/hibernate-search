@@ -174,6 +174,15 @@
         local copy of the index.</para>
       </section>
 
+      <section>
+       <title>JGroups</title>
+
+       <para>The JGroups based back end works similarly as the JMS one. Designed on the same
+       master/slave pattern, instead of JMS the JGroups toolkit is used as a replication mechanism.
+       This back end can be used as an alternative to JMS one when response time is still critical,
+       but i.e. JNDI service is not available.</para>
+      </section>
+
       <note>Hibernate Search is an extensible architecture. Feel free to drop
       ideas for other third party back ends to
       <literal>hibernate-dev@lists.jboss.org</literal>.</note>

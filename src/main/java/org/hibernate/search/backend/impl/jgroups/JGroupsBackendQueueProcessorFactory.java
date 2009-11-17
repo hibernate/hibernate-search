@@ -97,11 +97,11 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 	}
 
 	/**
-	 * Reads congiguration and builds channnel with its base.
+	 * Reads configuration and builds channnel with its base.
 	 * In order of preference - we first look for an external JGroups file, then a set of XML properties, and
 	 * finally the legacy JGroups String properties.
 	 *
-	 * @param props configuratuion file
+	 * @param props configuration file
 	 */
 	private void buildChannel(Properties props) {
 		String cfg;
