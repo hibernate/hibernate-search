@@ -29,9 +29,12 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.bridge.builtin.LongBridge;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.io.Serializable;
 
 
@@ -39,10 +42,11 @@ import java.io.Serializable;
  * @author Navin Surtani
  */
 @Entity
-@ProvidedId
+@ProvidedId(bridge = @FieldBridge(impl = LongBridge.class) )
 @Indexed
 public class ProvidedIdPerson implements Serializable {
 
+	@Id
 	@GeneratedValue
 	private long id;
 	
