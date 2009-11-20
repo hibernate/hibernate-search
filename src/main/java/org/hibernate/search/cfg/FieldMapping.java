@@ -31,6 +31,7 @@ import java.util.Map;
 import org.apache.solr.analysis.TokenizerFactory;
 
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 
@@ -103,16 +104,20 @@ public class FieldMapping {
 		return new PropertyMapping(name, type, entity, mapping);
 	}
 
+	public DateBridgeMapping dateBridge(Resolution resolution) {
+		return new DateBridgeMapping(mapping, entity, property, resolution);
+	}
+	
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType) {
-		return new EntityMapping(entityType, null, mapping);
+	public EntityMapping entity(Class<?> entityType) {
+		return new EntityMapping(entityType, mapping);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType, String indexName) {
-		return new EntityMapping(entityType, indexName,  mapping);
+	public CalendarBridgeMapping calendarBridge(Resolution resolution) {
+		return new CalendarBridgeMapping(mapping,entity,property, resolution);
 	}
 
 }

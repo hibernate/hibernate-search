@@ -69,11 +69,8 @@ public class AnalyzerDefMapping {
 		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType) {
-		return new EntityMapping(entityType, null, mapping);
+	public EntityMapping entity(Class<?> entityType) {
+		return new EntityMapping(entityType,mapping);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType, String indexName) {
-		return new EntityMapping(entityType, indexName,  mapping);
-	}
 }

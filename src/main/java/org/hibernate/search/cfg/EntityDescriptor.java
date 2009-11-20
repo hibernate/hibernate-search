@@ -26,7 +26,9 @@ package org.hibernate.search.cfg;
 
 import java.lang.annotation.ElementType;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Emmanuel Bernard
@@ -38,7 +40,10 @@ public class EntityDescriptor {
 	private Map<String, Object> similarity;
 	private Map<String, Object> boost;
 	private Map<String, Object> analyzerDiscriminator;
-
+	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
+	private Map<String,Object> providedId;
+	
+	
 	public Map<String, Object> getIndexed() {
 		return indexed;
 	}
@@ -88,7 +93,24 @@ public class EntityDescriptor {
 	public Map<String, Object> getAnalyzerDiscriminator() {
 		return analyzerDiscriminator;
 	}
+	
+	public Set<Map<String, Object>> getFullTextFilterDefs() {
+		return fullTextFilterDefs;
+	}
+	
+	public void addFulltextFilterDef(Map<String, Object> fullTextFilterDef) {
+		fullTextFilterDefs.add(fullTextFilterDef);
+	}
 
+	
+	public void setProvidedId(Map<String, Object> providedId) {
+		this.providedId = providedId;
+	}
+	
+	public Map<String, Object> getProvidedId() {
+		return this.providedId;
+	}
+	
 	private static class PropertyKey {
 		private String name;
 		private ElementType type;
@@ -126,4 +148,5 @@ public class EntityDescriptor {
 			return result;
 		}
 	}
+	
 }

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import org.apache.solr.analysis.TokenizerFactory;
 
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.annotations.Resolution;
 
 /**
  * @author Emmanuel Bernard
@@ -54,6 +55,14 @@ public class PropertyMapping {
 		return new FieldMapping(property, entity, mapping);
 	}
 
+	public DateBridgeMapping dateBridge(Resolution resolution) {
+		return new DateBridgeMapping(mapping, entity, property, resolution);
+	}
+	
+	public CalendarBridgeMapping calendarBridge(Resolution resolution) {
+		return new CalendarBridgeMapping(mapping, entity, property, resolution);
+	}
+	
 	public PropertyMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
 		Map<String, Object> analyzerDiscriminatorAnn = new HashMap<String, Object>();
 		analyzerDiscriminatorAnn.put( "impl", discriminator );
@@ -69,11 +78,15 @@ public class PropertyMapping {
 		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType) {
-		return new EntityMapping(entityType, null, mapping);
+	public EntityMapping entity(Class<?> entityType) {
+		return new EntityMapping(entityType, mapping);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType, String indexName) {
-		return new EntityMapping(entityType, indexName,  mapping);
+	public IndexEmbeddedMapping indexEmbedded() {
+		return new IndexEmbeddedMapping(mapping,property,entity);
+	}
+
+	public ContainedInMapping containedIn() {
+		return new ContainedInMapping(mapping, property, entity);
 	}
 }

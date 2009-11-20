@@ -24,41 +24,50 @@
  */
 package org.hibernate.search.impl;
 
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Collection;
+import java.beans.Introspector;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.beans.Introspector;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
-import org.hibernate.annotations.common.reflection.MetadataProvider;
-import org.hibernate.annotations.common.reflection.AnnotationReader;
-import org.hibernate.annotations.common.reflection.ReflectionUtil;
-import org.hibernate.annotations.common.reflection.Filter;
-import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
 import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
-import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
+import org.hibernate.annotations.common.reflection.AnnotationReader;
+import org.hibernate.annotations.common.reflection.Filter;
+import org.hibernate.annotations.common.reflection.MetadataProvider;
+import org.hibernate.annotations.common.reflection.ReflectionUtil;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.AnalyzerDiscriminator;
+import org.hibernate.search.annotations.Boost;
+import org.hibernate.search.annotations.CalendarBridge;
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Fields;
+import org.hibernate.search.annotations.FullTextFilterDef;
+import org.hibernate.search.annotations.FullTextFilterDefs;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.ProvidedId;
+import org.hibernate.search.annotations.Similarity;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.PropertyDescriptor;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Fields;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.AnalyzerDefs;
-import org.hibernate.search.annotations.Boost;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Similarity;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.AnalyzerDiscriminator;
+import org.hibernate.search.cfg.SearchMapping;
 
 /**
  * @author Emmanuel Bernard
@@ -114,7 +123,8 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		}
 		return defs;
 	}
-
+	
+	
 	private AnalyzerDef createAnalyzerDef(Map<String, Object> analyzerDef) {
 		AnnotationDescriptor analyzerDefAnnotation = new AnnotationDescriptor( AnalyzerDef.class );
 		for ( Map.Entry<String, Object> entry : analyzerDef.entrySet() ) {
@@ -133,7 +143,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				analyzerDefAnnotation.setValue( "tokenizer", AnnotationFactory.create( tokenizerAnnotation ) );
 			}
 			else if ( entry.getKey().equals( "filters" ) ) {
-				TokenFilterDef[] filtersArray = createFilters( (List<Map<String, Object>>) entry.getValue() );
+				@SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters( (List<Map<String, Object>>) entry.getValue() );
 				analyzerDefAnnotation.setValue( "filters", filtersArray );
 			}
 			else {
@@ -144,7 +154,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	static private void addParamsToAnnotation(AnnotationDescriptor annotationDescriptor, Map.Entry<String, Object> entry) {
-		Parameter[] paramsArray = createParams( ( List<Map<String, Object>> ) entry.getValue() );
+		@SuppressWarnings("unchecked") Parameter[] paramsArray = createParams( ( List<Map<String, Object>> ) entry.getValue() );
 		annotationDescriptor.setValue( "params", paramsArray );
 	}
 
@@ -193,7 +203,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			this.delegate = delegate.getAnnotationReader( el );
 			this.mapping = mapping;
 			if ( el instanceof Class ) {
-				entityType = (Class) el;
+				entityType = (Class<?>) el;
 			}
 			else if ( el instanceof Field ) {
 				Field field = (Field) el;
@@ -254,6 +264,9 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 								createDocumentId( property );
 								createAnalyzerDiscriminator( property );
 								createFields( property );
+								createIndexEmbedded(property);
+								createContainedIn(property);
+								
 							}
 						}
 					}
@@ -266,6 +279,24 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 		}
 
+		private void createDateBridge(PropertyDescriptor property) {
+			Map<String, Object> map = property.getDateBridge();	
+			for(Map.Entry<String, Object> entry: map.entrySet()) {
+					AnnotationDescriptor dateBrigeAnnotation = new AnnotationDescriptor( DateBridge.class );
+					dateBrigeAnnotation.setValue(entry.getKey(), entry.getValue());
+					annotations.put( DateBridge.class, AnnotationFactory.create( dateBrigeAnnotation ) );	
+			}
+		}
+
+		private void createCalendarBridge(PropertyDescriptor property) {
+			Map<String, Object> map = property.getCalendarBridge();
+			for(Map.Entry<String, Object> entry: map.entrySet()) {
+				AnnotationDescriptor calendarBrigeAnnotation = new AnnotationDescriptor( CalendarBridge.class );
+				calendarBrigeAnnotation.setValue(entry.getKey(), entry.getValue());
+				annotations.put( CalendarBridge.class, AnnotationFactory.create( calendarBrigeAnnotation ) );	
+			}
+		}
+		
 		private void createDocumentId(PropertyDescriptor property) {
 			Map<String, Object> documentId = property.getDocumentId();
 			if (documentId != null) {
@@ -276,7 +307,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				annotations.put( DocumentId.class, AnnotationFactory.create( documentIdAnnotation ) );	
 			}
 		}
-
+		
 		private void createAnalyzerDiscriminator(PropertyDescriptor property) {
 			Map<String, Object> analyzerDiscriminator = property.getAnalyzerDiscriminator();
 			if (analyzerDiscriminator != null) {
@@ -340,15 +371,45 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final org.hibernate.search.annotations.Field[] fieldAsArray = fieldAnnotations.toArray( fieldArray );
 			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
+			createDateBridge(property);
+			createCalendarBridge(property);
+		}
+
+		
+
+		private void createContainedIn(PropertyDescriptor property) {
+			if (property.getContainedIn() != null) {
+				Map<String, Object> containedIn = property.getContainedIn();
+				AnnotationDescriptor containedInAnn = new AnnotationDescriptor( ContainedIn.class );
+				Set<Entry<String,Object>> entrySet = containedIn.entrySet();
+				for (Entry<String, Object> entry : entrySet) {
+					containedInAnn.setValue(entry.getKey(), entry.getValue());
+				}
+				annotations.put(ContainedIn.class,AnnotationFactory.create(containedInAnn));
+			}
+		}
+
+		private void createIndexEmbedded(PropertyDescriptor property) {
+			Map<String, Object> indexEmbedded = property.getIndexEmbedded();
+			if (indexEmbedded != null) {
+				AnnotationDescriptor indexEmbeddedAnn = new AnnotationDescriptor(IndexedEmbedded.class);
+				Set<Entry<String,Object>> entrySet = indexEmbedded.entrySet();
+				for (Entry<String, Object> entry : entrySet) {
+					indexEmbeddedAnn.setValue(entry.getKey(), entry.getValue());
+				}
+				annotations.put(IndexedEmbedded.class, AnnotationFactory.create(indexEmbeddedAnn));
+			}
 		}
 
 		private void createIndexed(EntityDescriptor entity) {
 			Class<? extends Annotation> annotationType = Indexed.class;
 			AnnotationDescriptor annotation = new AnnotationDescriptor( annotationType );
-			for ( Map.Entry<String, Object> entry : entity.getIndexed().entrySet() ) {
-				annotation.setValue( entry.getKey(), entry.getValue() );
+			if (entity.getIndexed() != null) {
+				for ( Map.Entry<String, Object> entry : entity.getIndexed().entrySet() ) {
+					annotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( annotationType, AnnotationFactory.create( annotation ) );
 			}
-			annotations.put( annotationType, AnnotationFactory.create( annotation ) );
 
 			if ( entity.getSimilarity() != null ) {
 				annotation = new AnnotationDescriptor( Similarity.class );
@@ -373,8 +434,62 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 				annotations.put( AnalyzerDiscriminator.class, AnnotationFactory.create( annotation ) );
 			}
+			if (entity.getFullTextFilterDefs().size() > 0)  {
+				AnnotationDescriptor fullTextFilterDefsAnnotation = new AnnotationDescriptor( FullTextFilterDefs.class );
+				FullTextFilterDef[] fullTextFilterDefArray = createFullTextFilterDefArray(entity);
+				fullTextFilterDefsAnnotation.setValue("value", fullTextFilterDefArray);
+				annotations.put( FullTextFilterDefs.class, AnnotationFactory.create( fullTextFilterDefsAnnotation ) );
+			}
+			if (entity.getProvidedId() != null) {
+				createProvidedId(entity);
+			}
 		}
 
+		private void createProvidedId(EntityDescriptor entity) {
+			AnnotationDescriptor annotation	= new AnnotationDescriptor( ProvidedId.class );
+			Set<Entry<String,Object>> entrySet = entity.getProvidedId().entrySet();
+			for (Entry<String, Object> entry : entrySet) {
+				if (entry.getKey().equals("bridge")) {
+					AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
+					@SuppressWarnings("unchecked")
+					Map<String, Object> bridge = (Map<String, Object>) entry.getValue();
+					for( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
+						if ( bridgeEntry.getKey().equals( "params" ) ) {
+							addParamsToAnnotation( bridgeAnnotation, bridgeEntry );
+						}
+						else {
+							bridgeAnnotation.setValue( bridgeEntry.getKey(), bridgeEntry.getValue() );
+						}
+					}
+					annotation.setValue( "bridge", AnnotationFactory.create( bridgeAnnotation ) );
+				} else {
+					annotation.setValue(entry.getKey(), entry.getValue());
+				}
+			}
+			annotations.put( ProvidedId.class, AnnotationFactory.create( annotation ) );
+		}
+		
+		
+		private FullTextFilterDef[] createFullTextFilterDefArray(EntityDescriptor entity) {
+			Set<Map<String, Object>> fullTextFilterDefs = entity.getFullTextFilterDefs();
+			FullTextFilterDef[] filters = new FullTextFilterDef[fullTextFilterDefs.size()];
+			int index = 0;
+			for(Map<String,Object> filterDef : fullTextFilterDefs) {
+				filters[index] = createFullTextFilterDef(filterDef);
+				index++;
+			}
+			return filters;
+		}
+		
+		private FullTextFilterDef createFullTextFilterDef(Map<String,Object> filterDef) {
+			AnnotationDescriptor fullTextFilterDefAnnotation = new AnnotationDescriptor( FullTextFilterDef.class );
+			for (Entry<String, Object> entry : filterDef.entrySet()) {
+				fullTextFilterDefAnnotation.setValue(entry.getKey(), entry.getValue());
+			}
+			
+			return AnnotationFactory.create( fullTextFilterDefAnnotation );
+		}
+		
 		private void populateAnnotationArray() {
 			annotationsArray = new Annotation[ annotations.size() ];
 			int index = 0;

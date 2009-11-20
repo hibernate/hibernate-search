@@ -24,10 +24,15 @@
  */
 package org.hibernate.search.test.configuration;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+
+import org.hibernate.search.test.embedded.nested.Place;
 
 /**
  * @author Emmanuel Bernard
@@ -41,7 +46,10 @@ public class Address {
 	private String street2;
 	@ManyToOne
 	private Country country;
-
+	private Date dateCreated;
+	private Calendar lastUpdated;
+	private String owner;
+	
 	public Long getAddressId() {
 		return addressId;
 	}
@@ -69,4 +77,29 @@ public class Address {
 	public void setStreet2(String street2) {
 		this.street2 = street2;
 	}
+	
+	public Calendar getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(Calendar lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+	
+	public String getOwner() {
+		return this.owner;
+	}
+	
 }

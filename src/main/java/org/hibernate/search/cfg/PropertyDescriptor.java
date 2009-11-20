@@ -25,9 +25,10 @@
 package org.hibernate.search.cfg;
 
 import java.lang.annotation.ElementType;
-import java.util.Map;
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Emmanuel Bernard
@@ -36,6 +37,11 @@ public class PropertyDescriptor {
 	private ElementType type;
 	private String name;
 	private Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
+	private Map<String, Object> dateBridge= new HashMap<String, Object>();
+	private Map<String, Object> calendarBridge= new HashMap<String, Object>();
+	private Map<String,Object> indexEmbedded;
+	private Map<String,Object> containedIn;
+
 	private Map<String, Object> documentId;
 	private Map<String, Object> analyzerDiscriminator;
 
@@ -52,6 +58,13 @@ public class PropertyDescriptor {
 		fields.add( field );
 	}
 
+	public void setDateBridge(Map<String,Object> dateBridge) {
+		this.dateBridge = dateBridge;
+	}
+	public void setCalendarBridge(Map<String,Object> calendarBridge) {
+		this.calendarBridge = calendarBridge;
+	}
+	
 	public Collection<Map<String, Object>> getFields() {
 		return fields;
 	}
@@ -64,7 +77,32 @@ public class PropertyDescriptor {
 		return analyzerDiscriminator;
 	}
 
+	
+	public Map<String, Object> getDateBridge() {
+		return dateBridge;
+	}
+	public Map<String, Object> getCalendarBridge() {
+		return calendarBridge;
+	}
+	
+	
 	public void setAnalyzerDiscriminator(Map<String, Object> analyzerDiscriminator) {
 		this.analyzerDiscriminator = analyzerDiscriminator;
 	}
+	
+	public Map<String, Object> getIndexEmbedded() {
+		return indexEmbedded;
+	}
+
+	public void setIndexEmbedded(Map<String, Object> indexEmbedded) {
+		this.indexEmbedded = indexEmbedded;
+	}
+	public Map<String, Object> getContainedIn() {
+		return containedIn;
+	}
+
+	public void setContainedIn(Map<String, Object> containedIn) {
+		this.containedIn = containedIn;
+	}
+
 }

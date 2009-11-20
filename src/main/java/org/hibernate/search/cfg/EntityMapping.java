@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
-
 import org.hibernate.search.analyzer.Discriminator;
 
 /**
@@ -38,15 +37,16 @@ import org.hibernate.search.analyzer.Discriminator;
 public class EntityMapping {
 	private SearchMapping mapping;
 	private EntityDescriptor entity;
-
-	public EntityMapping(Class<?> entityType, String name, SearchMapping mapping) {
+	
+	public EntityMapping(Class<?> entityType, SearchMapping mapping) {
 		this.mapping = mapping;
 		entity = mapping.getEntity(entityType);
-		Map<String, Object> indexed = new HashMap<String, Object>();
-		if (name != null) indexed.put( "index", name );
-		entity.setIndexed(indexed);
 	}
-
+	
+	public IndexedMapping indexed() {
+		return new IndexedMapping(mapping,entity, this);
+	}
+	
 	public EntityMapping similarity(Class<?> impl) {
 		Map<String, Object> similarity = new HashMap<String, Object>(1);
 		similarity.put( "impl", impl );
@@ -67,7 +67,12 @@ public class EntityMapping {
 		entity.setAnalyzerDiscriminator(discriminatorAnn);
 		return this;
 	}
-
+	
+	
+	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
+		return new FullTextFilterDefMapping(mapping, entity, name, impl);
+	}
+	
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping(name, type, entity, mapping);
 	}
@@ -76,11 +81,12 @@ public class EntityMapping {
 		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType) {
-		return new EntityMapping(entityType, null, mapping);
+	public EntityMapping entity(Class<?> entityType) {
+		return new EntityMapping(entityType, mapping);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType, String indexName) {
-		return new EntityMapping(entityType, indexName,  mapping);
+	public ProvidedIdMapping providedId() {
+		return new ProvidedIdMapping(mapping,entity);
 	}
+	
 }

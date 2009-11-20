@@ -43,7 +43,7 @@ public class SearchMapping {
 	public Set<Map<String, Object>> getAnalyzerDefs() {
 		return analyzerDefs;
 	}
-
+	
 	public EntityDescriptor getEntityDescriptor(Class<?> entityType) {
 		return entities.get( entityType );
 	}
@@ -52,12 +52,8 @@ public class SearchMapping {
 		return new AnalyzerDefMapping(name, tokenizerFactory, this);
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType) {
-		return new EntityMapping(entityType, null, this);
-	}
-
-	public EntityMapping indexedClass(Class<?> entityType, String indexName) {
-		return new EntityMapping(entityType, indexName,  this);
+	public EntityMapping entity(Class<?> entityType) {
+		return new EntityMapping(entityType, this);
 	}
 
 	/**
@@ -88,4 +84,5 @@ public class SearchMapping {
 		}
 		return entity;
 	}
+	
 }

@@ -61,12 +61,8 @@ public class TokenFilterDefMapping {
 		return new TokenFilterDefMapping(factory, analyzerDef, mapping );
 	}
 
-	public EntityMapping indexedClass(Class<?> entityType) {
-		return new EntityMapping(entityType, null,  mapping);
-	}
-
-	public EntityMapping indexedClass(Class<?> entityType, String indexName) {
-		return new EntityMapping(entityType, indexName,  mapping);
+	public EntityMapping entity(Class<?> entityType) {
+		return new EntityMapping(entityType,  mapping);
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {

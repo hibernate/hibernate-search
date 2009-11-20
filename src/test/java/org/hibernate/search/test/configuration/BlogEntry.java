@@ -1,22 +1,21 @@
 package org.hibernate.search.test.configuration;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
+import java.util.Date;
 
-import org.apache.solr.analysis.StandardTokenizerFactory;
-import org.apache.solr.analysis.LowerCaseFilterFactory;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
 import org.apache.solr.analysis.EnglishPorterFilterFactory;
 import org.apache.solr.analysis.GermanStemFilterFactory;
-
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.AnalyzerDefs;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.AnalyzerDiscriminator;
+import org.apache.solr.analysis.LowerCaseFilterFactory;
+import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
 
 /**
  * @author Emmanuel Bernard
@@ -43,6 +42,7 @@ public class BlogEntry {
 	private String language;
 	private String title;
 	private String description;
+	private Date dateCreated;
 
 	@Id @GeneratedValue
 	public Long getId() {
@@ -77,6 +77,13 @@ public class BlogEntry {
 		this.description = description;
 	}
 
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
 	public static class BlogLangDiscriminator implements Discriminator {
 
 		public String getAnalyzerDefinitionName(Object value, Object entity, String field) {
