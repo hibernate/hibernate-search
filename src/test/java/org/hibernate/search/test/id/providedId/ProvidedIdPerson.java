@@ -41,13 +41,13 @@ import java.io.Serializable;
 /**
  * @author Navin Surtani
  */
-@Entity
+//@Entity
 @ProvidedId(bridge = @FieldBridge(impl = LongBridge.class) )
 @Indexed
 public class ProvidedIdPerson implements Serializable {
 
-	@Id
-	@GeneratedValue
+//	@Id
+//	@GeneratedValue
 	private long id;
 	
 	@Field(index = Index.TOKENIZED, store = Store.YES)

@@ -34,22 +34,22 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.backend.Work;
+import org.hibernate.search.backend.WorkType;
+import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Navin Surtani
  */
-public class ProvidedIdTest extends SearchTestCase {
-
-	protected Class[] getMappings() {
-		return new Class[] {
-				ProvidedIdPerson.class,
-				ProvidedIdPersonSub.class
-		};
-	}
+public class ProvidedIdTest extends junit.framework.TestCase {
 
 	public void testProvidedId() throws Exception {
+		SearchFactoryImplementor sf = new SearchFactoryImpl( new StandaloneConf() );
 
 		ProvidedIdPerson person1 = new ProvidedIdPerson();
 		person1.setName( "Big Goat" );
@@ -63,17 +63,16 @@ public class ProvidedIdTest extends SearchTestCase {
 		person3.setName( "Regular goat" );
 		person3.setBlurb( "Is anorexic" );
 
-		Session session = openSession();
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		Transaction transaction = session.beginTransaction();
-		session.persist( person1 );
-		session.persist( person2 );
-		session.persist( person3 );
+		ManualTransactionContext tc = new ManualTransactionContext();
 
-		transaction.commit();
-		session.clear();
+		Work<ProvidedIdPerson> work = new Work<ProvidedIdPerson>( person1, 1, WorkType.INDEX );
+		sf.getWorker().performWork( work, tc );
+		work = new Work<ProvidedIdPerson>( person2, 2, WorkType.INDEX );
+		sf.getWorker().performWork( work, tc );
+		Work<ProvidedIdPersonSub> work2 = new Work<ProvidedIdPersonSub>( person3, 3, WorkType.INDEX );
+		sf.getWorker().performWork( work2, tc );
 
-		transaction = fullTextSession.beginTransaction();
+		tc.end();
 
 		QueryParser parser = new QueryParser( "name", new StandardAnalyzer() );
 		Query luceneQuery = parser.parse( "Goat" );
@@ -82,15 +81,12 @@ public class ProvidedIdTest extends SearchTestCase {
 		//needs it. So we use plain Lucene 
 
 		//we know there is only one DP
-		DirectoryProvider provider = fullTextSession.getSearchFactory()
+		DirectoryProvider provider = sf
 				.getDirectoryProviders( ProvidedIdPerson.class )[0];
 		IndexSearcher searcher = new IndexSearcher( provider.getDirectory() );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
-		searcher.close();
-		transaction.commit();
-		session.close();
-
 		assertEquals( 3, hits.totalHits );
+		searcher.close();
 	}
 
 

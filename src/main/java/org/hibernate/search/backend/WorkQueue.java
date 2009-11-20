@@ -26,6 +26,7 @@ package org.hibernate.search.backend;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.hibernate.annotations.common.AssertionFailure;
 
@@ -73,7 +74,7 @@ public class WorkQueue {
 
 	public void setSealedQueue(List<LuceneWork> sealedQueue) {
 		//invalidate the working queue for serializability
-		queue = null;
+		queue = Collections.EMPTY_LIST;
 		this.sealedQueue = sealedQueue;
 	}
 
