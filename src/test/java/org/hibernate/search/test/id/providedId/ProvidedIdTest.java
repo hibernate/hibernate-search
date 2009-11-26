@@ -29,19 +29,11 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Navin Surtani
@@ -88,6 +80,5 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		assertEquals( 3, hits.totalHits );
 		searcher.close();
 	}
-
 
 }

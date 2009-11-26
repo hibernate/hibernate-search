@@ -32,8 +32,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.search.test.embedded.nested.Place;
-
 /**
  * @author Emmanuel Bernard
  */
