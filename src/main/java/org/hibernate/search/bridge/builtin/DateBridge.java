@@ -30,8 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.lucene.document.DateTools;
-import org.hibernate.AssertionFailure;
-import org.hibernate.HibernateException;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.TwoWayStringBridge;
@@ -78,7 +77,7 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 			return DateTools.stringToDate( stringValue );
 		}
 		catch (ParseException e) {
-			throw new HibernateException( "Unable to parse into date: " + stringValue, e );
+			throw new SearchException( "Unable to parse into date: " + stringValue, e );
 		}
 	}
 
@@ -97,8 +96,7 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 		else {
 			hibResolution = (Resolution) resolution;
 		}
-		this.resolution = DateResolutionUtil.getLuceneResolution(hibResolution );
+		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
 	}
-
 	
 }
