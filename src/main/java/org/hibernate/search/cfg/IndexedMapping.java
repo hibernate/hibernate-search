@@ -74,7 +74,7 @@ public class IndexedMapping {
 	
 	
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
-		return new FullTextFilterDefMapping(mapping, entity, name, impl);
+		return new FullTextFilterDefMapping(mapping, name, impl);
 	}
 	
 	public PropertyMapping property(String name, ElementType type) {

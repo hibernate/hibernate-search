@@ -1548,7 +1548,7 @@ public class MyClass{
     <classname>SearchMapping</classname> object. This object is passed to
     Hibernate Search via a property set to the <classname>Configuration
     </classname>object. The property key is
-    <literal>hibernate.search.mapping_model</literal>. </para>
+    <literal>hibernate.search.mapping_model</literal>.</para>
 
     <programlisting>SearchMapping mapping = new SearchMapping();
 [...]
@@ -1736,6 +1736,85 @@ public class Address {
     </section>
 
     <section>
+      <title>Defining full text filter definitions</title>
+
+      <para>The programmatic API provides easy mechanism for defining full
+      text filter definitions which is available via
+      <classname>@FullTextFilterDef</classname> and
+      <classname>@FullTextFilterDefs</classname>. Note that contrary to the
+      annotation equivalent, full text filter definitions are a global
+      construct and are not tied to an entity. The next example depicts the
+      creation of full text filter definition using the
+      <methodname>fullTextFilterDef </methodname>method.</para>
+
+      <para><example>
+          <title>Defining full text definition programmatically</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping
+    .analyzerDef( "en", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( EnglishPorterFilterFactory.class )
+    <emphasis role="bold">.fullTextFilterDef("security", SecurityFilterFactory.class)
+            .cache(FilterCacheModeType.INSTANCE_ONLY)</emphasis>
+    .entity(Address.class)
+        .indexed()
+        .property("addressId", ElementType.METHOD)
+            .documentId()
+                .name("id")
+        .property("street1", ElementType.METHOD)
+            .field()
+                .analyzer("en")
+                .store(Store.YES)
+            .field()
+                .name("address_data")
+                .analyzer("en")
+                .store(Store.NO);
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>The previous example can effectively been seen as annotating
+          your entity with <classname>@FullTextFilterDef</classname> like
+          below:</para>
+        </example><example>
+          <title>Using annotation to define full text filter
+          definition</title>
+
+          <programlisting>@Entity
+@Indexed
+@AnalyzerDefs({
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+   })
+})
+@FullTextFilterDefs({
+ @FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_ONLY)
+})
+public class Address {
+ 
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ pubblic Long getAddressId() {...};
+
+ @Fields({
+      @Field(index=Index.TOKENIZED, store=Store.YES, 
+             analyzer=@Analyzer(definition="en")),
+      @Field(name="address_data", analyzer=@Analyzer(definition="en"))
+ })
+ public String getAddress1() {...};
+
+ ......
+ 
+}</programlisting>
+        </example></para>
+    </section>
+
+    <section>
       <title>Defining fields for indexing</title>
 
       <para>When defining fields for indexing using the programmatic API, call
@@ -1804,82 +1883,6 @@ public class Address {
 }</programlisting>
 
           <para></para>
-        </example></para>
-    </section>
-
-    <section>
-      <title>Defining full text filter definitions</title>
-
-      <para>The programmatic API provides easy mechanism for defining full
-      text filter definitions which is available via
-      <classname>@FullTextFilterDef</classname> and
-      <classname>@FullTextFilterDefs</classname>. The next example depicts the
-      creation of full text filter definition using the
-      <methodname>fullTextFilterDef </methodname>method.</para>
-
-      <para><example>
-          <title>Defining full text definition programmatically</title>
-
-          <programlisting>SearchMapping mapping = new SearchMapping();
-
-mapping
-    .analyzerDef( "en", StandardTokenizerFactory.class )
-        .filter( LowerCaseFilterFactory.class )
-        .filter( EnglishPorterFilterFactory.class )
-    .entity(Address.class)
-        .indexed()
-        <emphasis role="bold">.fullTextFilterDef("security", SecurityFilterFactory.class)
-            .cache(FilterCacheModeType.INSTANCE_ONLY)</emphasis>
-        .property("addressId", ElementType.METHOD)
-            .documentId()
-                .name("id")
-        .property("street1", ElementType.METHOD)
-            .field()
-                .analyzer("en")
-                .store(Store.YES)
-            .field()
-                .name("address_data")
-                .analyzer("en")
-                .store(Store.NO);
-
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
-
-          <para>The previous example can effectively been seen as annotating
-          your entity with @FullTextFilterDef like below:</para>
-        </example><example>
-          <title>Using annotation to define full text filter
-          definition</title>
-
-          <programlisting>@Entity
-@Indexed
-@AnalyzerDefs({
-  @AnalyzerDef(name = "en",
-    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-    filters = {
-      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
-   })
-})
-@FullTextFilterDefs({
- @FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_ONLY)
-})
-public class Address {
- 
- @Id
- @GeneratedValue
- @DocumentId(name="id")
- pubblic Long getAddressId() {...};
-
- @Fields({
-      @Field(index=Index.TOKENIZED, store=Store.YES, 
-             analyzer=@Analyzer(definition="en")),
-      @Field(name="address_data", analyzer=@Analyzer(definition="en"))
- })
- public String getAddress1() {...};
-
- ......
- 
-}</programlisting>
         </example></para>
     </section>
 

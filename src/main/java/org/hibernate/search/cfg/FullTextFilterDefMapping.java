@@ -39,15 +39,13 @@ public class FullTextFilterDefMapping {
 	
 	private final SearchMapping mapping;
 	private final Map<String,Object> fullTextFilterDef;
-	private final EntityDescriptor entity;
 	
-	public FullTextFilterDefMapping(SearchMapping mapping, EntityDescriptor entity, String name, Class<?> impl) {
+	public FullTextFilterDefMapping(SearchMapping mapping, String name, Class<?> impl) {
 		this.mapping = mapping;
-		this.entity = entity;
 		this.fullTextFilterDef =new HashMap<String, Object>();
 		this.fullTextFilterDef.put("name", name);
 		this.fullTextFilterDef.put("impl", impl);
-		entity.addFulltextFilterDef(fullTextFilterDef);
+		mapping.addFulltextFilterDef(fullTextFilterDef);
 	}
 	
 	/**
@@ -61,11 +59,7 @@ public class FullTextFilterDefMapping {
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
-		return new FullTextFilterDefMapping(mapping,entity,name, impl);
-	}
-
-	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, mapping);
+		return new FullTextFilterDefMapping(mapping, name, impl);
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
@@ -75,10 +69,4 @@ public class FullTextFilterDefMapping {
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping(entityType, mapping);
 	}
-
-	public ProvidedIdMapping providedId() {
-		return new ProvidedIdMapping(mapping,entity);
-	}
-
-	
 }

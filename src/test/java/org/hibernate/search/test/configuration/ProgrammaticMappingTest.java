@@ -44,7 +44,6 @@ import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
@@ -54,12 +53,16 @@ import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.backend.Work;
+import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.builtin.LongBridge;
 import org.hibernate.search.cfg.ConcatStringBridge;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.analyzer.inheritance.ISOLatin1Analyzer;
+import org.hibernate.search.test.id.providedId.ManualTransactionContext;
 
 /**
  * @author Emmanuel Bernard
@@ -320,6 +323,9 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 	
 	
 	public void testProvidedIdMapping() throws Exception{
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		SearchFactoryImplementor sf = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+		
 		ProvidedIdEntry person1 = new ProvidedIdEntry();
 		person1.setName( "Big Goat" );
 		person1.setBlurb( "Eats grass" );
@@ -332,17 +338,18 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		person3.setName( "Regular goat" );
 		person3.setBlurb( "Is anorexic" );
 
-		Session session = openSession();
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		Transaction transaction = session.beginTransaction();
-		session.persist( person1 );
-		session.persist( person2 );
-		session.persist( person3 );
+		ManualTransactionContext tc = new ManualTransactionContext();
 
-		transaction.commit();
-		session.clear();
+		Work<ProvidedIdEntry> work = new Work<ProvidedIdEntry>( person1, 1, WorkType.INDEX );
+		sf.getWorker().performWork( work, tc );
+		work = new Work<ProvidedIdEntry>( person2, 2, WorkType.INDEX );
+		sf.getWorker().performWork( work, tc );
+		Work<ProvidedIdEntry> work2 = new Work<ProvidedIdEntry>( person3, 3, WorkType.INDEX );
+		sf.getWorker().performWork( work2, tc );
 
-		transaction = fullTextSession.beginTransaction();
+		tc.end();
+		
+		Transaction transaction = fullTextSession.beginTransaction();
 
 		QueryParser parser = new QueryParser( "providedidentry.name", new StandardAnalyzer() );
 		Query luceneQuery = parser.parse( "Goat" );
@@ -364,7 +371,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 	
 	
 	
-	public void testFullTextFilterDef() throws Exception{
+	public void testFullTextFilterDefAtMappingLevel() throws Exception{
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -407,7 +414,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-	
 	
 	public void testIndexEmbedded() throws Exception{
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -514,7 +520,8 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		//cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		SearchMapping mapping = new SearchMapping();
 
-		mapping.analyzerDef( "ngram", StandardTokenizerFactory.class )
+		mapping.fullTextFilterDef("security", SecurityFilterFactory.class).cache(FilterCacheModeType.INSTANCE_ONLY)
+				.analyzerDef( "ngram", StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( NGramFilterFactory.class )
 						.param( "minGramSize", "3" )
@@ -525,10 +532,10 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				.analyzerDef( "de", StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( GermanStemFilterFactory.class )
-				.entity( Address.class ).indexed()
+				.entity( Address.class )
+					.indexed()
 					.similarity( DefaultSimilarity.class )
 					.boost( 2 )
-					.fullTextFilterDef("security", SecurityFilterFactory.class).cache(FilterCacheModeType.INSTANCE_ONLY)
 					.property( "addressId", ElementType.FIELD ).documentId().name( "id" )
 					.property("lastUpdated", ElementType.FIELD)
 						.field().name("last-updated")

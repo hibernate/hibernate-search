@@ -101,9 +101,14 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					new HashMap<Object, Object>() :
 					new HashMap<Object, Object>(delegateDefaults);
 			defaults.put( AnalyzerDefs.class, createAnalyzerDefArray() );
+			if (!mapping.getFullTextFilerDefs().isEmpty()) {
+				defaults.put(FullTextFilterDefs.class, createFullTextFilterDefsForMapping());
+			}
 		}
 		return defaults;
 	}
+
+	
 
 	public AnnotationReader getAnnotationReader(AnnotatedElement annotatedElement) {
 		AnnotationReader reader = cache.get(annotatedElement);
@@ -124,6 +129,35 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		return defs;
 	}
 	
+	private FullTextFilterDef[] createFullTextFilterDefsForMapping() {
+		Set<Map<String, Object>> fullTextFilterDefs = mapping.getFullTextFilerDefs();
+		FullTextFilterDef[] filters = new FullTextFilterDef[fullTextFilterDefs.size()];
+		int index = 0;
+		for(Map<String,Object> filterDef : fullTextFilterDefs) {
+			filters[index] = createFullTextFilterDef(filterDef);
+			index++;
+		}
+		return filters;
+	}
+	
+	private static FullTextFilterDef createFullTextFilterDef(Map<String,Object> filterDef) {
+		AnnotationDescriptor fullTextFilterDefAnnotation = new AnnotationDescriptor( FullTextFilterDef.class );
+		for (Entry<String, Object> entry : filterDef.entrySet()) {
+			fullTextFilterDefAnnotation.setValue(entry.getKey(), entry.getValue());
+		}
+		
+		return AnnotationFactory.create( fullTextFilterDefAnnotation );
+	}
+
+	private static FullTextFilterDef[] createFullTextFilterDefArray(Set<Map<String, Object>> fullTextFilterDefs) {
+		FullTextFilterDef[] filters = new FullTextFilterDef[fullTextFilterDefs.size()];
+		int index = 0;
+		for(Map<String,Object> filterDef : fullTextFilterDefs) {
+			filters[index] = createFullTextFilterDef(filterDef);
+			index++;
+		}
+		return filters;
+	}
 	
 	private AnalyzerDef createAnalyzerDef(Map<String, Object> analyzerDef) {
 		AnnotationDescriptor analyzerDefAnnotation = new AnnotationDescriptor( AnalyzerDef.class );
@@ -436,7 +470,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 			if (entity.getFullTextFilterDefs().size() > 0)  {
 				AnnotationDescriptor fullTextFilterDefsAnnotation = new AnnotationDescriptor( FullTextFilterDefs.class );
-				FullTextFilterDef[] fullTextFilterDefArray = createFullTextFilterDefArray(entity);
+				FullTextFilterDef[] fullTextFilterDefArray = createFullTextFilterDefArray(entity.getFullTextFilterDefs());
 				fullTextFilterDefsAnnotation.setValue("value", fullTextFilterDefArray);
 				annotations.put( FullTextFilterDefs.class, AnnotationFactory.create( fullTextFilterDefsAnnotation ) );
 			}
@@ -467,27 +501,6 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 			}
 			annotations.put( ProvidedId.class, AnnotationFactory.create( annotation ) );
-		}
-		
-		
-		private FullTextFilterDef[] createFullTextFilterDefArray(EntityDescriptor entity) {
-			Set<Map<String, Object>> fullTextFilterDefs = entity.getFullTextFilterDefs();
-			FullTextFilterDef[] filters = new FullTextFilterDef[fullTextFilterDefs.size()];
-			int index = 0;
-			for(Map<String,Object> filterDef : fullTextFilterDefs) {
-				filters[index] = createFullTextFilterDef(filterDef);
-				index++;
-			}
-			return filters;
-		}
-		
-		private FullTextFilterDef createFullTextFilterDef(Map<String,Object> filterDef) {
-			AnnotationDescriptor fullTextFilterDefAnnotation = new AnnotationDescriptor( FullTextFilterDef.class );
-			for (Entry<String, Object> entry : filterDef.entrySet()) {
-				fullTextFilterDefAnnotation.setValue(entry.getKey(), entry.getValue());
-			}
-			
-			return AnnotationFactory.create( fullTextFilterDefAnnotation );
 		}
 		
 		private void populateAnnotationArray() {

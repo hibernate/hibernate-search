@@ -38,10 +38,15 @@ import org.apache.solr.analysis.TokenizerFactory;
  */
 public class SearchMapping {
 	private Set<Map<String, Object>> analyzerDefs = new HashSet<Map<String, Object>>();
+	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
 	private Map<Class<?>, EntityDescriptor> entities = new HashMap<Class<?>, EntityDescriptor>();
 
 	public Set<Map<String, Object>> getAnalyzerDefs() {
 		return analyzerDefs;
+	}
+	
+	public Set<Map<String, Object>> getFullTextFilerDefs() {
+		return fullTextFilterDefs;
 	}
 	
 	public EntityDescriptor getEntityDescriptor(Class<?> entityType) {
@@ -51,18 +56,23 @@ public class SearchMapping {
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping(name, tokenizerFactory, this);
 	}
-
+	
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping(entityType, this);
+	}
+	
+	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
+		return new FullTextFilterDefMapping(this, name, impl );
 	}
 
 	/**
 	 * eg @Containing(things={@Thing(...), @Thing(...)}
 	 * Map<String, Object> addedThing = addElementToAnnotationArray(containing, "things");
 	 */
+
 	static Map<String, Object> addElementToAnnotationArray(Map<String, Object> containingAnnotation,
 													  String attributeName) {
-		List<Map<String, Object>> array = (List<Map<String, Object>>) containingAnnotation.get( attributeName );
+		@SuppressWarnings("unchecked") List<Map<String, Object>> array = (List<Map<String, Object>>) containingAnnotation.get( attributeName );
 		if ( array == null) {
 			array = new ArrayList<Map<String, Object>>();
 			containingAnnotation.put( attributeName, array );
@@ -83,6 +93,10 @@ public class SearchMapping {
 			entities.put( entityType, entity );
 		}
 		return entity;
+	}
+
+	void addFulltextFilterDef(Map<String, Object> fullTextFilterDef) {
+		fullTextFilterDefs.add(fullTextFilterDef);
 	}
 	
 }

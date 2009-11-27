@@ -69,4 +69,8 @@ public class TokenFilterDefMapping {
 		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
 	}
 
+	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
+		return new FullTextFilterDefMapping(mapping, name, impl );
+	}
+
 }

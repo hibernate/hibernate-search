@@ -53,7 +53,7 @@ public class ProvidedIdMapping {
 	}
 	
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
-		return new FullTextFilterDefMapping(searchMapping, entity, name, impl);
+		return new FullTextFilterDefMapping(searchMapping, name, impl);
 	}
 	
 	public PropertyMapping property(String name, ElementType type) {

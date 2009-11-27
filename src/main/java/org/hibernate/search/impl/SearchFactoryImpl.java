@@ -281,6 +281,20 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			}
 		}
 	}
+	
+	
+	private void initProgrammaticallyDefinedFilterDef(ReflectionManager reflectionManager) {
+		@SuppressWarnings("unchecked") Map defaults = reflectionManager.getDefaults();
+		FullTextFilterDef[] filterDefs = (FullTextFilterDef[]) defaults.get(FullTextFilterDefs.class);
+		if (filterDefs != null && filterDefs.length != 0) {
+			for (FullTextFilterDef defAnn : filterDefs) {
+				if ( filterDefinitions.containsKey( defAnn.name() ) ) {
+					throw new SearchException("Multiple definition of @FullTextFilterDef.name=" + defAnn.name());
+				}
+				bindFullTextFilterDef(defAnn);
+			}
+		}
+	}
 
 	private void bindFilterDef(FullTextFilterDef defAnn, XClass mappedXClass) {
 		if ( filterDefinitions.containsKey( defAnn.name() ) ) {
@@ -290,6 +304,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			);
 		}
 
+		bindFullTextFilterDef(defAnn);
+	}
+
+	private void bindFullTextFilterDef(FullTextFilterDef defAnn) {
 		FilterDef filterDef = new FilterDef( defAnn );
 		if ( filterDef.getImpl().equals( ShardSensitiveOnlyFilter.class ) ) {
 			//this is a placeholder don't process regularly
@@ -463,6 +481,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
 		initProgrammaticAnalyzers(context, reflectionManager);
+		initProgrammaticallyDefinedFilterDef(reflectionManager);
 
 		while ( iter.hasNext() ) {
 			Class mappedClass = iter.next();
