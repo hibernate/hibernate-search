@@ -36,7 +36,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.QueryBuilder;
+import javax.persistence.criteria.CriteriaBuilder;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -212,10 +212,6 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
-	public Set<String> getSupportedProperties() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
 	public Query createQuery(String ejbqlString) {
 		return em.createQuery( ejbqlString );
 	}
@@ -276,13 +272,14 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
-	public QueryBuilder getQueryBuilder() {
+	public CriteriaBuilder getCriteriaBuilder() {
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	public Metamodel getMetamodel() {
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
+
 
 	public MassIndexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );

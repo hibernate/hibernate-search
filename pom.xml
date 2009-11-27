@@ -53,7 +53,7 @@
     <properties>
         <slf4jVersion>1.5.8</slf4jVersion>
         <luceneVersion>2.4.1</luceneVersion>
-        <hibernateVersion>3.5.0.Beta-1</hibernateVersion>
+        <hibernateVersion>3.5.0-Beta-2</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Beta1</hibernateCommonsAnnotationVersion>
     </properties>
 
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.hibernate.java-persistence</groupId>
             <artifactId>jpa-api</artifactId>
-            <version>2.0.Beta-20090815</version>
+            <version>2.0-cr-1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

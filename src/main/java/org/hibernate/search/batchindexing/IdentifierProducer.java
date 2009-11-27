@@ -111,14 +111,14 @@ public class IdentifierProducer implements Runnable {
 	}
 
 	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
-		Integer totalCount = (Integer) session
+		Long totalCount = (Long) session
 			.createCriteria( indexedType )
 			.setProjection( Projections.count( "id" ) )
 			.setCacheable( false )
 			.uniqueResult();
 		
 		if ( objectsLimit != 0 && objectsLimit < totalCount.intValue() ) {
-			totalCount = objectsLimit;
+			totalCount = new Long(objectsLimit);
 		}
 		log.debug( "going to fetch {} primary keys", totalCount);
 		monitor.addToTotalCount( totalCount );

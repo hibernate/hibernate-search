@@ -278,6 +278,18 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
+	public <T> Query setParameter(Parameter<T> tParameter, T t) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public Query setParameter(Parameter<Calendar> calendarParameter, Calendar calendar, TemporalType temporalType) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	public Query setParameter(Parameter<Date> dateParameter, Date date, TemporalType temporalType) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
 	public Set<String> getSupportedHints() {
 		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
