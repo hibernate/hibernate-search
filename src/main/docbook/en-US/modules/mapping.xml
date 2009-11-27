@@ -1507,4 +1507,648 @@ public class MyClass{
       </example>
     </section>
   </section>
+
+  <section>
+    <title>Programmatic API</title>
+
+    <para><warning>
+        <para>This feature is considered experimental. While stable code-wise,
+        the API is subject to change in the future.</para>
+      </warning>Although the recommended approach for mapping indexed entities
+    is to use annotations, it is sometimes more convenient to use a different
+    approach:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>the same entity is mapped differently depending on deployment
+        needs (customization for clients)</para>
+      </listitem>
+
+      <listitem>
+        <para>some automatization process requires the dynamic mapping of many
+        entities sharing a common traits</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>While it has been a popular demand in the past, the Hibernate team
+    never found the idea of an XML alternative to annotations appealing due to
+    it's heavy duplication, lack of code refactoring safety, because it did
+    not cover all the use case spectrum and because we are in the 21st century
+    :)</para>
+
+    <para>Th idea of a programmatic API was much more appealing and has now
+    become a reality. You can programmatically and safely define your mapping
+    using a programmatic API: you define entities and fields as indexable by
+    using mapping classes which effectively mirror the annotation concepts in
+    Hibernate Search. Note that fan(s) of XML approach can design their own
+    schema and use the programmatic API to create the mapping while parsing
+    the XML stream.</para>
+
+    <para>In order to use the programmatic model you must first construct a
+    <classname>SearchMapping</classname> object. This object is passed to
+    Hibernate Search via a property set to the <classname>Configuration
+    </classname>object. The property key is
+    <literal>hibernate.search.mapping_model</literal>. </para>
+
+    <programlisting>SearchMapping mapping = new SearchMapping();
+[...]
+configuration.setProperty( "hibernate.search.mapping_model", mapping );
+
+//or in JPA
+SearchMapping mapping = new SearchMapping();
+[...]
+Map&lt;String,String&gt; properties = new HashMap&lt;String,String)(1);
+properties.put( "hibernate.search.mapping_model", mapping );
+EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", properties );</programlisting>
+
+    <para>The <classname>SearchMapping</classname> is the root object which
+    contains all the necessary indexable entities and fields. From there, the
+    <classname>SearchMapping</classname> object exposes a fluent (and thus
+    intuitive) API to express your mappings: it contextually exposes the
+    relevant mapping options in a type-safe way, just let your IDE
+    autocompletion feature guide you through.</para>
+
+    <para>Today, the programmatic API cannot be used on a class annotated with
+    Hibernate Search annotations, chose one approach or the other. Also note
+    that the same default values apply in annotations and the programmatic
+    API. For example, the <methodname>@Field.name</methodname> is defaulted to
+    the property name and does not have to be set.</para>
+
+    <para>Each core concept of the programmatic API has a corresponding
+    example to depict how the same definition would look using annotation.
+    Therefore seeing an annotation example of the programmatic approach should
+    give you a clear picture of what Hibernate Search will build with the
+    marked entities and associated properties.</para>
+
+    <section>
+      <title>Mapping an entity as indexable</title>
+
+      <para>The first concept of the programmatic API is to define an entity
+      as indexable. Using the annotation approach a user would mark the entity
+      as <classname>@Indexed</classname>, the following example demonstrates
+      how to programmatically achieve this.</para>
+
+      <para><example>
+          <title>Marking an entity indexable</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping.entity(Address.class)
+           .indexed()
+               .indexName("Address_Index"); //optional
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>As you can see you must first create a
+          <classname>SearchMapping</classname> object which is the root object
+          that is then passed to the <classname>Configuration</classname>
+          object as property. You must declare an entity and if you wish to
+          make that entity as indexable then you must call the
+          <methodname>indexed()</methodname> method. The <methodname>indexed()
+          </methodname>method has an optional <methodname>indexName(String
+          indexName)</methodname> which can be used to change the default
+          index name that is created by Hibernate Search. Using the annotation
+          model the above can be achieved as:</para>
+
+          <para><example>
+              <title>Annotation example of indexing entity</title>
+
+              <programlisting>@Entity
+@Indexed(index="Address_Index")
+public class Address {
+....
+}</programlisting>
+            </example></para>
+        </example></para>
+    </section>
+
+    <section>
+      <title>Adding DocumentId to indexed entity</title>
+
+      <para>To set a property as a document id:</para>
+
+      <para><example>
+          <title>Enabling document id with programmatic model</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping.entity(Address.class).indexed()
+           .property("addressId", ElementType.FIELD) //field access
+               .documentId()
+                   .name("id");
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping);</programlisting>
+
+          <para>The above is equivalent to annotating a property in the entity
+          as <classname>@DocumentId</classname> as seen in the following
+          example:</para>
+
+          <para><example>
+              <title>DocumentId annotation definition</title>
+
+              <programlisting>@Entity
+@Indexed
+public class Address {
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ private Long addressId;
+
+ ....
+}</programlisting>
+            </example></para>
+        </example>The next section demonstrates how to programmatically define
+      analyzers.</para>
+    </section>
+
+    <section>
+      <title>Defining analyzers</title>
+
+      <para>Analyzers can be programmatically defined using the
+      <methodname>analyzerDef(String analyzerDef, Class&lt;? extends
+      TokenizerFactory&gt; tokenizerFactory) </methodname>method. This method
+      also enables you to define filters for the analyzer definition. Each
+      filter that you define can optionally take in parameters as seen in the
+      following example :</para>
+
+      <para><example>
+          <title>Defining analyzers using programmatic model</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping
+    <emphasis role="bold">.analyzerDef( "ngram", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( NGramFilterFactory.class )
+            .param( "minGramSize", "3" )
+            .param( "maxGramSize", "3" )
+    .analyzerDef( "en", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( EnglishPorterFilterFactory.class )
+    .analyzerDef( "de", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( GermanStemFilterFactory.class )</emphasis>
+    .entity(Address.class).indexed()
+        .property("addressId", ElementType.METHOD) //getter access
+            .documentId()
+                .name("id");
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>The analyzer mapping defined above is equivalent to the
+          annotation model using <classname>@AnalyzerDef</classname> in
+          conjunction with <classname>@AnalyzerDefs</classname>:</para>
+        </example><example>
+          <title>Analyzer definition using annotation</title>
+
+          <programlisting>@Indexed
+@Entity
+@AnalyzerDefs({
+  @AnalyzerDef(name = "ngram",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = NGramFilterFactory.class, 
+        params = {
+          @Parameter(name = "minGramSize",value = "3"),
+          @Parameter(name = "maxGramSize",value = "3") 
+       })
+   }),
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+   }),
+
+  @AnalyzerDef(name = "de",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = GermanStemFilterFactory.class)
+  })
+
+})
+public class Address {
+...
+}</programlisting>
+        </example></para>
+    </section>
+
+    <section>
+      <title>Defining fields for indexing</title>
+
+      <para>When defining fields for indexing using the programmatic API, call
+      <methodname>field()</methodname> on the <methodname>property(String
+      propertyName, ElementType elementType)</methodname> method. From
+      <methodname>field()</methodname> you can specify the <methodname>name,
+      index</methodname>, <methodname>store</methodname>,
+      <methodname>bridge</methodname> and <methodname>analyzer</methodname>
+      definitions.</para>
+
+      <para><example>
+          <title>Indexing fields using programmatic API</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping
+    .analyzerDef( "en", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( EnglishPorterFilterFactory.class )
+    .entity(Address.class).indexed()
+        .property("addressId", ElementType.METHOD)
+            .documentId()
+                .name("id")
+        .property("street1", ElementType.METHOD)
+            <emphasis role="bold">.field()
+                .analyzer("en")
+                .store(Store.YES)
+                .index(Index.TOKENIZED) //no useful here as it's the default
+            .field()
+                .name("address_data")
+                .analyzer("en");</emphasis>
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>The above example of marking fields as indexable is equivalent
+          to defining fields using <classname>@Field</classname> as seen
+          below:</para>
+        </example><example>
+          <title>Indexing fields using annotation</title>
+
+          <programlisting>@Entity
+@Indexed
+@AnalyzerDefs({
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+   })
+})
+public class Address {
+ 
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ private Long getAddressId() {...};
+
+ @Fields({
+      @Field(index=Index.TOKENIZED, store=Store.YES, 
+             analyzer=@Analyzer(definition="en")),
+      @Field(name="address_data", analyzer=@Analyzer(definition="en"))
+ })
+ public String getAddress1() {...}
+
+ ......
+}</programlisting>
+
+          <para></para>
+        </example></para>
+    </section>
+
+    <section>
+      <title>Defining full text filter definitions</title>
+
+      <para>The programmatic API provides easy mechanism for defining full
+      text filter definitions which is available via
+      <classname>@FullTextFilterDef</classname> and
+      <classname>@FullTextFilterDefs</classname>. The next example depicts the
+      creation of full text filter definition using the
+      <methodname>fullTextFilterDef </methodname>method.</para>
+
+      <para><example>
+          <title>Defining full text definition programmatically</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping
+    .analyzerDef( "en", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( EnglishPorterFilterFactory.class )
+    .entity(Address.class)
+        .indexed()
+        <emphasis role="bold">.fullTextFilterDef("security", SecurityFilterFactory.class)
+            .cache(FilterCacheModeType.INSTANCE_ONLY)</emphasis>
+        .property("addressId", ElementType.METHOD)
+            .documentId()
+                .name("id")
+        .property("street1", ElementType.METHOD)
+            .field()
+                .analyzer("en")
+                .store(Store.YES)
+            .field()
+                .name("address_data")
+                .analyzer("en")
+                .store(Store.NO);
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>The previous example can effectively been seen as annotating
+          your entity with @FullTextFilterDef like below:</para>
+        </example><example>
+          <title>Using annotation to define full text filter
+          definition</title>
+
+          <programlisting>@Entity
+@Indexed
+@AnalyzerDefs({
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+   })
+})
+@FullTextFilterDefs({
+ @FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_ONLY)
+})
+public class Address {
+ 
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ pubblic Long getAddressId() {...};
+
+ @Fields({
+      @Field(index=Index.TOKENIZED, store=Store.YES, 
+             analyzer=@Analyzer(definition="en")),
+      @Field(name="address_data", analyzer=@Analyzer(definition="en"))
+ })
+ public String getAddress1() {...};
+
+ ......
+ 
+}</programlisting>
+        </example></para>
+    </section>
+
+    <section>
+      <title>Programmatically defining embedded entities</title>
+
+      <para>In this section you will see how to programmatically define
+      entities to be embedded into the indexed entity similar to using the
+      <classname>@IndexEmbedded</classname> model. In order to define this you
+      must mark the property as <methodname>indexEmbedded. </methodname>The is
+      the option to add a prefix to the embedded entity definition and this
+      can be done by calling <methodname>prefix</methodname> as seen in the
+      example below:</para>
+
+      <para><example>
+          <title>Programmatically defining embedded entites</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mappping
+    .entity(ProductCatalog.class)
+        .indexed()
+        .property("catalogId", ElementType.METHOD)
+            .documentId()
+                .name("id")
+        .property("title", ElementType.METHOD)
+            .field()
+                .index(Index.TOKENIZED)
+                .store(Store.NO)
+        .property("description", ElementType.METHOD)
+             .field()
+                 .index(Index.TOKENIZED)
+                 .store(Store.NO)
+        .property("items", ElementType.METHOD)
+            <emphasis role="bold">.indexEmbedded()
+                .prefix("catalog.items"); //optional</emphasis>
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>The next example shows the same definition using annotation
+          (<classname>@IndexEmbedded</classname>):</para>
+        </example><example>
+          <title>Using @IndexEmbedded</title>
+
+          <programlisting>@Entity
+@Indexed
+public class ProductCatalog {
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ public Long getCatalogId() {...}
+ 
+ @Field(store=Store.NO, index=Index.TOKENIZED)
+ public String getTitle() {...}
+
+ @Field(store=Store.NO, index=Index.TOKENIZED)
+ public String getDescription();
+ 
+ @OneToMany(fetch = FetchType.LAZY)
+ @IndexColumn(name = "list_position")
+ @Cascade(org.hibernate.annotations.CascadeType.ALL)
+ @IndexEmbedded(prefix="catalog.items")
+ public List&lt;Item&gt; getItems() {...}
+
+ ...
+
+}</programlisting>
+        </example></para>
+    </section>
+
+    <section>
+      <title>Contained In definition</title>
+
+      <para><classname>@ContainedIn</classname> can be define as seen in the
+      example below:<example>
+          <title>Programmatically defining ContainedIn</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mappping
+    .entity(ProductCatalog.class)
+        .indexed()
+        .property("catalogId", ElementType.METHOD)
+            .documentId()
+        .property("title", ElementType.METHOD)
+            .field()
+        .property("description", ElementType.METHOD)
+            .field()
+        .property("items", ElementType.METHOD)
+            .indexEmbedded()
+
+    .entity(Item.class)
+        .property("description", ElementType.METHOD)
+            .field()
+        .property("productCatalog", ElementType.METHOD)
+            <emphasis role="bold">.containedIn()</emphasis>;
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>This is equivalent to defining
+          <classname>@ContainedIn</classname> in your entity:</para>
+
+          <para><example>
+              <title>Annotation approach for ContainedIn</title>
+
+              <programlisting>@Entity
+@Indexed
+public class ProductCatalog {
+ 
+ @Id
+ @GeneratedValue
+ @DocumentId
+ public Long getCatalogId() {...}
+ 
+ @Field
+ public String getTitle() {...}
+
+ @Field
+ public String getDescription() {...}
+ 
+ @OneToMany(fetch = FetchType.LAZY)
+ @IndexColumn(name = "list_position")
+ @Cascade(org.hibernate.annotations.CascadeType.ALL)
+ @IndexEmbedded
+ private List&lt;Item&gt; getItems() {...}
+
+ ...
+
+}
+
+
+@Entity
+public class Item {
+ 
+ @Id
+ @GeneratedValue
+ private Long itemId;
+
+ @Field
+ public String getDescription() {...}
+ 
+ @ManyToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+ @ContainedIn
+ public ProductCatalog getProductCatalog() {...}
+
+ ...
+}</programlisting>
+            </example></para>
+        </example></para>
+    </section>
+
+    <section>
+      <title>Date/Calendar Bridge</title>
+
+      <para>In order to define a calendar or date bridge mapping, call the
+      <methodname>dateBridge(Resolution resolution) </methodname>or
+      <methodname>calendarBridge(Resolution resolution)</methodname> methods
+      after you have defined a <methodname>field()</methodname> in the
+      <classname>SearchMapping </classname>hierarchy.</para>
+
+      <para><example>
+          <title>Programmatic model for defining calendar/date bridge</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping
+    .entity(Address.class)
+        .indexed()
+        .property("addressId", ElementType.FIELD)
+            .documentId()
+    .property("street1", ElementType.FIELD()
+        .field()
+    .property("createdOn", ElementType.FIELD)
+        .field()
+        <emphasis role="bold">.dateBridge(Resolution.DAY)</emphasis>
+    .property("lastUpdated", ElementType.FIELD)
+        <emphasis role="bold">.calendarBridge(Resolution.DAY)</emphasis>;
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>See below for defining the above using
+          <classname>@CalendarBridge</classname> and
+          <classname>@DateBridge</classname>:</para>
+        </example><example>
+          <title>@CalendarBridge and @DateBridge definition</title>
+
+          <programlisting>@Entity
+@Indexed
+public class Address {
+ 
+ @Id
+ @GeneratedValue
+ @DocumentId
+ private Long addressId;
+
+ @Field
+ private String address1;
+
+ @Field
+ @DateBridge(resolution=Resolution.DAY)
+ private Date createdOn;
+
+ @CalendarBridge(resolution=Resolution.DAY)
+ private Calendar lastUpdated;
+
+ ...
+}</programlisting>
+        </example></para>
+    </section>
+
+    <section>
+      <title>Defining bridges</title>
+
+      <para>It is possible to associate bridges to programmatically defined
+      fields. When you define a <methodname>field()</methodname>
+      programmatically you can use the <methodname>bridge(Class&lt;?&gt;
+      impl)</methodname> to associate a <classname>FieldBridge
+      </classname>implementation class. The bridge method also provides
+      optional methods to include any parameters required for the bridge
+      class. The below shows an example of programmatically defining a
+      bridge:</para>
+
+      <para><example>
+          <title>Defining field bridges programmatically</title>
+
+          <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping
+    .entity(Address.class)
+        .indexed()
+        .property("addressId", ElementType.FIELD)
+            .documentId()
+        .property("street1", ElementType.FIELD)
+            .field()
+            .field()
+                .name("street1_abridged")
+                <emphasis role="bold">.bridge( ConcatStringBridge.class )
+                    .param( "size", "4" )</emphasis>;
+ 
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+
+          <para>The above can equally be defined using annotations, as seen in
+          the next example.</para>
+
+          <para><example>
+              <title>Defining field bridges using annotation</title>
+
+              <programlisting>@Entity
+@Indexed
+
+public class Address {
+ 
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ private Long addressId;
+
+ @Fields({
+      @Field,
+      @Field(name="street1_abridged", 
+             bridge= @FieldBridge(impl = ConcatStringBridge.class, 
+             params = @Parameter( name="size", value="4" ))
+ })
+ private String address1;
+
+ ...
+}</programlisting>
+            </example></para>
+        </example></para>
+    </section>
+  </section>
 </chapter>
