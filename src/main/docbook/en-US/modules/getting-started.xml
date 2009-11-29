@@ -129,7 +129,7 @@
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
-   &lt;version&gt;3.1.0.GA&lt;/version&gt;
+   &lt;version&gt;3.2.0.Beta1&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
@@ -620,7 +620,7 @@ public class Book {
       <programlisting>mvn archetype:create \ 
     -DarchetypeGroupId=org.hibernate \
     -DarchetypeArtifactId=hibernate-search-quickstart \ 
-    -DarchetypeVersion=3.1.0.GA \
+    -DarchetypeVersion=3.2.0.Beta1 \
     -DgroupId=my.company -DartifactId=quickstart</programlisting>
     </example>
 

@@ -1,6 +1,65 @@
 Hibernate Search Changelog
 ==========================
 
+3.2.0.Beta1 (30-11-2009)
+------------------------
+
+** Sub-task
+    * [HSEARCH-410] - Write documentation for what's available of the programmatic mapping API (Amin Mohammed-Coleman)
+    * [HSEARCH-412] - Provide the main mapping artifacts programmatically
+
+** Bug
+    * [HSEARCH-178] - Out of transaction work causes collection lazy loading to throw AssertionFailure
+    * [HSEARCH-332] - documentation errors: org.hibernate.Query  should be  javax.persistence.Query
+    * [HSEARCH-353] - removing an entity and adding another with same PK  (in same TX) will not add second entity to index
+    * [HSEARCH-355] - FilterOptimizationHelper was improperly using method overloading
+    * [HSEARCH-357] - IdBridge being applied on null entity during purgeAll()
+    * [HSEARCH-366] - typo in Discriminator.getAnanyzerDefinitionName()
+    * [HSEARCH-367] - Support only one kind of Similarity per index
+    * [HSEARCH-380] - Duplicate classes from Maven transitive dependencies (incompatible version of solr-lucene-core)
+    * [HSEARCH-391] - Two-Level embedded objects don't get an index update
+    * [HSEARCH-394] - @ProvidedId gets ignored
+    * [HSEARCH-398] - NPE when named FullTextFilter is disabled without being enabled first
+    * [HSEARCH-418] - ProvidedIdTest fails
+
+** Deprecation
+    * [HSEARCH-201] - IndexWriter settings meant for transactional operations won't be inherited by the settings meant for batch operations
+
+** Improvement
+    * [HSEARCH-246] - Run optimize at the end of the transaction even if flushToIndexes() is used
+    * [HSEARCH-284] - Be able to configure a LockFactory
+    * [HSEARCH-301] - Refactor JMSMasterTest and JMSSlaveTest
+    * [HSEARCH-327] - Capability to reuse IndexWriter instances across transactions
+    * [HSEARCH-328] - Add a builtin bridge for Calendar (Amin Mohammed-Coleman)
+    * [HSEARCH-358] - @ClassBridge.impl is no longer defaulted
+    * [HSEARCH-365] - Update pom.xml to include database profiles for QA Lab
+    * [HSEARCH-369] - typos in documentation
+    * [HSEARCH-384] - improve error messages for loading plugins and add consistency to the performed checks
+    * [HSEARCH-404] - Update database profiles in pom.xml
+
+** New Feature
+    * [HSEARCH-218] - add indexAll( Class type ) to rebuild indexes from all data
+    * [HSEARCH-251] - Query on a shard subset based on a filter activation (Chase Seibert)
+    * [HSEARCH-324] - @DynamicBoost(BoostStrategy.class)
+    * [HSEARCH-334] - Create a builtin bridge for Character
+    * [HSEARCH-345] - Use any custom LockFactory
+    * [HSEARCH-347] - Adding a blackhole backend
+    * [HSEARCH-392] - Provide a JGroups based backend
+
+
+** Task
+    * [HSEARCH-82] - Migrate from ant  to maven2
+    * [HSEARCH-326] - Drop support for IndexReader usage to update indexes.
+    * [HSEARCH-348] - Upgrade to Lucene 2.4.1
+    * [HSEARCH-359] - Fix usage of deprecated Hibernate commons-annotations methods
+    * [HSEARCH-375] - Create pot files in order to allow translation of documentation
+    * [HSEARCH-403] - Fix copyright notice and end-of-line terminators in source code
+    * [HSEARCH-409] - Write documentation for JGroups based configuration (Lukasz Moren)
+    * [HSEARCH-413] - Document all new features
+    * [HSEARCH-419] - Create a proper @ProvidedId test
+    * [HSEARCH-423] - Migrate to Hibernate Core 3.5 beta2 and JPA 2.0 CR1
+
+
 3.1.1.GA (28-05-2009)
 ---------------------
 
