@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search</artifactId>
-    <version>3.2.0.Beta1</version>
+    <version>3.2.0.Beta1-SNAPSHOT</version>
     <name>Hibernate Search</name>
     <description>Hibernate Search</description>
     <url>http://search.hibernate.org</url>
