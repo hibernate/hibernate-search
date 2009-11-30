@@ -58,6 +58,7 @@ Hibernate Search Changelog
     * [HSEARCH-413] - Document all new features
     * [HSEARCH-419] - Create a proper @ProvidedId test
     * [HSEARCH-423] - Migrate to Hibernate Core 3.5 beta2 and JPA 2.0 CR1
+    * [HSEARCH-426] - Update archetype sources 
 
 
 3.1.1.GA (28-05-2009)
