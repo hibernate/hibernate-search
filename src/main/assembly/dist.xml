@@ -36,7 +36,8 @@
             <outputDirectory></outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
-                <exclude>**/target/**</exclude>
+                <exclude>target/**</exclude>
+                <exclude>hibernate-search-archetype/**</exclude>
             </excludes>
         </fileSet>
     </fileSets>
