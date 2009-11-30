@@ -117,6 +117,7 @@ public class IndexAndSearchTest {
         for (Object obj : results) {
             ftSession.index(obj);
         }
+		ftSession.flushToIndexes();
     }
 
     private void purge() {
