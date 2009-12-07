@@ -2157,10 +2157,8 @@ public class Address {
     <section>
       <title>Mapping class bridge</title>
 
-      <para>The annotation model provides a
-      <classname>@ClassBridge</classname> which enables you to modify the
-      lucene document, this feature is also available using the programmatic
-      appraoch. This is shown in the next example:</para>
+      <para>You can define class bridges on entities programmatically.
+          This is shown in the next example:</para>
 
       <example>
         <title>Defining class briges using API</title>
