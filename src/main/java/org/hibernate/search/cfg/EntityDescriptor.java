@@ -42,7 +42,7 @@ public class EntityDescriptor {
 	private Map<String, Object> analyzerDiscriminator;
 	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
 	private Map<String,Object> providedId;
-	
+	private Set<Map<String,Object>> classBridges = new HashSet<Map<String,Object>>();
 	
 	public Map<String, Object> getIndexed() {
 		return indexed;
@@ -103,6 +103,14 @@ public class EntityDescriptor {
 	}
 
 	
+	public void addClassBridgeDef(Map<String,Object> classBridge) {
+		classBridges.add(classBridge);
+	}
+	
+	public Set<Map<String, Object>> getClassBridgeDefs() {
+		return classBridges;
+	}
+	
 	public void setProvidedId(Map<String, Object> providedId) {
 		this.providedId = providedId;
 	}
@@ -148,5 +156,5 @@ public class EntityDescriptor {
 			return result;
 		}
 	}
-	
+
 }

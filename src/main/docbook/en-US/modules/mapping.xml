@@ -2153,5 +2153,70 @@ public class Address {
             </example></para>
         </example></para>
     </section>
+
+    <section>
+      <title>Mapping class bridge</title>
+
+      <para>The annotation model provides a
+      <classname>@ClassBridge</classname> which enables you to modify the
+      lucene document, this feature is also available using the programmatic
+      appraoch. This is shown in the next example:</para>
+
+      <example>
+        <title>Defining class briges using API</title>
+
+        <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping
+    .entity(Departments.class)
+<emphasis>       .classBridge(CatDeptsFieldsClassBridge.class)
+         .name("branchnetwork")
+         .index(Index.TOKENIZED)
+         .store(Store.YES)
+         .param("sepChar", " ")
+      .classBridge(EquipmentType.class)
+         .name("equiptype")
+         .index(Index.TOKENIZED)
+         .store(Store.YES)
+         .param("C", "Cisco")
+         .param("D", "D-Link")
+         .param("K", "Kingston")
+         .param("3", "3Com")</emphasis>
+      .indexed();
+
+cfg.getProperties().put( "hibernate.search.mapping_model", mapping );
+
+</programlisting>
+
+        <para>The above is similar to using <classname>@ClassBridge
+        </classname>as seen in the next example:<example>
+            <title>Using @ClassBridge</title>
+
+            <programlisting>@Entity
+@Indexed
+@ClassBridges ( {
+  @ClassBridge(name="branchnetwork",
+     index= Index.TOKENIZED,
+     store= Store.YES,
+     impl = CatDeptsFieldsClassBridge.class,
+     params = @Parameter( name="sepChar", value=" " ) ),
+  @ClassBridge(name="equiptype",
+     index= Index.TOKENIZED,
+     store= Store.YES,
+     impl = EquipmentType.class,
+     params = {@Parameter( name="C", value="Cisco" ),
+        @Parameter( name="D", value="D-Link" ),
+        @Parameter( name="K", value="Kingston" ),
+        @Parameter( name="3", value="3Com" )
+   })
+})
+public class Departments {
+
+....
+
+}</programlisting>
+          </example> </para>
+      </example>
+    </section>
   </section>
 </chapter>

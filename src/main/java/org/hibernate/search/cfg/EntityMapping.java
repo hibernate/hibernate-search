@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.engine.BoostStrategy;
 
 /**
  * @author Emmanuel Bernard
@@ -85,8 +86,8 @@ public class EntityMapping {
 		return new EntityMapping(entityType, mapping);
 	}
 
-	public ProvidedIdMapping providedId() {
-		return new ProvidedIdMapping(mapping,entity);
+	public ClassBridgeMapping classBridge(Class<?> impl) {
+		return new ClassBridgeMapping(mapping, entity, impl, this);
 	}
 	
 }

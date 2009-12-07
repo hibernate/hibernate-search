@@ -31,6 +31,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -63,12 +64,17 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.analyzer.inheritance.ISOLatin1Analyzer;
 import org.hibernate.search.test.id.providedId.ManualTransactionContext;
+import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Bernard
  */
 public class ProgrammaticMappingTest extends SearchTestCase {
+	
+	private static final Logger log = LoggerFactory.make();
 
+	
 	public void testMapping() throws Exception{
 		Address address = new Address();
 		address.setStreet1( "3340 Peachtree Rd NE" );
@@ -507,6 +513,68 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 	
+	@SuppressWarnings("unchecked")
+	public void testClassBridgeMapping() throws Exception {
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( getDepts1() );
+		s.persist( getDepts2() );
+		s.persist( getDepts3() );
+		s.persist( getDepts4() );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.getFullTextSession( s );
+
+		// The equipment field is the manufacturer field  in the
+		// Departments entity after being massaged by passing it
+		// through the EquipmentType class. This field is in
+		// the Lucene document but not in the Department entity itself.
+		QueryParser parser = new QueryParser( "equipment", new SimpleAnalyzer() );
+
+		// Check the second ClassBridge annotation
+		Query query = parser.parse( "equiptype:Cisco" );
+		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Departments.class );
+		List<Departments> result = hibQuery.list();
+		assertNotNull( result );
+		assertEquals( "incorrect number of results returned", 2, result.size() );
+		for (Departments d : result) {
+			assertEquals("incorrect manufacturer", "C", d.getManufacturer());
+		}
+
+		// No data cross-ups.
+		query = parser.parse( "branchnetwork:Kent Lewin" );
+		hibQuery = session.createFullTextQuery( query, Departments.class );
+		result = hibQuery.list();
+		assertNotNull( result );
+		assertTrue( "problem with field cross-ups", result.size() == 0 );
+
+		// Non-ClassBridge field.
+		parser = new QueryParser( "branchHead", new SimpleAnalyzer() );
+		query = parser.parse( "branchHead:Kent Lewin" );
+		hibQuery = session.createFullTextQuery( query, Departments.class );
+		result = hibQuery.list();
+		assertNotNull( result );
+		assertTrue( "incorrect entity returned, wrong branch head", result.size() == 1 );
+		assertEquals("incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead());
+
+		// Check other ClassBridge annotation.
+		parser = new QueryParser( "branchnetwork", new SimpleAnalyzer() );
+		query = parser.parse( "branchnetwork:st. george 1D" );
+		hibQuery = session.createFullTextQuery( query, Departments.class );
+		result = hibQuery.list();
+		assertNotNull( result );
+		assertEquals( "incorrect entity returned, wrong network", "1D", ( result.get( 0 ) ).getNetwork() );
+		assertEquals( "incorrect entity returned, wrong branch", "St. George", ( result.get( 0 ) ).getBranch() );
+		assertEquals( "incorrect number of results returned", 1, result.size() );
+
+		//cleanup
+		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) s.delete( element );
+		tx.commit();
+		s.close();
+	}
+	
 	private int nbrOfMatchingResults(String field, String token, FullTextSession s) throws ParseException {
 		QueryParser parser = new QueryParser( field, new StandardAnalyzer() );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( token );
@@ -514,6 +582,55 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		return query.getResultSize();
 	}
 
+	
+	private Departments getDepts1() {
+		Departments depts = new Departments();
+
+		depts.setBranch( "Salt Lake City" );
+		depts.setBranchHead( "Kent Lewin" );
+		depts.setMaxEmployees( 100 );
+		depts.setNetwork( "1A" );
+		depts.setManufacturer( "C" );
+
+		return depts;
+	}
+
+	private Departments getDepts2() {
+		Departments depts = new Departments();
+
+		depts.setBranch( "Layton" );
+		depts.setBranchHead( "Terry Poperszky" );
+		depts.setMaxEmployees( 20 );
+		depts.setNetwork( "2B" );
+		depts.setManufacturer( "3" );
+
+		return depts;
+	}
+
+	private Departments getDepts3() {
+		Departments depts = new Departments();
+
+		depts.setBranch( "West Valley" );
+		depts.setBranchHead( "Pat Kelley" );
+		depts.setMaxEmployees( 15 );
+		depts.setNetwork( "3C" );
+		depts.setManufacturer( "D" );
+
+		return depts;
+	}
+
+	private Departments getDepts4() {
+		Departments depts = new Departments();
+
+		depts.setBranch( "St. George" );
+		depts.setBranchHead( "Spencer Stajskal" );
+		depts.setMaxEmployees( 10 );
+		depts.setNetwork( "1D" );
+		depts.setManufacturer( "C" );
+		return depts;
+	}
+	
+	
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
@@ -572,10 +689,35 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 					.property("items", ElementType.FIELD)
 						.indexEmbedded()
 				.entity(Item.class)
-						.property("description", ElementType.FIELD)
-							.field().name("description").analyzer("en").index(Index.TOKENIZED).store(Store.YES)
-						.property("productCatalog", ElementType.FIELD)
-							.containedIn()
+					.property("description", ElementType.FIELD)
+						.field().name("description").analyzer("en").index(Index.TOKENIZED).store(Store.YES)
+					.property("productCatalog", ElementType.FIELD)
+						.containedIn()
+				.entity(Departments.class)
+					.classBridge(CatDeptsFieldsClassBridge.class)
+						.name("branchnetwork")
+						.index(Index.TOKENIZED)
+						.store(Store.YES)
+						.param("sepChar", " ")
+					.classBridge(EquipmentType.class)
+						.name("equiptype")
+						.index(Index.TOKENIZED)
+						.store(Store.YES)
+							.param("C", "Cisco")
+							.param("D", "D-Link")
+							.param("K", "Kingston")
+							.param("3", "3Com")
+					  .indexed()
+					.property("deptsId", ElementType.FIELD)
+						.documentId().name("id")
+					.property("branchHead", ElementType.FIELD)
+						.field().store(Store.YES)
+					.property("network", ElementType.FIELD)
+						.field().store(Store.YES)
+					.property("branch", ElementType.FIELD)
+						.field().store(Store.YES)
+					.property("maxEmployees", ElementType.FIELD)
+						.field().index(Index.UN_TOKENIZED).store(Store.YES)
 				.entity( BlogEntry.class ).indexed()
 					.property( "title", ElementType.METHOD )
 						.field()
@@ -624,6 +766,9 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				.analyzerDef( "minimal", StandardTokenizerFactory.class  );
 
 	}
+	
+	
+	
 
 	protected Class<?>[] getMappings() {
 		return new Class<?>[] {
@@ -632,8 +777,11 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				BlogEntry.class,
 				ProvidedIdEntry.class,
 				ProductCatalog.class,
-				Item.class
+				Item.class,
+				Departments.class,
 				
 		};
 	}
+	
+	
 }

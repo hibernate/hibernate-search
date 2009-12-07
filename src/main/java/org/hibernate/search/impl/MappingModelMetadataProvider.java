@@ -51,6 +51,8 @@ import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.CalendarBridge;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
@@ -409,7 +411,6 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			createCalendarBridge(property);
 		}
 
-		
 
 		private void createContainedIn(PropertyDescriptor property) {
 			if (property.getContainedIn() != null) {
@@ -477,6 +478,39 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			if (entity.getProvidedId() != null) {
 				createProvidedId(entity);
 			}
+			
+			if (entity.getClassBridgeDefs().size() > 0) {
+				AnnotationDescriptor classBridgesAnn = new AnnotationDescriptor( ClassBridges.class );
+				ClassBridge[] classBridesDefArray  = createClassBridgesDefArray(entity.getClassBridgeDefs());
+				classBridgesAnn.setValue("value", classBridesDefArray);
+				annotations.put(ClassBridges.class, AnnotationFactory.create( classBridgesAnn ));
+			}
+			
+		}
+
+		private ClassBridge[] createClassBridgesDefArray(Set<Map<String, Object>> classBridgeDefs) {
+			ClassBridge[] classBridgeDefArray = new ClassBridge[classBridgeDefs.size()];
+			int index = 0;
+			for(Map<String,Object> classBridgeDef : classBridgeDefs) {
+				classBridgeDefArray[index] = createClassBridge(classBridgeDef);
+				index++;
+			}
+			
+			return classBridgeDefArray;
+		}
+
+		
+		private ClassBridge createClassBridge(Map<String, Object> classBridgeDef) {
+			AnnotationDescriptor annotation	= new AnnotationDescriptor( ClassBridge.class );
+			Set<Entry<String,Object>> entrySet = classBridgeDef.entrySet();
+			for (Entry<String, Object> entry : entrySet) {
+				if (entry.getKey().equals("params")) {
+					addParamsToAnnotation(annotation, entry);
+				} else {
+					annotation.setValue(entry.getKey(), entry.getValue());
+				}
+			}
+			return AnnotationFactory.create( annotation );
 		}
 
 		private void createProvidedId(EntityDescriptor entity) {
