@@ -80,7 +80,7 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 	}
 
 	public SearchMapping getProgrammaticMapping() {
-		return ( SearchMapping ) getProperties().get( "hibernate.search.mapping_model" );
+		return null;
 	}
 
 	private static class ClassIterator implements Iterator<Class<?>> {

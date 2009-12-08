@@ -110,5 +110,10 @@ public final class Environment {
 	 * This is an index-scoped property and defaults to false.
 	 */
 	public static final String EXCLUSIVE_INDEX_USE = "exclusive_index_use";
+
+	/**
+	 *
+	 */
+	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
 	
 }

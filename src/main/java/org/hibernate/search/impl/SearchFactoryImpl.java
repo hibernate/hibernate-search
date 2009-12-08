@@ -27,6 +27,7 @@ package org.hibernate.search.impl;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,30 +36,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
-import org.slf4j.Logger;
-
-import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
+import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Key;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.LuceneWork;
@@ -72,11 +69,11 @@ import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.EntityState;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.engine.EntityState;
-import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
@@ -88,6 +85,8 @@ import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
+import org.hibernate.util.StringHelper;
+import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Bernard
@@ -148,7 +147,18 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	public SearchFactoryImpl(SearchConfiguration cfg) {
 		ReflectionManager reflectionManager = getReflectionManager(cfg);
-
+		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping(cfg);
+		if ( mapping != null) {
+			if ( ! ( reflectionManager instanceof MetadataProviderInjector)) {
+				throw new SearchException("Programmatic mapping model used but ReflectionManager does not implement "
+						+ MetadataProviderInjector.class.getName() );
+			}
+			MetadataProviderInjector injector = (MetadataProviderInjector) reflectionManager;
+			MetadataProvider original = injector.getMetadataProvider();
+			injector.setMetadataProvider( new MappingModelMetadataProvider( original, mapping ) );
+			
+		}
+		
 		this.indexingStrategy = defineIndexingStrategy( cfg ); //need to be done before the document builds
 		initDocumentBuilders( cfg, reflectionManager );
 
@@ -170,6 +180,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.configurationProperties = cfg.getProperties();
 		this.barrier = 1; //write barrier
 	}
+
+
 
 	private void fillSimilarityMapping() {
 		for ( DirectoryProviderData directoryConfiguration : dirProviderData.values() ) {
@@ -193,17 +205,6 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		ReflectionManager reflectionManager = cfg.getReflectionManager();
 		if ( reflectionManager == null ) {
 			reflectionManager = new JavaReflectionManager();
-		}
-		final SearchMapping mapping = cfg.getProgrammaticMapping();
-		if ( mapping != null) {
-			if ( ! ( reflectionManager instanceof MetadataProviderInjector)) {
-				throw new SearchException("Programmatic mapping model used but ReflectionManager does not implement "
-						+ MetadataProviderInjector.class.getName() );
-			}
-			MetadataProviderInjector injector = (MetadataProviderInjector) reflectionManager;
-			MetadataProvider original = injector.getMetadataProvider();
-			injector.setMetadataProvider( new MappingModelMetadataProvider( original, mapping ) );
-			
 		}
 		return reflectionManager;
 	}

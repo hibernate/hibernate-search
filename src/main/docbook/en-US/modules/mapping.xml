@@ -1548,17 +1548,18 @@ public class MyClass{
     <classname>SearchMapping</classname> object. This object is passed to
     Hibernate Search via a property set to the <classname>Configuration
     </classname>object. The property key is
-    <literal>hibernate.search.mapping_model</literal>.</para>
+    <literal>hibernate.search.mapping_model</literal> or it's tpye-safe representation
+    <classname>Environment.MODEL_MAPPING</classname>.</para>
 
     <programlisting>SearchMapping mapping = new SearchMapping();
 [...]
-configuration.setProperty( "hibernate.search.mapping_model", mapping );
+configuration.setProperty( Environment.MODEL_MAPPING, mapping );
 
 //or in JPA
 SearchMapping mapping = new SearchMapping();
 [...]
 Map&lt;String,String&gt; properties = new HashMap&lt;String,String)(1);
-properties.put( "hibernate.search.mapping_model", mapping );
+properties.put( Environment.MODEL_MAPPING, mapping );
 EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", properties );</programlisting>
 
     <para>The <classname>SearchMapping</classname> is the root object which
@@ -1597,7 +1598,7 @@ mapping.entity(Address.class)
            .indexed()
                .indexName("Address_Index"); //optional
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 
           <para>As you can see you must first create a
           <classname>SearchMapping</classname> object which is the root object
@@ -1637,7 +1638,7 @@ mapping.entity(Address.class).indexed()
                .documentId()
                    .name("id");
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping);</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping);</programlisting>
 
           <para>The above is equivalent to annotating a property in the entity
           as <classname>@DocumentId</classname> as seen in the following
@@ -1693,7 +1694,7 @@ mapping
             .documentId()
                 .name("id");
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 
           <para>The analyzer mapping defined above is equivalent to the
           annotation model using <classname>@AnalyzerDef</classname> in
@@ -1772,7 +1773,7 @@ mapping
                 .analyzer("en")
                 .store(Store.NO);
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 
           <para>The previous example can effectively been seen as annotating
           your entity with <classname>@FullTextFilterDef</classname> like
@@ -1847,7 +1848,7 @@ mapping
                 .name("address_data")
                 .analyzer("en");</emphasis>
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 
           <para>The above example of marking fields as indexable is equivalent
           to defining fields using <classname>@Field</classname> as seen
@@ -1920,7 +1921,7 @@ mappping
             <emphasis role="bold">.indexEmbedded()
                 .prefix("catalog.items"); //optional</emphasis>
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 
           <para>The next example shows the same definition using annotation
           (<classname>@IndexEmbedded</classname>):</para>
@@ -1980,7 +1981,7 @@ mappping
         .property("productCatalog", ElementType.METHOD)
             <emphasis role="bold">.containedIn()</emphasis>;
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 
           <para>This is equivalent to defining
           <classname>@ContainedIn</classname> in your entity:</para>
@@ -2061,7 +2062,7 @@ mapping
     .property("lastUpdated", ElementType.FIELD)
         <emphasis role="bold">.calendarBridge(Resolution.DAY)</emphasis>;
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 
           <para>See below for defining the above using
           <classname>@CalendarBridge</classname> and
@@ -2122,7 +2123,7 @@ mapping
                 <emphasis role="bold">.bridge( ConcatStringBridge.class )
                     .param( "size", "4" )</emphasis>;
  
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );</programlisting>
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 
           <para>The above can equally be defined using annotations, as seen in
           the next example.</para>
@@ -2182,7 +2183,7 @@ mapping
          .param("3", "3Com")</emphasis>
       .indexed();
 
-cfg.getProperties().put( "hibernate.search.mapping_model", mapping );
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 
 </programlisting>
 
