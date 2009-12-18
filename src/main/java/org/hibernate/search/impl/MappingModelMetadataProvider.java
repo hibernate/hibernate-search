@@ -56,6 +56,7 @@ import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.FullTextFilterDef;
@@ -314,6 +315,17 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				populateAnnotationArray();
 			}
 		}
+		
+		private void createDynamicFieldBoost(PropertyDescriptor property) {
+			if (property.getDynamicFieldBoost() != null) {
+				AnnotationDescriptor dynamicBoostAnn = new AnnotationDescriptor( DynamicBoost.class );
+				Set<Entry<String,Object>> entrySet = property.getDynamicFieldBoost().entrySet();
+				for (Entry<String, Object> entry : entrySet) {
+					dynamicBoostAnn.setValue(entry.getKey(), entry.getValue());
+				}
+				annotations.put(DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ));
+			}
+		}
 
 		private void createDateBridge(PropertyDescriptor property) {
 			Map<String, Object> map = property.getDateBridge();	
@@ -405,10 +417,12 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final org.hibernate.search.annotations.Field[] fieldArray =
 					new org.hibernate.search.annotations.Field[fieldAnnotations.size()];
 			final org.hibernate.search.annotations.Field[] fieldAsArray = fieldAnnotations.toArray( fieldArray );
+	
 			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
 			createDateBridge(property);
 			createCalendarBridge(property);
+			createDynamicFieldBoost(property);
 		}
 
 
@@ -484,6 +498,15 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				ClassBridge[] classBridesDefArray  = createClassBridgesDefArray(entity.getClassBridgeDefs());
 				classBridgesAnn.setValue("value", classBridesDefArray);
 				annotations.put(ClassBridges.class, AnnotationFactory.create( classBridgesAnn ));
+			}
+			
+			if (entity.getDynamicEntityBoost() != null) {
+				AnnotationDescriptor dynamicBoostAnn = new AnnotationDescriptor( DynamicBoost.class );
+				Set<Entry<String,Object>> entrySet = entity.getDynamicEntityBoost().entrySet();
+				for (Entry<String, Object> entry : entrySet) {
+					dynamicBoostAnn.setValue(entry.getKey(), entry.getValue());
+				}
+				annotations.put(DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ));
 			}
 			
 		}

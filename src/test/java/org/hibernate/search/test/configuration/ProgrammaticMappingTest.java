@@ -33,32 +33,29 @@ import java.util.TimeZone;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.DefaultSimilarity;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.apache.solr.analysis.EnglishPorterFilterFactory;
-import org.apache.solr.analysis.GermanStemFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
-import org.hibernate.search.Environment;
-import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.bridge.builtin.LongBridge;
-import org.hibernate.search.cfg.ConcatStringBridge;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
@@ -576,6 +573,89 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 	
+	
+	public void testDynamicBoosts() throws Exception {
+
+		Session session = openSession();
+		session.beginTransaction();
+
+		DynamicBoostedDescLibrary lib1 = new DynamicBoostedDescLibrary();
+		lib1.setName( "one" );
+		session.persist( lib1 );
+
+		DynamicBoostedDescLibrary lib2 = new DynamicBoostedDescLibrary();
+		lib2.setName( "two" );
+		session.persist( lib2 );
+
+		session.getTransaction().commit();
+		session.close();
+
+		float lib1Score = getScore( new TermQuery( new Term( "name", "one" ) ) );
+		float lib2Score = getScore( new TermQuery( new Term( "name", "two" ) ) );
+		assertEquals( "The scores should be equal", lib1Score, lib2Score );
+
+		// set dynamic score and reindex!
+		session = openSession();
+		session.beginTransaction();
+
+		session.refresh( lib2 );
+		lib2.setDynScore( 2.0f );
+
+		session.getTransaction().commit();
+		session.close();
+
+		lib1Score = getScore( new TermQuery( new Term( "name", "one" ) ) );
+		lib2Score = getScore( new TermQuery( new Term( "name", "two" ) ) );
+		assertTrue( "lib2score should be greater than lib1score", lib1Score < lib2Score );
+
+
+
+		lib1Score = getScore( new TermQuery( new Term( "name", "foobar" ) ) );
+		assertEquals( "lib1score should be 0 since term is not yet indexed.", 0.0f, lib1Score );
+
+		// index foobar
+		session = openSession();
+		session.beginTransaction();
+
+		session.refresh( lib1 );
+		lib1.setName( "foobar" );
+
+		session.getTransaction().commit();
+		session.close();
+
+		lib1Score = getScore( new TermQuery( new Term( "name", "foobar" ) ) );
+		lib2Score = getScore( new TermQuery( new Term( "name", "two" ) ) );
+		assertTrue( "lib1score should be greater than lib2score", lib1Score > lib2Score );
+	}
+	
+	private float getScore(Query query) {
+		Session session = openSession();
+		Object[] queryResult;
+		float score;
+		try {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			List<?> resultList = fullTextSession
+					.createFullTextQuery( query, DynamicBoostedDescLibrary.class )
+					.setProjection( ProjectionConstants.SCORE, ProjectionConstants.EXPLANATION )
+					.setMaxResults( 1 )
+					.list();
+
+			if ( resultList.size() == 0 ) {
+				score = 0.0f;
+			}
+			else {
+				queryResult = ( Object[] ) resultList.get( 0 );
+				score = ( Float ) queryResult[0];
+				String explanation = queryResult[1].toString();
+				log.debug( "score: " + score + " explanation: " + explanation );
+			}
+		}
+		finally {
+			session.close();
+		}
+		return score;
+	}
+	
 	private int nbrOfMatchingResults(String field, String token, FullTextSession s) throws ParseException {
 		QueryParser parser = new QueryParser( field, new StandardAnalyzer() );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( token );
@@ -636,8 +716,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.getProperties().put( Environment.MODEL_MAPPING, ProgrammaticSearchMappingFactory.class.getName() );
-		//cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
-
 	}
 
 	public void NotUseddefineMapping() {
@@ -685,6 +763,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				ProductCatalog.class,
 				Item.class,
 				Departments.class,
+				DynamicBoostedDescLibrary.class
 				
 		};
 	}

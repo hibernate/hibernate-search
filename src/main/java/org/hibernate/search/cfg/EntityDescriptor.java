@@ -43,6 +43,7 @@ public class EntityDescriptor {
 	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
 	private Map<String,Object> providedId;
 	private Set<Map<String,Object>> classBridges = new HashSet<Map<String,Object>>();
+	private Map<String, Object> dynamicEntityBoost;
 	
 	public Map<String, Object> getIndexed() {
 		return indexed;
@@ -117,6 +118,14 @@ public class EntityDescriptor {
 	
 	public Map<String, Object> getProvidedId() {
 		return this.providedId;
+	}
+	
+	public void setDynamicEntityBoost(Map<String, Object> dynamicEntityBoost) {
+		this.dynamicEntityBoost = dynamicEntityBoost;
+	}
+	
+	public Map<String, Object> getDynamicEntityBoost() {
+		return this.dynamicEntityBoost;
 	}
 	
 	private static class PropertyKey {

@@ -29,11 +29,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
-
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.engine.BoostStrategy;
 
 /**
  * @author Emmanuel Bernard
@@ -118,6 +118,10 @@ public class FieldMapping {
 
 	public CalendarBridgeMapping calendarBridge(Resolution resolution) {
 		return new CalendarBridgeMapping(mapping,entity,property, resolution);
+	}
+
+	public DynamicFieldBoostMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
+		return new DynamicFieldBoostMapping(mapping, impl, property, entity);
 	}
 
 }

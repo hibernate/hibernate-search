@@ -1548,8 +1548,8 @@ public class MyClass{
     <classname>SearchMapping</classname> object. This object is passed to
     Hibernate Search via a property set to the <classname>Configuration
     </classname>object. The property key is
-    <literal>hibernate.search.mapping_model</literal> or it's tpye-safe representation
-    <classname>Environment.MODEL_MAPPING</classname>.</para>
+    <literal>hibernate.search.model_mapping</literal> or it's type-safe
+    representation <classname>Environment.MODEL_MAPPING</classname>.</para>
 
     <programlisting>SearchMapping mapping = new SearchMapping();
 [...]
@@ -2158,8 +2158,8 @@ public class Address {
     <section>
       <title>Mapping class bridge</title>
 
-      <para>You can define class bridges on entities programmatically.
-          This is shown in the next example:</para>
+      <para>You can define class bridges on entities programmatically. This is
+      shown in the next example:</para>
 
       <example>
         <title>Defining class briges using API</title>
@@ -2214,7 +2214,62 @@ public class Departments {
 ....
 
 }</programlisting>
-          </example> </para>
+          </example></para>
+      </example>
+    </section>
+
+    <section>
+      <title>Mapping dynamic boost</title>
+
+      <para>You can apply a dynamic boost
+      factor on either a field or a whole entity: </para>
+
+      <example>
+        <title>DynamicBoost mapping using programmatic model</title>
+
+        <programlisting>SearchMapping mapping = new SearchMapping();
+
+mapping
+  .entity(DynamicBoostedDescLibrary.class)
+   .indexed()
+   <emphasis>.dynamicBoost(CustomBoostStrategy.class)</emphasis>
+  .property("libraryId", ElementType.FIELD)
+    .documentId().name("id")
+  .property("name", ElementType.FIELD)
+    .field()
+      .store(Store.YES)
+      <emphasis>.dynamicBoost(CustomFieldBoostStrategy.class)</emphasis>;
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+
+        <para>The next example shows the equivalent mapping using the
+        <classname>@DynamicBoost</classname> annotation: <example>
+            <title>Using the @DynamicBoost </title>
+
+            <programlisting>@Entity
+@Indexed
+@DynamicBoost(impl = CustomBoostStrategy.class)
+public class DynamicBoostedDescriptionLibrary {
+
+ @Id
+ @GeneratedValue
+ @DocumentId
+ private int id;
+
+ private float dynScore;
+ 
+ @Field(store = Store.YES)
+ @DynamicBoost(impl = CustomFieldBoostStrategy.class)
+ private String name;
+
+ public DynamicBoostedDescriptionLibrary() {
+  dynScore = 1.0f;
+ }
+  
+ .......
+
+}</programlisting>
+          </example></para>
       </example>
     </section>
   </section>
