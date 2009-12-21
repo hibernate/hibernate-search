@@ -32,6 +32,7 @@ import org.apache.solr.analysis.TokenizerFactory;
 
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.engine.BoostStrategy;
 
 /**
  * @author Emmanuel Bernard
@@ -67,6 +68,13 @@ public class PropertyMapping {
 		Map<String, Object> analyzerDiscriminatorAnn = new HashMap<String, Object>();
 		analyzerDiscriminatorAnn.put( "impl", discriminator );
 		property.setAnalyzerDiscriminator(analyzerDiscriminatorAnn);
+		return this;
+	}
+	
+	public PropertyMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
+		final Map<String, Object> dynamicBoostAnn = new HashMap<String, Object>();
+		dynamicBoostAnn.put("impl", impl);
+		property.setDynamicBoost(dynamicBoostAnn);
 		return this;
 	}
 

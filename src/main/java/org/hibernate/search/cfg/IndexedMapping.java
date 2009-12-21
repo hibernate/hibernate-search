@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
-import org.hibernate.search.engine.BoostStrategy;
 
 public class IndexedMapping {
 	
@@ -92,10 +91,6 @@ public class IndexedMapping {
 
 	public ProvidedIdMapping providedId() {
 		return new ProvidedIdMapping(mapping,entity);
-	}
-
-	public DynamicEntityBoostMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
-		return new DynamicEntityBoostMapping(mapping, impl, entity, entityMapping);
 	}
 	
 }

@@ -62,6 +62,14 @@ public class EntityMapping {
 		return this;
 	}
 
+	
+	public EntityMapping dynamicBoost(Class<? extends BoostStrategy>  impl) {
+		final Map<String, Object> dynamicBoost = new HashMap<String, Object>();
+		dynamicBoost.put("impl", impl);
+		entity.setDynamicBoost(dynamicBoost);
+		return this;
+	}
+	
 	public EntityMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
 		final Map<String, Object> discriminatorAnn = new HashMap<String, Object>();
 		discriminatorAnn.put( "impl", discriminator );

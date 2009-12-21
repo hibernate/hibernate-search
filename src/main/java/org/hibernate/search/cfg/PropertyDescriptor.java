@@ -44,7 +44,7 @@ public class PropertyDescriptor {
 
 	private Map<String, Object> documentId;
 	private Map<String, Object> analyzerDiscriminator;
-	private Map<String, Object> dynamicFieldBoost;
+	private Map<String, Object> dynamicBoost;
 
 	public PropertyDescriptor(String name, ElementType type) {
 		this.name = name;
@@ -106,12 +106,11 @@ public class PropertyDescriptor {
 		this.containedIn = containedIn;
 	}
 
-	public void setDynamicFieldBoost(Map<String, Object> dynamicFieldBoost) {
-		this.dynamicFieldBoost = dynamicFieldBoost;
+	public void setDynamicBoost(Map<String, Object> dynamicBoostAnn) {
+		this.dynamicBoost = dynamicBoostAnn;
 	}
 	
-	public Map<String,Object> getDynamicFieldBoost() {
-		return this.dynamicFieldBoost;
+	public Map<String,Object> getDynamicBoost() {
+		return this.dynamicBoost;
 	}
-
 }

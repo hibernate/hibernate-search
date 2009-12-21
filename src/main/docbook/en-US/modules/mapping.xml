@@ -2236,9 +2236,9 @@ mapping
   .property("libraryId", ElementType.FIELD)
     .documentId().name("id")
   .property("name", ElementType.FIELD)
+    <emphasis>.dynamicBoost(CustomFieldBoostStrategy.class)</emphasis>;
     .field()
       .store(Store.YES)
-      <emphasis>.dynamicBoost(CustomFieldBoostStrategy.class)</emphasis>;
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
 

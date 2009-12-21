@@ -316,16 +316,6 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 		}
 		
-		private void createDynamicFieldBoost(PropertyDescriptor property) {
-			if (property.getDynamicFieldBoost() != null) {
-				AnnotationDescriptor dynamicBoostAnn = new AnnotationDescriptor( DynamicBoost.class );
-				Set<Entry<String,Object>> entrySet = property.getDynamicFieldBoost().entrySet();
-				for (Entry<String, Object> entry : entrySet) {
-					dynamicBoostAnn.setValue(entry.getKey(), entry.getValue());
-				}
-				annotations.put(DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ));
-			}
-		}
 
 		private void createDateBridge(PropertyDescriptor property) {
 			Map<String, Object> map = property.getDateBridge();	
@@ -367,6 +357,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 		}
 
+		
 		private void createFields(PropertyDescriptor property) {
 			final Collection<Map<String,Object>> fields = property.getFields();
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
@@ -405,7 +396,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 							}
 						}
 						fieldAnnotation.setValue( "bridge", AnnotationFactory.create( bridgeAnnotation ) );
-					}
+					} 
 					else {
 						fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
 					}
@@ -422,10 +413,20 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
 			createDateBridge(property);
 			createCalendarBridge(property);
-			createDynamicFieldBoost(property);
+			createDynamicBoost(property);
+			
 		}
 
-
+		private void createDynamicBoost(PropertyDescriptor property) {
+			if (property.getDynamicBoost() != null) {
+				AnnotationDescriptor dynamicBoostAnn = new AnnotationDescriptor( DynamicBoost.class );
+				Set<Entry<String,Object>> entrySet = property.getDynamicBoost().entrySet();
+				for (Entry<String, Object> entry : entrySet) {
+					dynamicBoostAnn.setValue(entry.getKey(), entry.getValue());
+				}
+				annotations.put(DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ));
+			}
+		}
 		private void createContainedIn(PropertyDescriptor property) {
 			if (property.getContainedIn() != null) {
 				Map<String, Object> containedIn = property.getContainedIn();
@@ -500,9 +501,9 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				annotations.put(ClassBridges.class, AnnotationFactory.create( classBridgesAnn ));
 			}
 			
-			if (entity.getDynamicEntityBoost() != null) {
+			if (entity.getDynamicBoost() != null) {
 				AnnotationDescriptor dynamicBoostAnn = new AnnotationDescriptor( DynamicBoost.class );
-				Set<Entry<String,Object>> entrySet = entity.getDynamicEntityBoost().entrySet();
+				Set<Entry<String,Object>> entrySet = entity.getDynamicBoost().entrySet();
 				for (Entry<String, Object> entry : entrySet) {
 					dynamicBoostAnn.setValue(entry.getKey(), entry.getValue());
 				}

@@ -77,6 +77,7 @@ public class FieldMapping {
 		field.put( "boost", boostAnn );
 		return this;
 	}
+	
 
 	public FieldBridgeMapping bridge(Class<?> impl) {
 		return new FieldBridgeMapping( impl, field, this, property, entity, mapping );
@@ -118,10 +119,6 @@ public class FieldMapping {
 
 	public CalendarBridgeMapping calendarBridge(Resolution resolution) {
 		return new CalendarBridgeMapping(mapping,entity,property, resolution);
-	}
-
-	public DynamicFieldBoostMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
-		return new DynamicFieldBoostMapping(mapping, impl, property, entity);
 	}
 
 }
