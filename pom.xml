@@ -12,9 +12,9 @@
         <url>http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH</url>
     </issueManagement>
     <scm>
-        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/tags/v3_2_0_Beta1</connection>
-        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/tags/v3_2_0_Beta1</developerConnection>
-        <url>http://fisheye.jboss.com/browse/Hibernate/search/tags/v3_2_0_Beta1</url>
+        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/trunk</connection>
+        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/trunk</developerConnection>
+        <url>http://fisheye.jboss.com/browse/Hibernate/search/trunk</url>
     </scm>
 
     <organization>
@@ -29,6 +29,11 @@
         </license>
     </licenses>
 
+    <ciManagement>
+    	<system>Hudson</system>
+    	<url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-trunk/</url>
+    </ciManagement>
+    <inceptionYear>2006</inceptionYear>
     <developers>
         <developer>
             <id>epbernard</id>
@@ -41,11 +46,13 @@
             <name>Hardy Ferentschik</name>
             <url>http://in.relation.to/Bloggers/Hardy</url>
         </developer>
+        <developer>
+        	<id>sannegrinovero</id>
+        	<name>Sanne Grinovero</name>
+        	<url>http://in.relation.to/Bloggers/Sanne</url>
+        </developer>
     </developers>
     <contributors>
-        <contributor>
-            <name>Sanne Grinovero</name>
-        </contributor>
     </contributors>
 
     <properties>
@@ -336,6 +343,7 @@
                     <groupId>hsqldb</groupId>
                     <artifactId>hsqldb</artifactId>
                     <version>1.8.0.2</version>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
             <properties>
