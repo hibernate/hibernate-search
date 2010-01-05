@@ -57,6 +57,7 @@ import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
+import org.hibernate.LockOptions;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.impl.AbstractQueryImpl;
@@ -877,11 +878,19 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
+	public Query setLockOptions(LockOptions lockOptions) {
+		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries");
+	}
+
 	@Override
 	public FullTextQuery setResultTransformer(ResultTransformer transformer) {
 		super.setResultTransformer( transformer );
 		this.resultTransformer = transformer;
 		return this;
+	}
+
+	protected LockOptions getLockOptions() {
+		return null;
 	}
 
 	public int executeUpdate() throws HibernateException {

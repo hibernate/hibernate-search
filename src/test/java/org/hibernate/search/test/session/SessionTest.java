@@ -28,6 +28,7 @@ import java.lang.reflect.Proxy;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.context.ThreadLocalSessionContext;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.search.FullTextSession;
@@ -78,6 +79,18 @@ public class SessionTest extends SearchTestCase {
 		s.close();
 	}
 
+	public void testThreadBoundSessionWrappingOutOfTransaction() throws Exception {
+		final Session session = getSessions().getCurrentSession();
+		try {
+			FullTextSession fts = Search.getFullTextSession( session );
+			//success
+		}
+		finally {
+			//clean up after the mess
+			ThreadLocalSessionContext.unbind( getSessions() );
+		}
+	}
+
 	protected Class[] getMappings() {
 		return new Class[] {
 				Email.class,
@@ -90,5 +103,7 @@ public class SessionTest extends SearchTestCase {
 		// for this test we explcitly set the auto commit mode since we are not explcitly starting a transaction
 		// which could be a problem in some databases.
 		cfg.setProperty( "hibernate.connection.autocommit", "true" );
+		//needed for testThreadBoundSessionWrappingOutOfTransaction
+		cfg.setProperty( "hibernate.current_session_context_class", "thread" );
 	}
 }

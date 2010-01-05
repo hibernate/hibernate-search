@@ -49,6 +49,7 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.UnknownProfileException;
+import org.hibernate.LockOptions;
 import org.hibernate.classic.Session;
 import org.hibernate.collection.PersistentCollection;
 import org.hibernate.engine.EntityKey;
@@ -57,6 +58,7 @@ import org.hibernate.engine.QueryParameters;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.engine.LoadQueryInfluencers;
+import org.hibernate.engine.NonFlushedChanges;
 import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.engine.query.sql.NativeSQLQuerySpecification;
 import org.hibernate.event.EventListeners;
@@ -386,12 +388,20 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.get( clazz, id, lockMode );
 	}
 
+	public Object get(Class clazz, Serializable id, LockOptions lockOptions) throws HibernateException {
+		return session.get(clazz, id, lockOptions);
+	}
+
 	public Object get(String entityName, Serializable id) throws HibernateException {
 		return session.get( entityName, id );
 	}
 
 	public Object get(String entityName, Serializable id, LockMode lockMode) throws HibernateException {
 		return session.get( entityName, id, lockMode );
+	}
+
+	public Object get(String entityName, Serializable id, LockOptions lockOptions) throws HibernateException {
+		return session.get(entityName, id, lockOptions);
 	}
 
 	public CacheMode getCacheMode() {
@@ -556,6 +566,14 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.executeNativeUpdate( specification, queryParameters );
 	}
 
+	public NonFlushedChanges getNonFlushedChanges() throws HibernateException {
+		return sessionImplementor.getNonFlushedChanges();
+	}
+
+	public void applyNonFlushedChanges(NonFlushedChanges nonFlushedChanges) throws HibernateException {
+		sessionImplementor.applyNonFlushedChanges( nonFlushedChanges );
+	}
+
 	public EntityMode getEntityMode() {
 		return session.getEntityMode();
 	}
@@ -644,6 +662,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.load( entityName, id, lockMode );
 	}
 
+	public Object load(String entityName, Serializable id, LockOptions lockOptions) throws HibernateException {
+		return session.load( entityName, id, lockOptions );
+	}
+
 	public void load(Object object, Serializable id) throws HibernateException {
 		session.load( object, id );
 	}
@@ -656,8 +678,16 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.load( theClass, id, lockMode );
 	}
 
+	public Object load(Class theClass, Serializable id, LockOptions lockOptions) throws HibernateException {
+		return session.load( theClass, id, lockOptions );
+	}
+
 	public void lock(String entityName, Object object, LockMode lockMode) throws HibernateException {
 		session.lock( entityName, object, lockMode );
+	}
+
+	public LockRequest buildLockRequest(LockOptions lockOptions) {
+		return session.buildLockRequest( lockOptions );
 	}
 
 	public void lock(Object object, LockMode lockMode) throws HibernateException {
@@ -694,6 +724,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public void refresh(Object object, LockMode lockMode) throws HibernateException {
 		session.refresh( object, lockMode );
+	}
+
+	public void refresh(Object object, LockOptions lockOptions) throws HibernateException {
+		session.refresh( object, lockOptions );
 	}
 
 	public void replicate(String entityName, Object object, ReplicationMode replicationMode) throws HibernateException {
