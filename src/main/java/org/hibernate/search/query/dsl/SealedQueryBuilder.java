@@ -1,5 +1,7 @@
 package org.hibernate.search.query.dsl;
 
+import org.apache.lucene.search.BooleanClause;
+
 /**
  * // TODO: Document this
  *
@@ -13,7 +15,15 @@ public class SealedQueryBuilder {
 
    }
 
-   public QueryContext getContext(){
-      return new QueryContext();
+   public BooleanContext should() {
+      return new BooleanContext(BooleanClause.Occur.SHOULD);
+   }
+
+   public NegatableBooleanContext must(){
+      return new NegatableBooleanContext(BooleanClause.Occur.MUST);
+   }
+
+   public UnbuildableTermQueryBuilderOnField term(){
+      return new UnbuildableTermQueryBuilderOnField();
    }
 }

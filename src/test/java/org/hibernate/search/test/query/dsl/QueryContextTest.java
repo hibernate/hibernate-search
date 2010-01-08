@@ -1,6 +1,5 @@
 package org.hibernate.search.test.query.dsl;
 
-import org.hibernate.search.query.dsl.QueryContext;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.query.Person;
 
