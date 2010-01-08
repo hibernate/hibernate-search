@@ -115,7 +115,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 				//no default
 				log.debug( "Setting directory 1 as current" );
 				currentToBe = 1;
-				File destinationFile = new File( indexDir, Integer.valueOf( readCurrentState ).toString() );
+				File destinationFile = new File( indexDir, Integer.valueOf( currentToBe ).toString() );
 				int sourceCurrent;
 				if ( new File( sourceIndexDir, "current1" ).exists() ) {
 					sourceCurrent = 1;
