@@ -3,7 +3,9 @@ package org.hibernate.search.query.dsl;
 import org.apache.lucene.search.BooleanClause;
 
 /**
- * // TODO: Document this
+ * Starting class that will allow users to build their queries using the DSL.
+ *
+ * //TODO: This needs to be tied into the SearchFactory somehow so that users can actually "access" it.
  *
  * @author Navin Surtani
  */

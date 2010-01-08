@@ -3,7 +3,9 @@ package org.hibernate.search.query.dsl;
 import org.apache.lucene.index.Term;
 
 /**
- * // TODO: Document this
+ * Class that allows users to continue building their TermQueries.
+ * However, a TermQuery cannot be built from an instance of this class, as there is not enough information
+ * to do so.
  *
  * @author Navin Surtani
  */

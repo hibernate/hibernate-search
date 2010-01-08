@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * // TODO: Document this
+ * Class that allows users to create BooleanQueries.
  *
  * @author Navin Surtani
  */
