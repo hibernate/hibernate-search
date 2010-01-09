@@ -24,6 +24,7 @@
  */
 package org.hibernate.search.test.embedded;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -47,7 +48,7 @@ public class State {
 	private String name;
 	
 	@ContainedIn
-	@OneToOne(mappedBy = "state")
+	@OneToOne(mappedBy = "state", cascade = CascadeType.ALL)
 	private StateCandidate candidate;
 
 	public Integer getId() {

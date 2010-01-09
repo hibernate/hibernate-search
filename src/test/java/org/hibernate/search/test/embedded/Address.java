@@ -26,20 +26,20 @@ package org.hibernate.search.test.embedded;
 
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.CascadeType;
 
+import org.hibernate.annotations.Target;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.annotations.Target;
 
 /**
  * @author Emmanuel Bernard
@@ -53,7 +53,7 @@ public class Address {
 	@DocumentId
 	private Long id;
 
-	@Field(index= Index.TOKENIZED)
+	@Field(index = Index.TOKENIZED)
 	private String street;
 
 	@IndexedEmbedded(depth = 1, prefix = "ownedBy_", targetElement = Owner.class)
@@ -64,18 +64,9 @@ public class Address {
 	@ContainedIn
 	private Set<Tower> towers = new HashSet<Tower>();
 
-	public Country getCountry() {
-		return country;
-	}
-
-	public void setCountry(Country country) {
-		this.country = country;
-	}
-
-	@ManyToOne(cascade = { CascadeType.PERSIST })
+	@ManyToOne(cascade = CascadeType.ALL)
 	@IndexedEmbedded
 	private Country country;
-
 
 	public Long getId() {
 		return id;
@@ -108,5 +99,13 @@ public class Address {
 
 	public void setTowers(Set<Tower> towers) {
 		this.towers = towers;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
 	}
 }

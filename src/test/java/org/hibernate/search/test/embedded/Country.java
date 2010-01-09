@@ -26,14 +26,13 @@ package org.hibernate.search.test.embedded;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -54,10 +53,9 @@ public class Country {
 	@Field
 	private String name;
 
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	//FIXME with JPA 2, move to @OrderColumn
 	@IndexColumn(name = "list_position")
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	@IndexedEmbedded
 	private List<State> states = new ArrayList<State>();
 

@@ -51,7 +51,7 @@ public class Attribute {
 	@ContainedIn
 	private Product product;
 
-	@OneToMany(mappedBy = "attribute", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@OneToMany(mappedBy = "attribute", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@IndexedEmbedded
 	private List<AttributeValue> values;
 

@@ -50,7 +50,7 @@ public class Place {
 	@Field(index = Index.TOKENIZED)
 	private String name;
 
-	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@OneToOne(cascade = CascadeType.ALL)
 	@IndexedEmbedded
 	private Address address;
 

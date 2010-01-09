@@ -47,10 +47,10 @@ public class Tower {
 	@DocumentId
 	private Long id;
 
-	@Field( index = Index.TOKENIZED )
+	@Field(index = Index.TOKENIZED)
 	private String name;
 
-	@ManyToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+	@ManyToOne(cascade = CascadeType.ALL)
 	@IndexedEmbedded
 	private Address address;
 

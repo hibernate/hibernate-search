@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: Product.java 17630 2009-10-06 13:38:43Z sannegrinovero $
  * 
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
@@ -46,7 +46,7 @@ public class Product {
 	@GeneratedValue
 	private long id;
 
-	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@OneToMany(mappedBy = "product", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@IndexedEmbedded
 	private List<Attribute> attributes;
 
