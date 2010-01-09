@@ -66,6 +66,11 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		createMany( Dvd.class, DVD_NUM );
 		createMany( AncientBook.class, ANCIENTBOOK_NUM );
 	}
+	
+	@Override
+	protected void tearDown() {
+		builder.close();
+	}
 
 	private void createMany(Class<? extends TitleAble> entityType, int amount ) throws InstantiationException, IllegalAccessException {
 		FullTextSession fullTextSession = builder.openFullTextSession();

@@ -54,6 +54,7 @@ public class FullTextSessionBuilder {
 
 	private AnnotationConfiguration cfg;
 	private SessionFactory sessionFactory;
+	private boolean usingFileSystem = false;
 	
 	static {
 		String buildDir = System.getProperty( "build.dir" );
@@ -89,10 +90,12 @@ public class FullTextSessionBuilder {
 		 if ( use ) {
 			 cfg.setProperty( "hibernate.search.default.directory_provider",
 						RAMDirectoryProvider.class.getName() );
+			 usingFileSystem = false;
 		 }
 		 else {
 			 cfg.setProperty( "hibernate.search.default.directory_provider",
 						FSDirectoryProvider.class.getName() );
+			 usingFileSystem = true;
 		 }
 		return this;
 	}
@@ -138,7 +141,9 @@ public class FullTextSessionBuilder {
 			throw new java.lang.IllegalStateException( "sessionFactory not yet built" );
 		}
 		sessionFactory.close();
-		FileHelper.delete( indexDir );
+		if ( usingFileSystem ) {
+			FileHelper.delete( indexDir );
+		}
 		sessionFactory = null;
 	}
 

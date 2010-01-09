@@ -26,7 +26,6 @@ package org.hibernate.search.test.directoryProvider;
 
 import junit.framework.TestCase;
 
-import org.hibernate.search.event.ContextHolder;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 /**

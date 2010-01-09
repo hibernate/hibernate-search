@@ -90,7 +90,7 @@ public abstract class SearchTestCase extends TestCase {
 		PostInsertEventListener[] listeners = ( ( SessionFactoryImpl ) getSessions() ).getEventListeners()
 				.getPostInsertEventListeners();
 		FullTextIndexEventListener listener = null;
-		//FIXME this sucks since we mandante the event listener use
+		//FIXME this sucks since we mandate the event listener use
 		for ( PostInsertEventListener candidate : listeners ) {
 			if ( candidate instanceof FullTextIndexEventListener ) {
 				listener = ( FullTextIndexEventListener ) candidate;

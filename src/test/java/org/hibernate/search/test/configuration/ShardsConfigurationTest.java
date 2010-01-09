@@ -109,6 +109,11 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Document.class, 1, BATCH, MAX_MERGE_DOCS, 11 );
 	}
 	
+	@Override
+	protected void ensureIndexesAreEmpty() {
+		// skips index emptying to prevent a problem with UselessShardingStrategy
+	}
+	
 	protected Class[] getMappings() {
 		return new Class[] {
 				Book.class,
