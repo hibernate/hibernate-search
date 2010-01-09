@@ -1,59 +1,117 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-search</artifactId>
-    <version>3.2.0.Beta2-SNAPSHOT</version>
-    <name>Hibernate Search</name>
-    <description>Hibernate Search</description>
-    <url>http://search.hibernate.org</url>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
+ * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ * 
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.hibernate</groupId>
+	<artifactId>hibernate-search</artifactId>
+	<version>3.2.0.Beta2-SNAPSHOT</version>
+	<name>Hibernate Search</name>
+	<description>Hibernate Search</description>
+	<url>http://search.hibernate.org</url>
 
-    <issueManagement>
-        <system>JIRA</system>
-        <url>http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH</url>
-    </issueManagement>
-    <scm>
-        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/trunk</connection>
-        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/trunk</developerConnection>
-        <url>http://fisheye.jboss.com/browse/Hibernate/search/trunk</url>
-    </scm>
+	<issueManagement>
+		<system>JIRA</system>
+		<url>http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH</url>
+	</issueManagement>
+	<scm>
+		<connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/trunk</connection>
+		<developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/trunk</developerConnection>
+		<url>http://fisheye.jboss.com/browse/Hibernate/search/trunk</url>
+	</scm>
 
-    <organization>
-        <name>Hibernate</name>
-        <url>http://www.hibernate.org</url>
-    </organization>
+	<organization>
+		<name>Hibernate</name>
+		<url>http://www.hibernate.org</url>
+	</organization>
 
-    <licenses>
-        <license>
-            <name>LGPL</name>
-            <url>lgpl.txt</url>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License</name>
+			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+			<comments>See discussion at http://hibernate.org/356.html for more details.</comments>
+		</license>
+	</licenses>
 
-    <ciManagement>
-    	<system>Hudson</system>
-    	<url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-trunk/</url>
-    </ciManagement>
-    <inceptionYear>2006</inceptionYear>
-    <developers>
-        <developer>
-            <id>epbernard</id>
-            <name>Emmanuel Bernard</name>
-            <email>emmanuel@hibernate.org</email>
-            <url>http://in.relation.to/Bloggers/Emmanuel</url>
-        </developer>
-        <developer>
-            <id>hardy.ferentschik</id>
-            <name>Hardy Ferentschik</name>
-            <url>http://in.relation.to/Bloggers/Hardy</url>
-        </developer>
-        <developer>
-        	<id>sannegrinovero</id>
-        	<name>Sanne Grinovero</name>
-        	<url>http://in.relation.to/Bloggers/Sanne</url>
-        </developer>
-    </developers>
-    <contributors>
-    </contributors>
+	<ciManagement>
+		<system>Hudson</system>
+		<url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-trunk/</url>
+	</ciManagement>
+	<inceptionYear>2006</inceptionYear>
+	<developers>
+		<developer>
+			<id>epbernard</id>
+			<name>Emmanuel Bernard</name>
+			<email>emmanuel@hibernate.org</email>
+			<url>http://in.relation.to/Bloggers/Emmanuel</url>
+		</developer>
+		<developer>
+			<id>hardy.ferentschik</id>
+			<name>Hardy Ferentschik</name>
+			<url>http://in.relation.to/Bloggers/Hardy</url>
+		</developer>
+		<developer>
+			<id>sannegrinovero</id>
+			<name>Sanne Grinovero</name>
+			<url>http://in.relation.to/Bloggers/Sanne</url>
+		</developer>
+	</developers>
+
+	<mailingLists>
+		<mailingList>
+			<name>Hibernate Announcements</name>
+			<post>hibernate-announce@lists.jboss.org</post>
+			<subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-announce</subscribe>
+			<unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-announce</unsubscribe>
+			<archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
+		</mailingList>
+		<mailingList>
+			<name>Hibernate Commit Notificatons</name>
+			<post>hibernate-commits@lists.jboss.org</post>
+			<subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</subscribe>
+			<unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</unsubscribe>
+			<archive>http://lists.jboss.org/pipermail/hibernate-commits/</archive>
+		</mailingList>
+		<mailingList>
+			<name>Hibernate Developers</name>
+			<post>hibernate-dev@lists.jboss.org</post>
+			<subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-dev</subscribe>
+			<unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-dev</unsubscribe>
+			<archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
+			<otherArchives>
+				<otherArchive>http://www.mail-archive.com/hibernate-dev%40lists.jboss.org/index.html</otherArchive>
+			</otherArchives>
+		</mailingList>
+		<mailingList>
+			<name>Hibernate Issue Notifications</name>
+			<post>hibernate-issues@lists.jboss.org</post>
+			<subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-issues</subscribe>
+			<unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-issues</unsubscribe>
+			<archive>http://lists.jboss.org/pipermail/hibernate-issues/</archive>
+		</mailingList>
+	</mailingLists>
 
     <properties>
         <slf4jVersion>1.5.8</slf4jVersion>
