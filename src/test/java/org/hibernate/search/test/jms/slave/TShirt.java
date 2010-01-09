@@ -24,6 +24,7 @@
  */
 package org.hibernate.search.test.jms.slave;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
@@ -45,6 +46,7 @@ public class TShirt {
 	private int id;
 	@Field(index= Index.TOKENIZED)
 	private String logo;
+	@Column(name="size_")
 	private String size;
 
 	public int getId() {

@@ -141,7 +141,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 		s.getTransaction().begin();
 		Statement statement = s.connection().createStatement();
 		statement.executeUpdate(
-				"insert into TShirt_Master(id, logo, size) values( '1', 'JBoss balls', 'large')"
+				"insert into TShirt_Master(id, logo, size_) values( '1', 'JBoss balls', 'large')"
 		);
 		statement.close();
 		TShirt ts = ( TShirt ) s.get( TShirt.class, 1 );

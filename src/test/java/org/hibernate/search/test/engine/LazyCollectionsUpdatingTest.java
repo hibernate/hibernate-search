@@ -51,7 +51,10 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
-			BusStop busStop = (BusStop) fullTextSession.get( BusStop.class, 1L );
+			List list = fullTextSession.createCriteria( BusStop.class ).list();
+			assertNotNull( list );
+			assertEquals( 4, list.size() );
+			BusStop busStop = (BusStop) list.get( 1 );
 			busStop.setRoadName( "new road" );
 			tx.commit();
 		}
@@ -68,7 +71,10 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
 		try {
-			BusStop busStop = (BusStop) fullTextSession.get( BusStop.class, 1L );
+			List list = fullTextSession.createCriteria( BusStop.class ).list();
+			assertNotNull( list );
+			assertEquals( 4, list.size() );
+			BusStop busStop = (BusStop) list.get( 1 );
 			busStop.setRoadName( "new road" );
 			fullTextSession.flush();
 		}

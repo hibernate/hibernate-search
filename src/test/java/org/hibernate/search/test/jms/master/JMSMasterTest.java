@@ -56,7 +56,7 @@ import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
- * Tests  that the Master node in a JMS cluster can propertly process messages placed onto the queue.
+ * Tests  that the Master node in a JMS cluster can properly process messages placed onto the queue.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -158,18 +158,18 @@ public class JMSMasterTest extends SearchTestCase {
 	}
 
 	/**
-	 * Create a test object without trigggering indexing. Use SQL directly.
+	 * Create a test object without triggering indexing. Use SQL directly.
 	 *
 	 * @return a <code>TShirt</code> test object.
 	 *
-	 * @throws SQLException in case the inset fails.
+	 * @throws SQLException in case the insert fails.
 	 */
 	private TShirt createObjectWithSQL() throws SQLException {
 		Session s = openSession();
 		s.getTransaction().begin();
 		Statement statement = s.connection().createStatement();
 		statement.executeUpdate(
-				"insert into TShirt_Master(id, logo, size) values( '1', 'JBoss balls', 'large')"
+				"insert into TShirt_Master(id, logo, size_) values( 1, 'JBoss balls', 'large')"
 		);
 		statement.close();
 		TShirt ts = ( TShirt ) s.get( TShirt.class, 1 );
