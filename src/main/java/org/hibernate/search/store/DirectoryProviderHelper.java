@@ -43,7 +43,7 @@ import org.hibernate.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.search.util.PluginLoader;
 
 /**
  * @author Emmanuel Bernard
@@ -161,26 +161,8 @@ public class DirectoryProviderHelper {
 			return new NoLockFactory();
 		}
 		else {
-			LockFactoryFactory lockFactoryFactory;
-			try {
-				Class lockFactoryClass = ReflectHelper.classForName( lockFactoryName, dirConfiguration.getClass() );
-				lockFactoryFactory = (LockFactoryFactory) lockFactoryClass.newInstance();
-			}
-			catch (ClassNotFoundException e) {
-				throw new SearchException( "Unable to find LockFactoryFactory class " + lockFactoryName, e );
-			}
-			catch (IllegalAccessException e) {
-				throw new SearchException( "Unable to create instance of LockFactoryFactory class " + lockFactoryName
-						+ " Be sure to have a no-arg constructor", e );
-			}
-			catch (InstantiationException e) {
-				throw new SearchException( "Unable to create instance of LockFactoryFactory class " + lockFactoryName
-						+ " Be sure to have a no-arg constructor", e );
-			}
-			catch (ClassCastException e) {
-				throw new SearchException( "Class does not implement LockFactoryFactory: "
-						+ lockFactoryName, e );
-			}
+			LockFactoryFactory lockFactoryFactory = PluginLoader.instanceFromName( LockFactoryFactory.class,
+						lockFactoryName, DirectoryProviderHelper.class, "locking_strategy" );
 			return lockFactoryFactory.createLockFactory( indexDir, dirConfiguration );
 		}
 	}

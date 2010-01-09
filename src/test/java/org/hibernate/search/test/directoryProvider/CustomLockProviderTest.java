@@ -26,6 +26,7 @@ package org.hibernate.search.test.directoryProvider;
 
 import junit.framework.TestCase;
 
+import org.hibernate.search.event.ContextHolder;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 /**
@@ -62,7 +63,7 @@ public class CustomLockProviderTest extends TestCase {
 			assertTrue( causeSearch instanceof org.hibernate.search.SearchException );
 			Throwable causeLockin = causeSearch.getCause();
 			assertNotNull( causeLockin );
-			assertTrue( causeLockin.getMessage().startsWith("Unable to find LockFactory") );
+			assertEquals( "Unable to find locking_strategy implementation class: org.hibernate.NotExistingFactory", causeLockin.getMessage() );
 		}
 	}
 
