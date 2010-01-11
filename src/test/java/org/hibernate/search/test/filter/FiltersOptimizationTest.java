@@ -194,7 +194,7 @@ public class FiltersOptimizationTest extends TestCase {
 		}
 		
 		@Override
-		public DocIdSetIterator iterator() {
+		public DocIdSetIterator iterator() throws IOException {
 			return bitSet.iterator();
 		}
 		

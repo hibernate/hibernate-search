@@ -80,11 +80,11 @@ public class AndDocIdSet extends DocIdSet {
 		//iterator initialize, just one "next" for each DocIdSetIterator
 		for ( ; i<iteratorSize; i++ ) {
 			final DocIdSetIterator iterator = iterators[i];
-			if ( ! iterator.next() ) {
+			final int position = iterator.nextDoc();
+			if ( position==DocIdSetIterator.NO_MORE_DOCS ) {
 				//current iterator has no values, so skip all
-				return EmptyDocIdBitSet.instance;
+				return DocIdSet.EMPTY_DOCIDSET;
 			}
-			final int position = iterator.doc();
 			if ( targetPosition==position ) {
 				votes++; //stopped as same position of others
 			}
@@ -100,15 +100,14 @@ public class AndDocIdSet extends DocIdSet {
 			result.fastSet( targetPosition );
 			targetPosition++;
 		}
-		i=0;
-		votes=0; //could be smarted but would make the code even more complex for a minor optimization out of cycle.
+		i = 0;
+		votes = 0; //could be smarter but would make the code even more complex for a minor optimization out of cycle.
 		// enter main loop:
 		while ( true ) {
 			final DocIdSetIterator iterator = iterators[i];
-			final boolean validPosition = iterator.skipTo( targetPosition );
-			if ( ! validPosition )
+			final int position = iterator.advance( targetPosition );
+			if ( position==DocIdSetIterator.NO_MORE_DOCS )
 				return result; //exit condition
-			final int position = iterator.doc();
 			if ( position == targetPosition ) {
 				if ( ++votes == iteratorSize ) {
 					result.fastSet( position );
@@ -125,40 +124,13 @@ public class AndDocIdSet extends DocIdSet {
 	}
 
 	@Override
-	public DocIdSetIterator iterator() {
-		return new AndingDocIdSetIterator();
+	public DocIdSetIterator iterator() throws IOException {
+		return buildBitset().iterator();
 	}
 	
-	private class AndingDocIdSetIterator extends DocIdSetIterator {
-
-		private DocIdSetIterator iterator;
-
-		@Override
-		public int doc() {
-			// should never happen when respecting interface contract; otherwise I
-			// prefer a NPE than a hard to debug return 0.
-			assert iterator != null : "Illegal state, can't be called before next() or skipTo(int)";
-			return iterator.doc();
-		}
-
-		@Override
-		public boolean next() throws IOException {
-			ensureInitialized(); //can't initialize before as it would not be allowed to throw IOException
-			return iterator.next();
-		}
-
-		@Override
-		public boolean skipTo(int target) throws IOException {
-			ensureInitialized(); //can't initialize before as it would not be allowed to throw IOException
-			return iterator.skipTo( target );
-		}
-		
-		private final void ensureInitialized() throws IOException {
-			if ( iterator == null ) {
-				iterator = buildBitset().iterator();
-			}
-		}
-		
+	@Override
+	public boolean isCacheable() {
+		return true;
 	}
 	
 }

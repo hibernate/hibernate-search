@@ -31,8 +31,6 @@ import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.index.IndexReader;
 
-import org.hibernate.search.filter.EmptyDocIdBitSet;
-
 /**
  * @author Emmanuel Bernard
  */
@@ -58,6 +56,6 @@ public class ExcludeAllFilter extends Filter {
 			throw new IllegalStateException( "Called twice" );
 		}
 		done = true;
-		return EmptyDocIdBitSet.instance;
+		return DocIdSet.EMPTY_DOCIDSET;
 	}
 }

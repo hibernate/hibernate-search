@@ -97,10 +97,10 @@ public class AndDocIdSetsTest extends TestCase {
 	public void testIteratorMatchesTestArray() throws IOException {
 		DocIdSet docIdSet0_9 = arrayToDocIdSet(testDataFrom0to9);
 		DocIdSetIterator docIdSetIterator = docIdSet0_9.iterator();
-		assertTrue( docIdSetIterator.next() );
-		assertEquals( 0, docIdSetIterator.doc() );
-		assertTrue( docIdSetIterator.skipTo(9) );
-		assertFalse( docIdSetIterator.skipTo(10) );
+		assertTrue( docIdSetIterator.nextDoc() != DocIdSetIterator.NO_MORE_DOCS );
+		assertEquals( 0, docIdSetIterator.docID() );
+		assertEquals( 9, docIdSetIterator.advance(9) );
+		assertEquals( DocIdSetIterator.NO_MORE_DOCS, docIdSetIterator.advance(10) );
 	}
 	
 	public void testAndDocIdSets() {
@@ -180,13 +180,13 @@ public class AndDocIdSetsTest extends TestCase {
 		System.out.println(" Results are same: " + docIdSetsEqual( andedByBitsResult, andedByIterationResult ) );
 	}
 
-	private static int iterateOnResults(DocIdSet docIdBitSet) throws IOException {
+	private static void iterateOnResults(DocIdSet docIdBitSet) throws IOException {
 		DocIdSetIterator iterator = docIdBitSet.iterator();
-		int i = 0;
-		while ( iterator.next() ) {
-			i += iterator.doc();
+		int currentDoc;
+		do {
+			currentDoc = iterator.nextDoc();
 		}
-		return i;
+		while ( currentDoc != DocIdSetIterator.NO_MORE_DOCS );
 	}
 
 	private static final BitSet applyANDOnBitSets(final List<BitSet> filtersData) {
@@ -237,29 +237,24 @@ public class AndDocIdSetsTest extends TestCase {
 	}
 	
 	/**
-	 * @param a
-	 * @param b
+	 * @param expected
+	 * @param tested
 	 * @return true if the two DocIdSet are equal: contain the same number of ids, same order and all are equal
 	 */
 	public static final boolean docIdSetsEqual(DocIdSet expected, DocIdSet tested) {
-		DocIdSetIterator iterA = expected.iterator();
-		DocIdSetIterator iterB = tested.iterator();
-		boolean nextA = false;
-		boolean nextB = false;
 		try{
+			DocIdSetIterator iterA = expected.iterator();
+			DocIdSetIterator iterB = tested.iterator();
+			int nextA;
+			int nextB;
 			do {
-				nextA = iterA.next();
-				nextB = iterB.next();
-				if ( nextA!=nextB ) {
+				nextA = iterA.nextDoc();
+				nextB = iterB.nextDoc();
+				if ( nextA != nextB ) {
 					return false;
 				}
-				else if ( nextA==false) {
-					return true;
-				}
-				else if ( iterA.doc() != iterB.doc() ) {
-					return false;
-				}
-			} while ( nextA && nextB );
+				assertEquals( iterA.docID(), iterB.docID() );
+			} while ( nextA !=  DocIdSetIterator.NO_MORE_DOCS );
 		}
 		catch (IOException ioe) {
 			fail( "these DocIdSetIterator instances should not throw any exceptions" );
