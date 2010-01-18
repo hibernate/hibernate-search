@@ -23,95 +23,95 @@
  * Boston, MA  02110-1301  USA
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.hibernate</groupId>
-	<artifactId>hibernate-search</artifactId>
-	<version>3.2.0.Beta2-SNAPSHOT</version>
-	<name>Hibernate Search</name>
-	<description>Hibernate Search</description>
-	<url>http://search.hibernate.org</url>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-search</artifactId>
+    <version>3.2.0.Beta2-SNAPSHOT</version>
+    <name>Hibernate Search</name>
+    <description>Hibernate Search</description>
+    <url>http://search.hibernate.org</url>
 
-	<issueManagement>
-		<system>JIRA</system>
-		<url>http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH</url>
-	</issueManagement>
-	<scm>
-		<connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/trunk</connection>
-		<developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/trunk</developerConnection>
-		<url>http://fisheye.jboss.com/browse/Hibernate/search/trunk</url>
-	</scm>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH</url>
+    </issueManagement>
+    <scm>
+        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/trunk</connection>
+        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/trunk</developerConnection>
+        <url>http://fisheye.jboss.com/browse/Hibernate/search/trunk</url>
+    </scm>
 
-	<organization>
-		<name>Hibernate</name>
-		<url>http://www.hibernate.org</url>
-	</organization>
+    <organization>
+        <name>Hibernate</name>
+        <url>http://www.hibernate.org</url>
+    </organization>
 
-	<licenses>
-		<license>
-			<name>GNU Lesser General Public License</name>
-			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
-			<comments>See discussion at http://hibernate.org/356.html for more details.</comments>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+            <comments>See discussion at http://hibernate.org/356.html for more details.</comments>
+        </license>
+    </licenses>
 
-	<ciManagement>
-		<system>Hudson</system>
-		<url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-trunk/</url>
-	</ciManagement>
-	<inceptionYear>2006</inceptionYear>
-	<developers>
-		<developer>
-			<id>epbernard</id>
-			<name>Emmanuel Bernard</name>
-			<email>emmanuel@hibernate.org</email>
-			<url>http://in.relation.to/Bloggers/Emmanuel</url>
-		</developer>
-		<developer>
-			<id>hardy.ferentschik</id>
-			<name>Hardy Ferentschik</name>
-			<url>http://in.relation.to/Bloggers/Hardy</url>
-		</developer>
-		<developer>
-			<id>sannegrinovero</id>
-			<name>Sanne Grinovero</name>
-			<url>http://in.relation.to/Bloggers/Sanne</url>
-		</developer>
-	</developers>
+    <ciManagement>
+        <system>Hudson</system>
+        <url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-trunk/</url>
+    </ciManagement>
+    <inceptionYear>2006</inceptionYear>
+    <developers>
+        <developer>
+            <id>epbernard</id>
+            <name>Emmanuel Bernard</name>
+            <email>emmanuel@hibernate.org</email>
+            <url>http://in.relation.to/Bloggers/Emmanuel</url>
+        </developer>
+        <developer>
+            <id>hardy.ferentschik</id>
+            <name>Hardy Ferentschik</name>
+            <url>http://in.relation.to/Bloggers/Hardy</url>
+        </developer>
+        <developer>
+            <id>sannegrinovero</id>
+            <name>Sanne Grinovero</name>
+            <url>http://in.relation.to/Bloggers/Sanne</url>
+        </developer>
+    </developers>
 
-	<mailingLists>
-		<mailingList>
-			<name>Hibernate Announcements</name>
-			<post>hibernate-announce@lists.jboss.org</post>
-			<subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-announce</subscribe>
-			<unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-announce</unsubscribe>
-			<archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
-		</mailingList>
-		<mailingList>
-			<name>Hibernate Commit Notificatons</name>
-			<post>hibernate-commits@lists.jboss.org</post>
-			<subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</subscribe>
-			<unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</unsubscribe>
-			<archive>http://lists.jboss.org/pipermail/hibernate-commits/</archive>
-		</mailingList>
-		<mailingList>
-			<name>Hibernate Developers</name>
-			<post>hibernate-dev@lists.jboss.org</post>
-			<subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-dev</subscribe>
-			<unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-dev</unsubscribe>
-			<archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
-			<otherArchives>
-				<otherArchive>http://www.mail-archive.com/hibernate-dev%40lists.jboss.org/index.html</otherArchive>
-			</otherArchives>
-		</mailingList>
-		<mailingList>
-			<name>Hibernate Issue Notifications</name>
-			<post>hibernate-issues@lists.jboss.org</post>
-			<subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-issues</subscribe>
-			<unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-issues</unsubscribe>
-			<archive>http://lists.jboss.org/pipermail/hibernate-issues/</archive>
-		</mailingList>
-	</mailingLists>
+    <mailingLists>
+        <mailingList>
+            <name>Hibernate Announcements</name>
+            <post>hibernate-announce@lists.jboss.org</post>
+            <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-announce</subscribe>
+            <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-announce</unsubscribe>
+            <archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
+        </mailingList>
+        <mailingList>
+            <name>Hibernate Commit Notificatons</name>
+            <post>hibernate-commits@lists.jboss.org</post>
+            <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</subscribe>
+            <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</unsubscribe>
+            <archive>http://lists.jboss.org/pipermail/hibernate-commits/</archive>
+        </mailingList>
+        <mailingList>
+            <name>Hibernate Developers</name>
+            <post>hibernate-dev@lists.jboss.org</post>
+            <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-dev</subscribe>
+            <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-dev</unsubscribe>
+            <archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
+            <otherArchives>
+                <otherArchive>http://www.mail-archive.com/hibernate-dev%40lists.jboss.org/index.html</otherArchive>
+            </otherArchives>
+        </mailingList>
+        <mailingList>
+            <name>Hibernate Issue Notifications</name>
+            <post>hibernate-issues@lists.jboss.org</post>
+            <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-issues</subscribe>
+            <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-issues</unsubscribe>
+            <archive>http://lists.jboss.org/pipermail/hibernate-issues/</archive>
+        </mailingList>
+    </mailingLists>
 
     <properties>
         <slf4jVersion>1.5.8</slf4jVersion>
@@ -135,11 +135,6 @@
             <artifactId>hibernate-commons-annotations</artifactId>
             <version>${hibernateCommonsAnnotationVersion}</version>
         </dependency>
-        <!-- dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>ejb3-persistence</artifactId>
-            <version>1.0.2.GA</version>
-        </dependency -->
         <dependency>
             <groupId>org.hibernate.java-persistence</groupId>
             <artifactId>jpa-api</artifactId>
@@ -196,6 +191,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -204,6 +200,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -219,6 +216,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.3</version>
                 <configuration>
                     <forkMode>once</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -282,12 +280,14 @@
                         </format>
                         <format>
                             <formatName>html_single</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl</stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
+                            </stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                         <format>
                             <formatName>html</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl</stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
+                            </stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                     </formats>
@@ -329,6 +329,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <stylesheetfile>${basedir}/src/main/javadoc/jdstyle.css</stylesheetfile>
                 </configuration>
@@ -343,7 +344,9 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-2</version>
                 <configuration>
                     <descriptors>
                         <descriptor>src/main/assembly/dist.xml</descriptor>
@@ -351,12 +354,40 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>2.0-beta-9</version>
                 <configuration>
                     <releaseProfiles>release</releaseProfiles>
                     <goals>package javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:resources
                         org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:generate assembly:assembly
                     </goals>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jboss.maven.plugins</groupId>
+                <artifactId>maven-injection-plugin</artifactId>
+                <version>1.0.2</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>bytecode</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <bytecodeInjections>
+                        <bytecodeInjection>
+                            <expression>${pom.version}</expression>
+                            <targetMembers>
+                                <methodBodyReturn>
+                                    <className>org.hibernate.search.Version</className>
+                                    <methodName>getVersionString</methodName>
+                                </methodBodyReturn>
+                            </targetMembers>
+                        </bytecodeInjection>
+                    </bytecodeInjections>
                 </configuration>
             </plugin>
         </plugins>
@@ -410,8 +441,8 @@
                 <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                 <jdbc.url>jdbc:hsqldb:.</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
-                <jdbc.pass />
-                <jdbc.isolation />
+                <jdbc.pass/>
+                <jdbc.isolation/>
             </properties>
         </profile>
         <!--
@@ -438,7 +469,7 @@
                 <jdbc.url>jdbc:mysql://vmg08.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -458,7 +489,7 @@
                 <jdbc.url>jdbc:mysql://vmg02.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -475,10 +506,11 @@
             <properties>
                 <db.dialect>org.hibernate.dialect.MySQL5Dialect</db.dialect>
                 <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:mysql:loadbalance://dev61.qa.atl2.redhat.com:3306,dev62.qa.atl2.redhat.com:3306/searctru</jdbc.url>
+                <jdbc.url>jdbc:mysql:loadbalance://dev61.qa.atl2.redhat.com:3306,dev62.qa.atl2.redhat.com:3306/searctru
+                </jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -499,7 +531,7 @@
                 <jdbc.url>jdbc:postgresql://vmg01.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -520,7 +552,7 @@
                 <jdbc.url>jdbc:postgresql://vmg03.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -551,7 +583,7 @@
                 <jdbc.url>jdbc:db2://dev32.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -576,7 +608,7 @@
                 <jdbc.url>jdbc:db2://dev67.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -601,7 +633,7 @@
                 <jdbc.url>jdbc:db2://vmg06.mw.lab.eng.bos.redhat.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -622,7 +654,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev20.qa.atl.jboss.com:1521:qa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -643,7 +675,7 @@
                 <jdbc.url>jdbc:oracle:thin:@vmg05.mw.lab.eng.bos.redhat.com:1521:qaora10</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -663,7 +695,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -680,10 +712,12 @@
             <properties>
                 <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
                 <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
-                <jdbc.url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=TCP)(HOST=vmg24-vip.mw.lab.eng.bos.redhat.com)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=vmg25-vip.mw.lab.eng.bos.redhat.com)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=qarac.jboss)))</jdbc.url>
+                <jdbc.url>
+                    jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=TCP)(HOST=vmg24-vip.mw.lab.eng.bos.redhat.com)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=vmg25-vip.mw.lab.eng.bos.redhat.com)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=qarac.jboss)))
+                </jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -703,7 +737,7 @@
                 <jdbc.url>jdbc:sybase:Tds:vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 

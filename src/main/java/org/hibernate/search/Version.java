@@ -28,16 +28,18 @@ import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class Version {
-	
-	public static final String VERSION = "3.2.0.Beta1";
+
+	public static String getVersionString() {
+		return "[WORKING]";
+	}
 
 	static {
-		LoggerFactory.make().info( "Hibernate Search {}", VERSION );
+		LoggerFactory.make().info( "Hibernate Search {}", getVersionString() );
 	}
 
 	public static void touch() {
 	}
-	
 }
