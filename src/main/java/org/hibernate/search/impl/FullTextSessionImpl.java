@@ -638,6 +638,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.getStatistics();
 	}
 
+	public boolean isReadOnly(Object entityOrProxy) {
+		return session.isReadOnly( entityOrProxy );
+	}
+
 	public Transaction getTransaction() {
 		return session.getTransaction();
 	}
