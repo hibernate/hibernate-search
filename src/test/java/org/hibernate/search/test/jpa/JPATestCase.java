@@ -34,6 +34,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.cfg.Environment;
+import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
 import org.hibernate.search.store.RAMDirectoryProvider;
 import org.apache.lucene.analysis.StopAnalyzer;
@@ -101,23 +102,23 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 		ArrayList<Class> classes = new ArrayList<Class>();
 
 		classes.addAll( Arrays.asList( getAnnotatedClasses() ) );
-		config.put( HibernatePersistence.LOADED_CLASSES, classes );
+		config.put( AvailableSettings.LOADED_CLASSES, classes );
 		for ( Map.Entry<Class, String> entry : getCachedClasses().entrySet() ) {
 			config.put(
-					HibernatePersistence.CLASS_CACHE_PREFIX + "." + entry.getKey().getName(),
+					AvailableSettings.CLASS_CACHE_PREFIX + "." + entry.getKey().getName(),
 					entry.getValue()
 			);
 		}
 		for ( Map.Entry<String, String> entry : getCachedCollections().entrySet() ) {
 			config.put(
-					HibernatePersistence.COLLECTION_CACHE_PREFIX + "." + entry.getKey(),
+					AvailableSettings.COLLECTION_CACHE_PREFIX + "." + entry.getKey(),
 					entry.getValue()
 			);
 		}
 		if ( getEjb3DD().length > 0 ) {
 			ArrayList<String> dds = new ArrayList<String>();
 			dds.addAll( Arrays.asList( getEjb3DD() ) );
-			config.put( HibernatePersistence.XML_FILE_NAMES, dds );
+			config.put( AvailableSettings.XML_FILE_NAMES, dds );
 		}
 
 		//Search config
