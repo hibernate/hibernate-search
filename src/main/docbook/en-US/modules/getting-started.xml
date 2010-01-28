@@ -477,7 +477,7 @@ session.close();
       <programlisting>
 EntityManager em = entityManagerFactory.createEntityManager();
 FullTextEntityManager fullTextEntityManager = 
-    org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);
+    org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 em.getTransaction().begin();
 
 // create native Lucene query

@@ -748,7 +748,7 @@ hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
       disable it, set
       <literal>hibernate.search.autoregister_listeners</literal> to false.
       Note that there is no performance penalty when the listeners are enabled
-      even though no entities are indexed.</para>
+      but no entities are annotated as indexed.</para>
 
       <para>To enable Hibernate Search in Hibernate Core (ie. if you don't use
       Hibernate Annotations), add the

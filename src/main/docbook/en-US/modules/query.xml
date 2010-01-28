@@ -101,7 +101,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
     <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
 
 FullTextEntityManager fullTextEntityManager = 
-    org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);
+    org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 
 ...
 org.apache.lucene.queryParser.QueryParser parser = 
