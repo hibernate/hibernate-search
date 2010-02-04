@@ -56,6 +56,11 @@ import org.hibernate.search.util.LoggerFactory;
 //TODO rename copy?
 public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	
+	private static final String CURRENT1 = "current1";
+	private static final String CURRENT2 = "current2";
+	// defined to have CURRENT_DIR_NAME[1] == "current"+"1":
+	private static final String[] CURRENT_DIR_NAME = { null, CURRENT1, CURRENT2 };
+	
 	private static final Logger log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 	
@@ -97,10 +102,10 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		int currentLocal = 0;
 		try {
 			//copy to source
-			if ( new File( sourceDir, "current1").exists() ) {
+			if ( new File( sourceDir, CURRENT1 ).exists() ) {
 				currentLocal = 2;
 			}
-			else if ( new File( sourceDir, "current2").exists() ) {
+			else if ( new File( sourceDir, CURRENT2 ).exists() ) {
 				currentLocal = 1;
 			}
 			else {
@@ -110,10 +115,10 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			String currentString = Integer.valueOf( currentLocal ).toString();
 			File subDir = new File( sourceDir, currentString );
 			FileHelper.synchronize( indexDir, subDir, true, copyChunkSize );
-			new File( sourceDir, "current1 ").delete();
-			new File( sourceDir, "current2" ).delete();
+			new File( sourceDir, CURRENT1 ).delete();
+			new File( sourceDir, CURRENT2 ).delete();
 			//TODO small hole, no file can be found here
-			new File( sourceDir, "current" + currentString ).createNewFile();
+			new File( sourceDir, CURRENT_DIR_NAME[currentLocal] ).createNewFile();
 			log.debug( "Current directory: {}", currentLocal );
 		}
 		catch (IOException e) {
@@ -219,11 +224,11 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 					log.error( "Unable to synchronize source of " + indexName, e );
 					return;
 				}
-				if ( ! new File( destination, "current" + oldIndex ).delete() ) {
+				if ( ! new File( destination, CURRENT_DIR_NAME[oldIndex] ).delete() ) {
 					log.warn( "Unable to remove previous marker file from source of {}", indexName );
 				}
 				try {
-					new File( destination, "current" + index ).createNewFile();
+					new File( destination, CURRENT_DIR_NAME[index]  ).createNewFile();
 				}
 				catch( IOException e ) {
 					log.warn( "Unable to create current marker in source of " + indexName, e );

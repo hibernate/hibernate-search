@@ -63,7 +63,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	}
 
 	/**
-	 * The lucene index directory which is shared bewtween master and slave.
+	 * The lucene index directory which is shared between master and slave.
 	 */
 	private String masterCopy = "/master/copy";
 

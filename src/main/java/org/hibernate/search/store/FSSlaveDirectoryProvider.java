@@ -177,8 +177,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		FSSlaveDirectoryProvider other = ( FSSlaveDirectoryProvider ) obj;
 		//need to break memory barriers on both instances:
 		@SuppressWarnings("unused")
-		int readCurrentState = this.current; //unneded value, but ensure visibility of indexName
-		readCurrentState = other.current; //another unneded value, but ensure visibility of indexName
+		int readCurrentState = this.current; //unneeded value, but ensure visibility of indexName
+		readCurrentState = other.current; //another unneeded value, but ensure visibility of indexName
 		return indexName.equals( other.indexName );
 	}
 
