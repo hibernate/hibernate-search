@@ -654,6 +654,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.isDirty();
 	}
 
+    public boolean isDefaultReadOnly() {
+        return session.isDefaultReadOnly();
+    }
+
 	public boolean isOpen() {
 		return session.isOpen();
 	}
@@ -761,6 +765,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	public void setCacheMode(CacheMode cacheMode) {
 		session.setCacheMode( cacheMode );
 	}
+
+    public void setDefaultReadOnly(boolean readOnly) {
+        session.setDefaultReadOnly( readOnly );
+    }
 
 	public void setFlushMode(FlushMode flushMode) {
 		session.setFlushMode( flushMode );
