@@ -162,13 +162,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	/**
-	 * Return an interator on the results.
+	 * Return an iterator on the results.
 	 * Retrieve the object one by one (initialize it during the next() operation)
 	 */
 	public Iterator iterate() throws HibernateException {
-		//implement an interator which keep the id/class for each hit and get the object on demand
-		//cause I can't keep the searcher and hence the hit opened. I dont have any hook to know when the
-		//user stop using it
+		//implement an iterator which keep the id/class for each hit and get the object on demand
+		//cause I can't keep the searcher and hence the hit opened. I don't have any hook to know when the
+		//user stops using it
 		//scrollable is better in this area
 
 		//find the directories

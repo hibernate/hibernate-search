@@ -26,7 +26,6 @@ package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;

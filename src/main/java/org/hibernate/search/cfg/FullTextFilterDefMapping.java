@@ -24,7 +24,6 @@
  */
 package org.hibernate.search.cfg;
 
-import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
 

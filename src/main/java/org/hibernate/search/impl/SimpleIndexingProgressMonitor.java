@@ -72,8 +72,8 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	protected void printStatusMessage(long starttimems, long totalTodoCount, long doneCount) {
 		long elapsedMs = System.currentTimeMillis() - starttimems;
 		log.info( "{} documents indexed in {} ms", doneCount, elapsedMs );
-		float estimateSpeed = (float) doneCount * 1000f / elapsedMs ;
-		float estimatePercentileComplete = (float) doneCount * 100f / (float) totalTodoCount ;
+		float estimateSpeed = doneCount * 1000f / elapsedMs ;
+		float estimatePercentileComplete = doneCount * 100f / totalTodoCount ;
 		log.info( "Indexing speed: {} documents/second; progress: {}%", estimateSpeed, estimatePercentileComplete );
 	}
 

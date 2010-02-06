@@ -27,7 +27,7 @@ package org.hibernate.search.store;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.HibernateException;
@@ -52,7 +52,7 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 	public void start() {
 		try {
 			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
-			IndexWriter iw = new IndexWriter( directory, new StandardAnalyzer(), true, fieldLength );
+			IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
 			iw.close();
 		}
 		catch (IOException e) {

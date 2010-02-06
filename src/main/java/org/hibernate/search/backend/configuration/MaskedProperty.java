@@ -114,7 +114,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws IllegalArgumentException if the key is not a String instance
 	 */
 	@Override
-	public boolean containsKey(Object key) {
+	public synchronized boolean containsKey(Object key) {
 		if ( ! ( key instanceof String ) ) {
 			throw new IllegalArgumentException( "key must be a String" );
 		}
@@ -252,7 +252,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	@Override
-	public boolean contains(Object value) {
+	public synchronized boolean contains(Object value) {
 		initPropertyNames();
 		return propertyNames.contains( value );
 	}
@@ -291,7 +291,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public synchronized boolean isEmpty() {
 		initPropertyNames();
 		return propertyNames.isEmpty();
 	}
@@ -300,7 +300,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public Enumeration<Object> keys() {
+	public synchronized Enumeration<Object> keys() {
 		initPropertyNames();
 		return Collections.enumeration( propertyNames );
 	}
@@ -347,13 +347,13 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @throws UnsupportedOperationException
 	 */
 	@Override
-	public int size() {
+	public synchronized int size() {
 		initPropertyNames();
 		return propertyNames.size();
 	}
 
 	@Override
-	public String toString() {
+	public synchronized String toString() {
 		return masked.toString();
 	}
 
@@ -366,7 +366,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public synchronized int hashCode() {
 		final int prime = 31;
 		int result = ( ( fallBack == null ) ? 0 : fallBack.hashCode() );
 		result = prime * result + masked.hashCode();
@@ -375,7 +375,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized boolean equals(Object obj) {
 		if ( this == obj )
 			return true;
 		if ( obj == null )
@@ -394,4 +394,5 @@ public class MaskedProperty extends Properties implements Serializable {
 			return false;
 		return true;
 	}
+	
 }

@@ -118,7 +118,7 @@ public class IdentifierProducer implements Runnable {
 			.uniqueResult();
 		
 		if ( objectsLimit != 0 && objectsLimit < totalCount.intValue() ) {
-			totalCount = new Long(objectsLimit);
+			totalCount = Long.valueOf( objectsLimit );
 		}
 		log.debug( "going to fetch {} primary keys", totalCount);
 		monitor.addToTotalCount( totalCount );

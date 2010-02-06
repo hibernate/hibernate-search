@@ -28,7 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
@@ -105,14 +105,14 @@ public class DirectoryProviderHelper {
 	 */
 	public static FSDirectory createFSIndex(File indexDir, Properties dirConfiguration) throws IOException {
 		LockFactory lockFactory = createLockFactory(indexDir, dirConfiguration);
-		FSDirectory fsDirectory = FSDirectory.getDirectory( indexDir, null );
+		FSDirectory fsDirectory = FSDirectory.open( indexDir, null );
 		// must use the setter (instead of using the constructor) to set the lockFactory, or Lucene will
 		// throw an exception if it's different than a previous setting.
 		fsDirectory.setLockFactory( lockFactory );
 		if ( ! IndexReader.indexExists( fsDirectory ) ) {
 			log.debug( "Initialize index: '{}'", indexDir.getAbsolutePath() );
 			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
-			IndexWriter iw = new IndexWriter( fsDirectory, new StandardAnalyzer(), true, fieldLength );
+			IndexWriter iw = new IndexWriter( fsDirectory, new SimpleAnalyzer(), true, fieldLength );
 			iw.close();
 		}
 		return fsDirectory;

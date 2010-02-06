@@ -45,7 +45,7 @@ public abstract class ContextHelper {
 	public static SearchFactoryImplementor getSearchFactoryBySFI(SessionImplementor session) {
 		PostInsertEventListener[] listeners = session.getListeners().getPostInsertEventListeners();
 		FullTextIndexEventListener listener = null;
-		//FIXME this sucks since we mandante the event listener use
+		//FIXME this sucks since we mandate the event listener use
 		for ( PostInsertEventListener candidate : listeners ) {
 			if ( candidate instanceof FullTextIndexEventListener ) {
 				listener = (FullTextIndexEventListener) candidate;

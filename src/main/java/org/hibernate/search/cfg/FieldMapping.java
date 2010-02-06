@@ -33,7 +33,6 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
-import org.hibernate.search.engine.BoostStrategy;
 
 /**
  * @author Emmanuel Bernard
@@ -78,7 +77,6 @@ public class FieldMapping {
 		return this;
 	}
 	
-
 	public FieldBridgeMapping bridge(Class<?> impl) {
 		return new FieldBridgeMapping( impl, field, this, property, entity, mapping );
 	}
