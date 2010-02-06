@@ -39,6 +39,8 @@ import java.text.ParseException;
 
 public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
     
+	public static final String RESOLUTION_PARAMETER = "resolution";
+	
 	private DateTools.Resolution resolution;
 	public static final TwoWayStringBridge CALENDAR_YEAR = new CalendarBridge( Resolution.YEAR );
 	public static final TwoWayStringBridge CALENDAR_MONTH = new CalendarBridge( Resolution.MONTH );
@@ -56,7 +58,7 @@ public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 	}
 
 	public void setParameterValues(Map parameters) {
-		Object resolution = parameters.get( "resolution" );
+		Object resolution = parameters.get( RESOLUTION_PARAMETER );
 		Resolution hibResolution;
 		if ( resolution instanceof String ) {
 			hibResolution = Resolution.valueOf( ( (String) resolution ).toUpperCase( Locale.ENGLISH ) );
@@ -64,7 +66,7 @@ public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 		else {
 			hibResolution = (Resolution) resolution;
 		}
-		resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
+		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
 	}
 
     public Object stringToObject(String stringValue) {

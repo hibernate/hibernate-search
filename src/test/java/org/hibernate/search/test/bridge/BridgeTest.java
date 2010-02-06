@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -46,6 +47,8 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.builtin.CalendarBridge;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -252,6 +255,17 @@ public class BridgeTest extends SearchTestCase {
 		s.delete( s.get( Cloud.class, cloud.getId() ) );
 		tx.commit();
 		s.close();
+		
+		//now unit-test the bridge directly:
+		
+		CalendarBridge bridge = new CalendarBridge();
+		HashMap<String, String> bridgeParams = new HashMap<String, String>();
+		bridgeParams.put( CalendarBridge.RESOLUTION_PARAMETER, Resolution.YEAR.toString() );
+		bridge.setParameterValues( bridgeParams );
+		assertEquals( "2000", bridge.objectToString( c ) );
+		bridgeParams.put( CalendarBridge.RESOLUTION_PARAMETER, Resolution.DAY.toString() );
+		bridge.setParameterValues( bridgeParams );
+		assertEquals( "20001215", bridge.objectToString( c ) );
 
 	}
 
