@@ -189,11 +189,6 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 		}
 
 		@Override
-		protected void doCommit() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		protected void doDelete(int docNum) {
 			throw new UnsupportedOperationException();
 		}
@@ -290,6 +285,16 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 
 		@Override
 		public TermEnum terms(Term t) throws IOException {
+			throw new UnsupportedOperationException();
+		}
+
+//		@Override not defined in Lucene 2.9, added in 3.0
+		protected void doCommit(Map<String, String> commitUserData) {
+			throw new UnsupportedOperationException();
+		}
+
+//		@Override not defined in Lucene 3.0, existed before
+		protected void doCommit() throws IOException {
 			throw new UnsupportedOperationException();
 		}
 

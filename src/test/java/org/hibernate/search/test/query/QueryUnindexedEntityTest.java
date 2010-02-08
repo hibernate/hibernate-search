@@ -24,10 +24,8 @@
  */
 package org.hibernate.search.test.query;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -53,7 +51,7 @@ public class QueryUnindexedEntityTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "name", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query query = parser.parse( "name:foo" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query );
 		try {
@@ -68,7 +66,7 @@ public class QueryUnindexedEntityTest extends SearchTestCase {
 		s.close();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Person.class,
 		};

@@ -27,7 +27,6 @@ package org.hibernate.search.test.reader.performance;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -38,6 +37,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Sanne Grinovero
@@ -47,9 +47,9 @@ public abstract class AbstractActivity implements Runnable {
 	private final ThreadLocal<QueryParser> parsers = new ThreadLocal<QueryParser>(){
 		@Override
 		protected QueryParser initialValue(){
-			return new MultiFieldQueryParser(
+			return new MultiFieldQueryParser( SearchTestCase.getTargetLuceneVersion(),
 					new String[] {"name", "physicalDescription", "suspectCharge"},
-					new StandardAnalyzer() );
+					SearchTestCase.standardAnalyzer );
 			}
 		};
 	

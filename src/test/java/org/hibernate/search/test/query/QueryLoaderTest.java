@@ -26,7 +26,6 @@ package org.hibernate.search.test.query;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
@@ -88,7 +87,7 @@ public class QueryLoaderTest extends SearchTestCase {
 
 		FullTextSession s = Search.getFullTextSession( sess );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "title", new KeywordAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.keywordAnalyzer );
 		Query query = parser.parse( "title:moo" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Music.class );
 		List result = hibQuery.list();
@@ -110,7 +109,7 @@ public class QueryLoaderTest extends SearchTestCase {
 		s.close();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Author.class,
 				Music.class

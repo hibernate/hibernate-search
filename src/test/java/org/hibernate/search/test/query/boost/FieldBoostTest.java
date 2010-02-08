@@ -26,7 +26,6 @@ package org.hibernate.search.test.query.boost;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -53,8 +52,8 @@ public class  FieldBoostTest extends SearchTestCase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( "author", new StandardAnalyzer() );
-		QueryParser descParser = new QueryParser( "description", new StandardAnalyzer() );
+		QueryParser authorParser = new QueryParser( getTargetLuceneVersion(), "author", SearchTestCase.standardAnalyzer );
+		QueryParser descParser = new QueryParser( getTargetLuceneVersion(), "description", SearchTestCase.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
@@ -91,8 +90,8 @@ public class  FieldBoostTest extends SearchTestCase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( "author", new StandardAnalyzer() );
-		QueryParser descParser = new QueryParser( "description", new StandardAnalyzer() );
+		QueryParser authorParser = new QueryParser( getTargetLuceneVersion(), "author", SearchTestCase.standardAnalyzer );
+		QueryParser descParser = new QueryParser( getTargetLuceneVersion(), "description", SearchTestCase.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
@@ -129,8 +128,8 @@ public class  FieldBoostTest extends SearchTestCase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( "author", new StandardAnalyzer() );
-		QueryParser descParser = new QueryParser( "description", new StandardAnalyzer() );
+		QueryParser authorParser = new QueryParser( getTargetLuceneVersion(), "author", SearchTestCase.standardAnalyzer );
+		QueryParser descParser = new QueryParser( getTargetLuceneVersion(), "description", SearchTestCase.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
@@ -211,7 +210,7 @@ public class  FieldBoostTest extends SearchTestCase {
 		tx.commit();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				BoostedDescriptionLibrary.class,
 				BoostedFieldDescriptionLibrary.class,

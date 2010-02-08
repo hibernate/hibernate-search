@@ -27,7 +27,6 @@ package org.hibernate.search.test.query;
 import java.util.List;
 import java.util.Calendar;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -53,7 +52,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		createTestBooks(s);
 		Transaction tx = s.beginTransaction();
-		QueryParser parser = new QueryParser("title", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.stopAnalyzer );
 
 		Query query = parser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Book.class );
@@ -71,21 +70,21 @@ public class LuceneQuerySortTest extends SearchTestCase {
 		// now the same query, but with a lucene sort specified.
 		query = parser.parse( "summary:lucene" );
 		hibQuery = s.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort(new SortField("id", true));
+		Sort sort = new Sort( new SortField( "id", SortField.STRING, true ) );
 		hibQuery.setSort(sort);
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Wrong number of test results.", 3, result.size() );
 		id = 3;
-		for(Book b : result) {
-			assertEquals("Expected another id", Integer.valueOf( id ), b.getId());
+		for (Book b : result) {
+			assertEquals( "Expected another id", Integer.valueOf( id ), b.getId() );
 			id--;
 		}
 
 		// order by summary
 		query = parser.parse( "summary:lucene OR summary:action" );
 		hibQuery = s.createFullTextQuery( query, Book.class );
-		sort = new Sort( new SortField( "summary_forSort", false ) ); //ASC
+		sort = new Sort( new SortField( "summary_forSort", SortField.STRING ) ); //ASC
 		hibQuery.setSort( sort );
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -95,7 +94,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 		// order by summary backwards
 		query = parser.parse( "summary:lucene OR summary:action" );
 		hibQuery = s.createFullTextQuery( query, Book.class );
-		sort = new Sort( new SortField( "summary_forSort", true ) ); //DESC
+		sort = new Sort( new SortField( "summary_forSort", SortField.STRING, true ) ); //DESC
 		hibQuery.setSort( sort );
 		result = hibQuery.list();
 		assertNotNull( result );
@@ -158,7 +157,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 		s.clear();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Book.class,
 				Author.class

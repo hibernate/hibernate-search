@@ -77,7 +77,7 @@ public class MassIndexTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 14, result.size() );
 		for (Object object : result) {
@@ -105,7 +105,7 @@ public class MassIndexTest extends SearchTestCase {
 		//check non created object does get found!!1
 		s = new FullTextSessionImpl( openSession() );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 0, result.size() );
 		tx.commit();
@@ -126,7 +126,7 @@ public class MassIndexTest extends SearchTestCase {
 
 		s = new FullTextSessionImpl( openSession() );
 		tx = s.beginTransaction();
-		parser = new QueryParser( "id", new StopAnalyzer() );
+		parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
 		assertEquals( 0, result.size() );
 		result = s.createCriteria( Email.class ).list();
@@ -217,7 +217,7 @@ public class MassIndexTest extends SearchTestCase {
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Email.class,
 				Entite.class,

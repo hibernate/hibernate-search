@@ -65,7 +65,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 		tx = s.beginTransaction();
 
 
-		QueryParser parser = new QueryParser( "name", s.getSearchFactory().getAnalyzer( SubClass.class ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", s.getSearchFactory().getAnalyzer( SubClass.class ) );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "name:Proca\u00EFne" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery, SubClass.class );
 		assertEquals( 1, query.getResultSize() );
@@ -100,7 +100,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 	}
 
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] { SubClass.class };
 	}
 }

@@ -118,7 +118,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		super.tearDown();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				TShirt.class
 		};

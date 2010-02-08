@@ -28,7 +28,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.slf4j.Logger;
 
@@ -38,6 +37,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -87,7 +87,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		// assert that the salve index is empty
 		FullTextSession fullTextSession = Search.getFullTextSession( getSlaveSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		List result = fullTextSession.createFullTextQuery( parser.parse( "location:texas" ) ).list();
 		assertEquals( "No copy yet, fresh index expected", 0, result.size() );
 		tx.commit();
@@ -212,7 +212,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return 2;
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				SnowStorm.class
 		};

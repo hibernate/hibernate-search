@@ -39,12 +39,10 @@ import javax.jms.QueueSession;
 import javax.naming.Context;
 
 import org.apache.activemq.broker.BrokerService;
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
@@ -93,7 +91,7 @@ public class JMSMasterTest extends SearchTestCase {
 
 		FullTextSession ftSess = Search.getFullTextSession( openSession() );
 		ftSess.getTransaction().begin();
-		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		Query luceneQuery = parser.parse( "logo:jboss" );
 		org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
 		List result = query.list();
@@ -200,7 +198,7 @@ public class JMSMasterTest extends SearchTestCase {
 		cfg.setProperty( Environment.WORKER_BACKEND, "lucene" );
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				TShirt.class
 		};

@@ -30,7 +30,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.queryParser.QueryParser;
@@ -82,7 +81,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 		FullTextSession ftSess = Search.getFullTextSession( openSession() );
 		ftSess.getTransaction().begin();
-		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		Query luceneQuery = parser.parse( "logo:jboss" );
 		org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
 		List result = query.list();
@@ -186,7 +185,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 				"shun=false;print_local_addr=true)";
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				TShirt.class
 		};

@@ -26,29 +26,36 @@ package org.hibernate.search.test.analyzer.solr;
 
 import java.io.IOException;
 
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 
 /**
  * A filter which will actually insert spaces. Most filters/tokenizers remove them, but for testing it is
  * sometimes better to insert them again ;-)
  *
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class InsertWhitespaceFilter extends TokenFilter {
+	
+	private TermAttribute termAtt;
+
 	public InsertWhitespaceFilter(TokenStream in) {
 		super( in );
+		termAtt = (TermAttribute) addAttribute(TermAttribute.class);
 	}
 
-	public Token next(final Token reusableToken) throws IOException {
-		Token nextToken = input.next( reusableToken );
-		if ( nextToken != null ) {
-			nextToken.setTermBuffer( " " + nextToken.term() + " " );
-			return nextToken;
+	@Override
+	public boolean incrementToken() throws IOException {
+		if ( input.incrementToken() ) {
+			String value = " " + termAtt.term() + " ";
+			termAtt.setTermBuffer( value );
+			return true;
 		}
 		else {
-			return null;
+			return false;
 		}
 	}
+	
 }

@@ -27,13 +27,11 @@ package org.hibernate.search.test.worker.duplication;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TopDocs;
-
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -81,7 +79,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 		// search if the record made it into the index
 		tx = s.beginTransaction();
 		String searchQuery = "Joe";
-		QueryParser parser = new QueryParser( "Content", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "Content", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( searchQuery );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		List results = query.list();
@@ -154,7 +152,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 	}	
 
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
 	}
 }

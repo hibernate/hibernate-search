@@ -65,7 +65,7 @@ public class OptimizeTest extends SearchTestCase {
 		//check non indexed object get indexed by s.index
 		s = new FullTextSessionImpl( openSession() );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		int result = s.createFullTextQuery( parser.parse( "body:wrote" ) ).getResultSize();
 		assertEquals( 2000, result );
 		s.createQuery( "delete " + Email.class.getName() ).executeUpdate();
@@ -101,7 +101,7 @@ public class OptimizeTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Email.class,
 				Domain.class

@@ -120,7 +120,7 @@ public class TermVectorTest extends SearchTestCase {
       tx.commit();
    }
 
-   protected Class[] getMappings() {
+   protected Class<?>[] getMappings() {
       return new Class[]{
          ElectricalProperties.class,
          Employee.class

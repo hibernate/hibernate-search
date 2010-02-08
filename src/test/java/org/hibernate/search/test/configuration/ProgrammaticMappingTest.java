@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -71,7 +70,6 @@ import org.slf4j.Logger;
 public class ProgrammaticMappingTest extends SearchTestCase {
 	
 	private static final Logger log = LoggerFactory.make();
-
 	
 	public void testMapping() throws Exception{
 		Address address = new Address();
@@ -87,7 +85,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "" + address.getAddressId() );
 		System.out.println(luceneQuery.toString(  ));
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
@@ -118,7 +116,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery =  parser.parse( "street1_ngram:pea" );
 
 		final FullTextQuery query = s.createFullTextQuery( luceneQuery );
@@ -127,7 +125,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.delete( query.list().get( 0 ));
 		tx.commit();
 		s.close();
-
 	}
 
 	public void testBridgeMapping() throws Exception{
@@ -144,7 +141,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:peac" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( "PrefixQuery should not be on", 0, query.getResultSize() );
@@ -178,7 +175,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:peachtree OR idx_street2:peachtree" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting two results", 2, query.getResultSize() );
@@ -194,9 +191,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-
-	
-	
 	
 	public void testAnalyzerDiscriminator() throws Exception{
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -233,7 +227,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-
 	
 	public void testDateBridgeMapping() throws Exception{
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -269,7 +262,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "date-created:20091115 OR blog-entry-created:20091115" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 3 results", 3, query.getResultSize() );
@@ -310,7 +303,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "last-updated:20091115" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 2 results", 2, query.getResultSize() );
@@ -324,7 +317,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-	
 	
 	public void testProvidedIdMapping() throws Exception{
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -355,7 +347,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		
 		Transaction transaction = fullTextSession.beginTransaction();
 
-		QueryParser parser = new QueryParser( "providedidentry.name", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "providedidentry.name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Goat" );
 
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
@@ -364,7 +356,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		//we know there is only one DP
 		DirectoryProvider<?> provider = fullTextSession.getSearchFactory()
 				.getDirectoryProviders( ProvidedIdEntry.class )[0];
-		IndexSearcher searcher = new IndexSearcher( provider.getDirectory() );
+		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		searcher.close();
 		transaction.commit();
@@ -372,8 +364,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		assertEquals( 3, hits.totalHits );
 	}
-	
-	
 	
 	public void testFullTextFilterDefAtMappingLevel() throws Exception{
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -403,7 +393,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:Peachtnot" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		query.enableFullTextFilter("security").setParameter("ownerName", "test");
@@ -438,7 +428,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "items.description:Ferrari" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 1 results", 1, query.getResultSize() );
@@ -472,7 +462,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "items.description:test" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 1 results", 1, query.getResultSize() );
@@ -489,12 +479,12 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		
 		tx = s.beginTransaction();
 
-		parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		luceneQuery = parser.parse( "items.description:test" );
 		query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 0 results", 0, query.getResultSize() );
 
-		parser = new QueryParser( "id", new StandardAnalyzer( ) );
+		parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		luceneQuery = parser.parse( "items.description:Ferrari" );
 		query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 1 results", 1, query.getResultSize() );
@@ -529,7 +519,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		// Departments entity after being massaged by passing it
 		// through the EquipmentType class. This field is in
 		// the Lucene document but not in the Department entity itself.
-		QueryParser parser = new QueryParser( "equipment", new SimpleAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "equipment", new SimpleAnalyzer() );
 
 		// Check the second ClassBridge annotation
 		Query query = parser.parse( "equiptype:Cisco" );
@@ -549,7 +539,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertTrue( "problem with field cross-ups", result.size() == 0 );
 
 		// Non-ClassBridge field.
-		parser = new QueryParser( "branchHead", new SimpleAnalyzer() );
+		parser = new QueryParser( getTargetLuceneVersion(), "branchHead", new SimpleAnalyzer() );
 		query = parser.parse( "branchHead:Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
@@ -558,7 +548,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertEquals("incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead());
 
 		// Check other ClassBridge annotation.
-		parser = new QueryParser( "branchnetwork", new SimpleAnalyzer() );
+		parser = new QueryParser( getTargetLuceneVersion(), "branchnetwork", new SimpleAnalyzer() );
 		query = parser.parse( "branchnetwork:st. george 1D" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
@@ -572,7 +562,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-	
 	
 	public void testDynamicBoosts() throws Exception {
 
@@ -657,7 +646,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 	}
 	
 	private int nbrOfMatchingResults(String field, String token, FullTextSession s) throws ParseException {
-		QueryParser parser = new QueryParser( field, new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), field, SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( token );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		return query.getResultSize();
@@ -750,9 +739,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				.analyzerDef( "minimal", StandardTokenizerFactory.class  );
 
 	}
-	
-	
-	
 
 	protected Class<?>[] getMappings() {
 		return new Class<?>[] {

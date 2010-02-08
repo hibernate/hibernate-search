@@ -123,7 +123,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				FullTextSession fts = new FullTextSessionImpl( s );
-				QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+				QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 				Query query;
 				try {
 					query = parser.parse( "name:Gavin" );
@@ -201,7 +201,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Worker.class,
 				Construction.class

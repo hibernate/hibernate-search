@@ -24,8 +24,6 @@
  */
 package org.hibernate.search.test.id.providedId;
 
-import javax.persistence.Entity;
-
 import org.hibernate.search.annotations.Indexed;
 
 /**

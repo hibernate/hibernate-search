@@ -124,7 +124,7 @@ public class DynamicBoostingTest extends SearchTestCase {
 		return score;
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				DynamicBoostedDescriptionLibrary.class
 		};

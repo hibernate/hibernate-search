@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.slf4j.Logger;
 
@@ -78,12 +77,12 @@ public class AnalyzerTest extends SearchTestCase {
 
 		// at query time we use a standard analyzer. We explicitly search for tokens which can only be found if the
 		// right language specific stemmer was used at index time
-		QueryParser parser = new QueryParser( "references.text", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "references.text", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "aufeinanderschlug" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( 1, query.getResultSize() );
 
-		parser = new QueryParser( "text", new StandardAnalyzer() );
+		parser = new QueryParser( getTargetLuceneVersion(), "text", SearchTestCase.standardAnalyzer );
 		luceneQuery = parser.parse( "acknowledg" );
 		query = s.createFullTextQuery( luceneQuery );
 		assertEquals( 1, query.getResultSize() );
@@ -92,7 +91,7 @@ public class AnalyzerTest extends SearchTestCase {
 		s.close();
 	}
 
-	public void testMultipleAnalyzerDiscriminatorDefinitions() throws Exception {
+	public void testMultipleAnalyzerDiscriminatorDefinitions() {
 		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( cfg );
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
@@ -119,7 +118,7 @@ public class AnalyzerTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "entity:alarm" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery, MyEntity.class );
 		assertEquals( 1, query.getResultSize() );

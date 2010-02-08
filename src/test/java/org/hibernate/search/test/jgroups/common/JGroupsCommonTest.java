@@ -26,10 +26,8 @@ package org.hibernate.search.test.jgroups.common;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -38,6 +36,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
+import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.master.TShirt;
 
 /**
@@ -73,7 +72,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 		FullTextSession ftSess = Search.getFullTextSession( openSession() );
 		ftSess.getTransaction().begin();
-		QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		Query luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
 		org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
 		List result = query.list();
@@ -89,7 +88,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		//need to sleep for the message consumption
 		Thread.sleep( 3000 );
 
-		parser = new QueryParser( "id", new StopAnalyzer() );
+		parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		luceneQuery = parser.parse( "logo:Peter pan" );
 		query = ftSess.createFullTextQuery( luceneQuery );
 		result = query.list();
@@ -104,7 +103,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		//Need to sleep for the message consumption
 		Thread.sleep( 3000 );
 
-		parser = new QueryParser( "id", new StopAnalyzer() );
+		parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 		luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
 		query = ftSess.createFullTextQuery( luceneQuery );
 		result = query.list();

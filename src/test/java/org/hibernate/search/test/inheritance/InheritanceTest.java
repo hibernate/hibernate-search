@@ -27,12 +27,11 @@ package org.hibernate.search.test.inheritance;
 import java.util.List;
 import java.io.Serializable;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeQuery;
 import org.slf4j.Logger;
 
 import org.hibernate.Transaction;
@@ -55,7 +54,7 @@ public class InheritanceTest extends SearchTestCase {
 	public void testSearchUnindexClass() throws Exception {
 		createTestData();
 
-		QueryParser parser = new QueryParser( "name", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -84,7 +83,7 @@ public class InheritanceTest extends SearchTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( "name", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
 		assertItsTheElephant( hibQuery.list() );
@@ -103,7 +102,7 @@ public class InheritanceTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "Query filtering on superclass return mapped subclasses", 2, result.size() );
 
-		query = new RangeQuery( new Term( "weight", "04000" ), new Term( "weight", "05000" ), true );
+		query = new TermRangeQuery( "weight", "04000", "05000", true, true );
 		hibQuery = s.createFullTextQuery( query, Animal.class );
 		assertItsTheElephant( hibQuery.list() );
 
@@ -121,7 +120,7 @@ public class InheritanceTest extends SearchTestCase {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "name", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
@@ -252,7 +251,7 @@ public class InheritanceTest extends SearchTestCase {
 	}
 
 	private void assertNumberOfAnimals(FullTextSession s, int count) throws Exception {
-		QueryParser parser = new QueryParser( "name", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.stopAnalyzer );
 		Query query = parser.parse( "Elephant OR White Pointer OR Chimpanzee OR Dove or Eagle" );
 		List result = s.createFullTextQuery( query, Animal.class ).list();
 		assertNotNull( result );
@@ -304,7 +303,7 @@ public class InheritanceTest extends SearchTestCase {
 		assertEquals( "Wrong animal name", "Elephant", mammal.getName() );
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Animal.class,
 				Mammal.class,

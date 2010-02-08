@@ -27,8 +27,13 @@ package org.hibernate.search.test;
 import java.io.File;
 import java.io.InputStream;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.KeywordAnalyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
@@ -56,6 +61,11 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 public abstract class SearchTestCase extends TestCase {
 
 	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
+	
+	public static Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
+	public static Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
+	public static Analyzer simpleAnalyzer = new SimpleAnalyzer();
+	public static Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static File indexDir;
 	
@@ -180,4 +190,9 @@ public abstract class SearchTestCase extends TestCase {
 	protected static File getIndexDir() {
 		return indexDir;
 	}
+	
+	public static Version getTargetLuceneVersion() {
+		return Version.LUCENE_29;
+	}
+	
 }

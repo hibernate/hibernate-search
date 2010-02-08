@@ -24,6 +24,7 @@
  */
 package org.hibernate.search.test.util.textbuilder;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
@@ -53,7 +54,7 @@ public class WordDictionary {
 		gaussFactor = ((double)maxSize +1 ) / 4d ;
 	}
 	
-	private static class StringLengthComparator implements Comparator<String> {
+	private static class StringLengthComparator implements Comparator<String>, Serializable {
 
 		public int compare(String o1, String o2) {
 			return o1.length()-o2.length();

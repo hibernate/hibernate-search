@@ -24,7 +24,6 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -45,7 +44,7 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 
 	public static final Logger log = LoggerFactory.make();
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] { MyEntity.class, AlarmEntity.class };
 	}
 
@@ -61,7 +60,7 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		{
 			Query luceneQuery =  new MatchAllDocsQuery();
 			FullTextQuery query = s.createFullTextQuery( luceneQuery );

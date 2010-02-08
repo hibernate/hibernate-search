@@ -126,17 +126,16 @@ public class FiltersOptimizationTest extends TestCase {
 	private boolean isIdSetSequenceSameTo(DocIdSet docIdSet, int...expectedIds) throws IOException {
 		DocIdSetIterator idSetIterator = docIdSet.iterator();
 		for ( int setBit : expectedIds ) {
-			if ( ! idSetIterator.next() ) {
+			int currentId = idSetIterator.nextDoc();
+			if ( currentId == DocIdSetIterator.NO_MORE_DOCS ) {
 				return false;
 			}
-			if ( idSetIterator.doc() != setBit ) {
+			if ( currentId != setBit ) {
 				return false;
 			}
 		}
-		if ( idSetIterator.next() ){
-			return false;
-		}
-		return true;
+		// and now test both sequences are at the end:
+		return idSetIterator.nextDoc() == DocIdSetIterator.NO_MORE_DOCS;
 	}
 
 	/**
@@ -185,7 +184,7 @@ public class FiltersOptimizationTest extends TestCase {
 	 * Implementation for testing: wraps a DocIdSet with a new type
 	 * to make it not possible to cast/detect to the original type.
 	 */
-	private class DocIdSetHiddenType extends DocIdSet {
+	private static class DocIdSetHiddenType extends DocIdSet {
 
 		private final DocIdSet bitSet;
 

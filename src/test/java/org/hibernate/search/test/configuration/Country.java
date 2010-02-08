@@ -51,7 +51,7 @@ public class Country {
 	private String name;
 	
 	@OneToMany(mappedBy = "country")
-	private Set<Address> addresses = new HashSet<Address>();;
+	private Set<Address> addresses = new HashSet<Address>();
 
 	public String getName() {
 		return name;

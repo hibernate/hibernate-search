@@ -24,7 +24,6 @@
  */
 package org.hibernate.search.test.id.providedId;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -34,6 +33,7 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Navin Surtani
@@ -66,7 +66,7 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 
 		tc.end();
 
-		QueryParser parser = new QueryParser( "name", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Goat" );
 
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
@@ -75,7 +75,7 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		//we know there is only one DP
 		DirectoryProvider provider = sf
 				.getDirectoryProviders( ProvidedIdPerson.class )[0];
-		IndexSearcher searcher = new IndexSearcher( provider.getDirectory() );
+		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 3, hits.totalHits );
 		searcher.close();

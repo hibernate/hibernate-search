@@ -160,7 +160,7 @@ public class JMSSlaveTest extends SearchTestCase {
 		cfg.setProperty( JMSBackendQueueProcessorFactory.JMS_QUEUE, QUEUE_NAME );
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				TShirt.class
 		};

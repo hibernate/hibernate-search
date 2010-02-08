@@ -40,6 +40,7 @@ import org.hibernate.search.annotations.*;
 @Entity
 @Indexed
 public class Cloud {
+	
     private int id;
     private Long long1;
     private long long2;
@@ -75,9 +76,6 @@ public class Cloud {
     private Calendar calendarSecond;
     private Calendar calendarHour;
     private Calendar calendarMillisecond;
-
-
-
 
 	@Field(index=Index.UN_TOKENIZED, store=Store.YES)
 	public URL getUrl() {
@@ -266,7 +264,6 @@ public class Cloud {
         this.dateHour = dateHour;
     }
 
-
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @DateBridge( resolution = Resolution.MINUTE )
     public Date getDateMinute() {
@@ -333,7 +330,6 @@ public class Cloud {
 		this.char2 = char2;
 	}
 
-
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     public Calendar getMyCalendar() {
         return myCalendar;
@@ -373,8 +369,6 @@ public class Cloud {
         this.calendarDay = calendarDay;
     }
 
-
-
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @CalendarBridge( resolution = Resolution.MINUTE )
     public Calendar getCalendarMinute() {
@@ -385,7 +379,6 @@ public class Cloud {
         this.calendarMinute = calendarMinute;
     }
 
-
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @CalendarBridge( resolution = Resolution.HOUR )
     public Calendar getCalendarHour() {
@@ -395,7 +388,6 @@ public class Cloud {
     public void setCalendarHour(Calendar calendarHour) {
         this.calendarHour = calendarHour;
     }
-
 
     @Field(index=Index.UN_TOKENIZED, store=Store.YES)
     @CalendarBridge( resolution = Resolution.MILLISECOND )

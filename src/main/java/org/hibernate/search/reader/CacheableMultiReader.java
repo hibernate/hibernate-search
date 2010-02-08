@@ -24,8 +24,6 @@
  */
 package org.hibernate.search.reader;
 
-import java.io.IOException;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 
@@ -41,7 +39,7 @@ public class CacheableMultiReader extends MultiReader {
 	// expose this publically (it's a protected member in Lucene 2.3)
 	final IndexReader[] subReaders;
 
-	public CacheableMultiReader(IndexReader[] subReaders) throws IOException {
+	public CacheableMultiReader(IndexReader[] subReaders) {
 		super( subReaders );
 		this.subReaders = subReaders;
 	}

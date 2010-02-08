@@ -80,7 +80,7 @@ public class ScrollableResultsTest extends TestCase {
 	public void testScrollingForward() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "summary" ) );
+		Sort sort = new Sort( new SortField( "summary", SortField.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -115,7 +115,7 @@ public class ScrollableResultsTest extends TestCase {
 	public void testScrollingBackwards() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "summary" ) );
+		Sort sort = new Sort( new SortField( "summary", SortField.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -145,7 +145,7 @@ public class ScrollableResultsTest extends TestCase {
 	public void testResultsAreManaged() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "summary" ) );
+		Sort sort = new Sort( new SortField( "summary", SortField.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )

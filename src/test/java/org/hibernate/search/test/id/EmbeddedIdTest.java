@@ -112,7 +112,7 @@ public class EmbeddedIdTest extends SearchTestCase {
 		s.close();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Person.class
 		};

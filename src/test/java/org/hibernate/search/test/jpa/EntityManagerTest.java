@@ -26,10 +26,10 @@ package org.hibernate.search.test.jpa;
 
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.test.SearchTestCase;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.index.Term;
 
 /**
@@ -45,7 +45,7 @@ public class EntityManagerTest extends JPATestCase {
 		em.getTransaction().commit();
 		em.clear();
 		em.getTransaction().begin();
-		QueryParser parser = new QueryParser( "title", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.stopAnalyzer );
 		Query query = parser.parse( "saltQty:noword" );
 		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
 		query = new TermQuery( new Term("saltQty", "23.0") );
@@ -56,14 +56,14 @@ public class EntityManagerTest extends JPATestCase {
 		em.getTransaction().commit();
 
 		em.clear();
-
+		
 		em.getTransaction().begin();
 		em.remove( em.find( Bretzel.class, bretzel.getId() ) );
 		em.getTransaction().commit();
 		em.close();
 	}
 
-	public void testIndex() throws Exception {
+	public void testIndex() {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
 		Bretzel bretzel = new Bretzel( 23, 34 );

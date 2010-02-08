@@ -25,7 +25,6 @@
 package org.hibernate.search.filter;
 
 import java.io.IOException;
-import java.util.BitSet;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.DocIdSet;
@@ -74,18 +73,6 @@ public class CachingWrapperFilter extends Filter {
 		this.cache = new SoftLimitMRUCache( size );
 	}	
 
-	@Override
-	public BitSet bits(IndexReader reader) throws IOException {
-		throw new UnsupportedOperationException();
-		/* BitSet cached = (BitSet) cache.get(reader);
-		if (cached != null) {
-			return cached;
-		}
-		final BitSet bits = filter.bits(reader);
-		cache.put(reader, bits);
-		return bits; */
-	}
-	
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 		DocIdSet cached = (DocIdSet) cache.get( reader );

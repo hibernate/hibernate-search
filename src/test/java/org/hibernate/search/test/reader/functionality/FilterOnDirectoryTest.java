@@ -84,7 +84,7 @@ public class FilterOnDirectoryTest extends SearchTestCase {
 		cfg.setProperty( Environment.READER_STRATEGY,  SharingBufferReaderProvider.class.getName() );
 	}
 	
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Detective.class,
 				Suspect.class

@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
@@ -45,6 +44,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -128,7 +128,7 @@ public class SearcherThread implements Runnable {
 	}
 
 	private Query getQuery() throws ParseException {
-		QueryParser qp = new QueryParser( "t", new StandardAnalyzer() );
+		QueryParser qp = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "t", SearchTestCase.standardAnalyzer );
 		qp.setLowercaseExpandedTerms( true );
 		// Parse the query
 		Query q = qp.parse( queryString );

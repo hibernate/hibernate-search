@@ -70,7 +70,7 @@ public class CustomerShardingStrategyTest extends TestCase {
 		// create a dummy document for the same customerID, and make sure the shard it would be
 		// indexed on matches the shard returned by getDirectoryProvidersForQuery()
 		Document document = new Document();
-		document.add(new Field("customerID", "5", Field.Store.NO, Field.Index.UN_TOKENIZED));
+		document.add(new Field("customerID", "5", Field.Store.NO, Field.Index.NOT_ANALYZED));
 		
 		assertTrue(providers[0].equals(
 			shardStrategy.getDirectoryProviderForAddition(null, null, null, document)

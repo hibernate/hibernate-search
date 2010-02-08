@@ -62,7 +62,7 @@ public class UnresolvedBridgeTest extends TestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Gangster.class
 		};

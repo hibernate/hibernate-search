@@ -98,7 +98,7 @@ public class RollbackTransactionTest extends SearchTestCase {
 	
 	// Test setup options - Entities
 	@Override
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] { BusLine.class, BusStop.class };
 	}
 	

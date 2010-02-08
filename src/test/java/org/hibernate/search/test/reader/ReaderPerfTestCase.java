@@ -31,7 +31,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -70,7 +69,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Detective.class,
 				Suspect.class
@@ -144,9 +143,9 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		public void run() {
 			Session s = sf.openSession();
 			Transaction tx = s.beginTransaction();
-			QueryParser parser = new MultiFieldQueryParser(
+			QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(),
 					new String[] { "name", "physicalDescription", "suspectCharge" },
-					new StandardAnalyzer()
+					SearchTestCase.standardAnalyzer
 			);
 			FullTextQuery query = getQuery( "John Doe", parser, s );
 			assertTrue( query.getResultSize() != 0 );
@@ -207,9 +206,9 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		public void run() {
 			Session s = sf.openSession();
 			Transaction tx = s.beginTransaction();
-			QueryParser parser = new MultiFieldQueryParser(
+			QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), 
 					new String[] { "name", "physicalDescription", "suspectCharge" },
-					new StandardAnalyzer()
+					SearchTestCase.standardAnalyzer
 			);
 			FullTextQuery query = getQuery( "John Doe", parser, s );
 			assertTrue( query.getResultSize() != 0 );

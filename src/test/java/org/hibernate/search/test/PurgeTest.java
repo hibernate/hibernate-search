@@ -26,7 +26,6 @@ package org.hibernate.search.test;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
@@ -60,7 +59,7 @@ public class PurgeTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "brand", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "brand", SearchTestCase.stopAnalyzer );
 
 		Query query = parser.parse( "brand:Seiko" );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
@@ -104,8 +103,8 @@ public class PurgeTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( "brand", new StopAnalyzer() );
-		                     tx = s.beginTransaction();
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "brand", SearchTestCase.stopAnalyzer );
+		tx = s.beginTransaction();
 		s.purgeAll( Clock.class);
 
 		tx.commit();
@@ -127,7 +126,7 @@ public class PurgeTest extends SearchTestCase {
 		s.close();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Book.class,
 				AlternateBook.class,

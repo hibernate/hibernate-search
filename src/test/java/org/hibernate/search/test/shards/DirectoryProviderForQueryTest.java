@@ -26,7 +26,6 @@ package org.hibernate.search.test.shards;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -72,7 +71,7 @@ public class DirectoryProviderForQueryTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser("id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 
 		FullTextQuery fullTextQuery = fts.createFullTextQuery( parser.parse( "body:message" ) );
 		List results = fullTextQuery.list();
@@ -88,7 +87,7 @@ public class DirectoryProviderForQueryTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Email.class
 		};

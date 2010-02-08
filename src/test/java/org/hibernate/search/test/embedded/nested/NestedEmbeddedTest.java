@@ -26,10 +26,8 @@ package org.hibernate.search.test.embedded.nested;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -61,7 +59,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "attributes.values.value", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "attributes.values.value", SearchTestCase.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -115,7 +113,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "placesVisited.address.city", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "placesVisited.address.city", SearchTestCase.standardAnalyzer );
 		Query query;
 		List<?> result;
 

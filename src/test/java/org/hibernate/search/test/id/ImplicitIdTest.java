@@ -63,7 +63,7 @@ public class ImplicitIdTest extends SearchTestCase {
 		s.close();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Animal.class
 		};

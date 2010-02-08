@@ -80,7 +80,7 @@ public class SimilarityTest extends SearchTestCase {
 
 	}
 	
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Trash.class,
 				Can.class

@@ -37,7 +37,7 @@ import org.hibernate.search.util.FileHelper;
  */
 public class DirectoryProviderHelperTest extends TestCase {
 
-	public void testMkdirsDetermineIndex() throws Exception {
+	public void testMkdirsDetermineIndex() {
 		String root = "./testDir/dir1/dir2";
 		String relative = "dir3";
 
@@ -45,14 +45,14 @@ public class DirectoryProviderHelperTest extends TestCase {
 		properties.put( "indexBase", root );
 		properties.put( "indexName", relative );
 
-		File f = DirectoryProviderHelper.getVerifiedIndexDir( "name", properties, true );
+		DirectoryProviderHelper.getVerifiedIndexDir( "name", properties, true );
 
 		assertTrue( new File( root ).exists() );
 
 		FileHelper.delete( new File( "./testDir" ) );
 	}
 	
-	public void testMkdirsGetSource() throws Exception {
+	public void testMkdirsGetSource() {
 		String root = "./testDir";
 		String relative = "dir1/dir2/dir3";
 

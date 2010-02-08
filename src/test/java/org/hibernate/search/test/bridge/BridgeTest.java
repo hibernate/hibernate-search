@@ -34,14 +34,12 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
@@ -82,7 +80,7 @@ public class BridgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		Query query;
 		List result;
 
@@ -145,7 +143,7 @@ public class BridgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", new SimpleAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.simpleAnalyzer );
 		Query query;
 		List result;
 
@@ -187,7 +185,7 @@ public class BridgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		Query query;
 		List result;
 
@@ -235,7 +233,7 @@ public class BridgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		Query query;
 		List result;
 
@@ -270,7 +268,7 @@ public class BridgeTest extends SearchTestCase {
 	}
 
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Cloud.class
 		};

@@ -69,7 +69,7 @@ public class ConcurrencyTest extends SearchTestCase {
 
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Drink.class,
 				Food.class

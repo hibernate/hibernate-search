@@ -41,6 +41,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.index.Term;
@@ -49,7 +50,6 @@ import org.apache.lucene.index.Term;
  * @author Emmanuel Bernard
  */
 public class ShardsTest extends SearchTestCase {
-
 
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
@@ -98,7 +98,7 @@ public class ShardsTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser("id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 2, results.size() );
@@ -127,23 +127,35 @@ public class ShardsTest extends SearchTestCase {
 
 		s.clear();
 
-		IndexReader reader = IndexReader.open( new File( getBaseIndexDir(), "Animal00" ) );
+		FSDirectory animal00Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal00" ) );
 		try {
-			int num = reader.numDocs();
-			assertEquals( 1, num );
+			IndexReader reader = IndexReader.open( animal00Directory );
+			try {
+				int num = reader.numDocs();
+				assertEquals( 1, num );
+			}
+			finally {
+				reader.close();
+			}
 		}
 		finally {
-			reader.close();
+			animal00Directory.close();
 		}
-		reader = IndexReader.open( new File( getBaseIndexDir(), "Animal.1" ) );
+		
+		FSDirectory animal01Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.1" ) );
 		try {
-			int num = reader.numDocs();
-			assertEquals( 1, num );
+			IndexReader reader = IndexReader.open( animal01Directory );
+			try {
+				int num = reader.numDocs();
+				assertEquals( 1, num );
+			}
+			finally {
+				reader.close();
+			}
 		}
 		finally {
-			reader.close();
+			animal01Directory.close();
 		}
-
 
 		tx = s.beginTransaction();
 		a = (Animal) s.get(Animal.class, 1);
@@ -152,22 +164,28 @@ public class ShardsTest extends SearchTestCase {
 
 		s.clear();
 
-		reader = IndexReader.open( new File( getBaseIndexDir(), "Animal.1" ) );
+		animal01Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.1" ) );
 		try {
-			int num = reader.numDocs();
-			assertEquals( 1, num );
-			TermDocs docs = reader.termDocs( new Term( "name", "mouse" ) );
-			assertTrue( docs.next() );
-			org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-			assertFalse( docs.next() );
+			IndexReader reader = IndexReader.open( animal01Directory );
+			try {
+				int num = reader.numDocs();
+				assertEquals( 1, num );
+				TermDocs docs = reader.termDocs( new Term( "name", "mouse" ) );
+				assertTrue( docs.next() );
+				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
+				assertFalse( docs.next() );
+			}
+			finally {
+				reader.close();
+			}
 		}
 		finally {
-			reader.close();
+			animal01Directory.close();
 		}
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser("id", new StopAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 2, results.size() );
@@ -196,7 +214,7 @@ public class ShardsTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Animal.class,
 				Furniture.class

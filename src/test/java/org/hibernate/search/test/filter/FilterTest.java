@@ -30,8 +30,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.RangeFilter;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeFilter;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -137,8 +137,7 @@ public class FilterTest extends SearchTestCase {
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver");
-		Filter dateFilter = new RangeFilter("delivery", "2001", "2005",
-				true, true);
+		Filter dateFilter = new TermRangeFilter("delivery", "2001", "2005", true, true);
 		ftQuery.setFilter( dateFilter );
 		assertEquals("Should select only liz", 1, ftQuery.getResultSize() );
 
@@ -200,7 +199,7 @@ public class FilterTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Driver.class,
 				Soap.class

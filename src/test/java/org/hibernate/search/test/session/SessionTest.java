@@ -91,7 +91,7 @@ public class SessionTest extends SearchTestCase {
 		}
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Email.class,
 				Domain.class

@@ -28,7 +28,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
@@ -37,6 +36,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
@@ -76,63 +77,70 @@ public class FSDirectoryTest extends SearchTestCase {
 		);
 		s.getTransaction().commit();
 		s.close();
-		IndexReader reader = IndexReader.open( new File( getBaseIndexDir(), "Documents" ) );
+
+		Directory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
 		try {
-			int num = reader.numDocs();
-			assertEquals( 1, num );
-			TermDocs docs = reader.termDocs( new Term( "Abstract", "hibernate" ) );
-			assertTrue( docs.next() );
-			org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-			assertFalse( docs.next() );
-			docs = reader.termDocs( new Term( "title", "action" ) );
-			assertTrue( docs.next() );
-			doc = reader.document( docs.doc() );
-			assertFalse( docs.next() );
-			assertEquals( "1", doc.getField( "id" ).stringValue() );
+			IndexReader reader = IndexReader.open( dir, true );
+			try {
+				int num = reader.numDocs();
+				assertEquals( 1, num );
+				TermDocs docs = reader.termDocs( new Term( "Abstract", "hibernate" ) );
+				assertTrue( docs.next() );
+				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
+				assertFalse( docs.next() );
+				docs = reader.termDocs( new Term( "title", "action" ) );
+				assertTrue( docs.next() );
+				doc = reader.document( docs.doc() );
+				assertFalse( docs.next() );
+				assertEquals( "1", doc.getField( "id" ).stringValue() );
+			}
+			finally {
+				reader.close();
+			}
+
+			s = getSessions().openSession();
+			s.getTransaction().begin();
+			Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
+			entity.setSummary( "Object/relational mapping with EJB3" );
+			s.persist( new Document( "Seam in Action", "", "blah blah blah blah" ) );
+			s.getTransaction().commit();
+			s.close();
+
+			reader = IndexReader.open( dir, true );
+			try {
+				int num = reader.numDocs();
+				assertEquals( 2, num );
+				TermDocs docs = reader.termDocs( new Term( "Abstract", "ejb" ) );
+				assertTrue( docs.next() );
+				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
+				assertFalse( docs.next() );
+			}
+			finally {
+				reader.close();
+			}
+
+			s = getSessions().openSession();
+			s.getTransaction().begin();
+			s.delete( entity );
+			s.getTransaction().commit();
+			s.close();
+
+			reader = IndexReader.open( dir, true );
+			try {
+				int num = reader.numDocs();
+				assertEquals( 1, num );
+				TermDocs docs = reader.termDocs( new Term( "title", "seam" ) );
+				assertTrue( docs.next() );
+				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
+				assertFalse( docs.next() );
+				assertEquals( "2", doc.getField( "id" ).stringValue() );
+			}
+			finally {
+				reader.close();
+			}
 		}
 		finally {
-			reader.close();
-		}
-
-		s = getSessions().openSession();
-		s.getTransaction().begin();
-		Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
-		entity.setSummary( "Object/relational mapping with EJB3" );
-		s.persist( new Document( "Seam in Action", "", "blah blah blah blah" ) );
-		s.getTransaction().commit();
-		s.close();
-
-		reader = IndexReader.open( new File( getBaseIndexDir(), "Documents" ) );
-		try {
-			int num = reader.numDocs();
-			assertEquals( 2, num );
-			TermDocs docs = reader.termDocs( new Term( "Abstract", "ejb" ) );
-			assertTrue( docs.next() );
-			org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-			assertFalse( docs.next() );
-		}
-		finally {
-			reader.close();
-		}
-
-		s = getSessions().openSession();
-		s.getTransaction().begin();
-		s.delete( entity );
-		s.getTransaction().commit();
-		s.close();
-
-		reader = IndexReader.open( new File( getBaseIndexDir(), "Documents" ) );
-		try {
-			int num = reader.numDocs();
-			assertEquals( 1, num );
-			TermDocs docs = reader.termDocs( new Term( "title", "seam" ) );
-			assertTrue( docs.next() );
-			org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-			assertFalse( docs.next() );
-			assertEquals( "2", doc.getField( "id" ).stringValue() );
-		}
-		finally {
-			reader.close();
+			dir.close();
 		}
 
 		s = getSessions().openSession();
@@ -154,9 +162,10 @@ public class FSDirectoryTest extends SearchTestCase {
 		s.getTransaction().commit();
 		s.close();
 
-		IndexSearcher searcher = new IndexSearcher( new File( getBaseIndexDir(), "Documents" ).getCanonicalPath() );
+		FSDirectory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
+		IndexSearcher searcher = new IndexSearcher( dir, true );
 		try {
-			QueryParser qp = new QueryParser( "id", new StandardAnalyzer() );
+			QueryParser qp = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 			Query query = qp.parse( "title:Action OR Abstract:Action" );
 			TopDocs hits = searcher.search( query, 1000 );
 			assertEquals( 2, hits.totalHits );
@@ -166,6 +175,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		}
 		finally {
 			searcher.close();
+			dir.close();
 		}
 
 		s = getSessions().openSession();
@@ -182,23 +192,25 @@ public class FSDirectoryTest extends SearchTestCase {
 	public void testSearchOnDeletedIndex() throws Exception {
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
-		s.persist( new Document( "Hibernate Search in Action", "", "") );
+		s.persist( new Document( "Hibernate Search in Action", "", "" ) );
 		s.getTransaction().commit();
 		s.close();
-		
-		IndexSearcher searcher = new IndexSearcher( new File( getBaseIndexDir(), "Documents" ).getCanonicalPath() );
+
+		Directory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
+		IndexSearcher searcher = new IndexSearcher( dir, true );
 		// deleting before search, but after IndexSearcher creation:
 		// ( fails when deleting -concurrently- to IndexSearcher initialization! )
-		FileHelper.delete(getBaseIndexDir());
-		TermQuery query = new TermQuery( new Term("title","action") );
+		FileHelper.delete( getBaseIndexDir() );
+		TermQuery query = new TermQuery( new Term( "title", "action" ) );
 		TopDocs hits = searcher.search( query, 1000 );
 		assertEquals( 1, hits.totalHits );
 		org.apache.lucene.document.Document doc = searcher.doc( 0 );
 		assertEquals( "Hibernate Search in Action", doc.get( "title" ) );
 		searcher.close();
+		dir.close();
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Document.class
 		};
@@ -213,4 +225,3 @@ public class FSDirectoryTest extends SearchTestCase {
 	}
 
 }
-

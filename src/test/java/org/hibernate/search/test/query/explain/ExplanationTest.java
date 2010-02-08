@@ -35,7 +35,6 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.Transaction;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 /**
  * @author Emmanuel Bernard
@@ -55,7 +54,8 @@ public class ExplanationTest extends SearchTestCase {
 		Map<String, Float> boosts = new HashMap<String, Float>(2);
 		boosts.put( "title", new Float(4) );
 		boosts.put( "description", new Float(1) );
-		MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[] {"title", "description"}, new StandardAnalyzer(), boosts);
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), new String[] {"title", "description"},
+				SearchTestCase.standardAnalyzer, boosts );
 		Query luceneQuery = parser.parse( "dark" );
 		FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )
 				.setProjection( FullTextQuery.DOCUMENT_ID, FullTextQuery.EXPLANATION, FullTextQuery.THIS );
@@ -69,7 +69,7 @@ public class ExplanationTest extends SearchTestCase {
 		s.close();
 
 	}
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Dvd.class
 		};

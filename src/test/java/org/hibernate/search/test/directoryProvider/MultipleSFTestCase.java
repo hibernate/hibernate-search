@@ -28,11 +28,13 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
+import org.apache.lucene.util.Version;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * Build multiple session factories from the same set of classes
@@ -130,4 +132,9 @@ public abstract class MultipleSFTestCase extends TestCase {
 	public static SessionFactory[] getSessionFactories() {
 		return sessionFactories;
 	}
+	
+	public static Version getTargetLuceneVersion() {
+		return SearchTestCase.getTargetLuceneVersion();
+	}
+	
 }

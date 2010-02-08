@@ -77,7 +77,7 @@ public class ManualIndexingStrategyTest extends SearchTestCase {
 		}
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Document.class,
 				AlternateDocument.class

@@ -89,7 +89,8 @@ public class TransactionTest extends SearchTestCase {
 		}
 	}
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] { Document.class };
 	}
+	
 }

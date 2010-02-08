@@ -26,10 +26,8 @@ package org.hibernate.search.test.query.criteria;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -54,8 +52,8 @@ public class MixedCriteriaTest extends SearchTestCase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser(
-				new String[] { "kurztext" }, new StandardAnalyzer()
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), 
+				new String[] { "kurztext" }, SearchTestCase.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );
 
@@ -78,8 +76,8 @@ public class MixedCriteriaTest extends SearchTestCase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser(
-				new String[] { "kurztext" }, new StandardAnalyzer()
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(),
+				new String[] { "kurztext" }, SearchTestCase.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );
 
@@ -102,8 +100,8 @@ public class MixedCriteriaTest extends SearchTestCase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser(
-				new String[] { "kurztext" }, new StandardAnalyzer()
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(),
+				new String[] { "kurztext" }, SearchTestCase.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );
 
@@ -143,7 +141,7 @@ public class MixedCriteriaTest extends SearchTestCase {
 	}
 
 
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[] {
 				AbstractCar.class, CombiCar.class, SportCar.class, Bike.class
 		};

@@ -61,7 +61,7 @@ public class SecurityFilterFactory {
 		return key;
 	}
 	
-	private final class SecurityFilter extends Filter {
+	private static final class SecurityFilter extends Filter {
 		private static final long serialVersionUID = -5105989141875576599L;
 		private final String ownerName;
 		

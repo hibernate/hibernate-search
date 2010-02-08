@@ -24,8 +24,8 @@
  */
 package org.hibernate.search.test.filter;
 
-import java.util.BitSet;
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
@@ -34,21 +34,10 @@ import org.apache.lucene.index.IndexReader;
 /**
  * @author Emmanuel Bernard
  */
-@SuppressWarnings("serial")
-public class ExcludeAllFilter extends Filter {
+public class ExcludeAllFilter extends Filter implements Serializable {
 
 	// ugly but useful for test purposes
 	private static volatile boolean done = false;
-
-	@Override
-	public BitSet bits(IndexReader reader) throws IOException {
-		if ( done ) {
-			throw new IllegalStateException( "Called twice" );
-		}
-		BitSet bitSet = new BitSet( reader.maxDoc() );
-		done = true;
-		return bitSet;
-	}
 
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
@@ -58,4 +47,5 @@ public class ExcludeAllFilter extends Filter {
 		done = true;
 		return DocIdSet.EMPTY_DOCIDSET;
 	}
+	
 }

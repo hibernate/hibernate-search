@@ -27,16 +27,19 @@ package org.hibernate.search.test.analyzer.inheritance;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.ISOLatin1AccentFilter;
+import org.apache.lucene.analysis.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Hardy Ferentschik
  */
-	public class ISOLatin1Analyzer extends Analyzer {
-		public TokenStream tokenStream(String s, Reader reader) {
-			TokenStream result = new StandardTokenizer( reader );
-			return new ISOLatin1AccentFilter( result );
-		}
+public class ISOLatin1Analyzer extends Analyzer {
+	
+	public TokenStream tokenStream(String s, Reader reader) {
+		TokenStream result = new StandardTokenizer( SearchTestCase.getTargetLuceneVersion(), reader );
+		return new ASCIIFoldingFilter(result);
 	}
+	
+}

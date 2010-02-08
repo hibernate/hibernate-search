@@ -124,7 +124,7 @@ public class WorkerTestCase extends SearchTestCase {
 			s = sf.openSession();
 			tx = s.beginTransaction();
 			FullTextSession fts = new FullTextSessionImpl( s );
-			QueryParser parser = new QueryParser( "id", new StopAnalyzer() );
+			QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
 			Query query;
 			try {
 				query = parser.parse( "name:emmanuel2" );
@@ -198,7 +198,7 @@ public class WorkerTestCase extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class[] getMappings() {
+	protected Class<?>[] getMappings() {
 		return new Class[]{
 				Employee.class,
 				Employer.class

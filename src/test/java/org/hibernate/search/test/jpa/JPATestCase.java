@@ -37,7 +37,9 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
 import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.test.SearchTestCase;
 import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.util.Version;
 
 /**
  * @author Emmanuel Bernard
@@ -127,5 +129,10 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 
 		return config;
 	}
+	
+	public static Version getTargetLuceneVersion() {
+		return SearchTestCase.getTargetLuceneVersion();
+	}
+	
 }
 

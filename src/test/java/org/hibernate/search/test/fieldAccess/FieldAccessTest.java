@@ -32,7 +32,6 @@ import org.hibernate.search.Search;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 /**
  * @author Emmanuel Bernard
@@ -50,7 +49,7 @@ public class FieldAccessTest extends SearchTestCase {
 
         FullTextSession session = Search.getFullTextSession(s);
         tx = session.beginTransaction();
-        QueryParser p = new QueryParser("id", new StandardAnalyzer( ) );
+        QueryParser p = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
         List result = session.createFullTextQuery( p.parse( "Abstract:Hibernate" ) ).list();
         assertEquals( "Query by field", 1, result.size() );
         s.delete( result.get( 0 ) );
@@ -74,7 +73,7 @@ public class FieldAccessTest extends SearchTestCase {
 
         FullTextSession session = Search.getFullTextSession(s);
         tx = session.beginTransaction();
-        QueryParser p = new QueryParser("id", new StandardAnalyzer( ) );
+        QueryParser p = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
         List result = session.createFullTextQuery( p.parse( "title:Action OR Abstract:Action" ) ).list();
         assertEquals( "Query by field", 2, result.size() );
         assertEquals( "@Boost fails", "Hibernate in Action", ( (Document) result.get( 0 ) ).getTitle() );
@@ -84,7 +83,7 @@ public class FieldAccessTest extends SearchTestCase {
 
     }
 
-    protected Class[] getMappings() {
+    protected Class<?>[] getMappings() {
         return new Class[] {
                 Document.class
         };

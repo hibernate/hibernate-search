@@ -27,7 +27,6 @@ package org.hibernate.search.test.embedded;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.QueryParser;
@@ -66,7 +65,7 @@ public class EmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -132,7 +131,7 @@ public class EmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -169,7 +168,7 @@ public class EmbeddedTest extends SearchTestCase {
 		s.clear();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( "id", new StandardAnalyzer() );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -246,7 +245,7 @@ public class EmbeddedTest extends SearchTestCase {
 		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
 
-		QueryParser parser = new MultiFieldQueryParser( new String[] { "name", "authors.name" }, new StandardAnalyzer() );
+		QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), new String[] { "name", "authors.name" }, SearchTestCase.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -306,7 +305,7 @@ public class EmbeddedTest extends SearchTestCase {
 		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
 
-		QueryParser parser = new MultiFieldQueryParser( new String[] { "name", "state.name" }, new StandardAnalyzer() );
+		QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), new String[] { "name", "state.name" }, SearchTestCase.standardAnalyzer );
 		Query query;
 		List<?> result;
 

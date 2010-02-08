@@ -31,13 +31,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * Serialization test for entity manager. HSEARCH-117.
@@ -120,7 +120,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 		em.getTransaction().commit();
 		em.clear();
 		em.getTransaction().begin();
-		QueryParser parser = new QueryParser("title", new StopAnalyzer());
+		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "title", SearchTestCase.stopAnalyzer );
 		Query query = parser.parse("saltQty:noword");
 		assertEquals(0, em.createFullTextQuery(query).getResultList().size());
 		query = new TermQuery(new Term("saltQty", "23.0"));
