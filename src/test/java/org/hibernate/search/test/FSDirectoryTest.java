@@ -81,11 +81,11 @@ public class FSDirectoryTest extends SearchTestCase {
 			int num = reader.numDocs();
 			assertEquals( 1, num );
 			TermDocs docs = reader.termDocs( new Term( "Abstract", "Hibernate" ) );
-			docs.next();
+			assertTrue( docs.next() );
 			org.apache.lucene.document.Document doc = reader.document( docs.doc() );
 			assertFalse( docs.next() );
 			docs = reader.termDocs( new Term( "Title", "Action" ) );
-			docs.next();
+			assertTrue( docs.next() );
 			doc = reader.document( docs.doc() );
 			assertFalse( docs.next() );
 			assertEquals( "1", doc.getField( "id" ).stringValue() );
