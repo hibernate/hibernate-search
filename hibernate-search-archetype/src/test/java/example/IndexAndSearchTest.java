@@ -27,6 +27,7 @@ package example;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.util.Version;
 import org.hibernate.Session;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.search.FullTextSession;
@@ -113,16 +114,18 @@ public class IndexAndSearchTest {
 
     private void index() {
         FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession((Session) em.getDelegate());
-        List results = ftSession.createCriteria(Book.class).list();
-        for (Object obj : results) {
-            ftSession.index(obj);
-        }
-		ftSession.flushToIndexes();
+        try {
+			ftSession.createIndexer().startAndWait();
+		}
+		catch (InterruptedException e) {
+			log.error( "Was interrupted during indexing", e );
+		}
     }
 
     private void purge() {
         FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession((Session) em.getDelegate());
         ftSession.purgeAll(Book.class);
+        ftSession.flushToIndexes();
     }
 
     private List<Book> search(String searchQuery) throws ParseException {
@@ -149,7 +152,7 @@ public class IndexAndSearchTest {
 
         FullTextEntityManager ftEm = org.hibernate.search.jpa.Search.getFullTextEntityManager((EntityManager) em);
 
-        QueryParser parser = new MultiFieldQueryParser(bookFields, ftEm.getSearchFactory().getAnalyzer("customanalyzer"),
+        QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_29, bookFields, ftEm.getSearchFactory().getAnalyzer("customanalyzer"),
                 boostPerField);
 
         org.apache.lucene.search.Query luceneQuery;
