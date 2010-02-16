@@ -135,16 +135,16 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		return em.find( entityClass, primaryKey );
 	}
 
-	public <T> T find(Class<T> tClass, Object o, Map<String, Object> stringObjectMap) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> hints) {
+		return em.find(entityClass, primaryKey, hints);
 	}
 
-	public <T> T find(Class<T> tClass, Object o, LockModeType lockModeType) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockModeType) {
+		return em.find(entityClass, primaryKey, lockModeType);
 	}
 
-	public <T> T find(Class<T> tClass, Object o, LockModeType lockModeType, Map<String, Object> stringObjectMap) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockModeType, Map<String, Object> hints) {
+		return em.find(entityClass, primaryKey, lockModeType, hints);
 	}
 
 	public <T> T getReference(Class<T> entityClass, Object primaryKey) {
@@ -167,48 +167,48 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		em.lock( entity, lockMode );
 	}
 
-	public void lock(Object o, LockModeType lockModeType, Map<String, Object> stringObjectMap) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	public void lock(Object entity, LockModeType lockModeType, Map<String, Object> hints) {
+		em.lock(entity, lockModeType, hints);
 	}
 
 	public void refresh(Object entity) {
 		em.refresh( entity );
 	}
 
-	public void refresh(Object o, Map<String, Object> stringObjectMap) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	public void refresh(Object entity, Map<String, Object> hints) {
+		em.refresh(entity, hints);
 	}
 
-	public void refresh(Object o, LockModeType lockModeType) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	public void refresh(Object entity, LockModeType lockModeType) {
+		em.refresh(entity, lockModeType);
 	}
 
-	public void refresh(Object o, LockModeType lockModeType, Map<String, Object> stringObjectMap) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	public void refresh(Object entity, LockModeType lockModeType, Map<String, Object> hints) {
+		em.refresh(entity, lockModeType, hints);
 	}
 
 	public void clear() {
 		em.clear();
 	}
 
-	public void detach(Object o) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	public void detach(Object entity) {
+		em.detach(entity);
 	}
 
 	public boolean contains(Object entity) {
 		return em.contains( entity );
 	}
 
-	public LockModeType getLockMode(Object o) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public LockModeType getLockMode(Object entity) {
+		return em.getLockMode(entity);
 	}
 
-	public void setProperty(String s, Object o) {
-		//To change body of implemented methods use File | Settings | File Templates.
+	public void setProperty(String key, Object value) {
+		em.setProperty(key, value);
 	}
 
 	public Map<String, Object> getProperties() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return em.getProperties();
 	}
 
 	public Query createQuery(String ejbqlString) {
@@ -247,8 +247,15 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		em.joinTransaction();
 	}
 
-	public <T> T unwrap(Class<T> tClass) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public <T> T unwrap(Class<T> type) {
+        if (type.equals( FullTextSession.class ) ) {
+            @SuppressWarnings("unchecked")
+            final T ftSession = (T) Search.getFullTextSession(em.unwrap(Session.class));
+            return ftSession;
+        }
+        else {
+		    return em.unwrap(type);
+        }
 	}
 
 	public Object getDelegate() {
@@ -268,17 +275,16 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	}
 
 	public EntityManagerFactory getEntityManagerFactory() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return em.getEntityManagerFactory();
 	}
 
 	public CriteriaBuilder getCriteriaBuilder() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return em.getCriteriaBuilder();
 	}
 
 	public Metamodel getMetamodel() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return em.getMetamodel();
 	}
-
 
 	public MassIndexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );
