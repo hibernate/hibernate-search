@@ -25,12 +25,7 @@
 package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
+import java.util.*;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.FlushModeType;
@@ -65,13 +60,21 @@ import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.transform.ResultTransformer;
 
 /**
+ * Implements JPA 2 query interface and delegate the call to
+ * a Hibernate Core FullTextQuery.
+ * This has the consequence of "duplicating" the JPA 2 query logic in some areas.
  * @author Emmanuel Bernard
  */
 public class FullTextQueryImpl implements FullTextQuery {
 	private final org.hibernate.search.FullTextQuery query;
 	private final Session session;
+    private Integer firstResult;
+	private Integer maxResults;
+    //initialized at 0 since we don't expect to use hints at this stage
+    private final Map<String, Object> hints = new HashMap<String, Object>(0);
+    private FlushModeType jpaFlushMode;
 
-	public FullTextQueryImpl(org.hibernate.search.FullTextQuery query, Session session) {
+    public FullTextQueryImpl(org.hibernate.search.FullTextQuery query, Session session) {
 		this.query = query;
 		this.session = session;
 	}
@@ -230,20 +233,23 @@ public class FullTextQueryImpl implements FullTextQuery {
 		}
 	}
 
-	public Query setMaxResults(int maxResult) {
-		if ( maxResult < 0 ) {
+	public Query setMaxResults(int maxResults) {
+		if ( maxResults < 0 ) {
 			throw new IllegalArgumentException(
 					"Negative ("
-							+ maxResult
+							+ maxResults
 							+ ") parameter passed in to setMaxResults"
 			);
 		}
-		query.setMaxResults( maxResult );
+		query.setMaxResults( maxResults );
+        this.maxResults = maxResults;
 		return this;
 	}
 
 	public int getMaxResults() {
-		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return maxResults == null || maxResults == -1
+				? Integer.MAX_VALUE
+				: maxResults;
 	}
 
 	public Query setFirstResult(int firstResult) {
@@ -255,11 +261,12 @@ public class FullTextQueryImpl implements FullTextQuery {
 			);
 		}
 		query.setFirstResult( firstResult );
+        this.firstResult = firstResult;
 		return this;
 	}
 
 	public int getFirstResult() {
-		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+		return firstResult == null ? 0 : firstResult;
 	}
 
 	public Explanation explain(int documentId) {
@@ -271,27 +278,24 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	public Query setHint(String hintName, Object value) {
+        hints.put(hintName, value);
 		return this;
 	}
 
 	public Map<String, Object> getHints() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return hints;
 	}
 
 	public <T> Query setParameter(Parameter<T> tParameter, T t) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
 	public Query setParameter(Parameter<Calendar> calendarParameter, Calendar calendar, TemporalType temporalType) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
 	public Query setParameter(Parameter<Date> dateParameter, Date date, TemporalType temporalType) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	public Set<String> getSupportedHints() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
 	public Query setParameter(String name, Object value) {
@@ -314,66 +318,48 @@ public class FullTextQueryImpl implements FullTextQuery {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	public Query setParameter(int position, Calendar value, TemporalType temporalType) {
+    public Set<Parameter<?>> getParameters() {
+        return Collections.EMPTY_SET;
+    }
+
+    public Query setParameter(int position, Calendar value, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	//FIXME remove old JPA 2 contract
-	public Map<String, Object> getNamedParameters() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	//FIXME remove old JPA 2 contract
-	public List getPositionalParameters() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	//FIXME
-	public Set<Parameter<?>> getParameters() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	//FIXME
 	public Parameter<?> getParameter(String name) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	//FIXME
 	public Parameter<?> getParameter(int position) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	//FIXME
 	public <T> Parameter<T> getParameter(String name, Class<T> type) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	//FIXME
 	public <T> Parameter<T> getParameter(int position, Class<T> type) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	//FIXME
 	public boolean isBound(Parameter<?> param) {
-		return false;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	//FIXME
 	public <T> T getParameterValue(Parameter<T> param) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	//FIXME
 	public Object getParameterValue(String name) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
-	//FIXME
 	public Object getParameterValue(int position) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
 	}
 
 	public Query setFlushMode(FlushModeType flushMode) {
+        this.jpaFlushMode = flushMode;
 		if ( flushMode == FlushModeType.AUTO ) {
 			query.setFlushMode( FlushMode.AUTO );
 		}
@@ -384,18 +370,35 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	public FlushModeType getFlushMode() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if (jpaFlushMode != null) {
+            return jpaFlushMode;
+        }
+        final FlushMode hibernateFlushMode = session.getFlushMode();
+        if (FlushMode.AUTO == hibernateFlushMode) {
+            return FlushModeType.AUTO;
+        }
+        else if (FlushMode.COMMIT == hibernateFlushMode) {
+            return FlushModeType.COMMIT;
+        }
+        else {
+            return null; //incompatible flush mode
+        }
 	}
 
 	public Query setLockMode(LockModeType lockModeType) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "lock modes not supported in fullText queries");
 	}
 
 	public LockModeType getLockMode() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		throw new UnsupportedOperationException( "lock modes not supported in fullText queries");
 	}
 
-	public <T> T unwrap(Class<T> tClass) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public <T> T unwrap(Class<T> type) {
+		if ( type.equals( org.hibernate.search.FullTextQuery.class ) ) {
+            return (T) query;
+        }
+        else {
+            return query.unwrap( type );
+        }
 	}
 }

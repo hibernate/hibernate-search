@@ -131,4 +131,9 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 */
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
+    /**
+     * return the underlying type if possible
+     * TODO document what can be unwrapped
+     */
+    <T> T unwrap(Class<T> type);
 }

@@ -889,7 +889,11 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
-	protected LockOptions getLockOptions() {
+    public <T> T unwrap(Class<T> type) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    protected LockOptions getLockOptions() {
 		return null;
 	}
 
