@@ -673,6 +673,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	}
 
 	private static void processFieldsForProjection(PropertiesMetadata metadata, String[] fields, Object[] result, Document document) {
+        //process base fields
 		final int nbrFoEntityFields = metadata.fieldNames.size();
 		for ( int index = 0; index < nbrFoEntityFields; index++ ) {
 			populateResult(
@@ -684,6 +685,8 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 					document
 			);
 		}
+
+        //process fields of embedded
 		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
 		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
 			//there is nothing we can do for collections
@@ -692,6 +695,19 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 						metadata.embeddedPropertiesMetadata.get( index ), fields, result, document
 				);
 			}
+		}
+
+        //process class bridges
+        final int nbrOfClassBridges = metadata.classBridges.size();
+		for ( int index = 0; index < nbrOfClassBridges; index++ ) {
+			populateResult(
+                    metadata.classNames.get(index),
+                    metadata.classBridges.get(index),
+                    metadata.classStores.get(index),
+                    fields,
+                    result,
+                    document
+            );
 		}
 	}
 
@@ -721,5 +737,11 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 				return;
 			}
 		}
+        for ( FieldBridge bridge : metadata.classBridges ) {
+            if ( !( bridge instanceof TwoWayStringBridge || bridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
+                allowFieldSelectionInProjection = false;
+                return;
+            }
+        }
 	}
 }
