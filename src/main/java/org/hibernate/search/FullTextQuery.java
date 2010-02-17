@@ -136,8 +136,9 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
 	/**
-	 * return the underlying type if possible
-	 * TODO document what can be unwrapped
+	 * return the underlying type if possible or IllegalArgumentException otherwise
+	 * Supported types are:
+	 *  - org.apache.lucene.search.Query the underlying lucene query
 	 */
 	<T> T unwrap(Class<T> type);
 }

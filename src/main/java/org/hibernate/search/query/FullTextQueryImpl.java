@@ -902,23 +902,26 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public <T> T unwrap(Class<T> type) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		if ( type == org.apache.lucene.search.Query.class) {
+			return (T) luceneQuery;
+		}
+		throw new IllegalArgumentException("Cannot unwrap " + type.getName() );
 	}
 
 	protected LockOptions getLockOptions() {
-		return null;
+		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
 	public int executeUpdate() throws HibernateException {
-		throw new HibernateException( "Not supported operation" );
+		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
 	}
 
 	public Query setLockMode(String alias, LockMode lockMode) {
-		return null;
+		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
 	protected Map getLockModes() {
-		return null;
+		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
 	public FullTextFilter enableFullTextFilter(String name) {
