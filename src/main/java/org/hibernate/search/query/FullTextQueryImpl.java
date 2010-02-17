@@ -81,12 +81,16 @@ import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.reader.ReaderProvider;
+
 import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
+
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.ContextHelper;
+
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
+
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.util.ReflectHelper;
@@ -430,17 +434,21 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	private void buildFilters() {
 		ChainedFilter chainedFilter = null;
-		if ( ! filterDefinitions.isEmpty() ) {
+		if ( !filterDefinitions.isEmpty() ) {
 			chainedFilter = new ChainedFilter();
 			for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
 				Filter filter = buildLuceneFilter( fullTextFilter );
-				if (filter != null) chainedFilter.addFilter( filter );
+				if ( filter != null ) {
+					chainedFilter.addFilter( filter );
+				}
 			}
 		}
 
 		if ( userFilter != null ) {
 			//chainedFilter is not always necessary here but the code is easier to read
-			if (chainedFilter == null) chainedFilter = new ChainedFilter();
+			if ( chainedFilter == null ) {
+				chainedFilter = new ChainedFilter();
+			}
 			chainedFilter.addFilter( userFilter );
 		}
 
@@ -469,7 +477,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		FilterDef def = searchFactoryImplementor.getFilterDefinition( fullTextFilter.getName() );
 		//def can never be null, ti's guarded by enableFullTextFilter(String)
 
-		if ( isPreQueryFilterOnly(def) ) return null;
+		if ( isPreQueryFilterOnly( def ) ) {
+			return null;
+		}
 
 		Object instance = createFilterInstance( fullTextFilter, def );
 		FilterKey key = createFilterKey( def, instance );
@@ -753,7 +763,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 
 		//set up the searcher
-		final DirectoryProvider[] directoryProviders = targetedDirectories.toArray( new DirectoryProvider[targetedDirectories.size()] );
+		final DirectoryProvider[] directoryProviders = targetedDirectories.toArray(
+				new DirectoryProvider[targetedDirectories.size()]
+		);
 		IndexSearcher is = new IndexSearcher(
 				searchFactoryImplementor.getReaderProvider().openReader(
 						directoryProviders
@@ -768,14 +780,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		final DirectoryProvider[] directoryProviders;
 		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
 			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery(
-				filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] )
+					filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] )
 			);
 		}
 		else {
 			//no filter get all shards
 			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery( EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR );
 		}
-		
+
 		for ( DirectoryProvider provider : directoryProviders ) {
 			if ( !directories.contains( provider ) ) {
 				directories.add( provider );
@@ -879,7 +891,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public Query setLockOptions(LockOptions lockOptions) {
-		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries");
+		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
 	@Override
@@ -889,11 +901,11 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
-    public <T> T unwrap(Class<T> type) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+	public <T> T unwrap(Class<T> type) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    protected LockOptions getLockOptions() {
+	protected LockOptions getLockOptions() {
 		return null;
 	}
 

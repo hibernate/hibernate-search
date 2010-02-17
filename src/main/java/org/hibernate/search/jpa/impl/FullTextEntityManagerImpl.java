@@ -136,15 +136,15 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	}
 
 	public <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> hints) {
-		return em.find(entityClass, primaryKey, hints);
+		return em.find( entityClass, primaryKey, hints );
 	}
 
 	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockModeType) {
-		return em.find(entityClass, primaryKey, lockModeType);
+		return em.find( entityClass, primaryKey, lockModeType );
 	}
 
 	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockModeType, Map<String, Object> hints) {
-		return em.find(entityClass, primaryKey, lockModeType, hints);
+		return em.find( entityClass, primaryKey, lockModeType, hints );
 	}
 
 	public <T> T getReference(Class<T> entityClass, Object primaryKey) {
@@ -168,7 +168,7 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	}
 
 	public void lock(Object entity, LockModeType lockModeType, Map<String, Object> hints) {
-		em.lock(entity, lockModeType, hints);
+		em.lock( entity, lockModeType, hints );
 	}
 
 	public void refresh(Object entity) {
@@ -176,15 +176,15 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	}
 
 	public void refresh(Object entity, Map<String, Object> hints) {
-		em.refresh(entity, hints);
+		em.refresh( entity, hints );
 	}
 
 	public void refresh(Object entity, LockModeType lockModeType) {
-		em.refresh(entity, lockModeType);
+		em.refresh( entity, lockModeType );
 	}
 
 	public void refresh(Object entity, LockModeType lockModeType, Map<String, Object> hints) {
-		em.refresh(entity, lockModeType, hints);
+		em.refresh( entity, lockModeType, hints );
 	}
 
 	public void clear() {
@@ -192,7 +192,7 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	}
 
 	public void detach(Object entity) {
-		em.detach(entity);
+		em.detach( entity );
 	}
 
 	public boolean contains(Object entity) {
@@ -200,11 +200,11 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	}
 
 	public LockModeType getLockMode(Object entity) {
-		return em.getLockMode(entity);
+		return em.getLockMode( entity );
 	}
 
 	public void setProperty(String key, Object value) {
-		em.setProperty(key, value);
+		em.setProperty( key, value );
 	}
 
 	public Map<String, Object> getProperties() {
@@ -248,14 +248,14 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	}
 
 	public <T> T unwrap(Class<T> type) {
-        if (type.equals( FullTextSession.class ) ) {
-            @SuppressWarnings("unchecked")
-            final T ftSession = (T) Search.getFullTextSession(em.unwrap(Session.class));
-            return ftSession;
-        }
-        else {
-		    return em.unwrap(type);
-        }
+		if ( type.equals( FullTextSession.class ) ) {
+			@SuppressWarnings("unchecked")
+			final T ftSession = ( T ) Search.getFullTextSession( em.unwrap( Session.class ) );
+			return ftSession;
+		}
+		else {
+			return em.unwrap( type );
+		}
 	}
 
 	public Object getDelegate() {
@@ -289,5 +289,5 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	public MassIndexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );
 	}
-	
+
 }

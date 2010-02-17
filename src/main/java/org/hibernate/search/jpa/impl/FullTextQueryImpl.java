@@ -41,6 +41,7 @@ import javax.persistence.Parameter;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Explanation;
+
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -63,18 +64,19 @@ import org.hibernate.transform.ResultTransformer;
  * Implements JPA 2 query interface and delegate the call to
  * a Hibernate Core FullTextQuery.
  * This has the consequence of "duplicating" the JPA 2 query logic in some areas.
+ *
  * @author Emmanuel Bernard
  */
 public class FullTextQueryImpl implements FullTextQuery {
 	private final org.hibernate.search.FullTextQuery query;
 	private final Session session;
-    private Integer firstResult;
+	private Integer firstResult;
 	private Integer maxResults;
-    //initialized at 0 since we don't expect to use hints at this stage
-    private final Map<String, Object> hints = new HashMap<String, Object>(0);
-    private FlushModeType jpaFlushMode;
+	//initialized at 0 since we don't expect to use hints at this stage
+	private final Map<String, Object> hints = new HashMap<String, Object>( 0 );
+	private FlushModeType jpaFlushMode;
 
-    public FullTextQueryImpl(org.hibernate.search.FullTextQuery query, Session session) {
+	public FullTextQueryImpl(org.hibernate.search.FullTextQuery query, Session session) {
 		this.query = query;
 		this.session = session;
 	}
@@ -120,25 +122,26 @@ public class FullTextQueryImpl implements FullTextQuery {
 		try {
 			return query.list();
 		}
-		catch (QueryExecutionRequestException he) {
+		catch ( QueryExecutionRequestException he ) {
 			//TODO when an illegal state exception should be raised?
-			throw new IllegalStateException(he);
+			throw new IllegalStateException( he );
 		}
-		catch( TypeMismatchException e ) {
+		catch ( TypeMismatchException e ) {
 			//TODO when an illegal arg exception should be raised?
-			throw new IllegalArgumentException(e);
+			throw new IllegalArgumentException( e );
 		}
-		catch (SearchException he) {
+		catch ( SearchException he ) {
 			throwPersistenceException( he );
 			throw he;
 		}
 	}
 
 	//TODO mutualize this code with the EM this will fix the rollback issues
-	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
+
+	@SuppressWarnings({ "ThrowableInstanceNeverThrown" })
 	private void throwPersistenceException(Exception e) {
 		if ( e instanceof StaleStateException ) {
-			PersistenceException pe = wrapStaleStateException( (StaleStateException) e );
+			PersistenceException pe = wrapStaleStateException( ( StaleStateException ) e );
 			throwPersistenceException( pe );
 		}
 		else if ( e instanceof ConstraintViolationException ) {
@@ -167,19 +170,19 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	void throwPersistenceException(PersistenceException e) {
-		if ( ! ( e instanceof NoResultException || e instanceof NonUniqueResultException ) ) {
+		if ( !( e instanceof NoResultException || e instanceof NonUniqueResultException ) ) {
 			//FIXME rollback
 		}
 		throw e;
 	}
 
-	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
+	@SuppressWarnings({ "ThrowableInstanceNeverThrown" })
 	PersistenceException wrapStaleStateException(StaleStateException e) {
 		PersistenceException pe;
 		if ( e instanceof StaleObjectStateException ) {
-			StaleObjectStateException sose = (StaleObjectStateException) e;
+			StaleObjectStateException sose = ( StaleObjectStateException ) e;
 			Serializable identifier = sose.getIdentifier();
-			if (identifier != null) {
+			if ( identifier != null ) {
 				Object entity = session.load( sose.getEntityName(), identifier );
 				if ( entity instanceof Serializable ) {
 					//avoid some user errors regarding boundary crossing
@@ -199,7 +202,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return pe;
 	}
 
-	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
+	@SuppressWarnings({ "ThrowableInstanceNeverThrown" })
 	public Object getSingleResult() {
 		try {
 			List result = query.list();
@@ -207,9 +210,9 @@ public class FullTextQueryImpl implements FullTextQuery {
 				throwPersistenceException( new NoResultException( "No entity found for query" ) );
 			}
 			else if ( result.size() > 1 ) {
-				Set uniqueResult = new HashSet(result);
+				Set uniqueResult = new HashSet( result );
 				if ( uniqueResult.size() > 1 ) {
-					throwPersistenceException( new NonUniqueResultException( "result returns " + uniqueResult.size() + " elements") );
+					throwPersistenceException( new NonUniqueResultException( "result returns " + uniqueResult.size() + " elements" ) );
 				}
 				else {
 					return uniqueResult.iterator().next();
@@ -217,17 +220,17 @@ public class FullTextQueryImpl implements FullTextQuery {
 
 			}
 			else {
-				return result.get(0);
+				return result.get( 0 );
 			}
 			return null; //should never happen
 		}
-		catch (QueryExecutionRequestException he) {
-			throw new IllegalStateException(he);
+		catch ( QueryExecutionRequestException he ) {
+			throw new IllegalStateException( he );
 		}
-		catch( TypeMismatchException e ) {
-			throw new IllegalArgumentException(e);
+		catch ( TypeMismatchException e ) {
+			throw new IllegalArgumentException( e );
 		}
-		catch (HibernateException he) {
+		catch ( HibernateException he ) {
 			throwPersistenceException( he );
 			return null;
 		}
@@ -242,12 +245,12 @@ public class FullTextQueryImpl implements FullTextQuery {
 			);
 		}
 		query.setMaxResults( maxResults );
-        this.maxResults = maxResults;
+		this.maxResults = maxResults;
 		return this;
 	}
 
 	public int getMaxResults() {
-        return maxResults == null || maxResults == -1
+		return maxResults == null || maxResults == -1
 				? Integer.MAX_VALUE
 				: maxResults;
 	}
@@ -261,7 +264,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 			);
 		}
 		query.setFirstResult( firstResult );
-        this.firstResult = firstResult;
+		this.firstResult = firstResult;
 		return this;
 	}
 
@@ -278,7 +281,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	public Query setHint(String hintName, Object value) {
-        hints.put(hintName, value);
+		hints.put( hintName, value );
 		return this;
 	}
 
@@ -287,79 +290,79 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	public <T> Query setParameter(Parameter<T> tParameter, T t) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Query setParameter(Parameter<Calendar> calendarParameter, Calendar calendar, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Query setParameter(Parameter<Date> dateParameter, Date date, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Query setParameter(String name, Object value) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Query setParameter(String name, Date value, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Query setParameter(String name, Calendar value, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Query setParameter(int position, Object value) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Query setParameter(int position, Date value, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
-    public Set<Parameter<?>> getParameters() {
-        return Collections.EMPTY_SET;
-    }
+	public Set<Parameter<?>> getParameters() {
+		return Collections.EMPTY_SET;
+	}
 
-    public Query setParameter(int position, Calendar value, TemporalType temporalType) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+	public Query setParameter(int position, Calendar value, TemporalType temporalType) {
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Parameter<?> getParameter(String name) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Parameter<?> getParameter(int position) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public <T> Parameter<T> getParameter(String name, Class<T> type) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public <T> Parameter<T> getParameter(int position, Class<T> type) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public boolean isBound(Parameter<?> param) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public <T> T getParameterValue(Parameter<T> param) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Object getParameterValue(String name) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Object getParameterValue(int position) {
-		throw new UnsupportedOperationException( "parameters not supported in fullText queries");
+		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
 	public Query setFlushMode(FlushModeType flushMode) {
-        this.jpaFlushMode = flushMode;
+		this.jpaFlushMode = flushMode;
 		if ( flushMode == FlushModeType.AUTO ) {
 			query.setFlushMode( FlushMode.AUTO );
 		}
@@ -370,35 +373,32 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	public FlushModeType getFlushMode() {
-        if (jpaFlushMode != null) {
-            return jpaFlushMode;
-        }
-        final FlushMode hibernateFlushMode = session.getFlushMode();
-        if (FlushMode.AUTO == hibernateFlushMode) {
-            return FlushModeType.AUTO;
-        }
-        else if (FlushMode.COMMIT == hibernateFlushMode) {
-            return FlushModeType.COMMIT;
-        }
-        else {
-            return null; //incompatible flush mode
-        }
+		if ( jpaFlushMode != null ) {
+			return jpaFlushMode;
+		}
+		final FlushMode hibernateFlushMode = session.getFlushMode();
+		if ( FlushMode.AUTO == hibernateFlushMode ) {
+			return FlushModeType.AUTO;
+		}
+		else if ( FlushMode.COMMIT == hibernateFlushMode ) {
+			return FlushModeType.COMMIT;
+		}
+		else {
+			return null; //incompatible flush mode
+		}
 	}
 
 	public Query setLockMode(LockModeType lockModeType) {
-		throw new UnsupportedOperationException( "lock modes not supported in fullText queries");
+		throw new UnsupportedOperationException( "lock modes not supported in fullText queries" );
 	}
 
 	public LockModeType getLockMode() {
-		throw new UnsupportedOperationException( "lock modes not supported in fullText queries");
+		throw new UnsupportedOperationException( "lock modes not supported in fullText queries" );
 	}
 
 	public <T> T unwrap(Class<T> type) {
-		if ( type.equals( org.hibernate.search.FullTextQuery.class ) ) {
-            return (T) query;
-        }
-        else {
-            return query.unwrap( type );
-        }
+		//I've purposely decided not to return the underlying Hibernate FullTextQuery
+		//as I see this as an implementation detail that should not be exposed.
+		return query.unwrap( type );
 	}
 }

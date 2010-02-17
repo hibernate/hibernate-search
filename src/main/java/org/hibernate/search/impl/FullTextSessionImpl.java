@@ -89,7 +89,7 @@ import org.hibernate.type.Type;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-@SuppressWarnings( "deprecation" )
+@SuppressWarnings("deprecation")
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 
 	private final Session session;
@@ -134,7 +134,11 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 			return;
 		}
 
-		Set<Class<?>> targetedClasses = getSearchFactoryImplementor().getIndexedTypesPolymorphic( new Class[] {entityType} );
+		Set<Class<?>> targetedClasses = getSearchFactoryImplementor().getIndexedTypesPolymorphic(
+				new Class[] {
+						entityType
+				}
+		);
 		if ( targetedClasses.isEmpty() ) {
 			String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
 			throw new IllegalArgumentException( msg );
@@ -189,7 +193,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		//another solution would be to subclass SessionImpl instead of having this LuceneSession delegation model
 		//this is an open discussion
 	}
-	
+
 	public MassIndexer createIndexer(Class<?>... types) {
 		if ( types.length == 0 ) {
 			return new MassIndexerImpl( getSearchFactoryImplementor(), getSessionFactory(), Object.class );
@@ -389,7 +393,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	public Object get(Class clazz, Serializable id, LockOptions lockOptions) throws HibernateException {
-		return session.get(clazz, id, lockOptions);
+		return session.get( clazz, id, lockOptions );
 	}
 
 	public Object get(String entityName, Serializable id) throws HibernateException {
@@ -401,7 +405,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	public Object get(String entityName, Serializable id, LockOptions lockOptions) throws HibernateException {
-		return session.get(entityName, id, lockOptions);
+		return session.get( entityName, id, lockOptions );
 	}
 
 	public CacheMode getCacheMode() {
@@ -654,9 +658,9 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.isDirty();
 	}
 
-    public boolean isDefaultReadOnly() {
-        return session.isDefaultReadOnly();
-    }
+	public boolean isDefaultReadOnly() {
+		return session.isDefaultReadOnly();
+	}
 
 	public boolean isOpen() {
 		return session.isOpen();
@@ -766,9 +770,9 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		session.setCacheMode( cacheMode );
 	}
 
-    public void setDefaultReadOnly(boolean readOnly) {
-        session.setDefaultReadOnly( readOnly );
-    }
+	public void setDefaultReadOnly(boolean readOnly) {
+		session.setDefaultReadOnly( readOnly );
+	}
 
 	public void setFlushMode(FlushMode flushMode) {
 		session.setFlushMode( flushMode );

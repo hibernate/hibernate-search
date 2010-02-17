@@ -27,6 +27,7 @@ package org.hibernate.search;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Explanation;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.transform.ResultTransformer;
@@ -47,6 +48,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * order the hibernate objects.
 	 *
 	 * @param sort The lucene sort object.
+	 *
 	 * @return this for method chaining
 	 */
 	FullTextQuery setSort(Sort sort);
@@ -56,6 +58,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Semi-deprecated? a preferred way is to use the @FullTextFilterDef approach
 	 *
 	 * @param filter The lucene filter.
+	 *
 	 * @return this for method chaining
 	 */
 	FullTextQuery setFilter(Filter filter);
@@ -107,6 +110,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * in the current query
 	 *
 	 * @param documentId Lucene Document id to be explain. This is NOT the object id
+	 *
 	 * @return Lucene Explanation
 	 */
 	Explanation explain(int documentId);
@@ -131,9 +135,9 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 */
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
-    /**
-     * return the underlying type if possible
-     * TODO document what can be unwrapped
-     */
-    <T> T unwrap(Class<T> type);
+	/**
+	 * return the underlying type if possible
+	 * TODO document what can be unwrapped
+	 */
+	<T> T unwrap(Class<T> type);
 }
