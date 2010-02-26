@@ -25,7 +25,7 @@
   -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY versionNumber "3.2.0.Beta1">
+<!ENTITY version "WORKING">
 <!ENTITY copyrightYear "2004">
 <!ENTITY copyrightHolder "Red Hat Middleware, LLC.">
 ]>
@@ -37,7 +37,7 @@
 
     <subtitle>Reference Guide</subtitle>
 
-    <releaseinfo>&versionNumber;</releaseinfo>
+    <releaseinfo>&version;</releaseinfo>
 
 
               <mediaobject>
