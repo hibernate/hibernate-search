@@ -116,7 +116,7 @@
     <properties>
         <slf4jVersion>1.5.8</slf4jVersion>
         <luceneVersion>2.9.1</luceneVersion>
-        <hibernateVersion>3.5.0-Beta-4</hibernateVersion>
+        <hibernateVersion>3.5.0-CR-2</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Beta1</hibernateCommonsAnnotationVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

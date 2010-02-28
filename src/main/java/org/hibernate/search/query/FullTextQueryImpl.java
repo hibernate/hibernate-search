@@ -908,7 +908,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		throw new IllegalArgumentException("Cannot unwrap " + type.getName() );
 	}
 
-	protected LockOptions getLockOptions() {
+	public LockOptions getLockOptions() {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
