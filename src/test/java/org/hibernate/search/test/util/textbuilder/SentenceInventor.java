@@ -107,7 +107,7 @@ public class SentenceInventor {
 			//completely uppercase in 2/200 cases
 			return term;
 		else
-			//first letter upercase in 9/200 cases
+			//first letter uppercase in 9/200 cases
 			return term.substring( 0, 1 ) + term.substring( 1 ).toLowerCase();
 	}
 	

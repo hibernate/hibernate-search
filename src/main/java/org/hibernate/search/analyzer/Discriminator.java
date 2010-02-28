@@ -25,7 +25,7 @@
 package org.hibernate.search.analyzer;
 
 /**
- * Returs the expected discriminator name to use on the element evaluated
+ * Returns the expected discriminator name to use on the element evaluated
  *
  * @author Hardy Ferentschik
  */
