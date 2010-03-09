@@ -53,11 +53,22 @@ public class Executors {
 	 * @return the new ExecutorService
 	 */
 	public static ThreadPoolExecutor newFixedThreadPool(int threads, String groupname) {
+		return newFixedThreadPool( threads, groupname, QUEUE_MAX_LENGTH );
+	}
+
+    /**
+     * Creates a new fixed size ThreadPoolExecutor
+     * @param threads the number of threads
+     * @param groupname a label to identify the threadpool; useful for profiling.
+     * @param queueSize the size of the queue to store Runnables when all threads are busy
+     * @return the new ExecutorService
+     */
+	public static ThreadPoolExecutor newFixedThreadPool(int threads, String groupname, int queueSize) {
 		return new ThreadPoolExecutor(
 				threads,
 				threads,
 	            0L, TimeUnit.MILLISECONDS,
-	            new LinkedBlockingQueue<Runnable>( QUEUE_MAX_LENGTH ),
+	            new LinkedBlockingQueue<Runnable>( queueSize ),
 	            new SearchThreadFactory( groupname ),
 	            new ThreadPoolExecutor.CallerRunsPolicy() );
 	}

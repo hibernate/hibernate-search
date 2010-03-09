@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -49,6 +47,7 @@ import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProces
 import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
@@ -76,7 +75,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		this.sync = isConfiguredAsSync( properties );
 
 		//default to a simple asynchronous operation
-		int min = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
+		int threadPoolSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
 		//no queue limit
 		int queueSize = ConfigurationParseHelper.getIntValue(
 				properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE
@@ -86,17 +85,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 		if ( !sync ) {
 			/**
-			 * choose min = max with a sizable queue to be able to
-			 * actually queue operations
-			 * The locking mechanism preventing much of the scalability
-			 * anyway, the idea is really to have a buffer
 			 * If the queue limit is reached, the operation is executed by the main thread
 			 */
-			executorService = new ThreadPoolExecutor(
-					min, min, 60, TimeUnit.SECONDS,
-					new LinkedBlockingQueue<Runnable>( queueSize ),
-					new ThreadPoolExecutor.CallerRunsPolicy()
-			);
+			executorService =  Executors.newFixedThreadPool( threadPoolSize, "backend queueing processor", queueSize );
 		}
 		else {
 			executorService = null;
