@@ -117,7 +117,7 @@
         <slf4jVersion>1.5.8</slf4jVersion>
         <luceneVersion>2.9.2</luceneVersion>
         <hibernateVersion>3.5.0-CR-2</hibernateVersion>
-        <hibernateCommonsAnnotationVersion>3.2.0.Beta1</hibernateCommonsAnnotationVersion>
+        <hibernateCommonsAnnotationVersion>3.2.0.Final</hibernateCommonsAnnotationVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -535,7 +535,7 @@
             </properties>
         </profile>
 
-        <!-- The PostgreSQL 8.3.7 test envionment -->
+        <!-- The PostgreSQL 8.3.7 test environment -->
         <profile>
             <id>postgresql837</id>
             <dependencies>
@@ -550,6 +550,26 @@
                 <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
                 <jdbc.url>jdbc:postgresql://vmg03.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation/>
+            </properties>
+        </profile>
+
+        <!-- The PostgreSQL 8.4  test environment -->
+        <profile>
+            <id>postgresql84</id>
+            <dependencies>
+                <dependency>
+                    <groupId>postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>8.4-701.jdbc3</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
                 <jdbc.isolation/>

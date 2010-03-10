@@ -226,7 +226,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public void close() {
 		if ( barrier != 0 ) {
 		} //read barrier
-		if ( stopped.compareAndSet( false, true ) ) {
+		if ( stopped.compareAndSet( false, true ) ) {  //make sure we only sop once
 			try {
 				worker.close();
 			}
@@ -241,7 +241,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 				log.error( "ReaderProvider raises an exception on destroy()", e );
 			}
 
-			//TODO move to DirectoryProviderFactory for cleaner
+			//TODO move directory provider cleaning to DirectoryProviderFactory
 			for ( DirectoryProvider dp : getDirectoryProviders() ) {
 				try {
 					dp.stop();
