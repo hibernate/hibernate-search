@@ -104,7 +104,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 				return (FullTextIndexEventListener) listener;
 			}
 		}
-		log.debug( "No FullTextIndexEventListener was registered" );
+		log.debug( "FullTextIndexEventListener was not registered as FlushEventListener" );
 		return null;
 	}
 
