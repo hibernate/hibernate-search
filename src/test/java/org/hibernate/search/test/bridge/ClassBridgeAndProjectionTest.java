@@ -1,8 +1,6 @@
 package org.hibernate.search.test.bridge;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.util.Version;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -45,9 +43,9 @@ public class ClassBridgeAndProjectionTest  extends SearchTestCase {
         // test query without projection
         FullTextSession ftSession = Search.getFullTextSession( s );
         QueryParser parser = new QueryParser(
-                Version.LUCENE_CURRENT,
+        		getTargetLuceneVersion(),
                 "name", 
-                new StandardAnalyzer(Version.LUCENE_CURRENT) );
+                standardAnalyzer );
         FullTextQuery query = ftSession.createFullTextQuery(parser.parse("name:John"), Teacher.class);
         List results = query.list();
         assertNotNull(results);
