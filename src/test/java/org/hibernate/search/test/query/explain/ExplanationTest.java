@@ -43,9 +43,9 @@ public class ExplanationTest extends SearchTestCase {
 	public void testExplanation() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		Dvd dvd = new Dvd("The dark knight", "Batman returns with it best enomy the Jocker. The dark side of this movies shows up pretty quickly");
+		Dvd dvd = new Dvd("The dark knight", "Batman returns with his best enemy the Joker. The dark side of this movies shows up pretty quickly");
 		s.persist( dvd );
-		dvd = new Dvd("Wall-e", "The tiny little robot comes to Eartch after the dark times and tries to clean it");
+		dvd = new Dvd("Wall-e", "The tiny little robot comes to Earth after the dark times and tries to clean it");
 		s.persist( dvd );
 		tx.commit();
 		s.clear();
