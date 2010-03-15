@@ -212,6 +212,25 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+                <executions>
+					<execution>
+						<id>build-test-jar</id>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifestEntries>
+	                            	<Implementation-Title>${name} testsuite</Implementation-Title>
+                            		<Implementation-Version>${version}</Implementation-Version>
+                            		<Implementation-Vendor>hibernate.org</Implementation-Vendor>
+                            		<Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
+                            		<Implementation-URL>http://search.hibernate.org</Implementation-URL>
+                        		</manifestEntries>
+							</archive>
+						</configuration>
+					</execution>
+				</executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
