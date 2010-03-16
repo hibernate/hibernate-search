@@ -1,4 +1,4 @@
-/* $Id: CatDeptsFieldsClassBridge.java 17630 2009-10-06 13:38:43Z sannegrinovero $
+/* $Id$
  * 
  * Hibernate, Relational Persistence for Idiomatic Java
  * 

@@ -1,4 +1,4 @@
-/* $Id: DynamicBoostedDescriptionLibrary.java 17630 2009-10-06 13:38:43Z sannegrinovero $
+/* $Id$
  * 
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
@@ -22,54 +22,47 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.configuration;
+package org.hibernate.search.test.embedded.nested;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
- * Test entity using a custom <code>CustomBoostStrategy</code> to set
- * the document boost as the dynScore field.
- *
- * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
 @Entity
-public class DynamicBoostedDescLibrary {
-
+@Indexed
+public class Product {
 	@Id
 	@GeneratedValue
-	private int libraryId;
-	private float dynScore;
-	private String name;
+	private long id;
 
-	public DynamicBoostedDescLibrary() {
-		dynScore = 1.0f;
+	@OneToMany(mappedBy = "product", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@IndexedEmbedded
+	private List<Attribute> attributes;
+
+	public Product() {
+		attributes = new ArrayList<Attribute>();
 	}
 
-	
-	public int getLibraryId() {
-		return libraryId;
+	public long getId() {
+		return id;
 	}
 
-	public void setLibraryId(int id) {
-		this.libraryId = id;
+	public List<Attribute> getAttributes() {
+		return attributes;
 	}
 
-	public float getDynScore() {
-		return dynScore;
-	}
-
-	public void setDynScore(float dynScore) {
-		this.dynScore = dynScore;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setAttribute(Attribute attribute) {
+		attributes.add( attribute );
 	}
 }

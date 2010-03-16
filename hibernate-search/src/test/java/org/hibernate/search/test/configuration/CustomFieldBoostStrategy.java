@@ -1,4 +1,4 @@
-/* $Id: Product.java 17630 2009-10-06 13:38:43Z sannegrinovero $
+/* $Id$
  * 
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
@@ -22,47 +22,25 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.embedded.nested;
+package org.hibernate.search.test.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.engine.BoostStrategy;
 
 /**
+ * Example for a custom <code>BoostStrategy</code> implementation.
+ *
  * @author Hardy Ferentschik
+ * @see org.hibernate.search.engine.BoostStrategy
  */
-@Entity
-@Indexed
-public class Product {
-	@Id
-	@GeneratedValue
-	private long id;
+public class CustomFieldBoostStrategy implements BoostStrategy {
 
-	@OneToMany(mappedBy = "product", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@IndexedEmbedded
-	private List<Attribute> attributes;
-
-	public Product() {
-		attributes = new ArrayList<Attribute>();
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public List<Attribute> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttribute(Attribute attribute) {
-		attributes.add( attribute );
+	public float defineBoost(Object value) {
+		String name = ( String ) value;
+		if ( "foobar".equals( name ) ) {
+			return 3.0f;
+		}
+		else {
+			return 1.0f;
+		}
 	}
 }

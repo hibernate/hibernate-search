@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--  $Id$ -->
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
@@ -23,9 +24,10 @@
   ~ Boston, MA  02110-1301  USA
   -->
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY version "WORKING">
+]>
 <chapter id="getting-started">
-  <!--  $Id$ -->
 
   <title>Getting started</title>
 
@@ -129,7 +131,7 @@
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
-   &lt;version&gt;3.2.0.Beta1&lt;/version&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;

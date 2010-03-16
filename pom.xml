@@ -1,52 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
- * 
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
-  -->
+    * Hibernate, Relational Persistence for Idiomatic Java
+    * 
+    * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+    * indicated by the @author tags or express copyright attribution
+    * statements applied by the authors.  All third-party contributions are
+    * distributed under license by Red Hat, Inc.
+    * 
+    * This copyrighted material is made available to anyone wishing to use, modify,
+    * copy, or redistribute it subject to the terms and conditions of the GNU
+    * Lesser General Public License, as published by the Free Software Foundation.
+    * 
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+    * for more details.
+    * 
+    * You should have received a copy of the GNU Lesser General Public License
+    * along with this distribution; if not, write to:
+    * Free Software Foundation, Inc.
+    * 51 Franklin Street, Fifth Floor
+    * Boston, MA  02110-1301  USA
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-search</artifactId>
+    <artifactId>hibernate-search-parent</artifactId>
     <version>3.2.0-SNAPSHOT</version>
-    <name>Hibernate Search</name>
-    <description>Hibernate Search</description>
+    <packaging>pom</packaging>
+    
+    <name>Hibernate Search Parent</name>
+    <description>Hibernate Search Parent POM</description>
     <url>http://search.hibernate.org</url>
-
+    
+    <modules>
+        <module>hibernate-search</module>
+        <module>hibernate-search-archetype</module>
+    </modules>
+    
     <issueManagement>
         <system>JIRA</system>
         <url>http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH</url>
     </issueManagement>
+    
     <scm>
         <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/trunk</connection>
         <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/trunk</developerConnection>
         <url>http://fisheye.jboss.com/browse/Hibernate/search/trunk</url>
     </scm>
-
+    
     <organization>
         <name>Hibernate</name>
         <url>http://www.hibernate.org</url>
     </organization>
-
+    
     <licenses>
         <license>
             <name>GNU Lesser General Public License</name>
@@ -54,7 +63,7 @@
             <comments>See discussion at http://hibernate.org/356.html for more details.</comments>
         </license>
     </licenses>
-
+    
     <ciManagement>
         <system>Hudson</system>
         <url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-trunk/</url>
@@ -78,7 +87,7 @@
             <url>http://in.relation.to/Bloggers/Sanne</url>
         </developer>
     </developers>
-
+    
     <mailingLists>
         <mailingList>
             <name>Hibernate Announcements</name>
@@ -112,7 +121,7 @@
             <archive>http://lists.jboss.org/pipermail/hibernate-issues/</archive>
         </mailingList>
     </mailingLists>
-
+    
     <properties>
         <slf4jVersion>1.5.8</slf4jVersion>
         <luceneVersion>2.9.2</luceneVersion>
@@ -120,56 +129,12 @@
         <hibernateCommonsAnnotationVersion>3.2.0.Final</hibernateCommonsAnnotationVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+    
     <dependencies>
-        <!-- =============================== -->
-        <!-- Required Dependencies -->
-        <!-- =============================== -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernateVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-commons-annotations</artifactId>
-            <version>${hibernateCommonsAnnotationVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.java-persistence</groupId>
-            <artifactId>jpa-api</artifactId>
-            <version>2.0-cr-1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>${luceneVersion}</version>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4jVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-            <version>1.1</version>
-        </dependency>
-
-        <!-- =============================== -->
-        <!-- Testing Dependencies            -->
-        <!-- =============================== -->
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <version>5.2.0</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -183,15 +148,144 @@
             <version>${slf4jVersion}</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
-
+    </dependencies>    
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernateVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-commons-annotations</artifactId>
+                <version>${hibernateCommonsAnnotationVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.java-persistence</groupId>
+                <artifactId>jpa-api</artifactId>
+                <version>2.0-cr-1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>${luceneVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.transaction</groupId>
+                <artifactId>jta</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-core</artifactId>
+                <version>5.2.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-annotations</artifactId>
+                <version>${hibernateVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernateVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-common</artifactId>
+                <version>1.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-core</artifactId>
+                <version>1.3.0</version>
+                <optional>true</optional>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-httpclient</groupId>
+                        <artifactId>commons-httpclient</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.solr</groupId>
+                        <artifactId>solr-solrj</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>woodstox</groupId>
+                        <artifactId>wstx-asl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>net.java.dev.stax-utils</groupId>
+                        <artifactId>stax-utils</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.solr</groupId>
+                        <artifactId>solr-lucene-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-snowball</artifactId>
+                <version>${luceneVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers</artifactId>
+                <version>${luceneVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>jgroups</groupId>
+                <artifactId>jgroups</artifactId>
+                <version>2.6.7.GA</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>jsr250-api</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.4.GA</version>
+                <optional>true</optional>
+            </dependency>            
+        </dependencies>
+    </dependencyManagement>
+    
     <build>
         <defaultGoal>test</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>2.1</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -212,124 +306,6 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
-                <executions>
-					<execution>
-						<id>build-test-jar</id>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-						<configuration>
-							<archive>
-								<manifestEntries>
-	                            	<Implementation-Title>${name} testsuite</Implementation-Title>
-                            		<Implementation-Version>${version}</Implementation-Version>
-                            		<Implementation-Vendor>hibernate.org</Implementation-Vendor>
-                            		<Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
-                            		<Implementation-URL>http://search.hibernate.org</Implementation-URL>
-                        		</manifestEntries>
-							</archive>
-						</configuration>
-					</execution>
-				</executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.4.3</version>
-                <configuration>
-                    <forkMode>once</forkMode>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <systemProperties>
-                        <property>
-                            <name>build.dir</name>
-                            <value>${basedir}/target</value>
-                        </property>
-                        <!--
-                            Following is the default jgroups mcast address. If you find the testsuite runs very slowly,
-                            there may be problems with multicast on the interface JGroups uses by default on
-                            your machine. You can try to resolve setting 'jgroups.bind_addr' as a system-property
-                            to the jvm launching maven and setting the value to an interface where you know multicast works
-                        -->
-                        <property>
-                            <name>jgroups.bind_addr</name>
-                            <value>127.0.0.1</value>
-                        </property>
-                        <!-- There are problems with multicast and IPv6 on some OS/JDK combos, so we tell Java
-                             to use IPv4. If you have problems with multicast when running the tests you can
-                             try setting this to 'false', although typically that won't be helpful.
-                        -->
-                        <property>
-                            <name>java.net.preferIPv4Stack</name>
-                            <value>true</value>
-                        </property>
-                    </systemProperties>
-                    <excludes>
-                        <exclude>**/*.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jboss.maven.plugins</groupId>
-                <artifactId>maven-jdocbook-plugin</artifactId>
-                <version>2.2.0</version>
-                <extensions>true</extensions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-jdocbook-style</artifactId>
-                        <version>2.0.0</version>
-                        <type>jdocbook-style</type>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <sourceDocumentName>master.xml</sourceDocumentName>
-                    <sourceDirectory>${basedir}/src/main/docbook</sourceDirectory>
-                    <masterTranslation>en-US</masterTranslation>
-                    <translations>
-                        <translation>zh-CN</translation>
-                    </translations>
-                    <imageResource>
-                        <directory>${basedir}/src/main/docbook/en-US/images</directory>
-                    </imageResource>
-                    <formats>
-                        <format>
-                            <formatName>pdf</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl</stylesheetResource>
-                            <finalName>hibernate_reference.pdf</finalName>
-                        </format>
-                        <format>
-                            <formatName>html_single</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
-                            </stylesheetResource>
-                            <finalName>index.html</finalName>
-                        </format>
-                        <format>
-                            <formatName>html</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
-                            </stylesheetResource>
-                            <finalName>index.html</finalName>
-                        </format>
-                    </formats>
-                    <options>
-                        <xincludeSupported>true</xincludeSupported>
-                        <xmlTransformerType>saxon</xmlTransformerType>
-                        <!-- needed for uri-resolvers; can be ommitted if using 'current' uri scheme -->
-                        <!--     could also locate the docbook dependency and inspect its version... -->
-                        <docbookVersion>1.72.0</docbookVersion>
-                        <localeSeparator>-</localeSeparator>
-                    </options>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-doc</id>
-                        <phase>site</phase>
-                        <goals>
-                            <goal>translate</goal>
-                            <goal>resources</goal>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -349,9 +325,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.5</version>
-                <configuration>
-                    <stylesheetfile>${basedir}/src/main/javadoc/jdstyle.css</stylesheetfile>
-                </configuration>
                 <executions>
                     <execution>
                         <id>make-javadoc</id>
@@ -362,66 +335,77 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-2</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/dist.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.0-beta-9</version>
-                <configuration>
-                    <releaseProfiles>release</releaseProfiles>
-                    <goals>package javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:resources
-                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:generate assembly:assembly
-                    </goals>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jboss.maven.plugins</groupId>
-                <artifactId>maven-injection-plugin</artifactId>
-                <version>1.0.2</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>bytecode</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <bytecodeInjections>
-                        <bytecodeInjection>
-                            <expression>${pom.version}</expression>
-                            <targetMembers>
-                                <methodBodyReturn>
-                                    <className>org.hibernate.search.Version</className>
-                                    <methodName>getVersionString</methodName>
-                                </methodBodyReturn>
-                            </targetMembers>
-                        </bytecodeInjection>
-                    </bytecodeInjections>
-                </configuration>
-            </plugin>
         </plugins>
-        <testResources>
-            <testResource>
-                <filtering>true</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                </includes>
-            </testResource>
-        </testResources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.4.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jboss.maven.plugins</groupId>
+                    <artifactId>maven-jdocbook-plugin</artifactId>
+                    <version>2.2.0</version>
+                    <extensions>true</extensions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jdocbook-style</artifactId>
+                            <version>2.0.0</version>
+                            <type>jdocbook-style</type>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>make-doc</id>
+                            <phase>site</phase>
+                            <goals>
+                                <goal>translate</goal>
+                                <goal>resources</goal>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.2-beta-2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.0-beta-9</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jboss.maven.plugins</groupId>
+                    <artifactId>maven-injection-plugin</artifactId>
+                    <version>1.0.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.5</version>
+                    <executions>
+                        <execution>
+                            <id>make-javadoc</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>javadoc</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
-
+    
     <distributionManagement>
         <repository>
             <!-- Copy the dist to the local checkout of the JBoss maven2 repo ${maven.repository.root} -->
@@ -436,7 +420,7 @@
             <url>dav:https://snapshots.jboss.org/maven2</url>
         </snapshotRepository>
     </distributionManagement>
-
+    
     <profiles>
         <!-- =============================== -->
         <!-- Database profiles               -->
@@ -467,11 +451,11 @@
         <!--
             ###################################################################
             Profiles naming db instances in the Red Hat QA/QE lab
-
+            
             First, those with OSS drivers
             ###################################################################
         -->
-
+        
         <!-- The MySQL 5 test envionment -->
         <profile>
             <id>mysql5</id>
@@ -491,7 +475,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The MySQL 5.1 test envionment -->
         <profile>
             <id>mysql51</id>
@@ -511,7 +495,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The MySQL 5.1 Cluster test envionment -->
         <profile>
             <id>mysql51-cluster</id>
@@ -532,7 +516,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The PostgreSQL 8.2.4 test envionment -->
         <profile>
             <id>postgresql824</id>
@@ -553,7 +537,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The PostgreSQL 8.3.7 test environment -->
         <profile>
             <id>postgresql837</id>
@@ -574,7 +558,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The PostgreSQL 8.4  test environment -->
         <profile>
             <id>postgresql84</id>
@@ -594,13 +578,13 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!--
             ###################################################################
             Then, those with commercial drivers
             ###################################################################
         -->
-
+        
         <!-- The DB2 8.x test envionment (using 9x drivers)-->
         <profile>
             <id>db2v82</id>
@@ -625,7 +609,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The DB2 9.1 test envionment (using 9x drivers)-->
         <profile>
             <id>db2v91</id>
@@ -650,7 +634,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The DB2 9.7 test envionment (using 9x drivers)-->
         <profile>
             <id>db2v97</id>
@@ -675,7 +659,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The Oracle9i test envionment -->
         <profile>
             <id>oracle9i</id>
@@ -696,7 +680,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The Oracle10g test envionment -->
         <profile>
             <id>oracle10g</id>
@@ -717,7 +701,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The Oracle11g test envionment -->
         <profile>
             <id>oracle11g</id>
@@ -737,7 +721,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The Oracle11gRAC test envionment -->
         <profile>
             <id>oracle11gRAC</id>
@@ -759,7 +743,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The Sybase 15 test envionment -->
         <profile>
             <id>sybase15</id>
@@ -779,7 +763,7 @@
                 <jdbc.isolation/>
             </properties>
         </profile>
-
+        
         <!-- The SQLServer2005 (MS JDBC) test envionment -->
         <profile>
             <id>mssql2005</id>
@@ -799,7 +783,7 @@
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
         </profile>
-
+        
         <!-- The SQLServer2005 (MS JDBC) test envionment -->
         <profile>
             <id>mssql2008</id>
@@ -818,163 +802,6 @@
                 <jdbc.pass>searctru</jdbc.pass>
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
-        </profile>
-
-        <!-- ================================ -->
-        <!-- Dependecy profiles to test w and -->
-        <!-- w/o optional dependencies        -->
-        <!-- ===============================  -->
-        <profile>
-            <id>with-optional-jars</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <!-- =============================== -->
-                <!-- Optional Dependencies           -->
-                <!-- =============================== -->
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-annotations</artifactId>
-                    <version>${hibernateVersion}</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                    <version>${hibernateVersion}</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.solr</groupId>
-                    <artifactId>solr-common</artifactId>
-                    <version>1.3.0</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.solr</groupId>
-                    <artifactId>solr-core</artifactId>
-                    <version>1.3.0</version>
-                    <optional>true</optional>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>commons-httpclient</groupId>
-                            <artifactId>commons-httpclient</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.apache.solr</groupId>
-                            <artifactId>solr-solrj</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>woodstox</groupId>
-                            <artifactId>wstx-asl</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>net.java.dev.stax-utils</groupId>
-                            <artifactId>stax-utils</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>commons-logging</groupId>
-                            <artifactId>commons-logging</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.apache.solr</groupId>
-                            <artifactId>solr-lucene-core</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.lucene</groupId>
-                    <artifactId>lucene-snowball</artifactId>
-                    <version>${luceneVersion}</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.lucene</groupId>
-                    <artifactId>lucene-analyzers</artifactId>
-                    <version>${luceneVersion}</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-codec</artifactId>
-                    <version>1.3</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-io</artifactId>
-                    <version>1.3.2</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>javax.jms</groupId>
-                    <artifactId>jms</artifactId>
-                    <version>1.1</version>
-                    <scope>provided</scope>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>jgroups</groupId>
-                    <artifactId>jgroups</artifactId>
-                    <version>2.6.7.GA</version>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>jsr250-api</artifactId>
-                    <version>1.0</version>
-                    <optional>true</optional>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <forkMode>once</forkMode>
-                            <!--argLine>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</argLine-->
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <excludes>
-                                <exclude>**/classloading/*.java</exclude>
-                                <exclude>**/*PerfTest.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>without-optional-jars</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                    <version>3.4.GA</version>
-                    <optional>true</optional>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <forkMode>once</forkMode>
-                            <!--argLine>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</argLine-->
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <excludes>
-                                <exclude>none</exclude>
-                                <exclude>**/*PerfTest.java</exclude>
-                            </excludes>
-                            <includes>
-                                <include>**/classloading/*Test.java</include>
-                            </includes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>

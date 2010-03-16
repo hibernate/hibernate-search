@@ -1,4 +1,4 @@
-/* $Id: Departments.java 17630 2009-10-06 13:38:43Z sannegrinovero $
+/* $Id$
  * 
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
@@ -29,68 +29,47 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
- * This is just a simple copy of the Department entity to allow
- * separation of the tests for ClassBridge and ClassBridges.
+ * Test entity using a custom <code>CustomBoostStrategy</code> to set
+ * the document boost as the dynScore field.
  *
- * @author John Griffin
+ * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  */
 @Entity
-public class Departments {
+public class DynamicBoostedDescLibrary {
+
 	@Id
 	@GeneratedValue
-	private int deptsId;
+	private int libraryId;
+	private float dynScore;
+	private String name;
+
+	public DynamicBoostedDescLibrary() {
+		dynScore = 1.0f;
+	}
+
 	
-	private String network;
-	private String manufacturer;
-	private String branchHead;
-	private String branch;
-	private Integer maxEmployees;
-
-	public int getDeptsId() {
-		return deptsId;
+	public int getLibraryId() {
+		return libraryId;
 	}
 
-	public void setDeptsId(int deptsId) {
-		this.deptsId = deptsId;
+	public void setLibraryId(int id) {
+		this.libraryId = id;
 	}
 
-	public String getBranchHead() {
-		return branchHead;
+	public float getDynScore() {
+		return dynScore;
 	}
 
-	public void setBranchHead(String branchHead) {
-		this.branchHead = branchHead;
+	public void setDynScore(float dynScore) {
+		this.dynScore = dynScore;
 	}
 
-	public String getNetwork() {
-		return network;
+	public String getName() {
+		return name;
 	}
 
-	public void setNetwork(String network) {
-		this.network = network;
-	}
-
-	public String getBranch() {
-		return branch;
-	}
-
-	public void setBranch(String branch) {
-		this.branch = branch;
-	}
-
-	public Integer getMaxEmployees() {
-		return maxEmployees;
-	}
-
-	public void setMaxEmployees(Integer maxEmployees) {
-		this.maxEmployees = maxEmployees;
-	}
-
-	public String getManufacturer() {
-		return manufacturer;
-	}
-
-	public void setManufacturer(String manufacturer) {
-		this.manufacturer = manufacturer;
+	public void setName(String name) {
+		this.name = name;
 	}
 }
