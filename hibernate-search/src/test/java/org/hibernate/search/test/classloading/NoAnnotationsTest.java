@@ -32,18 +32,24 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.Search;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.test.TestCase;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NoAnnotationsTest extends org.hibernate.search.test.TestCase {
-
+public class NoAnnotationsTest extends TestCase {
 	/**
 	 * Tests that @DocumentId is optional. See HSEARCH-104.
 	 *
 	 * @throws Exception in case the test fails.
 	 */
 	public void testConfigurationWithoutAnnotations() throws Exception {
+		FullTextEntityManager em = org.hibernate
+				.search
+				.jpa
+				.Search
+				.getFullTextEntityManager( null );
 		Animal dog = new Animal();
 		dog.setName( "Dog" );
 
@@ -61,7 +67,7 @@ public class NoAnnotationsTest extends org.hibernate.search.test.TestCase {
 		tx.commit();
 		s.close();
 	}
-	
+
 	public void testFlushListenerRegistrationWithoutAnnotations() throws Exception {
 		// This test should pass even if the flushListener is not registered,
 		// as a workaround is done in code (you'll see a warning in logs).
@@ -74,7 +80,6 @@ public class NoAnnotationsTest extends org.hibernate.search.test.TestCase {
 		s.clear();
 
 		Transaction tx = s.beginTransaction();
-		tx = s.beginTransaction();
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term( "name", "penguin" ) )
 		).list();
