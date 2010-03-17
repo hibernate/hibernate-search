@@ -1,6 +1,7 @@
 package org.hibernate.search.query.dsl.v2.impl;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.query.dsl.v2.EntityContext;
 import org.hibernate.search.query.dsl.v2.QueryBuilder;
 import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
 import org.hibernate.search.util.ScopedAnalyzer;
@@ -21,7 +22,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 		return new HSearchEntityContext(entityType, factory );
 	}
 
-	public final class HSearchEntityContext implements QueryContextBuilder.EntityContext {
+	public final class HSearchEntityContext implements EntityContext {
 		private final ScopedAnalyzer queryAnalyzer;
 		private final SearchFactory factory;
 

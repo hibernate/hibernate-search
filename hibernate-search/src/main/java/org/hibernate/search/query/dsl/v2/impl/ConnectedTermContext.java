@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.index.Term;
@@ -22,6 +21,9 @@ import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.query.dsl.v2.TermContext;
+import org.hibernate.search.query.dsl.v2.TermCustomization;
+import org.hibernate.search.query.dsl.v2.TermFuzzy;
+import org.hibernate.search.query.dsl.v2.TermMatchingContext;
 
 /**
  * @author Emmanuel Bernard
@@ -55,7 +57,7 @@ public class ConnectedTermContext implements TermContext {
 		}
 	}
 
-	public static class ConnectedTermCustomization implements TermCustomization, TermCustomization.TermFuzzy {
+	public static class ConnectedTermCustomization implements TermCustomization, TermFuzzy {
 		private final SearchFactory factory;
 		private final String field;
 		private final String text;

@@ -20,12 +20,4 @@ package org.hibernate.search.query.dsl.v2;
 public interface QueryContextBuilder {
 	//TODO make a forEntities
 	EntityContext forEntity(Class<?> entityType);
-	interface EntityContext {
-		EntityContext overridesForField(String field, String analyzerName);
-
-		/**
-		 * return the query builder
-		 */
-		QueryBuilder get();
-	}
 }
