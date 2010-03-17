@@ -2,8 +2,6 @@ package org.hibernate.search.query.dsl.v2;
 
 import org.apache.lucene.search.Query;
 
-import org.hibernate.search.query.dsl.v2.QueryBuilder;
-
 /**
  * @author Emmanuel Bernard
  */

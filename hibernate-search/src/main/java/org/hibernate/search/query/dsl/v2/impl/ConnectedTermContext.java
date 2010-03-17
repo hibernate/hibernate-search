@@ -106,14 +106,21 @@ public class ConnectedTermContext implements TermContext {
 				catch ( IOException e ) {
 					throw new AssertionFailure("IO exception while reading String stream??", e);
 				}
-
-				BooleanQuery finalQuery = new BooleanQuery();
-				for (String term : terms) {
-					Query termQuery = createTermQuery(term);
-					//termQuery.setBoost( boost );
-					finalQuery.add( termQuery, BooleanClause.Occur.SHOULD );
+				if ( terms.size() == 0 ) {
+					throw new SearchException("try to search with an empty string: " + field);
 				}
-				return finalQuery;
+				else if (terms.size() == 1 ) {
+					return createTermQuery( terms.get( 0 ) );
+				}
+				else {
+					BooleanQuery finalQuery = new BooleanQuery();
+					for (String term : terms) {
+						Query termQuery = createTermQuery(term);
+						//termQuery.setBoost( boost );
+						finalQuery.add( termQuery, BooleanClause.Occur.SHOULD );
+					}
+					return finalQuery;
+				}
 			}
 		}
 

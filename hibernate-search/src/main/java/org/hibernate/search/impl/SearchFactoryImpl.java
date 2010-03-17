@@ -78,6 +78,8 @@ import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
+import org.hibernate.search.query.dsl.v2.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.store.DirectoryProvider;
@@ -474,6 +476,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		}
 
 		return builder.getAnalyzer();
+	}
+
+	public QueryContextBuilder buildQueryBuilder() {
+		return new ConnectedQueryContextBuilder( this );
 	}
 
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager) {
