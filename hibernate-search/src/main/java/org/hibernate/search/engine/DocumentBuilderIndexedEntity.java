@@ -404,7 +404,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 						CLASS_FIELDNAME,
 						entityType.getName(),
 						Field.Store.YES,
-						Field.Index.NOT_ANALYZED,
+						Field.Index.NOT_ANALYZED_NO_NORMS,
 						Field.TermVector.NO
 				);
 		doc.add( classField );
@@ -412,8 +412,8 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		// now add the entity id to the document
 		LuceneOptions luceneOptions = new LuceneOptionsImpl(
 				Field.Store.YES,
-				Field.Index.NOT_ANALYZED, Field.TermVector.NO, idBoost
-		);
+				Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO, idBoost
+			);
 		idBridge.set( idKeywordName, id, doc, luceneOptions );
 
 		// finally add all other document fields
