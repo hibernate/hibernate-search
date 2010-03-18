@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Factory;
@@ -27,16 +28,9 @@ import org.hibernate.search.test.SearchTestCase;
 public class DSLTest extends SearchTestCase {
 
 	public void testTermQueryOnAnalyzer() throws Exception {
-		Session session = openSession();
-		FullTextSession fts = Search.getFullTextSession( session );
+		FullTextSession fts = initData();
+
 		Transaction transaction = fts.beginTransaction();
-		fts.persist( new Month("January", "Month of colder and whitening") );
-		fts.persist( new Month("February", "Month of snowboarding") );
-		transaction.commit();
-
-		fts.clear();
-
-		transaction = fts.beginTransaction();
 		final QueryBuilder monthQb = fts.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 		Query 
@@ -67,27 +61,15 @@ public class DSLTest extends SearchTestCase {
 
 		query = monthQb.term().on( "mythology" ).matches( "Month" ).createQuery();
 
-		final List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
-		assertEquals( 2, results.size() );
-
-		for (Month entity : results) {
-			fts.delete( entity );
-		}
 		transaction.commit();
-		fts.close();
+
+		cleanData( fts );
 	}
 
-	public void tesFuzzyAndWildcardQuery() throws Exception {
-		Session session = openSession();
-		FullTextSession fts = Search.getFullTextSession( session );
+	public void testFuzzyAndWildcardQuery() throws Exception {
+		FullTextSession fts = initData();
+
 		Transaction transaction = fts.beginTransaction();
-		fts.persist( new Month("January", "Month of colder and whitening") );
-		fts.persist( new Month("February", "Month of snowboarding") );
-		transaction.commit();
-
-		fts.clear();
-
-		transaction = fts.beginTransaction();
 		final QueryBuilder monthQb = fts.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 		Query
@@ -106,19 +88,72 @@ public class DSLTest extends SearchTestCase {
 				.term().on( "mythology" ).matches( "mon*" )
 					.wildcard()
 				.createQuery();
-
+		System.out.println(query.toString(  ));
 		assertEquals( 2, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		final List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
+		transaction.commit();
+
+		cleanData( fts );
+	}
+
+	public void testQueryCustomization() throws Exception {
+		FullTextSession fts = initData();
+
+		Transaction transaction = fts.beginTransaction();
+		final QueryBuilder monthQb = fts.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+		Query
+
+		//combined query, January and february both contain whitening but February in a longer text
+		query = monthQb
+				.bool()
+					.should( monthQb.term().on( "mythology" ).matches( "whitening" ).createQuery() )
+					.should( monthQb.term().on( "history" ).matches( "whitening" ).createQuery() )
+				.createQuery();
+
+		List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 2, results.size() );
+		assertEquals( "January", results.get( 0 ).getName() );
+
+		//boosted query, January and february both contain whitening but February in a longer text
+		//since history is boosted, February should come first though
+		query = monthQb
+				.bool()
+					.should( monthQb.term().on( "mythology" ).matches( "whitening" ).createQuery() )
+					.should( monthQb.term().on( "history" ).matches( "whitening" ).boostedTo( 30 ).createQuery() )
+				.createQuery();
+
+		results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 2, results.size() );
+		assertEquals( "February", results.get( 0 ).getName() );
+
+		transaction.commit();
+
+		cleanData( fts );
+	}
+
+	private void cleanData(FullTextSession fts) {
+		Transaction tx = fts.beginTransaction();
+		final List<Month> results = fts.createQuery( "from " + Month.class.getName() ).list();
 		assertEquals( 2, results.size() );
 
 		for (Month entity : results) {
 			fts.delete( entity );
 		}
-		transaction.commit();
+		tx.commit();
 		fts.close();
 	}
 
+	private FullTextSession initData() {
+		Session session = openSession();
+		FullTextSession fts = Search.getFullTextSession( session );
+		Transaction tx = fts.beginTransaction();
+		fts.persist( new Month("January", "Month of colder and whitening", "Historically colder than any other month in the northern hemisphere") );
+		fts.persist( new Month("February", "Month of snowboarding", "Historically, the month where we make babies while watching the whitening landscape") );
+		tx.commit();
+		fts.clear();
+		return fts;
+	}
 
 	@Override
 	protected Class<?>[] getMappings() {

@@ -3,6 +3,7 @@ package org.hibernate.search.query.dsl.v2.impl;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.query.dsl.v2.BooleanJunction;
 import org.hibernate.search.query.dsl.v2.QueryBuilder;
 import org.hibernate.search.query.dsl.v2.TermContext;
 
@@ -22,5 +23,9 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 
 	public TermContext term() {
 		return new ConnectedTermContext( queryAnalyzer, factory);
+	}
+
+	public BooleanJunction bool() {
+		return new BooleanQueryBuilder();
 	}
 }

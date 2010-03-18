@@ -5,7 +5,7 @@ import org.apache.lucene.search.Query;
 /**
 * @author Emmanuel Bernard
 */
-public interface TermCustomization {
+public interface TermCustomization extends QueryCustomization<TermCustomization> {
 	/**
 	 * Advanced
 	 * Do not execute the analyzer on the text.
@@ -27,10 +27,5 @@ public interface TermCustomization {
 	 */
 	//TODO make it mutually exclusive with fuzzy use (but that's much more complex)
 	TermCustomization wildcard();
-
-	/**
-	 * Create a Lucene query
-	 */
-	Query createQuery();
 
 }

@@ -8,4 +8,10 @@ public interface QueryBuilder {
 	 * build a term query
 	 */
 	TermContext term();
+
+
+	/**
+	 * Boolean query
+	 */
+	BooleanJunction<BooleanJunction> bool();
 }

@@ -12,6 +12,7 @@ import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -28,7 +29,7 @@ import org.hibernate.search.query.dsl.v2.TermMatchingContext;
 /**
  * @author Emmanuel Bernard
  */
-public class ConnectedTermContext implements TermContext {
+class ConnectedTermContext implements TermContext {
 	private final SearchFactory factory;
 	private final Analyzer queryAnalyzer;
 
@@ -62,6 +63,7 @@ public class ConnectedTermContext implements TermContext {
 		private final String field;
 		private final String text;
 		private final Analyzer queryAnalyzer;
+		private final QueryCustomizer queryCustomizer;
 
 		private boolean ignoreAnalyzer;
 		private Approximation approximation = Approximation.EXACT;
@@ -73,6 +75,7 @@ public class ConnectedTermContext implements TermContext {
 			this.field = field;
 			this.text = text;
 			this.queryAnalyzer = queryAnalyzer;
+			this.queryCustomizer = new QueryCustomizer();
 		}
 
 		public TermCustomization ignoreAnalyzer() {
@@ -96,9 +99,25 @@ public class ConnectedTermContext implements TermContext {
 			return this;
 		}
 
+		public TermCustomization boostedTo(float boost) {
+			queryCustomizer.boostedTo( boost );
+			return this;
+		}
+
+		public TermCustomization constantScore() {
+			queryCustomizer.constantScore();
+			return this;
+		}
+
+		public TermCustomization filter(Filter filter) {
+			queryCustomizer.filter( filter );
+			return this;
+		}
+
 		public Query createQuery() {
+			final Query result;
 			if ( ignoreAnalyzer ) {
-				return createTermQuery( text );	
+				result = createTermQuery( text );
 			}
 			else {
 				List<String> terms;
@@ -112,18 +131,19 @@ public class ConnectedTermContext implements TermContext {
 					throw new SearchException("try to search with an empty string: " + field);
 				}
 				else if (terms.size() == 1 ) {
-					return createTermQuery( terms.get( 0 ) );
+					result = createTermQuery( terms.get( 0 ) );
 				}
 				else {
-					BooleanQuery finalQuery = new BooleanQuery();
+					BooleanQuery booleanQuery = new BooleanQuery();
 					for (String term : terms) {
 						Query termQuery = createTermQuery(term);
 						//termQuery.setBoost( boost );
-						finalQuery.add( termQuery, BooleanClause.Occur.SHOULD );
+						booleanQuery.add( termQuery, BooleanClause.Occur.SHOULD );
 					}
-					return finalQuery;
+					result = booleanQuery;
 				}
 			}
+			return queryCustomizer.setWrappedQuery( result ).createQuery();
 		}
 
 		private Query createTermQuery(String term) {
@@ -146,19 +166,26 @@ public class ConnectedTermContext implements TermContext {
 		}
 
 		private List<String> getAllTermsFromText(String fieldName, String text, Analyzer analyzer) throws IOException {
-			Reader reader = new StringReader(text);
-			TokenStream stream = analyzer.reusableTokenStream( fieldName, reader);
-			TermAttribute attribute = (TermAttribute) stream.addAttribute( TermAttribute.class );
-			stream.reset();
+			//it's better not to apply the analyzer with windcards as * and ? can be mistakenly removed
 			List<String> terms = new ArrayList<String>();
-			while ( stream.incrementToken() ) {
-				if ( attribute.termLength() > 0 ) {
-					String term = attribute.term();
-					terms.add( term );
-				}
+			if ( approximation == Approximation.WILDCARD ) {
+				terms.add( text );
 			}
-			stream.end();
-    		stream.close();
+			else {
+				Reader reader = new StringReader(text);
+				TokenStream stream = analyzer.reusableTokenStream( fieldName, reader);
+				TermAttribute attribute = (TermAttribute) stream.addAttribute( TermAttribute.class );
+				stream.reset();
+
+				while ( stream.incrementToken() ) {
+					if ( attribute.termLength() > 0 ) {
+						String term = attribute.term();
+						terms.add( term );
+					}
+				}
+				stream.end();
+				stream.close();
+			}
 			return terms;
 		}
 

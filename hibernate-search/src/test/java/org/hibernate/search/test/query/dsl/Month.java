@@ -17,9 +17,10 @@ import org.hibernate.search.annotations.Indexed;
 public class Month {
 	public Month() {}
 	
-	public Month(String name, String mythology) {
+	public Month(String name, String mythology, String history) {
 		this.name = name;
 		this.mythology = mythology;
+		this.history = history;
 	}
 
 	@Id @GeneratedValue
@@ -40,5 +41,11 @@ public class Month {
 	public String getMythology() { return mythology; }
 	public void setMythology(String mythology) { this.mythology = mythology; }
 	private String mythology;
+
+	@Field
+	public String getHistory() { return history; }
+	public void setHistory(String history) { this.history = history; }
+	private String history;
+
 }
 
