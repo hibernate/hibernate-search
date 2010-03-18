@@ -127,10 +127,14 @@ public class DSLTest extends SearchTestCase {
 		assertEquals( 2, results.size() );
 		assertEquals( "February", results.get( 0 ).getName() );
 
+		//FIXME add other method tests besides boostedTo
+
 		transaction.commit();
 
 		cleanData( fts );
 	}
+
+	//FIXME add boolean tests
 
 	private void cleanData(FullTextSession fts) {
 		Transaction tx = fts.beginTransaction();
