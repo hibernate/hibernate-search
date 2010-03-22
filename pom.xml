@@ -38,6 +38,7 @@
     
     <modules>
         <module>hibernate-search</module>
+        <module>hibernate-search-testing</module>
         <module>hibernate-search-archetype</module>
     </modules>
     
@@ -280,7 +281,7 @@
     </dependencyManagement>
     
     <build>
-        <defaultGoal>test</defaultGoal>
+        <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -306,25 +307,6 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.5</version>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -394,6 +376,20 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.5</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.1</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -408,8 +404,9 @@
         </repository>
         <snapshotRepository>
             <id>snapshots.jboss.org</id>
-            <name>JBoss Snapshot Repository</name>
-            <url>dav:https://snapshots.jboss.org/maven2</url>
+            <name>JBoss Snapshot Repository</name>          
+            <url>file:///Users/hardy/tmp/snapshot</url>
+            <!--url>dav:https://snapshots.jboss.org/maven2</url-->
         </snapshotRepository>
     </distributionManagement>
     

@@ -23,8 +23,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -40,7 +41,6 @@
     <description>Hibernate Search</description>
 
     <dependencies>
-        <!-- REQUIRED DEPENDECIES -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -58,34 +58,12 @@
             <artifactId>lucene-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-        </dependency>
-
-        <!-- OPTIONAL DEPENDECIES -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-annotations</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-common</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -108,32 +86,44 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>javax.jms</groupId>
-            <artifactId>jms</artifactId>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>jgroups</groupId>
             <artifactId>jgroups</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>jsr250-api</artifactId>
-            <optional>true</optional>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+            <scope>provided</scope>
         </dependency>
 
-        <!-- TEST DEPENDECIES -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
-        <defaultGoal>test</defaultGoal>
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -147,19 +137,19 @@
                             <value>${basedir}/target</value>
                         </property>
                         <!--
-                            Following is the default jgroups mcast address. If you find the testsuite runs very slowly,
-                            there may be problems with multicast on the interface JGroups uses by default on
-                            your machine. You can try to resolve setting 'jgroups.bind_addr' as a system-property
-                            to the jvm launching maven and setting the value to an interface where you know multicast works
-                        -->
+                                Following is the default jgroups mcast address. If you find the testsuite runs very slowly,
+                                there may be problems with multicast on the interface JGroups uses by default on
+                                your machine. You can try to resolve setting 'jgroups.bind_addr' as a system-property
+                                to the jvm launching maven and setting the value to an interface where you know multicast works
+                            -->
                         <property>
                             <name>jgroups.bind_addr</name>
                             <value>127.0.0.1</value>
                         </property>
                         <!-- There are problems with multicast and IPv6 on some OS/JDK combos, so we tell Java
-                             to use IPv4. If you have problems with multicast when running the tests you can
-                             try setting this to 'false', although typically that won't be helpful.
-                        -->
+                                to use IPv4. If you have problems with multicast when running the tests you can
+                                try setting this to 'false', although typically that won't be helpful.
+                            -->
                         <property>
                             <name>java.net.preferIPv4Stack</name>
                             <value>true</value>
@@ -192,14 +182,12 @@
                         </format>
                         <format>
                             <formatName>html_single</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl </stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                         <format>
                             <formatName>html</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl </stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                     </formats>
@@ -212,6 +200,10 @@
                         <localeSeparator>-</localeSeparator>
                     </options>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -233,9 +225,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <goals>deploy javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:resources
-                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:generate assembly:assembly
-                    </goals>
+                    <goals>deploy javadoc:javadoc
+                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:resources
+                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.0:generate
+                        assembly:assembly </goals>
                 </configuration>
             </plugin>
             <plugin>
@@ -264,15 +257,5 @@
                 </configuration>
             </plugin>
         </plugins>
-        <testResources>
-            <testResource>
-                <filtering>true</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                </includes>
-            </testResource>
-        </testResources>
     </build>
 </project>
