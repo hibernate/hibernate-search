@@ -38,6 +38,7 @@ import org.apache.lucene.search.Query;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class MultiClassesQueryLoaderTest extends SearchTestCase {
 
@@ -61,9 +62,43 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 		List result = hibQuery.list();
 		assertEquals( "Should have returned no author", 0, result.size() );
 
-		for (Object o : s.createCriteria( Object.class ).list()) {
-			s.delete( o );
-		}
+		tx.commit();
+		s.close();
+	}
+	
+	public void testObjectTypeFiltering() throws Exception {
+		Session sess = openSession();
+		Transaction tx = sess.beginTransaction();
+		Author author = new Author();
+		author.setName( "Moo Cow" );
+		Music music = new Music();
+		music.addAuthor( author );
+		music.setTitle( "The moo moo mooing under the stars" );
+		Book book = new Book();
+		book.setBody( "This is the story of the Moo Cow, who sang the moo moo moo at night" );
+		book.setId( 1 );
+		sess.persist( book );
+		sess.persist( author );
+		sess.persist( music );
+		tx.commit();
+		sess.clear();
+
+		FullTextSession s = Search.getFullTextSession( sess );
+		tx = s.beginTransaction();
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.keywordAnalyzer );
+		Query query = parser.parse( "name:moo OR title:moo OR body:moo" );
+		FullTextQuery hibQuery = s.createFullTextQuery( query, Music.class );
+		List result = hibQuery.list();
+		assertEquals( "Should match the music only", 1, result.size() );
+		hibQuery = s.createFullTextQuery( query, Author.class, Music.class );
+		result = hibQuery.list();
+		assertEquals( "Should match the author and music only", 2, result.size() );
+		hibQuery = s.createFullTextQuery( query, Author.class, Music.class, Book.class );
+		result = hibQuery.list();
+		assertEquals( "Should match the author, music and book", 3, result.size() );
+		hibQuery = s.createFullTextQuery( query );
+		result = hibQuery.list();
+		assertEquals( "Should match all types", 3, result.size() );
 
 		tx.commit();
 		s.close();
@@ -72,7 +107,9 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 	protected Class<?>[] getMappings() {
 		return new Class[] {
 				Author.class,
-				Music.class
+				Music.class,
+				Book.class
 		};
 	}
+	
 }
