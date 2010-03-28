@@ -214,4 +214,26 @@ public class Workspace {
 		return entitiesInDirectory;
 	}
 
+	/**
+	 * Forces release of Directory lock. Should be used only to cleanup as error recovery.
+	 */
+	public synchronized void forceLockRelease() {
+		log.warn( "going to force release of the IndexWriter lock" );
+		try {
+			try {
+				if ( writer != null ) {
+					writer.close();
+					log.trace( "IndexWriter closed" );
+				}
+			}
+			finally {
+				writer = null; //make sure to send a faulty writer into garbage
+				IndexWriter.unlock( directoryProvider.getDirectory() );
+			}
+		}
+		catch (IOException ioe) {
+			throw new SearchException( "IOException while attempting to force release the Directory Lock", ioe );
+		}
+	}
+
 }

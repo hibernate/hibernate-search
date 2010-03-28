@@ -87,17 +87,28 @@ class PerDPQueueProcessor implements Runnable {
 			return;
 		}
 		log.debug( "Opening an IndexWriter for update" );
-		IndexWriter indexWriter = workspace.getIndexWriter( batchmode );
 		try {
-			for (LuceneWork lw : workOnWriter) {
-				lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
+			IndexWriter indexWriter = workspace.getIndexWriter( batchmode );
+			try {
+				for ( LuceneWork lw : workOnWriter ) {
+					lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
+				}
+				workspace.commitIndexWriter();
+				performOptimizations();
 			}
-			workspace.commitIndexWriter();
-			performOptimizations();
+			finally {
+				if ( ! exclusiveIndexUsage ) workspace.closeIndexWriter();
+			}
 		}
-		finally {
-			if ( ! exclusiveIndexUsage )
+		catch (Throwable tw) {
+			//needs to be attempted even for out of memory errors, therefore we catch Throwable
+			log.error( "Unexpected error in Lucene Backend: ", tw );
+			try {
 				workspace.closeIndexWriter();
+			}
+			finally {
+				workspace.forceLockRelease();
+			}
 		}
 	}
 	
