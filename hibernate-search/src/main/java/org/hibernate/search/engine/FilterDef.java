@@ -98,5 +98,9 @@ public class FilterDef {
 		catch (InvocationTargetException e) {
 			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: " + this.impl, e );
 		}
+		catch (IllegalArgumentException e) {
+			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: "
+					+ this.impl + " : " + e.getMessage(), e );
+		}
 	}
 }
