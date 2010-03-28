@@ -31,10 +31,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.apache.solr.analysis.EnglishPorterFilterFactory;
 import org.apache.solr.analysis.GermanStemFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
+import org.apache.solr.analysis.SnowballPorterFilterFactory;
 
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -43,6 +43,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
@@ -57,8 +58,9 @@ import org.hibernate.search.annotations.TokenizerDef;
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-						@TokenFilterDef(factory = EnglishPorterFilterFactory.class
-						)
+						@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params =   {
+                          @Parameter(name = "language", value = "English")
+                        })
 				}),
 		@AnalyzerDef(name = "de",
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),

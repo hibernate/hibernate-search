@@ -150,7 +150,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 				filters = {
 						@TokenFilterDef(factory = PhoneticFilterFactory.class, params = {
 								@Parameter(name = "encoder", value = "Metaphone"),
-								@Parameter(name = "inject", value = "true")
+								@Parameter(name = "inject", value = "false")
 						})
 				})
 })

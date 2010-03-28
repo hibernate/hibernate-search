@@ -59,10 +59,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
-            <artifactId>solr-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
         </dependency>
         <dependency>

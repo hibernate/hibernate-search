@@ -32,19 +32,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
-            <artifactId>solr-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>commons-httpclient</groupId>
                     <artifactId>commons-httpclient</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.solr</groupId>
-                    <artifactId>solr-solrj</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>woodstox</groupId>
