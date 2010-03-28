@@ -62,10 +62,10 @@ public abstract class SearchTestCase extends TestCase {
 
 	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
 	
-	public static Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
-	public static Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
-	public static Analyzer simpleAnalyzer = new SimpleAnalyzer();
-	public static Analyzer keywordAnalyzer = new KeywordAnalyzer();
+	public static final Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
+	public static final Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
+	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer();
+	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static File indexDir;
 	
