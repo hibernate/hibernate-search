@@ -44,4 +44,9 @@ public class PurgeAllLuceneWork extends LuceneWork implements Serializable {
 		return visitor.getDelegate( this );
 	}
 	
+	@Override
+	public String toString() {
+		return "PurgeAllLuceneWork: " + this.getEntityClass().getName();
+	}
+	
 }

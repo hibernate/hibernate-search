@@ -63,5 +63,10 @@ public class AddLuceneWork extends LuceneWork implements Serializable {
 	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
 		return visitor.getDelegate( this );
 	}
+	
+	@Override
+	public String toString() {
+		return "AddLuceneWork: " + this.getEntityClass().getName() + "#" + this.getIdInString();
+	}
 
 }

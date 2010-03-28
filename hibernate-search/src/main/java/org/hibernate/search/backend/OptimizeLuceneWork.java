@@ -45,4 +45,9 @@ public class OptimizeLuceneWork extends LuceneWork implements Serializable {
 		return visitor.getDelegate( this );
 	}
 	
+	@Override
+	public String toString() {
+		return "OptimizeLuceneWork: " + this.getEntityClass().getName();
+	}
+	
 }

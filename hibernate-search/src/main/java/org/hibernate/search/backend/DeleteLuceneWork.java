@@ -42,4 +42,9 @@ public class DeleteLuceneWork extends LuceneWork implements Serializable {
 		return visitor.getDelegate( this );
 	}
 	
+	@Override
+	public String toString() {
+		return "DeleteLuceneWork: " + this.getEntityClass().getName() + "#" + this.getIdInString();
+	}
+	
 }
