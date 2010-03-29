@@ -24,21 +24,16 @@
  */
 package org.hibernate.search.test.scratch;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 import org.hibernate.Session;
 import org.hibernate.search.test.SearchTestCase;
 
+/**
+ * TestCase to verify proper management of saving of complex relations and collections.
+ * See HSEARCH-476
+ * 
+ * @author Sanne Grinovero
+ */
 public class RecursiveGraphTest extends SearchTestCase {
 
 	public void testCreateParentAndChild() throws Exception {
@@ -51,7 +46,6 @@ public class RecursiveGraphTest extends SearchTestCase {
         people[0] = parent;
         people[1] = child;
         savePeople( people );
-        showIndexContentsForType( Person.class );
         assertEquals( 2, getDocumentNbr( Person.class ) );
     }
 	
@@ -92,24 +86,4 @@ public class RecursiveGraphTest extends SearchTestCase {
 		}
 	}
 	
-	private void showIndexContentsForType(Class type) throws CorruptIndexException, IOException {
-		IndexSearcher searcher = new IndexSearcher( getDirectory( type ), false );
-		try {
-			Query q = new MatchAllDocsQuery();
-			TopDocs docs = searcher.search( q, null, 100 );
-			ScoreDoc[] scoreDocs = docs.scoreDocs;
-			for (ScoreDoc sd : scoreDocs) {
-				Document doc = searcher.doc( sd.doc );
-				StringBuilder sb = new StringBuilder();
-				for (Fieldable field : (List<Fieldable>)doc.getFields()) {
-					sb.append( field.name() ).append( ":" ).append( field.stringValue() ).append( " " );
-				}
-				//System.out.println( sb.toString() );
-			}
-		}
-		finally {
-			searcher.close();
-		}
-	}
-
 }
