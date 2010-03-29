@@ -22,28 +22,34 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.scratch;
+package org.hibernate.search.test.embedded.graph;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 @Entity
-public class Event implements Serializable {
+@Indexed
+public class ParentOfBirthEvent {
 
 	private Long id;
-	private Set<ParentOfBirthEvent> parentsOf = new HashSet<ParentOfBirthEvent>();
-	private Set<Person> children = new HashSet<Person>();
+	private Person parent;
+	private Event event;
+
+	public ParentOfBirthEvent(Person parent, Event event) {
+		this.parent = parent;
+		this.event = event;
+	}
 
 	@Id
+	@DocumentId
 	@GeneratedValue
 	public Long getId() {
 		return id;
@@ -54,23 +60,23 @@ public class Event implements Serializable {
 	}
 
 	@IndexedEmbedded
-	@OneToMany(mappedBy = "event")
-	public Set<ParentOfBirthEvent> getParentsOf() {
-		return parentsOf;
+	@ManyToOne
+	public Person getParent() {
+		return parent;
 	}
 
-	public void setParentsOf(Set<ParentOfBirthEvent> parentsOf) {
-		this.parentsOf = parentsOf;
+	public void setParent(Person parent) {
+		this.parent = parent;
 	}
 
 	@ContainedIn
-	@OneToMany(mappedBy = "birthEvent")
-	public Set<Person> getChildren() {
-		return children;
+	@ManyToOne(cascade=CascadeType.ALL)
+	public Event getEvent() {
+		return event;
 	}
 
-	public void setChildren(Set<Person> children) {
-		this.children = children;
+	public void setEvent(Event event) {
+		this.event = event;
 	}
 
 }

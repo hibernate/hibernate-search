@@ -22,34 +22,43 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.scratch;
+package org.hibernate.search.test.embedded.graph;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Store;
 
 @Entity
 @Indexed
-public class ParentOfBirthEvent {
+public class Person implements Serializable {
 
 	private Long id;
-	private Person parent;
-	private Event event;
+	private Set<ParentOfBirthEvent> parentOfBirthEvents;
+	private Event birthEvent;
+	private String name;
 
-	public ParentOfBirthEvent(Person parent, Event event) {
-		this.parent = parent;
-		this.event = event;
+	public Person() {
+		birthEvent = new Event();
+		birthEvent.getChildren().add( this );
+		parentOfBirthEvents = new HashSet<ParentOfBirthEvent>();
 	}
 
-	@Id
 	@DocumentId
+	@Id
 	@GeneratedValue
 	public Long getId() {
 		return id;
@@ -59,24 +68,33 @@ public class ParentOfBirthEvent {
 		this.id = id;
 	}
 
-	@IndexedEmbedded
-	@ManyToOne
-	public Person getParent() {
-		return parent;
-	}
-
-	public void setParent(Person parent) {
-		this.parent = parent;
-	}
-
 	@ContainedIn
-	@ManyToOne(cascade=CascadeType.ALL)
-	public Event getEvent() {
-		return event;
+	@OneToMany(cascade = { CascadeType.ALL })
+	public Set<ParentOfBirthEvent> getParentOfBirthEvents() {
+		return parentOfBirthEvents;
 	}
 
-	public void setEvent(Event event) {
-		this.event = event;
+	public void setParentOfBirthEvents(Set<ParentOfBirthEvent> parentOfBirthEvents) {
+		this.parentOfBirthEvents = parentOfBirthEvents;
+	}
+
+	@IndexedEmbedded(depth = 4)
+	@ManyToOne(cascade = { CascadeType.ALL }, optional = false)
+	public Event getBirthEvent() {
+		return birthEvent;
+	}
+
+	public void setBirthEvent(Event birthEvent) {
+		this.birthEvent = birthEvent;
+	}
+
+	@Field(store=Store.YES)
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

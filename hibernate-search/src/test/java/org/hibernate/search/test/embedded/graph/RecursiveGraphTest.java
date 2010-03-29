@@ -22,7 +22,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.scratch;
+package org.hibernate.search.test.embedded.graph;
 
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.Session;
@@ -31,8 +31,6 @@ import org.hibernate.search.test.SearchTestCase;
 /**
  * TestCase to verify proper management of saving of complex relations and collections.
  * See HSEARCH-476
- * 
- * @author Sanne Grinovero
  */
 public class RecursiveGraphTest extends SearchTestCase {
 
