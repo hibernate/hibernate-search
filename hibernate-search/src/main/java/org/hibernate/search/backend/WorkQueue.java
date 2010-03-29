@@ -29,11 +29,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Bernard
  */
 public class WorkQueue {
+	
+	private static final Logger log = LoggerFactory.make();
+	
 	private List<Work> queue;
 
 	private List<LuceneWork> sealedQueue;
@@ -66,9 +71,16 @@ public class WorkQueue {
 		return subQueue;
 	}
 
-
 	public List<LuceneWork> getSealedQueue() {
 		if (sealedQueue == null) throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
+		if (log.isTraceEnabled()) {
+			StringBuilder sb = new StringBuilder();
+			for (LuceneWork lw : sealedQueue) {
+				sb.append( lw.toString() );
+				sb.append( "\n" );
+			}
+			log.trace( "sending sealedQueue to backend: \n" + sb.toString() );
+		}
 		return sealedQueue;
 	}
 

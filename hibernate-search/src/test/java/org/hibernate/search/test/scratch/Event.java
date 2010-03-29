@@ -22,28 +22,55 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend;
+package org.hibernate.search.test.scratch;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
-/**
- * @author Emmanuel Bernard
- */
-public class DeleteLuceneWork extends LuceneWork implements Serializable {
-	
-	private static final long serialVersionUID = -854604138119230246L;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
-	public DeleteLuceneWork(Serializable id, String idInString, Class entity) {
-		super( id, idInString, entity );
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.IndexedEmbedded;
+
+@Entity
+public class Event implements Serializable {
+
+	private Long id;
+	private Set<ParentOfBirthEvent> parentsOf = new HashSet<ParentOfBirthEvent>();
+	private Set<Person> children = new HashSet<Person>();
+
+	@Id
+	@GeneratedValue
+	public Long getId() {
+		return id;
 	}
 
-	@Override
-	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	public void setId(Long id) {
+		this.id = id;
 	}
-	
-	@Override
-	public String toString() {
-		return "Delete LuceneWork: " + this.getEntityClass().getSimpleName() + "#" + this.getIdInString();
+
+	@IndexedEmbedded
+	@OneToMany(mappedBy = "event")
+	public Set<ParentOfBirthEvent> getParentsOf() {
+		return parentsOf;
 	}
+
+	public void setParentsOf(Set<ParentOfBirthEvent> parentsOf) {
+		this.parentsOf = parentsOf;
+	}
+
+	@ContainedIn
+	@OneToMany(mappedBy = "birthEvent")
+	public Set<Person> getChildren() {
+		return children;
+	}
+
+	public void setChildren(Set<Person> children) {
+		this.children = children;
+	}
+
 }

@@ -721,7 +721,14 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	private <T> void addWorkForEmbeddedValue(T value, List<LuceneWork> queue, Class<T> valueClass,
 											 DocumentBuilderIndexedEntity<T> builderIndexedEntity, SearchFactoryImplementor searchFactoryImplementor) {
 		Serializable id = ( Serializable ) ReflectionHelper.getMemberValue( value, builderIndexedEntity.idGetter );
-		builderIndexedEntity.addWorkToQueue( valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor );
+		if ( id != null) {
+			builderIndexedEntity.addWorkToQueue( valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor );
+		}
+		else {
+			//this is an indexed entity that is not yet persisted but should be reached by cascade
+			// and thus raise an Hibernate Core event leading to its indexing by Hibernate Search
+			// => no need to do anything here
+		}
 	}
 
 	public Analyzer getAnalyzer() {

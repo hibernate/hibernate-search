@@ -22,28 +22,61 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend;
+package org.hibernate.search.test.scratch;
 
-import java.io.Serializable;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
-/**
- * @author Emmanuel Bernard
- */
-public class DeleteLuceneWork extends LuceneWork implements Serializable {
-	
-	private static final long serialVersionUID = -854604138119230246L;
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
-	public DeleteLuceneWork(Serializable id, String idInString, Class entity) {
-		super( id, idInString, entity );
+@Entity
+@Indexed
+public class ParentOfBirthEvent {
+
+	private Long id;
+	private Person parent;
+	private Event event;
+
+	public ParentOfBirthEvent(Person parent, Event event) {
+		this.parent = parent;
+		this.event = event;
 	}
 
-	@Override
-	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	@Id
+	@DocumentId
+	@GeneratedValue
+	public Long getId() {
+		return id;
 	}
-	
-	@Override
-	public String toString() {
-		return "Delete LuceneWork: " + this.getEntityClass().getSimpleName() + "#" + this.getIdInString();
+
+	public void setId(Long id) {
+		this.id = id;
 	}
+
+	@IndexedEmbedded
+	@ManyToOne
+	public Person getParent() {
+		return parent;
+	}
+
+	public void setParent(Person parent) {
+		this.parent = parent;
+	}
+
+	@ContainedIn
+	@ManyToOne(cascade=CascadeType.ALL)
+	public Event getEvent() {
+		return event;
+	}
+
+	public void setEvent(Event event) {
+		this.event = event;
+	}
+
 }
