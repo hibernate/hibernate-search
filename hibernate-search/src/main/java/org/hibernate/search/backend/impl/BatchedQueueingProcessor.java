@@ -27,11 +27,9 @@ package org.hibernate.search.backend.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -39,11 +37,10 @@ import org.slf4j.Logger;
 
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.backend.AddLuceneWork;
-import org.hibernate.search.backend.DeleteLuceneWork;
-import org.hibernate.util.StringHelper;
 import org.hibernate.search.Environment;
+import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
@@ -56,11 +53,12 @@ import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcess
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.Executors;
+import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
+import org.hibernate.util.StringHelper;
 
 /**
  * Batch work until {@link #performWorks} is called.
