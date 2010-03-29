@@ -24,15 +24,23 @@
  */
 package org.hibernate.search.backend.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
@@ -140,7 +148,96 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		 */
 		processWorkByLayer( queue, initialSize, luceneQueue, Layer.FIRST );
 		processWorkByLayer( queue, initialSize, luceneQueue, Layer.SECOND );
-		workQueue.setSealedQueue( luceneQueue );
+		workQueue.setSealedQueue( optimize( luceneQueue ) );
+	}
+
+	private List<LuceneWork> optimize(List<LuceneWork> luceneQueue) {
+		/*
+		 * for a given entity id and entity type,
+		 * keep the latest AddLuceneWork and the first DeleteLuceneWork
+		 * in the queue.
+		 *
+		 * To do that, keep a list of indexes that need to be removed from the list
+		 */
+		final int size = luceneQueue.size();
+		List<Integer> toDelete = new ArrayList<Integer>( size );
+		Map<DuplicatableWork, Integer> workByPosition = new HashMap<DuplicatableWork, Integer>( size );
+		for ( int index = 0 ; index < size; index++ ) {
+			LuceneWork work = luceneQueue.get( index );
+			if ( work instanceof AddLuceneWork ) {
+				DuplicatableWork dupWork = new DuplicatableWork( work );
+				final Integer oldIndex = workByPosition.get( dupWork );
+				if ( oldIndex != null ) {
+					toDelete.add(oldIndex);
+					workByPosition.put( dupWork, index );
+				}
+				workByPosition.put( dupWork, index );
+			}
+			else if ( work instanceof DeleteLuceneWork ) {
+				DuplicatableWork dupWork = new DuplicatableWork( work );
+				final Integer oldIndex = workByPosition.get( dupWork );
+				if ( oldIndex != null ) {
+					toDelete.add(index);
+				}
+				else {
+					workByPosition.put( dupWork, index );
+				}
+			}
+		}
+		List<LuceneWork> result = new ArrayList<LuceneWork>( size - toDelete.size() );
+		for ( int index = 0 ; index < size; index++ ) {
+			if ( ! toDelete.contains( index ) ) {
+				result.add( luceneQueue.get( index ) );
+			}
+		}
+		return result;
+	}
+
+	private static class DuplicatableWork {
+		private final Class<? extends LuceneWork> workType;
+		private final Serializable id;
+		private final Class<?> entityType;
+
+		public DuplicatableWork(LuceneWork work) {
+			workType = work.getClass();
+			if ( ! ( AddLuceneWork.class.isAssignableFrom( workType ) || DeleteLuceneWork.class.isAssignableFrom( workType ) ) ) {
+				throw new AssertionFailure( "Should not be used for lucene work type: " + workType );
+			}
+			id = work.getId();
+			entityType = work.getEntityClass();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+
+			DuplicatableWork that = ( DuplicatableWork ) o;
+
+			if ( !entityType.equals( that.entityType ) ) {
+				return false;
+			}
+			if ( !id.equals( that.id ) ) {
+				return false;
+			}
+			if ( !workType.equals( that.workType ) ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = workType.hashCode();
+			result = 31 * result + id.hashCode();
+			result = 31 * result + entityType.hashCode();
+			return result;
+		}
 	}
 
 	private <T> void processWorkByLayer(List<Work> queue, int initialSize, List<LuceneWork> luceneQueue, Layer layer) {
