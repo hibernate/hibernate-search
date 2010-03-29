@@ -275,13 +275,13 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	public void performWorks(WorkQueue workQueue) {
 		List<LuceneWork> sealedQueue = workQueue.getSealedQueue();
-		if ( log.isDebugEnabled() ) {
+		if ( log.isTraceEnabled() ) {
 			StringBuilder sb = new StringBuilder( "Lucene WorkQueue to send to backend: \n\t" );
 			for ( LuceneWork lw : sealedQueue ) {
 				sb.append( lw.toString() );
 				sb.append( "\n\t" );
 			}
-			log.debug( sb.toString() );
+			log.trace( sb.toString() );
 		}
 		Runnable processor = backendQueueProcessorFactory.getProcessor( sealedQueue );
 		if ( sync ) {

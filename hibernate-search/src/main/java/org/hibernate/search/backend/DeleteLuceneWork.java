@@ -44,6 +44,7 @@ public class DeleteLuceneWork extends LuceneWork implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Delete LuceneWork: " + this.getEntityClass().getSimpleName() + "#" + this.getIdInString();
+		return "DeleteLuceneWork: " + this.getEntityClass().getName() + "#" + this.getIdInString();
 	}
+	
 }

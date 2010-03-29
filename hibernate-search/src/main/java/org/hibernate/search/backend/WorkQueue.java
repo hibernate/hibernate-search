@@ -55,11 +55,9 @@ public class WorkQueue {
 		this(10);
 	}
 
-
 	public void add(Work work) {
 		queue.add(work);
 	}
-
 
 	public List<Work> getQueue() {
 		return queue;
@@ -73,14 +71,6 @@ public class WorkQueue {
 
 	public List<LuceneWork> getSealedQueue() {
 		if (sealedQueue == null) throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
-		if (log.isTraceEnabled()) {
-			StringBuilder sb = new StringBuilder();
-			for (LuceneWork lw : sealedQueue) {
-				sb.append( lw.toString() );
-				sb.append( "\n" );
-			}
-			log.trace( "sending sealedQueue to backend: \n" + sb.toString() );
-		}
 		return sealedQueue;
 	}
 
