@@ -104,7 +104,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 				for (Fieldable field : (List<Fieldable>)doc.getFields()) {
 					sb.append( field.name() ).append( ":" ).append( field.stringValue() ).append( " " );
 				}
-				System.out.println( sb.toString() );
+				//System.out.println( sb.toString() );
 			}
 		}
 		finally {
