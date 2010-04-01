@@ -14,10 +14,7 @@ care of the index synchronization, brings you back managed objects from free tex
 queries.
 Hibernate Search is using Apache Lucene(tm) under the cover.
 
-
-Hibernate Search Requires Hibernate Core 3.3 and above.
-This version runs well with Hibernate Annotations 3.4.x and Hibernate EntityManager 3.4.x
-
+This version of Hibernate Search requires Hibernate Core 3.5 and above.
 
 Instructions
 ------------
@@ -35,7 +32,7 @@ Latest Documentation:
 Bug Reports:
 
    Hibernate JIRA (preferred)
-   hibernate-devel@lists.sourceforge.net
+   hibernate-dev@lists.jboss.org
 
 Free Technical Support:
 
@@ -45,7 +42,7 @@ Free Technical Support:
 Notes
 -----------
 
-If you want to contribute, go to http://www.hibernate.org/
+If you want to contribute, read http://community.jboss.org/wiki/ContributingtoHibernateSearch
 
 This software and its documentation are distributed under the terms of the
 FSF Lesser Gnu Public License (see lgpl.txt).
