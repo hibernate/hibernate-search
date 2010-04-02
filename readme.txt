@@ -31,7 +31,7 @@ Latest Documentation:
 
 Bug Reports:
 
-   Hibernate JIRA (preferred)
+   Hibernate JIRA (preferred): http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH
    hibernate-dev@lists.jboss.org
 
 Free Technical Support:
