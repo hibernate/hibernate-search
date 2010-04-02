@@ -117,13 +117,9 @@ public class MultiClassesQueryLoader implements Loader {
 			final RootEntityMetadata key = entry.getKey();
 			final List<EntityInfo> value = entry.getValue();
 			final EntityInfo[] bucketEntityInfos = value.toArray( new EntityInfo[value.size()] );
-			if ( key.useObjectLoader ) {
-				objectLoader.load( bucketEntityInfos );
-			}
-			else {
-				ObjectLoaderHelper.initializeObjects( bucketEntityInfos,
-						key.criteria, key.rootEntity, searchFactoryImplementor);
-			}
+
+			ObjectLoaderHelper.initializeObjects( bucketEntityInfos,
+					key.criteria, key.rootEntity, searchFactoryImplementor);
 		}
 		return ObjectLoaderHelper.returnAlreadyLoadedObjectsInCorrectOrder( entityInfos, session );
 	}
@@ -132,7 +128,6 @@ public class MultiClassesQueryLoader implements Loader {
 		public final Class<?> rootEntity;
 		public final Set<Class<?>> mappedSubclasses;
 		private final Criteria criteria;
-		public final boolean useObjectLoader;
 
 		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor, Session session) {
 			this.rootEntity = rootEntity;
@@ -140,7 +135,6 @@ public class MultiClassesQueryLoader implements Loader {
 			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
 			this.mappedSubclasses = provider.getMappedSubclasses();
 			this.criteria = session.createCriteria( rootEntity );
-			this.useObjectLoader = !provider.isSafeFromTupleId();
 		}
 	}
 }

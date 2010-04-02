@@ -65,27 +65,38 @@ public class ObjectLoaderHelper {
 		return maybeProxy;
 	}
 
-	public static void initializeObjects(EntityInfo[] entityInfos, Criteria criteria, Class<?> entityType,
+	public static void initializeObjects(EntityInfo[] entityInfos,
+										 Criteria criteria, Class<?> entityType,
 										 SearchFactoryImplementor searchFactoryImplementor) {
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) return;
 
 		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[]{entityType} );
 		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( indexedEntities.iterator().next() );
+		//FIXME starting from Core 3.5, this loging is handled in Restrictions.in so we should remove this code.
+		boolean useInClause = builder.isSafeFromTupleId();
 		String idName = builder.getIdentifierName();
-		int loop = maxResults / MAX_IN_CLAUSE;
-		boolean exact = maxResults % MAX_IN_CLAUSE == 0;
-		if ( !exact ) loop++;
+
 		Disjunction disjunction = Restrictions.disjunction();
-		for (int index = 0; index < loop; index++) {
-			int max = index * MAX_IN_CLAUSE + MAX_IN_CLAUSE <= maxResults ?
-					index * MAX_IN_CLAUSE + MAX_IN_CLAUSE :
-					maxResults;
-			List<Serializable> ids = new ArrayList<Serializable>( max - index * MAX_IN_CLAUSE );
-			for (int entityInfoIndex = index * MAX_IN_CLAUSE; entityInfoIndex < max; entityInfoIndex++) {
-				ids.add( entityInfos[entityInfoIndex].id );
+		if (useInClause) {
+			int loop = maxResults / MAX_IN_CLAUSE;
+			boolean exact = maxResults % MAX_IN_CLAUSE == 0;
+			if ( !exact ) loop++;
+			for (int index = 0; index < loop; index++) {
+				int max = index * MAX_IN_CLAUSE + MAX_IN_CLAUSE <= maxResults ?
+						index * MAX_IN_CLAUSE + MAX_IN_CLAUSE :
+						maxResults;
+				List<Serializable> ids = new ArrayList<Serializable>( max - index * MAX_IN_CLAUSE );
+				for (int entityInfoIndex = index * MAX_IN_CLAUSE; entityInfoIndex < max; entityInfoIndex++) {
+					ids.add( entityInfos[entityInfoIndex].id );
+				}
+				disjunction.add( Restrictions.in( idName, ids ) );
 			}
-			disjunction.add( Restrictions.in( idName, ids ) );
+		}
+		else {
+			for (EntityInfo entityInfo : entityInfos) {
+				disjunction.add( Restrictions.eq( idName, entityInfo.id ) );
+			}
 		}
 		criteria.add( disjunction );
 		criteria.list(); //load all objects
