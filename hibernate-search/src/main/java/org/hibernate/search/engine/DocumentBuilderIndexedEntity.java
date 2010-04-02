@@ -132,10 +132,6 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	 */
 	private boolean idProvided = false;
 
-
-	//if composite id, use of (a, b) in ((1,2), (3,4)) fails on most database
-	private boolean safeFromTupleId;
-
 	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
 	 *
@@ -168,10 +164,6 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		if ( idKeywordName == null ) {
 			throw new SearchException( "No document id in: " + clazz.getName() );
 		}
-
-		//if composite id, use of (a, b) in ((1,2),(3,4)) fails on most database
-		//a TwoWayString2FieldBridgeAdaptor is never a composite id
-		safeFromTupleId = TwoWayString2FieldBridgeAdaptor.class.isAssignableFrom( idBridge.getClass() );
 
 		checkAllowFieldSelection();
 		if ( log.isDebugEnabled() ) {
@@ -565,13 +557,6 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 
 	public boolean allowFieldSelectionInProjection() {
 		return allowFieldSelectionInProjection;
-	}
-
-	/**
-	 * @return <code>false</code> if there is a risk of composite id. If composite id, use of (a, b) in ((1,2), (3,4)) fails on most database
-	 */
-	public boolean isSafeFromTupleId() {
-		return safeFromTupleId;
 	}
 
 	public Term getTerm(Serializable id) {
