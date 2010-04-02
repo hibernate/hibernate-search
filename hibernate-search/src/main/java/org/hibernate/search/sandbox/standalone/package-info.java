@@ -28,4 +28,4 @@
  * Temptative to externalize the query functions from Hibernate Core specifics.
  * This will open the doors to easier back end alternatives, including search-wise.
  */
-package org.hibernate.search.sandbox.standaloone;
+package org.hibernate.search.sandbox.standalone;
