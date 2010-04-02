@@ -1508,7 +1508,7 @@ public class MyClass{
     </section>
   </section>
 
-  <section>
+  <section id="hsearch-mapping-programmaticapi">
     <title>Programmatic API</title>
 
     <para><warning>
@@ -2221,8 +2221,8 @@ public class Departments {
     <section>
       <title>Mapping dynamic boost</title>
 
-      <para>You can apply a dynamic boost
-      factor on either a field or a whole entity: </para>
+      <para>You can apply a dynamic boost factor on either a field or a whole
+      entity:</para>
 
       <example>
         <title>DynamicBoost mapping using programmatic model</title>
@@ -2244,7 +2244,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
 
         <para>The next example shows the equivalent mapping using the
         <classname>@DynamicBoost</classname> annotation: <example>
-            <title>Using the @DynamicBoost </title>
+            <title>Using the @DynamicBoost</title>
 
             <programlisting>@Entity
 @Indexed

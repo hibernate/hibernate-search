@@ -3,10 +3,10 @@
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
-  ~ Copyright (c) 2008, Red Hat Middleware LLC or third-party contributors as
+  ~ Copyright (c) 2010, Red Hat Inc. or third-party contributors as
   ~ indicated by the @author tags or express copyright attribution
   ~ statements applied by the authors.  All third-party contributions are
-  ~ distributed under license by Red Hat Middleware LLC.
+  ~ distributed under license by Red Hat Inc.
   ~
   ~ This copyrighted material is made available to anyone wishing to use, modify,
   ~ copy, or redistribute it subject to the terms and conditions of the GNU
@@ -28,10 +28,9 @@
 <!ENTITY version "WORKING">
 ]>
 <chapter id="getting-started">
-
   <title>Getting started</title>
 
-  <para>Welcome to Hibernate Search! The following chapter will guide you
+  <para>Welcome to Hibernate Search. The following chapter will guide you
   through the initial steps required to integrate Hibernate Search into an
   existing Hibernate enabled application. In case you are a Hibernate new
   timer we recommend you start <ulink
@@ -57,16 +56,14 @@
             <entry>Hibernate Search</entry>
 
             <entry><literal>hibernate-search.jar</literal> and all runtime
-            dependencies from the <literal>lib</literal> directory of the
-            Hibernate Search distribution. Please refer to
-            <filename>README.txt </filename>in the lib directory to understand
-            which dependencies are required.</entry>
+            dependencies from the <literal>dist/lib</literal> directory of the
+            Hibernate Search distribution.</entry>
           </row>
 
           <row>
             <entry>Hibernate Core</entry>
 
-            <entry>This instructions have been tested against Hibernate 3.3.x.
+            <entry>This instructions have been tested against Hibernate 3.5.
             You will need <literal>hibernate-core.jar</literal> and its
             transitive dependencies from the <literal>lib</literal> directory
             of the distribution. Refer to <literal>README.txt</literal> in the
@@ -85,17 +82,15 @@
             has its own set of annotations (<emphasis>@Indexed, @DocumentId,
             @Field,...</emphasis>) for which there exists so far no
             alternative configuration. The tutorial is tested against version
-            3.4.x of Hibernate Annotations.</entry>
+            3.5 of Hibernate Annotations (part of the Hibernate Core
+            distribution). </entry>
           </row>
         </tbody>
       </tgroup>
     </table>
 
-    <para>You can download all dependencies from the Hibernate <ulink
-    url="http://www.hibernate.org/6.html">download site</ulink>. You can also
-    verify the dependency versions against the <ulink
-    url="http://www.hibernate.org/6.html#A3">Hibernate Compatibility
-    Matrix</ulink>.</para>
+    <para>You can download all dependencies from the Hibernate download
+    site.</para>
   </section>
 
   <section>
@@ -112,14 +107,12 @@
       <title>Adding the JBoss maven repository to
       <filename>settings.xml</filename></title>
 
-      <programlisting>
-&lt;repository&gt;
+      <programlisting>&lt;repository&gt;
   &lt;id&gt;repository.jboss.org&lt;/id&gt;
   &lt;name&gt;JBoss Maven Repository&lt;/name&gt;
   &lt;url&gt;http://repository.jboss.org/maven2&lt;/url&gt;
   &lt;layout&gt;default&lt;/layout&gt;
-&lt;/repository&gt;
-      </programlisting>
+&lt;/repository&gt;      </programlisting>
     </example>
 
     <para>Then add the following dependencies to your pom.xml:</para>
@@ -127,54 +120,83 @@
     <example>
       <title>Maven dependencies for Hibernate Search</title>
 
-      <programlisting>
-&lt;dependency&gt;
+      <programlisting>&lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
-   &lt;artifactId&gt;hibernate-annotations&lt;/artifactId&gt;
-   &lt;version&gt;3.4.0.GA&lt;/version&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
-   &lt;version&gt;3.4.0.GA&lt;/version&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-   &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
-   &lt;artifactId&gt;solr-common&lt;/artifactId&gt;
-   &lt;version&gt;1.3.0&lt;/version&gt;
+   &lt;version&gt;3.5.0-Final&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
    &lt;artifactId&gt;solr-core&lt;/artifactId&gt;
-   &lt;version&gt;1.3.0&lt;/version&gt;
+   &lt;version&gt;1.4.0&lt;/version&gt;
+   &lt;exclusions&gt;
+      &lt;exclusion&gt;
+         &lt;groupId&gt;commons-httpclient&lt;/groupId&gt;
+         &lt;artifactId&gt;commons-httpclient&lt;/artifactId&gt;
+      &lt;/exclusion&gt;
+      &lt;exclusion&gt;
+         &lt;groupId&gt;woodstox&lt;/groupId&gt;
+         &lt;artifactId&gt;wstx-asl&lt;/artifactId&gt;
+      &lt;/exclusion&gt;
+      &lt;exclusion&gt;
+         &lt;groupId&gt;net.java.dev.stax-utils&lt;/groupId&gt;
+         &lt;artifactId&gt;stax-utils&lt;/artifactId&gt;
+      &lt;/exclusion&gt;
+      &lt;exclusion&gt;
+         &lt;groupId&gt;commons-logging&lt;/groupId&gt;
+         &lt;artifactId&gt;commons-logging&lt;/artifactId&gt;
+      &lt;/exclusion&gt;
+      &lt;exclusion&gt;
+         &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
+         &lt;artifactId&gt;solr-lucene-core&lt;/artifactId&gt;
+      &lt;/exclusion&gt;
+   &lt;/exclusions&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;
    &lt;artifactId&gt;lucene-snowball&lt;/artifactId&gt;
-   &lt;version&gt;2.4.0&lt;/version&gt;
+   &lt;version&gt;2.9.2&lt;/version&gt;
 &lt;/dependency&gt;
-      </programlisting>
+&lt;dependency&gt;
+   &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;
+   &lt;artifactId&gt;lucene-snowball&lt;/artifactId&gt;
+   &lt;version&gt;2.9.2&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;
+   &lt;artifactId&gt;lucene-analyzers&lt;/artifactId&gt;
+   &lt;version&gt;2.9.2&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
     </example>
 
     <para>Not all dependencies are required. Only the
     <emphasis>hibernate-search</emphasis> dependency is mandatory. This
     dependency, together with its required transitive dependencies, contain
-    all required classes needed to use Hibernate Search.
-    <emphasis>hibernate-annotations</emphasis> is only needed if you want to
-    use annotations to configure your domain model as we do in this tutorial.
-    However, even if you choose not to use Hibernate Annotations you still
-    have to use the Hibernate Search specific annotations, which are bundled
-    with the hibernate-search jar file, to configure your Lucene index.
-    Currently there is no XML configuration available for Hibernate Search.
-    <emphasis>hibernate-entitymanager</emphasis> is required if you want to
-    use Hibernate Search in conjunction with JPA. The Solr dependencies are
-    needed if you want to utilize Solr's analyzer framework. More about this
-    later. And finally, the <literal>lucene-snowball</literal> dependency is
+    all required classes needed to use Hibernate Search. </para>
+
+    <para><emphasis>hibernate-annotations</emphasis> is needed if you want to
+    use annotations to configure your domain model but don't want to use JPA's
+    runtime APIs. If you choose not to use Hibernate Annotations and describe
+    your ORM mapping using <filename>cfg.xml</filename> files, you still have
+    to use the Hibernate Search specific annotations, which are bundled with
+    the hibernate-search jar file, to configure your Lucene index. There is no
+    XML configuration available for Hibernate Search but we provide a powerful
+    programmatic mapping API that elegantly replace this kind of deployment
+    descriptor (see <xref linkend="hsearch-mapping-programmaticapi" /> for
+    more information). </para>
+
+    <para><emphasis>hibernate-entitymanager</emphasis> is required if you want
+    to use Hibernate Search in conjunction with JPA. </para>
+
+    <para>The Solr dependencies are needed if you want to utilize Solr's
+    analyzer framework. More about this later. </para>
+
+    <para>And finally, the <literal>lucene-snowball</literal> dependency is
     needed if you want to use Lucene's snowball stemmer.</para>
   </section>
 
@@ -197,14 +219,13 @@
       <literal><filename>hibernate.cfg.xml</filename></literal> or
       <filename>persistence.xml</filename></title>
 
-      <programlisting>
-...
+      <programlisting>...
 &lt;property name="hibernate.search.default.directory_provider" 
-   value="org.hibernate.search.store.FSDirectoryProvider"/&gt; 
+          value="org.hibernate.search.store.FSDirectoryProvider"/&gt; 
 
-&lt;property name="hibernate.search.default.indexBase" value="/var/lucene/indexes"/&gt; 
-...
-    </programlisting>
+&lt;property name="hibernate.search.default.indexBase" 
+          value="/var/lucene/indexes"/&gt; 
+...    </programlisting>
     </example>
 
     <para>First you have to tell Hibernate Search which
@@ -234,8 +255,7 @@
       <title>Example entities Book and Author before adding Hibernate Search
       specific annotations</title>
 
-      <programlisting>
-package example;
+      <programlisting>package example;
 ...
 @Entity
 public class Book {
@@ -253,16 +273,13 @@ public class Book {
 
   private Date publicationDate;
   
-  public Book() {
-  } 
+  public Book() {} 
   
   // standard getters/setters follow here
   ...
-} 
-    </programlisting>
+}</programlisting>
 
-      <programlisting>
-package example;
+      <programlisting>package example;
 ...
 @Entity
 public class Author {
@@ -273,14 +290,11 @@ public class Author {
 
   private String name;
 
-  public Author() {
-  } 
+  public Author() {} 
  
   // standard getters/setters follow here
   ...
-}
-
-</programlisting>
+}</programlisting>
     </example>
 
     <para>To achieve this you have to add a few annotations to the
@@ -308,7 +322,7 @@ public class Author {
     to do with the ability to search for it. From Lucene's perspective it is
     not necessary to keep the data once the index is created. The benefit of
     storing it is the ability to retrieve it via projections (<xref
-    linkend="projections" />). </para>
+    linkend="projections" />).</para>
 
     <para>Without projections, Hibernate Search will per default execute a
     Lucene query in order to find the database identifiers of the entities
@@ -348,8 +362,7 @@ public class Author {
       <title>Example entities after adding Hibernate Search
       annotations</title>
 
-      <programlisting>
-package example;
+      <programlisting>package example;
 ...
 @Entity
 <emphasis role="bold">@Indexed</emphasis>
@@ -357,7 +370,6 @@ public class Book {
 
   @Id
   @GeneratedValue
-  <emphasis role="bold">@DocumentId</emphasis>
   private Integer id;
   
   <emphasis role="bold">@Field(index=Index.TOKENIZED, store=Store.NO)</emphasis>
@@ -379,11 +391,9 @@ public class Book {
   
   // standard getters/setters follow here
   ... 
-}
-  </programlisting>
+}</programlisting>
 
-      <programlisting>
-package example;
+      <programlisting>package example;
 ...
 @Entity
 public class Author {
@@ -400,8 +410,7 @@ public class Author {
  
   // standard getters/setters follow here
   ...
-}
-  </programlisting>
+}</programlisting>
     </example>
   </section>
 
@@ -410,25 +419,23 @@ public class Author {
 
     <para>Hibernate Search will transparently index every entity persisted,
     updated or removed through Hibernate Core. However, you have to trigger an
-    initial indexing to populate the Lucene index with the data already present
-    in your database. Once you have added the above properties and annotations
-    it is time to trigger an initial batch index of your books. You can
-    achieve this by using one of the following code snippets (see also <xref
-    linkend="search-batchindex" />):</para>
+    initial indexing to populate the Lucene index with the data already
+    present in your database. Once you have added the above properties and
+    annotations it is time to trigger an initial batch index of your books.
+    You can achieve this by using one of the following code snippets (see also
+    <xref linkend="search-batchindex" />):</para>
 
     <example>
       <title>Using Hibernate Session to index data</title>
 
-      <programlisting>
-FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
 fullTextSession.createIndexer().startAndWait();</programlisting>
     </example>
 
     <example>
       <title>Using JPA to index data</title>
 
-      <programlisting>
-EntityManager em = entityManagerFactory.createEntityManager();
+      <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
 FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
 fullTextEntityManager.createIndexer().startAndWait();</programlisting>
     </example>
@@ -448,13 +455,12 @@ fullTextEntityManager.createIndexer().startAndWait();</programlisting>
     org.hibernate.Query in order to get all the functionality one is used to
     from the Hibernate API. The following code will prepare a query against
     the indexed fields, execute it and return a list of
-    <classname>Book</classname>s. </para>
+    <classname>Book</classname>s.</para>
 
     <example>
       <title>Using Hibernate Session to create and execute a search</title>
 
-      <programlisting>
-FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 
 // create native Lucene query
@@ -469,15 +475,13 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery(query, Book.c
 List result = hibQuery.list();
   
 tx.commit();
-session.close();  
-    </programlisting>
+session.close();  </programlisting>
     </example>
 
     <example>
       <title>Using JPA to create and execute a search</title>
 
-      <programlisting>
-EntityManager em = entityManagerFactory.createEntityManager();
+      <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
 FullTextEntityManager fullTextEntityManager = 
     org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 em.getTransaction().begin();
@@ -494,9 +498,7 @@ javax.persistence.Query persistenceQuery = fullTextEntityManager.createFullTextQ
 List result = persistenceQuery.getResultList();
 
 em.getTransaction().commit();
-em.close();
-
-    </programlisting>
+em.close();  </programlisting>
     </example>
   </section>
 
@@ -560,9 +562,7 @@ em.close();
       <title>Using <classname>@AnalyzerDef</classname> and the Solr framework
       to define and use an analyzer</title>
 
-      <programlisting>
-
-package example;
+      <programlisting>package example;
 ...
 @Entity
 @Indexed
@@ -602,9 +602,7 @@ public class Book {
   
   // standard getters/setters follow here
   ... 
-}
-
-  </programlisting>
+}</programlisting>
     </example>
   </section>
 
@@ -622,7 +620,7 @@ public class Book {
       <programlisting>mvn archetype:create \ 
     -DarchetypeGroupId=org.hibernate \
     -DarchetypeArtifactId=hibernate-search-quickstart \ 
-    -DarchetypeVersion=3.2.0.Beta1 \
+    -DarchetypeVersion=&version; \
     -DgroupId=my.company -DartifactId=quickstart</programlisting>
     </example>
 

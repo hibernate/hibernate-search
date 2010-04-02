@@ -19,7 +19,7 @@ This version of Hibernate Search requires Hibernate Core 3.5 and above.
 Instructions
 ------------
 
-Unzip to installation directory and read docs/manual
+Unzip to installation directory and read the documentation available in dist/docs/manual
 
 
 Contact

@@ -158,9 +158,9 @@
                     <sourceDocumentName>master.xml</sourceDocumentName>
                     <sourceDirectory>${basedir}/src/main/docbook</sourceDirectory>
                     <masterTranslation>en-US</masterTranslation>
-                    <translations>
+                    <!-- translations>
                         <translation>zh-CN</translation>
-                    </translations>
+                    </translations -->
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
                     </imageResource>
