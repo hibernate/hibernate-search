@@ -427,9 +427,10 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
 		Annotation documentIdAnn = member.getAnnotation( DocumentId.class );
 		if ( documentIdAnn != null ) {
-			log.warn(
-					"@DocumentId specified on an entity which is not indexed by itself. Annotation gets ignored. Use @Field instead."
-			);
+			//FIXME commented until HSEARCH-333 is resolved
+//			log.warn(
+//					"@DocumentId specified on an entity which is not indexed by itself. Annotation gets ignored. Use @Field instead."
+//			);
 		}
 	}
 
