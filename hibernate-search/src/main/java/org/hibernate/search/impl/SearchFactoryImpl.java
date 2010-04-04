@@ -64,6 +64,7 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.configuration.MaskedProperty;
+import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -89,6 +90,9 @@ import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
 import org.hibernate.util.StringHelper;
 import org.slf4j.Logger;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.LogErrorHandler;
+import org.hibernate.search.exception.impl.RethrowErrorHandler;
 
 /**
  * @author Emmanuel Bernard
@@ -114,6 +118,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
+	private final ErrorHandler errorHandler;
 
 	private final PolymorphicIndexHierarchy indexHierarchy = new PolymorphicIndexHierarchy();
 
@@ -148,6 +153,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	public SearchFactoryImpl(SearchConfiguration cfg) {
+		this.configurationProperties = cfg.getProperties();
+		this.errorHandler = createErrorHandler( configurationProperties );
 		ReflectionManager reflectionManager = getReflectionManager(cfg);
 		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping(cfg);
 		if ( mapping != null) {
@@ -179,11 +186,8 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		this.cacheBitResultsSize = ConfigurationParseHelper.getIntValue(
 				cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 		);
-		this.configurationProperties = cfg.getProperties();
 		this.barrier = 1; //write barrier
 	}
-
-
 
 	private void fillSimilarityMapping() {
 		for ( DirectoryProviderData directoryConfiguration : dirProviderData.values() ) {
@@ -687,6 +691,45 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		if ( barrier != 0 ) {
 		} //read barrier
 		return dirProviderData.get( provider ).exclusiveIndexUsage;
+	}
+
+	/**
+	 * @param configuration
+	 * @return the configured ErrorHandler
+	 * @since 3.2
+	 */
+	private static ErrorHandler createErrorHandler(Properties configuration) {
+		boolean sync = BatchedQueueingProcessor.isConfiguredAsSync( configuration );
+		String errorHandlerClassName = configuration.getProperty( Environment.ERROR_HANDLER );
+		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
+			// default error handler depends on sync/async:
+			if ( sync ) {
+				return new RethrowErrorHandler();
+			}
+			else {
+				return new LogErrorHandler();
+			}
+		}
+		else if ( errorHandlerClassName.trim().equals( "log" ) ) {
+			return new LogErrorHandler();
+		}
+		else if ( errorHandlerClassName.trim().equals( "rethrow" ) ) {
+			if ( ! sync ) {
+				// RethrowErrorHandler won't work when backend is async:
+				throw new SearchException( "The \"rethrow\" ErrorHandler is not compatible with aync backend" );
+			}
+			else {
+				return new RethrowErrorHandler();
+			}
+		}
+		else {
+			return PluginLoader.instanceFromName( ErrorHandler.class, errorHandlerClassName,
+				SearchFactoryImpl.class, "Error Handler" );
+		}
+	}
+
+	public ErrorHandler getErrorHandler() {
+		return errorHandler;
 	}
 
 }

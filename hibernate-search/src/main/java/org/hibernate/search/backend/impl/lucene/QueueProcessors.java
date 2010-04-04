@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.DirectoryProvider;
 
@@ -102,16 +103,21 @@ class QueueProcessors implements PerDirectoryWorkProcessor {
 		}
 		// and then wait for all tasks to be finished:
 		for ( Future<Object> f : futures ) {
-            if ( !f.isDone() ) {
-                try {
-                    f.get(); 
-                } catch(CancellationException ignore) {
-                	//ignored, as in java.util.concurrent.AbstractExecutorService.invokeAll(Collection<Callable<T>> tasks)
-                } catch(ExecutionException ignore) {
-                	//ignored, as in java.util.concurrent.AbstractExecutorService.invokeAll(Collection<Callable<T>> tasks)
-                }
-            }
-        }
+			if ( !f.isDone() ) {
+				try {
+					f.get();
+				}
+				catch (CancellationException ignore) {
+					// ignored, as in java.util.concurrent.AbstractExecutorService.invokeAll(Collection<Callable<T>>
+					// tasks)
+				}
+				catch (ExecutionException error) {
+					// rethrow cause to serviced thread - this could hide more exception:
+					Throwable cause = error.getCause();
+					throw new SearchException( cause );
+				}
+			}
+		}
 	}
 
 }

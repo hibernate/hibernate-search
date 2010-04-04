@@ -34,12 +34,19 @@ import org.slf4j.Logger;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
  * A Runnable containing a unit of changes to be applied to a specific index.
  * After creation, use addWork(LuceneWork) to fill the changes queue and then
  * run it to apply all changes. After run() this object should be discarded.
+ * 
+ * A new PerDPQueueProcessor is created for each unit of work, expensive
+ * resources to be shared across multiple transactions should be created once
+ * in PerDPResources.
+ * 
  * @see Runnable
  * @see #addWork(LuceneWork)
  * @author Sanne Grinovero
@@ -47,11 +54,13 @@ import org.hibernate.search.util.LoggerFactory;
 class PerDPQueueProcessor implements Runnable {
 	
 	private static final Logger log = LoggerFactory.make();
+	
 	private final Workspace workspace;
 	private final LuceneWorkVisitor worker;
 	private final ExecutorService executor;
 	private final boolean exclusiveIndexUsage;
 	private final List<LuceneWork> workOnWriter = new ArrayList<LuceneWork>();
+	private final ErrorHandler handler;
 	
 	// if any work needs batchmode, set corresponding flag to true:
 	private boolean batchmode = false;
@@ -65,6 +74,7 @@ class PerDPQueueProcessor implements Runnable {
 		this.workspace = resources.getWorkspace();
 		this.executor = resources.getExecutor();
 		this.exclusiveIndexUsage = resources.isExclusiveIndexUsageEnabled();
+		this.handler = resources.getErrorHandler();
 	}
 
 	/**
@@ -87,11 +97,14 @@ class PerDPQueueProcessor implements Runnable {
 			return;
 		}
 		log.debug( "Opening an IndexWriter for update" );
+		ErrorContextBuilder builder = new ErrorContextBuilder();
+		builder.allWorkToBeDone( workOnWriter );
 		try {
 			IndexWriter indexWriter = workspace.getIndexWriter( batchmode );
 			try {
 				for ( LuceneWork lw : workOnWriter ) {
 					lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
+					builder.workCompleted( lw );
 				}
 				workspace.commitIndexWriter();
 				performOptimizations();
@@ -100,10 +113,11 @@ class PerDPQueueProcessor implements Runnable {
 				if ( ! exclusiveIndexUsage ) workspace.closeIndexWriter();
 			}
 		}
-		catch (Throwable tw) {
+		catch ( Throwable tw ) {
 			//needs to be attempted even for out of memory errors, therefore we catch Throwable
 			log.error( "Unexpected error in Lucene Backend: ", tw );
 			try {
+				handler.handle( builder.errorThatOccurred( tw ).createErrorContext() );
 				workspace.closeIndexWriter();
 			}
 			finally {

@@ -38,6 +38,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.exception.ErrorHandler;
 
 /**
  * Interface which gives access to the different directory providers and their configuration.
@@ -93,4 +94,7 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	Similarity getSimilarity(DirectoryProvider<?> directoryProvider);
 
 	boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> provider);
+
+	ErrorHandler getErrorHandler();
+	
 }

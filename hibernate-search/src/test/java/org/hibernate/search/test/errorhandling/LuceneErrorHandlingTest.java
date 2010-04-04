@@ -1,0 +1,205 @@
+/* $Id$
+ * 
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
+ * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ * 
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+ */
+package org.hibernate.search.test.errorhandling;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import junit.framework.Assert;
+
+import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.backend.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.WorkVisitor;
+import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
+import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.LogErrorHandler;
+import org.hibernate.search.impl.SearchFactoryImpl;
+import org.hibernate.search.test.Document;
+import org.hibernate.search.test.SearchTestCase;
+
+/**
+ * Test to verify the configured ErrorHandler is used in the Lucene
+ * backend, and the backend exceptions are logged as expected.
+ * 
+ * @see Environment#ERROR_HANDLER
+ * 
+ * @author Sanne Grinovero
+ * @since 3.2
+ */
+public class LuceneErrorHandlingTest extends SearchTestCase {
+	
+	static final AtomicInteger workcounter = new AtomicInteger();
+	
+	public void testErrorHandling() {
+		SearchFactoryImpl searchFactoryImpl = getSearchFactoryImpl();
+		ErrorHandler errorHandler = searchFactoryImpl.getErrorHandler();
+		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
+		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
+		BackendQueueProcessorFactory queueProcessorFactory = searchFactoryImpl.getBackendQueueProcessorFactory();
+		List<LuceneWork> queue = new ArrayList<LuceneWork>();
+		queue.add( new HarmlessWork( "firstWork" ) );
+		queue.add( new HarmlessWork( "secondWork" ) );
+		Runnable processor = queueProcessorFactory.getProcessor( queue );
+		workcounter.set( 0 ); // reset work counter
+		processor.run();
+		Assert.assertEquals( 2, workcounter.get() );
+		
+		workcounter.set( 0 ); // reset work counter
+		final FailingWork firstFailure = new FailingWork("firstFailure");
+		queue.add(firstFailure);
+		final HarmlessWork thirdWork = new HarmlessWork("thirdWork");
+		queue.add(thirdWork);
+		final HarmlessWork fourthWork = new HarmlessWork("fourthWork");
+		queue.add(fourthWork);
+		processor = queueProcessorFactory.getProcessor( queue );
+		processor.run();
+		Assert.assertEquals( 2, workcounter.get() );
+		String errorMessage = mockErrorHandler.getErrorMessage();
+		Throwable exception = mockErrorHandler.getLastException();
+		
+		StringBuilder expectedErrorMessage = new StringBuilder();
+		expectedErrorMessage.append( "Exception occurred " ).append ( exception ).append ("\n");
+		expectedErrorMessage.append( "Primary Failure:\n");
+		LogErrorHandler.appendFailureMessage(expectedErrorMessage, firstFailure);
+
+		expectedErrorMessage.append( "Subsequent failures:\n" );
+		LogErrorHandler.appendFailureMessage(expectedErrorMessage, thirdWork );
+		LogErrorHandler.appendFailureMessage(expectedErrorMessage, fourthWork );
+
+		// should verify the errorHandler logs the work which was not processed (third and fourth)
+		// and which work was failing
+		Assert.assertEquals( expectedErrorMessage.toString() , errorMessage );
+		Assert.assertTrue( exception instanceof SearchException );
+		Assert.assertEquals( "failed work message", exception.getMessage() );
+	}
+
+	protected Class<?>[] getMappings() {
+		return new Class[] { Document.class };
+	}
+	
+	protected void configure(org.hibernate.cfg.Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
+	}
+	
+	protected SearchFactoryImpl getSearchFactoryImpl() {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		s.close();
+		SearchFactory searchFactory = s.getSearchFactory();
+		return (SearchFactoryImpl) searchFactory;
+	}
+	
+	/**
+	 * A LuceneWork which doesn't fail and delegates to a NoOp
+	 * operation on the index.
+	 */
+	static class HarmlessWork extends DeleteLuceneWork {
+
+		public HarmlessWork(String workIdentifier) {
+			super( workIdentifier, workIdentifier, Document.class );
+		}
+
+		@Override
+		public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
+			if ( visitor instanceof DpSelectionVisitor ) {
+				//during shard-selection visitor this work is applied to
+				//all DirectoryProviders as this extends DeleteLuceneWork
+				return visitor.getDelegate( this );
+			}
+			else {
+				return (T) new NoOpLuceneWorkDelegate();
+			}
+		}
+		
+		@Override
+		public String toString() {
+			return "HarmlessWork: " + this.getIdInString();
+		}
+		
+	}
+	
+	static class NoOpLuceneWorkDelegate implements LuceneWorkDelegate {
+
+		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
+		}
+
+		public void performWork(LuceneWork work, IndexWriter writer) {
+			workcounter.incrementAndGet();
+		}
+		
+	}
+	
+	/**
+	 * A LuceneWork which will throw a SearchException when applied to
+	 * the index, which is the type thrown to wrap real IOExceptions.
+	 */
+	static class FailingWork extends DeleteLuceneWork {
+
+		public FailingWork(String workIdentifier) {
+			super( workIdentifier, workIdentifier, Document.class );
+		}
+
+		@Override
+		public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
+			if ( visitor instanceof DpSelectionVisitor ) {
+				//during shard-selection visitor this work is applied to
+				//all DirectoryProviders as this extends DeleteLuceneWork
+				return visitor.getDelegate( this );
+			}
+			else {
+				return (T) new FailingLuceneWorkDelegate();
+			}
+		}
+		
+		@Override
+		public String toString() {
+			return "FailingWork: " + this.getIdInString();
+		}
+		
+	}
+	
+	static class FailingLuceneWorkDelegate implements LuceneWorkDelegate {
+
+		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
+		}
+
+		public void performWork(LuceneWork work, IndexWriter writer) {
+			throw new SearchException( "failed work message" );
+		}
+		
+	}
+
+}
+

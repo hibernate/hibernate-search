@@ -115,5 +115,13 @@ public final class Environment {
 	 *
 	 */
 	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
+
+	
+	/**
+	 * Set to a fully qualified classname of a type implementing org.hibernate.search.exception.ErrorHandler
+	 * to override the error strategy used during processing of the Lucene updates.
+	 * Default is to log errors.
+	 */
+	public static final String ERROR_HANDLER = "hibernate.search.error_handler";
 	
 }

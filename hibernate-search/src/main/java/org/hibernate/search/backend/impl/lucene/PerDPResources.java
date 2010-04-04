@@ -28,6 +28,7 @@ import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
 
 import java.util.concurrent.ExecutorService;
@@ -44,12 +45,14 @@ class PerDPResources {
 	private final LuceneWorkVisitor visitor;
 	private final Workspace workspace;
 	private final boolean exclusiveIndexUsage;
+	private final ErrorHandler errorHandler;
 	
 	PerDPResources(SearchFactoryImplementor searchFactoryImp, DirectoryProvider<?> dp) {
 		workspace = new Workspace( searchFactoryImp, dp );
 		visitor = new LuceneWorkVisitor( workspace );
 		executor = Executors.newFixedThreadPool( 1, "Directory writer" );
 		exclusiveIndexUsage = searchFactoryImp.isExclusiveIndexUsageEnabled( dp );
+		errorHandler = searchFactoryImp.getErrorHandler();
 	}
 
 	public ExecutorService getExecutor() {
@@ -74,6 +77,10 @@ class PerDPResources {
 			executor.execute( new CloseIndexRunnable( workspace ) );
 		}
 		executor.shutdown();
+	}
+
+	public ErrorHandler getErrorHandler() {
+		return errorHandler;
 	}
 	
 }

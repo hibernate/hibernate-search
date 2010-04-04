@@ -34,6 +34,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.ErrorContextBuilder;
 
 /**
  * Apply the operations to Lucene directories.
@@ -49,6 +51,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final Map<DirectoryProvider,PerDPResources> resourcesMap;
 	private final boolean sync;
+	private final ErrorHandler errorHandler;
 	
 	private static final DpSelectionVisitor providerSelectionVisitor = new DpSelectionVisitor();
 	private static final Logger log = LoggerFactory.make();
@@ -61,6 +64,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 		this.queue = queue;
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.resourcesMap = resourcesMap;
+		this.errorHandler = searchFactoryImplementor.getErrorHandler();
 	}
 
 	public void run() {
@@ -75,8 +79,11 @@ class LuceneBackendQueueProcessor implements Runnable {
 			}
 			//this Runnable splits tasks in more runnables and then runs them:
 			processors.runAll( sync );
-		} catch (InterruptedException e) {
-			log.error( "Index update task has been interrupted", e );
+		} catch ( Exception e ) {
+			log.error( "Error in backend", e );	
+			ErrorContextBuilder builder = new ErrorContextBuilder();
+			builder.errorThatOccurred( e );
+			errorHandler.handle( builder.createErrorContext() );
 		}
 	}
 	
