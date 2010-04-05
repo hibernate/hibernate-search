@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Collections;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.solr.analysis.CharFilterFactory;
 import org.apache.solr.analysis.TokenizerChain;
 import org.apache.solr.analysis.TokenFilterFactory;
 import org.apache.solr.analysis.TokenizerFactory;
@@ -36,6 +37,7 @@ import org.apache.solr.util.plugin.ResourceLoaderAware;
 import org.apache.solr.common.ResourceLoader;
 
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.Parameter;
@@ -65,7 +67,9 @@ class SolrAnalyzerBuilder {
 		tokenFactory.init( getMapOfParameters( token.params() ) );
 
 		final int length = analyzerDef.filters().length;
+		final int charLength = analyzerDef.charFilters().length;
 		TokenFilterFactory[] filters = new TokenFilterFactory[length];
+		CharFilterFactory[] charFilters = new CharFilterFactory[charLength];
 		ResourceLoader resourceLoader = new HibernateSearchResourceLoader();
 		for ( int index = 0 ; index < length ; index++ ) {
 			TokenFilterDef filterDef = analyzerDef.filters()[index];
@@ -75,7 +79,15 @@ class SolrAnalyzerBuilder {
 				((ResourceLoaderAware)filters[index]).inform( resourceLoader );
 			}
 		}
-		return new TokenizerChain(tokenFactory, filters);
+		for ( int index = 0 ; index < charFilters.length ; index++ ) {
+			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
+			charFilters[index] = (CharFilterFactory) instantiate( charFilterDef.factory() );
+			charFilters[index].init( getMapOfParameters( charFilterDef.params() ) );
+			if ( charFilters[index] instanceof ResourceLoaderAware ) {
+				((ResourceLoaderAware)charFilters[index]).inform( resourceLoader );
+			}
+		}
+		return new TokenizerChain( charFilters, tokenFactory, filters );
 	}
 
 	private static Object instantiate(Class clazz) {

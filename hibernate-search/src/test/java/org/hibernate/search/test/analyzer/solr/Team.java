@@ -28,12 +28,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.apache.solr.analysis.HTMLStripStandardTokenizerFactory;
-import org.apache.solr.analysis.HTMLStripWhitespaceTokenizerFactory;
+import org.apache.solr.analysis.HTMLStripCharFilterFactory;
 import org.apache.solr.analysis.ISOLatin1AccentFilterFactory;
 import org.apache.solr.analysis.LengthFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.LowerCaseTokenizerFactory;
+import org.apache.solr.analysis.MappingCharFilterFactory;
 import org.apache.solr.analysis.PorterStemFilterFactory;
 import org.apache.solr.analysis.ShingleFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
@@ -49,6 +49,7 @@ import org.apache.solr.analysis.PatternTokenizerFactory;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -87,17 +88,19 @@ import org.hibernate.search.annotations.TokenizerDef;
 				filters = {
 						@TokenFilterDef(factory = StandardFilterFactory.class)
 				}),
-
 		@AnalyzerDef(name = "html_standard_analyzer",
-				tokenizer = @TokenizerDef(factory = HTMLStripStandardTokenizerFactory.class),
+				charFilters = {
+						@CharFilterDef(factory = HTMLStripCharFilterFactory.class)
+				},
+				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = StandardFilterFactory.class)
 				}),
 
 		@AnalyzerDef(name = "html_whitespace_analyzer",
-				tokenizer = @TokenizerDef(factory = HTMLStripWhitespaceTokenizerFactory.class),
-				filters = {
-						@TokenFilterDef(factory = StandardFilterFactory.class)
+				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+				charFilters = {
+						@CharFilterDef(factory = HTMLStripCharFilterFactory.class)
 				}),
 
 		@AnalyzerDef(name = "trim_analyzer",
@@ -123,7 +126,10 @@ import org.hibernate.search.annotations.TokenizerDef;
 				}),
 
 		@AnalyzerDef(name = "word_analyzer",
-				tokenizer = @TokenizerDef(factory = HTMLStripStandardTokenizerFactory.class),
+				charFilters = {
+						@CharFilterDef(factory = HTMLStripCharFilterFactory.class)
+				},
+				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = WordDelimiterFilterFactory.class, params = {
 								@Parameter(name = "splitOnCaseChange", value = "1")
@@ -131,7 +137,10 @@ import org.hibernate.search.annotations.TokenizerDef;
 				}),
 
 		@AnalyzerDef(name = "synonym_analyzer",
-				tokenizer = @TokenizerDef(factory = HTMLStripStandardTokenizerFactory.class),
+				charFilters = {
+						@CharFilterDef(factory = HTMLStripCharFilterFactory.class)
+				},
+				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = SynonymFilterFactory.class, params = {
 								@Parameter(name = "synonyms",
@@ -140,7 +149,10 @@ import org.hibernate.search.annotations.TokenizerDef;
 				}),
 
 		@AnalyzerDef(name = "shingle_analyzer",
-				tokenizer = @TokenizerDef(factory = HTMLStripStandardTokenizerFactory.class),
+				charFilters = {
+						@CharFilterDef(factory = HTMLStripCharFilterFactory.class)
+				},
+				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = ShingleFilterFactory.class)
 				}),
@@ -152,7 +164,23 @@ import org.hibernate.search.annotations.TokenizerDef;
 								@Parameter(name = "encoder", value = "Metaphone"),
 								@Parameter(name = "inject", value = "false")
 						})
-				})
+				}),
+
+		@AnalyzerDef(name = "html_char_analyzer",
+				charFilters = {
+						@CharFilterDef(factory = HTMLStripCharFilterFactory.class)
+				},
+				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class)
+				),
+
+		@AnalyzerDef(name = "mapping_char_analyzer",
+				charFilters = {
+						@CharFilterDef(factory = MappingCharFilterFactory.class, params = {
+								@Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+						})
+				},		
+				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class)
+		)
 })
 public class Team {
 	@Id

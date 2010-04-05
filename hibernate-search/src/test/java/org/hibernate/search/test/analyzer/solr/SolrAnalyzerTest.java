@@ -174,6 +174,12 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
 		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "foo", "bar" } );
 
+		// CharStreamFactories test
+		analyzer = fts.getSearchFactory().getAnalyzer( "mapping_char_analyzer" );
+		text = "CORAÇÃO DE MELÃO";
+		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "CORACAO", "DE", "MELAO" } );
+
 		fts.close();
 	}
 

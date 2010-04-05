@@ -693,6 +693,12 @@ public class MyEntity {
           </listitem>
 
           <listitem>
+              <para>a list of char filters: each char filter is responsible to
+              pre-process input characters before the tokenization. Char filters can add,
+              change or remove characters; one common usage is for characters normalization</para>
+          </listitem>
+
+          <listitem>
             <para>a tokenizer: responsible for tokenizing the input stream
             into individual words</para>
           </listitem>
@@ -704,16 +710,17 @@ public class MyEntity {
           </listitem>
         </itemizedlist>
 
-        <para>This separation of tasks - a tokenizer followed by a list of
+        <para>This separation of tasks - a list of char filters, and a tokenizer followed by a list of
         filters - allows for easy reuse of each individual component and let
         you build your customized analyzer in a very flexible way (just like
-        Lego). Generally speaking the <classname>Tokenizer</classname> starts
-        the analysis process by turning the character input into tokens which
+        Lego). Generally speaking the <classname>char filters</classname> do some
+        pre-processing in the character input, then the <classname>Tokenizer</classname> starts
+        the tokenizing process by turning the character input into tokens which
         are then further processed by the <classname>TokenFilter</classname>s.
         Hibernate Search supports this infrastructure by utilizing the Solr
         analyzer framework. Make sure to add<filename> solr-core.jar and
-        </filename><filename>solr-common.jar</filename> to your classpath to
-        use analyzer definitions. In case you also want to utilizing a
+        </filename><filename>solr-solrj.jar</filename> to your classpath to
+        use analyzer definitions. In case you also want to use the
         snowball stemmer also include the
         <filename>lucene-snowball.jar.</filename> Other Solr analyzers might
         depend on more libraries. For example, the
@@ -727,6 +734,11 @@ public class MyEntity {
           framework</title>
 
           <programlisting>@AnalyzerDef(name="customanalyzer",
+        charFilters = {
+                @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
+                    @Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+                })
+        },
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
         filters = {
                 @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
@@ -741,9 +753,12 @@ public class Team {
 }</programlisting>
         </example>
 
-        <para>A tokenizer is defined by its factory which is responsible for
-        building the tokenizer and using the optional list of parameters. This
-        example use the standard tokenizer. A filter is defined by its factory
+        <para>A char filter is defined by its factory which is responsible for
+        building the char filter and using the optional list of parameters.
+        In our example, a mapping char filter is used, and will replace
+        characters in the input based on the rules specified in the mapping
+        file. A tokenizer is also defined by its factory.
+        This example use the standard tokenizer. A filter is defined by its factory
         which is responsible for creating the filter instance using the
         optional parameters. In our example, the StopFilter filter is built
         reading the dedicated words property file and is expected to ignore
@@ -751,7 +766,7 @@ public class Team {
         factory.</para>
 
         <warning>
-          <para>Filters are applied in the order they are defined in the
+          <para>Filters and char filters are applied in the order they are defined in the
           <classname>@AnalyzerDef</classname> annotation. Make sure to think
           twice about this order.</para>
         </warning>
@@ -800,11 +815,51 @@ public class Team {
       <section>
         <title>Available analyzers</title>
 
-        <para>Solr and Lucene come with a lot of useful default tokenizers and
-        filters. You can find a complete list of tokenizer factories and
+        <para>Solr and Lucene come with a lot of useful default char filters, tokenizers and
+        filters. You can find a complete list of char filter factories, tokenizer factories and
         filter factories at <ulink
         url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters</ulink>.
         Let check a few of them.</para>
+
+        <table>
+          <title>Some of the available char filters</title>
+          <tgroup cols="3">
+            <thead>
+              <row>
+                <entry align="center">Factory</entry>
+
+                <entry align="center">Description</entry>
+
+                <entry align="center">parameters</entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>MappingCharFilterFactory</entry>
+
+                <entry>Replaces one or more characters with one or more characters, based on mappings
+                specified in the resource file</entry>
+
+                <entry><para><literal>mapping</literal>: points to a resource file containing the mappings
+                using the format:
+                <literallayout>
+                    "á" => "a"
+                    "ñ" => "n"
+                    "ø" => "o"
+                </literallayout>
+                </para></entry>
+              </row>
+              <row>
+                <entry>HTMLStripCharFilterFactory</entry>
+
+                <entry>Remove HTML standard tags, keeping the text</entry>
+
+                <entry>none</entry>
+              </row>
+            </tbody>
+          </tgroup>
+
+        </table>
 
         <table>
           <title>Some of the available tokenizers</title>
@@ -833,7 +888,7 @@ public class Team {
                 <entry>HTMLStripStandardTokenizerFactory</entry>
 
                 <entry>Remove HTML tags, keep the text and pass it to a
-                StandardTokenizer</entry>
+                StandardTokenizer. @Deprecated, use the HTMLStripCharFilterFactory instead</entry>
 
                 <entry>none</entry>
               </row>
