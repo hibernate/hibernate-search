@@ -60,7 +60,7 @@ public class IdentifierProducer implements Runnable {
 	private final Class<?> indexedType;
 	private final MassIndexerProgressMonitor monitor;
 
-	private final int objectsLimit;
+	private final long objectsLimit;
 
 	/**
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
@@ -75,7 +75,7 @@ public class IdentifierProducer implements Runnable {
 			SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
 			Class<?> indexedType, MassIndexerProgressMonitor monitor,
-			int objectsLimit) {
+			long objectsLimit) {
 				this.destination = fromIdentifierListToEntities;
 				this.sessionFactory = sessionFactory;
 				this.batchSize = objectLoadingBatchSize;
@@ -111,14 +111,14 @@ public class IdentifierProducer implements Runnable {
 	}
 
 	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
-		Long totalCount = (Long) session
+		Number countAsNumber = (Number) session
 			.createCriteria( indexedType )
-			.setProjection( Projections.count( "id" ) )
+			.setProjection( Projections.rowCount() )
 			.setCacheable( false )
 			.uniqueResult();
-		
-		if ( objectsLimit != 0 && objectsLimit < totalCount.intValue() ) {
-			totalCount = Long.valueOf( objectsLimit );
+		long totalCount = countAsNumber.longValue(); 
+		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
+			totalCount = objectsLimit;
 		}
 		log.debug( "going to fetch {} primary keys", totalCount);
 		monitor.addToTotalCount( totalCount );
@@ -131,7 +131,7 @@ public class IdentifierProducer implements Runnable {
 		
 		ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY );
 		ArrayList<Serializable> destinationList = new ArrayList<Serializable>( batchSize );
-		int counter = 0;
+		long counter = 0;
 		try {
 			while ( results.next() ) {
 				Serializable id = (Serializable) results.get( 0 );

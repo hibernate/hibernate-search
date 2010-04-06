@@ -61,7 +61,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private int collectionLoadingThreads = 4; //also responsible for loading of lazy @IndexedEmbedded collections
 //	private int writerThreads = 1; //also running the Analyzers
 	private int objectLoadingBatchSize = 10;
-	private int objectsLimit = 0; //means no limit at all
+	private long objectsLimit = 0; //means no limit at all
 	private CacheMode cacheMode = CacheMode.IGNORE;
 	private boolean optimizeAtEnd = true;
 	private boolean purgeAtStart = true;
@@ -193,7 +193,7 @@ public class MassIndexerImpl implements MassIndexer {
 				monitor );
 	}
 
-	public MassIndexer limitIndexedObjectsTo(int maximum) {
+	public MassIndexer limitIndexedObjectsTo(long maximum) {
 		this.objectsLimit = maximum;
 		return this;
 	}

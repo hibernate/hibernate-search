@@ -61,7 +61,7 @@ public class BatchCoordinator implements Runnable {
 	private final boolean optimizeAfterPurge;
 	private final CountDownLatch endAllSignal;
 	private final MassIndexerProgressMonitor monitor;
-	private final int objectsLimit;
+	private final long objectsLimit;
 	
 	private BatchBackend backend;
 
@@ -69,7 +69,7 @@ public class BatchCoordinator implements Runnable {
 			SearchFactoryImplementor searchFactoryImplementor,
 			SessionFactory sessionFactory, int objectLoadingThreads,
 			int collectionLoadingThreads, CacheMode cacheMode,
-			int objectLoadingBatchSize, int objectsLimit,
+			int objectLoadingBatchSize, long objectsLimit,
 			boolean optimizeAtEnd,
 			boolean purgeAtStart, boolean optimizeAfterPurge,
 			MassIndexerProgressMonitor monitor) {

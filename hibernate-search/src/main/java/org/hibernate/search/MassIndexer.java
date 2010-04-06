@@ -115,7 +115,7 @@ public interface MassIndexer {
 	 * @param maximum
 	 * @return
 	 */
-	MassIndexer limitIndexedObjectsTo(int maximum);
+	MassIndexer limitIndexedObjectsTo(long maximum);
 
 	/**
 	 * Starts the indexing process in background (asynchronous).
