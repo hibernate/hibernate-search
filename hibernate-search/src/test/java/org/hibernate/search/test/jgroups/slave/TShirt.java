@@ -29,6 +29,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -45,6 +46,7 @@ public class TShirt {
 	private int id;
 	@Field(index= Index.TOKENIZED)
 	private String logo;
+	@Column(name="size_")
 	private String size;
 
 	public int getId() {

@@ -27,6 +27,7 @@ package org.hibernate.search.test.query.boost;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -44,6 +45,7 @@ import org.hibernate.search.annotations.DynamicBoost;
 @Entity
 @Indexed
 @DynamicBoost(impl = CustomBoostStrategy.class)
+@Table(name="DynBoostLibrary")
 public class DynamicBoostedDescriptionLibrary {
 
 	private int id;

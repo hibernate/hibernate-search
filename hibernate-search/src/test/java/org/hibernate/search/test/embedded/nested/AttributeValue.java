@@ -50,7 +50,7 @@ public class AttributeValue {
 	@ContainedIn
 	private Attribute attribute;
 
-	@Column(name = "_value")
+	@Column(name = "att_value")
 	@Field(index = Index.TOKENIZED, store = Store.YES)
 	private String value;
 
