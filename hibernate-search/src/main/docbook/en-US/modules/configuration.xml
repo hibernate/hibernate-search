@@ -1160,4 +1160,46 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
 
      
   </section>
+
+  <section>
+    <title>Exception Handling Configuration</title>
+
+    <para>Hibernate Search allows you to configure how exceptions are handled
+    during the indexing process. If no configuration is provided then
+    exceptions are logged to the log output by default. It is possible to
+    explicitly declare the exception logging mechanism as seen below:</para>
+
+    <para><programlisting>hibernate.search.error_handler log</programlisting>The
+    default exception handling occurs for both synchronous and asynchronous
+    indexing. Hibernate Search provides an easy mechanism to override the
+    default error handling implementation.</para>
+
+    <para>In order to provide your own implementation you must implement the
+    <code>ErrorHandler</code> interface, which provides <code>handle (
+    ErrorContext context )</code> method. The <code>ErrorContext</code>
+    provides a reference to the primary <code>LuceneWork</code> that failed, the
+    underlying exception and any subsequent <code>LuceneWork</code> that could
+    not be processed due to the primary exception.</para>
+
+    <para><programlisting>public interface ErrorContext  {
+   List&lt;LuceneWork&gt; getFailingOperations();
+   LuceneWork getOperationAtFault();
+   Throwable getThrowable();
+   boolean hasErrors();
+}</programlisting></para>
+
+    <para>The following provides an example implementation of
+    <code>ErrorHandler</code>:</para>
+
+    <para><programlisting>public class CustomErrorHandler implements ErrorHandler {
+   public void handle ( ErrorContext context ) {
+      ...
+      //publish error context to some internal error handling system
+      ...
+   }
+}</programlisting>To register this error handler with Hibernate Search you
+    must declare the <code>CustomErrorHandler</code> fully qualified classname
+    in the configuration properties:</para>
+    <para><programlisting>hibernate.search.error_handler CustomerErrorHandler</programlisting></para>
+  </section>
 </chapter>

@@ -92,7 +92,6 @@ import org.hibernate.util.StringHelper;
 import org.slf4j.Logger;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
-import org.hibernate.search.exception.impl.RethrowErrorHandler;
 
 /**
  * @author Emmanuel Bernard
@@ -702,25 +701,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		boolean sync = BatchedQueueingProcessor.isConfiguredAsSync( configuration );
 		String errorHandlerClassName = configuration.getProperty( Environment.ERROR_HANDLER );
 		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
-			// default error handler depends on sync/async:
-			if ( sync ) {
-				return new RethrowErrorHandler();
-			}
-			else {
-				return new LogErrorHandler();
-			}
+			return new LogErrorHandler();
 		}
 		else if ( errorHandlerClassName.trim().equals( "log" ) ) {
 			return new LogErrorHandler();
-		}
-		else if ( errorHandlerClassName.trim().equals( "rethrow" ) ) {
-			if ( ! sync ) {
-				// RethrowErrorHandler won't work when backend is async:
-				throw new SearchException( "The \"rethrow\" ErrorHandler is not compatible with aync backend" );
-			}
-			else {
-				return new RethrowErrorHandler();
-			}
 		}
 		else {
 			return PluginLoader.instanceFromName( ErrorHandler.class, errorHandlerClassName,
