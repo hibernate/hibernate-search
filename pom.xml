@@ -385,8 +385,7 @@
         <snapshotRepository>
             <id>snapshots.jboss.org</id>
             <name>JBoss Snapshot Repository</name>          
-            <url>file:///Users/hardy/tmp/snapshot</url>
-            <!--url>dav:https://snapshots.jboss.org/maven2</url-->
+            <url>dav:https://snapshots.jboss.org/maven2</url>
         </snapshotRepository>
     </distributionManagement>
     
