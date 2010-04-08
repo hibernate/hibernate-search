@@ -24,8 +24,12 @@
  */
 package org.hibernate.search.bridge;
 
+import java.util.zip.DataFormatException;
+
+import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.hibernate.search.SearchException;
 
 /**
  * Bridge to use a TwoWayStringBridge as a TwoWayFieldBridge
@@ -52,7 +56,19 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 			return stringBridge.stringToObject( null );
 		}
 		else {
-			return stringBridge.stringToObject( field.stringValue() );
+			String stringValue;
+			if ( field.isBinary() ) {
+				try {
+					stringValue = CompressionTools.decompressString( field.getBinaryValue() );
+				}
+				catch (DataFormatException e) {
+					throw new SearchException( "Field " + name + " looks like binary but couldn't be decompressed" );
+				}
+			}
+			else {
+				stringValue = field.stringValue();
+			}
+			return stringBridge.stringToObject( stringValue );
 		}
 	}
 }

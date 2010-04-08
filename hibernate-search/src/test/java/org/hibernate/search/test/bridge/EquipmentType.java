@@ -27,7 +27,6 @@ package org.hibernate.search.test.bridge;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -51,16 +50,11 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 		// a requirement. It just works that way in this instance. The
 		// actual name could be supplied by hard coding it below.
 		Departments deps = ( Departments ) value;
-		Field field;
 		String fieldValue1 = deps.getManufacturer();
 
 		if ( fieldValue1 != null ) {
-			String fieldValue = ( String ) equips.get( fieldValue1 );
-			field = new Field(
-					name, fieldValue, luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector()
-			);
-			field.setBoost( luceneOptions.getBoost() );
-			document.add( field );
+			String indexedString = ( String ) equips.get( fieldValue1 );
+			luceneOptions.addFieldToDocument( name, indexedString, document );
 		}
 	}
 }

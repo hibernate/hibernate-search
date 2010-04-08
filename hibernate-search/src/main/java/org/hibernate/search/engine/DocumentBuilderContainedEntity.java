@@ -459,7 +459,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	private void bindClassBridgeAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, InitContext context) {
 		String fieldName = prefix + ann.name();
 		propertiesMetadata.classNames.add( fieldName );
-		propertiesMetadata.classStores.add( getStore( ann.store() ) );
+		propertiesMetadata.classStores.add( ann.store() );
 		propertiesMetadata.classIndexes.add( getIndex( ann.index() ) );
 		propertiesMetadata.classTermVectors.add( getTermVector( ann.termVector() ) );
 		propertiesMetadata.classBridges.add( BridgeFactory.extractType( ann ) );
@@ -480,7 +480,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		propertiesMetadata.fieldGetters.add( member );
 		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
 		propertiesMetadata.fieldNames.add( fieldName );
-		propertiesMetadata.fieldStore.add( getStore( fieldAnn.store() ) );
+		propertiesMetadata.fieldStore.add( fieldAnn.store() );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
 		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
 		propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
@@ -538,19 +538,6 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 			localPrefix += embeddedAnn.prefix();
 		}
 		return localPrefix;
-	}
-
-	protected Field.Store getStore(Store store) {
-		switch ( store ) {
-			case NO:
-				return Field.Store.NO;
-			case YES:
-				return Field.Store.YES;
-			case COMPRESS:
-				return Field.Store.COMPRESS;
-			default:
-				throw new AssertionFailure( "Unexpected Store: " + store );
-		}
 	}
 
 	protected Field.TermVector getTermVector(TermVector vector) {
@@ -785,7 +772,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		public final List<String> fieldNames = new ArrayList<String>();
 		public final List<XMember> fieldGetters = new ArrayList<XMember>();
 		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
-		public final List<Field.Store> fieldStore = new ArrayList<Field.Store>();
+		public final List<Store> fieldStore = new ArrayList<Store>();
 		public final List<Field.Index> fieldIndex = new ArrayList<Field.Index>();
 		public final List<Float> fieldBoosts = new ArrayList<Float>();
 		public final List<BoostStrategy> dynamicFieldBoosts = new ArrayList<BoostStrategy>();
@@ -797,7 +784,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		public final List<XMember> containedInGetters = new ArrayList<XMember>();
 
 		public final List<String> classNames = new ArrayList<String>();
-		public final List<Field.Store> classStores = new ArrayList<Field.Store>();
+		public final List<Store> classStores = new ArrayList<Store>();
 		public final List<Field.Index> classIndexes = new ArrayList<Field.Index>();
 		public final List<FieldBridge> classBridges = new ArrayList<FieldBridge>();
 		public final List<Field.TermVector> classTermVectors = new ArrayList<Field.TermVector>();

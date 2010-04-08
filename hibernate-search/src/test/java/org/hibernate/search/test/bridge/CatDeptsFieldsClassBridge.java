@@ -27,7 +27,6 @@ package org.hibernate.search.test.bridge;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
@@ -58,9 +57,7 @@ public class CatDeptsFieldsClassBridge implements FieldBridge, ParameterizedBrid
 		if ( fieldValue2 == null ) {
 			fieldValue2 = "";
 		}
-		String fieldValue = fieldValue1 + sepChar + fieldValue2;
-		Field field = new Field( name, fieldValue, luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
-		field.setBoost( luceneOptions.getBoost() );
-		document.add( field );
+		String indexedString = fieldValue1 + sepChar + fieldValue2;
+		luceneOptions.addFieldToDocument( name, indexedString, document );
 	}
 }

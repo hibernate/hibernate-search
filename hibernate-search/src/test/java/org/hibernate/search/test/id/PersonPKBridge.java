@@ -55,35 +55,13 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 		PersonPK id = ( PersonPK ) value;
 
 		//store each property in a unique field
-		Field field = new Field(
-				name + ".firstName",
-				id.getFirstName(),
-				luceneOptions.getStore(),
-				luceneOptions.getIndex(),
-				luceneOptions.getTermVector()
-		);
-		field.setBoost( luceneOptions.getBoost() );
-		document.add( field );
+		luceneOptions.addFieldToDocument( name + ".firstName", id.getFirstName(), document );
 
-		field = new Field(
-				name + ".lastName",
-				id.getLastName(),
-				luceneOptions.getStore(),
-				luceneOptions.getIndex(),
-				luceneOptions.getTermVector()
-		);
-		field.setBoost( luceneOptions.getBoost() );
-		document.add( field );
-
+		luceneOptions.addFieldToDocument( name + ".lastName", id.getLastName(), document );
+		
 		//store the unique string representation in the named field
-		field = new Field(
-				name,
-				objectToString( id ),
-				luceneOptions.getStore(),
-				luceneOptions.getIndex(),
-				luceneOptions.getTermVector()
-		);
-		field.setBoost( luceneOptions.getBoost() );
-		document.add( field );
+		luceneOptions.addFieldToDocument( name, objectToString( id ), document );
+
 	}
+	
 }

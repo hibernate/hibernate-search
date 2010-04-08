@@ -206,7 +206,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 				propertiesMetadata.fieldGetters.add( member );
 				String fieldName = prefix + attributeName;
 				propertiesMetadata.fieldNames.add( fieldName );
-				propertiesMetadata.fieldStore.add( getStore( Store.YES ) );
+				propertiesMetadata.fieldStore.add( Store.YES );
 				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
 				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
@@ -403,7 +403,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 
 		// now add the entity id to the document
 		LuceneOptions luceneOptions = new LuceneOptionsImpl(
-				Field.Store.YES,
+				Store.YES,
 				Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO, idBoost
 			);
 		idBridge.set( idKeywordName, id, doc, luceneOptions );
@@ -623,7 +623,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			populateResult(
 					builderIndexedEntity.idKeywordName,
 					builderIndexedEntity.idBridge,
-					Field.Store.YES,
+					Store.YES,
 					fields,
 					result,
 					document
@@ -635,19 +635,19 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		return result;
 	}
 
-	private static void populateResult(String fieldName, FieldBridge fieldBridge, Field.Store store,
+	private static void populateResult(String fieldName, FieldBridge fieldBridge, Store store,
 									   String[] fields, Object[] result, Document document) {
 		int matchingPosition = getFieldPosition( fields, fieldName );
 		if ( matchingPosition != -1 ) {
 			//TODO make use of an isTwoWay() method
-			if ( store != Field.Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
+			if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 				result[matchingPosition] = ( ( TwoWayFieldBridge ) fieldBridge ).get( fieldName, document );
 				if ( log.isTraceEnabled() ) {
 					log.trace( "Field {} projected as {}", fieldName, result[matchingPosition] );
 				}
 			}
 			else {
-				if ( store == Field.Store.NO ) {
+				if ( store == Store.NO ) {
 					throw new SearchException( "Projecting an unstored field: " + fieldName );
 				}
 				else {

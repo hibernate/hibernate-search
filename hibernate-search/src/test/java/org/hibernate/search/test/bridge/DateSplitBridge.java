@@ -30,7 +30,6 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
@@ -52,24 +51,14 @@ public class DateSplitBridge implements FieldBridge {
 		int day = cal.get(Calendar.DAY_OF_MONTH);
 		
 		// set year
-		Field field = new Field(name + ".year", String.valueOf(year),
-				luceneOptions.getStore(), luceneOptions.getIndex(),
-				luceneOptions.getTermVector());
-		field.setBoost(luceneOptions.getBoost());
-		document.add(field);
+		luceneOptions.addFieldToDocument( name + ".year", String.valueOf( year ), document );
 		
 		// set month and pad it if needed
-		field = new Field(name + ".month", month < 10 ? "0" : ""
-				+ String.valueOf(month), luceneOptions.getStore(),
-				luceneOptions.getIndex(), luceneOptions.getTermVector());
-		field.setBoost(luceneOptions.getBoost());
-		document.add(field);
+		luceneOptions.addFieldToDocument( name + ".month",
+				month < 10 ? "0" : "" + String.valueOf( month ), document );
 		
 		// set day and pad it if needed
-		field = new Field(name + ".day", day < 10 ? "0" : ""
-				+ String.valueOf(day), luceneOptions.getStore(),
-				luceneOptions.getIndex(), luceneOptions.getTermVector());
-		field.setBoost(luceneOptions.getBoost());
-		document.add(field);
+		luceneOptions.addFieldToDocument( name + ".day",
+				day < 10 ? "0" : "" + String.valueOf( day ), document );
 	}
 }

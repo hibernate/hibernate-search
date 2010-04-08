@@ -24,23 +24,42 @@
  */
 package org.hibernate.search.bridge;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
 /**
  * A wrapper class for Lucene parameters needed for indexing.
  * 
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public interface LuceneOptions {
+	
+	void addFieldToDocument(String name, String indexedString, Document document);
+	
+	/**
+	 * Might be removed in version 3.3 to better support Lucene 3
+	 * which is missing COMPRESS Store Type.
+	 * To use compression either use #addFieldToDocument or refer
+	 * to Lucene documentation to implement your own compression
+	 * strategy.
+	 * @deprecated use addToDocument to add fields to the Document if possible 
+	 */
 	Field.Store getStore();
 
+	/**
+	 * @deprecated likely to be removed in version 3.3, use #addFieldToDocument
+	 */
 	Field.Index getIndex();
 
+	/**
+	 * @deprecated likely to be removed in version 3.3, use #addFieldToDocument
+	 */
 	Field.TermVector getTermVector();
 
 	/**
-	 * @return the boost value. If <code>boost == null</code>, the default boost value
-	 * 1.0 is returned.
+	 * @deprecated likely to be removed in version 3.3, use #addFieldToDocument
 	 */
 	Float getBoost();
+	
 }

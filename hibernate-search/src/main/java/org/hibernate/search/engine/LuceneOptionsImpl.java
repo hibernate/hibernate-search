@@ -24,10 +24,14 @@
  */
 package org.hibernate.search.engine;
 
+import org.apache.lucene.document.CompressionTools;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.Field.TermVector;
 
+import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 
 /**
@@ -35,36 +39,53 @@ import org.hibernate.search.bridge.LuceneOptions;
  * This is a package level class
  *  
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 class LuceneOptionsImpl implements LuceneOptions {
-	private final Store store;
-	private final Index index;
+	
+	private final boolean storeCompressed;
+	private final boolean storeUncompressed;
+	private final Index indexMode;
 	private final TermVector termVector;
 	private final Float boost;
+	private final Store storeType;
 
-	public LuceneOptionsImpl(Store store, Index index, TermVector termVector, Float boost) {
-		this.store = store;
-		this.index = index;
+	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost) {
+		this.indexMode = indexMode;
 		this.termVector = termVector;
 		this.boost = boost;
+		this.storeType = store;
+		this.storeCompressed = store.equals( Store.COMPRESS );
+		this.storeUncompressed = store.equals( Store.YES );
 	}
 
-	public Store getStore() {
-		return store;
+	public void addFieldToDocument(String name, String indexedString, Document document) {
+		//Do not add fields on empty strings, seems a sensible default in most situations
+		//TODO if Store, probably also save empty ones
+		if ( StringHelper.isNotEmpty( indexedString ) ) {
+			if ( ! ( indexMode.equals( Index.NO ) && storeCompressed ) ) {
+				standardFieldAdd( name, indexedString, document );
+			}
+			if ( storeCompressed ) {
+				compressedFieldAdd( name, indexedString, document );
+			}
+		}
 	}
 
-	public Index getIndex() {
-		return index;
+	private void standardFieldAdd(String name, String indexedString, Document document) {
+		Field field = new Field( name, false, indexedString, storeUncompressed ? Field.Store.YES : Field.Store.NO , indexMode, termVector );
+		if ( boost != null )
+			field.setBoost( boost );
+		document.add( field );
+	}
+	
+	private void compressedFieldAdd(String name, String indexedString, Document document) {
+		byte[] compressedString = CompressionTools.compressString( indexedString );
+		// indexed is implicitly set to false when using byte[]
+		Field field = new Field( name, compressedString, Field.Store.YES );
+		document.add( field );
 	}
 
-	public TermVector getTermVector() {
-		return termVector;
-	}
-
-	/**
-	 * @return the boost value. If <code>boost == null</code>, the default boost value
-	 * 1.0 is returned.
-	 */
 	public Float getBoost() {
 		if ( boost != null ) {
 			return boost;
@@ -72,4 +93,33 @@ class LuceneOptionsImpl implements LuceneOptions {
 			return 1.0f;
 		}
 	}
+
+	public Index getIndex() {
+		return this.indexMode;
+	}
+
+	/**
+	 * @deprecated likely to be removed in 3.3
+	 */
+	public org.apache.lucene.document.Field.Store getStore() {
+		if (storeCompressed)
+			return org.apache.lucene.document.Field.Store.COMPRESS;
+		else if (storeUncompressed)
+			return org.apache.lucene.document.Field.Store.YES;
+		else
+			return org.apache.lucene.document.Field.Store.NO;
+	}
+
+	public TermVector getTermVector() {
+		return this.termVector;
+	}
+
+	/**
+	 * Might be useful for a bridge implementation, but not currently part
+	 * of LuceneOptions API as we are considering to remove the getters.
+	 */
+	public Store getStoreStrategy() {
+		return storeType;
+	}
+	
 }
