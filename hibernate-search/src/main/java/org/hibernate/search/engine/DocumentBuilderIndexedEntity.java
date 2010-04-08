@@ -37,6 +37,7 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
 import org.slf4j.Logger;
 
@@ -514,7 +515,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 
 		// now we give the discriminator the opportunity to specify a analyzer per field level
 		for ( Object o : doc.getFields() ) {
-			Field field = ( Field ) o;
+			Fieldable field = ( Fieldable ) o;
 			if ( !processedFieldNames.contains( field.name() ) ) {
 				String analyzerName = discriminator.getAnalyzerDefinitionName( value, unproxiedInstance, field.name() );
 				if ( analyzerName != null ) {
