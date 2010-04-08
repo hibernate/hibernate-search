@@ -79,6 +79,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		s.clear();
 
 		session = Search.getFullTextSession( s );
+		tx = s.beginTransaction();
 
 		query = parser.parse( "foo" );
 		result = session.createFullTextQuery( query, Product.class ).list();
@@ -88,6 +89,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		result = session.createFullTextQuery( query, Product.class ).list();
 		assertEquals( "change in embedded not reflected in root index", 1, result.size() );
 
+		tx.commit();
 		s.close();
 	}
 
@@ -144,7 +146,8 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		result = session.createFullTextQuery( query, Person.class ).list();
 		assertEquals( "change in embedded not reflected in root index", 1, result.size() );
 
-		s.close();
+		session.close();
+		//s.close();
 	}
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
