@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
@@ -77,6 +77,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	private File indexDir;
 	private String directoryProviderName;
 	private Properties properties;
+	private TriggerTask task;
 
 	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
 		this.properties = properties;
@@ -124,7 +125,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
-		TimerTask task = new FSMasterDirectoryProvider.TriggerTask( indexDir, sourceDir, this );
+		task = new FSMasterDirectoryProvider.TriggerTask( indexDir, sourceDir, this );
 		long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
 		timer.scheduleAtFixedRate( task, period, period );
 		this.current = currentLocal; //write to volatile to publish all state
@@ -166,6 +167,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		@SuppressWarnings("unused")
 		int readCurrentState = current; //Another unneeded value, to ensure visibility of state protected by memory barrier
 		timer.cancel();
+		task.stop();
 		try {
 			directory.close();
 		}
@@ -176,7 +178,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 
 	private class TriggerTask extends TimerTask {
 
-		private final Executor executor;
+		private final ExecutorService executor;
 		private final FSMasterDirectoryProvider.CopyDirectory copyTask;
 
 		public TriggerTask(File source, File destination, DirectoryProvider<FSDirectory> directoryProvider) {
@@ -191,6 +193,10 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			else {
 				log.info( "Skipping directory synchronization, previous work still in progress: {}", indexName );
 			}
+		}
+		
+		public void stop() {
+			executor.shutdownNow();
 		}
 	}
 

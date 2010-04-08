@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -72,6 +72,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 	private File indexDir;
 	private String directoryProviderName;
 	private Properties properties;
+	private TriggerTask task;
 
 	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
 		this.properties = properties;
@@ -144,7 +145,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		catch ( IOException e ) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
-		TimerTask task = new TriggerTask( sourceIndexDir, indexDir );
+		task = new TriggerTask( sourceIndexDir, indexDir );
 		long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
 		timer.scheduleAtFixedRate( task, period, period );
 		this.current = currentToBe;
@@ -195,7 +196,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 
 	class TriggerTask extends TimerTask {
 
-		private final Executor executor;
+		private final ExecutorService executor;
 		private final CopyDirectory copyTask;
 
 		public TriggerTask(File sourceIndexDir, File destination) {
@@ -214,6 +215,10 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 					log.trace( "Skipping directory synchronization, previous work still in progress: {}", indexName );
 				}
 			}
+		}
+		
+		public void stop() {
+			executor.shutdownNow();
 		}
 	}
 
@@ -301,6 +306,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		@SuppressWarnings("unused")
 		int readCurrentState = current; //unneded value, but ensure visibility of state protected by memory barrier
 		timer.cancel();
+		task.stop();
 		try {
 			directory1.close();
 		}
