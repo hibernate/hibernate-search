@@ -137,6 +137,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		john = ( Person ) s.get( Person.class, john.getId() );
 
 		session = Search.getFullTextSession( s );
+		tx = s.beginTransaction();
 
 		query = parser.parse( "London" );
 		result = session.createFullTextQuery( query, Person.class ).list();
@@ -146,6 +147,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		result = session.createFullTextQuery( query, Person.class ).list();
 		assertEquals( "change in embedded not reflected in root index", 1, result.size() );
 
+		tx.commit();
 		session.close();
 		//s.close();
 	}
