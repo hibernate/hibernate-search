@@ -135,6 +135,7 @@ public class BridgeTest extends SearchTestCase {
 		Cloud cloud = new Cloud();
 		cloud.setCustomFieldBridge( "This is divided by 2" );
 		cloud.setCustomStringBridge( "This is div by 4" );
+		cloud.setChar2( 's' );
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
@@ -177,6 +178,7 @@ public class BridgeTest extends SearchTestCase {
 		cloud.setDateMonth( date );
 		cloud.setDateSecond( date );
 		cloud.setDateYear( date );
+		cloud.setChar2( 's' );
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
@@ -225,6 +227,7 @@ public class BridgeTest extends SearchTestCase {
 		cloud.setCalendarMonth( c );
 		cloud.setCalendarSecond( c );
 		cloud.setCalendarYear( c );
+		cloud.setChar2( 's' );
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
