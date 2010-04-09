@@ -34,8 +34,11 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * @author Emmanuel Bernard
  */
 public interface Worker {
-	//Use of EventSource since it's the common subinterface for Session and SessionImplementor
-	//the alternative would have been to do a subcasting or to retrieve 2 parameters :(
+	/**
+	 * Declare a work to be done within a given transaction context
+	 * @param work
+	 * @param transactionContext
+	 */
 	void performWork(Work work, TransactionContext transactionContext);
 
 	void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor);

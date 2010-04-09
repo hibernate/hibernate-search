@@ -26,15 +26,23 @@ package org.hibernate.search.backend.impl;
 
 import java.io.Serializable;
 
+import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.action.AfterTransactionCompletionProcess;
+import org.hibernate.action.BeforeTransactionCompletionProcess;
+import org.hibernate.engine.ActionQueue;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.event.EventSource;
 import org.hibernate.event.FlushEventListener;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.util.LoggerFactory;
+
+import com.sun.xml.internal.ws.handler.HandlerException;
 import org.slf4j.Logger;
 
 /**
@@ -75,8 +83,12 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 
 	public void registerSynchronization(Synchronization synchronization) {
 		if ( isRealTransactionInProgress() ) {
-			Transaction transaction = eventSource.getTransaction();
-			transaction.registerSynchronization( synchronization );
+			//use {Before|After}TransactionCompletionProcess instead of registerTransaction because it does not
+			//swallow transactions.
+			final ActionQueue actionQueue = eventSource.getActionQueue();
+			actionQueue.registerProcess( new DelegateToSynchronizationOnBeforeTx( synchronization ) );
+			actionQueue.registerProcess( new DelegateToSynchronizationOnAfterTx( synchronization ) );
+//			eventSource.getTransaction().registerSynchronization( synchronization );
 		}
 		else {
 			//registerSynchronization is only called if isRealTransactionInProgress or if
@@ -121,6 +133,40 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			realTxInProgress = eventSource.isTransactionInProgress();
 		}
 		return realTxInProgress;
+	}
+
+	private static class DelegateToSynchronizationOnBeforeTx implements BeforeTransactionCompletionProcess {
+		private final Synchronization synchronization;
+
+		DelegateToSynchronizationOnBeforeTx(Synchronization synchronization) {
+			this.synchronization = synchronization;
+		}
+
+		public void doBeforeTransactionCompletion(SessionImplementor sessionImplementor) {
+			try {
+				synchronization.beforeCompletion();
+			}
+			catch ( Exception e ) {
+				throw new HibernateException( "Error while indexing in Hibernate Search (before transaction completion)", e);
+			}
+		}
+	}
+
+	private static class DelegateToSynchronizationOnAfterTx implements AfterTransactionCompletionProcess {
+		private final Synchronization synchronization;
+
+		DelegateToSynchronizationOnAfterTx(Synchronization synchronization) {
+			this.synchronization = synchronization;
+		}
+
+		public void doAfterTransactionCompletion(boolean success, SessionImplementor sessionImplementor) {
+			try {
+				synchronization.afterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
+			}
+			catch ( Exception e ) {
+				throw new HibernateException( "Error while indexing in Hibernate Search (ater transaction completion)", e);
+			}
+		}
 	}
 	
 }
