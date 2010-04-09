@@ -25,12 +25,12 @@
 package org.hibernate.search.backend.impl;
 
 import java.io.Serializable;
-
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.slf4j.Logger;
+
 import org.hibernate.HibernateException;
-import org.hibernate.Transaction;
 import org.hibernate.action.AfterTransactionCompletionProcess;
 import org.hibernate.action.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.ActionQueue;
@@ -41,9 +41,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.util.LoggerFactory;
-
-import com.sun.xml.internal.ws.handler.HandlerException;
-import org.slf4j.Logger;
 
 /**
  * Implementation of the transactional context on top of an EventSource (Session)
