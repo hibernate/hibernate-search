@@ -83,7 +83,7 @@
             @Field,...</emphasis>) for which there exists so far no
             alternative configuration. The tutorial is tested against version
             3.5 of Hibernate Annotations (part of the Hibernate Core
-            distribution). </entry>
+            distribution).</entry>
           </row>
         </tbody>
       </tgroup>
@@ -129,55 +129,13 @@
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
    &lt;version&gt;3.5.0-Final&lt;/version&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-   &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
-   &lt;artifactId&gt;solr-core&lt;/artifactId&gt;
-   &lt;version&gt;1.4.0&lt;/version&gt;
-   &lt;exclusions&gt;
-      &lt;exclusion&gt;
-         &lt;groupId&gt;commons-httpclient&lt;/groupId&gt;
-         &lt;artifactId&gt;commons-httpclient&lt;/artifactId&gt;
-      &lt;/exclusion&gt;
-      &lt;exclusion&gt;
-         &lt;groupId&gt;woodstox&lt;/groupId&gt;
-         &lt;artifactId&gt;wstx-asl&lt;/artifactId&gt;
-      &lt;/exclusion&gt;
-      &lt;exclusion&gt;
-         &lt;groupId&gt;net.java.dev.stax-utils&lt;/groupId&gt;
-         &lt;artifactId&gt;stax-utils&lt;/artifactId&gt;
-      &lt;/exclusion&gt;
-      &lt;exclusion&gt;
-         &lt;groupId&gt;commons-logging&lt;/groupId&gt;
-         &lt;artifactId&gt;commons-logging&lt;/artifactId&gt;
-      &lt;/exclusion&gt;
-      &lt;exclusion&gt;
-         &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;
-         &lt;artifactId&gt;solr-lucene-core&lt;/artifactId&gt;
-      &lt;/exclusion&gt;
-   &lt;/exclusions&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-   &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;
-   &lt;artifactId&gt;lucene-snowball&lt;/artifactId&gt;
-   &lt;version&gt;2.9.2&lt;/version&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-   &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;
-   &lt;artifactId&gt;lucene-snowball&lt;/artifactId&gt;
-   &lt;version&gt;2.9.2&lt;/version&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-   &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;
-   &lt;artifactId&gt;lucene-analyzers&lt;/artifactId&gt;
-   &lt;version&gt;2.9.2&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
     </example>
 
     <para>Not all dependencies are required. Only the
     <emphasis>hibernate-search</emphasis> dependency is mandatory. This
     dependency, together with its required transitive dependencies, contain
-    all required classes needed to use Hibernate Search. </para>
+    all required classes needed to use Hibernate Search.</para>
 
     <para><emphasis>hibernate-annotations</emphasis> is needed if you want to
     use annotations to configure your domain model but don't want to use JPA's
@@ -188,16 +146,14 @@
     XML configuration available for Hibernate Search but we provide a powerful
     programmatic mapping API that elegantly replace this kind of deployment
     descriptor (see <xref linkend="hsearch-mapping-programmaticapi" /> for
-    more information). </para>
+    more information).</para>
 
     <para><emphasis>hibernate-entitymanager</emphasis> is required if you want
-    to use Hibernate Search in conjunction with JPA. </para>
+    to use Hibernate Search in conjunction with JPA.</para>
 
-    <para>The Solr dependencies are needed if you want to utilize Solr's
-    analyzer framework. More about this later. </para>
-
-    <para>And finally, the <literal>lucene-snowball</literal> dependency is
-    needed if you want to use Lucene's snowball stemmer.</para>
+    <para>And finally, you might want to add optional dependencies related to
+    Lucene (if you use some of the contribs of Lucene). By default, we add
+    lucene-snowball and lucene-analyzers as dependencies.</para>
   </section>
 
   <section>
@@ -540,10 +496,7 @@ em.close();  </programlisting>
     more about the factory classes available you can either browse the Solr
     JavaDoc or read the corresponding section on the <ulink
     url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">Solr
-    Wiki.</ulink> Note that depending on the chosen factory class additional
-    libraries on top of the Solr dependencies might be required. For example,
-    the <classname>PhoneticFilterFactory</classname> depends on <ulink
-    url="http://commons.apache.org/codec">commons-codec</ulink>.</para>
+    Wiki.</ulink></para>
 
     <para>In the example below a
     <classname>StandardTokenizerFactory</classname> is used followed by two

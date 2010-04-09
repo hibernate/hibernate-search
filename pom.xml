@@ -144,11 +144,6 @@
             <version>${slf4jVersion}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-            <version>1.4.0</version>
-        </dependency>
     </dependencies>    
     
     <dependencyManagement>
@@ -203,7 +198,6 @@
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-core</artifactId>
                 <version>1.4.0</version>
-                <optional>true</optional>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-httpclient</groupId>
@@ -225,6 +219,51 @@
                         <groupId>org.apache.solr</groupId>
                         <artifactId>solr-lucene-core</artifactId>
                     </exclusion>
+                    <exclusion>
+                         <groupId>commons-fileupload</groupId>
+                         <artifactId>commons-fileupload</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.apache.solr</groupId>
+                         <artifactId>solr-commons-csv</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.apache.lucene</groupId>
+                         <artifactId>lucene-highlighter</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.apache.lucene</groupId>
+                         <artifactId>lucene-queries</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.apache.lucene</groupId>
+                         <artifactId>lucene-memory</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.apache.lucene</groupId>
+                         <artifactId>lucene-misc</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.codehaus.woodstox</groupId>
+                         <artifactId>wstx-asl</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.apache.geronimo.specs</groupId>
+                         <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.apache.lucene</groupId>
+                         <artifactId>lucene-spellchecker</artifactId>
+                     </exclusion>
+                     <exclusion>
+                         <groupId>org.apache.lucene</groupId>
+                         <artifactId>lucene-analyzers</artifactId>
+                     </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.lucene</groupId>
+                        <artifactId>lucene-snowball</artifactId>
+                    </exclusion>
+                    
                 </exclusions>
             </dependency>
             <dependency>
