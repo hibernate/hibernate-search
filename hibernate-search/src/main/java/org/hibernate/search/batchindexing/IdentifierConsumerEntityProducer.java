@@ -34,6 +34,7 @@ import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
@@ -126,6 +127,7 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 			.setLockMode( LockMode.NONE )
 			.setCacheable( false )
 			.setFlushMode( FlushMode.MANUAL )
+			.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY )
 			.add( Restrictions.in( "id", listIds ) );
 		List<?> list = criteria.list();
 		monitor.entitiesLoaded( list.size() );

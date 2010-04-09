@@ -24,7 +24,12 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 
 import org.hibernate.search.annotations.Indexed;
 
@@ -33,6 +38,7 @@ import org.hibernate.search.annotations.Indexed;
 public class AncientBook extends Book {
 	
 	public String catalogueGroupName = "";
+	public Set<String> alternativeTitles = new HashSet<String>();
 
 	public String getCatalogueGroupName() {
 		return catalogueGroupName;
@@ -40,6 +46,15 @@ public class AncientBook extends Book {
 
 	public void setCatalogueGroupName(String catalogueGroupName) {
 		this.catalogueGroupName = catalogueGroupName;
+	}
+
+	@ElementCollection( fetch=FetchType.EAGER )
+	public Set<String> getAlternativeTitles() {
+		return alternativeTitles;
+	}
+	
+	public void setAlternativeTitles(Set<String> alternativeTitles) {
+		this.alternativeTitles = alternativeTitles;
 	}
 	
 }
