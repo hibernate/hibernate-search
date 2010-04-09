@@ -91,6 +91,13 @@ public abstract class TestCase extends junit.framework.TestCase {
 			lastTestClass = getClass();
 		}
 	}
+	
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		if ( sessions != null ) {
+			sessions.close();
+		}
+	}
 
 	protected void runTest() throws Throwable {
 		try {
