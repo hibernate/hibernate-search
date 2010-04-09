@@ -103,7 +103,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		query = ftSess.createFullTextQuery( luceneQuery );
 		result = query.list();
 		assertEquals( 0, result.size() );
-
+		ftSess.getTransaction().commit();
 		ftSess.close();
 		s.close();
 
