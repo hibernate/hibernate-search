@@ -1,0 +1,59 @@
+package org.hibernate.search.test.embedded.nested.containedIn;
+
+import java.io.Serializable;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Version;
+
+/**
+ * Entite 1
+ *
+ * @author grolland
+ */
+@javax.persistence.Entity
+@org.hibernate.annotations.Proxy(lazy = true)
+@org.hibernate.search.annotations.Indexed
+@javax.persistence.Table(name = "entity1")
+//@SequenceGenerator( name="ids_generator1", sequenceName = "ids_generator1")
+public class Entity1ForDoc0 implements Serializable {
+
+	private static final long serialVersionUID = -3191273589083411349L;
+
+	@Id
+	@GeneratedValue //(generator = "ids_generator1", strategy = GenerationType.SEQUENCE)
+	private long uid;
+
+	@Version
+	private int optlock;
+
+	@javax.persistence.OneToMany(mappedBy = "entity1", cascade = { })
+	@org.hibernate.search.annotations.IndexedEmbedded
+	private java.util.List<Entity2ForDoc0> entities2 = new java.util.ArrayList<Entity2ForDoc0>();
+
+	public long getUid() {
+		return uid;
+	}
+
+	public void setUid(final long uid) {
+		this.uid = uid;
+	}
+
+	public int getOptlock() {
+		return optlock;
+	}
+
+	public void setOptlock(final int optlock) {
+		this.optlock = optlock;
+	}
+
+	public void setEntities2(final java.util.List<Entity2ForDoc0> entities2) {
+		this.entities2 = entities2;
+	}
+
+	public java.util.List<Entity2ForDoc0> getEntities2() {
+		return entities2;
+	}
+
+}

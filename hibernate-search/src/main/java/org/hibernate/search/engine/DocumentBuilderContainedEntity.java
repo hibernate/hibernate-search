@@ -642,9 +642,26 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 				}
 			}
 			else if ( member.isCollection() ) {
-				Collection<T> collection = getActualCollection( member, value );
-				for ( T collectionValue : collection ) {
-					processSingleContainedInInstance( queue, searchFactoryImplementor, collectionValue );
+				Collection<T> collection = null;
+				try {
+					collection = getActualCollection( member, value );
+					collection.size(); //load it
+				}
+				catch ( Exception e ) {
+					if ( e.getClass().getName().contains( "org.hibernate.LazyInitializationException" ) ) {
+						/* A deleted entity not having its collection initialized
+						 * leads to a LIE because the colleciton is no longer attached to the session
+						 *
+						 * But that's ok as the collection update event has been processed before
+						 * or the fk would have been cleared and thus triggering the cleaning
+						 */
+						collection = null;
+					}
+				}
+				if ( collection != null ) {
+					for ( T collectionValue : collection ) {
+						processSingleContainedInInstance( queue, searchFactoryImplementor, collectionValue );
+					}
 				}
 			}
 			else {
