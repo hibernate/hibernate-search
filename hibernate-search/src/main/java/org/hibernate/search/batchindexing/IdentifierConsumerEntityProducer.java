@@ -78,6 +78,7 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 		Session session = sessionFactory.openSession();
 		session.setFlushMode( FlushMode.MANUAL );
 		session.setCacheMode( cacheMode );
+		session.setDefaultReadOnly( true );
 		try {
 			Transaction transaction = session.beginTransaction();
 			loadAllFromQueue( session );

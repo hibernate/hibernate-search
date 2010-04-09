@@ -31,7 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
-import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -85,6 +85,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 		Session session = sessionFactory.openSession();
 		session.setFlushMode( FlushMode.MANUAL );
 		session.setCacheMode( cacheMode );
+		session.setDefaultReadOnly( true );
 		try {
 			Transaction transaction = session.beginTransaction();
 			indexAllQueue( session );
@@ -107,7 +108,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 				else {
 					log.trace( "received an object {}", take );
 					//trick to attach the objects to session:
-					session.lock( take, LockMode.NONE );
+					session.buildLockRequest( LockOptions.NONE ).lock( take );
 					index( take, session );
 					monitor.documentsBuilt( 1 );
 					session.evict( take );
