@@ -81,6 +81,8 @@ public class SearchIndexerTest extends TestCase {
 			assertFalse( tsii.getRootEntities().contains( Object.class ) );
 			assertEquals( 2, tsii.getRootEntities().size() );
 		}
+		fullTextSession.close();
+		ftsb.close();
 	}
 	
 	private static class TestableMassIndexerImpl extends MassIndexerImpl {
@@ -133,6 +135,7 @@ public class SearchIndexerTest extends TestCase {
 			//verify index is now containing both DVDs:
 			assertEquals( 2, countResults( new Term( "title", "trek" ), ftsb, Dvd.class ) );
 		}
+		ftsb.close();
 	}
 	
 	//helper method
