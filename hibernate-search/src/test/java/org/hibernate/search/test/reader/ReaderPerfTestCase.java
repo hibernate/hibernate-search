@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
@@ -125,7 +126,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			es.execute( work );
 			es.execute( reverseWork );
 		}
-		while ( work.count < iteration - 1 ) {
+		while ( work.count.get() < iteration - 1 ) {
 			Thread.sleep( 20 );
 		}
 		log.debug( iteration + " iterations in " + nThreads + " threads: " + ( System.currentTimeMillis() - start ) );
@@ -134,53 +135,71 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 	protected class Work implements Runnable {
 		private Random random = new Random();
 		private SessionFactory sf;
-		public volatile int count = 0;
+//		public volatile int count = 0;
+		public AtomicInteger count = new AtomicInteger(0);
 
 		public Work(SessionFactory sf) {
 			this.sf = sf;
 		}
 
 		public void run() {
-			Session s = sf.openSession();
-			Transaction tx = s.beginTransaction();
-			QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(),
-					new String[] { "name", "physicalDescription", "suspectCharge" },
-					SearchTestCase.standardAnalyzer
-			);
-			FullTextQuery query = getQuery( "John Doe", parser, s );
-			assertTrue( query.getResultSize() != 0 );
+			Session s = null;
+			Transaction tx = null;
+			try {
+				s = sf.openSession();
+				tx = s.beginTransaction();
+				QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(),
+						new String[] { "name", "physicalDescription", "suspectCharge" },
+						SearchTestCase.standardAnalyzer );
+				FullTextQuery query = getQuery( "John Doe", parser, s );
+				assertTrue( query.getResultSize() != 0 );
 
-			query = getQuery( "green", parser, s );
-			random.nextInt( query.getResultSize() - 15 );
-			query.setFirstResult( random.nextInt( query.getResultSize() - 15 ) );
-			query.setMaxResults( 10 );
-			query.list();
-			tx.commit();
-			s.close();
+				query = getQuery( "green", parser, s );
+				random.nextInt( query.getResultSize() - 15 );
+				query.setFirstResult( random.nextInt( query.getResultSize() - 15 ) );
+				query.setMaxResults( 10 );
+				query.list();
+				tx.commit();
+				s.close();
 
-			s = sf.openSession();
-			tx = s.beginTransaction();
+				s = sf.openSession();
+				tx = s.beginTransaction();
 
-			query = getQuery( "John Doe", parser, s );
-			assertTrue( query.getResultSize() != 0 );
+				query = getQuery( "John Doe", parser, s );
+				assertTrue( query.getResultSize() != 0 );
 
-			query = getQuery( "thief", parser, s );
-			int firstResult = random.nextInt( query.getResultSize() - 15 );
-			query.setFirstResult( firstResult );
-			query.setMaxResults( 10 );
-			List result = query.list();
-			Object object = result.get( 0 );
-			if ( insert && object instanceof Detective ) {
-				Detective detective = ( Detective ) object;
-				detective.setPhysicalDescription( detective.getPhysicalDescription() + " Eye" + firstResult );
+				query = getQuery( "thief", parser, s );
+				int firstResult = random.nextInt( query.getResultSize() - 15 );
+				query.setFirstResult( firstResult );
+				query.setMaxResults( 10 );
+				List result = query.list();
+				Object object = result.get( 0 );
+				if ( insert && object instanceof Detective ) {
+					Detective detective = (Detective) object;
+					detective.setPhysicalDescription( detective.getPhysicalDescription() + " Eye"
+							+ firstResult );
+				}
+				else if ( insert && object instanceof Suspect ) {
+					Suspect suspect = (Suspect) object;
+					suspect.setPhysicalDescription( suspect.getPhysicalDescription() + " Eye"
+							+ firstResult );
+				}
+				tx.commit();
+				s.close();
+				// count++;
+			} catch ( Throwable t ) {
+				t.printStackTrace();
+			} finally {
+				count.incrementAndGet();
+				try {
+					if ( tx != null && tx.isActive() )
+						tx.rollback();
+					if ( s != null && s.isOpen() )
+						s.close();
+				} catch ( Throwable t ) {
+					t.printStackTrace();
+				}
 			}
-			else if ( insert && object instanceof Suspect ) {
-				Suspect suspect = ( Suspect ) object;
-				suspect.setPhysicalDescription( suspect.getPhysicalDescription() + " Eye" + firstResult );
-			}
-			tx.commit();
-			s.close();
-			count++;
 		}
 
 		private FullTextQuery getQuery(String queryString, QueryParser parser, Session s) {

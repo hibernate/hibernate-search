@@ -27,6 +27,7 @@ package org.hibernate.search.test.worker;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
@@ -77,7 +78,7 @@ public class WorkerTestCase extends SearchTestCase {
 			es.execute( work );
 			es.execute( reverseWork );
 		}
-		while ( work.count < iteration - 1 ) {
+		while ( work.count.get() < iteration - 1 ) {
 			Thread.sleep( 20 );
 		}
 		getSessions().close();
@@ -87,66 +88,85 @@ public class WorkerTestCase extends SearchTestCase {
 
 	protected static class Work implements Runnable {
 		private SessionFactory sf;
-		public volatile int count = 0;
+		//public volatile int count = 0;
+		public AtomicInteger count = new AtomicInteger(0);
 
 		public Work(SessionFactory sf) {
 			this.sf = sf;
 		}
 
 		public void run() {
-			Session s = sf.openSession();
-			Transaction tx = s.beginTransaction();
-			Employee ee = new Employee();
-			ee.setName( "Emmanuel" );
-			s.persist( ee );
-			Employer er = new Employer();
-			er.setName( "RH" );
-			s.persist( er );
-			tx.commit();
-			s.close();
-
-			s = sf.openSession();
-			tx = s.beginTransaction();
-			ee = (Employee) s.get( Employee.class, ee.getId() );
-			ee.setName( "Emmanuel2" );
-			er = (Employer) s.get( Employer.class, er.getId() );
-			er.setName( "RH2" );
-			tx.commit();
-			s.close();
-
-//			try {
-//				Thread.sleep( 50 );
-//			}
-//			catch (InterruptedException e) {
-//				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//			}
-
-			s = sf.openSession();
-			tx = s.beginTransaction();
-			FullTextSession fts = new FullTextSessionImpl( s );
-			QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
-			Query query;
+			Session s = null;
+			Transaction tx = null;
 			try {
-				query = parser.parse( "name:emmanuel2" );
-			}
-			catch (ParseException e) {
-				throw new RuntimeException( e );
-			}
-			boolean results = fts.createFullTextQuery( query ).list().size() > 0;
-			//don't test because in case of async, it query happens before actual saving
-			//if ( !results ) throw new RuntimeException( "No results!" );
-			tx.commit();
-			s.close();
+				s = sf.openSession();
+				tx = s.beginTransaction();
+				Employee ee = new Employee();
+				ee.setName( "Emmanuel" );
+				s.persist( ee );
+				Employer er = new Employer();
+				er.setName( "RH" );
+				s.persist( er );
+				tx.commit();
+				s.close();
 
-			s = sf.openSession();
-			tx = s.beginTransaction();
-			ee = (Employee) s.get( Employee.class, ee.getId() );
-			s.delete( ee );
-			er = (Employer) s.get( Employer.class, er.getId() );
-			s.delete( er );
-			tx.commit();
-			s.close();
-			count++;
+				s = sf.openSession();
+				tx = s.beginTransaction();
+				ee = (Employee) s.get( Employee.class, ee.getId() );
+				ee.setName( "Emmanuel2" );
+				er = (Employer) s.get( Employer.class, er.getId() );
+				er.setName( "RH2" );
+				tx.commit();
+				s.close();
+
+				// try {
+				// Thread.sleep( 50 );
+				// }
+				// catch (InterruptedException e) {
+				// e.printStackTrace(); //To change body of catch statement use
+				// File | Settings | File Templates.
+				// }
+
+				s = sf.openSession();
+				tx = s.beginTransaction();
+				FullTextSession fts = new FullTextSessionImpl( s );
+				QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id",
+						SearchTestCase.stopAnalyzer );
+				Query query;
+				try {
+					query = parser.parse( "name:emmanuel2" );
+				} catch ( ParseException e ) {
+					throw new RuntimeException( e );
+				}
+				boolean results = fts.createFullTextQuery( query ).list().size() > 0;
+				// don't test because in case of async, it query happens before
+				// actual saving
+				// if ( !results ) throw new RuntimeException( "No results!" );
+				tx.commit();
+				s.close();
+
+				s = sf.openSession();
+				tx = s.beginTransaction();
+				ee = (Employee) s.get( Employee.class, ee.getId() );
+				s.delete( ee );
+				er = (Employer) s.get( Employer.class, er.getId() );
+				s.delete( er );
+				tx.commit();
+				s.close();
+				// count++;
+			} catch ( Throwable t ) {
+				t.printStackTrace();
+			} finally {
+				count.incrementAndGet();
+				try {
+					if ( tx != null && tx.isActive() )
+						tx.rollback();
+					if ( s != null && s.isOpen() )
+						s.close();
+				} catch ( Throwable t ) {
+					t.printStackTrace();
+				}
+			}
 		}
 	}
 
