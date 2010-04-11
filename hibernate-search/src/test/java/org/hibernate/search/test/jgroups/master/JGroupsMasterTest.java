@@ -25,8 +25,6 @@
 package org.hibernate.search.test.jgroups.master;
 
 import java.io.Serializable;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,23 +126,23 @@ public class JGroupsMasterTest extends SearchTestCase {
 	}
 
 	/**
-	 * Create a test object without trigggering indexing. Use SQL directly.
+	 * Create a test object and delete if from index.
 	 *
 	 * @return a <code>TShirt</code> test object.
-	 *
-	 * @throws java.sql.SQLException in case the inset fails.
 	 */
-	@SuppressWarnings({ "deprecation" })
-	private TShirt createObjectWithSQL() throws SQLException {
+	private TShirt createObjectWithSQL() {
 		Session s = openSession();
 		s.getTransaction().begin();
-		Statement statement = s.connection().createStatement();
-		statement.executeUpdate(
-				"insert into TShirt_Master(id, logo, size_) values( '1', 'JBoss balls', 'large')"
-		);
-		statement.close();
-		TShirt ts = ( TShirt ) s.get( TShirt.class, 1 );
+		TShirt ts = new TShirt();
+		ts.setId( 1 );
+		ts.setLogo( "JBoss balls" );
+		ts.setSize( "large" );
+		s.persist( ts );
 		s.getTransaction().commit();
+		FullTextSession fullTextSession = Search.getFullTextSession( s );
+		fullTextSession.beginTransaction();
+		fullTextSession.purge( TShirt.class, 1 );
+		fullTextSession.getTransaction().commit();
 		s.close();
 		return ts;
 	}
