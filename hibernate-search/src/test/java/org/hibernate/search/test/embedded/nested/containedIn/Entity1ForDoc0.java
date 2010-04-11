@@ -1,6 +1,8 @@
 package org.hibernate.search.test.embedded.nested.containedIn;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,6 +34,7 @@ public class Entity1ForDoc0 implements Serializable {
 	@org.hibernate.search.annotations.IndexedEmbedded
 	private java.util.List<Entity2ForDoc0> entities2 = new java.util.ArrayList<Entity2ForDoc0>();
 
+	@Column(name="universalid")//"uid" is a keywork in Oracle
 	public long getUid() {
 		return uid;
 	}

@@ -1,10 +1,10 @@
 package org.hibernate.search.test.embedded.nested.containedIn;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Version;
 
 import org.hibernate.search.annotations.Field;
@@ -36,11 +36,7 @@ public class Entity1ForUnindexed implements Serializable {
 	@org.hibernate.annotations.Cache(usage = org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
 	private java.util.List<Entity2ForUnindexed> entities2 = new java.util.ArrayList<Entity2ForUnindexed>();
 
-	/**
-	 * Getter de l'attribut uid
-	 *
-	 * @return long : Renvoie uid.
-	 */
+	@Column(name="universalid")
 	public long getUid() {
 		return uid;
 	}
