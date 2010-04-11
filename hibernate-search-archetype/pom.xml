@@ -5,7 +5,7 @@
     
     <!-- 
         The link to the hibernate-search parent POM only exists out of convenience.
-        If you want to continue using this quickstart proejct you should remove this
+        If you want to continue using this quickstart project you should remove this
         entry.
     -->
     <parent>

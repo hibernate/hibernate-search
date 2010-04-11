@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: Book.java 17630 2009-10-06 13:38:43Z sannegrinovero $
  * 
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
@@ -22,8 +22,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package example;
+package com.example;
 
+import com.example.Author;
 import org.hibernate.search.annotations.*;
 import org.apache.solr.analysis.*;
 
@@ -33,8 +34,6 @@ import javax.persistence.ManyToMany;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import example.Author;
 
 /**
  *

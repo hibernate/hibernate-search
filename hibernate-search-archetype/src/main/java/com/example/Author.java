@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: Author.java 17630 2009-10-06 13:38:43Z sannegrinovero $
  * 
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
@@ -22,7 +22,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package example;
+package com.example;
 
 import org.hibernate.search.annotations.*;
 

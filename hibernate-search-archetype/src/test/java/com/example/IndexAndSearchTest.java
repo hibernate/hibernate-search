@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: IndexAndSearchTest.java 18745 2010-02-09 13:00:22Z sannegrinovero $
  * 
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
@@ -22,8 +22,11 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package example;
+package com.example;
 
+import com.example.Book;
+
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -48,7 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Example testcase for Hibernate Search
  */
 public class IndexAndSearchTest {
 
@@ -151,9 +154,9 @@ public class IndexAndSearchTest {
         boostPerField.put(bookFields[3], (float) .5);
 
         FullTextEntityManager ftEm = org.hibernate.search.jpa.Search.getFullTextEntityManager((EntityManager) em);
-
-        QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_29, bookFields, ftEm.getSearchFactory().getAnalyzer("customanalyzer"),
-                boostPerField);
+        Analyzer customAnalyzer = ftEm.getSearchFactory().getAnalyzer("customanalyzer");
+        QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_29, bookFields,
+        		customAnalyzer, boostPerField);
 
         org.apache.lucene.search.Query luceneQuery;
         luceneQuery = parser.parse(searchQuery);
