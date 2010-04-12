@@ -1,6 +1,91 @@
 Hibernate Search Changelog
 ==========================
 
+3.2.0.CR1 (12-04-2010)
+----------------------
+
+** Sub-task
+    * [HSEARCH-411] - Get a feature complete programmatic mapping (Amin Mohammed-Coleman)
+    * [HSEARCH-459] - Update quickstart archetype
+    * [HSEARCH-480] - Some add/delete operations have null primary keys
+    * [HSEARCH-481] - In a given sealed queue, only apply the same add/delete operation once
+    * [HSEARCH-493] - Continuous integration builds fail some tests on Oracle databases
+    * [HSEARCH-496] - Some hudson configurations need more time to run the testsuite
+    * [HSEARCH-497] - sybase15 Hudson configuration fails because of java.net.ConnectException: Connection refused
+    * [HSEARCH-498] - Postgres Hudson configurations fail by SQLGrammarException
+
+** Bug
+    * [HSEARCH-305] - Hibernate search doesn't work with criteria when it is not initialized laziily
+    * [HSEARCH-321] - FSSlaveDirectoryProvider incorrectly creates a subdirectory named 0
+    * [HSEARCH-346] - Setup hudson job testing Search against several databases
+    * [HSEARCH-382] - Indexing fails silently in case the file based index is mounted read only
+    * [HSEARCH-385] - Lazy ManyToOne association with @containedIn annotation cause HSearch create entity index with documentId = 0
+    * [HSEARCH-386] - In a Transaction, Delete on unindexed entities referenced by indexed entities with ContainedIn throw LazyInitializationException
+    * [HSEARCH-393] - unit test of the NotSharedReaderPerfTest hangs on with some database
+    * [HSEARCH-399] - NPE in org.hibernate.search.backend.WorkQueue.clear()
+    * [HSEARCH-422] - Properly implement delegation for FullTextEntityManager, FullTextSession and FullTextQuery methods of the new Hibernate version
+    * [HSEARCH-440] - FSSlaveDirectoryProvider creates a wrong index directory in case the current marker file does not exist
+    * [HSEARCH-443] - Using a Field extending AbstractField causes a ClassCastException in DocumentBuilderIndexedEntity when using @AnalyzerDiscriminator
+    * [HSEARCH-448] - Update JPATestCase after renaming of HibernatePersistence to AvailableSettings in Core
+    * [HSEARCH-450] - Example 1.9. superfluous hibernate word
+    * [HSEARCH-452] - FSMasterDirectoryProvider: typo in marker file name (Stephan Bublava)
+    * [HSEARCH-456] - CalendarBridge ignoring setParameterValues
+    * [HSEARCH-473] - Fields for _hibernate_class and the document ID are hard-coded to be analyzed and have "norms" enabled (Dobes Vandermeer)
+    * [HSEARCH-474] - Ensure IndexWriter is closed on errors in backend
+    * [HSEARCH-476] - Work queue contains the same operation multiple times and some add/delete operations have null primary keys
+    * [HSEARCH-478] - Entities with composite PK lead to query exceptions on MySQL
+    * [HSEARCH-479] - Return empty result list - Composed primary key - lucene search ok - primary key bridge ok
+    * [HSEARCH-484] - Building documentation fails
+    * [HSEARCH-488] - Nested use of @ContainedIn: changes not propagated to Lucene index
+    * [HSEARCH-490] - MassIndexer needs to use distinct on primary key selection
+    * [HSEARCH-492] - FSMasterDirectoryProvider and FSSlaveDirectoryProvider don't shutdown the Executor
+    * [HSEARCH-495] - IdentifierProducer: ClassCastException
+    * [HSEARCH-500] - Some tests don't close the SessionFactory and SearchFactory
+    * [HSEARCH-505] - JGroupsMasterTest uses native SQL failing on DB2 and sybase
+
+
+** Improvement
+    * [HSEARCH-437] - When using Thread bound sessions, Hibernate Search FTSession creation fails if out of transaction
+    * [HSEARCH-441] - Custom LockFactory loading should use PluginLoader
+    * [HSEARCH-447] - The build should use the maven-injection-plugin in order to dynamically inject the version string into org.hibernate.search.Version
+    * [HSEARCH-464] - Upgrade Lucene to 2.9.2
+    * [HSEARCH-475] - Improve error message on wrong type as filter parameter
+    * [HSEARCH-477] - Support for the new Solr's character filters (Gustavo Fernandes)
+    * [HSEARCH-489] - Remove the code avoiding the use of in restrictions when a composite id is used: Core does it automatically
+    * [HSEARCH-491] - Make some optional dependencies mandatory
+    * [HSEARCH-501] - Make use of BeforeTransactionCompletionProcess and AfterTransactionCompletionProcess instead of Synchronization
+    * [HSEARCH-502] - update MassIndexer to use new core features
+
+** New Feature
+    * [HSEARCH-352] - Introduce a programmatic mapping API
+    * [HSEARCH-372] - Support projection for ClassBridges that pass and use the field name passed in @ClassBridge.name
+    * [HSEARCH-379] - Properly implement new JPA 2 methods (Query and EntityManager)
+    * [HSEARCH-415] - Consider moving to Lucene 2.9
+    * [HSEARCH-421] - Provide a callback on indexing exception (Amin Mohammed-Coleman)
+    * [HSEARCH-429] - Add a configuration property to declaratively use a factory for the programmatic mapping API (Amin Mohammed-Coleman)
+
+
+** Task
+    * [HSEARCH-322] - Review MultiClassesQueryLoader
+    * [HSEARCH-408] - Improve execution speed of functional tests
+    * [HSEARCH-425] - Reimplement support for compressed fields (support removed in Lucene3)
+    * [HSEARCH-427] - Make the hibernate-search-artifact directory a proper maven module
+    * [HSEARCH-428] - Update the Getting Started section of the documentation
+    * [HSEARCH-432] - Add logging to trace the WorkQueue before being processed
+    * [HSEARCH-439] - Merge fixes from JBAPP (v3_1_1_GA_CP) branch to trunk
+    * [HSEARCH-442] - Upgrade existing code to Lucene 2.9.1
+    * [HSEARCH-454] - Upgrade Solr dependencies (Gustavo Fernandes)
+    * [HSEARCH-455] - Keep Search compatible with latest Hibernate Core
+    * [HSEARCH-458] - Remove all deprecations from Lucene's 2.9 API usage
+    * [HSEARCH-463] - Change the master docbook document to use the version number provided by the docbook plugin
+    * [HSEARCH-465] - Move to commons-annotations 3.2.0.Final
+    * [HSEARCH-468] - Refactor build to have a module setup
+    * [HSEARCH-482] - Update dependencies to Hibernate Core 3.5.0-Final
+    * [HSEARCH-483] - update readme.txt
+    * [HSEARCH-494] - Fix hudson failures
+    * [HSEARCH-504] - Fix ContainedIn tests which break on Oracle as they use a reserved keyword as column name
+
+
 3.2.0.Beta1 (30-11-2009)
 ------------------------
 
