@@ -7,7 +7,7 @@ import org.apache.lucene.search.Query;
  *
  * @author Emmanuel Bernard
  */
-public interface BooleanJunction<T extends BooleanJunction> extends QueryCustomization<T> {
+public interface BooleanJunction<T extends BooleanJunction> extends QueryCustomization<T>, Termination {
 	/**
 	 * The boolean query results should match the subquery
 	 */
@@ -18,9 +18,4 @@ public interface BooleanJunction<T extends BooleanJunction> extends QueryCustomi
 	 * Call the .not() method to ensure results of the boolean query do NOT match the subquery.
 	 */
 	MustJunction must(Query query);
-
-	/**
-	 * Return the lucene query representing the boolean operation
-	 */
-	Query createQuery();
 }

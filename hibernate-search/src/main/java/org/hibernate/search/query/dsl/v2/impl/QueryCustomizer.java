@@ -20,7 +20,7 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 	private Filter filter;
 
 	public QueryCustomizer boostedTo(float boost) {
-		this.boost = boost;
+		this.boost = boost * this.boost;
 		return this;
 	}
 
@@ -44,7 +44,7 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		if (wrappedQuery == null) {
 			throw new AssertionFailure( "wrapped query not set" );
 		}
-		finalQuery.setBoost( boost );
+		finalQuery.setBoost( boost * finalQuery.getBoost() );
 		if (filter != null) {
 			finalQuery = new FilteredQuery(finalQuery, filter);
 		}

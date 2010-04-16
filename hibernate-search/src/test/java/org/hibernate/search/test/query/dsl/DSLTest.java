@@ -35,31 +35,31 @@ public class DSLTest extends SearchTestCase {
 				.buildQueryBuilder().forEntity( Month.class ).get();
 		Query 
 		//regular term query
-		query = monthQb.term().on( "mythology" ).matches( "cold" ).createQuery();
+		query = monthQb.exact().onField( "mythology" ).matches( "cold" ).createQuery();
 
 		assertEquals( 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//term query based on several words
-		query = monthQb.term().on( "mythology" ).matches( "colder darker" ).createQuery();
+		query = monthQb.exact().onField( "mythology" ).matches( "colder darker" ).createQuery();
 
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//term query applying the analyzer and generating one term per word
-		query = monthQb.term().on( "mythology_stem" ).matches( "snowboard" ).createQuery();
+		query = monthQb.exact().onField( "mythology_stem" ).matches( "snowboard" ).createQuery();
 
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//term query applying the analyzer and generating several terms per word
-		query = monthQb.term().on( "mythology_ngram" ).matches( "snobored" ).createQuery();
+		query = monthQb.exact().onField( "mythology_ngram" ).matches( "snobored" ).createQuery();
 
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//term query not using analyzers
-		query = monthQb.term().on( "mythology" ).matches( "Month" ).ignoreAnalyzer().createQuery();
+		query = monthQb.exact().onField( "mythology" ).ignoreAnalyzer().matches( "Month" ).createQuery();
 
 		assertEquals( 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		query = monthQb.term().on( "mythology" ).matches( "Month" ).createQuery();
+		query = monthQb.exact().onField( "mythology" ).matches( "Month" ).createQuery();
 
 		transaction.commit();
 
@@ -73,22 +73,25 @@ public class DSLTest extends SearchTestCase {
 		final QueryBuilder monthQb = fts.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 		Query
+
 		//fuzzy search with custom threshold and prefix
 		query = monthQb
-				.term().on( "mythology" ).matches( "calder" )
-					.fuzzy()
-						.threshold( .8f )
-						.prefixLength( 1 )
-				.createQuery();
+				.fuzzy()
+					.threshold( .8f )
+					.prefixLength( 1 )
+					.onField( "mythology" )
+						.matches( "calder" )
+						.createQuery();
 
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//wildcard query
 		query = monthQb
-				.term().on( "mythology" ).matches( "mon*" )
-					.wildcard()
-				.createQuery();
-		System.out.println(query.toString(  ));
+				.wildcard()
+					.onField( "mythology" )
+						.matches( "mon*" )
+						.createQuery();
+
 		assertEquals( 2, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		transaction.commit();
@@ -107,8 +110,8 @@ public class DSLTest extends SearchTestCase {
 		//combined query, January and february both contain whitening but February in a longer text
 		query = monthQb
 				.bool()
-					.should( monthQb.term().on( "mythology" ).matches( "whitening" ).createQuery() )
-					.should( monthQb.term().on( "history" ).matches( "whitening" ).createQuery() )
+					.should( monthQb.exact().onField( "mythology" ).matches( "whitening" ).createQuery() )
+					.should( monthQb.exact().onField( "history" ).matches( "whitening" ).createQuery() )
 				.createQuery();
 
 		List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
@@ -119,8 +122,8 @@ public class DSLTest extends SearchTestCase {
 		//since history is boosted, February should come first though
 		query = monthQb
 				.bool()
-					.should( monthQb.term().on( "mythology" ).matches( "whitening" ).createQuery() )
-					.should( monthQb.term().on( "history" ).matches( "whitening" ).boostedTo( 30 ).createQuery() )
+					.should( monthQb.exact().onField( "mythology" ).matches( "whitening" ).createQuery() )
+					.should( monthQb.exact().onField( "history" ).boostedTo( 30 ).matches( "whitening" ).createQuery() )
 				.createQuery();
 
 		results = fts.createFullTextQuery( query, Month.class ).list();
@@ -133,6 +136,114 @@ public class DSLTest extends SearchTestCase {
 
 		cleanData( fts );
 	}
+
+
+//	public void testTermQueryOnAnalyzer() throws Exception {
+//		FullTextSession fts = initData();
+//
+//		Transaction transaction = fts.beginTransaction();
+//		final QueryBuilder monthQb = fts.getSearchFactory()
+//				.buildQueryBuilder().forEntity( Month.class ).get();
+//		Query
+//		//regular term query
+//		query = monthQb.term().on( "mythology" ).matches( "cold" ).createQuery();
+//
+//		assertEquals( 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+//
+//		//term query based on several words
+//		query = monthQb.term().on( "mythology" ).matches( "colder darker" ).createQuery();
+//
+//		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+//
+//		//term query applying the analyzer and generating one term per word
+//		query = monthQb.term().on( "mythology_stem" ).matches( "snowboard" ).createQuery();
+//
+//		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+//
+//		//term query applying the analyzer and generating several terms per word
+//		query = monthQb.term().on( "mythology_ngram" ).matches( "snobored" ).createQuery();
+//
+//		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+//
+//		//term query not using analyzers
+//		query = monthQb.term().on( "mythology" ).matches( "Month" ).ignoreAnalyzer().createQuery();
+//
+//		assertEquals( 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+//
+//		query = monthQb.term().on( "mythology" ).matches( "Month" ).createQuery();
+//
+//		transaction.commit();
+//
+//		cleanData( fts );
+//	}
+//
+//	public void testFuzzyAndWildcardQuery() throws Exception {
+//		FullTextSession fts = initData();
+//
+//		Transaction transaction = fts.beginTransaction();
+//		final QueryBuilder monthQb = fts.getSearchFactory()
+//				.buildQueryBuilder().forEntity( Month.class ).get();
+//		Query
+//		//fuzzy search with custom threshold and prefix
+//		query = monthQb
+//				.term().on( "mythology" ).matches( "calder" )
+//					.fuzzy()
+//						.threshold( .8f )
+//						.prefixLength( 1 )
+//				.createQuery();
+//
+//		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+//
+//		//wildcard query
+//		query = monthQb
+//				.term().on( "mythology" ).matches( "mon*" )
+//					.wildcard()
+//				.createQuery();
+//		System.out.println(query.toString(  ));
+//		assertEquals( 2, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+//
+//		transaction.commit();
+//
+//		cleanData( fts );
+//	}
+//
+//	public void testQueryCustomization() throws Exception {
+//		FullTextSession fts = initData();
+//
+//		Transaction transaction = fts.beginTransaction();
+//		final QueryBuilder monthQb = fts.getSearchFactory()
+//				.buildQueryBuilder().forEntity( Month.class ).get();
+//		Query
+//
+//		//combined query, January and february both contain whitening but February in a longer text
+//		query = monthQb
+//				.bool()
+//					.should( monthQb.term().on( "mythology" ).matches( "whitening" ).createQuery() )
+//					.should( monthQb.term().on( "history" ).matches( "whitening" ).createQuery() )
+//				.createQuery();
+//
+//		List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
+//		assertEquals( 2, results.size() );
+//		assertEquals( "January", results.get( 0 ).getName() );
+//
+//		//boosted query, January and february both contain whitening but February in a longer text
+//		//since history is boosted, February should come first though
+//		query = monthQb
+//				.bool()
+//					.should( monthQb.term().on( "mythology" ).matches( "whitening" ).createQuery() )
+//					.should( monthQb.term().on( "history" ).matches( "whitening" ).boostedTo( 30 ).createQuery() )
+//				.createQuery();
+//
+//		results = fts.createFullTextQuery( query, Month.class ).list();
+//		assertEquals( 2, results.size() );
+//		assertEquals( "February", results.get( 0 ).getName() );
+//
+//		//FIXME add other method tests besides boostedTo
+//
+//		transaction.commit();
+//
+//		cleanData( fts );
+//	}
 
 	//FIXME add boolean tests
 

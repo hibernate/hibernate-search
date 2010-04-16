@@ -1,15 +1,20 @@
 package org.hibernate.search.query.dsl.v2;
 
 /**
-* @author Emmanuel Bernard
-*/
-public interface TermFuzzy extends TermTermination {
+ * @author Emmanuel Bernard
+ */
+public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
+	/**
+	 * field / property the term query is executed on
+	 */
+	TermMatchingContext onField(String field);
+
 	/**
 	 * Threshold above which two terms are considered similar enough.
 	 * Value between 0 and 1 (1 excluded)
 	 * Defaults to .5
 	 */
-	TermFuzzy threshold(float threshold);
+	FuzzyContext threshold(float threshold);
 
 	/**
 	 * Size of the prefix ignored by the fuzzyness.
@@ -17,5 +22,5 @@ public interface TermFuzzy extends TermTermination {
 	 *
 	 * Defaults to 0
 	 */
-	TermFuzzy prefixLength(int prefixLength);
+	FuzzyContext prefixLength(int prefixLength);
 }

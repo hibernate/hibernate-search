@@ -32,9 +32,4 @@ public interface QueryCustomization<T> {
 	T filter(Filter filter);
 
 	//TODO filter(String) + parameters
-
-	/**
-	 * Create a Lucene query
-	 */
-	Query createQuery();
 }
