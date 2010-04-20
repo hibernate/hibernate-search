@@ -1,5 +1,7 @@
 package org.hibernate.search.query.dsl.v2;
 
+import org.apache.lucene.search.Query;
+
 /**
  * @author Emmanuel Bernard
  */
@@ -27,4 +29,10 @@ public interface QueryBuilder {
 	 * Boolean query
 	 */
 	BooleanJunction<BooleanJunction> bool();
+
+	/**
+	 * Query matching all documents
+	 * Typically mixed with a boolean query.
+	 */
+	AllContext all();
 }

@@ -137,6 +137,61 @@ public class DSLTest extends SearchTestCase {
 		cleanData( fts );
 	}
 
+	public void testBoolean() throws Exception {
+		FullTextSession fts = initData();
+
+		Transaction transaction = fts.beginTransaction();
+		final QueryBuilder monthQb = fts.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+		Query
+
+		//must
+		query = monthQb
+				.bool()
+					.must( monthQb.exact().onField( "mythology" ).matches( "colder" ).createQuery() )
+					.createQuery();
+
+		List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 1, results.size() );
+		assertEquals( "January", results.get( 0 ).getName() );
+
+		//must not + all
+		query = monthQb
+				.bool()
+					.should( monthQb.all().createQuery() )
+					.must( monthQb.exact().onField( "mythology" ).matches( "colder" ).createQuery() )
+						.not()
+					.createQuery();
+		results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 1, results.size() );
+		assertEquals( "February", results.get( 0 ).getName() );
+
+		//implicit must not + all (not recommended)
+		query = monthQb
+				.bool()
+					.must( monthQb.exact().onField( "mythology" ).matches( "colder" ).createQuery() )
+						.not()
+					.createQuery();
+		results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 1, results.size() );
+		assertEquals( "February", results.get( 0 ).getName() );
+
+		//all except (recommended)
+		query = monthQb
+				.all()
+					.except( monthQb.exact().onField( "mythology" ).matches( "colder" ).createQuery() )
+					.createQuery();
+
+		results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 1, results.size() );
+		assertEquals( "February", results.get( 0 ).getName() );
+
+
+		transaction.commit();
+
+		cleanData( fts );
+	}
+
 
 //	public void testTermQueryOnAnalyzer() throws Exception {
 //		FullTextSession fts = initData();

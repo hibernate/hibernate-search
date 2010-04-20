@@ -1,5 +1,8 @@
 package org.hibernate.search.query.dsl.v2.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.SearchFactory;
@@ -15,19 +18,23 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
 	private boolean ignoreAnalyzer;
-	private final QueryContext context;
+	private final QueryContext queryContext;
+	private final FieldContext fieldContext;
+	private final List<ConnectedTermMatchingContext> otherFields;
 
-	public ConnectedTermMatchingContext(QueryContext context,
+	public ConnectedTermMatchingContext(QueryContext queryContext,
 			String field, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactory factory) {
 		this.factory = factory;
 		this.field = field;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = queryCustomizer;
-		this.context = context;
+		this.queryContext = queryContext;
+		this.otherFields = new ArrayList<ConnectedTermMatchingContext>();
+		this.fieldContext = null;
 	}
 
 	public TermTermination matches(String text) {
-		return new ConnectedSingleTermQueryBuilder(context, ignoreAnalyzer, text, field, queryCustomizer, queryAnalyzer, factory);
+		return new ConnectedSingleTermQueryBuilder( queryContext, ignoreAnalyzer, text, field, queryCustomizer, queryAnalyzer, factory);
 	}
 
 	public TermMatchingContext boostedTo(float boost) {

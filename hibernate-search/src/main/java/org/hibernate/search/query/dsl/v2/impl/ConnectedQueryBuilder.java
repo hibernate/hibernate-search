@@ -3,6 +3,7 @@ package org.hibernate.search.query.dsl.v2.impl;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.query.dsl.v2.AllContext;
 import org.hibernate.search.query.dsl.v2.BooleanJunction;
 import org.hibernate.search.query.dsl.v2.FuzzyContext;
 import org.hibernate.search.query.dsl.v2.QueryBuilder;
@@ -38,5 +39,9 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 	//fixme Have to use raw types but would be nice to not have to
 	public BooleanJunction bool() {
 		return new BooleanQueryBuilder();
+	}
+
+	public AllContext all() {
+		return new ConnectedAllContext();
 	}
 }

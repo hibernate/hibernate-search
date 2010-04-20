@@ -31,7 +31,7 @@ class BooleanQueryBuilder implements MustJunction {
 		if ( ! last.getOccur().equals( BooleanClause.Occur.MUST ) ) {
 			throw new AssertionFailure( "Cannot negate class: " + last.getOccur() );
 		}
-		clauses.add( lastIndex, new BooleanClause( last.getQuery(), BooleanClause.Occur.MUST_NOT ) );
+		clauses.set( lastIndex, new BooleanClause( last.getQuery(), BooleanClause.Occur.MUST_NOT ) );
 		return this;
 	}
 
@@ -41,7 +41,7 @@ class BooleanQueryBuilder implements MustJunction {
 	}
 
 	public MustJunction must(Query query) {
-		clauses.add( new BooleanClause( query, BooleanClause.Occur.SHOULD ) );
+		clauses.add( new BooleanClause( query, BooleanClause.Occur.MUST ) );
 		return this;
 	}
 
