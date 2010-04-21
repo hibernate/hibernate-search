@@ -14,7 +14,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Factory;
@@ -125,6 +124,54 @@ public class DSLTest extends SearchTestCase {
 					.should( monthQb.exact().onField( "mythology" ).matches( "whitening" ).createQuery() )
 					.should( monthQb.exact().onField( "history" ).boostedTo( 30 ).matches( "whitening" ).createQuery() )
 				.createQuery();
+
+		results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 2, results.size() );
+		assertEquals( "February", results.get( 0 ).getName() );
+
+		//FIXME add other method tests besides boostedTo
+
+		transaction.commit();
+
+		cleanData( fts );
+	}
+
+	public void testMultipleFields() throws Exception {
+		FullTextSession fts = initData();
+
+		Transaction transaction = fts.beginTransaction();
+		final QueryBuilder monthQb = fts.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+		Query
+
+		//combined query, January and february both contain whitening but February in a longer text
+		query = monthQb.exact()
+						.onField( "mythology" )
+						.andField( "history" )
+						.matches( "whitening" ).createQuery();
+
+		List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 2, results.size() );
+		assertEquals( "January", results.get( 0 ).getName() );
+
+		//combined query, January and february both contain whitening but February in a longer text
+		query = monthQb.exact()
+						.onFields( "mythology", "history" )
+							.boostedTo( 30 )
+						.matches( "whitening" ).createQuery();
+
+		results = fts.createFullTextQuery( query, Month.class ).list();
+		assertEquals( 2, results.size() );
+		assertEquals( "January", results.get( 0 ).getName() );
+
+		//boosted query, January and february both contain whitening but February in a longer text
+		//since history is boosted, February should come first though
+		query = monthQb.exact()
+							.onField( "mythology" )
+							.andField( "history" )
+								.boostedTo( 30 )
+							.matches( "whitening" )
+							.createQuery();
 
 		results = fts.createFullTextQuery( query, Month.class ).list();
 		assertEquals( 2, results.size() );

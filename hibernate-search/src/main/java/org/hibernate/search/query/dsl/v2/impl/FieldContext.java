@@ -7,26 +7,16 @@ import org.apache.lucene.analysis.Analyzer;
  */
 public class FieldContext {
 	private final String field;
-	private final Analyzer queryAnalyzer;
-	private final QueryCustomizer queryCustomizer;
 	private boolean ignoreAnalyzer;
+	private final QueryCustomizer fieldCustomizer;
 
-	public FieldContext(String field, Analyzer queryAnalyzer, QueryCustomizer queryCustomizer) {
+	public FieldContext(String field) {
 		this.field = field;
-		this.queryAnalyzer = queryAnalyzer;
-		this.queryCustomizer = queryCustomizer;
+		this.fieldCustomizer = new QueryCustomizer();
 	}
 
 	public String getField() {
 		return field;
-	}
-
-	public Analyzer getQueryAnalyzer() {
-		return queryAnalyzer;
-	}
-
-	public QueryCustomizer getQueryCustomizer() {
-		return queryCustomizer;
 	}
 
 	public boolean isIgnoreAnalyzer() {
@@ -35,5 +25,9 @@ public class FieldContext {
 
 	public void setIgnoreAnalyzer(boolean ignoreAnalyzer) {
 		this.ignoreAnalyzer = ignoreAnalyzer;
+	}
+
+	public QueryCustomizer getFieldCustomizer() {
+		return fieldCustomizer;
 	}
 }

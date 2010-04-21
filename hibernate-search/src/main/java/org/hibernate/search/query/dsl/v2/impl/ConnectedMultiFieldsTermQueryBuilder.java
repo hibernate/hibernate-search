@@ -25,77 +25,88 @@ import org.hibernate.search.query.dsl.v2.TermTermination;
 /**
 * @author Emmanuel Bernard
 */
-public class ConnectedSingleTermQueryBuilder implements TermTermination {
-	private final SearchFactory factory;
-	private final String field;
+public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private final String text;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
-	private boolean ignoreAnalyzer;
-	private final QueryContext context;
+	private final QueryContext queryContext;
+	private final List<FieldContext> fieldContexts;
 
-	public ConnectedSingleTermQueryBuilder(
-			QueryContext context,
-			boolean ignoreAnalyzer,
-			String text,
-			String field,
-			QueryCustomizer queryCustomizer,
-			Analyzer queryAnalyzer,
-			SearchFactory factory) {
-		this.context = context;
-		this.factory = factory;
-		this.field = field;
+	public ConnectedMultiFieldsTermQueryBuilder(QueryContext queryContext,
+												String text,
+												List<FieldContext> fieldContexts,
+												QueryCustomizer queryCustomizer,
+												Analyzer queryAnalyzer,
+												SearchFactory factory) {
+		this.queryContext = queryContext;
 		this.text = text;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = queryCustomizer;
-		this.ignoreAnalyzer = ignoreAnalyzer;
+		this.fieldContexts = fieldContexts;
 	}
 
 	public Query createQuery() {
-		final Query result;
-		if ( ignoreAnalyzer ) {
-			result = createTermQuery( text );
+		final int size = fieldContexts.size();
+		if ( size == 1 ) {
+			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ) ) ).createQuery();
+		}
+		else {
+			BooleanQuery aggregatedFieldsQuery = new BooleanQuery( );
+			for ( FieldContext fieldContext : fieldContexts ) {
+				aggregatedFieldsQuery.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
+			}
+			return  queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
+		}
+	}
+
+	public Query createQuery(FieldContext fieldContext) {
+		final Query perFieldQuery;
+		if ( fieldContext.isIgnoreAnalyzer() ) {
+			perFieldQuery = createTermQuery( fieldContext, text );
 		}
 		else {
 			List<String> terms;
 			try {
-				terms = getAllTermsFromText( field, text, queryAnalyzer );
+				terms = getAllTermsFromText( fieldContext.getField(), text, queryAnalyzer );
 			}
 			catch ( IOException e ) {
 				throw new AssertionFailure("IO exception while reading String stream??", e);
 			}
 			if ( terms.size() == 0 ) {
-				throw new SearchException("try to search with an empty string: " + field);
+				throw new SearchException( "try to search with an empty string: " + fieldContext.getField() );
 			}
 			else if (terms.size() == 1 ) {
-				result = createTermQuery( terms.get( 0 ) );
+				perFieldQuery = createTermQuery( fieldContext, terms.get( 0 ) );
 			}
 			else {
 				BooleanQuery booleanQuery = new BooleanQuery();
 				for (String term : terms) {
-					Query termQuery = createTermQuery(term);
+					Query termQuery = createTermQuery(fieldContext, term);
 					booleanQuery.add( termQuery, BooleanClause.Occur.SHOULD );
 				}
-				result = booleanQuery;
+				perFieldQuery = booleanQuery;
 			}
 		}
-		return queryCustomizer.setWrappedQuery( result ).createQuery();
+		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
 
-	private Query createTermQuery(String term) {
+	private Query createTermQuery(FieldContext fieldContext, String term) {
 		Query query;
-		switch ( context.getApproximation() ) {
+		switch ( queryContext.getApproximation() ) {
 			case EXACT:
-				query = new TermQuery( new Term(field, term) );
+				query = new TermQuery( new Term( fieldContext.getField(), term ) );
 				break;
 			case WILDCARD:
-				query = new WildcardQuery( new Term(field, term) );
+				query = new WildcardQuery( new Term( fieldContext.getField(), term ) );
 				break;
 			case FUZZY:
-				query = new FuzzyQuery( new Term(field, term), context.getThreshold(), context.getPrefixLength() );
+				query = new FuzzyQuery(
+						new Term( fieldContext.getField(), term ),
+						queryContext.getThreshold(),
+						queryContext.getPrefixLength() );
 				break;
 			default:
-				throw new AssertionFailure( "Unknown approximation: " + context.getApproximation());
+				throw new AssertionFailure( "Unknown approximation: " + queryContext.getApproximation());
 		}
 		return query;
 	}
@@ -103,7 +114,7 @@ public class ConnectedSingleTermQueryBuilder implements TermTermination {
 	private List<String> getAllTermsFromText(String fieldName, String text, Analyzer analyzer) throws IOException {
 		//it's better not to apply the analyzer with windcards as * and ? can be mistakenly removed
 		List<String> terms = new ArrayList<String>();
-		if ( context.getApproximation() == QueryContext.Approximation.WILDCARD ) {
+		if ( queryContext.getApproximation() == QueryContext.Approximation.WILDCARD ) {
 			terms.add( text );
 		}
 		else {

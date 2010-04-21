@@ -27,6 +27,10 @@ class ConnectedTermContext implements TermContext {
 		return new ConnectedTermMatchingContext(context, field, queryCustomizer, queryAnalyzer, factory);
 	}
 
+	public TermMatchingContext onFields(String... fields) {
+		return new ConnectedTermMatchingContext(context, fields, queryCustomizer, queryAnalyzer, factory);
+	}
+
 	public TermContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;

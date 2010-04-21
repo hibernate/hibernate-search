@@ -9,8 +9,8 @@ public interface TermMatchingContext extends FieldCustomization<TermMatchingCont
 	 */
 	TermTermination matches(String text);
 
-//	/**
-//	 * field / property the term query is executed on
-//	 */
-//	TermMatchingContext onField(String field);
+	/**
+	 * field / property the term query is executed on
+	 */
+	TermMatchingContext andField(String field);
 }

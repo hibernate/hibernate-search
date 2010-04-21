@@ -11,4 +11,6 @@ public interface TermContext extends QueryCustomization<TermContext> {
 	 */
 	TermMatchingContext onField(String field);
 
+	TermMatchingContext onFields(String... field);
+
 }
