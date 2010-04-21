@@ -26,6 +26,7 @@ public class Entity1ForUnindexed implements Serializable {
 	@Id
 	@GeneratedValue
 	@Field(index = Index.UN_TOKENIZED)
+	@Column(name="universalid")
 	private long uid;
 
 	@Version
@@ -36,7 +37,7 @@ public class Entity1ForUnindexed implements Serializable {
 	@org.hibernate.annotations.Cache(usage = org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
 	private java.util.List<Entity2ForUnindexed> entities2 = new java.util.ArrayList<Entity2ForUnindexed>();
 
-	@Column(name="universalid")
+	
 	public long getUid() {
 		return uid;
 	}

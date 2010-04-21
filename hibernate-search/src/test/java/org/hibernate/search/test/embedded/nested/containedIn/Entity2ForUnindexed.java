@@ -26,6 +26,7 @@ public class Entity2ForUnindexed {
 	 */
 	@Id
 	@GeneratedValue
+	@Column(name="universalid")//"uid" is a keywork in Oracle
 	private long uid;
 
 	/**
@@ -44,7 +45,7 @@ public class Entity2ForUnindexed {
 	 *
 	 * @return long : Renvoie uid.
 	 */
-	@Column(name="universalid")//"uid" is a keywork in Oracle
+	
 	public long getUid() {
 		return uid;
 	}
