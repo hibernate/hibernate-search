@@ -44,7 +44,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 		}
 	}
 
-	public TermTermination matches(String text) {
+	public TermTermination matching(String text) {
 		return new ConnectedMultiFieldsTermQueryBuilder( queryContext, text, fieldContexts, queryCustomizer, queryAnalyzer, factory);
 	}
 

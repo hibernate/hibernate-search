@@ -7,7 +7,7 @@ public interface TermMatchingContext extends FieldCustomization<TermMatchingCont
 	/**
 	 * text searched in the term query (the term is pre-analyzer unless ignoreAnalyzer is called)
 	 */
-	TermTermination matches(String text);
+	TermTermination matching(String text);
 
 	/**
 	 * field / property the term query is executed on
