@@ -391,7 +391,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * Execute the lucene search and return the matching hits.
 	 *
 	 * @param searcher The index searcher.
-	 * @param n Numer of documents to retrieve
+	 * @param n Number of documents to retrieve
 	 *
 	 * @return An instance of <code>QueryHits</code> wrapping the Lucene query and the matching documents.
 	 *

@@ -33,7 +33,7 @@ package org.hibernate.search.bridge;
  * <li><code>stringToObject( objectToString( object ) ).equals(object)</code>, for non <code>null</code> object. </li>
  * </ul>
  * 
- * As for all Bridges implementations must be threasafe.
+ * As for all Bridges implementations must be threadsafe.
  * 
  * @author Emmanuel Bernard
  */
