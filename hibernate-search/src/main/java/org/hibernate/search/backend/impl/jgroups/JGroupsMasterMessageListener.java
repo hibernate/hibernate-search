@@ -66,11 +66,13 @@ public class JGroupsMasterMessageListener implements Receiver {
 		}
 
 		if ( queue != null && !queue.isEmpty() ) {
-			log.debug(
+			if ( log.isDebugEnabled() ) {
+				log.debug(
 					"There are {} Lucene docs received from slave node {} to be processed by master",
 					queue.size(),
 					message.getSrc()
-			);
+				);
+			}
 			Runnable worker = getWorker( queue );
 			worker.run();
 		}

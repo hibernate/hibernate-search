@@ -45,7 +45,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class JGroupsBackendQueueProcessor implements Runnable {
 
-	protected static final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 
 	private final JGroupsBackendQueueProcessorFactory factory;
 	private final List<LuceneWork> queue;
@@ -57,8 +57,11 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 
 	@SuppressWarnings("unchecked")
 	public void run() {
+		boolean trace = log.isTraceEnabled();
 		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>( queue );
-		log.trace( "Preparing {} Lucene works to be sent to master node.", filteredQueue.size() );
+		if ( trace ) {
+			log.trace( "Preparing {} Lucene works to be sent to master node.", filteredQueue.size() );
+		}
 
 		for ( LuceneWork work : queue ) {
 			if ( work instanceof OptimizeLuceneWork ) {
@@ -66,14 +69,16 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 				filteredQueue.remove( work );
 			}
 		}
-		log.trace(
+		if ( trace ) {
+			log.trace(
 				"Filtering: optimized Lucene works are not going to be sent to master node. There is {} Lucene works after filtering.",
 				filteredQueue.size()
-		);
-		if ( filteredQueue.size() == 0 ) {
-			log.trace(
-					"Nothing to send. Propagating works to a cluster has been skipped."
 			);
+		}
+		if ( filteredQueue.isEmpty() ) {
+			if ( trace ) {
+				log.trace( "Nothing to send. Propagating works to a cluster has been skipped." );
+			}
 			return;
 		}
 
@@ -83,9 +88,9 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 		try {
 			Message message = new Message( null, factory.getAddress(), ( Serializable ) filteredQueue );
 			factory.getChannel().send( message );
-			log.trace(
-					"Lucene works have been sent from slave {} to master node.", factory.getAddress()
-			);
+			if ( trace ) {
+				log.trace( "Lucene works have been sent from slave {} to master node.", factory.getAddress() );
+			}
 		}
 		catch ( ChannelNotConnectedException e ) {
 			throw new SearchException(
@@ -96,6 +101,6 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 		catch ( ChannelClosedException e ) {
 			throw new SearchException( "Unable to send Lucene work. Attempt to send message on closed JGroups channel" );
 		}
-
 	}
+	
 }

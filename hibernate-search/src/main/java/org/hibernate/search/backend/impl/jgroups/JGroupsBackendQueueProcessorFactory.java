@@ -51,7 +51,7 @@ import org.hibernate.util.ConfigHelper;
  */
 public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 
-	protected static final Logger log = LoggerFactory.make();
+	private static final Logger log = LoggerFactory.make();
 
 	public static final String JGROUPS_PREFIX = Environment.WORKER_BACKEND + ".jgroups.";
 
@@ -97,7 +97,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 	}
 
 	/**
-	 * Reads configuration and builds channnel with its base.
+	 * Reads configuration and builds channel with its base.
 	 * In order of preference - we first look for an external JGroups file, then a set of XML properties, and
 	 * finally the legacy JGroups String properties.
 	 *
@@ -142,7 +142,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 
 		if ( channel == null ) {
 			log.info(
-					"Unable to use any JGroups configuration mechanisms provided in properties {}.  Using default JGroups configuration file!",
+					"Unable to use any JGroups configuration mechanisms provided in properties {}. Using default JGroups configuration file!",
 					props
 			);
 			try {
