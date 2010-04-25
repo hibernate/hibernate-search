@@ -30,8 +30,11 @@ import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Collects all resources needed to apply changes to one index,
@@ -40,6 +43,8 @@ import java.util.concurrent.ExecutorService;
  * @author Sanne Grinovero
  */
 class PerDPResources {
+	
+	private static final Logger log = LoggerFactory.make();
 	
 	private final ExecutorService executor;
 	private final LuceneWorkVisitor visitor;
@@ -77,6 +82,12 @@ class PerDPResources {
 			executor.execute( new CloseIndexRunnable( workspace ) );
 		}
 		executor.shutdown();
+		try {
+			executor.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
+		}
+		catch (InterruptedException e) {
+			log.warn( "Was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock" );
+		}
 	}
 
 	public ErrorHandler getErrorHandler() {
