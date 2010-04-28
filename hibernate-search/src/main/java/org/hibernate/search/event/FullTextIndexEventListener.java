@@ -30,7 +30,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
-
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
@@ -61,9 +60,14 @@ import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
+import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.WeakIdentityHashMap;
+
+import static org.hibernate.search.event.FullTextIndexEventListener.Installation.MULTIPLE_INSTANCE;
+import static org.hibernate.search.event.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
 
 /**
  * This listener supports setting a parent directory for all generated index files.
@@ -86,6 +90,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	protected boolean used;
 	protected SearchFactoryImplementor searchFactoryImplementor;
+	private final Installation installation;
 	
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
 	// transient because it's not serializable (and state doesn't need to live longer than a flush).
@@ -94,12 +99,33 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
 	private transient final Map<Session,Synchronization> flushSynch = new WeakIdentityHashMap<Session,Synchronization>(0);
 
+	public FullTextIndexEventListener() {
+		this.installation = MULTIPLE_INSTANCE;
+	}
+
+	public FullTextIndexEventListener(Installation installation) {
+		this.installation = installation;
+	}
+
 	/**
 	 * Initialize method called by Hibernate Core when the SessionFactory starts
 	 */
 
 	public void initialize(Configuration cfg) {
-		searchFactoryImplementor = ContextHolder.getOrBuildSearchFactory( cfg );
+		/*
+		 * if we know we pass the same instance, we can actually ensure that
+		 *  - initialize() is a no op if already run
+		 *  - avoid ContextHolder altogether
+		 */
+		if ( installation != SINGLE_INSTANCE ) {
+			log.debug( "Storing SearchFactory in ThreadLocal" );
+			searchFactoryImplementor = ContextHolder.getOrBuildSearchFactory( cfg );
+		}
+		else {
+			if ( searchFactoryImplementor == null ) {
+				searchFactoryImplementor = new SearchFactoryImpl( new SearchConfigurationFromHibernateCore( cfg ) );
+			}
+		}
 		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
 		if ( "event".equals( indexingStrategy ) ) {
 			used = searchFactoryImplementor.getDocumentBuildersIndexedEntities().size() != 0;
@@ -107,6 +133,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		else if ( "manual".equals( indexingStrategy ) ) {
 			used = false;
 		}
+		log.debug( "Hibernate Search event listeners " + (used ? "activated" : "desactivated") );
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
@@ -153,6 +180,15 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	public void cleanup() {
 		searchFactoryImplementor.close();
+		temptativeContextCleaning();
+
+	}
+
+	private void temptativeContextCleaning() {
+		if ( installation != SINGLE_INSTANCE ) {
+			//unlikely to work: the thread used for closing is unlikely the thread used for initializing
+			ContextHolder.removeSearchFactoryFromCache( searchFactoryImplementor );
+		}
 	}
 
 	public void onPostRecreateCollection(PostCollectionRecreateEvent event) {
@@ -242,6 +278,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	private void writeObject(ObjectOutputStream os) throws IOException {
 		os.defaultWriteObject();
+		temptativeContextCleaning();
 	}
 
 	//needs to implement custom readObject to restore the transient fields
@@ -255,4 +292,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		f.set( this, flushSynch );
 	}
 
+	public static enum Installation {
+		SINGLE_INSTANCE,
+		MULTIPLE_INSTANCE
+	}
 }

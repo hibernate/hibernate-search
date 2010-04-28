@@ -67,7 +67,9 @@ public class EventListenerRegister {
 			);
 			return;
 		}
-		final FullTextIndexEventListener searchListener = new FullTextIndexEventListener();
+		final FullTextIndexEventListener searchListener =
+				new FullTextIndexEventListener( FullTextIndexEventListener.Installation.SINGLE_INSTANCE );
+		
 		// PostInsertEventListener
 		listeners.setPostInsertEventListeners(
 				addIfNeeded(
