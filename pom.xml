@@ -32,8 +32,8 @@
     <version>3.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Parent</name>
-    <description>Hibernate Search Parent POM</description>
+    <name>Hibernate Search Aggregator</name>
+    <description>Hibernate Search Aggregator POM</description>
     <url>http://search.hibernate.org</url>
 
     <modules>
@@ -356,17 +356,6 @@
                             <type>jdocbook-style</type>
                         </dependency>
                     </dependencies>
-                    <executions>
-                        <execution>
-                            <id>make-doc</id>
-                            <phase>site</phase>
-                            <goals>
-                                <goal>translate</goal>
-                                <goal>resources</goal>
-                                <goal>generate</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
