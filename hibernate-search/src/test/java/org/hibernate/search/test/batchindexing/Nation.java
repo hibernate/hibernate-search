@@ -25,48 +25,52 @@
 package org.hibernate.search.test.batchindexing;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Index;
 
-@Indexed
 @Entity
-public class Dvd implements TitleAble {
-	
-	private long unusuallyNamedIdentifier;
-	private String title;
-	private Nation firstPublishedIn;
+public class Nation {
 
-	@Id
-	@GeneratedValue
-	public long getUnusuallyNamedIdentifier() {
-		return unusuallyNamedIdentifier;
+	private Integer id;
+	private String name;
+	private String code;
+	
+	public Nation() {}
+	
+	public Nation(String name, String code){
+		this.name = name;
+		this.code = code;
 	}
 
-	public void setUnusuallyNamedIdentifier(long unusuallyNamedIdentifier) {
-		this.unusuallyNamedIdentifier = unusuallyNamedIdentifier;
+	@Id @GeneratedValue
+	public Integer getId() {
+		return id;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	@Field
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
 	
-	public void setTitle(String title) {
-		this.title = title;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	@ManyToOne(optional=false, fetch=FetchType.EAGER)
-	public Nation getFirstPublishedIn() {
-		return firstPublishedIn;
+	@Field(index=Index.UN_TOKENIZED)
+	public String getCode() {
+		return code;
 	}
 	
-	public void setFirstPublishedIn(Nation firstPublishedIn) {
-		this.firstPublishedIn = firstPublishedIn;
+	public void setCode(String code) {
+		this.code = code;
 	}
 	
 }
+

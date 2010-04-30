@@ -43,9 +43,9 @@ import org.hibernate.search.test.util.textbuilder.SentenceInventor;
  */
 public class IndexingGeneratedCorpusTest extends TestCase {
 	
-	private final int BOOK_NUM = 300;
-	private final int ANCIENTBOOK_NUM = 60;
-	private final int DVD_NUM = 200;
+	private final int BOOK_NUM = 600;
+	private final int ANCIENTBOOK_NUM = 120;
+	private final int DVD_NUM = 400;
 	
 	private SentenceInventor sentenceInventor = new SentenceInventor( 7L, 10000 );
 	private FullTextSessionBuilder builder;
@@ -59,6 +59,7 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 			.addAnnotatedClass( Book.class )
 			.addAnnotatedClass( Dvd.class )
 			.addAnnotatedClass( AncientBook.class )
+			.addAnnotatedClass( Nation.class )
 			.setProperty( "hibernate.show_sql", "false" ) //too verbose for this test
 			.setProperty( LuceneBatchBackend.CONCURRENT_WRITERS, "4" )
 			.build();
@@ -76,9 +77,15 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
+			fullTextSession.persist( new Nation("Italy", "IT") );
+			tx.commit();
+			tx = fullTextSession.beginTransaction();
 			for ( int i = 0; i < amount; i++ ) {
 				TitleAble instance = entityType.newInstance();
 				instance.setTitle( sentenceInventor.nextSentence() );
+				//to test for HSEARCH-512 we make all entities share some proxy
+				Nation country = (Nation) fullTextSession.load( Nation.class, 1 );
+				instance.setFirstPublishedIn( country );
 				fullTextSession.persist( instance );
 				totalEntitiesInDB++;
 				if ( i % 250 == 249 ) {

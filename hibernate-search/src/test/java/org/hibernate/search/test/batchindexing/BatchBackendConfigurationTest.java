@@ -45,6 +45,7 @@ public class BatchBackendConfigurationTest extends TestCase {
 	public void testConfigurationIsRead() throws InterruptedException {
 		FullTextSessionBuilder fsBuilder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Book.class )
+			.addAnnotatedClass( Nation.class )
 			// illegal option:
 			.setProperty( LuceneBatchBackend.CONCURRENT_WRITERS, "0" )
 			.build();

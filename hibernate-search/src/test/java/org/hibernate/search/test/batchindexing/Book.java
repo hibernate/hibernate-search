@@ -25,11 +25,16 @@
 package org.hibernate.search.test.batchindexing;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 @Indexed
 @Entity
@@ -38,6 +43,8 @@ public class Book implements TitleAble {
 	private long id;
 	
 	private String title;
+	
+	private Nation firstPublishedIn;
 
 	@Id @GeneratedValue
 	public long getId() {
@@ -55,6 +62,17 @@ public class Book implements TitleAble {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	@ManyToOne(fetch=FetchType.LAZY,optional=false)
+	@Fetch(FetchMode.SELECT)
+	@IndexedEmbedded
+	public Nation getFirstPublishedIn() {
+		return firstPublishedIn;
+	}
+	
+	public void setFirstPublishedIn(Nation firstPublishedIn) {
+		this.firstPublishedIn = firstPublishedIn;
 	}
 
 }

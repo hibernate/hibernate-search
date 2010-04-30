@@ -54,7 +54,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final ThreadPoolExecutor 		execIdentifiersLoader;
 	private final ProducerConsumerQueue<List<Serializable>> 	fromIdentifierListToEntities;
 	private final ThreadPoolExecutor 		execFirstLoader;
-	private final ProducerConsumerQueue<Object> 	fromEntityToAddwork;
+	private final ProducerConsumerQueue<List<?>> 	fromEntityToAddwork;
 	private final ThreadPoolExecutor		execDocBuilding;
 	
 	private final int objectLoadingThreadNum;
@@ -105,7 +105,7 @@ public class BatchIndexingWorkspace implements Runnable {
 		
 		//pipelining queues:
 		this.fromIdentifierListToEntities = new ProducerConsumerQueue<List<Serializable>>( 1 );
-		this.fromEntityToAddwork = new ProducerConsumerQueue<Object>( objectLoadingThreadNum );
+		this.fromEntityToAddwork = new ProducerConsumerQueue<List<?>>( objectLoadingThreadNum );
 		
 		//end signal shared with other instances:
 		this.endAllSignal = endAllSignal;

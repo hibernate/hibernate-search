@@ -52,7 +52,7 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 	private static final Logger log = LoggerFactory.make();
 
 	private final ProducerConsumerQueue<List<Serializable>> source;
-	private final ProducerConsumerQueue<Object> destination;
+	private final ProducerConsumerQueue<List<?>> destination;
 	private final SessionFactory sessionFactory;
 	private final CacheMode cacheMode;
 	private final Class<?> type;
@@ -60,7 +60,7 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 
 	public IdentifierConsumerEntityProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
-			ProducerConsumerQueue<Object> fromEntityToAddwork,
+			ProducerConsumerQueue<List<?>> fromEntityToAddwork,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CacheMode cacheMode, Class<?> type) {
@@ -133,9 +133,7 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 		List<?> list = criteria.list();
 		monitor.entitiesLoaded( list.size() );
 		session.clear();
-		for ( Object obj : list ) {
-			destination.put( obj );
-		}
+		destination.put( list );
 	}
 
 }

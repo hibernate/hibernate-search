@@ -51,6 +51,7 @@ public class SearchIndexerTest extends TestCase {
 			.addAnnotatedClass( AncientBook.class )
 			.addAnnotatedClass( Dvd.class )
 			.addAnnotatedClass( Book.class )
+			.addAnnotatedClass( Nation.class )
 			.build();
 		FullTextSession fullTextSession = ftsb.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
@@ -106,17 +107,22 @@ public class SearchIndexerTest extends TestCase {
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
 			.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
 			.addAnnotatedClass( Dvd.class )
+			.addAnnotatedClass( Nation.class )
 			.setProperty( Environment.INDEXING_STRATEGY, "manual" )
 			.build();
 		{
 			//creating the test data in database only:
 			FullTextSession fullTextSession = ftsb.openFullTextSession();
 			Transaction transaction = fullTextSession.beginTransaction();
+			Nation us = new Nation( "United States of America", "US" );
+			fullTextSession.persist( us );
 			Dvd dvda = new Dvd();
 			dvda.setTitle( "Star Trek (episode 96367)" );
+			dvda.setFirstPublishedIn( us );
 			fullTextSession.save(dvda);
 			Dvd dvdb = new Dvd();
 			dvdb.setTitle( "The Trek" );
+			dvdb.setFirstPublishedIn( us );
 			fullTextSession.save(dvdb);
 			transaction.commit();
 			fullTextSession.close();

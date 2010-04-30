@@ -25,6 +25,7 @@
 package org.hibernate.search.batchindexing;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -54,7 +55,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 	
 	private static final Logger log = LoggerFactory.make();
 	
-	private final ProducerConsumerQueue<Object> source;
+	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
 	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuilders;
 	private final MassIndexerProgressMonitor monitor;
@@ -67,7 +68,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 	private final BatchBackend backend;
 	
 	public EntityConsumerLuceneworkProducer(
-			ProducerConsumerQueue<Object> entitySource,
+			ProducerConsumerQueue<List<?>> entitySource,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CountDownLatch producerEndSignal,
@@ -91,6 +92,9 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 			indexAllQueue( session );
 			transaction.commit();
 		}
+		catch (Throwable e) {
+			log.error( "error during batch indexing: ", e );
+		}
 		finally {
 			producerEndSignal.countDown();
 			session.close();
@@ -101,20 +105,22 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 	private void indexAllQueue(Session session) {
 		try {
 			for ( int cycle=0; true; cycle++ ) {
-				Object take = source.take();
-				if ( take == null ) {
+				List<?> takeList = source.take();
+				if ( takeList == null ) {
 					break;
 				}
 				else {
-					log.trace( "received an object {}", take );
-					//trick to attach the objects to session:
-					session.buildLockRequest( LockOptions.NONE ).lock( take );
-					index( take, session );
-					monitor.documentsBuilt( 1 );
-					session.evict( take );
-					if ( cycle == CLEAR_PERIOD ) {
-						cycle = 0;
-						session.clear();
+					log.trace( "received a list of objects to index: {}", takeList );
+					for ( Object take : takeList ) {
+						//trick to attach the objects to session:
+						session.buildLockRequest( LockOptions.NONE ).lock( take );
+						index( take, session );
+						monitor.documentsBuilt( 1 );
+						session.evict( take );
+						if ( cycle == CLEAR_PERIOD ) {
+							cycle = 0;
+							session.clear();
+						}
 					}
 				}
 			}
