@@ -25,10 +25,14 @@
 package org.hibernate.search.batchindexing;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Helper class to create threads;
@@ -40,6 +44,8 @@ public class Executors {
 	
 	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
 	private static final int QUEUE_MAX_LENGTH = 1000; //TODO have it configurable?
+	
+	private static final Logger log = LoggerFactory.make();
 	
 	/**
 	 * Creates a new fixed size ThreadPoolExecutor.
@@ -70,7 +76,7 @@ public class Executors {
 	            0L, TimeUnit.MILLISECONDS,
 	            new LinkedBlockingQueue<Runnable>( queueSize ),
 	            new SearchThreadFactory( groupname ),
-	            new ThreadPoolExecutor.CallerRunsPolicy() );
+	            new BlockPolicy() );
 	}
 	
 	/**
@@ -96,6 +102,33 @@ public class Executors {
             return t;
         }
         
+    }
+    
+    /**
+     * A handler for rejected tasks that will have the caller block until
+     * space is available.
+     */
+    public static class BlockPolicy implements RejectedExecutionHandler {
+
+    	/**
+         * Creates a <tt>BlockPolicy</tt>.
+         */
+        public BlockPolicy() { }
+
+        /**
+         * Puts the Runnable to the blocking queue, effectively blocking
+         * the delegating thread until space is available.
+         * @param r the runnable task requested to be executed
+         * @param e the executor attempting to execute this task
+         */
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+        	try {
+				e.getQueue().put( r );
+			}
+			catch (InterruptedException e1) {
+				log.error( "Work discarded, thread was interrupted while waiting for space to schedule: {}", r );
+			}
+        }
     }
 	
 }
