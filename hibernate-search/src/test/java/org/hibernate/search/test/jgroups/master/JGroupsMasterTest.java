@@ -90,7 +90,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 	}
 
 	private void prepareJGroupsChannel() throws Exception {
-		channel = new JChannel( prepareJGroupsCongigurationString() );
+		channel = new JChannel( prepareJGroupsConfigurationString() );
 		channel.connect( CHANNEL_NAME );
 	}
 
@@ -167,11 +167,11 @@ public class JGroupsMasterTest extends SearchTestCase {
 		cfg.setProperty( Environment.WORKER_BACKEND, "jgroupsMaster" );
 		cfg.setProperty( JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
 		cfg.setProperty(
-				JGroupsBackendQueueProcessorFactory.CONFIGURATION_STRING, prepareJGroupsCongigurationString()
+				JGroupsBackendQueueProcessorFactory.CONFIGURATION_STRING, prepareJGroupsConfigurationString()
 		);
 	}
 
-	private String prepareJGroupsCongigurationString() {
+	private String prepareJGroupsConfigurationString() {
 		return "UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):" +
 				"PING(timeout=3000;num_initial_members=6):" +
 				"FD(timeout=5000):" +
