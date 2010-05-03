@@ -29,7 +29,7 @@
 <!ENTITY copyrightYear "2004">
 <!ENTITY copyrightHolder "Red Hat Middleware, LLC.">
 ]>
-<book lang="en">
+<book>
   <bookinfo>
     <title>Hibernate Search</title>
 

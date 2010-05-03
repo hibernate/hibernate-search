@@ -25,7 +25,7 @@
   -->
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY version "WORKING">
+<!ENTITY version "3.2.0.Final">
 ]>
 <chapter id="getting-started">
   <title>Getting started</title>
@@ -98,21 +98,64 @@
 
     <para>Instead of managing all dependencies manually, maven users have the
     possibility to use the <ulink
-    url="http://repository.jboss.com/maven2">JBoss maven repository</ulink>.
-    Just add the JBoss repository url to the <emphasis>repositories</emphasis>
-    section of your <filename>pom.xml</filename> or
-    <filename>settings.xml</filename>:</para>
+    url="https://repository.jboss.org/nexus/content/groups/public/">JBoss
+    maven repository</ulink>. Add the following to your Maven
+    <filename>settings.xml file</filename> (see also <ulink
+    url="http://community.jboss.org/wiki/MavenGettingStarted-Users">Maven
+    Getting Started</ulink>):</para>
 
     <example>
       <title>Adding the JBoss maven repository to
       <filename>settings.xml</filename></title>
 
-      <programlisting>&lt;repository&gt;
-  &lt;id&gt;repository.jboss.org&lt;/id&gt;
-  &lt;name&gt;JBoss Maven Repository&lt;/name&gt;
-  &lt;url&gt;http://repository.jboss.org/maven2&lt;/url&gt;
-  &lt;layout&gt;default&lt;/layout&gt;
-&lt;/repository&gt;      </programlisting>
+      <programlisting>&lt;settings&gt;
+  ...
+  &lt;profiles&gt;
+    ...
+    &lt;profile&gt;
+      &lt;id&gt;jboss-public-repository&lt;/id&gt;
+      &lt;repositories&gt;
+        &lt;repository&gt;
+          &lt;id&gt;jboss-public-repository-group&lt;/id&gt;
+          &lt;name&gt;JBoss Public Maven Repository Group&lt;/name&gt;
+          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public/&lt;/url&gt;
+          &lt;layout&gt;default&lt;/layout&gt;
+          &lt;releases&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;
+          &lt;/releases&gt;
+          &lt;snapshots&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;
+          &lt;/snapshots&gt;
+        &lt;/repository&gt;
+      &lt;/repositories&gt;
+      &lt;pluginRepositories&gt;
+        &lt;pluginRepository&gt;
+          &lt;id&gt;jboss-public-repository-group&lt;/id&gt;
+          &lt;name&gt;JBoss Public Maven Repository Group&lt;/name&gt;
+          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public/&lt;/url&gt;
+          &lt;layout&gt;default&lt;/layout&gt;
+          &lt;releases&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;
+          &lt;/releases&gt;
+          &lt;snapshots&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;
+          &lt;/snapshots&gt;
+        &lt;/pluginRepository&gt;
+      &lt;/pluginRepositories&gt;
+    &lt;/profile&gt;
+
+  &lt;/profiles&gt;
+
+  &lt;activeProfiles&gt;
+    &lt;activeProfile&gt;jboss-public-repository&lt;/activeProfile&gt;
+  &lt;/activeProfiles&gt;
+  ...
+&lt;/settings&gt;
+    </programlisting>
     </example>
 
     <para>Then add the following dependencies to your pom.xml:</para>
@@ -132,28 +175,19 @@
 &lt;/dependency&gt;</programlisting>
     </example>
 
-    <para>Not all dependencies are required. Only the
-    <emphasis>hibernate-search</emphasis> dependency is mandatory. This
-    dependency, together with its required transitive dependencies, contain
-    all required classes needed to use Hibernate Search.</para>
+    <para>Only the <emphasis>hibernate-search</emphasis> dependency is
+    mandatory, because it contains together with its required transitive
+    dependencies all required classes needed to use Hibernate
+    Search.<emphasis> hibernate-entitymanager</emphasis> is only required if
+    you want to use Hibernate Search in conjunction with JPA.</para>
 
-    <para><emphasis>hibernate-annotations</emphasis> is needed if you want to
-    use annotations to configure your domain model but don't want to use JPA's
-    runtime APIs. If you choose not to use Hibernate Annotations and describe
-    your ORM mapping using <filename>cfg.xml</filename> files, you still have
-    to use the Hibernate Search specific annotations, which are bundled with
-    the hibernate-search jar file, to configure your Lucene index. There is no
-    XML configuration available for Hibernate Search but we provide a powerful
-    programmatic mapping API that elegantly replace this kind of deployment
-    descriptor (see <xref linkend="hsearch-mapping-programmaticapi" /> for
-    more information).</para>
-
-    <para><emphasis>hibernate-entitymanager</emphasis> is required if you want
-    to use Hibernate Search in conjunction with JPA.</para>
-
-    <para>And finally, you might want to add optional dependencies related to
-    Lucene (if you use some of the contribs of Lucene). By default, we add
-    lucene-snowball and lucene-analyzers as dependencies.</para>
+    <para><note>
+        <para>There is no XML configuration available for Hibernate Search but
+        we provide a powerful programmatic mapping API that elegantly replace
+        this kind of deployment form (see <xref
+        linkend="hsearch-mapping-programmaticapi" /> for more
+        information).</para>
+      </note></para>
   </section>
 
   <section>
@@ -374,12 +408,12 @@ public class Author {
     <title>Indexing</title>
 
     <para>Hibernate Search will transparently index every entity persisted,
-    updated or removed through Hibernate Core. However, you have to trigger an
-    initial indexing to populate the Lucene index with the data already
-    present in your database. Once you have added the above properties and
-    annotations it is time to trigger an initial batch index of your books.
-    You can achieve this by using one of the following code snippets (see also
-    <xref linkend="search-batchindex" />):</para>
+    updated or removed through Hibernate Core. However, you have to create an
+    initial Lucene index for the data already present in your database. Once
+    you have added the above properties and annotations it is time to trigger
+    an initial batch index of your books. You can achieve this by using one of
+    the following code snippets (see also <xref
+    linkend="search-batchindex" />):</para>
 
     <example>
       <title>Using Hibernate Session to index data</title>
@@ -562,27 +596,8 @@ public class Book {
   <section>
     <title>What's next</title>
 
-    <para>The above paragraphs hopefully helped you getting an overview of
-    Hibernate Search. Using the maven archetype plugin and the following
-    command you can create an initial runnable maven project structure
-    populated with the example code of this tutorial.</para>
-
-    <example>
-      <title>Using the Maven archetype to create tutorial sources</title>
-
-      <programlisting>mvn archetype:create \ 
-    -DarchetypeGroupId=org.hibernate \
-    -DarchetypeArtifactId=hibernate-search-quickstart \ 
-    -DarchetypeVersion=&version; \
-    -DgroupId=my.company -DartifactId=quickstart</programlisting>
-    </example>
-
-    <para>Using the maven project you can execute the examples, inspect the
-    file system based index and search and retrieve a list of managed objects.
-    Just run <emphasis>mvn package</emphasis> to compile the sources and run
-    the unit tests.</para>
-
-    <para>The next step after this tutorial is to get more familiar with the
+    <para>The above paragraphs helped you getting an overview of Hibernate
+    Search. The next step after this tutorial is to get more familiar with the
     overall architecture of Hibernate Search (<xref
     linkend="search-architecture" />) and explore the basic features in more
     detail. Two topics which were only briefly touched in this tutorial were
