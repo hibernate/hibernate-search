@@ -425,13 +425,9 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
-		Annotation documentIdAnn = member.getAnnotation( DocumentId.class );
-		if ( documentIdAnn != null ) {
-			//FIXME commented until HSEARCH-333 is resolved
-//			log.warn(
-//					"@DocumentId specified on an entity which is not indexed by itself. Annotation gets ignored. Use @Field instead."
-//			);
-		}
+		// TODO - HSEARCH-333
+		// for a contained entity there is nothing to do here. This is really bad design since this protected method is called by the constructor and
+		// overridden by DocumentBuilderIndexedEntity
 	}
 
 	/**
