@@ -36,6 +36,8 @@
     <description>Hibernate Search Aggregator POM</description>
     <url>http://search.hibernate.org</url>
 
+    <inceptionYear>2006</inceptionYear>
+
     <modules>
         <module>hibernate-search</module>
         <module>hibernate-search-testing</module>
@@ -70,7 +72,7 @@
         <system>Hudson</system>
         <url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-trunk/</url>
     </ciManagement>
-    <inceptionYear>2006</inceptionYear>
+
     <developers>
         <developer>
             <id>epbernard</id>
@@ -263,7 +265,6 @@
                         <groupId>org.apache.lucene</groupId>
                         <artifactId>lucene-snowball</artifactId>
                     </exclusion>
-
                 </exclusions>
             </dependency>
             <dependency>
@@ -401,6 +402,14 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <repositories>
+        <!--
+        To build Hibernate Search you have to add the JBoss Maven repository to your settings.xml
+        See also http://community.jboss.org/wiki/ContributingtoHibernateSearch
+        -->
+    </repositories>
+    
 
     <distributionManagement>
         <repository>
