@@ -1,6 +1,37 @@
 Hibernate Search Changelog
 ==========================
 
+3.2.0.Final (05-05-2010)
+------------------------
+
+** Bug
+    * [HSEARCH-333] - Remove or improve log warning in DocumentBuilderContainedEntity.checkDocumentId
+    * [HSEARCH-396] - disableFullTextFilter(String name) in FullTextQueryImpl does not disable the filter.
+    * [HSEARCH-485] - mvn site is currently not working (in ./hibernate-search)
+    * [HSEARCH-512] - MassIndexer might associate proxies to two open session
+    * [HSEARCH-515] - Lucene AlreadyClosedExceptions During Batch Processing With ASYNC Workers
+    * [HSEARCH-516] - Lucene Directories might be closed before the backend finished all tasks on shutdown
+    * [HSEARCH-517] - ThreadLocal in ContextHolder causes memory leak when deployed in a web container
+    * [HSEARCH-518] - pom.xml misses pluginrepository
+    * [HSEARCH-522] - Search only compiles against JDK 6 with the current version of JGroups
+
+
+** Improvement
+    * [HSEARCH-506] - Bump dependency to core 3.5.1-Final
+    * [HSEARCH-519] - Update JGroups dependencies
+
+** New Feature
+    * [HSEARCH-467] - publish Maven artifacts containing the testsuite
+
+** Patch
+    * [HSEARCH-503] - Generated archetype broken for any package name with dot (.)
+    * [HSEARCH-514] - logging and typo improvements in JGroups backend
+
+** Task
+    * [HSEARCH-486] - Review the getting started section's pom and archetype creation
+    * [HSEARCH-510] - Update pom to use the new distributationManagement information
+    
+
 3.2.0.CR1 (12-04-2010)
 ----------------------
 
