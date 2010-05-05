@@ -28,10 +28,10 @@
     <parent>
         <artifactId>hibernate-search-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>3.2.0.Final</version>
+        <version>3.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    
+
     <artifactId>hibernate-search-testing</artifactId>
 
     <name>Hibernate Search Testing</name>
