@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search</artifactId>
-            <version>${parent.version}</version>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
