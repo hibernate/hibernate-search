@@ -39,9 +39,9 @@
     
     <dependencies>
         <dependency>
-            <groupId>${pom.groupId}</groupId>
+            <groupId>${parent.groupId}</groupId>
             <artifactId>hibernate-search</artifactId>
-            <version>${pom.version}</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
