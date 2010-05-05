@@ -28,7 +28,7 @@
     <parent>
         <artifactId>hibernate-search-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.2.0.Final</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     
@@ -39,9 +39,9 @@
     
     <dependencies>
         <dependency>
-            <groupId>${parent.groupId}</groupId>
+            <groupId>${groupId}</groupId>
             <artifactId>hibernate-search</artifactId>
-            <version>${parent.version}</version>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
