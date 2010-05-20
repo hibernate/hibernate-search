@@ -219,7 +219,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 					analyzer = propertiesMetadata.analyzer;
 				}
 				if ( analyzer == null ) {
-					throw new AssertionFailure( "Analizer should not be undefined" );
+					throw new AssertionFailure( "Analyzer should not be undefined" );
 				}
 				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 			}
