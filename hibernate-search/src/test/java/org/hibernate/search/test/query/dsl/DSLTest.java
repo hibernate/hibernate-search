@@ -32,7 +32,7 @@ public class DSLTest extends SearchTestCase {
 		Transaction transaction = fts.beginTransaction();
 		final QueryBuilder monthQb = fts.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
-		Query 
+		Query
 		//regular term query
 		query = monthQb.exact().onField( "mythology" ).matching( "cold" ).createQuery();
 
@@ -176,8 +176,6 @@ public class DSLTest extends SearchTestCase {
 		results = fts.createFullTextQuery( query, Month.class ).list();
 		assertEquals( 2, results.size() );
 		assertEquals( "February", results.get( 0 ).getName() );
-
-		//FIXME add other method tests besides boostedTo
 
 		transaction.commit();
 
