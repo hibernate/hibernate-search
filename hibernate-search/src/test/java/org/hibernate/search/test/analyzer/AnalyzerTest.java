@@ -179,6 +179,20 @@ public class AnalyzerTest extends SearchTestCase {
 		session.close();
 	}
 
+	public void testNotAnalyzedFieldAndScopedAnalyzer() throws Exception {
+		FullTextSession session = Search.getFullTextSession( openSession() );
+		SearchFactory searchFactory = session.getSearchFactory();
+		Analyzer analyzer = searchFactory.getAnalyzer( MyEntity.class );
+
+		// you can pass what so ever into the analysis since the used analyzers are
+		// returning the same tokens all the time. We just want to make sure that
+		// the right analyzers are used.
+		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "notAnalyzed", "pass through" );
+		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "pass through" } );
+
+		session.close();
+	}
+
 	protected Class<?>[] getMappings() {
 		return new Class[] { MyEntity.class, Article.class };
 	}
