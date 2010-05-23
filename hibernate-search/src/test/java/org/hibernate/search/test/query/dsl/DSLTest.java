@@ -1,6 +1,11 @@
 package org.hibernate.search.test.query.dsl;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.lucene.search.Query;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
@@ -14,6 +19,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Factory;
@@ -237,6 +243,59 @@ public class DSLTest extends SearchTestCase {
 		cleanData( fts );
 	}
 
+	public void testRangeQuery() throws Exception {
+		FullTextSession fts = initData();
+
+		Transaction transaction = fts.beginTransaction();
+		final QueryBuilder monthQb = fts.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		final Calendar calendar = Calendar.getInstance();
+		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		calendar.set(0 + 1900, 2, 12, 0, 0, 0);
+		Date from = calendar.getTime();
+		calendar.set(10 + 1900, 2, 12, 0, 0, 0);
+		Date to = calendar.getTime();
+		final SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyyMMdd" );
+
+		Query
+
+		query = monthQb.
+				range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+					.from( dateFormat.format( from ) )
+					.to( dateFormat.format( to ) ).exclude()
+					.createQuery();
+
+		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.
+				range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+					.below( dateFormat.format( to ) )
+					.createQuery();
+
+		FullTextQuery hibQuery = fts.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "January", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		query = monthQb.
+				range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+					.above( dateFormat.format( to ) )
+					.createQuery();
+		hibQuery = fts.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		transaction.commit();
+
+		cleanData( fts );
+	}
+
 
 //	public void testTermQueryOnAnalyzer() throws Exception {
 //		FullTextSession fts = initData();
@@ -363,8 +422,20 @@ public class DSLTest extends SearchTestCase {
 		Session session = openSession();
 		FullTextSession fts = Search.getFullTextSession( session );
 		Transaction tx = fts.beginTransaction();
-		fts.persist( new Month("January", "Month of colder and whitening", "Historically colder than any other month in the northern hemisphere") );
-		fts.persist( new Month("February", "Month of snowboarding", "Historically, the month where we make babies while watching the whitening landscape") );
+		final Calendar calendar = Calendar.getInstance();
+		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		calendar.set(0 + 1900, 2, 12, 0, 0, 0);
+		fts.persist( new Month(
+				"January",
+				"Month of colder and whitening",
+				"Historically colder than any other month in the northern hemisphere",
+				 calendar.getTime() ) );
+		calendar.set(100 + 1900, 2, 12, 0, 0, 0);
+		fts.persist( new Month(
+				"February",
+				"Month of snowboarding",
+				"Historically, the month where we make babies while watching the whitening landscape",
+				calendar.getTime() ) );
 		tx.commit();
 		fts.clear();
 		return fts;

@@ -3,12 +3,15 @@ package org.hibernate.search.query.dsl.v2.impl;
 /**
 * @author Emmanuel Bernard
 */
-public class QueryContext {
+class TermQueryContext {
 	private final Approximation approximation;
+	//FUZZY
 	private float threshold = .5f;
+
+	//WILDCARD
 	private int prefixLength = 0;
 
-	public QueryContext(Approximation approximation) {
+	public TermQueryContext(Approximation approximation) {
 		this.approximation = approximation;
 	}
 

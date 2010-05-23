@@ -1,14 +1,10 @@
 package org.hibernate.search.query.dsl.v2.impl;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -29,10 +25,10 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private final String text;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
-	private final QueryContext queryContext;
+	private final TermQueryContext queryContext;
 	private final List<FieldContext> fieldContexts;
 
-	public ConnectedMultiFieldsTermQueryBuilder(QueryContext queryContext,
+	public ConnectedMultiFieldsTermQueryBuilder(TermQueryContext queryContext,
 												String text,
 												List<FieldContext> fieldContexts,
 												QueryCustomizer queryCustomizer,
@@ -80,8 +76,8 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			}
 			else {
 				BooleanQuery booleanQuery = new BooleanQuery();
-				for (String term : terms) {
-					Query termQuery = createTermQuery(fieldContext, term);
+				for (String localTerm : terms) {
+					Query termQuery = createTermQuery(fieldContext, localTerm);
 					booleanQuery.add( termQuery, BooleanClause.Occur.SHOULD );
 				}
 				perFieldQuery = booleanQuery;
@@ -92,45 +88,34 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 	private Query createTermQuery(FieldContext fieldContext, String term) {
 		Query query;
+		final String fieldName = fieldContext.getField();
 		switch ( queryContext.getApproximation() ) {
 			case EXACT:
-				query = new TermQuery( new Term( fieldContext.getField(), term ) );
+				query = new TermQuery( new Term( fieldName, term ) );
 				break;
 			case WILDCARD:
-				query = new WildcardQuery( new Term( fieldContext.getField(), term ) );
+				query = new WildcardQuery( new Term( fieldName, term ) );
 				break;
 			case FUZZY:
 				query = new FuzzyQuery(
-						new Term( fieldContext.getField(), term ),
+						new Term( fieldName, term ),
 						queryContext.getThreshold(),
 						queryContext.getPrefixLength() );
 				break;
 			default:
-				throw new AssertionFailure( "Unknown approximation: " + queryContext.getApproximation());
+				throw new AssertionFailure( "Unknown approximation: " + queryContext.getApproximation() );
 		}
 		return query;
 	}
 
-	private List<String> getAllTermsFromText(String fieldName, String text, Analyzer analyzer) throws IOException {
-		//it's better not to apply the analyzer with windcards as * and ? can be mistakenly removed
+	private List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) throws IOException {
+		//it's better not to apply the analyzer with wildcard as * and ? can be mistakenly removed
 		List<String> terms = new ArrayList<String>();
-		if ( queryContext.getApproximation() == QueryContext.Approximation.WILDCARD ) {
-			terms.add( text );
+		if ( queryContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {
+			terms.add( localText );
 		}
 		else {
-			Reader reader = new StringReader(text);
-			TokenStream stream = analyzer.reusableTokenStream( fieldName, reader);
-			TermAttribute attribute = (TermAttribute) stream.addAttribute( TermAttribute.class );
-			stream.reset();
-
-			while ( stream.incrementToken() ) {
-				if ( attribute.termLength() > 0 ) {
-					String term = attribute.term();
-					terms.add( term );
-				}
-			}
-			stream.end();
-			stream.close();
+			terms = Helper.getAllTermsFromText( fieldName, localText, analyzer );
 		}
 		return terms;
 	}

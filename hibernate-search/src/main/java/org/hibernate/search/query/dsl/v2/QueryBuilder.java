@@ -31,6 +31,11 @@ public interface QueryBuilder {
 	BooleanJunction<BooleanJunction> bool();
 
 	/**
+	 * find matching elements within a range
+	 */
+	RangeContext range();
+
+	/**
 	 * Query matching all documents
 	 * Typically mixed with a boolean query.
 	 */

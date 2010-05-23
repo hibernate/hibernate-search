@@ -1,13 +1,17 @@
 package org.hibernate.search.test.query.dsl;
 
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Resolution;
 
 /**
  * @author Emmanuel Bernard
@@ -17,10 +21,11 @@ import org.hibernate.search.annotations.Indexed;
 public class Month {
 	public Month() {}
 	
-	public Month(String name, String mythology, String history) {
+	public Month(String name, String mythology, String history, Date estimatedCreation) {
 		this.name = name;
 		this.mythology = mythology;
 		this.history = history;
+		this.estimatedCreation = estimatedCreation;
 	}
 
 	@Id @GeneratedValue
@@ -46,6 +51,11 @@ public class Month {
 	public String getHistory() { return history; }
 	public void setHistory(String history) { this.history = history; }
 	private String history;
+
+	@Field(index = Index.UN_TOKENIZED) @DateBridge(resolution = Resolution.MINUTE)
+	public Date getEstimatedCreation() { return estimatedCreation; }
+	public void setEstimatedCreation(Date estimatedCreation) { this.estimatedCreation = estimatedCreation; }
+	private Date estimatedCreation;
 
 }
 

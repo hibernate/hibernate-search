@@ -14,13 +14,13 @@ class ConnectedTermContext implements TermContext {
 	private final SearchFactory factory;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
-	private final QueryContext context;
+	private final TermQueryContext context;
 
 	public ConnectedTermContext(Analyzer queryAnalyzer, SearchFactory factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = new QueryCustomizer();
-		this.context = new QueryContext( QueryContext.Approximation.EXACT);
+		this.context = new TermQueryContext( TermQueryContext.Approximation.EXACT);
 	}
 
 	public TermMatchingContext onField(String field) {

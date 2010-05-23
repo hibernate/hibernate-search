@@ -7,6 +7,7 @@ import org.hibernate.search.query.dsl.v2.AllContext;
 import org.hibernate.search.query.dsl.v2.BooleanJunction;
 import org.hibernate.search.query.dsl.v2.FuzzyContext;
 import org.hibernate.search.query.dsl.v2.QueryBuilder;
+import org.hibernate.search.query.dsl.v2.RangeContext;
 import org.hibernate.search.query.dsl.v2.TermContext;
 import org.hibernate.search.query.dsl.v2.WildcardContext;
 
@@ -34,6 +35,10 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 
 	public WildcardContext wildcard() {
 		return new ConnectedWildcardContext(queryAnalyzer, factory);
+	}
+
+	public RangeContext range() {
+		return new ConnectedRangeContext( queryAnalyzer, factory );
 	}
 
 	//fixme Have to use raw types but would be nice to not have to

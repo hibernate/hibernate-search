@@ -16,13 +16,13 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 	private final SearchFactory factory;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
-	private final QueryContext queryContext;
+	private final TermQueryContext queryContext;
 	private final List<FieldContext> fieldContexts;
 	//when a varargs of fields are passed, apply the same customization for all.
 	//keep the index of the first context in this queue
 	private int firstOfContext = 0;
 
-	public ConnectedTermMatchingContext(QueryContext queryContext,
+	public ConnectedTermMatchingContext(TermQueryContext queryContext,
 			String field, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactory factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
@@ -32,7 +32,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 		this.fieldContexts.add( new FieldContext( field ) );
 	}
 
-	public ConnectedTermMatchingContext(QueryContext queryContext,
+	public ConnectedTermMatchingContext(TermQueryContext queryContext,
 			String[] fields, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactory factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
