@@ -123,7 +123,6 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		if ( size == 0 ) {
 			throw new SearchException( "phrase query returns no term. Is there a problem with your analyzers? " + sentence);
 		}
-		//TODO
 		if ( size == 1 ) {
 			final List<Term> terms = termsPerPosition.values().iterator().next();
 			if ( terms.size() == 1 ) {
