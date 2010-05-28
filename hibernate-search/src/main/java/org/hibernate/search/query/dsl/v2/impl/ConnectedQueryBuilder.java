@@ -6,6 +6,7 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.query.dsl.v2.AllContext;
 import org.hibernate.search.query.dsl.v2.BooleanJunction;
 import org.hibernate.search.query.dsl.v2.FuzzyContext;
+import org.hibernate.search.query.dsl.v2.PhraseContext;
 import org.hibernate.search.query.dsl.v2.QueryBuilder;
 import org.hibernate.search.query.dsl.v2.RangeContext;
 import org.hibernate.search.query.dsl.v2.TermContext;
@@ -39,6 +40,10 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 
 	public RangeContext range() {
 		return new ConnectedRangeContext( queryAnalyzer, factory );
+	}
+
+	public PhraseContext phrase() {
+		return new ConnectedPhraseContext( queryAnalyzer, factory );
 	}
 
 	//fixme Have to use raw types but would be nice to not have to

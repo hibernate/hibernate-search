@@ -296,6 +296,54 @@ public class DSLTest extends SearchTestCase {
 		cleanData( fts );
 	}
 
+	public void testPhraseQuery() throws Exception {
+		FullTextSession fts = initData();
+
+		Transaction transaction = fts.beginTransaction();
+		final QueryBuilder monthQb = fts.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query
+
+		query = monthQb.
+				phrase()
+					.onField( "mythology" )
+					.sentence( "colder and whitening" )
+					.createQuery();
+
+		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.
+				phrase()
+					.onField( "mythology" )
+					.sentence( "Month whitening" )
+					.createQuery();
+
+		assertEquals( 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.
+				phrase()
+					.slop( 1 )
+					.onField( "mythology" )
+					.sentence( "Month whitening" )
+					.createQuery();
+
+		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		//Does not work as the NGram filter does not seem to be skipping posiional increment between ngrams.
+//		query = monthQb
+//				.phrase()
+//					.onField( "mythology_ngram" )
+//					.sentence( "snobored" )
+//					.createQuery();
+//
+//		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		transaction.commit();
+
+		cleanData( fts );
+	}
+
 
 //	public void testTermQueryOnAnalyzer() throws Exception {
 //		FullTextSession fts = initData();

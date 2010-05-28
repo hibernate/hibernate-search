@@ -36,6 +36,11 @@ public interface QueryBuilder {
 	RangeContext range();
 
 	/**
+	 * find an sentence (words can be inversed according to the slop factor
+	 */
+	PhraseContext phrase();
+
+	/**
 	 * Query matching all documents
 	 * Typically mixed with a boolean query.
 	 */
