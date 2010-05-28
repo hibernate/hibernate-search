@@ -4,8 +4,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Filter;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.query.dsl.v2.FuzzyContext;
 import org.hibernate.search.query.dsl.v2.TermContext;
 import org.hibernate.search.query.dsl.v2.TermMatchingContext;
+import org.hibernate.search.query.dsl.v2.WildcardContext;
 
 /**
  * @author Emmanuel Bernard
@@ -31,17 +33,25 @@ class ConnectedTermContext implements TermContext {
 		return new ConnectedTermMatchingContext(context, fields, queryCustomizer, queryAnalyzer, factory);
 	}
 
-	public TermContext boostedTo(float boost) {
+	public FuzzyContext fuzzy() {
+		return new ConnectedFuzzyContext( queryAnalyzer, factory, queryCustomizer );
+	}
+
+	public WildcardContext wildcard() {
+		return new ConnectedWildcardContext( queryAnalyzer, factory, queryCustomizer);
+	}
+
+	public ConnectedTermContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
 	}
 
-	public TermContext constantScore() {
+	public ConnectedTermContext constantScore() {
 		queryCustomizer.constantScore();
 		return this;
 	}
 
-	public TermContext filter(Filter filter) {
+	public ConnectedTermContext filter(Filter filter) {
 		queryCustomizer.filter(filter);
 		return this;
 	}

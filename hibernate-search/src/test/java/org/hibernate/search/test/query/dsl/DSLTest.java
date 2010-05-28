@@ -1,6 +1,5 @@
 package org.hibernate.search.test.query.dsl;
 
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,31 +39,29 @@ public class DSLTest extends SearchTestCase {
 				.buildQueryBuilder().forEntity( Month.class ).get();
 		Query
 		//regular term query
-		query = monthQb.exact().onField( "mythology" ).matching( "cold" ).createQuery();
+		query = monthQb.keyword().onField( "mythology" ).matching( "cold" ).createQuery();
 
 		assertEquals( 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//term query based on several words
-		query = monthQb.exact().onField( "mythology" ).matching( "colder darker" ).createQuery();
+		query = monthQb.keyword().onField( "mythology" ).matching( "colder darker" ).createQuery();
 
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//term query applying the analyzer and generating one term per word
-		query = monthQb.exact().onField( "mythology_stem" ).matching( "snowboard" ).createQuery();
+		query = monthQb.keyword().onField( "mythology_stem" ).matching( "snowboard" ).createQuery();
 
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//term query applying the analyzer and generating several terms per word
-		query = monthQb.exact().onField( "mythology_ngram" ).matching( "snobored" ).createQuery();
+		query = monthQb.keyword().onField( "mythology_ngram" ).matching( "snobored" ).createQuery();
 
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		//term query not using analyzers
-		query = monthQb.exact().onField( "mythology" ).ignoreAnalyzer().matching( "Month" ).createQuery();
+		query = monthQb.keyword().onField( "mythology" ).ignoreAnalyzer().matching( "Month" ).createQuery();
 
 		assertEquals( 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
-
-		query = monthQb.exact().onField( "mythology" ).matching( "Month" ).createQuery();
 
 		transaction.commit();
 
@@ -81,9 +78,10 @@ public class DSLTest extends SearchTestCase {
 
 		//fuzzy search with custom threshold and prefix
 		query = monthQb
-				.fuzzy()
-					.threshold( .8f )
-					.prefixLength( 1 )
+				.keyword()
+					.fuzzy()
+						.threshold( .8f )
+						.prefixLength( 1 )
 					.onField( "mythology" )
 						.matching( "calder" )
 						.createQuery();
@@ -92,7 +90,8 @@ public class DSLTest extends SearchTestCase {
 
 		//wildcard query
 		query = monthQb
-				.wildcard()
+				.keyword()
+					.wildcard()
 					.onField( "mythology" )
 						.matching( "mon*" )
 						.createQuery();
@@ -115,8 +114,8 @@ public class DSLTest extends SearchTestCase {
 		//combined query, January and february both contain whitening but February in a longer text
 		query = monthQb
 				.bool()
-					.should( monthQb.exact().onField( "mythology" ).matching( "whitening" ).createQuery() )
-					.should( monthQb.exact().onField( "history" ).matching( "whitening" ).createQuery() )
+					.should( monthQb.keyword().onField( "mythology" ).matching( "whitening" ).createQuery() )
+					.should( monthQb.keyword().onField( "history" ).matching( "whitening" ).createQuery() )
 				.createQuery();
 
 		List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
@@ -127,8 +126,8 @@ public class DSLTest extends SearchTestCase {
 		//since history is boosted, February should come first though
 		query = monthQb
 				.bool()
-					.should( monthQb.exact().onField( "mythology" ).matching( "whitening" ).createQuery() )
-					.should( monthQb.exact().onField( "history" ).boostedTo( 30 ).matching( "whitening" ).createQuery() )
+					.should( monthQb.keyword().onField( "mythology" ).matching( "whitening" ).createQuery() )
+					.should( monthQb.keyword().onField( "history" ).boostedTo( 30 ).matching( "whitening" ).createQuery() )
 				.createQuery();
 
 		results = fts.createFullTextQuery( query, Month.class ).list();
@@ -151,7 +150,7 @@ public class DSLTest extends SearchTestCase {
 		Query
 
 		//combined query, January and february both contain whitening but February in a longer text
-		query = monthQb.exact()
+		query = monthQb.keyword()
 						.onField( "mythology" )
 						.andField( "history" )
 						.matching( "whitening" ).createQuery();
@@ -161,7 +160,7 @@ public class DSLTest extends SearchTestCase {
 		assertEquals( "January", results.get( 0 ).getName() );
 
 		//combined query, January and february both contain whitening but February in a longer text
-		query = monthQb.exact()
+		query = monthQb.keyword()
 						.onFields( "mythology", "history" )
 							.boostedTo( 30 )
 						.matching( "whitening" ).createQuery();
@@ -172,7 +171,7 @@ public class DSLTest extends SearchTestCase {
 
 		//boosted query, January and february both contain whitening but February in a longer text
 		//since history is boosted, February should come first though
-		query = monthQb.exact()
+		query = monthQb.keyword()
 							.onField( "mythology" )
 							.andField( "history" )
 								.boostedTo( 30 )
@@ -199,7 +198,7 @@ public class DSLTest extends SearchTestCase {
 		//must
 		query = monthQb
 				.bool()
-					.must( monthQb.exact().onField( "mythology" ).matching( "colder" ).createQuery() )
+					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 					.createQuery();
 
 		List<Month> results = fts.createFullTextQuery( query, Month.class ).list();
@@ -210,7 +209,7 @@ public class DSLTest extends SearchTestCase {
 		query = monthQb
 				.bool()
 					.should( monthQb.all().createQuery() )
-					.must( monthQb.exact().onField( "mythology" ).matching( "colder" ).createQuery() )
+					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 						.not()
 					.createQuery();
 		results = fts.createFullTextQuery( query, Month.class ).list();
@@ -220,7 +219,7 @@ public class DSLTest extends SearchTestCase {
 		//implicit must not + all (not recommended)
 		query = monthQb
 				.bool()
-					.must( monthQb.exact().onField( "mythology" ).matching( "colder" ).createQuery() )
+					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 						.not()
 					.createQuery();
 		results = fts.createFullTextQuery( query, Month.class ).list();
@@ -230,7 +229,7 @@ public class DSLTest extends SearchTestCase {
 		//all except (recommended)
 		query = monthQb
 				.all()
-					.except( monthQb.exact().onField( "mythology" ).matching( "colder" ).createQuery() )
+					.except( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 					.createQuery();
 
 		results = fts.createFullTextQuery( query, Month.class ).list();

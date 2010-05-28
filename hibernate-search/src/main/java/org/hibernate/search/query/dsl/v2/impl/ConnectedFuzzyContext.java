@@ -16,10 +16,10 @@ class ConnectedFuzzyContext implements FuzzyContext {
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext context;
 
-	public ConnectedFuzzyContext(Analyzer queryAnalyzer, SearchFactory factory) {
+	public ConnectedFuzzyContext(Analyzer queryAnalyzer, SearchFactory factory, QueryCustomizer queryCustomizer) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
-		this.queryCustomizer = new QueryCustomizer();
+		this.queryCustomizer = queryCustomizer;
 		this.context = new TermQueryContext( TermQueryContext.Approximation.FUZZY);
 	}
 

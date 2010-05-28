@@ -16,10 +16,10 @@ class ConnectedWildcardContext implements WildcardContext {
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext context;
 
-	public ConnectedWildcardContext(Analyzer queryAnalyzer, SearchFactory factory) {
+	public ConnectedWildcardContext(Analyzer queryAnalyzer, SearchFactory factory, QueryCustomizer queryCustomizer) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
-		this.queryCustomizer = new QueryCustomizer();
+		this.queryCustomizer = queryCustomizer;
 		this.context = new TermQueryContext( TermQueryContext.Approximation.WILDCARD);
 	}
 

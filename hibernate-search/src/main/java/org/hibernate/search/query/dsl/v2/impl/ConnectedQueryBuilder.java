@@ -26,16 +26,8 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 		this.factory = factory;
 	}
 
-	public TermContext exact() {
+	public TermContext keyword() {
 		return new ConnectedTermContext(queryAnalyzer, factory);
-	}
-
-	public FuzzyContext fuzzy() {
-		return new ConnectedFuzzyContext(queryAnalyzer, factory);
-	}
-
-	public WildcardContext wildcard() {
-		return new ConnectedWildcardContext(queryAnalyzer, factory);
 	}
 
 	public RangeContext range() {
