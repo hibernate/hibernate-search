@@ -311,7 +311,7 @@ public class DSLTest extends SearchTestCase {
 					.sentence( "colder and whitening" )
 					.createQuery();
 
-		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+		assertEquals( "test exact phrase", 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		query = monthQb.
 				phrase()
@@ -319,7 +319,7 @@ public class DSLTest extends SearchTestCase {
 					.sentence( "Month whitening" )
 					.createQuery();
 
-		assertEquals( 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+		assertEquals( "test slop", 0, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		query = monthQb.
 				phrase()
@@ -328,7 +328,17 @@ public class DSLTest extends SearchTestCase {
 					.sentence( "Month whitening" )
 					.createQuery();
 
-		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+		assertEquals( "test slop", 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.
+				phrase()
+					.onField( "mythology" )
+					.sentence( "whitening" )
+					.createQuery();
+
+		assertEquals( "test one term optimization", 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+
 
 		//Does not work as the NGram filter does not seem to be skipping posiional increment between ngrams.
 //		query = monthQb

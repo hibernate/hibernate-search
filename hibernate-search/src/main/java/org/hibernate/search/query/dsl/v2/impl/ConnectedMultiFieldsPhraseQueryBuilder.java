@@ -18,6 +18,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -123,27 +124,38 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			throw new SearchException( "phrase query returns no term. Is there a problem with your analyzers? " + sentence);
 		}
 		//TODO
-		//if ( size == 1 ) {
-			//optimization
-		//}
-		//else {
-		if (isMultiPhrase) {
-			MultiPhraseQuery query = new MultiPhraseQuery();
-			query.setSlop( queryContext.getSlop() );
-			for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
-				final List<Term> value = entry.getValue();
-				query.add( value.toArray( new Term[value.size()] ), entry.getKey() );
+		if ( size == 1 ) {
+			final List<Term> terms = termsPerPosition.values().iterator().next();
+			if ( terms.size() == 1 ) {
+				perFieldQuery = new TermQuery( terms.get( 0 ) );
 			}
-			perFieldQuery = query;
+			else {
+				BooleanQuery query = new BooleanQuery( );
+				for ( Term term : terms ) {
+					query.add( new TermQuery(term), BooleanClause.Occur.SHOULD );
+				}
+				perFieldQuery = query;
+			}
 		}
 		else {
-			PhraseQuery query = new PhraseQuery();
-			query.setSlop(  queryContext.getSlop() );
-			for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
-				final List<Term> value = entry.getValue();
-				query.add( value.get(0), entry.getKey() );
+			if (isMultiPhrase) {
+				MultiPhraseQuery query = new MultiPhraseQuery();
+				query.setSlop( queryContext.getSlop() );
+				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
+					final List<Term> value = entry.getValue();
+					query.add( value.toArray( new Term[value.size()] ), entry.getKey() );
+				}
+				perFieldQuery = query;
 			}
-			perFieldQuery = query;
+			else {
+				PhraseQuery query = new PhraseQuery();
+				query.setSlop(  queryContext.getSlop() );
+				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
+					final List<Term> value = entry.getValue();
+					query.add( value.get(0), entry.getKey() );
+				}
+				perFieldQuery = query;
+			}
 		}
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
