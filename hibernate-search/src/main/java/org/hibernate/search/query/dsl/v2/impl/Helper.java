@@ -36,7 +36,6 @@ class Helper {
 	}
 
 	static List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) throws IOException {
-		//it's better not to apply the analyzer with wildcard as * and ? can be mistakenly removed
 		List<String> terms = new ArrayList<String>();
 
 		Reader reader = new StringReader(localText);
