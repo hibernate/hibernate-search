@@ -24,6 +24,8 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -66,6 +68,7 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		createMany( Book.class, BOOK_NUM );
 		createMany( Dvd.class, DVD_NUM );
 		createMany( AncientBook.class, ANCIENTBOOK_NUM );
+		storeAllBooksInNation();
 	}
 	
 	@Override
@@ -95,6 +98,24 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 					tx =  fullTextSession.beginTransaction();
 				}
 			}
+			tx.commit();
+		}
+		finally {
+			fullTextSession.close();
+		}
+	}
+	
+	/**
+	 * Adds all stored books to the Nation.
+	 * Needed to test for HSEARCH-534 and makes the dataset to index quite bigger.
+	 */
+	private void storeAllBooksInNation() {
+		FullTextSession fullTextSession = builder.openFullTextSession();
+		try {
+			Transaction tx = fullTextSession.beginTransaction();
+			List<Book> allBooks = fullTextSession.createCriteria( Book.class ).list();
+			Nation italy = (Nation) fullTextSession.load( Nation.class, 1 );
+			italy.getLibrariesHave().addAll( allBooks );
 			tx.commit();
 		}
 		finally {

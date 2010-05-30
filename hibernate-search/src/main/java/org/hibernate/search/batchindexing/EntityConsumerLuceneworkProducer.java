@@ -60,7 +60,6 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuilders;
 	private final MassIndexerProgressMonitor monitor;
 	
-	private static final int CLEAR_PERIOD = 50;
 	private final CacheMode cacheMode;
 
 	private final CountDownLatch producerEndSignal;
@@ -104,7 +103,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 
 	private void indexAllQueue(Session session) {
 		try {
-			for ( int cycle=0; true; cycle++ ) {
+			while ( true ) {
 				List<?> takeList = source.take();
 				if ( takeList == null ) {
 					break;
@@ -116,11 +115,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 						session.buildLockRequest( LockOptions.NONE ).lock( take );
 						index( take, session );
 						monitor.documentsBuilt( 1 );
-						session.evict( take );
-						if ( cycle == CLEAR_PERIOD ) {
-							cycle = 0;
-							session.clear();
-						}
+						session.clear();
 					}
 				}
 			}
