@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
@@ -19,25 +18,24 @@ import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.v2.PhraseTermination;
-import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
 
 /**
  * @author Emmanuel Bernard
  */
 public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination {
-	private final PhraseQueryContext queryContext;
-	private final Analyzer queryAnalyzer;
+	private final PhraseQueryContext phraseContext;
+	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final List<FieldContext> fieldContexts;
 
-	public ConnectedMultiFieldsPhraseQueryBuilder(PhraseQueryContext queryContext, Analyzer queryAnalyzer, QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts) {
+	public ConnectedMultiFieldsPhraseQueryBuilder(PhraseQueryContext phraseContext, QueryCustomizer queryCustomizer,
+												  List<FieldContext> fieldContexts, QueryBuildingContext queryContext) {
+		this.phraseContext = phraseContext;
 		this.queryContext = queryContext;
-		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldContexts = fieldContexts;
 	}
@@ -66,10 +64,10 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		TokenStream stream = null;
 		boolean isMultiPhrase = false;
 		Map<Integer, List<Term>> termsPerPosition = new HashMap<Integer, List<Term>>();
-		final String sentence = queryContext.getSentence();
+		final String sentence = phraseContext.getSentence();
 		try {
 			Reader reader = new StringReader( sentence );
-			stream = queryAnalyzer.reusableTokenStream( fieldName, reader);
+			stream = queryContext.getQueryAnalyzer().reusableTokenStream( fieldName, reader);
 
 			TermAttribute termAttribute = (TermAttribute) stream.addAttribute( TermAttribute.class );
 			PositionIncrementAttribute positionAttribute = (PositionIncrementAttribute) stream.addAttribute( PositionIncrementAttribute.class );
@@ -139,7 +137,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		else {
 			if (isMultiPhrase) {
 				MultiPhraseQuery query = new MultiPhraseQuery();
-				query.setSlop( queryContext.getSlop() );
+				query.setSlop( phraseContext.getSlop() );
 				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
 					final List<Term> value = entry.getValue();
 					query.add( value.toArray( new Term[value.size()] ), entry.getKey() );
@@ -148,7 +146,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			}
 			else {
 				PhraseQuery query = new PhraseQuery();
-				query.setSlop(  queryContext.getSlop() );
+				query.setSlop(  phraseContext.getSlop() );
 				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
 					final List<Term> value = entry.getValue();
 					query.add( value.get(0), entry.getKey() );

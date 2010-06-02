@@ -25,12 +25,12 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 	public final class HSearchEntityContext implements EntityContext {
 		private final ScopedAnalyzer queryAnalyzer;
-		private final SearchFactoryImplementor factory;
+		private final QueryBuildingContext context;
 
 		public HSearchEntityContext(Class<?> entityType, SearchFactoryImplementor factory) {
-			this.factory = factory;
 			queryAnalyzer = new ScopedAnalyzer();
 			queryAnalyzer.setGlobalAnalyzer( factory.getAnalyzer( entityType ) );
+			context = new QueryBuildingContext( factory, queryAnalyzer, entityType);
 		}
 
 		public EntityContext overridesForField(String field, String analyzerName) {
@@ -39,7 +39,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 		}
 
 		public QueryBuilder get() {
-			return new ConnectedQueryBuilder(queryAnalyzer, factory);
+			return new ConnectedQueryBuilder(context);
 		}
 	}
 }

@@ -12,18 +12,16 @@ import org.hibernate.search.query.dsl.v2.RangeMatchingContext;
  * @author Emmanuel Bernard
  */
 class ConnectedRangeContext implements RangeContext {
-	private final SearchFactoryImplementor factory;
-	private final Analyzer queryAnalyzer;
+	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 
-	public ConnectedRangeContext(Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
-		this.factory = factory;
-		this.queryAnalyzer = queryAnalyzer;
+	public ConnectedRangeContext(QueryBuildingContext queryContext) {
+		this.queryContext = queryContext;
 		this.queryCustomizer = new QueryCustomizer();
 	}
 
 	public RangeMatchingContext onField(String fieldName) {
-		return new ConnectedRangeMatchingContext(fieldName, queryCustomizer, queryAnalyzer, factory);
+		return new ConnectedRangeMatchingContext(fieldName, queryCustomizer, queryContext);
 	}
 
 	public RangeContext boostedTo(float boost) {

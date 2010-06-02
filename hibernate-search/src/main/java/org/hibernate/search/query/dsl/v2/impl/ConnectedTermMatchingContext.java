@@ -3,10 +3,6 @@ package org.hibernate.search.query.dsl.v2.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.analysis.Analyzer;
-
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.TermMatchingContext;
 import org.hibernate.search.query.dsl.v2.TermTermination;
 
@@ -14,31 +10,28 @@ import org.hibernate.search.query.dsl.v2.TermTermination;
 * @author Emmanuel Bernard
 */
 public class ConnectedTermMatchingContext implements TermMatchingContext {
-	private final SearchFactoryImplementor factory;
-	private final Analyzer queryAnalyzer;
+	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
-	private final TermQueryContext queryContext;
+	private final TermQueryContext termContext;
 	private final List<FieldContext> fieldContexts;
 	//when a varargs of fields are passed, apply the same customization for all.
 	//keep the index of the first context in this queue
 	private int firstOfContext = 0;
 
-	public ConnectedTermMatchingContext(TermQueryContext queryContext,
-			String field, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
-		this.factory = factory;
-		this.queryAnalyzer = queryAnalyzer;
-		this.queryCustomizer = queryCustomizer;
+	public ConnectedTermMatchingContext(TermQueryContext termContext,
+			String field, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
+		this.queryCustomizer = queryCustomizer;
+		this.termContext = termContext;
 		this.fieldContexts = new ArrayList<FieldContext>(4);
 		this.fieldContexts.add( new FieldContext( field ) );
 	}
 
-	public ConnectedTermMatchingContext(TermQueryContext queryContext,
-			String[] fields, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
-		this.factory = factory;
-		this.queryAnalyzer = queryAnalyzer;
-		this.queryCustomizer = queryCustomizer;
+	public ConnectedTermMatchingContext(TermQueryContext termContext,
+			String[] fields, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
+		this.queryCustomizer = queryCustomizer;
+		this.termContext = termContext;
 		this.fieldContexts = new ArrayList<FieldContext>(fields.length);
 		for (String field : fields) {
 			this.fieldContexts.add( new FieldContext( field ) );
@@ -46,7 +39,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 	}
 
 	public TermTermination matching(String text) {
-		return new ConnectedMultiFieldsTermQueryBuilder( queryContext, text, fieldContexts, queryCustomizer, queryAnalyzer, factory);
+		return new ConnectedMultiFieldsTermQueryBuilder( termContext, text, fieldContexts, queryCustomizer, queryContext);
 	}
 
 	public TermMatchingContext andField(String field) {

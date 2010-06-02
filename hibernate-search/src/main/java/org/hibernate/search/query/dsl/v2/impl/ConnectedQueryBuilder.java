@@ -19,24 +19,22 @@ import org.hibernate.search.query.dsl.v2.WildcardContext;
  * @author Emmanuel Bernard
  */
 public class ConnectedQueryBuilder implements QueryBuilder {
-	private final Analyzer queryAnalyzer;
-	private final SearchFactoryImplementor factory;
+	private final QueryBuildingContext context;
 
-	public ConnectedQueryBuilder(Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
-		this.queryAnalyzer = queryAnalyzer;
-		this.factory = factory;
+	public ConnectedQueryBuilder(QueryBuildingContext context) {
+		this.context = context;
 	}
 
 	public TermContext keyword() {
-		return new ConnectedTermContext(queryAnalyzer, factory);
+		return new ConnectedTermContext(context);
 	}
 
 	public RangeContext range() {
-		return new ConnectedRangeContext( queryAnalyzer, factory );
+		return new ConnectedRangeContext(context);
 	}
 
 	public PhraseContext phrase() {
-		return new ConnectedPhraseContext( queryAnalyzer, factory );
+		return new ConnectedPhraseContext(context);
 	}
 
 	//fixme Have to use raw types but would be nice to not have to

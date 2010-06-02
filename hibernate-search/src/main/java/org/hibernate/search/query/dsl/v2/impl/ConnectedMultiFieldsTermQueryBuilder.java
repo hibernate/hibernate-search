@@ -15,8 +15,6 @@ import org.apache.lucene.search.WildcardQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.TermTermination;
 
 /**
@@ -24,20 +22,19 @@ import org.hibernate.search.query.dsl.v2.TermTermination;
 */
 public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private final String text;
-	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
-	private final TermQueryContext queryContext;
+	private final TermQueryContext termContext;
 	private final List<FieldContext> fieldContexts;
+	private final QueryBuildingContext queryContext;
 
-	public ConnectedMultiFieldsTermQueryBuilder(TermQueryContext queryContext,
+	public ConnectedMultiFieldsTermQueryBuilder(TermQueryContext termContext,
 												String text,
 												List<FieldContext> fieldContexts,
 												QueryCustomizer queryCustomizer,
-												Analyzer queryAnalyzer,
-												SearchFactoryImplementor factory) {
-		this.queryContext = queryContext;
+												QueryBuildingContext queryContext) {
+		this.termContext = termContext;
 		this.text = text;
-		this.queryAnalyzer = queryAnalyzer;
+		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldContexts = fieldContexts;
 	}
@@ -64,7 +61,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		else {
 			List<String> terms;
 			try {
-				terms = getAllTermsFromText( fieldContext.getField(), text, queryAnalyzer );
+				terms = getAllTermsFromText( fieldContext.getField(), text, queryContext.getQueryAnalyzer() );
 			}
 			catch ( IOException e ) {
 				throw new AssertionFailure("IO exception while reading String stream??", e);
@@ -90,7 +87,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private Query createTermQuery(FieldContext fieldContext, String term) {
 		Query query;
 		final String fieldName = fieldContext.getField();
-		switch ( queryContext.getApproximation() ) {
+		switch ( termContext.getApproximation() ) {
 			case EXACT:
 				query = new TermQuery( new Term( fieldName, term ) );
 				break;
@@ -100,11 +97,11 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			case FUZZY:
 				query = new FuzzyQuery(
 						new Term( fieldName, term ),
-						queryContext.getThreshold(),
-						queryContext.getPrefixLength() );
+						termContext.getThreshold(),
+						termContext.getPrefixLength() );
 				break;
 			default:
-				throw new AssertionFailure( "Unknown approximation: " + queryContext.getApproximation() );
+				throw new AssertionFailure( "Unknown approximation: " + termContext.getApproximation() );
 		}
 		return query;
 	}
@@ -112,7 +109,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) throws IOException {
 		//it's better not to apply the analyzer with wildcard as * and ? can be mistakenly removed
 		List<String> terms = new ArrayList<String>();
-		if ( queryContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {
+		if ( termContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {
 			terms.add( localText );
 		}
 		else {

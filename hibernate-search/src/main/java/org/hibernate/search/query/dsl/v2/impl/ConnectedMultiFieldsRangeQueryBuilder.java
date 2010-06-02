@@ -1,53 +1,43 @@
 package org.hibernate.search.query.dsl.v2.impl;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
-import org.apache.lucene.search.WildcardQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
 
 /**
  * @author Emmanuel Bernard
  */
 public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationExcludable {
-	private final RangeQueryContext queryContext;
-	private final Analyzer queryAnalyzer;
+	private final RangeQueryContext rangeContext;
 	private final QueryCustomizer queryCustomizer;
 	private final List<FieldContext> fieldContexts;
-	private final SearchFactoryImplementor factory;
+	private final QueryBuildingContext queryContext;
 
-	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext queryContext, Analyzer queryAnalyzer,
+	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext rangeContext,
 												 QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts,
-												 SearchFactoryImplementor factory) {
-		this.queryContext = queryContext;
-		this.queryAnalyzer = queryAnalyzer;
+												 QueryBuildingContext queryContext) {
+		this.rangeContext = rangeContext;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldContexts = fieldContexts;
-		this.factory = factory;
+		this.queryContext = queryContext;
 	}
 
 	public RangeTerminationExcludable exclude() {
-		if ( queryContext.getFrom() != null && queryContext.getTo() != null ) {
-			queryContext.setExcludeTo( true );
+		if ( rangeContext.getFrom() != null && rangeContext.getTo() != null ) {
+			rangeContext.setExcludeTo( true );
 		}
-		else if ( queryContext.getFrom() != null ) {
-			queryContext.setExcludeTo( true );
+		else if ( rangeContext.getFrom() != null ) {
+			rangeContext.setExcludeTo( true );
 		}
-		else if ( queryContext.getTo() != null ) {
-			queryContext.setExcludeTo( true );
+		else if ( rangeContext.getTo() != null ) {
+			rangeContext.setExcludeTo( true );
 		}
 		else {
 			throw new AssertionFailure( "Both from and to clause of a range query are null" );
@@ -72,16 +62,17 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	public Query createQuery(FieldContext fieldContext) {
 		final Query perFieldQuery;
 		final String fieldName = fieldContext.getField();
-		final Object from = queryContext.getFrom();
+		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
+		final Object from = rangeContext.getFrom();
 		final String lowerTerm = from == null ? null : Helper.getAnalyzedTerm( fieldName, from, "from", queryAnalyzer );
-		final Object to = queryContext.getTo();
+		final Object to = rangeContext.getTo();
 		final String upperTerm = to == null ? null : Helper.getAnalyzedTerm( fieldName, to, "to", queryAnalyzer );
 		perFieldQuery = new TermRangeQuery(
 				fieldName,
 				lowerTerm,
 				upperTerm,
-				queryContext.isExcludeFrom(),
-				queryContext.isExcludeTo()
+				rangeContext.isExcludeFrom(),
+				rangeContext.isExcludeTo()
 		);
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}

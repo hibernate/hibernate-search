@@ -1,10 +1,7 @@
 package org.hibernate.search.query.dsl.v2.impl;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Filter;
 
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.FuzzyContext;
 import org.hibernate.search.query.dsl.v2.TermContext;
 import org.hibernate.search.query.dsl.v2.TermMatchingContext;
@@ -14,32 +11,30 @@ import org.hibernate.search.query.dsl.v2.WildcardContext;
  * @author Emmanuel Bernard
  */
 class ConnectedTermContext implements TermContext {
-	private final SearchFactoryImplementor factory;
-	private final Analyzer queryAnalyzer;
+	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
-	private final TermQueryContext context;
+	private final TermQueryContext termContext;
 
-	public ConnectedTermContext(Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
-		this.factory = factory;
-		this.queryAnalyzer = queryAnalyzer;
+	public ConnectedTermContext(QueryBuildingContext queryContext) {
+		this.queryContext = queryContext;
 		this.queryCustomizer = new QueryCustomizer();
-		this.context = new TermQueryContext( TermQueryContext.Approximation.EXACT);
+		this.termContext = new TermQueryContext( TermQueryContext.Approximation.EXACT);
 	}
 
 	public TermMatchingContext onField(String field) {
-		return new ConnectedTermMatchingContext(context, field, queryCustomizer, queryAnalyzer, factory);
+		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext);
 	}
 
 	public TermMatchingContext onFields(String... fields) {
-		return new ConnectedTermMatchingContext(context, fields, queryCustomizer, queryAnalyzer, factory);
+		return new ConnectedTermMatchingContext( termContext, fields, queryCustomizer, queryContext);
 	}
 
 	public FuzzyContext fuzzy() {
-		return new ConnectedFuzzyContext( queryAnalyzer, factory, queryCustomizer );
+		return new ConnectedFuzzyContext( queryCustomizer, queryContext );
 	}
 
 	public WildcardContext wildcard() {
-		return new ConnectedWildcardContext( queryAnalyzer, factory, queryCustomizer);
+		return new ConnectedWildcardContext(queryCustomizer, queryContext);
 	}
 
 	public ConnectedTermContext boostedTo(float boost) {

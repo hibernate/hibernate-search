@@ -3,37 +3,28 @@ package org.hibernate.search.query.dsl.v2.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.analysis.Analyzer;
-
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.PhraseMatchingContext;
 import org.hibernate.search.query.dsl.v2.PhraseTermination;
-import org.hibernate.search.query.dsl.v2.RangeMatchingContext;
-import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
 
 /**
  * @author Emmanuel Bernard
  */
 public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
-	private final SearchFactoryImplementor factory;
-	private final Analyzer queryAnalyzer;
+	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
-	private final PhraseQueryContext queryContext;
+	private final PhraseQueryContext phraseContext;
 	private final List<FieldContext> fieldContexts;
 	//when a varargs of fields are passed, apply the same customization for all.
 	//keep the index of the first context in this queue
 	private int firstOfContext = 0;
 
 	public ConnectedPhraseMatchingContext(String fieldName,
-											PhraseQueryContext queryContext,
+											PhraseQueryContext phraseContext,
 											QueryCustomizer queryCustomizer,
-											Analyzer queryAnalyzer,
-											SearchFactoryImplementor factory) {
-		this.factory = factory;
-		this.queryAnalyzer = queryAnalyzer;
-		this.queryCustomizer = queryCustomizer;
+											QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
+		this.queryCustomizer = queryCustomizer;
+		this.phraseContext = phraseContext;
 		this.fieldContexts = new ArrayList<FieldContext>(4);
 		this.fieldContexts.add( new FieldContext( fieldName ) );
 	}
@@ -45,8 +36,8 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 	}
 
 	public PhraseTermination sentence(String sentence) {
-		queryContext.setSentence(sentence);
-		return new ConnectedMultiFieldsPhraseQueryBuilder(queryContext, queryAnalyzer, queryCustomizer, fieldContexts);
+		phraseContext.setSentence(sentence);
+		return new ConnectedMultiFieldsPhraseQueryBuilder( phraseContext, queryCustomizer, fieldContexts, queryContext );
 	}
 
 	public PhraseMatchingContext boostedTo(float boost) {

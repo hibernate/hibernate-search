@@ -3,10 +3,6 @@ package org.hibernate.search.query.dsl.v2.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.analysis.Analyzer;
-
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.RangeMatchingContext;
 import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
 
@@ -14,10 +10,9 @@ import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
  * @author Emmanuel Bernard
  */
 public class ConnectedRangeMatchingContext implements RangeMatchingContext {
-	private final SearchFactoryImplementor factory;
-	private final Analyzer queryAnalyzer;
+	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
-	private final RangeQueryContext queryContext;
+	private final RangeQueryContext rangeContext;
 	private final List<FieldContext> fieldContexts;
 	//when a varargs of fields are passed, apply the same customization for all.
 	//keep the index of the first context in this queue
@@ -25,12 +20,10 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 
 	public ConnectedRangeMatchingContext(String fieldName,
 										 QueryCustomizer queryCustomizer,
-										 Analyzer queryAnalyzer,
-										 SearchFactoryImplementor factory) {
-		this.factory = factory;
-		this.queryAnalyzer = queryAnalyzer;
+										 QueryBuildingContext queryContext) {
+		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
-		this.queryContext = new RangeQueryContext();
+		this.rangeContext = new RangeQueryContext();
 		this.fieldContexts = new ArrayList<FieldContext>(4);
 		this.fieldContexts.add( new FieldContext( fieldName ) );
 	}
@@ -42,7 +35,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 	}
 
 	public <T> FromRangeContext<T> from(T from) {
-		queryContext.setFrom( from );
+		rangeContext.setFrom( from );
 		return new ConnectedFromRangeContext<T>(this);
 	}
 
@@ -54,29 +47,28 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		}
 
 		public RangeTerminationExcludable to(T to) {
-			mother.queryContext.setTo(to);
+			mother.rangeContext.setTo(to);
 			return new ConnectedMultiFieldsRangeQueryBuilder(
-					mother.queryContext,
-					mother.queryAnalyzer,
+					mother.rangeContext,
 					mother.queryCustomizer,
 					mother.fieldContexts,
-					mother.factory);
+					mother.queryContext);
 		}
 
 		public FromRangeContext<T> exclude() {
-			mother.queryContext.setExcludeFrom( true );
+			mother.rangeContext.setExcludeFrom( true );
 			return this;
 		}
 	}
 
 	public RangeTerminationExcludable below(Object below) {
-		queryContext.setTo( below );
-		return new ConnectedMultiFieldsRangeQueryBuilder(queryContext, queryAnalyzer, queryCustomizer, fieldContexts, factory);
+		rangeContext.setTo( below );
+		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext);
 	}
 
 	public RangeTerminationExcludable above(Object above) {
-		queryContext.setFrom( above );
-		return new ConnectedMultiFieldsRangeQueryBuilder(queryContext, queryAnalyzer, queryCustomizer, fieldContexts, factory);
+		rangeContext.setFrom( above );
+		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext);
 	}
 
 	public RangeMatchingContext boostedTo(float boost) {
