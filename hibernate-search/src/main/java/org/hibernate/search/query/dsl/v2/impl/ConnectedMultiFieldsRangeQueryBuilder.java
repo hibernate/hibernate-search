@@ -71,8 +71,8 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 				fieldName,
 				lowerTerm,
 				upperTerm,
-				rangeContext.isExcludeFrom(),
-				rangeContext.isExcludeTo()
+				!rangeContext.isExcludeFrom(),
+				!rangeContext.isExcludeTo()
 		);
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}

@@ -4,8 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
@@ -255,7 +257,6 @@ public class DSLTest extends SearchTestCase {
 		Date from = calendar.getTime();
 		calendar.set(10 + 1900, 2, 12, 0, 0, 0);
 		Date to = calendar.getTime();
-		final SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyyMMdd" );
 
 		Query
 
@@ -263,17 +264,16 @@ public class DSLTest extends SearchTestCase {
 				range()
 					.onField( "estimatedCreation" )
 					.andField( "justfortest" )
-					.from( dateFormat.format( from ) )
-					.to( dateFormat.format( to ) ).exclude()
+					.from( DateTools.dateToString( from, DateTools.Resolution.MINUTE ) )
+					.to( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) ).exclude()
 					.createQuery();
-
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		query = monthQb.
 				range()
 					.onField( "estimatedCreation" )
 					.andField( "justfortest" )
-					.below( dateFormat.format( to ) )
+					.below( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
 					.createQuery();
 
 		FullTextQuery hibQuery = fts.createFullTextQuery( query, Month.class );
@@ -284,7 +284,7 @@ public class DSLTest extends SearchTestCase {
 				range()
 					.onField( "estimatedCreation" )
 					.andField( "justfortest" )
-					.above( dateFormat.format( to ) )
+					.above( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
 					.createQuery();
 		hibQuery = fts.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
