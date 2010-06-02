@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.RangeMatchingContext;
 import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
 
@@ -13,7 +14,7 @@ import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
  * @author Emmanuel Bernard
  */
 public class ConnectedRangeMatchingContext implements RangeMatchingContext {
-	private final SearchFactory factory;
+	private final SearchFactoryImplementor factory;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
 	private final RangeQueryContext queryContext;
@@ -25,7 +26,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 	public ConnectedRangeMatchingContext(String fieldName,
 										 QueryCustomizer queryCustomizer,
 										 Analyzer queryAnalyzer,
-										 SearchFactory factory) {
+										 SearchFactoryImplementor factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = queryCustomizer;
@@ -58,7 +59,8 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 					mother.queryContext,
 					mother.queryAnalyzer,
 					mother.queryCustomizer,
-					mother.fieldContexts);
+					mother.fieldContexts,
+					mother.factory);
 		}
 
 		public FromRangeContext<T> exclude() {
@@ -69,12 +71,12 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 
 	public RangeTerminationExcludable below(Object below) {
 		queryContext.setTo( below );
-		return new ConnectedMultiFieldsRangeQueryBuilder(queryContext, queryAnalyzer, queryCustomizer, fieldContexts);
+		return new ConnectedMultiFieldsRangeQueryBuilder(queryContext, queryAnalyzer, queryCustomizer, fieldContexts, factory);
 	}
 
 	public RangeTerminationExcludable above(Object above) {
 		queryContext.setFrom( above );
-		return new ConnectedMultiFieldsRangeQueryBuilder(queryContext, queryAnalyzer, queryCustomizer, fieldContexts);
+		return new ConnectedMultiFieldsRangeQueryBuilder(queryContext, queryAnalyzer, queryCustomizer, fieldContexts, factory);
 	}
 
 	public RangeMatchingContext boostedTo(float boost) {

@@ -3,6 +3,7 @@ package org.hibernate.search.query.dsl.v2.impl;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.AllContext;
 import org.hibernate.search.query.dsl.v2.BooleanJunction;
 import org.hibernate.search.query.dsl.v2.FuzzyContext;
@@ -19,9 +20,9 @@ import org.hibernate.search.query.dsl.v2.WildcardContext;
  */
 public class ConnectedQueryBuilder implements QueryBuilder {
 	private final Analyzer queryAnalyzer;
-	private final SearchFactory factory;
+	private final SearchFactoryImplementor factory;
 
-	public ConnectedQueryBuilder(Analyzer queryAnalyzer, SearchFactory factory) {
+	public ConnectedQueryBuilder(Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
 		this.queryAnalyzer = queryAnalyzer;
 		this.factory = factory;
 	}

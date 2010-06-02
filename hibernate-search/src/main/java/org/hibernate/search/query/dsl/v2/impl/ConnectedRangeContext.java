@@ -4,6 +4,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Filter;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.RangeContext;
 import org.hibernate.search.query.dsl.v2.RangeMatchingContext;
 
@@ -11,11 +12,11 @@ import org.hibernate.search.query.dsl.v2.RangeMatchingContext;
  * @author Emmanuel Bernard
  */
 class ConnectedRangeContext implements RangeContext {
-	private final SearchFactory factory;
+	private final SearchFactoryImplementor factory;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
 
-	public ConnectedRangeContext(Analyzer queryAnalyzer, SearchFactory factory) {
+	public ConnectedRangeContext(Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = new QueryCustomizer();

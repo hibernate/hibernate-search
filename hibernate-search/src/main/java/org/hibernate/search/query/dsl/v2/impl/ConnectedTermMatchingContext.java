@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.TermMatchingContext;
 import org.hibernate.search.query.dsl.v2.TermTermination;
 
@@ -13,7 +14,7 @@ import org.hibernate.search.query.dsl.v2.TermTermination;
 * @author Emmanuel Bernard
 */
 public class ConnectedTermMatchingContext implements TermMatchingContext {
-	private final SearchFactory factory;
+	private final SearchFactoryImplementor factory;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext queryContext;
@@ -23,7 +24,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 	private int firstOfContext = 0;
 
 	public ConnectedTermMatchingContext(TermQueryContext queryContext,
-			String field, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactory factory) {
+			String field, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = queryCustomizer;
@@ -33,7 +34,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 	}
 
 	public ConnectedTermMatchingContext(TermQueryContext queryContext,
-			String[] fields, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactory factory) {
+			String[] fields, QueryCustomizer queryCustomizer, Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = queryCustomizer;

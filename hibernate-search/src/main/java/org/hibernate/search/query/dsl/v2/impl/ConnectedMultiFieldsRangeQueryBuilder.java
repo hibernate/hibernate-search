@@ -15,6 +15,8 @@ import org.apache.lucene.search.WildcardQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
 
 /**
@@ -25,12 +27,16 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
 	private final List<FieldContext> fieldContexts;
+	private final SearchFactoryImplementor factory;
 
-	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext queryContext, Analyzer queryAnalyzer, QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts) {
+	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext queryContext, Analyzer queryAnalyzer,
+												 QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts,
+												 SearchFactoryImplementor factory) {
 		this.queryContext = queryContext;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldContexts = fieldContexts;
+		this.factory = factory;
 	}
 
 	public RangeTerminationExcludable exclude() {

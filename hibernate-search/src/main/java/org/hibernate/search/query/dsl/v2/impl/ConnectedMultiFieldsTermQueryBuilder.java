@@ -16,6 +16,7 @@ import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.TermTermination;
 
 /**
@@ -33,7 +34,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 												List<FieldContext> fieldContexts,
 												QueryCustomizer queryCustomizer,
 												Analyzer queryAnalyzer,
-												SearchFactory factory) {
+												SearchFactoryImplementor factory) {
 		this.queryContext = queryContext;
 		this.text = text;
 		this.queryAnalyzer = queryAnalyzer;

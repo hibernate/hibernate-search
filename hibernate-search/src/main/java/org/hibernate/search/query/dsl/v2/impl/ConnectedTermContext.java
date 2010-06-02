@@ -4,6 +4,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Filter;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.FuzzyContext;
 import org.hibernate.search.query.dsl.v2.TermContext;
 import org.hibernate.search.query.dsl.v2.TermMatchingContext;
@@ -13,12 +14,12 @@ import org.hibernate.search.query.dsl.v2.WildcardContext;
  * @author Emmanuel Bernard
  */
 class ConnectedTermContext implements TermContext {
-	private final SearchFactory factory;
+	private final SearchFactoryImplementor factory;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext context;
 
-	public ConnectedTermContext(Analyzer queryAnalyzer, SearchFactory factory) {
+	public ConnectedTermContext(Analyzer queryAnalyzer, SearchFactoryImplementor factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = new QueryCustomizer();

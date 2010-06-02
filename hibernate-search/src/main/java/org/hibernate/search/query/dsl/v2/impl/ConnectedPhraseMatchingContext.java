@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.PhraseMatchingContext;
 import org.hibernate.search.query.dsl.v2.PhraseTermination;
 import org.hibernate.search.query.dsl.v2.RangeMatchingContext;
@@ -15,7 +16,7 @@ import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
  * @author Emmanuel Bernard
  */
 public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
-	private final SearchFactory factory;
+	private final SearchFactoryImplementor factory;
 	private final Analyzer queryAnalyzer;
 	private final QueryCustomizer queryCustomizer;
 	private final PhraseQueryContext queryContext;
@@ -28,7 +29,7 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 											PhraseQueryContext queryContext,
 											QueryCustomizer queryCustomizer,
 											Analyzer queryAnalyzer,
-											SearchFactory factory) {
+											SearchFactoryImplementor factory) {
 		this.factory = factory;
 		this.queryAnalyzer = queryAnalyzer;
 		this.queryCustomizer = queryCustomizer;

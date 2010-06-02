@@ -1,6 +1,7 @@
 package org.hibernate.search.query.dsl.v2.impl;
 
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.EntityContext;
 import org.hibernate.search.query.dsl.v2.QueryBuilder;
 import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
@@ -12,9 +13,9 @@ import org.hibernate.search.util.ScopedAnalyzer;
  * @author Emmanuel Bernard
  */
 public class ConnectedQueryContextBuilder implements QueryContextBuilder {
-	private final SearchFactory factory;
+	private final SearchFactoryImplementor factory;
 
-	public ConnectedQueryContextBuilder(SearchFactory factory) {
+	public ConnectedQueryContextBuilder(SearchFactoryImplementor factory) {
 		this.factory = factory;
 	}
 
@@ -24,9 +25,9 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 
 	public final class HSearchEntityContext implements EntityContext {
 		private final ScopedAnalyzer queryAnalyzer;
-		private final SearchFactory factory;
+		private final SearchFactoryImplementor factory;
 
-		public HSearchEntityContext(Class<?> entityType, SearchFactory factory) {
+		public HSearchEntityContext(Class<?> entityType, SearchFactoryImplementor factory) {
 			this.factory = factory;
 			queryAnalyzer = new ScopedAnalyzer();
 			queryAnalyzer.setGlobalAnalyzer( factory.getAnalyzer( entityType ) );
