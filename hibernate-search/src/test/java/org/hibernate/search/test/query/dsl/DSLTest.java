@@ -33,6 +33,29 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class DSLTest extends SearchTestCase {
 
+	public void testUseOfFieldBridge() throws Exception {
+		FullTextSession fts = initData();
+
+		Transaction transaction = fts.beginTransaction();
+		final QueryBuilder monthQb = fts.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+		Query
+
+		query = monthQb.keyword().onField( "monthValue" ).matching( 2 ).createQuery();
+		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword()
+						.onField( "monthValue" )
+							.ignoreFieldBridge()
+						.matching( "2" )
+						.createQuery();
+		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		transaction.commit();
+
+		cleanData( fts );
+	}
+
 	public void testTermQueryOnAnalyzer() throws Exception {
 		FullTextSession fts = initData();
 
@@ -264,6 +287,19 @@ public class DSLTest extends SearchTestCase {
 				range()
 					.onField( "estimatedCreation" )
 					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.from( from )
+					.to( to ).exclude()
+					.createQuery();
+
+		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.
+				range()
+					.onField( "estimatedCreation" )
+						.ignoreFieldBridge()
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
 					.from( DateTools.dateToString( from, DateTools.Resolution.MINUTE ) )
 					.to( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) ).exclude()
 					.createQuery();
@@ -273,7 +309,8 @@ public class DSLTest extends SearchTestCase {
 				range()
 					.onField( "estimatedCreation" )
 					.andField( "justfortest" )
-					.below( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.below( to )
 					.createQuery();
 
 		FullTextQuery hibQuery = fts.createFullTextQuery( query, Month.class );
@@ -283,7 +320,33 @@ public class DSLTest extends SearchTestCase {
 		query = monthQb.
 				range()
 					.onField( "estimatedCreation" )
+						.ignoreFieldBridge()
 					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.below( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+					.createQuery();
+
+		hibQuery = fts.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "January", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		query = monthQb.
+				range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.above( to )
+					.createQuery();
+		hibQuery = fts.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		query = monthQb.
+				range()
+					.onField( "estimatedCreation" )
+						.ignoreFieldBridge()
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
 					.above( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
 					.createQuery();
 		hibQuery = fts.createFullTextQuery( query, Month.class );
@@ -484,12 +547,14 @@ public class DSLTest extends SearchTestCase {
 		calendar.set(0 + 1900, 2, 12, 0, 0, 0);
 		fts.persist( new Month(
 				"January",
+				1,
 				"Month of colder and whitening",
 				"Historically colder than any other month in the northern hemisphere",
 				 calendar.getTime() ) );
 		calendar.set(100 + 1900, 2, 12, 0, 0, 0);
 		fts.persist( new Month(
 				"February",
+				2,
 				"Month of snowboarding",
 				"Historically, the month where we make babies while watching the whitening landscape",
 				calendar.getTime() ) );

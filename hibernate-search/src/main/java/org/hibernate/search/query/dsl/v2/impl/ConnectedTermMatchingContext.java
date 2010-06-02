@@ -38,8 +38,8 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 		}
 	}
 
-	public TermTermination matching(String text) {
-		return new ConnectedMultiFieldsTermQueryBuilder( termContext, text, fieldContexts, queryCustomizer, queryContext);
+	public TermTermination matching(Object value) {
+		return new ConnectedMultiFieldsTermQueryBuilder( termContext, value, fieldContexts, queryCustomizer, queryContext);
 	}
 
 	public TermMatchingContext andField(String field) {
@@ -62,6 +62,13 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 	public TermMatchingContext ignoreAnalyzer() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreAnalyzer( true );
+		}
+		return this;
+	}
+
+	public TermMatchingContext ignoreFieldBridge() {
+		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
+			fieldContext.setIgnoreFieldBridge( true );
 		}
 		return this;
 	}

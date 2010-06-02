@@ -5,9 +5,12 @@ package org.hibernate.search.query.dsl.v2;
 */
 public interface TermMatchingContext extends FieldCustomization<TermMatchingContext> {
 	/**
-	 * text searched in the term query (the term is pre-analyzer unless ignoreAnalyzer is called)
+	 * Value searched in the field or fields.
+	 * The value is passed to the field's:
+	 *  - field bridge
+	 *  - analyzer (unless ignoreAnalyzer is called).
 	 */
-	TermTermination matching(String text);
+	TermTermination matching(Object value);
 
 	/**
 	 * field / property the term query is executed on

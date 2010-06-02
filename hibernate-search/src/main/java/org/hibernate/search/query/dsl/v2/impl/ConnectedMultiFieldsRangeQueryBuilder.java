@@ -9,6 +9,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.v2.RangeTerminationExcludable;
 
 /**
@@ -63,10 +64,25 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		final Query perFieldQuery;
 		final String fieldName = fieldContext.getField();
 		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
-		final Object from = rangeContext.getFrom();
-		final String lowerTerm = from == null ? null : Helper.getAnalyzedTerm( fieldName, from, "from", queryAnalyzer );
-		final Object to = rangeContext.getTo();
-		final String upperTerm = to == null ? null : Helper.getAnalyzedTerm( fieldName, to, "to", queryAnalyzer );
+
+		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
+
+		final Object fromObject = rangeContext.getFrom();
+		final String fromString  = fieldContext.isIgnoreFieldBridge() ?
+				fromObject == null ? null : fromObject.toString() :
+				documentBuilder.objectToString( fieldName, fromObject );
+		final String lowerTerm = fromString == null ?
+				null :
+				Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
+
+		final Object toObject = rangeContext.getTo();
+		final String toString  = fieldContext.isIgnoreFieldBridge() ?
+				toObject == null ? null : toObject.toString() :
+				documentBuilder.objectToString( fieldName, toObject );
+		final String upperTerm = toString == null ?
+				null :
+				Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
+		
 		perFieldQuery = new TermRangeQuery(
 				fieldName,
 				lowerTerm,
@@ -76,4 +92,6 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		);
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
+
+
 }

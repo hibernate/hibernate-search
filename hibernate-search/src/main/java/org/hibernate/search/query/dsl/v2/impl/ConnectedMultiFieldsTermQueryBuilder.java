@@ -15,25 +15,26 @@ import org.apache.lucene.search.WildcardQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.v2.TermTermination;
 
 /**
 * @author Emmanuel Bernard
 */
 public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
-	private final String text;
+	private final Object value;
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext termContext;
 	private final List<FieldContext> fieldContexts;
 	private final QueryBuildingContext queryContext;
 
 	public ConnectedMultiFieldsTermQueryBuilder(TermQueryContext termContext,
-												String text,
+												Object value,
 												List<FieldContext> fieldContexts,
 												QueryCustomizer queryCustomizer,
 												QueryBuildingContext queryContext) {
 		this.termContext = termContext;
-		this.text = text;
+		this.value = value;
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldContexts = fieldContexts;
@@ -55,6 +56,10 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 	public Query createQuery(FieldContext fieldContext) {
 		final Query perFieldQuery;
+		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
+		String text = fieldContext.isIgnoreFieldBridge() ? 
+					value.toString() :
+					documentBuilder.objectToString( fieldContext.getField(), value );
 		if ( fieldContext.isIgnoreAnalyzer() ) {
 			perFieldQuery = createTermQuery( fieldContext, text );
 		}

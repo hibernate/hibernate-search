@@ -9,6 +9,7 @@ public class FieldContext {
 	private final String field;
 	private boolean ignoreAnalyzer;
 	private final QueryCustomizer fieldCustomizer;
+	private boolean ignoreFieldBridge;
 
 	public FieldContext(String field) {
 		this.field = field;
@@ -29,5 +30,13 @@ public class FieldContext {
 
 	public QueryCustomizer getFieldCustomizer() {
 		return fieldCustomizer;
+	}
+
+	public boolean isIgnoreFieldBridge() {
+		return ignoreFieldBridge;
+	}
+
+	public void setIgnoreFieldBridge(boolean ignoreFieldBridge) {
+		this.ignoreFieldBridge = ignoreFieldBridge;
 	}
 }

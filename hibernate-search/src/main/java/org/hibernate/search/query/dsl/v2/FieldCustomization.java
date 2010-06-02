@@ -20,4 +20,10 @@ public interface FieldCustomization<T> {
 	 * (It is usually a good idea to apply the analyzer)
 	 */
 	T ignoreAnalyzer();
+
+	/**
+	 * Do not try and find the field bridge nor apply the object / string conversion
+	 * matching objects should be of type String in this case.
+	 */
+	T ignoreFieldBridge();
 }

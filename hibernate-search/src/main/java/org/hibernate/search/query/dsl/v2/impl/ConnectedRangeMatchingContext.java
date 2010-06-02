@@ -88,4 +88,11 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		}
 		return this;
 	}
+
+	public RangeMatchingContext ignoreFieldBridge() {
+		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
+			fieldContext.setIgnoreFieldBridge( true );
+		}
+		return this;
+	}
 }

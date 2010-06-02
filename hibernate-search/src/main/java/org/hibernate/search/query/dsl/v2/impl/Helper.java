@@ -12,6 +12,8 @@ import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
  * @author Emmanuel Bernard
@@ -20,13 +22,22 @@ class Helper {
 	/**
 	 * return the analyzed value for a given field. If several terms are created, an exception is raised.
 	 */
-	static String getAnalyzedTerm(String fieldName, Object value, String name, Analyzer queryAnalyzer) {
+	static String getAnalyzedTerm(String fieldName, String value, String name, Analyzer queryAnalyzer, FieldContext fieldContext) {
+		if ( fieldContext.isIgnoreAnalyzer() ) return value;
+		
 		try {
 			final List<String> termsFromText = getAllTermsFromText(
 					fieldName, value.toString(), queryAnalyzer
 			);
 			if (termsFromText.size() > 1) {
-				throw new SearchException( "The " + name + " parameter leads to several terms when analyzed");
+				StringBuilder error = new StringBuilder( "The ")
+						.append( name )
+						.append( " parameter leads to several terms when analyzed: " );
+				for ( String term : termsFromText ) {
+					error.append( term ).append( ", " );
+				}
+				final int length = error.length();
+				throw new SearchException( error.delete( length - 1, length ).toString() );
 			}
 			return termsFromText.size() == 0 ? null : termsFromText.get( 0 );
 		}
@@ -52,5 +63,15 @@ class Helper {
 		stream.end();
 		stream.close();
 		return terms;
+	}
+
+	static DocumentBuilderIndexedEntity<?> getDocumentBuilder(QueryBuildingContext queryContext) {
+		final SearchFactoryImplementor factory = queryContext.getFactory();
+		final Class<?> type = queryContext.getEntityType();
+		DocumentBuilderIndexedEntity<?> builder = factory.getDocumentBuilderIndexedEntity( type );
+		if ( builder == null ) {
+			throw new AssertionFailure( "Class in not indexed: " + type );
+		}
+		return builder;
 	}
 }

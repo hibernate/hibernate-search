@@ -64,6 +64,7 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
@@ -705,6 +706,58 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			}
 		}
 		return -1;
+	}
+
+	public String objectToString(String fieldName, Object value) {
+		if ( fieldName == null ) {
+			throw new AssertionFailure( "Field name should not be null");
+		}
+		if ( fieldName.equals( idKeywordName ) ) {
+			return idBridge.objectToString( value );
+		}
+		else {
+			FieldBridge bridge = getBridge( metadata, fieldName );
+			if (bridge!=null) {
+				final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
+				if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
+					return ( (TwoWayFieldBridge) bridge ).objectToString( value );
+				}
+				else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
+					return ( (StringBridge) bridge ).objectToString( value );
+				}
+				throw new SearchException( "FieldBridge " + bridgeClass + "does not have a objectToString method: field "
+						+ fieldName + " in " + beanClass );
+			}
+		}
+		throw new SearchException( "Unable to find field " + fieldName + " in " + beanClass );
+	}
+
+	private FieldBridge getBridge(List<String> names, List<FieldBridge> bridges, String fieldName) {
+		int index = names.indexOf( fieldName );
+		if ( index != -1 ) {
+			return bridges.get( index );
+		}
+		else {
+			return null;
+		}
+	}
+
+	private FieldBridge getBridge(PropertiesMetadata metadata, String fieldName) {
+        //process base fields
+		FieldBridge fieldBridge = getBridge( metadata.fieldNames, metadata.fieldBridges, fieldName );
+		if ( fieldBridge != null ) return fieldBridge;
+
+		//process fields of embedded
+		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
+		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
+			fieldBridge = getBridge( metadata.embeddedPropertiesMetadata.get( index ), fieldName );
+			if ( fieldBridge != null ) return fieldBridge;
+		}
+
+		//process class bridges
+		fieldBridge = getBridge( metadata.classNames, metadata.classBridges, fieldName );
+		if ( fieldBridge != null ) return fieldBridge;
+		return null;
 	}
 
 	/**

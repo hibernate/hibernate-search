@@ -57,4 +57,9 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 		}
 		return this;
 	}
+
+	public PhraseMatchingContext ignoreFieldBridge() {
+		//this is a no-op
+		return this;
+	}
 }

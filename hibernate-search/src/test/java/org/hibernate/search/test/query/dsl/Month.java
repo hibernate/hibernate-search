@@ -19,19 +19,26 @@ import org.hibernate.search.annotations.Resolution;
 @Entity
 @Indexed
 public class Month {
+
 	public Month() {}
 	
-	public Month(String name, String mythology, String history, Date estimatedCreation) {
+	public Month(String name, int monthValue, String mythology, String history, Date estimatedCreation) {
 		this.name = name;
 		this.mythology = mythology;
 		this.history = history;
 		this.estimatedCreation = estimatedCreation;
+		this.monthValue = monthValue;
 	}
 
 	@Id @GeneratedValue
 	public Integer getId() { return id; }
 	public void setId(Integer id) { this.id = id; }
 	private Integer id;
+
+	@Field(index = Index.NO_NORMS)
+	public int getMonthValue() { return monthValue; }
+	public void setMonthValue(int monthValue) { this.monthValue = monthValue; }
+	private int monthValue;
 
 	@Field
 	public String getName() { return name; }
