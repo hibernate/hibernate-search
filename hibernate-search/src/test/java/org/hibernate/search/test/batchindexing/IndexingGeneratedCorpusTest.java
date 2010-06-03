@@ -45,11 +45,11 @@ import org.hibernate.search.test.util.textbuilder.SentenceInventor;
  */
 public class IndexingGeneratedCorpusTest extends TestCase {
 	
-	private final int BOOK_NUM = 600;
+	private final int BOOK_NUM = 140;
 	private final int ANCIENTBOOK_NUM = 120;
-	private final int DVD_NUM = 400;
+	private final int DVD_NUM = 200;
 	
-	private SentenceInventor sentenceInventor = new SentenceInventor( 7L, 10000 );
+	private SentenceInventor sentenceInventor = new SentenceInventor( 7L, 4000 );
 	private FullTextSessionBuilder builder;
 	private int totalEntitiesInDB = 0;
 
