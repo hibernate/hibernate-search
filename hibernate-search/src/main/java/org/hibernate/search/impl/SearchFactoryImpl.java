@@ -27,10 +27,8 @@ package org.hibernate.search.impl;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -191,17 +189,17 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 
 	private void fillSimilarityMapping() {
 		for ( DirectoryProviderData directoryConfiguration : dirProviderData.values() ) {
-			for (Class<?> indexedType : directoryConfiguration.classes) {
+			for ( Class<?> indexedType : directoryConfiguration.getClasses() ) {
 				DocumentBuilderIndexedEntity<?> documentBuilder = documentBuildersIndexedEntities.get( indexedType );
 				Similarity similarity = documentBuilder.getSimilarity();
-				Similarity prevSimilarity = directoryConfiguration.similarity;
+				Similarity prevSimilarity = directoryConfiguration.getSimilarity();
 				if ( prevSimilarity != null && ! prevSimilarity.getClass().equals( similarity.getClass() ) ) {
 					throw new SearchException( "Multiple entities are sharing the same index but are declaring an " + 
 							"inconsistent Similarity. When overrriding default Similarity make sure that all types sharing a same index " +
 							"declare the same Similarity implementation." );
 				}
 				else {
-					directoryConfiguration.similarity = similarity;
+					directoryConfiguration.setSimilarity( similarity );
 				}
 			}
 		}
@@ -266,14 +264,14 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			data = new DirectoryProviderData();
 			dirProviderData.put( directoryProvider, data );
 		}
-		data.classes.add( clazz );
-		data.exclusiveIndexUsage = exclusiveIndexUsage;
+		data.getClasses().add( clazz );
+		data.setExclusiveIndexUsage( exclusiveIndexUsage );
 	}
 
 	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		return Collections.unmodifiableSet( dirProviderData.get( directoryProvider ).classes );
+		return Collections.unmodifiableSet( dirProviderData.get( directoryProvider ).getClasses() );
 	}
 
 	private void bindFilterDefs(XClass mappedXClass) {
@@ -400,7 +398,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 			data = new DirectoryProviderData();
 			dirProviderData.put( provider, data );
 		}
-		data.optimizerStrategy = optimizerStrategy;
+		data.setOptimizerStrategy( optimizerStrategy );
 	}
 
 	public void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
@@ -411,7 +409,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		return dirProviderData.get( provider ).optimizerStrategy;
+		return dirProviderData.get( provider ).getOptimizerStrategy();
 	}
 
 	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
@@ -578,24 +576,16 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return filterDefinitions.get( name );
 	}
 
-	private static class DirectoryProviderData {
-		public final ReentrantLock dirLock = new ReentrantLock();
-		public OptimizerStrategy optimizerStrategy;
-		public final Set<Class<?>> classes = new HashSet<Class<?>>( 2 );
-		public Similarity similarity = null;
-		private boolean exclusiveIndexUsage;
-	}
-
 	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		return this.dirProviderData.get( dp ).dirLock;
+		return this.dirProviderData.get( dp ).getDirLock();
 	}
 
 	public void addDirectoryProvider(DirectoryProvider<?> provider, boolean exclusiveIndexUsage) {
 		//no need to set a barrier we use this method in the init thread
 		DirectoryProviderData dirConfiguration = new DirectoryProviderData();
-		dirConfiguration.exclusiveIndexUsage = exclusiveIndexUsage;
+		dirConfiguration.setExclusiveIndexUsage( exclusiveIndexUsage );
 		this.dirProviderData.put( provider, dirConfiguration );
 	}
 
@@ -627,58 +617,10 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return batchBackend;
 	}
 
-	/**
-	 * Helper class which keeps track of all super classes and interfaces of the indexed entities.
-	 */
-	private static class PolymorphicIndexHierarchy {
-		private Map<Class<?>, Set<Class<?>>> classToIndexedClass;
-
-		PolymorphicIndexHierarchy() {
-			classToIndexedClass = new HashMap<Class<?>, Set<Class<?>>>();
-		}
-
-		void addIndexedClass(Class indexedClass) {
-			addClass( indexedClass, indexedClass );
-			Class superClass = indexedClass.getSuperclass();
-			while ( superClass != null ) {
-				addClass( superClass, indexedClass );
-				superClass = superClass.getSuperclass();
-			}
-			for ( Class clazz : indexedClass.getInterfaces() ) {
-				addClass( clazz, indexedClass );
-			}
-		}
-
-		private void addClass(Class superclass, Class indexedClass) {
-			Set<Class<?>> classesSet = classToIndexedClass.get( superclass );
-			if ( classesSet == null ) {
-				classesSet = new HashSet<Class<?>>();
-				classToIndexedClass.put( superclass, classesSet );
-			}
-			classesSet.add( indexedClass );
-		}
-
-		Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
-			Set<Class<?>> idexedClasses = new HashSet<Class<?>>();
-			for ( Class clazz : classes ) {
-				Set<Class<?>> set = classToIndexedClass.get( clazz );
-				if ( set != null ) {
-					// at this point we don't have to care about including indexed subclasses of a indexed class
-					// MultiClassesQueryLoader will take care of this later and optimise the queries
-					idexedClasses.addAll( set );
-				}
-			}
-			if ( log.isTraceEnabled() ) {
-				log.trace( "Targeted indexed classes for {}: {}", Arrays.toString( classes ), idexedClasses );
-			}
-			return idexedClasses;
-		}
-	}
-
 	public Similarity getSimilarity(DirectoryProvider<?> provider) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		Similarity similarity = dirProviderData.get( provider ).similarity;
+		Similarity similarity = dirProviderData.get( provider ).getSimilarity();
 		if ( similarity == null ) throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
 		return similarity;
 	}
@@ -686,7 +628,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	public boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> provider) {
 		if ( barrier != 0 ) {
 		} //read barrier
-		return dirProviderData.get( provider ).exclusiveIndexUsage;
+		return dirProviderData.get( provider ).isExclusiveIndexUsage();
 	}
 
 	/**
