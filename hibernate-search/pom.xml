@@ -143,7 +143,6 @@
                     <excludes>
                         <exclude>**/classloading/*.java</exclude>
                         <exclude>**/*PerfTest.java</exclude>
-                        <exclude>**/IndexingGeneratedCorpusTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
