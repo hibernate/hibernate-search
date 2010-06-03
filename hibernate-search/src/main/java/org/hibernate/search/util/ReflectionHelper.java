@@ -53,8 +53,15 @@ public abstract class ReflectionHelper {
 	}
 
 	public static void setAccessible(XMember member) {
-		if ( !Modifier.isPublic( member.getModifiers() ) ) {
+		try {
+			//always set accessible to true as it bypass the security model checks
+			// at execution time and is faster.
 			member.setAccessible( true );
+		}
+		catch ( SecurityException se ) {
+			if ( !Modifier.isPublic( member.getModifiers() ) ) {
+				throw se;
+			}
 		}
 	}
 
