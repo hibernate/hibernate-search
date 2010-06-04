@@ -88,6 +88,7 @@ import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
+import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.util.StringHelper;
 import org.slf4j.Logger;
 import org.hibernate.search.exception.ErrorHandler;
@@ -337,9 +338,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 									+ filterDef.getImpl().getName() + "." + method.getName()
 					);
 				}
-				if ( !method.isAccessible() ) {
-					method.setAccessible( true );
-				}
+				ReflectionHelper.setAccessible( method );
 				filterDef.setFactoryMethod( method );
 			}
 			if ( method.isAnnotationPresent( Key.class ) ) {
@@ -349,9 +348,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 									+ filterDef.getImpl().getName() + "." + method.getName()
 					);
 				}
-				if ( !method.isAccessible() ) {
-					method.setAccessible( true );
-				}
+				ReflectionHelper.setAccessible( method );
 				filterDef.setKeyMethod( method );
 			}
 

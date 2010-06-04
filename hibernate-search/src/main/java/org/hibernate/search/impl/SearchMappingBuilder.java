@@ -33,6 +33,7 @@ import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.search.util.ReflectionHelper;
 
 import org.slf4j.Logger;
 
@@ -82,7 +83,7 @@ class SearchMappingBuilder {
 		for (Method method : methods) {
 			if (method.isAnnotationPresent(Factory.class)) {
 				count++;
-				makeMethodAccessibleIfRequired(method);
+				ReflectionHelper.setAccessible( method );
 				mapping = getNewInstanceOfSearchMapping(clazz, method);
 			}
 		}
@@ -102,12 +103,6 @@ class SearchMappingBuilder {
 		return mapping;
 	}
 
-	private static void makeMethodAccessibleIfRequired(Method method) {
-		if ( !method.isAccessible() ) {
-			method.setAccessible( true );
-		}
-	}
-	
 	private static void validateMappingFactoryDefinition(int count, Class<?> factory) {
 		if (count == 0) {
 			throw new SearchException("No @Factory method defined for building programmatic api on " + factory);

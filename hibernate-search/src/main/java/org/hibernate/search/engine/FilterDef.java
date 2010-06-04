@@ -29,9 +29,11 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
+import org.hibernate.search.util.ReflectionHelper;
 
 /**
  * A wrapper class which encapsulates all required information to create a defined filter.
@@ -82,7 +84,7 @@ public class FilterDef {
 	}
 
 	public void addSetter(String name, Method method) {
-		if ( method.isAccessible() ) method.setAccessible( true );
+		ReflectionHelper.setAccessible( method );
 		setters.put( name, method );
 	}
 

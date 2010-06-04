@@ -24,6 +24,9 @@
  */
 package org.hibernate.search.util;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.hibernate.annotations.common.reflection.XMember;
@@ -52,6 +55,9 @@ public abstract class ReflectionHelper {
 				member.getName(); //explicit field name
 	}
 
+	/**
+	 * Always use this method to set accessibility regardless of the visibility.
+	 */
 	public static void setAccessible(XMember member) {
 		try {
 			//always set accessible to true as it bypass the security model checks
@@ -60,6 +66,22 @@ public abstract class ReflectionHelper {
 		}
 		catch ( SecurityException se ) {
 			if ( !Modifier.isPublic( member.getModifiers() ) ) {
+				throw se;
+			}
+		}
+	}
+
+	/**
+	 * Always use this method to set accessibility regardless of the visibility.
+	 */
+	public static void setAccessible(AccessibleObject member) {
+		try {
+			//always set accessible to true as it bypass the security model checks
+			// at execution time and is faster.
+			member.setAccessible( true );
+		}
+		catch ( SecurityException se ) {
+			if ( !Modifier.isPublic( ( (Member) member ).getModifiers() ) ) {
 				throw se;
 			}
 		}

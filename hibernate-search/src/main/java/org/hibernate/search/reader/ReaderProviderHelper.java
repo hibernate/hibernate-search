@@ -35,6 +35,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.Searchable;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.util.ReflectionHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -46,7 +47,7 @@ public abstract class ReaderProviderHelper {
 	private static Field getSubReadersField() {
 		try {
 			Field field = MultiReader.class.getDeclaredField( "subReaders" );
-			if ( ! field.isAccessible() ) field.setAccessible( true );
+			ReflectionHelper.setAccessible( field );
 			return field;
 		}
 		catch (NoSuchFieldException e) {

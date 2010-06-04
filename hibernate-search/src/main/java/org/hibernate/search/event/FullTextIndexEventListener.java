@@ -64,6 +64,7 @@ import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;
 
 import static org.hibernate.search.event.FullTextIndexEventListener.Installation.MULTIPLE_INSTANCE;
@@ -286,7 +287,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		is.defaultReadObject();
 		Class<FullTextIndexEventListener> cl = FullTextIndexEventListener.class;
 		Field f = cl.getDeclaredField("flushSynch");
-		f.setAccessible( true );
+		ReflectionHelper.setAccessible( f );
 		Map<Session,Synchronization> flushSynch = new WeakIdentityHashMap<Session,Synchronization>(0);
 		// setting a final field by reflection during a readObject is considered as safe as in a constructor:
 		f.set( this, flushSynch );
