@@ -53,7 +53,7 @@ import org.slf4j.Logger;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class InitContext {
+public class ConfigContext {
 	
 	private static final Logger log = LoggerFactory.make();
 	
@@ -64,7 +64,7 @@ public class InitContext {
 	private final boolean solrPresent;
 	private final boolean jpaPresent;
 
-	public InitContext(SearchConfiguration cfg) {
+	public ConfigContext(SearchConfiguration cfg) {
 		defaultAnalyzer = initAnalyzer(cfg);
 		defaultSimilarity = initSimilarity(cfg);
 		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
@@ -128,7 +128,7 @@ public class InitContext {
 		}
 		else {
 			defaultSimilarity = PluginLoader.instanceFromName(
-					Similarity.class, similarityClassName, InitContext.class, "default similarity" );
+					Similarity.class, similarityClassName, ConfigContext.class, "default similarity" );
 		}
 		log.debug( "Using default similarity implementation: {}", defaultSimilarity.getClass().getName() );		
 		return defaultSimilarity;
@@ -191,7 +191,7 @@ public class InitContext {
 
 	private boolean isPresent(String classname) {
 		try {
-			ReflectHelper.classForName( classname, InitContext.class );
+			ReflectHelper.classForName( classname, ConfigContext.class );
 			return true;
 		}
 		catch ( Exception e ) {

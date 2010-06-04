@@ -68,7 +68,7 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.impl.InitContext;
+import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.LoggerFactory;
@@ -143,7 +143,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	 * @param shardingStrategy The sharding strategy used for the indexed entity.
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */
-	public DocumentBuilderIndexedEntity(XClass clazz, InitContext context, DirectoryProvider[] directoryProviders,
+	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, DirectoryProvider[] directoryProviders,
 										IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
 
 		super( clazz, context, reflectionManager );
@@ -153,7 +153,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		this.shardingStrategy = shardingStrategy;
 	}
 
-	protected void init(XClass clazz, InitContext context) {
+	protected void init(XClass clazz, ConfigContext context) {
 		super.init( clazz, context );
 
 		// special case @ProvidedId
@@ -177,7 +177,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		}
 	}
 
-	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
+	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
 		Annotation idAnnotation = getIdAnnotation( member, context );
 		if ( idAnnotation != null ) {
 			String attributeName = getIdAttributeName( member, idAnnotation );
@@ -238,7 +238,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	 *
 	 * @return the annotation used as document id or <code>null</code> if id annotation is specified on the property.
 	 */
-	private Annotation getIdAnnotation(XProperty member, InitContext context) {
+	private Annotation getIdAnnotation(XProperty member, ConfigContext context) {
 		Annotation idAnnotation = null;
 
 		// check for explicit DocumentId
@@ -254,7 +254,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 				@SuppressWarnings("unchecked")
 				Class<? extends Annotation> jpaIdClass =
 						org.hibernate.annotations.common.util.ReflectHelper
-							.classForName( "javax.persistence.Id", InitContext.class );
+							.classForName( "javax.persistence.Id", ConfigContext.class );
 				jpaId = member.getAnnotation( jpaIdClass );
 			}
 			catch ( ClassNotFoundException e ) {

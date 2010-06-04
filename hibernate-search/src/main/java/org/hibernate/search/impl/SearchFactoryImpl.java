@@ -481,7 +481,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 	}
 
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager) {
-		InitContext context = new InitContext( cfg );
+		ConfigContext context = new ConfigContext( cfg );
 		Iterator<Class<?>> iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
@@ -537,7 +537,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		factory.startDirectoryProviders();
 	}
 
-	private void initProgrammaticAnalyzers(InitContext context, ReflectionManager reflectionManager) {
+	private void initProgrammaticAnalyzers(ConfigContext context, ReflectionManager reflectionManager) {
 		final Map defaults = reflectionManager.getDefaults();
 
 		if (defaults != null) {
