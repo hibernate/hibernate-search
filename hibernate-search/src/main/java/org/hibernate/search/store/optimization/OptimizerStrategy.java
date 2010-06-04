@@ -26,6 +26,7 @@ package org.hibernate.search.store.optimization;
 
 import java.util.Properties;
 
+import org.hibernate.search.InitContext;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
@@ -34,7 +35,7 @@ import org.hibernate.search.store.DirectoryProvider;
  * @author Emmanuel Bernard
  */
 public interface OptimizerStrategy {
-	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, SearchFactoryImplementor searchFactoryImplementor);
+	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, InitContext initContext);
 
 	/**
 	 * has to be called in a thread safe way

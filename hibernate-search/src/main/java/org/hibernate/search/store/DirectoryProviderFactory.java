@@ -32,6 +32,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.Environment;
+import org.hibernate.search.InitAndRegisterContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
@@ -140,7 +141,8 @@ public class DirectoryProviderFactory {
 			return directoryProvider;
 		}
 		else {
-			configureOptimizerStrategy( searchFactoryImplementor, indexProps, provider );
+			//TODO IARC casting should not be necessary in the end
+			configureOptimizerStrategy( ( InitAndRegisterContext ) searchFactoryImplementor, indexProps, provider );
 			configureIndexingParameters( searchFactoryImplementor, indexProps, provider );
 			providers.add( provider );
 			searchFactoryImplementor.addClassToDirectoryProvider( entity, provider, exclusiveIndexUsage );
@@ -148,18 +150,18 @@ public class DirectoryProviderFactory {
 		}
 	}
 
-	private void configureOptimizerStrategy(SearchFactoryImplementor searchFactoryImplementor, Properties indexProps, DirectoryProvider<?> provider) {
+	private void configureOptimizerStrategy(InitAndRegisterContext context, Properties indexProps, DirectoryProvider<?> provider) {
 		boolean incremental = indexProps.containsKey( "optimizer.operation_limit.max" )
 				|| indexProps.containsKey( "optimizer.transaction_limit.max" );
 		OptimizerStrategy optimizerStrategy;
 		if ( incremental ) {
 			optimizerStrategy = new IncrementalOptimizerStrategy();
-			optimizerStrategy.initialize( provider, indexProps, searchFactoryImplementor );
+			optimizerStrategy.initialize( provider, indexProps, context );
 		}
 		else {
 			optimizerStrategy = new NoOpOptimizerStrategy();
 		}
-		searchFactoryImplementor.addOptimizerStrategy( provider, optimizerStrategy );
+		context.addOptimizerStrategy( provider, optimizerStrategy );
 	}
 
 	/**

@@ -45,6 +45,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.Environment;
+import org.hibernate.search.InitAndRegisterContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -95,7 +96,7 @@ import org.hibernate.search.exception.impl.LogErrorHandler;
 /**
  * @author Emmanuel Bernard
  */
-public class SearchFactoryImpl implements SearchFactoryImplementor {
+public class SearchFactoryImpl implements SearchFactoryImplementor, InitAndRegisterContext {
 
 	static {
 		Version.touch();
@@ -655,4 +656,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor {
 		return errorHandler;
 	}
 
+	public SearchFactoryImplementor getUninitializedSearchFactory() {
+		return this;
+	}
 }
