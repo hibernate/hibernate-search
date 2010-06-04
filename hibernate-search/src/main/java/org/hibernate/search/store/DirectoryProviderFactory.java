@@ -115,7 +115,7 @@ public class DirectoryProviderFactory {
 	}
 
 	private DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps,
-														 Class entity, SearchFactoryImplementor searchFactoryImplementor) {
+														 Class<?> entity, SearchFactoryImplementor searchFactoryImplementor) {
 		String className = indexProps.getProperty( "directory_provider" );
 		DirectoryProvider<?> provider;
 		if ( StringHelper.isEmpty( className ) ) {
@@ -221,7 +221,7 @@ public class DirectoryProviderFactory {
 		//get the most specialized (ie subclass > superclass) non default index name
 		//if none extract the name from the most generic (superclass > subclass) @Indexed class in the hierarchy
 		//FIXME I'm inclined to get rid of the default value
-		Class aClass = cfg.getClassMapping( clazz.getName() );
+		Class<?> aClass = cfg.getClassMapping( clazz.getName() );
 		XClass rootIndex = null;
 		do {
 			XClass currentClazz = reflectionManager.toXClass( aClass );
