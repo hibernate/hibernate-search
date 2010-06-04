@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.InitContext;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.PluginLoader;
@@ -50,7 +51,7 @@ public abstract class ReaderProviderFactory {
 		return workerProperties;
 	}
 
-	public static ReaderProvider createReaderProvider(SearchConfiguration cfg, SearchFactoryImplementor searchFactoryImplementor) {
+	public static ReaderProvider createReaderProvider(SearchConfiguration cfg, InitContext context) {
 		Properties props = getProperties( cfg );
 		String impl = props.getProperty( Environment.READER_STRATEGY );
 		ReaderProvider readerProvider;
@@ -72,7 +73,7 @@ public abstract class ReaderProviderFactory {
 			readerProvider = PluginLoader.instanceFromName( ReaderProvider.class, impl,
 					ReaderProviderFactory.class, "readerProvider" );
 		}
-		readerProvider.initialize( props, searchFactoryImplementor );
+		readerProvider.initialize( props, context );
 		return readerProvider;
 	}
 }

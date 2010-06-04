@@ -1,8 +1,11 @@
 package org.hibernate.search;
 
+import java.util.Set;
+
 import org.jcp.xml.dsig.internal.dom.DOMXMLSignature;
 
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * @author Emmanuel Bernard
@@ -30,4 +33,6 @@ public interface InitContext {
 	SearchFactoryImplementor getUninitializedSearchFactory();
 
 	String getIndexingStrategy();
+
+	Set<DirectoryProvider<?>> getDirectoryProviders();
 }

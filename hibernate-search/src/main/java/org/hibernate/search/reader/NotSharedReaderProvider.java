@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexReader;
+
+import org.hibernate.search.InitContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import static org.hibernate.search.reader.ReaderProviderHelper.buildMultiReader;
@@ -68,7 +70,7 @@ public class NotSharedReaderProvider implements ReaderProvider {
 		}
 	}
 
-	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
+	public void initialize(Properties props, InitContext context) {
 	}
 
 	public void destroy() {

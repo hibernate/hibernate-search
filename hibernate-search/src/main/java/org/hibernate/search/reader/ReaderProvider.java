@@ -27,6 +27,8 @@ package org.hibernate.search.reader;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexReader;
+
+import org.hibernate.search.InitContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 
@@ -55,7 +57,7 @@ public interface ReaderProvider {
 	/**
 	 * Inialize the reader provider before its use.
 	 */
-	void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor);
+	void initialize(Properties props, InitContext context);
 
 	/**
 	 * Called when a <code>SearchFactory</code> is destroyed. This method typically releases resources.
