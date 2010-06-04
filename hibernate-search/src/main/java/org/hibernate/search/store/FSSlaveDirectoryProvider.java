@@ -37,6 +37,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.search.InitContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.FileHelper;
@@ -74,7 +75,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 	private Properties properties;
 	private TriggerTask task;
 
-	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
+	public void initialize(String directoryProviderName, Properties properties, InitContext context) {
 		this.properties = properties;
 		this.directoryProviderName = directoryProviderName;
 		//source guessing

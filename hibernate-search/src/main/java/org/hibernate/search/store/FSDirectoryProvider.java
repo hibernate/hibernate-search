@@ -31,6 +31,8 @@ import java.util.Properties;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 
+import org.hibernate.search.InitAndRegisterContext;
+import org.hibernate.search.InitContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
@@ -57,9 +59,9 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	private FSDirectory directory;
 	private String indexName;
 
-	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
+	public void initialize(String directoryProviderName, Properties properties, InitContext context) {
 		// on "manual" indexing skip read-write check on index directory
-		boolean manual = searchFactoryImplementor.getIndexingStrategy().equals( "manual" );
+		boolean manual = context.getIndexingStrategy().equals( "manual" );
 		File indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, ! manual );
 		try {
 			indexName = indexDir.getCanonicalPath();
