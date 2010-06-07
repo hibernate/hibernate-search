@@ -26,7 +26,7 @@ package org.hibernate.search.backend;
 
 import java.util.Properties;
 
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.InitContextPostDocumentBuilder;
 
 /**
  * Perform work for a given session. This implementation has to be multi threaded.
@@ -41,7 +41,7 @@ public interface Worker {
 	 */
 	void performWork(Work work, TransactionContext transactionContext);
 
-	void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor);
+	void initialize(Properties props, InitContextPostDocumentBuilder context);
 
 	/**
 	 * clean resources

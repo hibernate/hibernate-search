@@ -27,6 +27,8 @@ package org.hibernate.search.backend;
 import java.util.Properties;
 import java.util.List;
 
+import org.hibernate.search.InitAndRegisterContext;
+import org.hibernate.search.InitContextPostDocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
@@ -42,7 +44,7 @@ public interface BackendQueueProcessorFactory {
 	 * @param props all configuration properties
 	 * @param searchFactory the client
 	 */
-	void initialize(Properties props, SearchFactoryImplementor searchFactory);
+	void initialize(Properties props, InitContextPostDocumentBuilder context);
 
 	/**
 	 * Return a runnable implementation responsible for processing the queue to a given backend.

@@ -28,6 +28,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+
+import org.hibernate.search.InitContextPostDocumentBuilder;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
@@ -35,10 +38,8 @@ import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * Collects all resources needed to apply changes to one index.
@@ -61,12 +62,12 @@ class DirectoryProviderWorkspace {
 	
 	private final AtomicBoolean closed = new AtomicBoolean( false );
 	
-	DirectoryProviderWorkspace(SearchFactoryImplementor searchFactoryImp, DirectoryProvider<?> dp, MassIndexerProgressMonitor monitor, int maxThreads) {
+	DirectoryProviderWorkspace(InitContextPostDocumentBuilder context, DirectoryProvider<?> dp, MassIndexerProgressMonitor monitor, int maxThreads) {
 		if ( maxThreads < 1 ) {
 			throw new IllegalArgumentException( "maxThreads needs to be at least 1" );
 		}
 		this.monitor = monitor;
-		workspace = new Workspace( searchFactoryImp, dp );
+		workspace = new Workspace( context, dp );
 		visitor = new LuceneWorkVisitor( workspace );
 		executor = Executors.newFixedThreadPool( maxThreads, "indexwriter" );
 	}

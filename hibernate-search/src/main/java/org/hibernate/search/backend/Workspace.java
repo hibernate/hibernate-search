@@ -35,6 +35,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
+import org.hibernate.search.InitContextPostDocumentBuilder;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
@@ -82,14 +83,14 @@ public class Workspace {
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 	
-	public Workspace(SearchFactoryImplementor searchFactoryImplementor, DirectoryProvider<?> provider) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public Workspace(InitContextPostDocumentBuilder context, DirectoryProvider<?> provider) {
+		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
 		this.directoryProvider = provider;
-		this.optimizerStrategy = searchFactoryImplementor.getOptimizerStrategy( directoryProvider );
-		this.entitiesInDirectory = searchFactoryImplementor.getClassesInDirectoryProvider( provider );
-		this.indexingParams = searchFactoryImplementor.getIndexingParameters( directoryProvider );
-		this.lock = searchFactoryImplementor.getDirectoryProviderLock( provider );
-		this.similarity = searchFactoryImplementor.getSimilarity( directoryProvider );
+		this.optimizerStrategy = context.getOptimizerStrategy( directoryProvider );
+		this.entitiesInDirectory = context.getClassesInDirectoryProvider( provider );
+		this.indexingParams = context.getIndexingParameters( directoryProvider );
+		this.lock = context.getDirectoryProviderLock( provider );
+		this.similarity = context.getSimilarity( directoryProvider );
 	}
 
 	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilder(Class<T> entity) {

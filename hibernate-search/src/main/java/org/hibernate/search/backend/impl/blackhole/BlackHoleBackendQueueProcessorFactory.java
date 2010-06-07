@@ -27,6 +27,7 @@ package org.hibernate.search.backend.impl.blackhole;
 import java.util.List;
 import java.util.Properties;
 
+import org.hibernate.search.InitContextPostDocumentBuilder;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -52,7 +53,7 @@ public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProces
 		return noOp;
 	}
 
-	public void initialize(Properties props, SearchFactoryImplementor searchFactory) {
+	public void initialize(Properties props, InitContextPostDocumentBuilder context) {
 		// no-op
 		log.warn( "initialized \"blackhole\" backend. Index changes will be prepared but discarded!" );
 	}

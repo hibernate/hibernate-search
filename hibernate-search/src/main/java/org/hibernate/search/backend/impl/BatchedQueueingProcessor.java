@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
+import org.hibernate.search.InitAndRegisterContext;
+import org.hibernate.search.InitContextPostDocumentBuilder;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -76,8 +78,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
 	private final SearchFactoryImplementor searchFactoryImplementor;
 
-	public BatchedQueueingProcessor(SearchFactoryImplementor searchFactoryImplementor, Properties properties) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public BatchedQueueingProcessor(InitContextPostDocumentBuilder context, Properties properties) {
 		this.sync = isConfiguredAsSync( properties );
 
 		//default to a simple asynchronous operation
@@ -118,8 +119,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			backendQueueProcessorFactory = PluginLoader.instanceFromName( BackendQueueProcessorFactory.class,
 					backend, BatchedQueueingProcessor.class, "processor" );
 		}
-		backendQueueProcessorFactory.initialize( properties, searchFactoryImplementor );
-		searchFactoryImplementor.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
+		backendQueueProcessorFactory.initialize( properties, context );
+		context.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
+		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
 	}
 
 	public void add(Work work, WorkQueue workQueue) {

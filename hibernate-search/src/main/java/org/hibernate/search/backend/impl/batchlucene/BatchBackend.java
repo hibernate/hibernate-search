@@ -27,9 +27,9 @@ package org.hibernate.search.backend.impl.batchlucene;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.InitContextPostDocumentBuilder;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
  * Implementors of this interface are not drop-in replacements for the standard BackendQueueProcessorFactory
@@ -46,7 +46,7 @@ public interface BatchBackend {
 	 * @param props all configuration properties
 	 * @param searchFactory the client
 	 */
-	void initialize(Properties props, MassIndexerProgressMonitor monitor, SearchFactoryImplementor searchFactory);
+	void initialize(Properties props, MassIndexerProgressMonitor monitor, InitContextPostDocumentBuilder context);
 
 	/**
 	 * Enqueues one work to be processed asynchronously

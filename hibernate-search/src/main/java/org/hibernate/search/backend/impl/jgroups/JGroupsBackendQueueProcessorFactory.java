@@ -35,6 +35,7 @@ import org.jgroups.JChannel;
 import org.slf4j.Logger;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.InitContextPostDocumentBuilder;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
@@ -67,13 +68,12 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 	protected Channel channel = null;
 	protected Address address;
 
-	public void initialize(Properties props, SearchFactoryImplementor searchFactory) {
-		this.searchFactory = searchFactory;
+	public void initialize(Properties props, InitContextPostDocumentBuilder context) {
+		this.searchFactory = context.getUninitializedSearchFactory();
 
 		if ( props.containsKey( JG_CLUSTER_NAME ) ) {
 			setClusterName( props.getProperty( JG_CLUSTER_NAME ) );
 		}
-
 		prepareJGroupsChannel( props );
 	}
 
