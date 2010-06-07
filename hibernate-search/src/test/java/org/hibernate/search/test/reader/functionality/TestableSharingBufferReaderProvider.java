@@ -47,7 +47,7 @@ import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 
-import org.hibernate.search.InitContext;
+import org.hibernate.search.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.reader.ReaderProviderHelper;
 import org.hibernate.search.reader.SharingBufferReaderProvider;
@@ -111,7 +111,7 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 	}
 
 	@Override
-	public void initialize(Properties props, InitContext context) {
+	public void initialize(Properties props, BuildContext context) {
 		try {
 			for ( Directory directory : manipulators.keySet() ) {
 				currentReaders.put( directory, new PerDirectoryLatestReader( directory ) );

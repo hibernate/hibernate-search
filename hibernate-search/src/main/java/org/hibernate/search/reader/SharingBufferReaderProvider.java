@@ -39,7 +39,7 @@ import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.InitContext;
+import org.hibernate.search.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
@@ -86,7 +86,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		log.trace( "IndexReader closed." );
 	}
 
-	public void initialize(Properties props, InitContext context) {
+	public void initialize(Properties props, BuildContext context) {
 		Set<DirectoryProvider<?>> providers = context.getDirectoryProviders();
 
 		// create the readers for the known providers. Unfortunately, it is not possible to

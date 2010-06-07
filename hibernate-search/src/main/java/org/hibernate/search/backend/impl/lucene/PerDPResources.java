@@ -24,11 +24,10 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import org.hibernate.search.InitContextPostDocumentBuilder;
+import org.hibernate.search.WorkerBuildContext;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.batchindexing.Executors;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
@@ -53,7 +52,7 @@ class PerDPResources {
 	private final boolean exclusiveIndexUsage;
 	private final ErrorHandler errorHandler;
 	
-	PerDPResources(InitContextPostDocumentBuilder context, DirectoryProvider<?> dp) {
+	PerDPResources(WorkerBuildContext context, DirectoryProvider<?> dp) {
 		workspace = new Workspace( context, dp );
 		visitor = new LuceneWorkVisitor( workspace );
 		executor = Executors.newFixedThreadPool( 1, "Directory writer" );

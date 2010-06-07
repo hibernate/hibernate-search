@@ -12,9 +12,12 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
+ * Build context for the worker and other backend
+ * Available after all index, entity metadata are built.
+ *
  * @author Emmanuel Bernard
  */
-public interface InitContextPostDocumentBuilder extends InitContext {
+public interface WorkerBuildContext extends BuildContext {
 	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider);
 	Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> provider);

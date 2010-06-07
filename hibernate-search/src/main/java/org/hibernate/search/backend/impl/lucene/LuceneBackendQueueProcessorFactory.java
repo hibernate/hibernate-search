@@ -29,8 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.List;
 
-import org.hibernate.search.InitAndRegisterContext;
-import org.hibernate.search.InitContextPostDocumentBuilder;
+import org.hibernate.search.WorkerBuildContext;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
@@ -65,7 +64,7 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 	 */
 	private boolean sync;
 
-	public void initialize(Properties props, InitContextPostDocumentBuilder context) {
+	public void initialize(Properties props, WorkerBuildContext context) {
 		this.searchFactoryImp = context.getUninitializedSearchFactory();
 		this.sync = BatchedQueueingProcessor.isConfiguredAsSync( props );
 		for (DirectoryProvider dp : context.getDirectoryProviders() ) {

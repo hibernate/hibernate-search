@@ -30,11 +30,10 @@ import java.util.Properties;
 import org.apache.lucene.index.IndexWriter;
 import org.slf4j.Logger;
 
-import org.hibernate.search.InitContext;
+import org.hibernate.search.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -53,7 +52,7 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 	private long transactions = 0;
 	private DirectoryProvider directoryProvider;
 
-	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, InitContext context) {
+	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, BuildContext context) {
 		this.directoryProvider = directoryProvider;
 		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
 		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );

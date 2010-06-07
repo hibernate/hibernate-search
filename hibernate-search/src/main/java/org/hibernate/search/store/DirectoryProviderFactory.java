@@ -32,7 +32,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.Environment;
-import org.hibernate.search.InitAndRegisterContext;
+import org.hibernate.search.WritableBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
@@ -70,7 +70,7 @@ public class DirectoryProviderFactory {
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 
 	public DirectoryProviders createDirectoryProviders(XClass entity, SearchConfiguration cfg,
-													   InitAndRegisterContext context,
+													   WritableBuildContext context,
 													   ReflectionManager reflectionManager) {
 		//get properties
 		String directoryProviderName = getDirectoryProviderName( entity, cfg );
@@ -117,7 +117,7 @@ public class DirectoryProviderFactory {
 	}
 
 	private DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps,
-														 Class<?> entity, InitAndRegisterContext context) {
+														 Class<?> entity, WritableBuildContext context) {
 		String className = indexProps.getProperty( "directory_provider" );
 		DirectoryProvider<?> provider;
 		if ( StringHelper.isEmpty( className ) ) {
@@ -150,7 +150,7 @@ public class DirectoryProviderFactory {
 		}
 	}
 
-	private void configureOptimizerStrategy(InitAndRegisterContext context, Properties indexProps, DirectoryProvider<?> provider) {
+	private void configureOptimizerStrategy(WritableBuildContext context, Properties indexProps, DirectoryProvider<?> provider) {
 		boolean incremental = indexProps.containsKey( "optimizer.operation_limit.max" )
 				|| indexProps.containsKey( "optimizer.transaction_limit.max" );
 		OptimizerStrategy optimizerStrategy;
@@ -180,7 +180,7 @@ public class DirectoryProviderFactory {
 	 * @param directoryProperties	  The properties extracted from the configuration.
 	 * @param provider				 The directory provider for which to configure the indexing parameters.
 	 */
-	private void configureIndexingParameters(InitAndRegisterContext context,
+	private void configureIndexingParameters(WritableBuildContext context,
 											 Properties directoryProperties, DirectoryProvider<?> provider) {
 		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters( directoryProperties );
 		context.addIndexingParameters( provider, indexingParams );

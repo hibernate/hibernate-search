@@ -37,7 +37,7 @@ import java.util.concurrent.locks.Lock;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 
-import org.hibernate.search.InitContext;
+import org.hibernate.search.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.FileHelper;
@@ -80,7 +80,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	private Properties properties;
 	private TriggerTask task;
 
-	public void initialize(String directoryProviderName, Properties properties, InitContext context) {
+	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.properties = properties;
 		this.directoryProviderName = directoryProviderName;
 		//source guessing

@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
-import org.hibernate.search.InitContextPostDocumentBuilder;
+import org.hibernate.search.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
@@ -62,7 +62,7 @@ class DirectoryProviderWorkspace {
 	
 	private final AtomicBoolean closed = new AtomicBoolean( false );
 	
-	DirectoryProviderWorkspace(InitContextPostDocumentBuilder context, DirectoryProvider<?> dp, MassIndexerProgressMonitor monitor, int maxThreads) {
+	DirectoryProviderWorkspace(WorkerBuildContext context, DirectoryProvider<?> dp, MassIndexerProgressMonitor monitor, int maxThreads) {
 		if ( maxThreads < 1 ) {
 			throw new IllegalArgumentException( "maxThreads needs to be at least 1" );
 		}

@@ -29,7 +29,7 @@ import javax.transaction.Synchronization;
 
 import org.slf4j.Logger;
 
-import org.hibernate.search.InitContextPostDocumentBuilder;
+import org.hibernate.search.WorkerBuildContext;
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
@@ -84,7 +84,7 @@ public class TransactionalWorker implements Worker {
 		}
 	}
 
-	public void initialize(Properties props, InitContextPostDocumentBuilder context) {
+	public void initialize(Properties props, WorkerBuildContext context) {
 		this.queueingProcessor = new BatchedQueueingProcessor( context, props );
 	}
 

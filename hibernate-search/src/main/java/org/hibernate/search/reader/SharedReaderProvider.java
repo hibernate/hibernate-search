@@ -38,7 +38,7 @@ import org.apache.lucene.index.MultiReader;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.InitContext;
+import org.hibernate.search.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
@@ -347,7 +347,7 @@ public class SharedReaderProvider implements ReaderProvider {
 		}
 	}
 
-	public void initialize(Properties props, InitContext context) {
+	public void initialize(Properties props, BuildContext context) {
 		Set<DirectoryProvider<?>> providers = context.getDirectoryProviders();
 		perDirectoryProviderManipulationLocks = new HashMap<DirectoryProvider, Lock>( providers.size() );
 		for ( DirectoryProvider dp : providers ) {

@@ -38,8 +38,7 @@ import org.slf4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
-import org.hibernate.search.InitAndRegisterContext;
-import org.hibernate.search.InitContextPostDocumentBuilder;
+import org.hibernate.search.WorkerBuildContext;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -78,7 +77,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
 	private final SearchFactoryImplementor searchFactoryImplementor;
 
-	public BatchedQueueingProcessor(InitContextPostDocumentBuilder context, Properties properties) {
+	public BatchedQueueingProcessor(WorkerBuildContext context, Properties properties) {
 		this.sync = isConfiguredAsSync( properties );
 
 		//default to a simple asynchronous operation

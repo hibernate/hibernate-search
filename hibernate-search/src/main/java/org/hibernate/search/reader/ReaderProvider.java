@@ -28,9 +28,8 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexReader;
 
-import org.hibernate.search.InitContext;
+import org.hibernate.search.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
  * Responsible for providing and managing the lifecycle of a read only reader. The implementation must have a
@@ -57,7 +56,7 @@ public interface ReaderProvider {
 	/**
 	 * Inialize the reader provider before its use.
 	 */
-	void initialize(Properties props, InitContext context);
+	void initialize(Properties props, BuildContext context);
 
 	/**
 	 * Called when a <code>SearchFactory</code> is destroyed. This method typically releases resources.

@@ -35,7 +35,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
-import org.hibernate.search.InitContextPostDocumentBuilder;
+import org.hibernate.search.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
@@ -83,7 +83,7 @@ public class Workspace {
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 	
-	public Workspace(InitContextPostDocumentBuilder context, DirectoryProvider<?> provider) {
+	public Workspace(WorkerBuildContext context, DirectoryProvider<?> provider) {
 		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
 		this.directoryProvider = provider;
 		this.optimizerStrategy = context.getOptimizerStrategy( directoryProvider );

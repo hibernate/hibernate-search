@@ -2,15 +2,15 @@ package org.hibernate.search;
 
 import java.util.Set;
 
-import org.jcp.xml.dsig.internal.dom.DOMXMLSignature;
-
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
+ * Build context that can be used by some services at initialization
+ * 
  * @author Emmanuel Bernard
  */
-public interface InitContext {
+public interface BuildContext {
 	/**
 	 * Returns the SessionFactoryImplementor instance. Do not use until after the initialize method is fully executed.
 	 * Implementations should not cache values provided by the SessionFactoryImplementor but rather access them
