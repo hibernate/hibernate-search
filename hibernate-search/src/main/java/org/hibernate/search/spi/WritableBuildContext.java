@@ -1,4 +1,4 @@
-package org.hibernate.search;
+package org.hibernate.search.spi;
 
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.store.DirectoryProvider;

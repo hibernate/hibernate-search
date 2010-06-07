@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.List;
 
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;

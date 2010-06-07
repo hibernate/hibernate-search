@@ -32,7 +32,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.Environment;
-import org.hibernate.search.WritableBuildContext;
+import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;

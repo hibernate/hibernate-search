@@ -27,7 +27,7 @@ package org.hibernate.search.backend.impl.blackhole;
 import java.util.List;
 import java.util.Properties;
 
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.LoggerFactory;

@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.impl.TransactionalWorker;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.util.PluginLoader;

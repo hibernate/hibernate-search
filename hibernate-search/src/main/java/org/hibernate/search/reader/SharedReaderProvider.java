@@ -38,7 +38,7 @@ import org.apache.lucene.index.MultiReader;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.BuildContext;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;

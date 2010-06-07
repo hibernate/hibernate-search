@@ -27,7 +27,7 @@ package org.hibernate.search.backend;
 import java.util.Properties;
 import java.util.List;
 
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
  * Interface for different types of queue processor factories. Implementations need a no-arg constructor.

@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;

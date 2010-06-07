@@ -24,7 +24,7 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.batchindexing.Executors;

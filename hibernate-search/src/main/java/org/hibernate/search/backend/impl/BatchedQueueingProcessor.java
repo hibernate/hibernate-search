@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;

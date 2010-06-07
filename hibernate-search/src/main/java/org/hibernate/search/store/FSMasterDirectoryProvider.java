@@ -37,7 +37,7 @@ import java.util.concurrent.locks.Lock;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 
-import org.hibernate.search.BuildContext;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.FileHelper;

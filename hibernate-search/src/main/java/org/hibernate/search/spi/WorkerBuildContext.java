@@ -1,4 +1,4 @@
-package org.hibernate.search;
+package org.hibernate.search.spi;
 
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;

@@ -31,7 +31,7 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.HibernateException;
-import org.hibernate.search.BuildContext;
+import org.hibernate.search.spi.BuildContext;
 
 /**
  * Use a Lucene RAMDirectory

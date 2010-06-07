@@ -29,11 +29,12 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexReader;
 
-import org.hibernate.search.BuildContext;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 
 import static org.hibernate.search.reader.ReaderProviderHelper.buildMultiReader;
 import static org.hibernate.search.reader.ReaderProviderHelper.clean;
+
 import org.hibernate.search.store.DirectoryProvider;
 
 /**

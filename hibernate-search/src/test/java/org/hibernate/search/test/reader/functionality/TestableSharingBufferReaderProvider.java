@@ -47,7 +47,7 @@ import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 
-import org.hibernate.search.BuildContext;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.reader.ReaderProviderHelper;
 import org.hibernate.search.reader.SharingBufferReaderProvider;

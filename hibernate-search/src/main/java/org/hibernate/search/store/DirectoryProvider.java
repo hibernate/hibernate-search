@@ -28,7 +28,7 @@ import java.util.Properties;
 
 import org.apache.lucene.store.Directory;
 
-import org.hibernate.search.BuildContext;
+import org.hibernate.search.spi.BuildContext;
 
 
 /**

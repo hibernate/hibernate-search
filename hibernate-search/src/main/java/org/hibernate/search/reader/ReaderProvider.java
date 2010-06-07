@@ -28,7 +28,7 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexReader;
 
-import org.hibernate.search.BuildContext;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**

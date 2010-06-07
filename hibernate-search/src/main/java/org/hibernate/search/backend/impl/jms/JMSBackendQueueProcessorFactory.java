@@ -35,7 +35,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;

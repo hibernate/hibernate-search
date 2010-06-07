@@ -27,7 +27,7 @@ package org.hibernate.search.backend.impl.batchlucene;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 

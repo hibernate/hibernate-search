@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import org.jgroups.Receiver;
 
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 

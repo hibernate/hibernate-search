@@ -35,7 +35,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
-import org.hibernate.search.WorkerBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
