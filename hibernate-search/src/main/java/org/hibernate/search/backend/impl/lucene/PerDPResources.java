@@ -54,7 +54,7 @@ class PerDPResources {
 	
 	PerDPResources(WorkerBuildContext context, DirectoryProvider<?> dp) {
 		workspace = new Workspace( context, dp );
-		visitor = new LuceneWorkVisitor( workspace );
+		visitor = new LuceneWorkVisitor( workspace, context );
 		executor = Executors.newFixedThreadPool( 1, "Directory writer" );
 		exclusiveIndexUsage = context.isExclusiveIndexUsageEnabled( dp );
 		errorHandler = context.getErrorHandler();

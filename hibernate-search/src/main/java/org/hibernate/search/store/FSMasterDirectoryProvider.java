@@ -70,7 +70,8 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	//variables having visibility granted by a read of "current"
 	private FSDirectory directory;
 	private String indexName;
-	private SearchFactoryImplementor searchFactory;
+	//get rid of it after start()
+	private BuildContext context;
 	private long copyChunkSize;
 
 	//variables needed between initialize and start (used by same thread: no special care needed)
@@ -79,6 +80,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	private String directoryProviderName;
 	private Properties properties;
 	private TriggerTask task;
+	private Lock directoryProviderLock;
 
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.properties = properties;
@@ -96,12 +98,14 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
-		this.searchFactory = context.getUninitializedSearchFactory();
+		this.context = context;
 		current = 0; //write to volatile to publish all state
 	}
 
 	public void start() {
 		int currentLocal = 0;
+		this.directoryProviderLock = this.context.getDirectoryProviderLock( this );
+		this.context = null;
 		try {
 			//copy to source
 			if ( new File( sourceDir, CURRENT1 ).exists() ) {
@@ -126,7 +130,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
-		task = new FSMasterDirectoryProvider.TriggerTask( indexDir, sourceDir, this );
+		task = new FSMasterDirectoryProvider.TriggerTask( indexDir, sourceDir );
 		long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
 		timer.scheduleAtFixedRate( task, period, period );
 		this.current = currentLocal; //write to volatile to publish all state
@@ -182,9 +186,9 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		private final ExecutorService executor;
 		private final FSMasterDirectoryProvider.CopyDirectory copyTask;
 
-		public TriggerTask(File source, File destination, DirectoryProvider<FSDirectory> directoryProvider) {
+		public TriggerTask(File source, File destination) {
 			executor = Executors.newSingleThreadExecutor();
-			copyTask = new FSMasterDirectoryProvider.CopyDirectory( source, destination, directoryProvider );
+			copyTask = new FSMasterDirectoryProvider.CopyDirectory( source, destination );
 		}
 
 		public void run() {
@@ -205,12 +209,10 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		private final File source;
 		private final File destination;
 		private final AtomicBoolean inProgress = new AtomicBoolean( false );
-		private final Lock directoryProviderLock;
 
-		public CopyDirectory(File source, File destination, DirectoryProvider<FSDirectory> directoryProvider) {
+		public CopyDirectory(File source, File destination) {
 			this.source = source;
 			this.destination = destination;
-			this.directoryProviderLock = searchFactory.getDirectoryProviderLock( directoryProvider );
 		}
 
 		public void run() {

@@ -24,23 +24,24 @@
  */
 package org.hibernate.search.test.worker.duplication;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.impl.SearchFactoryImpl;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
@@ -123,7 +124,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 	@SuppressWarnings( "unchecked" )
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
-		SearchFactoryImpl searchFactory = ( SearchFactoryImpl ) fullTextSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = ( SearchFactoryImplementor ) fullTextSession.getSearchFactory();
 		DocumentBuilderIndexedEntity builder = searchFactory.getDocumentBuilderIndexedEntity( SpecialPerson.class );
 
 		// create test entity

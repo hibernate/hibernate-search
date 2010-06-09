@@ -1,6 +1,7 @@
 package org.hibernate.search.spi;
 
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
@@ -12,7 +13,8 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 public interface BuildContext {
 	/**
-	 * Returns the SessionFactoryImplementor instance. Do not use until after the initialize method is fully executed.
+	 * Returns the SessionFactoryImplementor instance. Do not use until after the initialize and/or stard method is
+	 * fully executed.
 	 * Implementations should not cache values provided by the SessionFactoryImplementor but rather access them
 	 * each time: when the configuration is dynamically updated, new changes are available through the
 	 * SearchFactoryImplementor
@@ -35,4 +37,11 @@ public interface BuildContext {
 	String getIndexingStrategy();
 
 	Set<DirectoryProvider<?>> getDirectoryProviders();
+
+	/**
+	 * This method cannot be used in intialize methods. start methods can use it though.
+	 * @param provider
+	 * @return
+	 */
+	ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> provider);
 }

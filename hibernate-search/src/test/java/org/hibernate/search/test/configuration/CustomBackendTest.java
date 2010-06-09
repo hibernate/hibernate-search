@@ -30,7 +30,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
-import org.hibernate.search.impl.SearchFactoryImpl;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 /**
@@ -50,7 +50,7 @@ public class CustomBackendTest extends TestCase {
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.worker.backend", name )
 			.openFullTextSession();
-		SearchFactoryImpl searchFactory = (SearchFactoryImpl) ftSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = ( SearchFactoryImplementor) ftSession.getSearchFactory();
 		ftSession.close();
 		assertEquals( backendType, searchFactory.getBackendQueueProcessorFactory().getClass() );
 		builder.close();

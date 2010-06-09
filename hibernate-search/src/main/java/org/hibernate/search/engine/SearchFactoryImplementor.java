@@ -49,8 +49,6 @@ import org.hibernate.search.exception.ErrorHandler;
 public interface SearchFactoryImplementor extends SearchFactory {
 	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
 
-	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
-
 	Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities();
 
 	<T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType);
@@ -58,8 +56,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
 
 	Worker getWorker();
-
-	void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy);
 
 	OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider);
 
@@ -69,13 +65,9 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider);
 
-	void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams);
-
 	String getIndexingStrategy();
 
 	void close();
-
-	void addClassToDirectoryProvider(Class<?> clazz, DirectoryProvider<?> directoryProvider, boolean exclusiveIndexUsage);
 
 	Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider);
 
@@ -83,8 +75,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 
 	ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp);
 
-	void addDirectoryProvider(DirectoryProvider<?> provider, boolean exclusiveIndexUsage);
-	
 	int getFilterCacheBitResultsSize();
 
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
