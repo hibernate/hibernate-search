@@ -63,7 +63,6 @@ import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryBuilder;
-import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;

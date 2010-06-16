@@ -31,7 +31,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryBuilder;
-import org.hibernate.search.impl.SearchFactoryImpl;
 
 /**
  * Holds already built SearchFactory per Hibernate Configuration object
