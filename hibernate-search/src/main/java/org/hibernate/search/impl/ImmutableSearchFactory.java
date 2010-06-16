@@ -69,7 +69,7 @@ import org.hibernate.util.StringHelper;
 /**
  * @author Emmanuel Bernard
  */
-public class SearchFactoryImpl implements SearchFactoryImplementor, WorkerBuildContext {
+public class ImmutableSearchFactory implements SearchFactoryImplementor, WorkerBuildContext {
 
 	static {
 		Version.touch();
@@ -99,7 +99,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor, WorkerBuildC
 	private final Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams;
 	private final String indexingStrategy;
 
-	public SearchFactoryImpl(SearchFactoryBuilder cfg) {
+	public ImmutableSearchFactory(SearchFactoryBuilder cfg) {
 		this.analyzers = cfg.analyzers;
 		this.backendQueueProcessorFactory = cfg.backendQueueProcessorFactory;
 		this.cacheBitResultsSize = cfg.cacheBitResultsSize;
@@ -181,7 +181,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor, WorkerBuildC
 	}
 
 	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
-		throw new AssertionFailure( "SearchFactoryImpl is immutable: should never be called");
+		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called");
 	}
 
 	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
@@ -271,7 +271,7 @@ public class SearchFactoryImpl implements SearchFactoryImplementor, WorkerBuildC
 			batchBackend = new LuceneBatchBackend();
 		}
 		else {
-			batchBackend = PluginLoader.instanceFromName( BatchBackend.class, impl, SearchFactoryImpl.class,
+			batchBackend = PluginLoader.instanceFromName( BatchBackend.class, impl, ImmutableSearchFactory.class,
 					"batchbackend" );
 		}
 		Properties batchBackendConfiguration = new MaskedProperty(

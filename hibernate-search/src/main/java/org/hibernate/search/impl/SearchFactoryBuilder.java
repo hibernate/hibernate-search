@@ -137,7 +137,7 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 				cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 		);
 		//TODO uncomment
-		SearchFactoryImplementor factory = new SearchFactoryImpl( this );
+		SearchFactoryImplementor factory = new ImmutableSearchFactory( this );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
 	}
@@ -168,7 +168,7 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 		}
 		else {
 			filterCachingStrategy = PluginLoader.instanceFromName( FilterCachingStrategy.class,
-					impl, SearchFactoryImpl.class, "filterCachingStrategy" );
+					impl, ImmutableSearchFactory.class, "filterCachingStrategy" );
 		}
 		filterCachingStrategy.initialize( properties );
 		return filterCachingStrategy;
@@ -349,7 +349,7 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 		}
 		else {
 			return PluginLoader.instanceFromName( ErrorHandler.class, errorHandlerClassName,
-				SearchFactoryImpl.class, "Error Handler" );
+				ImmutableSearchFactory.class, "Error Handler" );
 		}
 	}
 
