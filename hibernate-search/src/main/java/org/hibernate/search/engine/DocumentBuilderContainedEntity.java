@@ -40,7 +40,6 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -67,6 +66,7 @@ import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PassThroughAnalyzer;
 import org.hibernate.search.util.ReflectionHelper;
@@ -703,8 +703,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	private <T> void processSingleContainedInInstance(List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor, T value) {
-		@SuppressWarnings("unchecked")
-		Class<T> valueClass = Hibernate.getClass( value );
+		Class<T> valueClass = HibernateHelper.getClass( value );
 		DocumentBuilderIndexedEntity<T> builderIndexedEntity =
 				searchFactoryImplementor.getDocumentBuilderIndexedEntity( valueClass );
 

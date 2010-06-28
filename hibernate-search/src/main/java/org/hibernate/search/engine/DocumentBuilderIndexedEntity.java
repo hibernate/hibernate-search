@@ -41,7 +41,6 @@ import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
 import org.slf4j.Logger;
 
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -71,6 +70,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 
@@ -389,7 +389,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		}
 
 		Document doc = new Document();
-		final Class<?> entityType = Hibernate.getClass( instance );
+		final Class<?> entityType = HibernateHelper.getClass( instance );
 		doc.setBoost( metadata.getClassBoost( instance ) );
 
 		// add the class name of the entity to the document

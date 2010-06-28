@@ -30,13 +30,13 @@ import java.util.List;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.FetchMode;
-import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.stat.Statistics;
 
 
@@ -86,7 +86,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "Query with no class filter", 2, result.size() );
 		for (Object element : result) {
-			assertTrue( Hibernate.isInitialized( element ) );
+			assertTrue( HibernateHelper.isInitialized( element ) );
 			s.delete( element );
 		}
 		s.flush();
@@ -530,7 +530,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "Query with no class filter", 2, result.size() );
 		for (Object element : result) {
-			assertTrue( Hibernate.isInitialized( element ) );
+			assertTrue( HibernateHelper.isInitialized( element ) );
 			s.delete( element );
 		}
 		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
@@ -558,14 +558,14 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "Query with no explicit criteria", 1, result.size() );
 		book = (Book) result.get( 0 );
-		assertFalse( "Association should not be inintialized", Hibernate.isInitialized( book.getAuthors() ) );
+		assertFalse( "Association should not be inintialized", HibernateHelper.isInitialized( book.getAuthors() ) );
 
 		result = s.createFullTextQuery( query ).setCriteriaQuery(
 				s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN ) ).list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit criteria", 1, result.size() );
 		book = (Book) result.get( 0 );
-		assertTrue( "Association should be inintialized", Hibernate.isInitialized( book.getAuthors() ) );
+		assertTrue( "Association should be inintialized", HibernateHelper.isInitialized( book.getAuthors() ) );
 		assertEquals( 1, book.getAuthors().size() );
 
 		//cleanup

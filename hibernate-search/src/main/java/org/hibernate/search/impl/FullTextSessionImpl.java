@@ -37,7 +37,6 @@ import org.hibernate.Criteria;
 import org.hibernate.EntityMode;
 import org.hibernate.Filter;
 import org.hibernate.FlushMode;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.LockMode;
@@ -79,6 +78,7 @@ import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.FullTextQueryImpl;
 import org.hibernate.search.util.ContextHelper;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.stat.SessionStatistics;
 import org.hibernate.type.Type;
 
@@ -173,7 +173,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 			throw new IllegalArgumentException( "Entity to index should not be null" );
 		}
 
-		Class<?> clazz = Hibernate.getClass( entity );
+		Class<?> clazz = HibernateHelper.getClass( entity );
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//not strictly necessary but a small optimization

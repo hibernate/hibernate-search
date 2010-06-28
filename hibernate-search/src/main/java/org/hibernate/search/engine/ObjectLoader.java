@@ -30,8 +30,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -71,7 +71,7 @@ public class ObjectLoader implements Loader {
 		for (EntityInfo entityInfo : entityInfos) {
 			try {
 				Object entity = session.load( entityInfo.clazz, entityInfo.id );
-				Hibernate.initialize( entity );
+				HibernateHelper.initialize( entity );
 				result.add( entity );
 			}
 			catch (RuntimeException e) {

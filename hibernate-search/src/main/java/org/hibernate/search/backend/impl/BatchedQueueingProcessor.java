@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -57,6 +56,7 @@ import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
 import org.hibernate.util.StringHelper;
@@ -253,10 +253,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	}
 
 	private <T> void addWorkToBuilderQueue(List<LuceneWork> luceneQueue, Work<T> work) {
-		@SuppressWarnings("unchecked")
 		Class<T> entityClass = work.getEntityClass() != null ?
 				work.getEntityClass() :
-				Hibernate.getClass( work.getEntity() );
+				HibernateHelper.getClass( work.getEntity() );
 		DocumentBuilderIndexedEntity<T> entityBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
 		if ( entityBuilder != null ) {
 			entityBuilder.addWorkToQueue(

@@ -32,10 +32,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -50,7 +50,7 @@ public class ObjectLoaderHelper {
 		//be sure to get an initialized object but save from ONFE and ENFE
 		Object maybeProxy = session.load( entityInfo.clazz, entityInfo.id );
 		try {
-			Hibernate.initialize( maybeProxy );
+			HibernateHelper.initialize( maybeProxy );
 		}
 		catch (RuntimeException e) {
 			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
@@ -99,7 +99,7 @@ public class ObjectLoaderHelper {
 		List result = new ArrayList( entityInfos.length );
 		for (EntityInfo entityInfo : entityInfos) {
 			Object element = session.load( entityInfo.clazz, entityInfo.id );
-			if ( Hibernate.isInitialized( element ) ) {
+			if ( HibernateHelper.isInitialized( element ) ) {
 				//all existing elements should have been loaded by the query,
 				//the other ones are missing ones
 				result.add( element );

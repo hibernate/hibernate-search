@@ -31,7 +31,6 @@ import java.util.concurrent.CountDownLatch;
 
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
-import org.hibernate.Hibernate;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -41,6 +40,7 @@ import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -129,7 +129,7 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 	@SuppressWarnings("unchecked")
 	private void index( Object entity, Session session ) throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
-		Class clazz = Hibernate.getClass( entity );
+		Class<?> clazz = HibernateHelper.getClass( entity );
 		DocumentBuilderIndexedEntity docBuilder = documentBuilders.get( clazz );
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
 		String idInString = idBridge.objectToString( id );
