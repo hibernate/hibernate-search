@@ -13,6 +13,7 @@ import org.hibernate.search.util.LoggerFactory;
 /**
  * Helper class which keeps track of all super classes and interfaces of the indexed entities.
  */
+//FIXME make it immutable (builder pattern)
 class PolymorphicIndexHierarchy {
 	private static final Logger log = LoggerFactory.make();
 
