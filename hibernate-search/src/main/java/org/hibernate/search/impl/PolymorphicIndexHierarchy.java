@@ -44,18 +44,18 @@ class PolymorphicIndexHierarchy {
 	}
 
 	Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
-		Set<Class<?>> idexedClasses = new HashSet<Class<?>>();
+		Set<Class<?>> indexedClasses = new HashSet<Class<?>>();
 		for ( Class<?> clazz : classes ) {
 			Set<Class<?>> set = classToIndexedClass.get( clazz );
 			if ( set != null ) {
 				// at this point we don't have to care about including indexed subclasses of a indexed class
 				// MultiClassesQueryLoader will take care of this later and optimise the queries
-				idexedClasses.addAll( set );
+				indexedClasses.addAll( set );
 			}
 		}
 		if ( log.isTraceEnabled() ) {
-			log.trace( "Targeted indexed classes for {}: {}", Arrays.toString( classes ), idexedClasses );
+			log.trace( "Targeted indexed classes for {}: {}", Arrays.toString( classes ), indexedClasses );
 		}
-		return idexedClasses;
+		return indexedClasses;
 	}
 }
