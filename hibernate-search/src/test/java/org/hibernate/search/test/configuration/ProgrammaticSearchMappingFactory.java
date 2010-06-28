@@ -99,6 +99,7 @@ public class ProgrammaticSearchMappingFactory {
 					.property("items", ElementType.FIELD)
 						.indexEmbedded()
 				.entity(Item.class)
+					.indexed()
 					.property("description", ElementType.FIELD)
 						.field().name("description").analyzer("en").index(Index.TOKENIZED).store(Store.YES)
 					.property("productCatalog", ElementType.FIELD)

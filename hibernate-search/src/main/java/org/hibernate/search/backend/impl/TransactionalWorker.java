@@ -29,12 +29,15 @@ import javax.transaction.Synchronization;
 
 import org.slf4j.Logger;
 
+import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.backend.Worker;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.WeakIdentityHashMap;
 
@@ -57,8 +60,14 @@ public class TransactionalWorker implements Worker {
 	//synchronized map since for a given transaction, we have not concurrent access
 	protected final WeakIdentityHashMap<Object, Synchronization> synchronizationPerTransaction = new WeakIdentityHashMap<Object, Synchronization>();
 	private QueueingProcessor queueingProcessor;
+	private SearchFactoryImplementor factory;
 
-	public void performWork(Work work, TransactionContext transactionContext) {
+	public void performWork(Work<?> work, TransactionContext transactionContext) {
+		final Class<?> entityType = HibernateHelper.getClassFromWork( work );
+		if ( factory.getDocumentBuilderIndexedEntity( entityType ) == null
+					&& factory.getDocumentBuilderContainedEntity( entityType ) == null ) {
+			throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityType);
+		}
 		if ( transactionContext.isTransactionInProgress() ) {
 			Object transactionIdentifier = transactionContext.getTransactionIdentifier();
 			PostTransactionWorkQueueSynchronization txSync = ( PostTransactionWorkQueueSynchronization )
@@ -86,6 +95,7 @@ public class TransactionalWorker implements Worker {
 
 	public void initialize(Properties props, WorkerBuildContext context) {
 		this.queueingProcessor = new BatchedQueueingProcessor( context, props );
+		this.factory = context.getUninitializedSearchFactory();
 	}
 
 	public void close() {

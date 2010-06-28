@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
@@ -268,7 +269,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			containedInBuilder.addWorkToQueue(
 					entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor
 			);
+			return;
 		}
+		//should never happen but better be safe than sorry
+		throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass);
 	}
 
 	public void performWorks(WorkQueue workQueue) {
