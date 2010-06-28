@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
@@ -59,14 +60,14 @@ public class LuceneBatchBackend implements BatchBackend {
 	private final PerDirectoryWorkProcessor asyncWorker = new AsyncBatchPerDirectoryWorkProcessor();
 	private final PerDirectoryWorkProcessor syncWorker = new SyncBatchPerDirectoryWorkProcessor();
 
-	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, WorkerBuildContext context) {
+		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
 		int maxThreadsPerIndex = ConfigurationParseHelper.getIntValue( cfg, "concurrent_writers", 2 );
 		if ( maxThreadsPerIndex < 1 ) {
 			throw new SearchException( "concurrent_writers for batch backend must be at least 1." );
 		}
-		for ( DirectoryProvider<?> dp : searchFactoryImplementor.getDirectoryProviders() ) {
-			DirectoryProviderWorkspace resources = new DirectoryProviderWorkspace( searchFactoryImplementor, dp, monitor, maxThreadsPerIndex );
+		for ( DirectoryProvider<?> dp : context.getDirectoryProviders() ) {
+			DirectoryProviderWorkspace resources = new DirectoryProviderWorkspace( context, dp, monitor, maxThreadsPerIndex );
 			resourcesMap.put( dp, resources );
 		}
 	}

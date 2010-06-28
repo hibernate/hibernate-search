@@ -39,8 +39,8 @@ import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -86,8 +86,8 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		log.trace( "IndexReader closed." );
 	}
 
-	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
-		Set<DirectoryProvider<?>> providers = searchFactoryImplementor.getDirectoryProviders();
+	public void initialize(Properties props, BuildContext context) {
+		Set<DirectoryProvider<?>> providers = context.getDirectoryProviders();
 
 		// create the readers for the known providers. Unfortunately, it is not possible to
 		// create all readers in initialize since some providers have more than one directory (eg

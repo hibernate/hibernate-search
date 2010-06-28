@@ -25,13 +25,13 @@
 package org.hibernate.search.test.reader.functionality;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,8 +47,8 @@ import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.reader.ReaderProviderHelper;
 import org.hibernate.search.reader.SharingBufferReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
@@ -111,7 +111,7 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 	}
 
 	@Override
-	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
+	public void initialize(Properties props, BuildContext context) {
 		try {
 			for ( Directory directory : manipulators.keySet() ) {
 				currentReaders.put( directory, new PerDirectoryLatestReader( directory ) );

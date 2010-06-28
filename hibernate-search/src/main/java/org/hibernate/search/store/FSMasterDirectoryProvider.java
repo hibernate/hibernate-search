@@ -37,6 +37,7 @@ import java.util.concurrent.locks.Lock;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.FileHelper;
@@ -79,7 +80,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	private Properties properties;
 	private TriggerTask task;
 
-	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
+	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.properties = properties;
 		this.directoryProviderName = directoryProviderName;
 		//source guessing
@@ -95,7 +96,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
-		this.searchFactory = searchFactoryImplementor;
+		this.searchFactory = context.getUninitializedSearchFactory();
 		current = 0; //write to volatile to publish all state
 	}
 

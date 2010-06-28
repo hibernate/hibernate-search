@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.impl.TransactionalWorker;
 import org.hibernate.search.cfg.SearchConfiguration;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.PluginLoader;
 import org.hibernate.util.StringHelper;
 
@@ -52,7 +52,7 @@ public abstract class WorkerFactory {
 		return workerProperties;
 	}
 
-	public static Worker createWorker(SearchConfiguration cfg, SearchFactoryImplementor searchFactoryImplementor) {
+	public static Worker createWorker(SearchConfiguration cfg, WorkerBuildContext context) {
 		Properties props = getProperties( cfg );
 		String impl = props.getProperty( Environment.WORKER_SCOPE );
 		Worker worker;
@@ -66,7 +66,7 @@ public abstract class WorkerFactory {
 			worker = PluginLoader.instanceFromName( Worker.class,
 					impl, WorkerFactory.class, "worker" );
 		}
-		worker.initialize( props, searchFactoryImplementor );
+		worker.initialize( props, context );
 		return worker;
 	}
 	

@@ -56,7 +56,6 @@ import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
-import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -67,7 +66,7 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.impl.InitContext;
+import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PassThroughAnalyzer;
 import org.hibernate.search.util.ReflectionHelper;
@@ -106,7 +105,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	 * @param context Handle to default configuration settings.
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */
-	public DocumentBuilderContainedEntity(XClass clazz, InitContext context, ReflectionManager reflectionManager) {
+	public DocumentBuilderContainedEntity(XClass clazz, ConfigContext context, ReflectionManager reflectionManager) {
 
 		if ( clazz == null ) {
 			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
@@ -123,7 +122,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 	}
 
-	protected void init(XClass clazz, InitContext context) {
+	protected void init(XClass clazz, ConfigContext context) {
 		metadata.boost = getBoost( clazz );
 		metadata.classBoostStrategy = getDynamicBoost( clazz );
 		metadata.analyzer = context.getDefaultAnalyzer();
@@ -145,7 +144,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
-								 Set<XClass> processedClasses, InitContext context) {
+								 Set<XClass> processedClasses, ConfigContext context) {
 		List<XClass> hierarchy = new ArrayList<XClass>();
 		for ( XClass currentClass = clazz; currentClass != null; currentClass = currentClass.getSuperclass() ) {
 			hierarchy.add( currentClass );
@@ -187,7 +186,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	 * @param prefix The current prefix used for the <code>Document</code> field names.
 	 * @param context Handle to default configuration settings.
 	 */
-	private void initializeClassLevelAnnotations(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
+	private void initializeClassLevelAnnotations(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
 
 		// check for a class level specified analyzer
 		Analyzer analyzer = getAnalyzer( clazz, context );
@@ -222,7 +221,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	protected void initializeMemberLevelAnnotations(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
-													String prefix, Set<XClass> processedClasses, InitContext context) {
+													String prefix, Set<XClass> processedClasses, ConfigContext context) {
 		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context );
 		checkForField( member, propertiesMetadata, prefix, context );
 		checkForFields( member, propertiesMetadata, prefix, context );
@@ -232,13 +231,13 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		checkForContainedIn( member, propertiesMetadata );
 	}
 
-	protected Analyzer getAnalyzer(XAnnotatedElement annotatedElement, InitContext context) {
+	protected Analyzer getAnalyzer(XAnnotatedElement annotatedElement, ConfigContext context) {
 		org.hibernate.search.annotations.Analyzer analyzerAnn =
 				annotatedElement.getAnnotation( org.hibernate.search.annotations.Analyzer.class );
 		return getAnalyzer( analyzerAnn, context );
 	}
 
-	protected Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, InitContext context) {
+	protected Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext context) {
 		Class analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
 		if ( analyzerClass == void.class ) {
 			String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
@@ -268,7 +267,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 	}
 
-	private void checkForAnalyzerDefs(XAnnotatedElement annotatedElement, InitContext context) {
+	private void checkForAnalyzerDefs(XAnnotatedElement annotatedElement, ConfigContext context) {
 		AnalyzerDefs defs = annotatedElement.getAnnotation( AnalyzerDefs.class );
 		if ( defs != null ) {
 			for ( AnalyzerDef def : defs.value() ) {
@@ -308,7 +307,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		return similarity;
 	}
 
-	private void checkForFields(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, InitContext context) {
+	private void checkForFields(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context) {
 		org.hibernate.search.annotations.Fields fieldsAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Fields.class );
 		if ( fieldsAnn != null ) {
@@ -339,7 +338,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 	}
 
-	private void checkForField(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, InitContext context) {
+	private void checkForField(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context) {
 		org.hibernate.search.annotations.Field fieldAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Field.class );
 		if ( fieldAnn != null ) {
@@ -355,7 +354,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 	}
 
-	private void checkForIndexedEmbedded(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, Set<XClass> processedClasses, InitContext context) {
+	private void checkForIndexedEmbedded(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, Set<XClass> processedClasses, ConfigContext context) {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
 			int oldMaxLevel = maxLevel;
@@ -426,7 +425,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 	}
 
-	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, InitContext context) {
+	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
 		// TODO - HSEARCH-333
 		// for a contained entity there is nothing to do here. This is really bad design since this protected method is called by the constructor and
 		// overridden by DocumentBuilderIndexedEntity
@@ -454,7 +453,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		return ReflectionHelper.getAttributeName( member, name );
 	}
 
-	private void bindClassBridgeAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, InitContext context) {
+	private void bindClassBridgeAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, ConfigContext context) {
 		String fieldName = prefix + ann.name();
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( ann.store() );
@@ -473,7 +472,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		addToScopedAnalyzer( fieldName, analyzer, ann.index() );
 	}
 
-	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, InitContext context) {
+	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, ConfigContext context) {
 		ReflectionHelper.setAccessible( member );
 		propertiesMetadata.fieldGetters.add( member );
 		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );

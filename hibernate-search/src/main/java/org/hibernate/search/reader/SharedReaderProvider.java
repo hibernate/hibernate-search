@@ -38,12 +38,13 @@ import org.apache.lucene.index.MultiReader;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.SearchFactoryImplementor;
-import static org.hibernate.search.reader.ReaderProviderHelper.buildMultiReader;
-import static org.hibernate.search.reader.ReaderProviderHelper.clean;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
+
+import static org.hibernate.search.reader.ReaderProviderHelper.buildMultiReader;
+import static org.hibernate.search.reader.ReaderProviderHelper.clean;
 
 /**
  * Share readers per <code>SearchFactory</code>, reusing them if they are still valid.
@@ -346,8 +347,8 @@ public class SharedReaderProvider implements ReaderProvider {
 		}
 	}
 
-	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
-		Set<DirectoryProvider<?>> providers = searchFactoryImplementor.getDirectoryProviders();
+	public void initialize(Properties props, BuildContext context) {
+		Set<DirectoryProvider<?>> providers = context.getDirectoryProviders();
 		perDirectoryProviderManipulationLocks = new HashMap<DirectoryProvider, Lock>( providers.size() );
 		for ( DirectoryProvider dp : providers ) {
 			perDirectoryProviderManipulationLocks.put( dp, new ReentrantLock() );

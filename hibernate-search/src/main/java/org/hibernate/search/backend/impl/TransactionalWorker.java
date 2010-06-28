@@ -25,18 +25,18 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.Properties;
-
 import javax.transaction.Synchronization;
 
+import org.slf4j.Logger;
+
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.QueueingProcessor;
+import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.backend.Worker;
-import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.WeakIdentityHashMap;
-import org.slf4j.Logger;
 
 /**
  * Queue works per transaction.
@@ -84,8 +84,8 @@ public class TransactionalWorker implements Worker {
 		}
 	}
 
-	public void initialize(Properties props, SearchFactoryImplementor searchFactory) {
-		this.queueingProcessor = new BatchedQueueingProcessor( searchFactory, props );
+	public void initialize(Properties props, WorkerBuildContext context) {
+		this.queueingProcessor = new BatchedQueueingProcessor( context, props );
 	}
 
 	public void close() {

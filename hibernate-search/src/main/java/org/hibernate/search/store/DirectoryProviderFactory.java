@@ -32,13 +32,13 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.Environment;
+import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.cfg.SearchConfiguration;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -70,7 +70,7 @@ public class DirectoryProviderFactory {
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 
 	public DirectoryProviders createDirectoryProviders(XClass entity, SearchConfiguration cfg,
-													   SearchFactoryImplementor searchFactoryImplementor,
+													   WritableBuildContext context,
 													   ReflectionManager reflectionManager) {
 		//get properties
 		String directoryProviderName = getDirectoryProviderName( entity, cfg );
@@ -83,8 +83,10 @@ public class DirectoryProviderFactory {
 			String providerName = nbrOfProviders > 1 ?
 					directoryProviderName + "." + index :
 					directoryProviderName;
-			providers[index] = createDirectoryProvider( providerName, indexProps[index],
-					reflectionManager.toClass( entity ), searchFactoryImplementor );
+			providers[index] = createDirectoryProvider( 
+					providerName, indexProps[index],
+					reflectionManager.toClass( entity ),
+					context );
 		}
 
 		//define sharding strategy
@@ -115,7 +117,7 @@ public class DirectoryProviderFactory {
 	}
 
 	private DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps,
-														 Class<?> entity, SearchFactoryImplementor searchFactoryImplementor) {
+														 Class<?> entity, WritableBuildContext context) {
 		String className = indexProps.getProperty( "directory_provider" );
 		DirectoryProvider<?> provider;
 		if ( StringHelper.isEmpty( className ) ) {
@@ -126,7 +128,7 @@ public class DirectoryProviderFactory {
 					DirectoryProviderFactory.class, "directory provider" );
 		}
 		try {
-			provider.initialize( directoryProviderName, indexProps, searchFactoryImplementor );
+			provider.initialize( directoryProviderName, indexProps, context );
 		}
 		catch (Exception e) {
 			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
@@ -136,30 +138,30 @@ public class DirectoryProviderFactory {
 		if ( index != -1 ) {
 			//share the same Directory provider for the same underlying store
 			final DirectoryProvider<?> directoryProvider = providers.get( index );
-			searchFactoryImplementor.addClassToDirectoryProvider( entity, directoryProvider, exclusiveIndexUsage);
+			context.addClassToDirectoryProvider( entity, directoryProvider, exclusiveIndexUsage);
 			return directoryProvider;
 		}
 		else {
-			configureOptimizerStrategy( searchFactoryImplementor, indexProps, provider );
-			configureIndexingParameters( searchFactoryImplementor, indexProps, provider );
+			configureOptimizerStrategy( context, indexProps, provider );
+			configureIndexingParameters( context, indexProps, provider );
 			providers.add( provider );
-			searchFactoryImplementor.addClassToDirectoryProvider( entity, provider, exclusiveIndexUsage );
+			context.addClassToDirectoryProvider( entity, provider, exclusiveIndexUsage );
 			return provider;
 		}
 	}
 
-	private void configureOptimizerStrategy(SearchFactoryImplementor searchFactoryImplementor, Properties indexProps, DirectoryProvider<?> provider) {
+	private void configureOptimizerStrategy(WritableBuildContext context, Properties indexProps, DirectoryProvider<?> provider) {
 		boolean incremental = indexProps.containsKey( "optimizer.operation_limit.max" )
 				|| indexProps.containsKey( "optimizer.transaction_limit.max" );
 		OptimizerStrategy optimizerStrategy;
 		if ( incremental ) {
 			optimizerStrategy = new IncrementalOptimizerStrategy();
-			optimizerStrategy.initialize( provider, indexProps, searchFactoryImplementor );
+			optimizerStrategy.initialize( provider, indexProps, context );
 		}
 		else {
 			optimizerStrategy = new NoOpOptimizerStrategy();
 		}
-		searchFactoryImplementor.addOptimizerStrategy( provider, optimizerStrategy );
+		context.addOptimizerStrategy( provider, optimizerStrategy );
 	}
 
 	/**
@@ -178,10 +180,10 @@ public class DirectoryProviderFactory {
 	 * @param directoryProperties	  The properties extracted from the configuration.
 	 * @param provider				 The directory provider for which to configure the indexing parameters.
 	 */
-	private void configureIndexingParameters(SearchFactoryImplementor searchFactoryImplementor,
+	private void configureIndexingParameters(WritableBuildContext context,
 											 Properties directoryProperties, DirectoryProvider<?> provider) {
 		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters( directoryProperties );
-		searchFactoryImplementor.addIndexingParameters( provider, indexingParams );
+		context.addIndexingParameters( provider, indexingParams );
 	}
 
 	/**

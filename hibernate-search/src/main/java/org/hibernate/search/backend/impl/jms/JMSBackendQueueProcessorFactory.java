@@ -35,8 +35,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 
@@ -53,7 +53,7 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 	public static final String JMS_CONNECTION_FACTORY = Environment.WORKER_PREFIX + "jms.connection_factory";
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
 
-	public void initialize(Properties props, SearchFactoryImplementor searchFactoryImplementor) {
+	public void initialize(Properties props, WorkerBuildContext context) {
 		//TODO proper exception if jms queues and connecitons are not there
 		this.properties = props;
 		this.jmsConnectionFactoryName = props.getProperty( JMS_CONNECTION_FACTORY );

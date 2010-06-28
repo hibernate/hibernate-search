@@ -40,7 +40,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.impl.InitContext;
+import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.test.SearchTestCase;
@@ -95,7 +95,7 @@ public class AnalyzerTest extends SearchTestCase {
 		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( cfg );
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
-		InitContext context = new InitContext( searchConfig );
+		ConfigContext context = new ConfigContext( searchConfig );
 		try {
 			new DocumentBuilderContainedEntity( xclass, context, reflectionManager );
 			fail();

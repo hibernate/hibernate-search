@@ -27,7 +27,8 @@ package org.hibernate.search.store;
 import java.util.Properties;
 
 import org.apache.lucene.store.Directory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+
+import org.hibernate.search.spi.BuildContext;
 
 
 /**
@@ -45,7 +46,7 @@ public interface DirectoryProvider<TDirectory extends Directory> {
 	/**
 	 * get the information to initialize the directory and build its hashCode/equals method
 	 */
-	void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor);
+	void initialize(String directoryProviderName, Properties properties, BuildContext context);
 
 	/**
 	 * Executed after initialize, this method set up the heavy process of starting up the DirectoryProvider

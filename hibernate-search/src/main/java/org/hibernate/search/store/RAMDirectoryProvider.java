@@ -31,7 +31,7 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.HibernateException;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.spi.BuildContext;
 
 /**
  * Use a Lucene RAMDirectory
@@ -44,7 +44,7 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 	private final RAMDirectory directory = new RAMDirectory();
 	private String indexName;
 
-	public void initialize(String directoryProviderName, Properties properties, SearchFactoryImplementor searchFactoryImplementor) {
+	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		indexName = directoryProviderName;
 		directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties ) );
 	}
