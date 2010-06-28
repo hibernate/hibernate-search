@@ -253,9 +253,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	}
 
 	private <T> void addWorkToBuilderQueue(List<LuceneWork> luceneQueue, Work<T> work) {
-		Class<T> entityClass = work.getEntityClass() != null ?
-				work.getEntityClass() :
-				HibernateHelper.getClass( work.getEntity() );
+		Class<T> entityClass = HibernateHelper.getClassFromWork( work );
 		DocumentBuilderIndexedEntity<T> entityBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
 		if ( entityBuilder != null ) {
 			entityBuilder.addWorkToQueue(

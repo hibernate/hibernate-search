@@ -1,6 +1,7 @@
 package org.hibernate.search.util;
 
 import org.hibernate.Hibernate;
+import org.hibernate.search.backend.Work;
 
 /**
  * @author Emmanuel Bernard
@@ -24,5 +25,11 @@ public final class HibernateHelper {
 
 	public static boolean isInitialized(Object entity) {
 		return Hibernate.isInitialized( entity );
+	}
+
+	public static <T> Class<T> getClassFromWork(Work<T> work) {
+		return work.getEntityClass() != null ?
+				work.getEntityClass() :
+				getClass( work.getEntity() );
 	}
 }
