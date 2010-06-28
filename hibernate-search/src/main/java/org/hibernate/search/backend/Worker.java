@@ -39,7 +39,7 @@ public interface Worker {
 	 * @param work
 	 * @param transactionContext
 	 */
-	void performWork(Work work, TransactionContext transactionContext);
+	void performWork(Work<?> work, TransactionContext transactionContext);
 
 	void initialize(Properties props, WorkerBuildContext context);
 

@@ -22,19 +22,19 @@ class PolymorphicIndexHierarchy {
 		classToIndexedClass = new HashMap<Class<?>, Set<Class<?>>>();
 	}
 
-	void addIndexedClass(Class indexedClass) {
+	void addIndexedClass(Class<?> indexedClass) {
 		addClass( indexedClass, indexedClass );
-		Class superClass = indexedClass.getSuperclass();
+		Class<?> superClass = indexedClass.getSuperclass();
 		while ( superClass != null ) {
 			addClass( superClass, indexedClass );
 			superClass = superClass.getSuperclass();
 		}
-		for ( Class clazz : indexedClass.getInterfaces() ) {
+		for ( Class<?> clazz : indexedClass.getInterfaces() ) {
 			addClass( clazz, indexedClass );
 		}
 	}
 
-	private void addClass(Class superclass, Class indexedClass) {
+	private void addClass(Class<?> superclass, Class<?> indexedClass) {
 		Set<Class<?>> classesSet = classToIndexedClass.get( superclass );
 		if ( classesSet == null ) {
 			classesSet = new HashSet<Class<?>>();
@@ -45,7 +45,7 @@ class PolymorphicIndexHierarchy {
 
 	Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
 		Set<Class<?>> idexedClasses = new HashSet<Class<?>>();
-		for ( Class clazz : classes ) {
+		for ( Class<?> clazz : classes ) {
 			Set<Class<?>> set = classToIndexedClass.get( clazz );
 			if ( set != null ) {
 				// at this point we don't have to care about including indexed subclasses of a indexed class
