@@ -28,10 +28,11 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
+
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.impl.SearchFactoryImpl;
+import org.hibernate.search.impl.SearchFactoryBuilder;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -41,7 +42,7 @@ import org.hibernate.search.test.SearchTestCase;
 public class ProvidedIdTest extends junit.framework.TestCase {
 
 	public void testProvidedId() throws Exception {
-		SearchFactoryImplementor sf = new SearchFactoryImpl( new StandaloneConf() );
+		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( new StandaloneConf() ).buildSearchFactory();
 
 		ProvidedIdPerson person1 = new ProvidedIdPerson();
 		person1.setName( "Big Goat" );

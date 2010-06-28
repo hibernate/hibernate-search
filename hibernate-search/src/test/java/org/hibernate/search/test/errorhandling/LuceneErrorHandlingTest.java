@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.index.IndexWriter;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -43,9 +43,9 @@ import org.hibernate.search.backend.WorkVisitor;
 import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
-import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -63,11 +63,11 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	static final AtomicInteger workcounter = new AtomicInteger();
 	
 	public void testErrorHandling() {
-		SearchFactoryImpl searchFactoryImpl = getSearchFactoryImpl();
-		ErrorHandler errorHandler = searchFactoryImpl.getErrorHandler();
+		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
+		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
-		BackendQueueProcessorFactory queueProcessorFactory = searchFactoryImpl.getBackendQueueProcessorFactory();
+		BackendQueueProcessorFactory queueProcessorFactory = searchFactory.getBackendQueueProcessorFactory();
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( new HarmlessWork( "firstWork" ) );
 		queue.add( new HarmlessWork( "secondWork" ) );
@@ -114,11 +114,11 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
 	
-	protected SearchFactoryImpl getSearchFactoryImpl() {
+	protected SearchFactoryImplementor getSearchFactoryImpl() {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.close();
 		SearchFactory searchFactory = s.getSearchFactory();
-		return (SearchFactoryImpl) searchFactory;
+		return (SearchFactoryImplementor) searchFactory;
 	}
 	
 	/**

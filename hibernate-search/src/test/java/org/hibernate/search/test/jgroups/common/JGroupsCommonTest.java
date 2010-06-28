@@ -46,7 +46,8 @@ import org.hibernate.search.test.jgroups.master.TShirt;
  * </code>
  * @author Lukasz Moren
  */
-public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
+public class
+		JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 

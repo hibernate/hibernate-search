@@ -49,8 +49,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
@@ -70,7 +70,7 @@ public abstract class SearchTestCase extends TestCase {
 
 	private static File indexDir;
 	
-	private SearchFactoryImpl searchFactory;
+	private SearchFactoryImplementor searchFactory;
 
 	static {
 		String buildDir = System.getProperty( "build.dir" );
@@ -139,7 +139,7 @@ public abstract class SearchTestCase extends TestCase {
 		if ( searchFactory == null ) {
 			Session session = openSession();
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
+			searchFactory = ( SearchFactoryImplementor) fullTextSession.getSearchFactory();
 			fullTextSession.close();
 		}
 		return searchFactory;

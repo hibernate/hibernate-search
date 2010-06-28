@@ -31,7 +31,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.impl.SearchFactoryImpl;
 import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
@@ -58,7 +57,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		searchFactory = (SearchFactoryImpl) fullTextSession.getSearchFactory();
+		searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 		fullTextSession.close();
 		FileHelper.delete( getBaseIndexDir() );
 		getBaseIndexDir().mkdirs();

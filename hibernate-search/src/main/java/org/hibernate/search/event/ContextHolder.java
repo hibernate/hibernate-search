@@ -30,7 +30,7 @@ import java.util.WeakHashMap;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.impl.SearchFactoryImpl;
+import org.hibernate.search.impl.SearchFactoryBuilder;
 
 /**
  * Holds already built SearchFactory per Hibernate Configuration object
@@ -44,20 +44,22 @@ import org.hibernate.search.impl.SearchFactoryImpl;
  * @author Emmanuel Bernard
  */
 public class ContextHolder {
-	private static final ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>> contexts =
-			new ThreadLocal<WeakHashMap<Configuration, SearchFactoryImpl>>();
+	private static final ThreadLocal<WeakHashMap<Configuration, SearchFactoryImplementor>> contexts =
+			new ThreadLocal<WeakHashMap<Configuration, SearchFactoryImplementor>>();
 
 	//code doesn't have to be multithreaded because SF creation is not.
 	//this is not a public API, should really only be used during the SessionFactory building
-	public static SearchFactoryImpl getOrBuildSearchFactory(Configuration cfg) {
-		WeakHashMap<Configuration, SearchFactoryImpl> contextMap = contexts.get();
+	public static SearchFactoryImplementor getOrBuildSearchFactory(Configuration cfg) {
+		WeakHashMap<Configuration, SearchFactoryImplementor> contextMap = contexts.get();
 		if ( contextMap == null ) {
-			contextMap = new WeakHashMap<Configuration, SearchFactoryImpl>( 2 );
+			contextMap = new WeakHashMap<Configuration, SearchFactoryImplementor>( 2 );
 			contexts.set( contextMap );
 		}
-		SearchFactoryImpl searchFactory = contextMap.get( cfg );
+		SearchFactoryImplementor searchFactory = contextMap.get( cfg );
 		if ( searchFactory == null ) {
-			searchFactory = new SearchFactoryImpl( new SearchConfigurationFromHibernateCore( cfg ) );
+			searchFactory = new SearchFactoryBuilder()
+					.configuration( new SearchConfigurationFromHibernateCore( cfg ) )
+					.buildSearchFactory();
 			contextMap.put( cfg, searchFactory );
 		}
 		return searchFactory;
@@ -66,9 +68,9 @@ public class ContextHolder {
 	//code doesn't have to be multithreaded because SF creation is not.
 	//this is not a public API, should really only be used by the same 
 	public static void removeSearchFactoryFromCache(SearchFactoryImplementor factory) {
-		WeakHashMap<Configuration, SearchFactoryImpl> contextMap = contexts.get();
+		WeakHashMap<Configuration, SearchFactoryImplementor> contextMap = contexts.get();
 		if ( contextMap != null ) {
-			for ( Map.Entry<Configuration, SearchFactoryImpl> entry : contextMap.entrySet() ) {
+			for ( Map.Entry<Configuration, SearchFactoryImplementor> entry : contextMap.entrySet() ) {
 				if ( entry.getValue() == factory ) {
 					contextMap.remove( entry.getKey() );
 				}
