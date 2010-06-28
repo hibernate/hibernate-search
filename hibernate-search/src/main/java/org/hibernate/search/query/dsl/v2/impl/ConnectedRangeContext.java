@@ -1,10 +1,7 @@
 package org.hibernate.search.query.dsl.v2.impl;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Filter;
 
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.RangeContext;
 import org.hibernate.search.query.dsl.v2.RangeMatchingContext;
 
@@ -29,13 +26,13 @@ class ConnectedRangeContext implements RangeContext {
 		return this;
 	}
 
-	public RangeContext constantScore() {
-		queryCustomizer.constantScore();
+	public RangeContext withConstantScore() {
+		queryCustomizer.withConstantScore();
 		return this;
 	}
 
-	public RangeContext filter(Filter filter) {
-		queryCustomizer.filter(filter);
+	public RangeContext filteredBy(Filter filter) {
+		queryCustomizer.filteredBy(filter);
 		return this;
 	}
 }

@@ -30,7 +30,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		this.queryContext = queryContext;
 	}
 
-	public RangeTerminationExcludable exclude() {
+	public RangeTerminationExcludable excludeLimit() {
 		if ( rangeContext.getFrom() != null && rangeContext.getTo() != null ) {
 			rangeContext.setExcludeTo( true );
 		}

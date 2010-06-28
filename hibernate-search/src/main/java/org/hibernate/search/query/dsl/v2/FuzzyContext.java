@@ -14,7 +14,7 @@ public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	 * Value between 0 and 1 (1 excluded)
 	 * Defaults to .5
 	 */
-	FuzzyContext threshold(float threshold);
+	FuzzyContext withThreshold(float threshold);
 
 	/**
 	 * Size of the prefix ignored by the fuzzyness.
@@ -22,5 +22,5 @@ public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	 *
 	 * Defaults to 0
 	 */
-	FuzzyContext prefixLength(int prefixLength);
+	FuzzyContext withPrefixLength(int prefixLength);
 }

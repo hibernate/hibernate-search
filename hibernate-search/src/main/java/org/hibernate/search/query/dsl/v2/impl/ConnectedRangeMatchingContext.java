@@ -55,7 +55,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 					mother.queryContext);
 		}
 
-		public FromRangeContext<T> exclude() {
+		public FromRangeContext<T> excludeLimit() {
 			mother.rangeContext.setExcludeFrom( true );
 			return this;
 		}

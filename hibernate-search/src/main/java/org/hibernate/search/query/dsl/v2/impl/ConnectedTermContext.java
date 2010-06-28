@@ -42,13 +42,13 @@ class ConnectedTermContext implements TermContext {
 		return this;
 	}
 
-	public ConnectedTermContext constantScore() {
-		queryCustomizer.constantScore();
+	public ConnectedTermContext withConstantScore() {
+		queryCustomizer.withConstantScore();
 		return this;
 	}
 
-	public ConnectedTermContext filter(Filter filter) {
-		queryCustomizer.filter(filter);
+	public ConnectedTermContext filteredBy(Filter filter) {
+		queryCustomizer.filteredBy(filter);
 		return this;
 	}
 }

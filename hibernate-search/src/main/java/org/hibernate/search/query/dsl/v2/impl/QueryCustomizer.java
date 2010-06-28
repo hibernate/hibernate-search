@@ -24,12 +24,12 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 		return this;
 	}
 
-	public QueryCustomizer constantScore() {
+	public QueryCustomizer withConstantScore() {
 		constantScore = true;
 		return this;
 	}
 
-	public QueryCustomizer filter(Filter filter) {
+	public QueryCustomizer filteredBy(Filter filter) {
 		this.filter = filter;
 		return this;
 	}

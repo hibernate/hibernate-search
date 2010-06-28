@@ -1,9 +1,7 @@
 package org.hibernate.search.query.dsl.v2.impl;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Filter;
 
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.v2.PhraseContext;
 import org.hibernate.search.query.dsl.v2.PhraseMatchingContext;
 
@@ -22,7 +20,7 @@ class ConnectedPhraseContext implements PhraseContext {
 		this.queryContext = queryContext;
 	}
 
-	public PhraseContext slop(int slop) {
+	public PhraseContext withSlop(int slop) {
 		phraseContext.setSlop( slop );
 		return this;
 	}
@@ -36,13 +34,13 @@ class ConnectedPhraseContext implements PhraseContext {
 		return this;
 	}
 
-	public PhraseContext constantScore() {
-		queryCustomizer.constantScore();
+	public PhraseContext withConstantScore() {
+		queryCustomizer.withConstantScore();
 		return this;
 	}
 
-	public PhraseContext filter(Filter filter) {
-		queryCustomizer.filter(filter);
+	public PhraseContext filteredBy(Filter filter) {
+		queryCustomizer.filteredBy(filter);
 		return this;
 	}
 }

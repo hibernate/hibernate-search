@@ -11,7 +11,7 @@ public interface PhraseContext extends QueryCustomization<PhraseContext> {
 	 *
 	 * Defaults to 0
 	 */
-	PhraseContext slop(int slop);
+	PhraseContext withSlop(int slop);
 
 	/**
 	 * field / property the term query is executed on

@@ -28,13 +28,13 @@ class ConnectedWildcardContext implements WildcardContext {
 		return this;
 	}
 
-	public WildcardContext constantScore() {
-		queryCustomizer.constantScore();
+	public WildcardContext withConstantScore() {
+		queryCustomizer.withConstantScore();
 		return this;
 	}
 
-	public WildcardContext filter(Filter filter) {
-		queryCustomizer.filter(filter);
+	public WildcardContext filteredBy(Filter filter) {
+		queryCustomizer.filteredBy(filter);
 		return this;
 	}
 }

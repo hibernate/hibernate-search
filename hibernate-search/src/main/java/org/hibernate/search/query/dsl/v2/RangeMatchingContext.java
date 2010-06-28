@@ -16,18 +16,18 @@ public interface RangeMatchingContext extends FieldCustomization<RangeMatchingCo
 
 	public interface FromRangeContext<T> {
 		RangeTerminationExcludable to(T to);
-		FromRangeContext<T> exclude();
+		FromRangeContext<T> excludeLimit();
 	}
 
 	/**
 	 * The field value must be below <code>below</code>
-	 * You can exclude the value <code>below</code> by calling <code>.exclude()</code>
+	 * You can exclude the value <code>below</code> by calling <code>.excludeLimit()</code>
 	 */
 	RangeTerminationExcludable below(Object below);
 
 	/**
 	 * The field value must be above <code>above</code>
-	 * You can exclude the value <code>above</code> by calling <code>.exclude()</code>
+	 * You can exclude the value <code>above</code> by calling <code>.excludeLimit()</code>
 	 */
 	RangeTerminationExcludable above(Object above);
 

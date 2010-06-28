@@ -51,13 +51,13 @@ public class ConnectedAllContext implements AllContext {
 		return this;
 	}
 
-	public AllContext constantScore() {
-		queryCustomizer.constantScore();
+	public AllContext withConstantScore() {
+		queryCustomizer.withConstantScore();
 		return this;
 	}
 
-	public AllContext filter(Filter filter) {
-		queryCustomizer.filter( filter );
+	public AllContext filteredBy(Filter filter) {
+		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 }

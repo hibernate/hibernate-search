@@ -24,12 +24,12 @@ public interface QueryCustomization<T> {
 	 * All results matching the query have a constant score equals to the boost
 	 * FIXME is that true?
 	 */
-	T constantScore();
+	T withConstantScore();
 
 	/**
 	 * Filter the query results with the Filter instance
 	 */
-	T filter(Filter filter);
+	T filteredBy(Filter filter);
 
 	//TODO filter(String) + parameters
 }

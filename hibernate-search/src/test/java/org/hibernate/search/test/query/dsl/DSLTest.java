@@ -1,10 +1,8 @@
 package org.hibernate.search.test.query.dsl;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.lucene.document.DateTools;
@@ -105,8 +103,8 @@ public class DSLTest extends SearchTestCase {
 		query = monthQb
 				.keyword()
 					.fuzzy()
-						.threshold( .8f )
-						.prefixLength( 1 )
+						.withThreshold( .8f )
+						.withPrefixLength( 1 )
 					.onField( "mythology" )
 						.matching( "calder" )
 						.createQuery();
@@ -289,7 +287,7 @@ public class DSLTest extends SearchTestCase {
 					.andField( "justfortest" )
 						.ignoreFieldBridge().ignoreAnalyzer()
 					.from( from )
-					.to( to ).exclude()
+					.to( to ).excludeLimit()
 					.createQuery();
 
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
@@ -301,7 +299,7 @@ public class DSLTest extends SearchTestCase {
 					.andField( "justfortest" )
 						.ignoreFieldBridge().ignoreAnalyzer()
 					.from( DateTools.dateToString( from, DateTools.Resolution.MINUTE ) )
-					.to( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) ).exclude()
+					.to( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) ).excludeLimit()
 					.createQuery();
 		assertEquals( 1, fts.createFullTextQuery( query, Month.class ).getResultSize() );
 
@@ -385,7 +383,7 @@ public class DSLTest extends SearchTestCase {
 
 		query = monthQb.
 				phrase()
-					.slop( 1 )
+					.withSlop( 1 )
 					.onField( "mythology" )
 					.sentence( "Month whitening" )
 					.createQuery();

@@ -23,12 +23,12 @@ class ConnectedFuzzyContext implements FuzzyContext {
 		return new ConnectedTermMatchingContext(termContext, field, queryCustomizer, queryContext);
 	}
 
-	public ConnectedFuzzyContext threshold(float threshold) {
+	public ConnectedFuzzyContext withThreshold(float threshold) {
 		termContext.setThreshold( threshold );
 		return this;
 	}
 
-	public ConnectedFuzzyContext prefixLength(int prefixLength) {
+	public ConnectedFuzzyContext withPrefixLength(int prefixLength) {
 		termContext.setPrefixLength( prefixLength );
 		return this;
 	}
@@ -38,13 +38,13 @@ class ConnectedFuzzyContext implements FuzzyContext {
 		return this;
 	}
 
-	public FuzzyContext constantScore() {
-		queryCustomizer.constantScore();
+	public FuzzyContext withConstantScore() {
+		queryCustomizer.withConstantScore();
 		return this;
 	}
 
-	public FuzzyContext filter(Filter filter) {
-		queryCustomizer.filter(filter);
+	public FuzzyContext filteredBy(Filter filter) {
+		queryCustomizer.filteredBy(filter);
 		return this;
 	}
 

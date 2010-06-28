@@ -9,7 +9,7 @@ public interface TermFuzzy extends TermTermination {
 	 * Value between 0 and 1 (1 excluded)
 	 * Defaults to .5
 	 */
-	TermFuzzy threshold(float threshold);
+	TermFuzzy withThreshold(float threshold);
 
 	/**
 	 * Size of the prefix ignored by the fuzzyness.
@@ -17,5 +17,5 @@ public interface TermFuzzy extends TermTermination {
 	 *
 	 * Defaults to 0
 	 */
-	TermFuzzy prefixLength(int prefixLength);
+	TermFuzzy withPrefixLength(int prefixLength);
 }

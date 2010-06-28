@@ -50,13 +50,13 @@ class BooleanQueryBuilder implements MustJunction {
 		return this;
 	}
 
-	public MustJunction constantScore() {
-		queryCustomizer.constantScore();
+	public MustJunction withConstantScore() {
+		queryCustomizer.withConstantScore();
 		return this;
 	}
 
-	public MustJunction filter(Filter filter) {
-		queryCustomizer.filter(filter);
+	public MustJunction filteredBy(Filter filter) {
+		queryCustomizer.filteredBy(filter);
 		return this;
 	}
 
