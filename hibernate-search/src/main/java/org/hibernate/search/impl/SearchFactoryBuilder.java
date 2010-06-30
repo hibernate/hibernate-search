@@ -2,9 +2,11 @@ package org.hibernate.search.impl;
 
 import java.beans.Introspector;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -12,6 +14,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
+
+import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
@@ -65,10 +69,11 @@ import org.hibernate.util.StringHelper;
  * Build a search factory
  * @author Emmanuel Bernard
  */
-public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildContext {
+public class SearchFactoryBuilder {
 	private static final Logger log = LoggerFactory.make();
-	SearchConfiguration cfg;
-	MutableSearchFactory rootFactory;
+	private SearchConfiguration cfg;
+	private MutableSearchFactory rootFactory;
+	private final List<Class<?>> classes = new ArrayList<Class<?>>();
 
 	public SearchFactoryBuilder configuration(SearchConfiguration configuration) {
 		this.cfg = configuration;
@@ -77,6 +82,11 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 
 	public SearchFactoryBuilder rootFactory(MutableSearchFactory factory) {
 		this.rootFactory = factory;
+		return this;
+	}
+
+	public SearchFactoryBuilder addClass(Class<?> clazz) {
+		classes.add( clazz );
 		return this;
 	}
 
@@ -101,6 +111,9 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 
 	public SearchFactoryImplementor buildSearchFactory() {
 		if (rootFactory == null) {
+			if (classes.size() > 0) {
+				throw new SearchException( "Cannot add a class if the original SearchFactory is not passed");
+			}
 			return buildNewSearchFactory();
 		}
 		else {
@@ -109,9 +122,50 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 	}
 
 	private SearchFactoryImplementor buildIncrementalSearchFactory() {
+		BuildContext buildContext = new BuildContext();
 		copyStateFromOldFactory(rootFactory);
-		//FIXME next step for implementation
-		return null;
+		List<Class<?>> remove = new ArrayList<Class<?>>();
+		for (Class<?> entity : classes) {
+			if ( documentBuildersIndexedEntities.containsKey( entity ) || documentBuildersContainedEntities.containsKey(entity) ) {
+				remove.add( entity );
+			}
+		}
+		for(Class<?> entity : remove) {
+			classes.remove( entity );
+		}
+		//TODO we don't keep the reflectionManager. Is that an issue?
+		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties );
+		reflectionManager = getReflectionManager( cfg );
+		//TODO programmatic mapping support
+
+		//FIXME The current initDocumentBuilders
+		initDocumentBuilders( cfg, reflectionManager, buildContext );
+
+		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
+		for ( DocumentBuilderIndexedEntity builder : documentBuildersIndexedEntities.values() ) {
+			//FIXME improve this algorithm to deal with adding new classes to the class hierarchy.
+			//Today it seems only safe when a class outside the hierarchy is incrementally added.
+			builder.postInitialize( indexedClasses );
+		}
+		//not really necessary today
+		for ( DocumentBuilderContainedEntity builder : documentBuildersContainedEntities.values() ) {
+			builder.postInitialize( indexedClasses );
+		}
+		fillSimilarityMapping();
+
+		//update backend
+		final BackendQueueProcessorFactory backend = this.backendQueueProcessorFactory;
+		if ( backend instanceof UpdatableBackendQueueProcessorFactory) {
+			final UpdatableBackendQueueProcessorFactory updatableBackend = ( UpdatableBackendQueueProcessorFactory ) backend;
+			updatableBackend.updateDirectoryProviders( this.dirProviderData.keySet(), buildContext );
+		}
+		//safe for incremental init at least the ShredBufferReaderProvider
+		//this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
+		StateSearchFactoryImplementor factory = new ImmutableSearchFactory( this );
+		rootFactory.setDelegate( factory );
+		return rootFactory;
+
+
 	}
 
 	private void copyStateFromOldFactory(StateSearchFactoryImplementor stateFactory) {
@@ -138,6 +192,7 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 		configurationProperties = cfg.getProperties();
 		errorHandler = createErrorHandler( configurationProperties );
 		reflectionManager = getReflectionManager(cfg);
+		BuildContext buildContext = new BuildContext();
 
 		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping(cfg);
 		if ( mapping != null) {
@@ -152,7 +207,7 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 
 		indexingStrategy = defineIndexingStrategy( cfg );//need to be done before the document builds
 		dirProviderIndexingParams = new HashMap<DirectoryProvider, LuceneIndexingParameters>();
-		initDocumentBuilders( cfg, reflectionManager );
+		initDocumentBuilders( cfg, reflectionManager, buildContext );
 
 		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
 		for ( DocumentBuilderIndexedEntity builder : documentBuildersIndexedEntities.values() ) {
@@ -165,8 +220,8 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 		fillSimilarityMapping();
 
 		//build back end
-		this.worker = WorkerFactory.createWorker( cfg, this );
-		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
+		this.worker = WorkerFactory.createWorker( cfg, buildContext );
+		this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, buildContext );
 		this.filterCachingStrategy = buildFilterCachingStrategy( cfg.getProperties() );
 		this.cacheBitResultsSize = ConfigurationParseHelper.getIntValue(
 				cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
@@ -219,7 +274,11 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 		}
 	}
 
-	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager) {
+	/*
+	 * Initialize the document builder
+	 * This algorithm seems to be safe for incremental search factories.
+	 */
+	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager, BuildContext buildContext) {
 		ConfigContext context = new ConfigContext( cfg );
 		Iterator<Class<?>> iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
@@ -228,7 +287,7 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 		initProgrammaticallyDefinedFilterDef(reflectionManager);
 
 		while ( iter.hasNext() ) {
-			Class mappedClass = iter.next();
+			Class<?> mappedClass = iter.next();
 			if ( mappedClass == null ) {
 				continue;
 			}
@@ -246,7 +305,7 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 				}
 
 				DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders(
-						mappedXClass, cfg, this, reflectionManager
+						mappedXClass, cfg, buildContext, reflectionManager
 				);
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
@@ -388,6 +447,10 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 
 	private ReflectionManager getReflectionManager(SearchConfiguration cfg) {
 		ReflectionManager reflectionManager = cfg.getReflectionManager();
+		return geReflectionManager( reflectionManager );
+	}
+
+	private ReflectionManager geReflectionManager(ReflectionManager reflectionManager) {
 		if ( reflectionManager == null ) {
 			reflectionManager = new JavaReflectionManager();
 		}
@@ -402,77 +465,80 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 		return indexingStrategy;
 	}
 
-	public void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy) {
-		DirectoryProviderData data = dirProviderData.get( provider );
-		if ( data == null ) {
-			data = new DirectoryProviderData();
-			dirProviderData.put( provider, data );
+	private class BuildContext implements WritableBuildContext, WorkerBuildContext {
+		public void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy) {
+			DirectoryProviderData data = dirProviderData.get( provider );
+			if ( data == null ) {
+				data = new DirectoryProviderData();
+				dirProviderData.put( provider, data );
+			}
+			data.setOptimizerStrategy( optimizerStrategy );
 		}
-		data.setOptimizerStrategy( optimizerStrategy );
-	}
 
-	public void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
-		dirProviderIndexingParams.put( provider, indexingParams );
-	}
-
-	public void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider, boolean exclusiveIndexUsage) {
-		DirectoryProviderData data = dirProviderData.get( directoryProvider );
-		if ( data == null ) {
-			data = new DirectoryProviderData();
-			dirProviderData.put( directoryProvider, data );
+		public void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
+			dirProviderIndexingParams.put( provider, indexingParams );
 		}
-		data.getClasses().add( entity );
-		data.setExclusiveIndexUsage( exclusiveIndexUsage );
-	}
 
-	public SearchFactoryImplementor getUninitializedSearchFactory() {
-		return rootFactory;
-	}
+		public void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider, boolean exclusiveIndexUsage) {
+			DirectoryProviderData data = dirProviderData.get( directoryProvider );
+			if ( data == null ) {
+				data = new DirectoryProviderData();
+				dirProviderData.put( directoryProvider, data );
+			}
+			data.getClasses().add( entity );
+			data.setExclusiveIndexUsage( exclusiveIndexUsage );
+		}
 
-	public String getIndexingStrategy() {
-		return indexingStrategy;
-	}
+		public SearchFactoryImplementor getUninitializedSearchFactory() {
+			return rootFactory;
+		}
 
-	public Set<DirectoryProvider<?>> getDirectoryProviders() {
-		return this.dirProviderData.keySet();
-	}
+		public String getIndexingStrategy() {
+			return indexingStrategy;
+		}
 
-	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
-		this.backendQueueProcessorFactory = backendQueueProcessorFactory;
-	}
+		public Set<DirectoryProvider<?>> getDirectoryProviders() {
+			return SearchFactoryBuilder.this.dirProviderData.keySet();
+		}
 
-	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-		return dirProviderData.get( provider ).getOptimizerStrategy();
-	}
+		public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
+			SearchFactoryBuilder.this.backendQueueProcessorFactory = backendQueueProcessorFactory;
+		}
 
-	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-		return Collections.unmodifiableSet( dirProviderData.get( directoryProvider ).getClasses() );
-	}
+		public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
+			return dirProviderData.get( provider ).getOptimizerStrategy();
+		}
 
-	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
-		return dirProviderIndexingParams.get( provider );
-	}
+		public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
+			return Collections.unmodifiableSet( dirProviderData.get( directoryProvider ).getClasses() );
+		}
 
-	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
-		return this.dirProviderData.get( dp ).getDirLock();
-	}
+		public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
+			return dirProviderIndexingParams.get( provider );
+		}
 
-	public Similarity getSimilarity(DirectoryProvider<?> provider) {
-		Similarity similarity = dirProviderData.get( provider ).getSimilarity();
-		if ( similarity == null ) throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
-		return similarity;
-	}
+		public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
+			return SearchFactoryBuilder.this.dirProviderData.get( dp ).getDirLock();
+		}
 
-	public boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> provider) {
-		return dirProviderData.get( provider ).isExclusiveIndexUsage();
-	}
+		public Similarity getSimilarity(DirectoryProvider<?> provider) {
+			Similarity similarity = dirProviderData.get( provider ).getSimilarity();
+			if ( similarity == null ) throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
+			return similarity;
+		}
 
-	public ErrorHandler getErrorHandler() {
-		return errorHandler;
-	}
+		public boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> provider) {
+			return dirProviderData.get( provider ).isExclusiveIndexUsage();
+		}
 
-	@SuppressWarnings("unchecked")
-	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-		return ( DocumentBuilderIndexedEntity<T> ) documentBuildersIndexedEntities.get( entityType );
+		public ErrorHandler getErrorHandler() {
+			return errorHandler;
+		}
+
+		@SuppressWarnings("unchecked")
+		public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
+			return ( DocumentBuilderIndexedEntity<T> ) documentBuildersIndexedEntities.get( entityType );
+		}
+		
 	}
 }
