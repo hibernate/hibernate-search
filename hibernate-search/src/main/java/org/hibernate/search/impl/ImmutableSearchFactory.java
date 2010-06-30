@@ -70,6 +70,8 @@ import org.hibernate.search.util.PluginLoader;
 import org.hibernate.util.StringHelper;
 
 /**
+ * This implementation is never directly exposed to the user, it is always wrapped into a {@link org.hibernate.search.impl.MutableSearchFactory}
+ * 
  * @author Emmanuel Bernard
  */
 public class ImmutableSearchFactory implements StateSearchFactoryImplementor, WorkerBuildContext {
@@ -189,6 +191,10 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 
 	public Set<DirectoryProvider<?>> getDirectoryProviders() {
 		return this.dirProviderData.keySet();
+	}
+
+	public void addClasses(Class<?>... classes) {
+		throw new AssertionFailure( "Cannot add classes to an " + ImmutableSearchFactory.class.getName() );
 	}
 
 	public Worker getWorker() {

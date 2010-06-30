@@ -36,6 +36,7 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.exception.ErrorHandler;
@@ -46,7 +47,7 @@ import org.hibernate.search.exception.ErrorHandler;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public interface SearchFactoryImplementor extends SearchFactory {
+public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
 
 	Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities();
@@ -54,8 +55,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	<T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType);
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
-
-	Worker getWorker();
 
 	OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider);
 
@@ -66,8 +65,6 @@ public interface SearchFactoryImplementor extends SearchFactory {
 	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider);
 
 	String getIndexingStrategy();
-
-	void close();
 
 	Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider);
 

@@ -6,7 +6,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
-import org.hibernate.search.IncrementalSearchFactory;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -83,14 +83,14 @@ public class MutableFactoryTest extends TestCase {
 	public void testAddingClassSimpleAPI() throws Exception {
 		ManualConfiguration configuration = new ManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
-		//FIXME downcasting of MSF. create a getDelegate() ?
-		IncrementalSearchFactory sf = (IncrementalSearchFactory) new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
-		SearchFactoryImplementor sfi = (SearchFactoryImplementor) sf;
+
+		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+
 		sf.addClasses( A.class );
 
 		ManualTransactionContext tc = new ManualTransactionContext();
 
-		doIndexWork( new A(1, "Emmanuel"), 1, sfi, tc );
+		doIndexWork( new A(1, "Emmanuel"), 1, sf, tc );
 
 		tc.end();
 
@@ -98,7 +98,7 @@ public class MutableFactoryTest extends TestCase {
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
 		//we know there is only one DP
-		DirectoryProvider provider = sfi
+		DirectoryProvider provider = sf
 				.getDirectoryProviders( A.class )[0];
 		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
@@ -110,32 +110,32 @@ public class MutableFactoryTest extends TestCase {
 
 		tc = new ManualTransactionContext();
 
-		doIndexWork( new B(1, "Noel"), 1, sfi, tc );
-		doIndexWork( new C(1, "Vincent"), 1, sfi, tc );
+		doIndexWork( new B(1, "Noel"), 1, sf, tc );
+		doIndexWork( new C(1, "Vincent"), 1, sf, tc );
 
 		tc.end();
 
 		luceneQuery = parser.parse( "Noel" );
 
 		//we know there is only one DP
-		provider = sfi.getDirectoryProviders( B.class )[0];
+		provider = sf.getDirectoryProviders( B.class )[0];
 		searcher = new IndexSearcher( provider.getDirectory(), true );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		luceneQuery = parser.parse( "Vincent" );
 		
-		provider = sfi.getDirectoryProviders( C.class )[0];
+		provider = sf.getDirectoryProviders( C.class )[0];
 		searcher = new IndexSearcher( provider.getDirectory(), true );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
 
-		sfi.close();
+		sf.close();
 	}
 
-	private void doIndexWork(Object entity, Integer id, SearchFactoryImplementor sfi, ManualTransactionContext tc) {
+	private void doIndexWork(Object entity, Integer id, SearchFactoryIntegrator sfi, ManualTransactionContext tc) {
 		Work<?> work = new Work<Object>( entity, id, WorkType.INDEX );
 		sfi.getWorker().performWork( work, tc );
 	}

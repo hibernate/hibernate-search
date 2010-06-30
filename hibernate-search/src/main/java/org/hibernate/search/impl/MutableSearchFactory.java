@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
 
-import org.hibernate.search.IncrementalSearchFactory;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.Worker;
@@ -35,8 +35,12 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  *
  * @author Emmanuel Bernard
  */
-public class MutableSearchFactory implements StateSearchFactoryImplementor, IncrementalSearchFactory {
+public class MutableSearchFactory implements StateSearchFactoryImplementor, SearchFactoryIntegrator {
+	//a reference to the same instance of this class is help by clients and various HSearch services
+	//when changing the SearchFactory internals, only the underlying delegate should be changed.
+	//the volatile ensure that the state is replicated upong underlying factory switch.
 	private volatile StateSearchFactoryImplementor delegate;
+
 	//lock to be acquired every time the underlying searchFactory is rebuilt
 	private final Lock mutating = new ReentrantLock( );
 
