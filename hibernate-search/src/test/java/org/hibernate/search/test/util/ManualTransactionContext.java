@@ -22,7 +22,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.id.providedId;
+package org.hibernate.search.test.util;
 
 import java.util.List;
 import java.util.ArrayList;

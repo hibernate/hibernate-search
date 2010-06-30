@@ -22,38 +22,40 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.id.providedId;
+package org.hibernate.search.test.util;
 
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.apache.lucene.analysis.StopAnalyzer;
-
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.store.RAMDirectoryProvider;
-import org.hibernate.search.Environment;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 
 /**
+ * Manually defines the configuration
+ * Classes and properties are the only implemented options at the moment
+ *
  * @author Emmanuel Bernard
  */
-public class StandaloneConf implements SearchConfiguration {
+public class ManualConfiguration implements SearchConfiguration {
 	final Map<String,Class<?>>  classes;
 	final Properties properties;
 
-	public StandaloneConf() {
-		classes = new HashMap<String,Class<?>>(2);
-		classes.put( ProvidedIdPerson.class.getName(), ProvidedIdPerson.class );
-		classes.put( ProvidedIdPersonSub.class.getName(), ProvidedIdPersonSub.class );
-
+	public ManualConfiguration() {
+		classes = new HashMap<String,Class<?>>();
 		properties = new Properties( );
-		properties.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
-		properties.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		properties.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
-		properties.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
+	}
+
+	public ManualConfiguration addProperty(String key , String value) {
+		properties.setProperty( key, value );
+		return this;
+	}
+
+	public ManualConfiguration addClass(Class<?> indexed) {
+		classes.put( indexed.getName(), indexed );
+		return this;
 	}
 
 	public Iterator<Class<?>> getClassMappings() {

@@ -24,17 +24,22 @@
  */
 package org.hibernate.search.test.id.providedId;
 
+import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
+import org.hibernate.search.Environment;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.SearchFactoryBuilder;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.test.util.ManualConfiguration;
 
 /**
  * @author Navin Surtani
@@ -42,7 +47,14 @@ import org.hibernate.search.test.SearchTestCase;
 public class ProvidedIdTest extends junit.framework.TestCase {
 
 	public void testProvidedId() throws Exception {
-		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( new StandaloneConf() ).buildSearchFactory();
+		final ManualConfiguration configuration = new ManualConfiguration()
+				.addClass( ProvidedIdPerson.class )
+				.addClass( ProvidedIdPersonSub.class )
+				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() )
+				.addProperty(  Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() )
+				.addProperty( "hibernate.search.default.transaction.merge_factor", "100" )
+				.addProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
+		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 
 		ProvidedIdPerson person1 = new ProvidedIdPerson();
 		person1.setName( "Big Goat" );
@@ -71,7 +83,7 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		Query luceneQuery = parser.parse( "Goat" );
 
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
-		//needs it. So we use plain Lucene 
+		//needs it. So we use plain Lucene
 
 		//we know there is only one DP
 		DirectoryProvider provider = sf

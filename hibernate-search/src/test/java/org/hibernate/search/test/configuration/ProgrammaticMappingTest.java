@@ -60,7 +60,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.analyzer.inheritance.ISOLatin1Analyzer;
-import org.hibernate.search.test.id.providedId.ManualTransactionContext;
+import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
