@@ -3,11 +3,13 @@ package org.hibernate.search.impl;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.search.IncrementalSearchFactory;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.Worker;
@@ -33,8 +35,10 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  *
  * @author Emmanuel Bernard
  */
-public class MutableSearchFactory implements StateSearchFactoryImplementor {
+public class MutableSearchFactory implements StateSearchFactoryImplementor, IncrementalSearchFactory {
 	private volatile StateSearchFactoryImplementor delegate;
+	//lock to be acquired every time the underlying searchFactory is rebuilt
+	private final Lock mutating = new ReentrantLock( );
 
 	void setDelegate(StateSearchFactoryImplementor delegate) {
 		this.delegate = delegate;
@@ -178,5 +182,20 @@ public class MutableSearchFactory implements StateSearchFactoryImplementor {
 
 	public Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData() {
 		return delegate.getDirectoryProviderData();
+	}
+
+	public void addClasses(Class<?>... classes) {
+		//todo optimize the list of
+		final SearchFactoryBuilder builder = new SearchFactoryBuilder().rootFactory( this );
+		for (Class<?> type : classes) {
+			builder.addClass( type );
+		}
+		try {
+			mutating.lock();
+			builder.buildSearchFactory();
+		}
+		finally {
+			mutating.unlock();
+		}
 	}
 }

@@ -6,6 +6,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
+import org.hibernate.search.IncrementalSearchFactory;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -28,7 +29,7 @@ public class MutableFactoryTest extends TestCase {
 		sf.close();
 	}
 
-	public void testAddingClass() throws Exception {
+	public void testAddingClassFullModel() throws Exception {
 		ManualConfiguration configuration = new ManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
 		//FIXME downcasting of MSF. create a getDelegate() ?
@@ -38,14 +39,9 @@ public class MutableFactoryTest extends TestCase {
 				.addClass( A.class )
 				.buildSearchFactory();
 
-		A a = new A();
-		a.setId( 1 );
-		a.setName( "Emmanuel" );
-
 		ManualTransactionContext tc = new ManualTransactionContext();
 
-		Work<A> work = new Work<A>( a, 1, WorkType.INDEX );
-		sf.getWorker().performWork( work, tc );
+		doIndexWork( new A(1, "Emmanuel"), 1, sf, tc );
 
 		tc.end();
 
@@ -67,8 +63,7 @@ public class MutableFactoryTest extends TestCase {
 
 		tc = new ManualTransactionContext();
 
-		Work<B> workB = new Work<B>( new B(1, "Noel"), 1, WorkType.INDEX );
-		sf.getWorker().performWork( workB, tc );
+		doIndexWork( new B(1, "Noel"), 1, sf, tc );
 
 		tc.end();
 
@@ -83,5 +78,65 @@ public class MutableFactoryTest extends TestCase {
 		searcher.close();
 
 		sf.close();
+	}
+
+	public void testAddingClassSimpleAPI() throws Exception {
+		ManualConfiguration configuration = new ManualConfiguration()
+				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		//FIXME downcasting of MSF. create a getDelegate() ?
+		IncrementalSearchFactory sf = (IncrementalSearchFactory) new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		SearchFactoryImplementor sfi = (SearchFactoryImplementor) sf;
+		sf.addClasses( A.class );
+
+		ManualTransactionContext tc = new ManualTransactionContext();
+
+		doIndexWork( new A(1, "Emmanuel"), 1, sfi, tc );
+
+		tc.end();
+
+		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+		Query luceneQuery = parser.parse( "Emmanuel" );
+
+		//we know there is only one DP
+		DirectoryProvider provider = sfi
+				.getDirectoryProviders( A.class )[0];
+		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+		TopDocs hits = searcher.search( luceneQuery, 1000 );
+		assertEquals( 1, hits.totalHits );
+
+		searcher.close();
+
+		sf.addClasses( B.class, C.class );
+
+		tc = new ManualTransactionContext();
+
+		doIndexWork( new B(1, "Noel"), 1, sfi, tc );
+		doIndexWork( new C(1, "Vincent"), 1, sfi, tc );
+
+		tc.end();
+
+		luceneQuery = parser.parse( "Noel" );
+
+		//we know there is only one DP
+		provider = sfi.getDirectoryProviders( B.class )[0];
+		searcher = new IndexSearcher( provider.getDirectory(), true );
+		hits = searcher.search( luceneQuery, 1000 );
+		assertEquals( 1, hits.totalHits );
+
+		luceneQuery = parser.parse( "Vincent" );
+		
+		provider = sfi.getDirectoryProviders( C.class )[0];
+		searcher = new IndexSearcher( provider.getDirectory(), true );
+		hits = searcher.search( luceneQuery, 1000 );
+		assertEquals( 1, hits.totalHits );
+
+		searcher.close();
+
+		sfi.close();
+	}
+
+	private void doIndexWork(Object entity, Integer id, SearchFactoryImplementor sfi, ManualTransactionContext tc) {
+		Work<?> work = new Work<Object>( entity, id, WorkType.INDEX );
+		sfi.getWorker().performWork( work, tc );
 	}
 }

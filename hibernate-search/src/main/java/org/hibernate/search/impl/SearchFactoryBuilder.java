@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -122,17 +123,13 @@ public class SearchFactoryBuilder {
 	}
 
 	private SearchFactoryImplementor buildIncrementalSearchFactory() {
+		removeClassesAlreadyManaged();
+		if (classes.size() == 0) {
+			return rootFactory;
+		}
+
 		BuildContext buildContext = new BuildContext();
 		copyStateFromOldFactory(rootFactory);
-		List<Class<?>> remove = new ArrayList<Class<?>>();
-		for (Class<?> entity : classes) {
-			if ( documentBuildersIndexedEntities.containsKey( entity ) || documentBuildersContainedEntities.containsKey(entity) ) {
-				remove.add( entity );
-			}
-		}
-		for(Class<?> entity : remove) {
-			classes.remove( entity );
-		}
 		//TODO we don't keep the reflectionManager. Is that an issue?
 		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties );
 		reflectionManager = getReflectionManager( cfg );
@@ -166,6 +163,20 @@ public class SearchFactoryBuilder {
 		return rootFactory;
 
 
+	}
+
+	private void removeClassesAlreadyManaged() {
+		Set<Class<?>> remove = new HashSet<Class<?>>();
+		final Map<Class<?>, DocumentBuilderContainedEntity<?>> containedEntities = rootFactory.getDocumentBuildersContainedEntities();
+		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> indexedEntities = rootFactory.getDocumentBuildersIndexedEntities();	
+		for (Class<?> entity : classes) {
+			if ( indexedEntities.containsKey( entity ) || containedEntities.containsKey(entity) ) {
+				remove.add( entity );
+			}
+		}
+		for(Class<?> entity : remove) {
+			classes.remove( entity );
+		}
 	}
 
 	private void copyStateFromOldFactory(StateSearchFactoryImplementor stateFactory) {

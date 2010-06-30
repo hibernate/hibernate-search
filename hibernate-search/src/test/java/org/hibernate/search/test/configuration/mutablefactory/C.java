@@ -1,9 +1,5 @@
 package org.hibernate.search.test.configuration.mutablefactory;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -12,11 +8,11 @@ import org.hibernate.search.annotations.Indexed;
  * @author Emmanuel Bernard
  */
 @Indexed
-public class A {
+public class C {
 	private Integer id;
 	private String name;
 
-	public A(int id, String name) {
+	public C(Integer id, String name) {
 		this.id = id;
 		this.name = name;
 	}
