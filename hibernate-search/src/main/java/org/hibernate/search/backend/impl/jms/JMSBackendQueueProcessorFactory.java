@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
 import javax.naming.Context;
@@ -39,6 +40,7 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * @author Emmanuel Bernard
@@ -59,6 +61,10 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 		this.jmsConnectionFactoryName = props.getProperty( JMS_CONNECTION_FACTORY );
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		prepareJMSTools();
+	}
+
+	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context) {
+		//nothing to do here, this backend is not sensible to directory providers
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {

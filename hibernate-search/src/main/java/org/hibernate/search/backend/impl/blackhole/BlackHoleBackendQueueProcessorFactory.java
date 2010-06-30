@@ -26,10 +26,12 @@ package org.hibernate.search.backend.impl.blackhole;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -56,7 +58,11 @@ public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProces
 		// no-op
 		log.warn( "initialized \"blackhole\" backend. Index changes will be prepared but discarded!" );
 	}
-	
+
+	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers) {
+		log.warn( "update DirectoryProviders \"blackhole\" backend. Index changes will be prepared but discarded!" );
+	}
+
 	public void close() {
 		// no-op
 		log.info( "closed \"blackhole\" backend." );

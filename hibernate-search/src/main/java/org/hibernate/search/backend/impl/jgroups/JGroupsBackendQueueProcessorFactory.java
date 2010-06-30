@@ -27,6 +27,7 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.jgroups.Address;
 import org.jgroups.Channel;
@@ -40,6 +41,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.XMLHelper;
 import org.hibernate.util.ConfigHelper;
@@ -75,6 +77,10 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 			setClusterName( props.getProperty( JG_CLUSTER_NAME ) );
 		}
 		prepareJGroupsChannel( props );
+	}
+
+	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers) {
+		//nothing to do here. The DirectoryProviders are not used
 	}
 
 	private void prepareJGroupsChannel(Properties props) {

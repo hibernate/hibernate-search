@@ -140,7 +140,8 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 			Directory directory = directoryProviders[index].getDirectory();
 			log.trace( "Opening IndexReader from {}", directory );
 			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directory );
-			if ( directoryLatestReader == null ) { // might eg happen for FSSlaveDirectoryProvider
+			// might eg happen for FSSlaveDirectoryProvider or for mutable SearchFactory
+			if ( directoryLatestReader == null ) {
 				directoryLatestReader = createReader( directory );
 			}
 			readers[index] = directoryLatestReader.refreshAndGet();

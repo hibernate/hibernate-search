@@ -28,7 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.List;
+import java.util.Set;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
@@ -57,7 +59,8 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 	 * lifecycle (reused and shared by all transactions);
 	 * the LuceneWorkVisitor(s) are stateless, the Workspace(s) are threadsafe.
 	 */
-	private final Map<DirectoryProvider,PerDPResources> resourcesMap = new HashMap<DirectoryProvider,PerDPResources>();
+	private final Map<DirectoryProvider<?>,PerDPResources> resourcesMap =
+			new HashMap<DirectoryProvider<?>,PerDPResources>();
 
 	/**
 	 * copy of BatchedQueueingProcessor.sync
@@ -70,6 +73,23 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 		for (DirectoryProvider dp : context.getDirectoryProviders() ) {
 			PerDPResources resources = new PerDPResources( context, dp );
 			resourcesMap.put( dp, resources );
+		}
+	}
+
+	public void updateDirectoryProviders( Set<DirectoryProvider<?>> providers, WorkerBuildContext context ) {
+		Map<DirectoryProvider<?>,PerDPResources> newResourceMap =
+				new HashMap<DirectoryProvider<?>, PerDPResources>(resourcesMap);
+		for ( DirectoryProvider<?> provider : providers ) {
+			if ( ! resourcesMap.containsKey( provider ) ) {
+				PerDPResources resources = new PerDPResources( context, provider );
+				newResourceMap.put( provider, resources );
+			}
+		}
+		//TODO we could shut them down
+		for ( DirectoryProvider<?> provider : resourcesMap.keySet() ) {
+			if ( ! newResourceMap.containsKey( provider ) ) {
+				throw new SearchException("DirectoryProvider no longer present during SearchFactory update" );
+			}
 		}
 	}
 
