@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
@@ -44,7 +45,7 @@ import org.slf4j.Logger;
  *
  * @author Sanne Grinovero
  */
-public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
+public class BlackHoleBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
 	
 	private static final Logger log = LoggerFactory.make();
 	
@@ -59,15 +60,16 @@ public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProces
 		log.warn( "initialized \"blackhole\" backend. Index changes will be prepared but discarded!" );
 	}
 
-	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers) {
-		log.warn( "update DirectoryProviders \"blackhole\" backend. Index changes will be prepared but discarded!" );
-	}
-
 	public void close() {
 		// no-op
 		log.info( "closed \"blackhole\" backend." );
 	}
-	
+
+	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context) {
+		//no-op
+		log.warn( "update DirectoryProviders \"blackhole\" backend. Index changes will be prepared but discarded!" );
+	}
+
 	private static class NoOp implements Runnable {
 
 		public void run() {

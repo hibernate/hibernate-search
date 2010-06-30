@@ -36,6 +36,7 @@ import org.jgroups.JChannel;
 import org.slf4j.Logger;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
@@ -52,7 +53,7 @@ import org.hibernate.util.ConfigHelper;
  *
  * @author Lukasz Moren
  */
-public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
+public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
 
 	private static final Logger log = LoggerFactory.make();
 
@@ -79,7 +80,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 		prepareJGroupsChannel( props );
 	}
 
-	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers) {
+	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context) {
 		//nothing to do here. The DirectoryProviders are not used
 	}
 

@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -48,7 +48,7 @@ import org.hibernate.search.store.DirectoryProvider;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
+public class LuceneBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
 
 	private SearchFactoryImplementor searchFactoryImp;
 	
@@ -58,8 +58,11 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 	 * Both Workspace(s) and LuceneWorkVisitor(s) lifecycle are linked to the backend
 	 * lifecycle (reused and shared by all transactions);
 	 * the LuceneWorkVisitor(s) are stateless, the Workspace(s) are threadsafe.
+	 *
+	 * This read only structure is guarded by a volatile: upon updates of the backend,
+	 * changes should be synchronized in a multithreaded way.
 	 */
-	private final Map<DirectoryProvider<?>,PerDPResources> resourcesMap =
+	private volatile Map<DirectoryProvider<?>,PerDPResources> resourcesMap =
 			new HashMap<DirectoryProvider<?>,PerDPResources>();
 
 	/**
@@ -91,6 +94,7 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 				throw new SearchException("DirectoryProvider no longer present during SearchFactory update" );
 			}
 		}
+		this.resourcesMap = newResourceMap;
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {

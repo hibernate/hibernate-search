@@ -36,16 +36,16 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * @author Emmanuel Bernard
  */
-public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
+public class JMSBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
 	private String jmsQueueName;
 	private String jmsConnectionFactoryName;
 	private static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
