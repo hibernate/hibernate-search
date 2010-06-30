@@ -12,6 +12,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
+import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.WritableBuildContext;
+import org.hibernate.search.spi.internals.DirectoryProviderData;
+import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.reflection.MetadataProvider;
@@ -20,8 +25,6 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.Environment;
-import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -35,7 +38,6 @@ import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
@@ -98,6 +100,39 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 	Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams;
 
 	public SearchFactoryImplementor buildSearchFactory() {
+		if (rootFactory == null) {
+			return buildNewSearchFactory();
+		}
+		else {
+			return buildIncrementalSearchFactory();
+		}
+	}
+
+	private SearchFactoryImplementor buildIncrementalSearchFactory() {
+		copyStateFromOldFactory(rootFactory);
+		//FIXME next step for implementation
+		return null;
+	}
+
+	private void copyStateFromOldFactory(StateSearchFactoryImplementor stateFactory) {
+		indexingStrategy = stateFactory.getIndexingStrategy();
+		documentBuildersIndexedEntities = stateFactory.getDocumentBuildersIndexedEntities();
+		documentBuildersContainedEntities = stateFactory.getDocumentBuildersContainedEntities();
+		dirProviderData = stateFactory.getDirectoryProviderData();
+		worker = stateFactory.getWorker();
+		readerProvider = stateFactory.getReaderProvider();
+		backendQueueProcessorFactory = stateFactory.getBackendQueueProcessorFactory();
+		filterDefinitions = stateFactory.getFilterDefinitions();
+		filterCachingStrategy = stateFactory.getFilterCachingStrategy();
+		analyzers = stateFactory.getAnalyzers();
+		cacheBitResultsSize = stateFactory.getCacheBitResultsSize();
+		configurationProperties = stateFactory.getConfigurationProperties();
+		errorHandler = stateFactory.getErrorHandler();
+		indexHierarchy = stateFactory.getIndexHierarchy();
+		dirProviderIndexingParams = stateFactory.getDirectoryProviderIndexingParams();
+	}
+
+	private SearchFactoryImplementor buildNewSearchFactory() {
 		createCleanFactoryState();
 
 		configurationProperties = cfg.getProperties();
@@ -136,8 +171,7 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 		this.cacheBitResultsSize = ConfigurationParseHelper.getIntValue(
 				cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 		);
-		//TODO uncomment
-		SearchFactoryImplementor factory = new ImmutableSearchFactory( this );
+		StateSearchFactoryImplementor factory = new ImmutableSearchFactory( this );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
 	}
@@ -339,7 +373,6 @@ public class SearchFactoryBuilder implements WritableBuildContext, WorkerBuildCo
 	}
 
 	private static ErrorHandler createErrorHandler(Properties configuration) {
-		boolean sync = BatchedQueueingProcessor.isConfiguredAsSync( configuration );
 		String errorHandlerClassName = configuration.getProperty( Environment.ERROR_HANDLER );
 		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
 			return new LogErrorHandler();

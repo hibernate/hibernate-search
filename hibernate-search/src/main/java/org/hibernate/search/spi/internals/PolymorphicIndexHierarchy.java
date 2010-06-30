@@ -1,4 +1,4 @@
-package org.hibernate.search.impl;
+package org.hibernate.search.spi.internals;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,16 +14,16 @@ import org.hibernate.search.util.LoggerFactory;
  * Helper class which keeps track of all super classes and interfaces of the indexed entities.
  */
 //FIXME make it immutable (builder pattern)
-class PolymorphicIndexHierarchy {
+public class PolymorphicIndexHierarchy {
 	private static final Logger log = LoggerFactory.make();
 
 	private Map<Class<?>, Set<Class<?>>> classToIndexedClass;
 
-	PolymorphicIndexHierarchy() {
+	public PolymorphicIndexHierarchy() {
 		classToIndexedClass = new HashMap<Class<?>, Set<Class<?>>>();
 	}
 
-	void addIndexedClass(Class<?> indexedClass) {
+	public void addIndexedClass(Class<?> indexedClass) {
 		addClass( indexedClass, indexedClass );
 		Class<?> superClass = indexedClass.getSuperclass();
 		while ( superClass != null ) {
@@ -44,7 +44,7 @@ class PolymorphicIndexHierarchy {
 		classesSet.add( indexedClass );
 	}
 
-	Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
+	public Set<Class<?>> getIndexedClasses(Class<?>[] classes) {
 		Set<Class<?>> indexedClasses = new HashSet<Class<?>>();
 		for ( Class<?> clazz : classes ) {
 			Set<Class<?>> set = classToIndexedClass.get( clazz );

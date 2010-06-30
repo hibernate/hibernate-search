@@ -1,4 +1,4 @@
-package org.hibernate.search.impl;
+package org.hibernate.search.spi.internals;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,7 +11,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
 /**
 * @author Emmanuel Bernard
 */
-class DirectoryProviderData {
+public class DirectoryProviderData {
 	private final ReentrantLock dirLock = new ReentrantLock();
 	private OptimizerStrategy optimizerStrategy;
 	private final Set<Class<?>> classes = new HashSet<Class<?>>( 2 );

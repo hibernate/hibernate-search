@@ -1,6 +1,7 @@
 package org.hibernate.search.impl;
 
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -15,11 +16,13 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.FilterDef;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
+import org.hibernate.search.spi.internals.DirectoryProviderData;
+import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
@@ -30,15 +33,19 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  *
  * @author Emmanuel Bernard
  */
-public class MutableSearchFactory implements SearchFactoryImplementor {
-	private volatile SearchFactoryImplementor delegate;
+public class MutableSearchFactory implements StateSearchFactoryImplementor {
+	private volatile StateSearchFactoryImplementor delegate;
 
-	void setDelegate(SearchFactoryImplementor delegate) {
+	void setDelegate(StateSearchFactoryImplementor delegate) {
 		this.delegate = delegate;
 	}
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
 		return delegate.getBackendQueueProcessorFactory();
+	}
+
+	public Map<String, FilterDef> getFilterDefinitions() {
+		return delegate.getFilterDefinitions();
 	}
 
 	public Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities() {
@@ -63,6 +70,18 @@ public class MutableSearchFactory implements SearchFactoryImplementor {
 
 	public FilterCachingStrategy getFilterCachingStrategy() {
 		return delegate.getFilterCachingStrategy();
+	}
+
+	public Map<String, Analyzer> getAnalyzers() {
+		return delegate.getAnalyzers();
+	}
+
+	public int getCacheBitResultsSize() {
+		return delegate.getCacheBitResultsSize();
+	}
+
+	public Properties getConfigurationProperties() {
+		return delegate.getConfigurationProperties();
 	}
 
 	public FilterDef getFilterDefinition(String name) {
@@ -117,6 +136,14 @@ public class MutableSearchFactory implements SearchFactoryImplementor {
 		return delegate.getErrorHandler();
 	}
 
+	public PolymorphicIndexHierarchy getIndexHierarchy() {
+		return delegate.getIndexHierarchy();
+	}
+
+	public Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams() {
+		return delegate.getDirectoryProviderIndexingParams();
+	}
+
 	public ReaderProvider getReaderProvider() {
 		return delegate.getReaderProvider();
 	}
@@ -143,5 +170,13 @@ public class MutableSearchFactory implements SearchFactoryImplementor {
 
 	public QueryContextBuilder buildQueryBuilder() {
 		return delegate.buildQueryBuilder();
+	}
+
+	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
+		return delegate.getDocumentBuildersContainedEntities();
+	}
+
+	public Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData() {
+		return delegate.getDirectoryProviderData();
 	}
 }

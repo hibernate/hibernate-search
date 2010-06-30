@@ -35,6 +35,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
+import org.hibernate.search.spi.internals.DirectoryProviderData;
+import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -69,7 +72,7 @@ import org.hibernate.util.StringHelper;
 /**
  * @author Emmanuel Bernard
  */
-public class ImmutableSearchFactory implements SearchFactoryImplementor, WorkerBuildContext {
+public class ImmutableSearchFactory implements StateSearchFactoryImplementor, WorkerBuildContext {
 
 	static {
 		Version.touch();
@@ -122,6 +125,10 @@ public class ImmutableSearchFactory implements SearchFactoryImplementor, WorkerB
 		return backendQueueProcessorFactory;
 	}
 
+	public Map<String, FilterDef> getFilterDefinitions() {
+		return filterDefinitions;
+	}
+
 	public String getIndexingStrategy() {
 		return indexingStrategy;
 	}
@@ -156,6 +163,14 @@ public class ImmutableSearchFactory implements SearchFactoryImplementor, WorkerB
 
 	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
 		return Collections.unmodifiableSet( dirProviderData.get( directoryProvider ).getClasses() );
+	}
+
+	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
+		return documentBuildersContainedEntities;
+	}
+
+	public Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData() {
+		return dirProviderData;
 	}
 
 	public Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities() {
@@ -248,6 +263,18 @@ public class ImmutableSearchFactory implements SearchFactoryImplementor, WorkerB
 		return filterCachingStrategy;
 	}
 
+	public Map<String, Analyzer> getAnalyzers() {
+		return analyzers;
+	}
+
+	public int getCacheBitResultsSize() {
+		return cacheBitResultsSize;
+	}
+
+	public Properties getConfigurationProperties() {
+		return configurationProperties;
+	}
+
 	public FilterDef getFilterDefinition(String name) {
 		return filterDefinitions.get( name );
 	}
@@ -292,6 +319,14 @@ public class ImmutableSearchFactory implements SearchFactoryImplementor, WorkerB
 
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
+	}
+
+	public PolymorphicIndexHierarchy getIndexHierarchy() {
+		return indexHierarchy;
+	}
+
+	public Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams() {
+		return dirProviderIndexingParams;
 	}
 
 	public SearchFactoryImplementor getUninitializedSearchFactory() {
