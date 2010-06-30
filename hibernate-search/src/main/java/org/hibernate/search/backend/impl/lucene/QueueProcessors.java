@@ -45,10 +45,11 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 class QueueProcessors implements PerDirectoryWorkProcessor {
 	
-	private final Map<DirectoryProvider, PerDPResources> resourcesMap;
-	private final Map<DirectoryProvider, PerDPQueueProcessor> dpProcessors = new HashMap<DirectoryProvider, PerDPQueueProcessor>();
+	private final Map<DirectoryProvider<?>, PerDPResources> resourcesMap;
+	private final Map<DirectoryProvider<?>, PerDPQueueProcessor> dpProcessors
+			= new HashMap<DirectoryProvider<?>, PerDPQueueProcessor>();
 	
-	QueueProcessors(Map<DirectoryProvider, PerDPResources> resourcesMap) {
+	QueueProcessors(Map<DirectoryProvider<?>, PerDPResources> resourcesMap) {
 		this.resourcesMap = resourcesMap;
 	}
 

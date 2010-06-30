@@ -238,7 +238,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	protected Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext context) {
-		Class analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
+		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
 		if ( analyzerClass == void.class ) {
 			String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
 			if ( StringHelper.isEmpty( definition ) ) {
@@ -325,7 +325,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 						"Multiple Similarities defined in the same class hierarchy: " + beanClass.getName()
 				);
 			}
-			Class similarityClass = similarityAnn.impl();
+			Class<?> similarityClass = similarityAnn.impl();
 			try {
 				similarity = ( Similarity ) similarityClass.newInstance();
 			}
@@ -751,16 +751,16 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 			throw new AssertionFailure( "A non indexed entity is post processed" );
 		}
 		//this method does not requires synchronization
-		Class plainClass = reflectionManager.toClass( beanClass );
+		Class<?> plainClass = reflectionManager.toClass( beanClass );
 		Set<Class<?>> tempMappedSubclasses = new HashSet<Class<?>>();
 		//together with the caller this creates a o(2), but I think it's still faster than create the up hierarchy for each class
-		for ( Class currentClass : indexedClasses ) {
+		for ( Class<?> currentClass : indexedClasses ) {
 			if ( plainClass != currentClass && plainClass.isAssignableFrom( currentClass ) ) {
 				tempMappedSubclasses.add( currentClass );
 			}
 		}
 		this.mappedSubclasses = Collections.unmodifiableSet( tempMappedSubclasses );
-		Class superClass = plainClass.getSuperclass();
+		Class<?> superClass = plainClass.getSuperclass();
 		this.isRoot = true;
 		while ( superClass != null ) {
 			if ( indexedClasses.contains( superClass ) ) {

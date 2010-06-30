@@ -49,7 +49,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 	
 	private final List<LuceneWork> queue;
 	private final SearchFactoryImplementor searchFactoryImplementor;
-	private final Map<DirectoryProvider,PerDPResources> resourcesMap;
+	private final Map<DirectoryProvider<?>,PerDPResources> resourcesMap;
 	private final boolean sync;
 	private final ErrorHandler errorHandler;
 	
@@ -58,7 +58,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 
 	LuceneBackendQueueProcessor(List<LuceneWork> queue,
 			SearchFactoryImplementor searchFactoryImplementor,
-			Map<DirectoryProvider,PerDPResources> resourcesMap,
+			Map<DirectoryProvider<?>,PerDPResources> resourcesMap,
 			boolean syncMode) {
 		this.sync = syncMode;
 		this.queue = queue;
