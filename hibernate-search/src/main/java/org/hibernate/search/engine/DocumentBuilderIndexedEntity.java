@@ -726,10 +726,11 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 					return ( (StringBridge) bridge ).objectToString( value );
 				}
 				throw new SearchException( "FieldBridge " + bridgeClass + "does not have a objectToString method: field "
-						+ fieldName + " in " + beanClass );
+						+ fieldName + " in " + beanXClass
+				);
 			}
 		}
-		throw new SearchException( "Unable to find field " + fieldName + " in " + beanClass );
+		throw new SearchException( "Unable to find field " + fieldName + " in " + beanXClass );
 	}
 
 	private FieldBridge getBridge(List<String> names, List<FieldBridge> bridges, String fieldName) {

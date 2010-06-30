@@ -87,7 +87,8 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	private static final Logger log = LoggerFactory.make();
 
 	protected final PropertiesMetadata metadata = new PropertiesMetadata();
-	protected final XClass beanClass;
+	protected final XClass beanXClass;
+	protected final Class<?> beanClass;
 	protected Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	protected ReflectionManager reflectionManager; //available only during initialization and post-initialization
 	protected int level = 0;
@@ -97,25 +98,26 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	protected boolean isRoot;
 	protected EntityState entityState;
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
+	private boolean initialized;
 
 	/**
 	 * Constructor used on contained entities not annotated with <code>@Indexed</code> themselves.
 	 *
-	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>.
+	 * @param xClass The class for which to build a <code>DocumentBuilderContainedEntity</code>.
 	 * @param context Handle to default configuration settings.
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */
-	public DocumentBuilderContainedEntity(XClass clazz, ConfigContext context, ReflectionManager reflectionManager) {
+	public DocumentBuilderContainedEntity(XClass xClass, ConfigContext context, ReflectionManager reflectionManager) {
 
-		if ( clazz == null ) {
+		if ( xClass == null ) {
 			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
 		}
 
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
-		this.beanClass = clazz;
+		this.beanXClass = xClass;
 		this.reflectionManager = reflectionManager;
-
-		init( clazz, context );
+		this.beanClass = reflectionManager.toClass( xClass );
+		init( xClass, context );
 
 		if ( metadata.containedInGetters.size() == 0 ) {
 			this.entityState = EntityState.NON_INDEXABLE;
@@ -283,7 +285,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		if ( discriminatorAnn != null ) {
 			if ( propertiesMetadata.discriminator != null ) {
 				throw new SearchException(
-						"Multiple AnalyzerDiscriminator defined in the same class hierarchy: " + beanClass.getName()
+						"Multiple AnalyzerDiscriminator defined in the same class hierarchy: " + beanXClass.getName()
 				);
 			}
 
@@ -322,7 +324,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		if ( similarityAnn != null ) {
 			if ( similarity != null ) {
 				throw new SearchException(
-						"Multiple Similarities defined in the same class hierarchy: " + beanClass.getName()
+						"Multiple Similarities defined in the same class hierarchy: " + beanXClass.getName()
 				);
 			}
 			Class<?> similarityClass = similarityAnn.impl();
@@ -332,7 +334,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 			catch ( Exception e ) {
 				log.error(
 						"Exception attempting to instantiate Similarity '{}' set for {}",
-						similarityClass.getName(), beanClass.getName()
+						similarityClass.getName(), beanXClass.getName()
 				);
 			}
 		}
@@ -377,7 +379,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 				throw new SearchException(
 						"Circular reference. Duplicate use of "
 								+ elementClass.getName()
-								+ " in root entity " + beanClass.getName()
+								+ " in root entity " + beanXClass.getName()
 								+ "#" + buildEmbeddedPrefix( prefix, embeddedAnn, member )
 				);
 			}
@@ -747,11 +749,12 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	}
 
 	public void postInitialize(Set<Class<?>> indexedClasses) {
+		//we initialize only once because we no longer have a reference to the reflectionManager
+		//in theory
+		Class<?> plainClass = beanClass;
 		if ( entityState == EntityState.NON_INDEXABLE ) {
 			throw new AssertionFailure( "A non indexed entity is post processed" );
 		}
-		//this method does not requires synchronization
-		Class<?> plainClass = reflectionManager.toClass( beanClass );
 		Set<Class<?>> tempMappedSubclasses = new HashSet<Class<?>>();
 		//together with the caller this creates a o(2), but I think it's still faster than create the up hierarchy for each class
 		for ( Class<?> currentClass : indexedClasses ) {

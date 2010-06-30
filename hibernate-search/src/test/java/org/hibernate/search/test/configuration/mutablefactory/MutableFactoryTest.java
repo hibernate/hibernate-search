@@ -22,7 +22,7 @@ import org.hibernate.search.test.util.ManualTransactionContext;
  */
 public class MutableFactoryTest extends TestCase {
 
-	public void createEmptyFactory() throws Exception {
+	public void testCreateEmptyFactory() throws Exception {
 		final ManualConfiguration configuration = new ManualConfiguration();
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		sf.close();
@@ -75,7 +75,7 @@ public class MutableFactoryTest extends TestCase {
 		luceneQuery = parser.parse( "Noel" );
 
 		//we know there is only one DP
-		provider = sf.getDirectoryProviders( A.class )[0];
+		provider = sf.getDirectoryProviders( B.class )[0];
 		searcher = new IndexSearcher( provider.getDirectory(), true );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
