@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2009-05-26 15:46+0000\n"
+"POT-Creation-Date: 2010-07-01 20:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -121,7 +121,7 @@ msgid ""
       "EntityManager em = entityManagerFactory.createEntityManager();\n"
       "\n"
       "FullTextEntityManager fullTextEntityManager = \n"
-      "    org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);\n"
+      "    org.hibernate.search.jpa.Search.getFullTextEntityManager(em);\n"
       "\n"
       "...\n"
       "org.apache.lucene.queryParser.QueryParser parser = \n"
@@ -1005,43 +1005,159 @@ msgid "the Filter's DocIdSet is expensive to compute (compared to the time spent
 msgstr ""
 
 #. Tag: title
-#: query.xml:720
+#: query.xml:719
 #, no-c-format
-msgid "Optimizing the query process"
+msgid "Using filters in a sharded environment"
 msgstr ""
 
 #. Tag: para
-#: query.xml:722
+#: query.xml:721
 #, no-c-format
-msgid "Query performance depends on several criteria:"
+msgid "It is possible, in a sharded environment to execute queries on a subset of the available shards. This can be done in two steps:"
 msgstr ""
 
 #. Tag: para
 #: query.xml:726
 #, no-c-format
-msgid "the Lucene query itself: read the literature on this subject"
+msgid "create a sharding strategy that does select a subset of <classname>DirectoryProvider</classname>s depending on sone filter configuration"
 msgstr ""
 
 #. Tag: para
-#: query.xml:731
+#: query.xml:732
 #, no-c-format
-msgid "the number of object loaded: use pagination (always ;-) ) or index projection (if needed)"
+msgid "activate the proper filter at query time"
 msgstr ""
 
 #. Tag: para
 #: query.xml:736
 #, no-c-format
+msgid "Let's first look at an example of sharding strategy that query on a specific customer shard if the customer filter is activated."
+msgstr ""
+
+#. Tag: programlisting
+#: query.xml:739
+#, no-c-format
+msgid ""
+      "public class CustomerShardingStrategy implements IndexShardingStrategy {\n"
+      "\n"
+      "        // stored DirectoryProviders in a array indexed by customerID\n"
+      "        private DirectoryProvider&lt;?&gt;[] providers;\n"
+      "        \n"
+      "        public void initialize(Properties properties, DirectoryProvider&lt;?&gt;[] providers) {\n"
+      "                this.providers = providers;\n"
+      "        }\n"
+      "\n"
+      "        public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForAllShards() {\n"
+      "                return providers;\n"
+      "        }\n"
+      "\n"
+      "        public DirectoryProvider&lt;?&gt; getDirectoryProviderForAddition(Class&lt;?&gt; entity, Serializable id, String idInString, Document document) {\n"
+      "                Integer customerID = Integer.parseInt(document.getField(\"customerID\").stringValue());\n"
+      "                return providers[customerID];\n"
+      "        }\n"
+      "\n"
+      "        public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForDeletion(Class&lt;?&gt; entity, Serializable id, String idInString) {\n"
+      "                return getDirectoryProvidersForAllShards();\n"
+      "        }\n"
+      "\n"
+      "<emphasis role=\"bold\">        /**\n"
+      "         * Optimization; don't search ALL shards and union the results; in this case, we \n"
+      "         * can be certain that all the data for a particular customer Filter is in a single\n"
+      "         * shard; simply return that shard by customerID.\n"
+      "         */\n"
+      "        public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {\n"
+      "                FFullTextFilter filter = getCustomerFilter(filters, \"customer\");\n"
+      "                if (filter == null) {\n"
+      "                        return getDirectoryProvidersForAllShards();\n"
+      "                }\n"
+      "                else {\n"
+      "                        return new DirectoryProvider[] { providers[Integer.parseInt(filter.getParameter(\"customerID\").toString())] };\n"
+      "                }\n"
+      "        }\n"
+      "\n"
+      "        private FullTextFilter getFilter(FullTextFilterImplementor[] filters, String name) {\n"
+      "                for (FullTextFilterImplementor filter: filters) {\n"
+      "                        if (filter.getName().equals(name)) return filter;\n"
+      "                }\n"
+      "                return null;\n"
+      "        }</emphasis>\n"
+      "\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: query.xml:741
+#, no-c-format
+msgid "In this example, if the filter named <literal>customer</literal> is present, we make sure to only use the shard dedicated to this customer. Otherwise, we return all shards. A given Sharding strategy can react to one or more filters and depends on their parameters."
+msgstr ""
+
+#. Tag: para
+#: query.xml:746
+#, no-c-format
+msgid "The second step is simply to activate the filter at query time. While the filter can be a regular filter (as defined in <xref linkend=\"query-filter\"/>) which also filters Lucene results after the query, you can make use of a special filter that will only be passed to the sharding strategy and otherwise ignored for the rest of the query. Simply use the <classname>ShardSensitiveOnlyFilter</classname> class when declaring your filter."
+msgstr ""
+
+#. Tag: programlisting
+#: query.xml:754
+#, no-c-format
+msgid ""
+      "@Entity @Indexed\n"
+      "<emphasis role=\"bold\">@FullTextFilterDef(name=\"customer\", impl=ShardSensitiveOnlyFilter.class)</emphasis>\n"
+      "public class Customer {\n"
+      "   ...\n"
+      "}\n"
+      "\n"
+      "\n"
+      "FullTextQuery query = ftEm.createFullTextQuery(luceneQuery, Customer.class);\n"
+      "<emphasis role=\"bold\">query.enableFulltextFilter(\"customer\").setParameter(\"CustomerID\", 5);</emphasis>\n"
+      "@SuppressWarnings(\"unchecked\")\n"
+      "List&lt;Customer&gt; results = query.getResultList();"
+msgstr ""
+
+#. Tag: para
+#: query.xml:756
+#, no-c-format
+msgid "Note that by using the <classname>ShardSensitiveOnlyFilter</classname>, you do not have to implement any Lucene filter. Using filters and sharding strategy reacting to these filters is recommended to speed up queries in a sharded environment."
+msgstr ""
+
+#. Tag: title
+#: query.xml:765
+#, no-c-format
+msgid "Optimizing the query process"
+msgstr ""
+
+#. Tag: para
+#: query.xml:767
+#, no-c-format
+msgid "Query performance depends on several criteria:"
+msgstr ""
+
+#. Tag: para
+#: query.xml:771
+#, no-c-format
+msgid "the Lucene query itself: read the literature on this subject"
+msgstr ""
+
+#. Tag: para
+#: query.xml:776
+#, no-c-format
+msgid "the number of object loaded: use pagination (always ;-) ) or index projection (if needed)"
+msgstr ""
+
+#. Tag: para
+#: query.xml:781
+#, no-c-format
 msgid "the way Hibernate Search interacts with the Lucene readers: defines the appropriate <xref linkend=\"search-architecture-readerstrategy\"/>."
 msgstr ""
 
 #. Tag: title
-#: query.xml:744
+#: query.xml:789
 #, no-c-format
 msgid "Native Lucene Queries"
 msgstr ""
 
 #. Tag: para
-#: query.xml:746
+#: query.xml:791
 #, no-c-format
 msgid "If you wish to use some specific features of Lucene, you can always run Lucene specific queries. Check <xref linkend=\"search-lucene-native\"/> for more information."
 msgstr ""

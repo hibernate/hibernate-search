@@ -1,29 +1,30 @@
-# Chinese translations for PACKAGE package.
-# Automatically generated, 2009.
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2009-05-26 15:46+0000\n"
-"PO-Revision-Date: 2009-05-26 15:46+0000\n"
+"POT-Creation-Date: 2010-07-01 20:08+0000\n"
+"PO-Revision-Date: 2010-07-01 20:08+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
 
 #. Tag: title
-#: getting-started.xml:30
+#: getting-started.xml:31
 #, no-c-format
 msgid "Getting started"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:32
+#: getting-started.xml:33
 #, no-c-format
 msgid ""
-"Welcome to Hibernate Search! The following chapter will guide you through "
+"Welcome to Hibernate Search. The following chapter will guide you through "
 "the initial steps required to integrate Hibernate Search into an existing "
 "Hibernate enabled application. In case you are a Hibernate new timer we "
 "recommend you start <ulink url=\"http://hibernate.org/152.html\">here</"
@@ -31,25 +32,25 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:39
+#: getting-started.xml:40
 #, no-c-format
 msgid "System Requirements"
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:42
+#: getting-started.xml:43
 #, no-c-format
 msgid "System requirements"
 msgstr ""
 
 #. Tag: entry
-#: getting-started.xml:47
+#: getting-started.xml:48
 #, no-c-format
 msgid "Java Runtime"
 msgstr ""
 
 #. Tag: entry
-#: getting-started.xml:49
+#: getting-started.xml:50
 #, no-c-format
 msgid ""
 "A JDK or JRE version <emphasis>5</emphasis> or greater. You can download a "
@@ -58,32 +59,31 @@ msgid ""
 msgstr ""
 
 #. Tag: entry
-#: getting-started.xml:55
+#: getting-started.xml:56
 #, no-c-format
 msgid "Hibernate Search"
 msgstr ""
 
 #. Tag: entry
-#: getting-started.xml:57
+#: getting-started.xml:58
 #, no-c-format
 msgid ""
 "<literal>hibernate-search.jar</literal> and all runtime dependencies from "
-"the <literal>lib</literal> directory of the Hibernate Search distribution. "
-"Please refer to <filename>README.txt </filename>in the lib directory to "
-"understand which dependencies are required."
+"the <literal>dist/lib</literal> directory of the Hibernate Search "
+"distribution."
 msgstr ""
 
 #. Tag: entry
-#: getting-started.xml:65
+#: getting-started.xml:64
 #, no-c-format
 msgid "Hibernate Core"
 msgstr ""
 
 #. Tag: entry
-#: getting-started.xml:67
+#: getting-started.xml:66
 #, no-c-format
 msgid ""
-"This instructions have been tested against Hibernate 3.3.x. You will need "
+"This instructions have been tested against Hibernate 3.5. You will need "
 "<literal>hibernate-core.jar</literal> and its transitive dependencies from "
 "the <literal>lib</literal> directory of the distribution. Refer to "
 "<literal>README.txt</literal> in the <literal>lib</literal> directory of the "
@@ -91,13 +91,13 @@ msgid ""
 msgstr ""
 
 #. Tag: entry
-#: getting-started.xml:76
+#: getting-started.xml:75
 #, no-c-format
 msgid "Hibernate Annotations"
 msgstr ""
 
 #. Tag: entry
-#: getting-started.xml:78
+#: getting-started.xml:77
 #, no-c-format
 msgid ""
 "Even though Hibernate Search can be used without Hibernate Annotations the "
@@ -106,131 +106,152 @@ msgid ""
 "configuration could also be expressed in xml or code. However, Hibernate "
 "Search itself has its own set of annotations (<emphasis>@Indexed, "
 "@DocumentId, @Field,...</emphasis>) for which there exists so far no "
-"alternative configuration. The tutorial is tested against version 3.4.x of "
-"Hibernate Annotations."
+"alternative configuration. The tutorial is tested against version 3.5 of "
+"Hibernate Annotations (part of the Hibernate Core distribution)."
 msgstr ""
 
 #. Tag: para
 #: getting-started.xml:92
 #, no-c-format
-msgid ""
-"You can download all dependencies from the Hibernate <ulink url=\"http://www."
-"hibernate.org/6.html\">download site</ulink>. You can also verify the "
-"dependency versions against the <ulink url=\"http://www.hibernate.org/6."
-"html#A3\">Hibernate Compatibility Matrix</ulink>."
+msgid "You can download all dependencies from the Hibernate download site."
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:100
+#: getting-started.xml:97
 #, no-c-format
 msgid "Using Maven"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:102
+#: getting-started.xml:99
 #, no-c-format
 msgid ""
 "Instead of managing all dependencies manually, maven users have the "
-"possibility to use the <ulink url=\"http://repository.jboss.com/maven2"
-"\">JBoss maven repository</ulink>. Just add the JBoss repository url to the "
-"<emphasis>repositories</emphasis> section of your <filename>pom.xml</"
-"filename> or <filename>settings.xml</filename>:"
+"possibility to use the <ulink url=\"https://repository.jboss.org/nexus/"
+"content/groups/public/\">JBoss maven repository</ulink>. Add the following "
+"to your Maven <filename>settings.xml file</filename> (see also <ulink url="
+"\"http://community.jboss.org/wiki/MavenGettingStarted-Users\">Maven Getting "
+"Started</ulink>):"
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:110
+#: getting-started.xml:108
 #, no-c-format
 msgid "Adding the JBoss maven repository to <filename>settings.xml</filename>"
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:113
+#: getting-started.xml:111
 #, no-c-format
 msgid ""
-"&lt;repository&gt;\n"
-"  &lt;id&gt;repository.jboss.org&lt;/id&gt;\n"
-"  &lt;name&gt;JBoss Maven Repository&lt;/name&gt;\n"
-"  &lt;url&gt;http://repository.jboss.org/maven2&lt;/url&gt;\n"
-"  &lt;layout&gt;default&lt;/layout&gt;\n"
-"&lt;/repository&gt;"
+"&lt;settings&gt;\n"
+"  ...\n"
+"  &lt;profiles&gt;\n"
+"    ...\n"
+"    &lt;profile&gt;\n"
+"      &lt;id&gt;jboss-public-repository&lt;/id&gt;\n"
+"      &lt;repositories&gt;\n"
+"        &lt;repository&gt;\n"
+"          &lt;id&gt;jboss-public-repository-group&lt;/id&gt;\n"
+"          &lt;name&gt;JBoss Public Maven Repository Group&lt;/name&gt;\n"
+"          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/"
+"public/&lt;/url&gt;\n"
+"          &lt;layout&gt;default&lt;/layout&gt;\n"
+"          &lt;releases&gt;\n"
+"            &lt;enabled&gt;true&lt;/enabled&gt;\n"
+"            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;\n"
+"          &lt;/releases&gt;\n"
+"          &lt;snapshots&gt;\n"
+"            &lt;enabled&gt;true&lt;/enabled&gt;\n"
+"            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;\n"
+"          &lt;/snapshots&gt;\n"
+"        &lt;/repository&gt;\n"
+"      &lt;/repositories&gt;\n"
+"      &lt;pluginRepositories&gt;\n"
+"        &lt;pluginRepository&gt;\n"
+"          &lt;id&gt;jboss-public-repository-group&lt;/id&gt;\n"
+"          &lt;name&gt;JBoss Public Maven Repository Group&lt;/name&gt;\n"
+"          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/"
+"public/&lt;/url&gt;\n"
+"          &lt;layout&gt;default&lt;/layout&gt;\n"
+"          &lt;releases&gt;\n"
+"            &lt;enabled&gt;true&lt;/enabled&gt;\n"
+"            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;\n"
+"          &lt;/releases&gt;\n"
+"          &lt;snapshots&gt;\n"
+"            &lt;enabled&gt;true&lt;/enabled&gt;\n"
+"            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;\n"
+"          &lt;/snapshots&gt;\n"
+"        &lt;/pluginRepository&gt;\n"
+"      &lt;/pluginRepositories&gt;\n"
+"    &lt;/profile&gt;\n"
+"\n"
+"  &lt;/profiles&gt;\n"
+"\n"
+"  &lt;activeProfiles&gt;\n"
+"    &lt;activeProfile&gt;jboss-public-repository&lt;/activeProfile&gt;\n"
+"  &lt;/activeProfiles&gt;\n"
+"  ...\n"
+"&lt;/settings&gt;"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:116
+#: getting-started.xml:114
 #, no-c-format
 msgid "Then add the following dependencies to your pom.xml:"
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:119
+#: getting-started.xml:117
 #, no-c-format
 msgid "Maven dependencies for Hibernate Search"
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:121
+#: getting-started.xml:119
 #, no-c-format
 msgid ""
 "&lt;dependency&gt;\n"
 "   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;\n"
 "   &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;\n"
-"   &lt;version&gt;3.1.0.GA&lt;/version&gt;\n"
-"&lt;/dependency&gt;\n"
-"&lt;dependency&gt;\n"
-"   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;\n"
-"   &lt;artifactId&gt;hibernate-annotations&lt;/artifactId&gt;\n"
-"   &lt;version&gt;3.4.0.GA&lt;/version&gt;\n"
+"   &lt;version&gt;&version;&lt;/version&gt;\n"
 "&lt;/dependency&gt;\n"
 "&lt;dependency&gt;\n"
 "   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;\n"
 "   &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;\n"
-"   &lt;version&gt;3.4.0.GA&lt;/version&gt;\n"
-"&lt;/dependency&gt;\n"
-"&lt;dependency&gt;\n"
-"   &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;\n"
-"   &lt;artifactId&gt;solr-common&lt;/artifactId&gt;\n"
-"   &lt;version&gt;1.3.0&lt;/version&gt;\n"
-"&lt;/dependency&gt;\n"
-"&lt;dependency&gt;\n"
-"   &lt;groupId&gt;org.apache.solr&lt;/groupId&gt;\n"
-"   &lt;artifactId&gt;solr-core&lt;/artifactId&gt;\n"
-"   &lt;version&gt;1.3.0&lt;/version&gt;\n"
-"&lt;/dependency&gt;\n"
-"&lt;dependency&gt;\n"
-"   &lt;groupId&gt;org.apache.lucene&lt;/groupId&gt;\n"
-"   &lt;artifactId&gt;lucene-snowball&lt;/artifactId&gt;\n"
-"   &lt;version&gt;2.4.0&lt;/version&gt;\n"
+"   &lt;version&gt;3.5.0-Final&lt;/version&gt;\n"
 "&lt;/dependency&gt;"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:124
+#: getting-started.xml:122
 #, no-c-format
 msgid ""
-"Not all dependencies are required. Only the <emphasis>hibernate-search</"
-"emphasis> dependency is mandatory. This dependency, together with its "
-"required transitive dependencies, contain all required classes needed to use "
-"Hibernate Search. <emphasis>hibernate-annotations</emphasis> is only needed "
-"if you want to use annotations to configure your domain model as we do in "
-"this tutorial. However, even if you choose not to use Hibernate Annotations "
-"you still have to use the Hibernate Search specific annotations, which are "
-"bundled with the hibernate-search jar file, to configure your Lucene index. "
-"Currently there is no XML configuration available for Hibernate Search. "
-"<emphasis>hibernate-entitymanager</emphasis> is required if you want to use "
-"Hibernate Search in conjunction with JPA. The Solr dependencies are needed "
-"if you want to utilize Solr's analyzer framework. More about this later. And "
-"finally, the <literal>lucene-snowball</literal> dependency is needed if you "
-"want to use Lucene's snowball stemmer."
+"Only the <emphasis>hibernate-search</emphasis> dependency is mandatory, "
+"because it contains together with its required transitive dependencies all "
+"required classes needed to use Hibernate Search.<emphasis> hibernate-"
+"entitymanager</emphasis> is only required if you want to use Hibernate "
+"Search in conjunction with JPA."
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:129
+#, no-c-format
+msgid ""
+"There is no XML configuration available for Hibernate Search but we provide "
+"a powerful programmatic mapping API that elegantly replace this kind of "
+"deployment form (see <xref linkend=\"hsearch-mapping-programmaticapi\"/> for "
+"more information)."
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:142
+#: getting-started.xml:138
 #, no-c-format
 msgid "Configuration"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:144
+#: getting-started.xml:140
 #, no-c-format
 msgid ""
 "Once you have downloaded and added all required dependencies to your "
@@ -244,7 +265,7 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:155
+#: getting-started.xml:151
 #, no-c-format
 msgid ""
 "Basic configuration options to be added to <literal><filename>hibernate."
@@ -253,20 +274,20 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:160
+#: getting-started.xml:156
 #, no-c-format
 msgid ""
 "...\n"
 "&lt;property name=\"hibernate.search.default.directory_provider\" \n"
-"   value=\"org.hibernate.search.store.FSDirectoryProvider\"/&gt; \n"
+"          value=\"org.hibernate.search.store.FSDirectoryProvider\"/&gt; \n"
 "\n"
-"&lt;property name=\"hibernate.search.default.indexBase\" value=\"/var/lucene/"
-"indexes\"/&gt; \n"
+"&lt;property name=\"hibernate.search.default.indexBase\" \n"
+"          value=\"/var/lucene/indexes\"/&gt; \n"
 "..."
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:163
+#: getting-started.xml:159
 #, no-c-format
 msgid ""
 "First you have to tell Hibernate Search which <classname>DirectoryProvider</"
@@ -287,7 +308,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:180
+#: getting-started.xml:176
 #, no-c-format
 msgid ""
 "Lets assume that your application contains the Hibernate managed classes "
@@ -297,7 +318,7 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:187
+#: getting-started.xml:183
 #, no-c-format
 msgid ""
 "Example entities Book and Author before adding Hibernate Search specific "
@@ -305,7 +326,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:190
+#: getting-started.xml:186
 #, no-c-format
 msgid ""
 "package example;\n"
@@ -326,8 +347,7 @@ msgid ""
 "\n"
 "  private Date publicationDate;\n"
 "  \n"
-"  public Book() {\n"
-"  } \n"
+"  public Book() {} \n"
 "  \n"
 "  // standard getters/setters follow here\n"
 "  ...\n"
@@ -335,7 +355,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:192
+#: getting-started.xml:188
 #, no-c-format
 msgid ""
 "package example;\n"
@@ -349,8 +369,7 @@ msgid ""
 "\n"
 "  private String name;\n"
 "\n"
-"  public Author() {\n"
-"  } \n"
+"  public Author() {} \n"
 " \n"
 "  // standard getters/setters follow here\n"
 "  ...\n"
@@ -358,7 +377,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:195
+#: getting-started.xml:191
 #, no-c-format
 msgid ""
 "To achieve this you have to add a few annotations to the <classname>Book</"
@@ -373,7 +392,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:206
+#: getting-started.xml:202
 #, no-c-format
 msgid ""
 "Next you have to mark the fields you want to make searchable. Let's start "
@@ -393,7 +412,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:222
+#: getting-started.xml:218
 #, no-c-format
 msgid ""
 "Without projections, Hibernate Search will per default execute a Lucene "
@@ -406,7 +425,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:230
+#: getting-started.xml:226
 #, no-c-format
 msgid ""
 "After this short look under the hood let's go back to annotating the "
@@ -422,7 +441,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:241
+#: getting-started.xml:237
 #, no-c-format
 msgid ""
 "This leaves us with <literal>@IndexedEmbedded. </literal>This annotation is "
@@ -439,7 +458,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:253
+#: getting-started.xml:249
 #, no-c-format
 msgid ""
 "These settings should be sufficient for now. For more details on entity "
@@ -447,13 +466,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:257
+#: getting-started.xml:253
 #, no-c-format
 msgid "Example entities after adding Hibernate Search annotations"
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:260
+#: getting-started.xml:256
 #, no-c-format
 msgid ""
 "package example;\n"
@@ -464,7 +483,6 @@ msgid ""
 "\n"
 "  @Id\n"
 "  @GeneratedValue\n"
-"  <emphasis role=\"bold\">@DocumentId</emphasis>\n"
 "  private Integer id;\n"
 "  \n"
 "  <emphasis role=\"bold\">@Field(index=Index.TOKENIZED, store=Store.NO)</"
@@ -493,7 +511,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:262
+#: getting-started.xml:258
 #, no-c-format
 msgid ""
 "package example;\n"
@@ -518,72 +536,55 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:267
+#: getting-started.xml:263
 #, no-c-format
 msgid "Indexing"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:269
+#: getting-started.xml:265
 #, no-c-format
 msgid ""
 "Hibernate Search will transparently index every entity persisted, updated or "
-"removed through Hibernate Core. However, you have to trigger an initial "
-"indexing to populate the Lucene index with the data already present in your "
-"database. Once you have added the above properties and annotations it is "
-"time to trigger an initial batch index of your books. You can achieve this "
-"by using one of the following code snippets (see also <xref linkend=\"search-"
-"batchindex\"/>):"
+"removed through Hibernate Core. However, you have to create an initial "
+"Lucene index for the data already present in your database. Once you have "
+"added the above properties and annotations it is time to trigger an initial "
+"batch index of your books. You can achieve this by using one of the "
+"following code snippets (see also <xref linkend=\"search-batchindex\"/>):"
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:278
+#: getting-started.xml:274
 #, no-c-format
 msgid "Using Hibernate Session to index data"
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:280
+#: getting-started.xml:276
 #, no-c-format
 msgid ""
 "FullTextSession fullTextSession = Search.getFullTextSession(session);\n"
-"Transaction tx = fullTextSession.beginTransaction();\n"
-"\n"
-"List books = session.createQuery(\"from Book as book\").list();\n"
-"for (Book book : books) {\n"
-"    <emphasis role=\"bold\">fullTextSession.index(book);</emphasis>\n"
-"}\n"
-"\n"
-"tx.commit(); //index is written at commit time"
+"fullTextSession.createIndexer().startAndWait();"
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:284
+#: getting-started.xml:280
 #, no-c-format
 msgid "Using JPA to index data"
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:286
+#: getting-started.xml:282
 #, no-c-format
 msgid ""
 "EntityManager em = entityManagerFactory.createEntityManager();\n"
 "FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager"
 "(em);\n"
-"em.getTransaction().begin();\n"
-"\n"
-"List books = em.createQuery(\"select book from Book as book\").getResultList"
-"();\n"
-"for (Book book : books) {\n"
-"    <emphasis role=\"bold\">fullTextEntityManager.index(book);</emphasis>\n"
-"} \n"
-"\n"
-"em.getTransaction().commit();\n"
-"em.close();"
+"fullTextEntityManager.createIndexer().startAndWait();"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:289
+#: getting-started.xml:285
 #, no-c-format
 msgid ""
 "After executing the above code, you should be able to see a Lucene index "
@@ -593,13 +594,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:297
+#: getting-started.xml:293
 #, no-c-format
 msgid "Searching"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:299
+#: getting-started.xml:295
 #, no-c-format
 msgid ""
 "Now it is time to execute a first search. The general approach is to create "
@@ -610,13 +611,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:307
+#: getting-started.xml:303
 #, no-c-format
 msgid "Using Hibernate Session to create and execute a search"
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:309
+#: getting-started.xml:305
 #, no-c-format
 msgid ""
 "FullTextSession fullTextSession = Search.getFullTextSession(session);\n"
@@ -641,18 +642,18 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:313
+#: getting-started.xml:309
 #, no-c-format
 msgid "Using JPA to create and execute a search"
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:315
+#: getting-started.xml:311
 #, no-c-format
 msgid ""
 "EntityManager em = entityManagerFactory.createEntityManager();\n"
 "FullTextEntityManager fullTextEntityManager = \n"
-"    org.hibernate.hibernate.search.jpa.Search.getFullTextEntityManager(em);\n"
+"    org.hibernate.search.jpa.Search.getFullTextEntityManager(em);\n"
 "em.getTransaction().begin();\n"
 "\n"
 "// create native Lucene query\n"
@@ -674,13 +675,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:320
+#: getting-started.xml:316
 #, no-c-format
 msgid "Analyzer"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:322
+#: getting-started.xml:318
 #, no-c-format
 msgid ""
 "Let's make things a little more interesting now. Assume that one of your "
@@ -694,7 +695,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:333
+#: getting-started.xml:329
 #, no-c-format
 msgid ""
 "Setting the <literal>hibernate.search.analyzer</literal> property in the "
@@ -702,7 +703,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:339
+#: getting-started.xml:335
 #, no-c-format
 msgid ""
 "Setting the <literal><literal>@Analyzer</literal></literal> annotation at "
@@ -710,7 +711,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:344
+#: getting-started.xml:340
 #, no-c-format
 msgid ""
 "Setting the <literal>@<literal>Analyzer</literal></literal> annotation at "
@@ -718,7 +719,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:349
+#: getting-started.xml:345
 #, no-c-format
 msgid ""
 "When using the <literal>@Analyzer</literal> annotation one can either "
@@ -728,15 +729,11 @@ msgid ""
 "factories approach is utilized. To find out more about the factory classes "
 "available you can either browse the Solr JavaDoc or read the corresponding "
 "section on the <ulink url=\"http://wiki.apache.org/solr/"
-"AnalyzersTokenizersTokenFilters\">Solr Wiki.</ulink> Note that depending on "
-"the chosen factory class additional libraries on top of the Solr "
-"dependencies might be required. For example, the "
-"<classname>PhoneticFilterFactory</classname> depends on <ulink url=\"http://"
-"commons.apache.org/codec\">commons-codec</ulink>."
+"AnalyzersTokenizersTokenFilters\">Solr Wiki.</ulink>"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:362
+#: getting-started.xml:355
 #, no-c-format
 msgid ""
 "In the example below a <classname>StandardTokenizerFactory</classname> is "
@@ -749,7 +746,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:372
+#: getting-started.xml:365
 #, no-c-format
 msgid ""
 "Generally, when using the Solr framework you have to start with a tokenizer "
@@ -757,7 +754,7 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:376
+#: getting-started.xml:369
 #, no-c-format
 msgid ""
 "Using <classname>@AnalyzerDef</classname> and the Solr framework to define "
@@ -765,7 +762,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: getting-started.xml:379
+#: getting-started.xml:372
 #, no-c-format
 msgid ""
 "package example;\n"
@@ -815,53 +812,17 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: getting-started.xml:384
+#: getting-started.xml:377
 #, no-c-format
 msgid "What's next"
 msgstr ""
 
 #. Tag: para
-#: getting-started.xml:386
+#: getting-started.xml:379
 #, no-c-format
 msgid ""
-"The above paragraphs hopefully helped you getting an overview of Hibernate "
-"Search. Using the maven archetype plugin and the following command you can "
-"create an initial runnable maven project structure populated with the "
-"example code of this tutorial."
-msgstr ""
-
-#. Tag: title
-#: getting-started.xml:392
-#, no-c-format
-msgid "Using the Maven archetype to create tutorial sources"
-msgstr ""
-
-#. Tag: programlisting
-#: getting-started.xml:394
-#, no-c-format
-msgid ""
-"mvn archetype:create \\ \n"
-"    -DarchetypeGroupId=org.hibernate \\\n"
-"    -DarchetypeArtifactId=hibernate-search-quickstart \\ \n"
-"    -DarchetypeVersion=3.1.0.GA \\\n"
-"    -DgroupId=my.company -DartifactId=quickstart"
-msgstr ""
-
-#. Tag: para
-#: getting-started.xml:397
-#, no-c-format
-msgid ""
-"Using the maven project you can execute the examples, inspect the file "
-"system based index and search and retrieve a list of managed objects. Just "
-"run <emphasis>mvn package</emphasis> to compile the sources and run the unit "
-"tests."
-msgstr ""
-
-#. Tag: para
-#: getting-started.xml:402
-#, no-c-format
-msgid ""
-"The next step after this tutorial is to get more familiar with the overall "
+"The above paragraphs helped you getting an overview of Hibernate Search. The "
+"next step after this tutorial is to get more familiar with the overall "
 "architecture of Hibernate Search (<xref linkend=\"search-architecture\"/>) "
 "and explore the basic features in more detail. Two topics which were only "
 "briefly touched in this tutorial were analyzer configuration (<xref linkend="

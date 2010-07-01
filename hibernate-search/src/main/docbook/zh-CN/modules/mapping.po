@@ -1,17 +1,18 @@
-# Chinese translations for PACKAGE package.
-# Automatically generated, 2009.
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2009-05-26 16:41+0000\n"
-"PO-Revision-Date: 2009-05-26 15:46+0000\n"
+"POT-Creation-Date: 2010-07-01 20:08+0000\n"
+"PO-Revision-Date: 2010-07-01 20:08+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
 
 #. Tag: title
 #: mapping.xml:30
@@ -26,10 +27,10 @@ msgid ""
 "All the metadata information needed to index entities is described through "
 "annotations. There is no need for xml mapping files. In fact there is "
 "currently no xml configuration option available (see <ulink url=\"http://"
-"opensource.atlassian.com/projects/hibernate/browse/HSEARCH-210\">HSEARCH-"
-"210</ulink>). You can still use hibernate mapping files for the basic "
-"Hibernate configuration, but the Search specific configuration has to be "
-"expressed via annotations."
+"opensource.atlassian.com/projects/hibernate/browse/"
+"HSEARCH-210\">HSEARCH-210</ulink>). You can still use Hibernate mapping "
+"files for the basic Hibernate configuration, but the Hibernate Search "
+"specific configuration has to be expressed via annotations."
 msgstr ""
 
 #. Tag: title
@@ -94,9 +95,9 @@ msgstr ""
 msgid ""
 "For each property (or attribute) of your entity, you have the ability to "
 "describe how it will be indexed. The default (no annotation present) means "
-"that the property is completely ignored by the indexing process. "
-"<literal>@Field</literal> does declare a property as indexed. When indexing "
-"an element to a Lucene document you can specify how it is indexed:"
+"that the property is ignored by the indexing process. <literal>@Field</"
+"literal> does declare a property as indexed. When indexing an element to a "
+"Lucene document you can specify how it is indexed:"
 msgstr ""
 
 #. Tag: para
@@ -249,12 +250,17 @@ msgstr ""
 msgid ""
 "Whether or not you want to tokenize a property depends on whether you wish "
 "to search the element as is, or by the words it contains. It make sense to "
-"tokenize a text field, but tokenizing a date field probably not. Note that "
-"fields used for sorting must not be tokenized."
+"tokenize a text field, but probably not a date field."
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:184
+#: mapping.xml:182
+#, no-c-format
+msgid "Fields used for sorting must not be tokenized."
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:185
 #, no-c-format
 msgid ""
 "Finally, the id property of an entity is a special property used by "
@@ -266,7 +272,7 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:193
+#: mapping.xml:194
 #, no-c-format
 msgid ""
 "Adding <classname>@DocumentId</classname> ad <classname>@Field</classname> "
@@ -274,7 +280,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:196
+#: mapping.xml:197
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -297,23 +303,22 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:199
+#: mapping.xml:200
 #, no-c-format
 msgid ""
-"The above annotations define an index with three fields: <literal>id</"
-"literal> , <literal>Abstract</literal> and <literal>text</literal> . Note "
-"that by default the field name is decapitalized, following the JavaBean "
-"specification"
+"define an index with three fields: <literal>id</literal> , "
+"<literal>Abstract</literal> and <literal>text</literal> . Note that by "
+"default the field name is decapitalized, following the JavaBean specification"
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:206
+#: mapping.xml:207
 #, no-c-format
 msgid "Mapping properties multiple times"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:208
+#: mapping.xml:209
 #, no-c-format
 msgid ""
 "Sometimes one has to map a property multiple times per index, with slightly "
@@ -325,13 +330,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:216
+#: mapping.xml:217
 #, no-c-format
 msgid "Using @Fields to map a property multiple times"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:218
+#: mapping.xml:219
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -351,43 +356,43 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:221
+#: mapping.xml:222
 #, no-c-format
 msgid ""
-"The field <literal>summary</literal> is indexed twice, once as "
-"<literal>summary</literal> in a tokenized way, and once as "
-"<literal>summary_forSort</literal> in an untokenized way. @Field supports 2 "
-"attributes useful when @Fields is used:"
+"In <xref linkend=\"example-fields-annotation\"/> the field <literal>summary</"
+"literal> is indexed twice, once as <literal>summary</literal> in a tokenized "
+"way, and once as <literal>summary_forSort</literal> in an untokenized way. "
+"@Field supports 2 attributes useful when @Fields is used:"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:228
+#: mapping.xml:230
 #, no-c-format
 msgid ""
 "analyzer: defines a @Analyzer annotation per field rather than per property"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:233
+#: mapping.xml:235
 #, no-c-format
 msgid ""
 "bridge: defines a @FieldBridge annotation per field rather than per property"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:238
+#: mapping.xml:240
 #, no-c-format
 msgid "See below for more information about analyzers and field bridges."
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:243
+#: mapping.xml:245
 #, no-c-format
 msgid "Embedded and associated objects"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:245
+#: mapping.xml:247
 #, no-c-format
 msgid ""
 "Associated objects as well as embedded objects can be indexed as part of the "
@@ -399,13 +404,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:253
+#: mapping.xml:255
 #, no-c-format
 msgid "Using @IndexedEmbedded to index associations"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:255
+#: mapping.xml:257
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -445,7 +450,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:258
+#: mapping.xml:260
 #, no-c-format
 msgid ""
 "In this example, the place fields will be indexed in the <literal>Place</"
@@ -456,7 +461,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:265
+#: mapping.xml:267
 #, no-c-format
 msgid ""
 "Be careful. Because the data is denormalized in the Lucene index when using "
@@ -470,7 +475,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:275
+#: mapping.xml:277
 #, no-c-format
 msgid ""
 "<literal>@ContainedIn</literal> is only useful on associations pointing to "
@@ -478,13 +483,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:279
+#: mapping.xml:281
 #, no-c-format
 msgid "Let's make our example a bit more complex:"
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:282
+#: mapping.xml:284
 #, no-c-format
 msgid ""
 "Nested usage of <classname>@IndexedEmbedded</classname> and "
@@ -492,7 +497,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:285
+#: mapping.xml:287
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -543,7 +548,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:288
+#: mapping.xml:290
 #, no-c-format
 msgid ""
 "Any <literal>@*ToMany, @*ToOne</literal> and <literal>@Embedded</literal> "
@@ -553,37 +558,37 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:296
+#: mapping.xml:298
 #, no-c-format
 msgid "<para>id</para>"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:300
+#: mapping.xml:302
 #, no-c-format
 msgid "name"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:304
+#: mapping.xml:306
 #, no-c-format
 msgid "address.street"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:308
+#: mapping.xml:310
 #, no-c-format
 msgid "address.city"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:312
+#: mapping.xml:314
 #, no-c-format
 msgid "address.ownedBy_name"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:316
+#: mapping.xml:318
 #, no-c-format
 msgid ""
 "The default prefix is <literal>propertyName.</literal>, following the "
@@ -593,13 +598,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:322
+#: mapping.xml:324
 #, no-c-format
 msgid "The prefix cannot be set to the empty string."
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:325
+#: mapping.xml:327
 #, no-c-format
 msgid ""
 "The<literal> depth</literal> property is necessary when the object graph "
@@ -614,7 +619,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:336
+#: mapping.xml:338
 #, no-c-format
 msgid ""
 "Using <literal>@IndexedEmbedded</literal> for object associations allows you "
@@ -622,7 +627,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:341
+#: mapping.xml:343
 #, no-c-format
 msgid ""
 "Return places where name contains JBoss and where address city is Atlanta. "
@@ -630,13 +635,13 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:344
+#: mapping.xml:346
 #, no-c-format
 msgid "+name:jboss +address.city:atlanta"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:348
+#: mapping.xml:350
 #, no-c-format
 msgid ""
 "Return places where name contains JBoss and where owner's name contain Joe. "
@@ -644,13 +649,13 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:351
+#: mapping.xml:353
 #, no-c-format
 msgid "+name:jboss +address.orderBy_name:joe"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:355
+#: mapping.xml:357
 #, no-c-format
 msgid ""
 "In a way it mimics the relational join operation in a more efficient way (at "
@@ -661,7 +666,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:363
+#: mapping.xml:365
 #, no-c-format
 msgid ""
 "An associated object can itself (but does not have to) be <literal>@Indexed</"
@@ -669,7 +674,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:367
+#: mapping.xml:369
 #, no-c-format
 msgid ""
 "When @IndexedEmbedded points to an entity, the association has to be "
@@ -681,7 +686,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:375
+#: mapping.xml:377
 #, no-c-format
 msgid ""
 "Sometimes, the object type annotated by <classname>@IndexedEmbedded</"
@@ -693,7 +698,7 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:383
+#: mapping.xml:385
 #, no-c-format
 msgid ""
 "Using the <literal>targetElement</literal> property of "
@@ -701,7 +706,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:386
+#: mapping.xml:388
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -729,13 +734,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:391
+#: mapping.xml:393
 #, no-c-format
 msgid "Boost factor"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:393
+#: mapping.xml:395
 #, no-c-format
 msgid ""
 "Lucene has the notion of <emphasis>boost factor</emphasis>. It's a way to "
@@ -745,7 +750,7 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:399
+#: mapping.xml:401
 #, no-c-format
 msgid ""
 "Using different ways of increasing the weight of an indexed element using a "
@@ -753,7 +758,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:402
+#: mapping.xml:404
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -784,7 +789,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:405
+#: mapping.xml:407
 #, no-c-format
 msgid ""
 "In our example, <classname>Essay</classname>'s probability to reach the top "
@@ -801,13 +806,74 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:420
+#: mapping.xml:422
+#, no-c-format
+msgid "Dynamic boost factor"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:424
+#, no-c-format
+msgid ""
+"The <literal>@Boost </literal>annotation used in <xref linkend=\"section-"
+"boost-annotation\"/> defines a static boost factor which is is independent "
+"of the state of of the indexed entity at runtime. However, there are "
+"usecases in which the boost factor may depends on the actual state of the "
+"entity. In this case you can use the <literal>@DynamicBoost </"
+"literal>annotation together with an accompanying custom "
+"<classname>BoostStrategy</classname>.<example id=\"example-dynamic-boosting"
+"\"> <title>Dynamic boost examle</title> <programlisting>public enum "
+"PersonType {\n"
+"    NORMAL,\n"
+"    VIP\n"
+"}\n"
+"\n"
+"@Entity\n"
+"@Indexed\n"
+"<emphasis role=\"bold\">@DynamicBoost(impl = VIPBoostStrategy.class)</"
+"emphasis>\n"
+"public class Person {\n"
+"    private PersonType type;   \n"
+"    \n"
+"    // ....\n"
+"}\n"
+"\n"
+"public class VIPBoostStrategy implements BoostStrategy {\n"
+"    <emphasis role=\"bold\">public float defineBoost(Object value)</"
+"emphasis> {\n"
+"        Person person = ( Person ) value;\n"
+"        if ( person.getType().equals( PersonType.VIP ) ) {\n"
+"            return 2.0f;\n"
+"        }\n"
+"        else {\n"
+"            return 1.0f;\n"
+"        }\n"
+"    }\n"
+"}</programlisting> </example>In <xref linkend=\"example-dynamic-boosting\"/> "
+"a dynamic boost is defined on class level specifying "
+"<classname>VIPBoostStrategy</classname> as implementation of the "
+"<classname>BoostStrategy</classname> interface to be used at indexing time. "
+"You can place the <literal>@DynamicBoost</literal> either at class or field "
+"level. Depending on the placement of the annotation either the whole entity "
+"is passed to the <methodname>defineBoost</methodname> method or just the "
+"annotated field/property value. It's up to you to cast the passed object to "
+"the correct type. In the example all indexed values of a VIP person would be "
+"double as important as the values of a normal person.<note> <para>The "
+"specified <classname>BoostStrategy</classname> implementation must define a "
+"public no-arg constructor.</para> </note>Of course you can mix and match "
+"<literal>@Boost</literal> and <literal>@DynamicBoost</literal> annotations "
+"in your entity. All defined boost factors are cummulative as described in "
+"<xref linkend=\"section-boost-annotation\"/>."
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:455
 #, no-c-format
 msgid "Analyzer"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:422
+#: mapping.xml:457
 #, no-c-format
 msgid ""
 "The default analyzer class used to index tokenized fields is configurable "
@@ -817,7 +883,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:427
+#: mapping.xml:462
 #, no-c-format
 msgid ""
 "You can also define the analyzer class per entity, property and even per "
@@ -825,13 +891,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:432
+#: mapping.xml:467
 #, no-c-format
 msgid "Different ways of specifying an analyzer"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:434
+#: mapping.xml:469
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -860,7 +926,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:437
+#: mapping.xml:472
 #, no-c-format
 msgid ""
 "In this example, <classname>EntityAnalyzer</classname> is used to index all "
@@ -871,7 +937,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:444
+#: mapping.xml:479
 #, no-c-format
 msgid ""
 "Mixing different analyzers in the same entity is most of the time a bad "
@@ -882,13 +948,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:453
+#: mapping.xml:488
 #, no-c-format
 msgid "Analyzer definitions"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:455
+#: mapping.xml:490
 #, no-c-format
 msgid ""
 "Analyzers can become quite complex to deal with for which reason Hibernate "
@@ -898,13 +964,22 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:463
+#: mapping.xml:498
 #, no-c-format
 msgid "a name: the unique string used to refer to the definition"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:468
+#: mapping.xml:503
+#, no-c-format
+msgid ""
+"a list of char filters: each char filter is responsible to pre-process input "
+"characters before the tokenization. Char filters can add, change or remove "
+"characters; one common usage is for characters normalization"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:509
 #, no-c-format
 msgid ""
 "a tokenizer: responsible for tokenizing the input stream into individual "
@@ -912,7 +987,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:473
+#: mapping.xml:514
 #, no-c-format
 msgid ""
 "a list of filters: each filter is responsible to remove, modify or sometimes "
@@ -920,37 +995,46 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:479
+#: mapping.xml:520
 #, no-c-format
 msgid ""
-"This separation of tasks - a tokenizer followed by a list of filters - "
-"allows for easy reuse of each individual component and let you build your "
-"customized analyzer in a very flexible way (just like Lego). Generally "
-"speaking the <classname>Tokenizer</classname> starts the analysis process by "
-"turning the character input into tokens which are then further processed by "
-"the <classname>TokenFilter</classname>s. Hibernate Search supports this "
-"infrastructure by utilizing the Solr analyzer framework. Make sure to "
-"add<filename> solr-core.jar and </filename><filename>solr-common.jar</"
-"filename> to your classpath to use analyzer definitions. In case you also "
-"want to utilizing a snowball stemmer also include the <filename>lucene-"
-"snowball.jar.</filename> Other Solr analyzers might depend on more "
-"libraries. For example, the <classname>PhoneticFilterFactory</classname> "
-"depends on <ulink url=\"http://commons.apache.org/codec\">commons-codec</"
-"ulink>. Your distribution of Hibernate Search provides these dependencies in "
-"its <filename>lib</filename> directory."
+"This separation of tasks - a list of char filters, and a tokenizer followed "
+"by a list of filters - allows for easy reuse of each individual component "
+"and let you build your customized analyzer in a very flexible way (just like "
+"Lego). Generally speaking the <classname>char filters</classname> do some "
+"pre-processing in the character input, then the <classname>Tokenizer</"
+"classname> starts the tokenizing process by turning the character input into "
+"tokens which are then further processed by the <classname>TokenFilter</"
+"classname>s. Hibernate Search supports this infrastructure by utilizing the "
+"Solr analyzer framework. Make sure to add<filename> solr-core.jar and </"
+"filename><filename>solr-solrj.jar</filename> to your classpath to use "
+"analyzer definitions. In case you also want to use the snowball stemmer also "
+"include the <filename>lucene-snowball.jar.</filename> Other Solr analyzers "
+"might depend on more libraries. For example, the "
+"<classname>PhoneticFilterFactory</classname> depends on <ulink url=\"http://"
+"commons.apache.org/codec\">commons-codec</ulink>. Your distribution of "
+"Hibernate Search provides these dependencies in its <filename>lib</filename> "
+"directory."
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:498
+#: mapping.xml:540
 #, no-c-format
 msgid "<classname>@AnalyzerDef</classname> and the Solr framework"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:501
+#: mapping.xml:543
 #, no-c-format
 msgid ""
 "@AnalyzerDef(name=\"customanalyzer\",\n"
+"        charFilters = {\n"
+"                @CharFilterDef(factory = MappingCharFilterFactory.class, "
+"params = {\n"
+"                    @Parameter(name = \"mapping\", value = \"org/hibernate/"
+"search/test/analyzer/solr/mapping-chars.properties\")\n"
+"                })\n"
+"        },\n"
 "        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory."
 "class),\n"
 "        filters = {\n"
@@ -970,29 +1054,31 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:504
+#: mapping.xml:546
 #, no-c-format
 msgid ""
-"A tokenizer is defined by its factory which is responsible for building the "
-"tokenizer and using the optional list of parameters. This example use the "
-"standard tokenizer. A filter is defined by its factory which is responsible "
-"for creating the filter instance using the optional parameters. In our "
-"example, the StopFilter filter is built reading the dedicated words property "
-"file and is expected to ignore case. The list of parameters is dependent on "
-"the tokenizer or filter factory."
+"A char filter is defined by its factory which is responsible for building "
+"the char filter and using the optional list of parameters. In our example, a "
+"mapping char filter is used, and will replace characters in the input based "
+"on the rules specified in the mapping file. A tokenizer is also defined by "
+"its factory. This example use the standard tokenizer. A filter is defined by "
+"its factory which is responsible for creating the filter instance using the "
+"optional parameters. In our example, the StopFilter filter is built reading "
+"the dedicated words property file and is expected to ignore case. The list "
+"of parameters is dependent on the tokenizer or filter factory."
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:514
+#: mapping.xml:559
 #, no-c-format
 msgid ""
-"Filters are applied in the order they are defined in the "
+"Filters and char filters are applied in the order they are defined in the "
 "<classname>@AnalyzerDef</classname> annotation. Make sure to think twice "
 "about this order."
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:519
+#: mapping.xml:564
 #, no-c-format
 msgid ""
 "Once defined, an analyzer definition can be reused by an "
@@ -1001,13 +1087,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:524
+#: mapping.xml:569
 #, no-c-format
 msgid "Referencing an analyzer by name"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:526
+#: mapping.xml:571
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -1032,7 +1118,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:529
+#: mapping.xml:574
 #, no-c-format
 msgid ""
 "Analyzer instances declared by <classname>@AnalyzerDef</classname> are "
@@ -1040,7 +1126,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:533
+#: mapping.xml:578
 #, no-c-format
 msgid ""
 "Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer"
@@ -1048,7 +1134,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:535
+#: mapping.xml:580
 #, no-c-format
 msgid ""
 "This is quite useful wen building queries. Fields in queries should be "
@@ -1059,128 +1145,179 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:544
+#: mapping.xml:589
 #, no-c-format
 msgid "Available analyzers"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:546
+#: mapping.xml:591
 #, no-c-format
 msgid ""
-"Solr and Lucene come with a lot of useful default tokenizers and filters. "
-"You can find a complete list of tokenizer factories and filter factories at "
-"<ulink url=\"http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters"
-"\">http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters</ulink>. Let "
-"check a few of them."
+"Solr and Lucene come with a lot of useful default char filters, tokenizers "
+"and filters. You can find a complete list of char filter factories, "
+"tokenizer factories and filter factories at <ulink url=\"http://wiki.apache."
+"org/solr/AnalyzersTokenizersTokenFilters\">http://wiki.apache.org/solr/"
+"AnalyzersTokenizersTokenFilters</ulink>. Let check a few of them."
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:553
+#: mapping.xml:598
 #, no-c-format
-msgid "Some of the available tokenizers"
+msgid "Some of the available char filters"
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:558 mapping.xml:593
+#: mapping.xml:602 mapping.xml:639 mapping.xml:674
 #, no-c-format
 msgid "Factory"
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:560 mapping.xml:595
+#: mapping.xml:604 mapping.xml:641 mapping.xml:676
 #, no-c-format
 msgid "Description"
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:562 mapping.xml:597
+#: mapping.xml:606 mapping.xml:643 mapping.xml:678
 #, no-c-format
 msgid "parameters"
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:568
-#, no-c-format
-msgid "StandardTokenizerFactory"
-msgstr ""
-
-#. Tag: entry
-#: mapping.xml:570
-#, no-c-format
-msgid "Use the Lucene StandardTokenizer"
-msgstr ""
-
-#. Tag: entry
-#: mapping.xml:572 mapping.xml:581 mapping.xml:607 mapping.xml:615
-#: mapping.xml:647
-#, no-c-format
-msgid "none"
-msgstr ""
-
-#. Tag: entry
-#: mapping.xml:576
-#, no-c-format
-msgid "HTMLStripStandardTokenizerFactory"
-msgstr ""
-
-#. Tag: entry
-#: mapping.xml:578
-#, no-c-format
-msgid "Remove HTML tags, keep the text and pass it to a StandardTokenizer"
-msgstr ""
-
-#. Tag: title
-#: mapping.xml:588
-#, no-c-format
-msgid "Some of the available filters"
-msgstr ""
-
-#. Tag: entry
-#: mapping.xml:603
-#, no-c-format
-msgid "StandardFilterFactory"
-msgstr ""
-
-#. Tag: entry
-#: mapping.xml:605
-#, no-c-format
-msgid "Remove dots from acronyms and 's from words"
-msgstr ""
-
-#. Tag: entry
 #: mapping.xml:611
 #, no-c-format
-msgid "LowerCaseFilterFactory"
+msgid "MappingCharFilterFactory"
 msgstr ""
 
 #. Tag: entry
 #: mapping.xml:613
 #, no-c-format
+msgid ""
+"Replaces one or more characters with one or more characters, based on "
+"mappings specified in the resource file"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:616
+#, no-c-format
+msgid ""
+"<literal>mapping</literal>: points to a resource file containing the "
+"mappings using the format:"
+msgstr ""
+
+#. Tag: literallayout
+#: mapping.xml:618
+#, no-c-format
+msgid ""
+"\"á\" => \"a\"\n"
+"                    \"ñ\" => \"n\"\n"
+"                    \"ø\" => \"o\""
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:622
+#, no-c-format
+msgid "HTMLStripCharFilterFactory"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:624
+#, no-c-format
+msgid "Remove HTML standard tags, keeping the text"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:626 mapping.xml:653 mapping.xml:662 mapping.xml:688
+#: mapping.xml:696 mapping.xml:728
+#, no-c-format
+msgid "none"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:634
+#, no-c-format
+msgid "Some of the available tokenizers"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:649
+#, no-c-format
+msgid "StandardTokenizerFactory"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:651
+#, no-c-format
+msgid "Use the Lucene StandardTokenizer"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:657
+#, no-c-format
+msgid "HTMLStripStandardTokenizerFactory"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:659
+#, no-c-format
+msgid ""
+"Remove HTML tags, keep the text and pass it to a StandardTokenizer. "
+"@Deprecated, use the HTMLStripCharFilterFactory instead"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:669
+#, no-c-format
+msgid "Some of the available filters"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:684
+#, no-c-format
+msgid "StandardFilterFactory"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:686
+#, no-c-format
+msgid "Remove dots from acronyms and 's from words"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:692
+#, no-c-format
+msgid "LowerCaseFilterFactory"
+msgstr ""
+
+#. Tag: entry
+#: mapping.xml:694
+#, no-c-format
 msgid "Lowercase words"
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:619
+#: mapping.xml:700
 #, no-c-format
 msgid "StopFilterFactory"
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:621
+#: mapping.xml:702
 #, no-c-format
 msgid "remove words (tokens) matching a list of stop words"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:624
+#: mapping.xml:705
 #, no-c-format
 msgid ""
 "<literal>words</literal>: points to a resource file containing the stop words"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:625
+#: mapping.xml:706
 #, no-c-format
 msgid ""
 "ignoreCase: true if <literal>case</literal> should be ignore when comparing "
@@ -1188,13 +1325,13 @@ msgid ""
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:631
+#: mapping.xml:712
 #, no-c-format
 msgid "SnowballPorterFilterFactory"
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:633
+#: mapping.xml:714
 #, no-c-format
 msgid ""
 "Reduces a word to it's root in a given language. (eg. protect, protects, "
@@ -1203,7 +1340,7 @@ msgid ""
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:637
+#: mapping.xml:718
 #, no-c-format
 msgid ""
 "<literal>language</literal>: Danish, Dutch, English, Finnish, French, "
@@ -1212,19 +1349,19 @@ msgid ""
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:643
+#: mapping.xml:724
 #, no-c-format
 msgid "ISOLatin1AccentFilterFactory"
 msgstr ""
 
 #. Tag: entry
-#: mapping.xml:645
+#: mapping.xml:726
 #, no-c-format
 msgid "remove accents for languages like French"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:653
+#: mapping.xml:734
 #, no-c-format
 msgid ""
 "We recommend to check all the implementations of <classname>org.apache.solr."
@@ -1234,26 +1371,26 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:660
+#: mapping.xml:741
 #, no-c-format
 msgid "Analyzer discriminator (experimental)"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:662
+#: mapping.xml:743
 #, no-c-format
 msgid ""
 "So far all the introduced ways to specify an analyzer were static. However, "
 "there are use cases where it is useful to select an analyzer depending on "
 "the current state of the entity to be indexed, for example in multilingual "
-"application. For an <classname>BlogEntry</classname> class for example the "
+"applications. For an <classname>BlogEntry</classname> class for example the "
 "analyzer could depend on the language property of the entry. Depending on "
 "this property the correct language specific stemmer should be chosen to "
 "index the actual text."
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:671
+#: mapping.xml:752
 #, no-c-format
 msgid ""
 "To enable this dynamic analyzer selection Hibernate Search introduces the "
@@ -1262,7 +1399,7 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:677
+#: mapping.xml:758
 #, no-c-format
 msgid ""
 "Usage of @AnalyzerDiscriminator in order to select an analyzer depending on "
@@ -1270,7 +1407,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:680
+#: mapping.xml:761
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -1312,7 +1449,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:682
+#: mapping.xml:763
 #, no-c-format
 msgid ""
 "public class LanguageDiscriminator implements Discriminator {\n"
@@ -1328,7 +1465,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:685
+#: mapping.xml:766
 #, no-c-format
 msgid ""
 "The prerequisite for using <classname>@AnalyzerDiscriminator</classname> is "
@@ -1350,7 +1487,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:705
+#: mapping.xml:786
 #, no-c-format
 msgid ""
 "An implemention of the <classname>Discriminator</classname> interface has to "
@@ -1362,7 +1499,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:714
+#: mapping.xml:795
 #, no-c-format
 msgid ""
 "The <classname>@AnalyzerDiscriminator</classname> is currently still "
@@ -1371,13 +1508,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:722
+#: mapping.xml:803
 #, no-c-format
 msgid "Retrieving an analyzer"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:724
+#: mapping.xml:805
 #, no-c-format
 msgid ""
 "During indexing time, Hibernate Search is using analyzers under the hood for "
@@ -1388,7 +1525,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:732
+#: mapping.xml:813
 #, no-c-format
 msgid ""
 "This rule can be broken but you need a good reason for it. If you are "
@@ -1396,7 +1533,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:736
+#: mapping.xml:817
 #, no-c-format
 msgid ""
 "You can retrieve the scoped analyzer for a given entity used at indexing "
@@ -1408,13 +1545,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:745
+#: mapping.xml:826
 #, no-c-format
 msgid "Using the scoped analyzer when building a full-text query"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:748
+#: mapping.xml:829
 #, no-c-format
 msgid ""
 "org.apache.lucene.queryParser.QueryParser parser = new QueryParser(\n"
@@ -1432,7 +1569,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:751
+#: mapping.xml:832
 #, no-c-format
 msgid ""
 "In the example above, the song title is indexed in two fields: the standard "
@@ -1443,7 +1580,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:758
+#: mapping.xml:839
 #, no-c-format
 msgid ""
 "If your query targets more that one query and you wish to use your standard "
@@ -1453,13 +1590,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:767
+#: mapping.xml:848
 #, no-c-format
 msgid "Property/Field Bridge"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:769
+#: mapping.xml:850
 #, no-c-format
 msgid ""
 "In Lucene all index fields have to be represented as Strings. For this "
@@ -1471,13 +1608,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:777
+#: mapping.xml:858
 #, no-c-format
 msgid "Built-in bridges"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:779
+#: mapping.xml:860
 #, no-c-format
 msgid ""
 "Hibernate Search comes bundled with a set of built-in bridges between a Java "
@@ -1485,13 +1622,13 @@ msgid ""
 msgstr ""
 
 #. Tag: term
-#: mapping.xml:784
+#: mapping.xml:865
 #, no-c-format
 msgid "null"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:787
+#: mapping.xml:868
 #, no-c-format
 msgid ""
 "null elements are not indexed. Lucene does not support null elements and "
@@ -1499,19 +1636,19 @@ msgid ""
 msgstr ""
 
 #. Tag: term
-#: mapping.xml:793
+#: mapping.xml:874
 #, no-c-format
 msgid "java.lang.String"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:796
+#: mapping.xml:877
 #, no-c-format
 msgid "String are indexed as is"
 msgstr ""
 
 #. Tag: term
-#: mapping.xml:801
+#: mapping.xml:882
 #, no-c-format
 msgid ""
 "short, Short, integer, Integer, long, Long, float, Float, double, Double, "
@@ -1519,7 +1656,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:805
+#: mapping.xml:886
 #, no-c-format
 msgid ""
 "Numbers are converted in their String representation. Note that numbers "
@@ -1528,7 +1665,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:808
+#: mapping.xml:889
 #, no-c-format
 msgid ""
 "Using a Range query is debatable and has drawbacks, an alternative approach "
@@ -1537,19 +1674,19 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:812
+#: mapping.xml:893
 #, no-c-format
 msgid "Hibernate Search will support a padding mechanism"
 msgstr ""
 
 #. Tag: term
-#: mapping.xml:818
+#: mapping.xml:899
 #, no-c-format
 msgid "java.util.Date"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:821
+#: mapping.xml:902
 #, no-c-format
 msgid ""
 "Dates are stored as yyyyMMddHHmmssSSS in GMT time (200611072203012 for Nov "
@@ -1559,7 +1696,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:827
+#: mapping.xml:908
 #, no-c-format
 msgid ""
 "Usually, storing the date up to the millisecond is not necessary. "
@@ -1570,7 +1707,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:834
+#: mapping.xml:915
 #, no-c-format
 msgid ""
 "@Entity \n"
@@ -1584,7 +1721,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:837
+#: mapping.xml:918
 #, no-c-format
 msgid ""
 "A Date whose resolution is lower than <literal>MILLISECOND</literal> cannot "
@@ -1592,25 +1729,25 @@ msgid ""
 msgstr ""
 
 #. Tag: term
-#: mapping.xml:845
+#: mapping.xml:926
 #, no-c-format
 msgid "java.net.URI, java.net.URL"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:848
+#: mapping.xml:929
 #, no-c-format
 msgid "URI and URL are converted to their string representation"
 msgstr ""
 
 #. Tag: term
-#: mapping.xml:854
+#: mapping.xml:935
 #, no-c-format
 msgid "java.lang.Class"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:857
+#: mapping.xml:938
 #, no-c-format
 msgid ""
 "Class are converted to their fully qualified class name. The thread context "
@@ -1618,13 +1755,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:866
+#: mapping.xml:947
 #, no-c-format
 msgid "Custom Bridge"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:868
+#: mapping.xml:949
 #, no-c-format
 msgid ""
 "Sometimes, the built-in bridges of Hibernate Search do not cover some of "
@@ -1634,13 +1771,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:874
+#: mapping.xml:955
 #, no-c-format
 msgid "StringBridge"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:876
+#: mapping.xml:957
 #, no-c-format
 msgid ""
 "The simplest custom solution is to give Hibernate Search an implementation "
@@ -1651,13 +1788,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:885
+#: mapping.xml:966
 #, no-c-format
 msgid "Implementing your own <classname>StringBridge</classname>"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:888
+#: mapping.xml:969
 #, no-c-format
 msgid ""
 "/**\n"
@@ -1688,7 +1825,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:891
+#: mapping.xml:972
 #, no-c-format
 msgid ""
 "Then any property or field can use this bridge thanks to the "
@@ -1696,7 +1833,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:894
+#: mapping.xml:975
 #, no-c-format
 msgid ""
 "<emphasis role=\"bold\">@FieldBridge(impl = PaddedIntegerBridge.class)</"
@@ -1705,7 +1842,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:896
+#: mapping.xml:977
 #, no-c-format
 msgid ""
 "Parameters can be passed to the Bridge implementation making it more "
@@ -1715,13 +1852,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:903
+#: mapping.xml:984
 #, no-c-format
 msgid "Passing parameters to your bridge implementation"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:905
+#: mapping.xml:986
 #, no-c-format
 msgid ""
 "public class PaddedIntegerBridge implements StringBridge, <emphasis\n"
@@ -1760,7 +1897,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:908
+#: mapping.xml:989
 #, no-c-format
 msgid ""
 "The <classname>ParameterizedBridge</classname> interface can be implemented "
@@ -1769,7 +1906,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:913
+#: mapping.xml:994
 #, no-c-format
 msgid ""
 "All implementations have to be thread-safe, but the parameters are set "
@@ -1777,7 +1914,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:917
+#: mapping.xml:998
 #, no-c-format
 msgid ""
 "If you expect to use your bridge implementation on an id property (ie "
@@ -1785,12 +1922,12 @@ msgid ""
 "extended version of <literal>StringBridge</literal> named "
 "<classname>TwoWayStringBridge</classname>. Hibernate Search needs to read "
 "the string representation of the identifier and generate the object out of "
-"it. There is not difference in the way the <literal>@FieldBridge</literal> "
+"it. There is no difference in the way the <literal>@FieldBridge</literal> "
 "annotation is used."
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:926
+#: mapping.xml:1007
 #, no-c-format
 msgid ""
 "Implementing a TwoWayStringBridge which can for example be used for id "
@@ -1798,7 +1935,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:929
+#: mapping.xml:1010
 #, no-c-format
 msgid ""
 "public class PaddedIntegerBridge implements TwoWayStringBridge, "
@@ -1840,7 +1977,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:932
+#: mapping.xml:1013
 #, no-c-format
 msgid ""
 "It is critically important for the two-way process to be idempotent (ie "
@@ -1848,33 +1985,33 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:938
+#: mapping.xml:1019
 #, no-c-format
 msgid "FieldBridge"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:940
+#: mapping.xml:1021
 #, no-c-format
 msgid ""
 "Some use cases require more than a simple object to string translation when "
 "mapping a property to a Lucene index. To give you the greatest possible "
 "flexibility you can also implement a bridge as a <classname>FieldBridge</"
 "classname>. This interface gives you a property value and let you map it the "
-"way you want in your Lucene <classname>Document</classname>.The interface is "
-"very similar in its concept to the Hibernate<classname> UserType</"
+"way you want in your Lucene <classname>Document</classname>. The interface "
+"is very similar in its concept to the Hibernate <classname>UserType</"
 "classname>s."
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:948
+#: mapping.xml:1029
 #, no-c-format
 msgid ""
 "You can for example store a given property in two different document fields:"
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:952
+#: mapping.xml:1033
 #, no-c-format
 msgid ""
 "Implementing the FieldBridge interface in order to a given property into "
@@ -1882,7 +2019,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:955
+#: mapping.xml:1036
 #, no-c-format
 msgid ""
 "/**\n"
@@ -1890,7 +2027,6 @@ msgid ""
 "Query per\n"
 " * year, month or day (eg get all the elements of December for the last 5 "
 "years).\n"
-" * \n"
 " * @author Emmanuel Bernard\n"
 " */\n"
 "public class DateSplitBridge implements FieldBridge {\n"
@@ -1907,25 +2043,22 @@ msgid ""
 "        int day = cal.get(Calendar.DAY_OF_MONTH);\n"
 "  \n"
 "        // set year\n"
-"        Field field = new Field(name + \".year\", String.valueOf(year),\n"
-"            luceneOptions.getStore(), luceneOptions.getIndex(),\n"
-"            luceneOptions.getTermVector());\n"
-"        field.setBoost(luceneOptions.getBoost());\n"
-"        document.add(field);\n"
+"        luceneOptions.addFieldToDocument(\n"
+"            name + \".year\",\n"
+"            String.valueOf( year ),\n"
+"            document );\n"
 "  \n"
 "        // set month and pad it if needed\n"
-"        field = new Field(name + \".month\", month &lt; 10 ? \"0\" : \"\"\n"
-"            + String.valueOf(month), luceneOptions.getStore(),\n"
-"            luceneOptions.getIndex(), luceneOptions.getTermVector());\n"
-"        field.setBoost(luceneOptions.getBoost());\n"
-"        document.add(field);\n"
+"        luceneOptions.addFieldToDocument(\n"
+"            name + \".month\",\n"
+"            month &lt; 10 ? \"0\" : \"\" + String.valueOf( month ),\n"
+"            document );\n"
 "  \n"
 "        // set day and pad it if needed\n"
-"        field = new Field(name + \".day\", day &lt; 10 ? \"0\" : \"\"\n"
-"            + String.valueOf(day), luceneOptions.getStore(),\n"
-"            luceneOptions.getIndex(), luceneOptions.getTermVector());\n"
-"        field.setBoost(luceneOptions.getBoost());\n"
-"        document.add(field);\n"
+"        luceneOptions.addFieldToDocument(\n"
+"            name + \".day\",\n"
+"            day &lt; 10 ? \"0\" : \"\" + String.valueOf( day ),\n"
+"            document );\n"
 "    }\n"
 "}\n"
 "\n"
@@ -1935,14 +2068,40 @@ msgid ""
 "private Date date;"
 msgstr ""
 
+#. Tag: para
+#: mapping.xml:1039
+#, no-c-format
+msgid ""
+"In the previous example the fields where not added directly to Document but "
+"we where delegating this task to the <classname>LuceneOptions</classname> "
+"helper; this will apply the options you have selected on <literal>@Field</"
+"literal>, like <literal>Store</literal> or <literal>TermVector</literal> "
+"options, or apply the choosen <classname>@Boost</classname> value. It is "
+"especially useful to encapsulate the complexity of <literal>COMPRESS</"
+"literal> implementations so it's recommended to delegate to "
+"<classname>LuceneOptions</classname> to add fields to the "
+"<classname>Document</classname>, but nothing stops you from editing the "
+"<classname>Document</classname> directly and ignore the "
+"<classname>LuceneOptions</classname> in case you need to."
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1048
+#, no-c-format
+msgid ""
+"Classes like <classname>LuceneOptions</classname> are created to shield your "
+"application from changes in Lucene API and simplify your code. Use them if "
+"you can, but if you need more flexibility you're not required to."
+msgstr ""
+
 #. Tag: title
-#: mapping.xml:960
+#: mapping.xml:1055
 #, no-c-format
 msgid "ClassBridge"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:962
+#: mapping.xml:1057
 #, no-c-format
 msgid ""
 "It is sometimes useful to combine more than one property of a given entity "
@@ -1957,13 +2116,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:974
+#: mapping.xml:1069
 #, no-c-format
 msgid "Implementing a class bridge"
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:976
+#: mapping.xml:1071
 #, no-c-format
 msgid ""
 "@Entity\n"
@@ -1982,7 +2141,6 @@ msgid ""
 "    private Integer maxEmployees\n"
 "    ...\n"
 "}\n"
-"\n"
 "\n"
 "public class CatFieldsClassBridge implements FieldBridge, "
 "ParameterizedBridge {\n"
@@ -2017,7 +2175,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:979
+#: mapping.xml:1074
 #, no-c-format
 msgid ""
 "In this example, the particular <classname>CatFieldsClassBridge</classname> "
@@ -2026,19 +2184,19 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:989 mapping.xml:1014
+#: mapping.xml:1084 mapping.xml:1109
 #, no-c-format
 msgid "Providing your own id"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:992
+#: mapping.xml:1087
 #, no-c-format
 msgid "This part of the documentation is a work in progress."
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:995
+#: mapping.xml:1090
 #, no-c-format
 msgid ""
 "You can provide your own id for Hibernate Search if you are extending the "
@@ -2049,13 +2207,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: mapping.xml:1002
+#: mapping.xml:1097
 #, no-c-format
 msgid "The ProvidedId annotation"
 msgstr ""
 
 #. Tag: para
-#: mapping.xml:1004
+#: mapping.xml:1099
 #, no-c-format
 msgid ""
 "Unlike conventional Hibernate Search API and @DocumentId, this annotation is "
@@ -2068,7 +2226,7 @@ msgid ""
 msgstr ""
 
 #. Tag: programlisting
-#: mapping.xml:1016
+#: mapping.xml:1111
 #, no-c-format
 msgid ""
 "@ProvidedId (bridge = org.my.own.package.MyCustomBridge)\n"
@@ -2077,5 +2235,1115 @@ msgid ""
 "    @Field\n"
 "    String MyString;\n"
 "    ...\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1117
+#, no-c-format
+msgid "Programmatic API"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1120
+#, no-c-format
+msgid ""
+"This feature is considered experimental. While stable code-wise, the API is "
+"subject to change in the future."
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1121
+#, no-c-format
+msgid ""
+"Although the recommended approach for mapping indexed entities is to use "
+"annotations, it is sometimes more convenient to use a different approach:"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1128
+#, no-c-format
+msgid ""
+"the same entity is mapped differently depending on deployment needs "
+"(customization for clients)"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1133
+#, no-c-format
+msgid ""
+"some automatization process requires the dynamic mapping of many entities "
+"sharing a common traits"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1138
+#, no-c-format
+msgid ""
+"While it has been a popular demand in the past, the Hibernate team never "
+"found the idea of an XML alternative to annotations appealing due to it's "
+"heavy duplication, lack of code refactoring safety, because it did not cover "
+"all the use case spectrum and because we are in the 21st century :)"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1144
+#, no-c-format
+msgid ""
+"Th idea of a programmatic API was much more appealing and has now become a "
+"reality. You can programmatically and safely define your mapping using a "
+"programmatic API: you define entities and fields as indexable by using "
+"mapping classes which effectively mirror the annotation concepts in "
+"Hibernate Search. Note that fan(s) of XML approach can design their own "
+"schema and use the programmatic API to create the mapping while parsing the "
+"XML stream."
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1152
+#, no-c-format
+msgid ""
+"In order to use the programmatic model you must first construct a "
+"<classname>SearchMapping</classname> object. This object is passed to "
+"Hibernate Search via a property set to the <classname>Configuration </"
+"classname>object. The property key is <literal>hibernate.search."
+"model_mapping</literal> or it's type-safe representation "
+"<classname>Environment.MODEL_MAPPING</classname>."
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1159
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"[...]\n"
+"configuration.setProperty( Environment.MODEL_MAPPING, mapping );\n"
+"\n"
+"//or in JPA\n"
+"SearchMapping mapping = new SearchMapping();\n"
+"[...]\n"
+"Map&lt;String,String&gt; properties = new HashMap&lt;String,String)(1);\n"
+"properties.put( Environment.MODEL_MAPPING, mapping );\n"
+"EntityManagerFactory emf = Persistence.createEntityManagerFactory( \"userPU"
+"\", properties );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1161
+#, no-c-format
+msgid ""
+"The <classname>SearchMapping</classname> is the root object which contains "
+"all the necessary indexable entities and fields. From there, the "
+"<classname>SearchMapping</classname> object exposes a fluent (and thus "
+"intuitive) API to express your mappings: it contextually exposes the "
+"relevant mapping options in a type-safe way, just let your IDE "
+"autocompletion feature guide you through."
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1168
+#, no-c-format
+msgid ""
+"Today, the programmatic API cannot be used on a class annotated with "
+"Hibernate Search annotations, chose one approach or the other. Also note "
+"that the same default values apply in annotations and the programmatic API. "
+"For example, the <methodname>@Field.name</methodname> is defaulted to the "
+"property name and does not have to be set."
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1174
+#, no-c-format
+msgid ""
+"Each core concept of the programmatic API has a corresponding example to "
+"depict how the same definition would look using annotation. Therefore seeing "
+"an annotation example of the programmatic approach should give you a clear "
+"picture of what Hibernate Search will build with the marked entities and "
+"associated properties."
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1181
+#, no-c-format
+msgid "Mapping an entity as indexable"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1183
+#, no-c-format
+msgid ""
+"The first concept of the programmatic API is to define an entity as "
+"indexable. Using the annotation approach a user would mark the entity as "
+"<classname>@Indexed</classname>, the following example demonstrates how to "
+"programmatically achieve this."
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1189
+#, no-c-format
+msgid "Marking an entity indexable"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1191
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping.entity(Address.class)\n"
+"           .indexed()\n"
+"               .indexName(\"Address_Index\"); //optional\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1193
+#, no-c-format
+msgid ""
+"As you can see you must first create a <classname>SearchMapping</classname> "
+"object which is the root object that is then passed to the "
+"<classname>Configuration</classname> object as property. You must declare an "
+"entity and if you wish to make that entity as indexable then you must call "
+"the <methodname>indexed()</methodname> method. The <methodname>indexed() </"
+"methodname>method has an optional <methodname>indexName(String indexName)</"
+"methodname> which can be used to change the default index name that is "
+"created by Hibernate Search. Using the annotation model the above can be "
+"achieved as:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1205
+#, no-c-format
+msgid "Annotation example of indexing entity"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1207
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed(index=\"Address_Index\")\n"
+"public class Address {\n"
+"....\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1213
+#, no-c-format
+msgid "Adding DocumentId to indexed entity"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1215
+#, no-c-format
+msgid "To set a property as a document id:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1218
+#, no-c-format
+msgid "Enabling document id with programmatic model"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1220
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping.entity(Address.class).indexed()\n"
+"           .property(\"addressId\", ElementType.FIELD) //field access\n"
+"               .documentId()\n"
+"                   .name(\"id\");\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping);"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1222
+#, no-c-format
+msgid ""
+"The above is equivalent to annotating a property in the entity as "
+"<classname>@DocumentId</classname> as seen in the following example:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1227
+#, no-c-format
+msgid "DocumentId annotation definition"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1229
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"public class Address {\n"
+" @Id\n"
+" @GeneratedValue\n"
+" @DocumentId(name=\"id\")\n"
+" private Long addressId;\n"
+"\n"
+" ....\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1231
+#, no-c-format
+msgid "The next section demonstrates how to programmatically define analyzers."
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1236
+#, no-c-format
+msgid "Defining analyzers"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1238
+#, no-c-format
+msgid ""
+"Analyzers can be programmatically defined using the <methodname>analyzerDef"
+"(String analyzerDef, Class&lt;? extends TokenizerFactory&gt; "
+"tokenizerFactory) </methodname>method. This method also enables you to "
+"define filters for the analyzer definition. Each filter that you define can "
+"optionally take in parameters as seen in the following example :"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1246
+#, no-c-format
+msgid "Defining analyzers using programmatic model"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1248
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping\n"
+"    <emphasis role=\"bold\">.analyzerDef( \"ngram\", "
+"StandardTokenizerFactory.class )\n"
+"        .filter( LowerCaseFilterFactory.class )\n"
+"        .filter( NGramFilterFactory.class )\n"
+"            .param( \"minGramSize\", \"3\" )\n"
+"            .param( \"maxGramSize\", \"3\" )\n"
+"    .analyzerDef( \"en\", StandardTokenizerFactory.class )\n"
+"        .filter( LowerCaseFilterFactory.class )\n"
+"        .filter( EnglishPorterFilterFactory.class )\n"
+"    .analyzerDef( \"de\", StandardTokenizerFactory.class )\n"
+"        .filter( LowerCaseFilterFactory.class )\n"
+"        .filter( GermanStemFilterFactory.class )</emphasis>\n"
+"    .entity(Address.class).indexed()\n"
+"        .property(\"addressId\", ElementType.METHOD) //getter access\n"
+"            .documentId()\n"
+"                .name(\"id\");\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1250
+#, no-c-format
+msgid ""
+"The analyzer mapping defined above is equivalent to the annotation model "
+"using <classname>@AnalyzerDef</classname> in conjunction with "
+"<classname>@AnalyzerDefs</classname>:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1254
+#, no-c-format
+msgid "Analyzer definition using annotation"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1256
+#, no-c-format
+msgid ""
+"@Indexed\n"
+"@Entity\n"
+"@AnalyzerDefs({\n"
+"  @AnalyzerDef(name = \"ngram\",\n"
+"    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),\n"
+"    filters = {\n"
+"      @TokenFilterDef(factory = LowerCaseFilterFactory.class),\n"
+"      @TokenFilterDef(factory = NGramFilterFactory.class, \n"
+"        params = {\n"
+"          @Parameter(name = \"minGramSize\",value = \"3\"),\n"
+"          @Parameter(name = \"maxGramSize\",value = \"3\") \n"
+"       })\n"
+"   }),\n"
+"  @AnalyzerDef(name = \"en\",\n"
+"    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),\n"
+"    filters = {\n"
+"      @TokenFilterDef(factory = LowerCaseFilterFactory.class),\n"
+"      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)\n"
+"   }),\n"
+"\n"
+"  @AnalyzerDef(name = \"de\",\n"
+"    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),\n"
+"    filters = {\n"
+"      @TokenFilterDef(factory = LowerCaseFilterFactory.class),\n"
+"      @TokenFilterDef(factory = GermanStemFilterFactory.class)\n"
+"  })\n"
+"\n"
+"})\n"
+"public class Address {\n"
+"...\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1261
+#, no-c-format
+msgid "Defining full text filter definitions"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1263
+#, no-c-format
+msgid ""
+"The programmatic API provides easy mechanism for defining full text filter "
+"definitions which is available via <classname>@FullTextFilterDef</classname> "
+"and <classname>@FullTextFilterDefs</classname>. Note that contrary to the "
+"annotation equivalent, full text filter definitions are a global construct "
+"and are not tied to an entity. The next example depicts the creation of full "
+"text filter definition using the <methodname>fullTextFilterDef </"
+"methodname>method."
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1273
+#, no-c-format
+msgid "Defining full text definition programmatically"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1275
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping\n"
+"    .analyzerDef( \"en\", StandardTokenizerFactory.class )\n"
+"        .filter( LowerCaseFilterFactory.class )\n"
+"        .filter( EnglishPorterFilterFactory.class )\n"
+"    <emphasis role=\"bold\">.fullTextFilterDef(\"security\", "
+"SecurityFilterFactory.class)\n"
+"            .cache(FilterCacheModeType.INSTANCE_ONLY)</emphasis>\n"
+"    .entity(Address.class)\n"
+"        .indexed()\n"
+"        .property(\"addressId\", ElementType.METHOD)\n"
+"            .documentId()\n"
+"                .name(\"id\")\n"
+"        .property(\"street1\", ElementType.METHOD)\n"
+"            .field()\n"
+"                .analyzer(\"en\")\n"
+"                .store(Store.YES)\n"
+"            .field()\n"
+"                .name(\"address_data\")\n"
+"                .analyzer(\"en\")\n"
+"                .store(Store.NO);\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1277
+#, no-c-format
+msgid ""
+"The previous example can effectively been seen as annotating your entity "
+"with <classname>@FullTextFilterDef</classname> like below:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1281
+#, no-c-format
+msgid "Using annotation to define full text filter definition"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1284
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"@AnalyzerDefs({\n"
+"  @AnalyzerDef(name = \"en\",\n"
+"    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),\n"
+"    filters = {\n"
+"      @TokenFilterDef(factory = LowerCaseFilterFactory.class),\n"
+"      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)\n"
+"   })\n"
+"})\n"
+"@FullTextFilterDefs({\n"
+" @FullTextFilterDef(name = \"security\", impl = SecurityFilterFactory.class, "
+"cache = FilterCacheModeType.INSTANCE_ONLY)\n"
+"})\n"
+"public class Address {\n"
+" \n"
+" @Id\n"
+" @GeneratedValue\n"
+" @DocumentId(name=\"id\")\n"
+" pubblic Long getAddressId() {...};\n"
+"\n"
+" @Fields({\n"
+"      @Field(index=Index.TOKENIZED, store=Store.YES, \n"
+"             analyzer=@Analyzer(definition=\"en\")),\n"
+"      @Field(name=\"address_data\", analyzer=@Analyzer(definition=\"en\"))\n"
+" })\n"
+" public String getAddress1() {...};\n"
+"\n"
+" ......\n"
+" \n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1289
+#, no-c-format
+msgid "Defining fields for indexing"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1291
+#, no-c-format
+msgid ""
+"When defining fields for indexing using the programmatic API, call "
+"<methodname>field()</methodname> on the <methodname>property(String "
+"propertyName, ElementType elementType)</methodname> method. From "
+"<methodname>field()</methodname> you can specify the <methodname>name, "
+"index</methodname>, <methodname>store</methodname>, <methodname>bridge</"
+"methodname> and <methodname>analyzer</methodname> definitions."
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1300
+#, no-c-format
+msgid "Indexing fields using programmatic API"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1302
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping\n"
+"    .analyzerDef( \"en\", StandardTokenizerFactory.class )\n"
+"        .filter( LowerCaseFilterFactory.class )\n"
+"        .filter( EnglishPorterFilterFactory.class )\n"
+"    .entity(Address.class).indexed()\n"
+"        .property(\"addressId\", ElementType.METHOD)\n"
+"            .documentId()\n"
+"                .name(\"id\")\n"
+"        .property(\"street1\", ElementType.METHOD)\n"
+"            <emphasis role=\"bold\">.field()\n"
+"                .analyzer(\"en\")\n"
+"                .store(Store.YES)\n"
+"                .index(Index.TOKENIZED) //no useful here as it's the "
+"default\n"
+"            .field()\n"
+"                .name(\"address_data\")\n"
+"                .analyzer(\"en\");</emphasis>\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1304
+#, no-c-format
+msgid ""
+"The above example of marking fields as indexable is equivalent to defining "
+"fields using <classname>@Field</classname> as seen below:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1308
+#, no-c-format
+msgid "Indexing fields using annotation"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1310
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"@AnalyzerDefs({\n"
+"  @AnalyzerDef(name = \"en\",\n"
+"    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),\n"
+"    filters = {\n"
+"      @TokenFilterDef(factory = LowerCaseFilterFactory.class),\n"
+"      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)\n"
+"   })\n"
+"})\n"
+"public class Address {\n"
+" \n"
+" @Id\n"
+" @GeneratedValue\n"
+" @DocumentId(name=\"id\")\n"
+" private Long getAddressId() {...};\n"
+"\n"
+" @Fields({\n"
+"      @Field(index=Index.TOKENIZED, store=Store.YES, \n"
+"             analyzer=@Analyzer(definition=\"en\")),\n"
+"      @Field(name=\"address_data\", analyzer=@Analyzer(definition=\"en\"))\n"
+" })\n"
+" public String getAddress1() {...}\n"
+"\n"
+" ......\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1317
+#, no-c-format
+msgid "Programmatically defining embedded entities"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1319
+#, no-c-format
+msgid ""
+"In this section you will see how to programmatically define entities to be "
+"embedded into the indexed entity similar to using the "
+"<classname>@IndexEmbedded</classname> model. In order to define this you "
+"must mark the property as <methodname>indexEmbedded. </methodname>The is the "
+"option to add a prefix to the embedded entity definition and this can be "
+"done by calling <methodname>prefix</methodname> as seen in the example below:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1328
+#, no-c-format
+msgid "Programmatically defining embedded entites"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1330
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mappping\n"
+"    .entity(ProductCatalog.class)\n"
+"        .indexed()\n"
+"        .property(\"catalogId\", ElementType.METHOD)\n"
+"            .documentId()\n"
+"                .name(\"id\")\n"
+"        .property(\"title\", ElementType.METHOD)\n"
+"            .field()\n"
+"                .index(Index.TOKENIZED)\n"
+"                .store(Store.NO)\n"
+"        .property(\"description\", ElementType.METHOD)\n"
+"             .field()\n"
+"                 .index(Index.TOKENIZED)\n"
+"                 .store(Store.NO)\n"
+"        .property(\"items\", ElementType.METHOD)\n"
+"            <emphasis role=\"bold\">.indexEmbedded()\n"
+"                .prefix(\"catalog.items\"); //optional</emphasis>\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1332
+#, no-c-format
+msgid ""
+"The next example shows the same definition using annotation "
+"(<classname>@IndexEmbedded</classname>):"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1335
+#, no-c-format
+msgid "Using @IndexEmbedded"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1337
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"public class ProductCatalog {\n"
+" @Id\n"
+" @GeneratedValue\n"
+" @DocumentId(name=\"id\")\n"
+" public Long getCatalogId() {...}\n"
+" \n"
+" @Field(store=Store.NO, index=Index.TOKENIZED)\n"
+" public String getTitle() {...}\n"
+"\n"
+" @Field(store=Store.NO, index=Index.TOKENIZED)\n"
+" public String getDescription();\n"
+" \n"
+" @OneToMany(fetch = FetchType.LAZY)\n"
+" @IndexColumn(name = \"list_position\")\n"
+" @Cascade(org.hibernate.annotations.CascadeType.ALL)\n"
+" @IndexEmbedded(prefix=\"catalog.items\")\n"
+" public List&lt;Item&gt; getItems() {...}\n"
+"\n"
+" ...\n"
+"\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1342
+#, no-c-format
+msgid "Contained In definition"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1344
+#, no-c-format
+msgid ""
+"<classname>@ContainedIn</classname> can be define as seen in the example "
+"below:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1346
+#, no-c-format
+msgid "Programmatically defining ContainedIn"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1348
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mappping\n"
+"    .entity(ProductCatalog.class)\n"
+"        .indexed()\n"
+"        .property(\"catalogId\", ElementType.METHOD)\n"
+"            .documentId()\n"
+"        .property(\"title\", ElementType.METHOD)\n"
+"            .field()\n"
+"        .property(\"description\", ElementType.METHOD)\n"
+"            .field()\n"
+"        .property(\"items\", ElementType.METHOD)\n"
+"            .indexEmbedded()\n"
+"\n"
+"    .entity(Item.class)\n"
+"        .property(\"description\", ElementType.METHOD)\n"
+"            .field()\n"
+"        .property(\"productCatalog\", ElementType.METHOD)\n"
+"            <emphasis role=\"bold\">.containedIn()</emphasis>;\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1350
+#, no-c-format
+msgid ""
+"This is equivalent to defining <classname>@ContainedIn</classname> in your "
+"entity:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1354
+#, no-c-format
+msgid "Annotation approach for ContainedIn"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1356
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"public class ProductCatalog {\n"
+" \n"
+" @Id\n"
+" @GeneratedValue\n"
+" @DocumentId\n"
+" public Long getCatalogId() {...}\n"
+" \n"
+" @Field\n"
+" public String getTitle() {...}\n"
+"\n"
+" @Field\n"
+" public String getDescription() {...}\n"
+" \n"
+" @OneToMany(fetch = FetchType.LAZY)\n"
+" @IndexColumn(name = \"list_position\")\n"
+" @Cascade(org.hibernate.annotations.CascadeType.ALL)\n"
+" @IndexEmbedded\n"
+" private List&lt;Item&gt; getItems() {...}\n"
+"\n"
+" ...\n"
+"\n"
+"}\n"
+"\n"
+"\n"
+"@Entity\n"
+"public class Item {\n"
+" \n"
+" @Id\n"
+" @GeneratedValue\n"
+" private Long itemId;\n"
+"\n"
+" @Field\n"
+" public String getDescription() {...}\n"
+" \n"
+" @ManyToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )\n"
+" @ContainedIn\n"
+" public ProductCatalog getProductCatalog() {...}\n"
+"\n"
+" ...\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1362
+#, no-c-format
+msgid "Date/Calendar Bridge"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1364
+#, no-c-format
+msgid ""
+"In order to define a calendar or date bridge mapping, call the "
+"<methodname>dateBridge(Resolution resolution) </methodname>or "
+"<methodname>calendarBridge(Resolution resolution)</methodname> methods after "
+"you have defined a <methodname>field()</methodname> in the "
+"<classname>SearchMapping </classname>hierarchy."
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1371
+#, no-c-format
+msgid "Programmatic model for defining calendar/date bridge"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1373
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping\n"
+"    .entity(Address.class)\n"
+"        .indexed()\n"
+"        .property(\"addressId\", ElementType.FIELD)\n"
+"            .documentId()\n"
+"    .property(\"street1\", ElementType.FIELD()\n"
+"        .field()\n"
+"    .property(\"createdOn\", ElementType.FIELD)\n"
+"        .field()\n"
+"        <emphasis role=\"bold\">.dateBridge(Resolution.DAY)</emphasis>\n"
+"    .property(\"lastUpdated\", ElementType.FIELD)\n"
+"        <emphasis role=\"bold\">.calendarBridge(Resolution.DAY)</emphasis>;\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1375
+#, no-c-format
+msgid ""
+"See below for defining the above using <classname>@CalendarBridge</"
+"classname> and <classname>@DateBridge</classname>:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1379
+#, no-c-format
+msgid "@CalendarBridge and @DateBridge definition"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1381
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"public class Address {\n"
+" \n"
+" @Id\n"
+" @GeneratedValue\n"
+" @DocumentId\n"
+" private Long addressId;\n"
+"\n"
+" @Field\n"
+" private String address1;\n"
+"\n"
+" @Field\n"
+" @DateBridge(resolution=Resolution.DAY)\n"
+" private Date createdOn;\n"
+"\n"
+" @CalendarBridge(resolution=Resolution.DAY)\n"
+" private Calendar lastUpdated;\n"
+"\n"
+" ...\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1386
+#, no-c-format
+msgid "Defining bridges"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1388
+#, no-c-format
+msgid ""
+"It is possible to associate bridges to programmatically defined fields. When "
+"you define a <methodname>field()</methodname> programmatically you can use "
+"the <methodname>bridge(Class&lt;?&gt; impl)</methodname> to associate a "
+"<classname>FieldBridge </classname>implementation class. The bridge method "
+"also provides optional methods to include any parameters required for the "
+"bridge class. The below shows an example of programmatically defining a "
+"bridge:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1398
+#, no-c-format
+msgid "Defining field bridges programmatically"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1400
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping\n"
+"    .entity(Address.class)\n"
+"        .indexed()\n"
+"        .property(\"addressId\", ElementType.FIELD)\n"
+"            .documentId()\n"
+"        .property(\"street1\", ElementType.FIELD)\n"
+"            .field()\n"
+"            .field()\n"
+"                .name(\"street1_abridged\")\n"
+"                <emphasis role=\"bold\">.bridge( ConcatStringBridge.class )\n"
+"                    .param( \"size\", \"4\" )</emphasis>;\n"
+" \n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1402
+#, no-c-format
+msgid ""
+"The above can equally be defined using annotations, as seen in the next "
+"example."
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1406
+#, no-c-format
+msgid "Defining field bridges using annotation"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1408
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"\n"
+"public class Address {\n"
+" \n"
+" @Id\n"
+" @GeneratedValue\n"
+" @DocumentId(name=\"id\")\n"
+" private Long addressId;\n"
+"\n"
+" @Fields({\n"
+"      @Field,\n"
+"      @Field(name=\"street1_abridged\", \n"
+"             bridge = @FieldBridge( impl = ConcatStringBridge.class, \n"
+"             params = @Parameter( name=\"size\", value=\"4\" ))\n"
+" })\n"
+" private String address1;\n"
+"\n"
+" ...\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1414
+#, no-c-format
+msgid "Mapping class bridge"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1416
+#, no-c-format
+msgid ""
+"You can define class bridges on entities programmatically. This is shown in "
+"the next example:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1420
+#, no-c-format
+msgid "Defining class briges using API"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1422
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping\n"
+"    .entity(Departments.class)\n"
+"<emphasis>       .classBridge(CatDeptsFieldsClassBridge.class)\n"
+"         .name(\"branchnetwork\")\n"
+"         .index(Index.TOKENIZED)\n"
+"         .store(Store.YES)\n"
+"         .param(\"sepChar\", \" \")\n"
+"      .classBridge(EquipmentType.class)\n"
+"         .name(\"equiptype\")\n"
+"         .index(Index.TOKENIZED)\n"
+"         .store(Store.YES)\n"
+"         .param(\"C\", \"Cisco\")\n"
+"         .param(\"D\", \"D-Link\")\n"
+"         .param(\"K\", \"Kingston\")\n"
+"         .param(\"3\", \"3Com\")</emphasis>\n"
+"      .indexed();\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1424
+#, no-c-format
+msgid ""
+"The above is similar to using <classname>@ClassBridge </classname>as seen in "
+"the next example:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1426
+#, no-c-format
+msgid "Using @ClassBridge"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1428
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"@ClassBridges ( {\n"
+"  @ClassBridge(name=\"branchnetwork\",\n"
+"     index= Index.TOKENIZED,\n"
+"     store= Store.YES,\n"
+"     impl = CatDeptsFieldsClassBridge.class,\n"
+"     params = @Parameter( name=\"sepChar\", value=\" \" ) ),\n"
+"  @ClassBridge(name=\"equiptype\",\n"
+"     index= Index.TOKENIZED,\n"
+"     store= Store.YES,\n"
+"     impl = EquipmentType.class,\n"
+"     params = {@Parameter( name=\"C\", value=\"Cisco\" ),\n"
+"        @Parameter( name=\"D\", value=\"D-Link\" ),\n"
+"        @Parameter( name=\"K\", value=\"Kingston\" ),\n"
+"        @Parameter( name=\"3\", value=\"3Com\" )\n"
+"   })\n"
+"})\n"
+"public class Departments {\n"
+"\n"
+"....\n"
+"\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1434
+#, no-c-format
+msgid "Mapping dynamic boost"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1436
+#, no-c-format
+msgid ""
+"You can apply a dynamic boost factor on either a field or a whole entity:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1440
+#, no-c-format
+msgid "DynamicBoost mapping using programmatic model"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1442
+#, no-c-format
+msgid ""
+"SearchMapping mapping = new SearchMapping();\n"
+"\n"
+"mapping\n"
+"  .entity(DynamicBoostedDescLibrary.class)\n"
+"   .indexed()\n"
+"   <emphasis>.dynamicBoost(CustomBoostStrategy.class)</emphasis>\n"
+"  .property(\"libraryId\", ElementType.FIELD)\n"
+"    .documentId().name(\"id\")\n"
+"  .property(\"name\", ElementType.FIELD)\n"
+"    <emphasis>.dynamicBoost(CustomFieldBoostStrategy.class)</emphasis>;\n"
+"    .field()\n"
+"      .store(Store.YES)\n"
+"\n"
+"cfg.getProperties().put( \"hibernate.search.model_mapping\", mapping );"
+msgstr ""
+
+#. Tag: para
+#: mapping.xml:1444
+#, no-c-format
+msgid ""
+"The next example shows the equivalent mapping using the "
+"<classname>@DynamicBoost</classname> annotation:"
+msgstr ""
+
+#. Tag: title
+#: mapping.xml:1446
+#, no-c-format
+msgid "Using the @DynamicBoost"
+msgstr ""
+
+#. Tag: programlisting
+#: mapping.xml:1448
+#, no-c-format
+msgid ""
+"@Entity\n"
+"@Indexed\n"
+"@DynamicBoost(impl = CustomBoostStrategy.class)\n"
+"public class DynamicBoostedDescriptionLibrary {\n"
+"\n"
+" @Id\n"
+" @GeneratedValue\n"
+" @DocumentId\n"
+" private int id;\n"
+"\n"
+" private float dynScore;\n"
+" \n"
+" @Field(store = Store.YES)\n"
+" @DynamicBoost(impl = CustomFieldBoostStrategy.class)\n"
+" private String name;\n"
+"\n"
+" public DynamicBoostedDescriptionLibrary() {\n"
+"  dynScore = 1.0f;\n"
+" }\n"
+"  \n"
+" .......\n"
+"\n"
 "}"
 msgstr ""

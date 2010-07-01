@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2009-05-26 15:46+0000\n"
+"POT-Creation-Date: 2010-07-01 20:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -256,5 +256,11 @@ msgid ""
       "public class Book {\n"
       "   ...\n"
       "}</programlisting>As an example, let's assume it is not important how often a term appears in a document. Documents with a single occurrence of the term should be scored the same as documents with multiple occurrences. In this case your custom implementation of the method <methodname>tf(float freq)</methodname> should return 1.0."
+msgstr ""
+
+#. Tag: para
+#: lucene-native.xml:196
+#, no-c-format
+msgid "When two entities share the same index they must declare the same <classname>Similarity</classname> implementation. Classes in the same class hierarchy always share the index, so it's not allowed to override the <classname>Similarity</classname> implementation in a subtype."
 msgstr ""
 

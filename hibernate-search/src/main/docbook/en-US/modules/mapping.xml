@@ -1722,8 +1722,8 @@ public class Address {
  ....
 }</programlisting>
             </example></para>
-        </example>The next section demonstrates how to programmatically define
-      analyzers.</para>
+        </example>
+        The next section demonstrates how to programmatically define analyzers.</para>
     </section>
 
     <section>

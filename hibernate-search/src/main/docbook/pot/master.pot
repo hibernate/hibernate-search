@@ -1,0 +1,52 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2010-07-01 20:08+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: application/x-xml2pot; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: master.xml:34
+#, no-c-format
+msgid "Hibernate Search"
+msgstr ""
+
+#. Tag: subtitle
+#: master.xml:36
+#, no-c-format
+msgid "Apache <trademark>Lucene</trademark> Integration"
+msgstr ""
+
+#. Tag: subtitle
+#: master.xml:38
+#, no-c-format
+msgid "Reference Guide"
+msgstr ""
+
+#. Tag: title
+#: master.xml:58
+#, no-c-format
+msgid "Preface"
+msgstr ""
+
+#. Tag: para
+#: master.xml:60
+#, no-c-format
+msgid "Full text search engines like Apache Lucene are very powerful technologies to add efficient free text search capabilities to applications. However, Lucene suffers several mismatches when dealing with object domain model. Amongst other things indexes have to be kept up to date and mismatches between index structure and domain model as well as query mismatches have to be avoided."
+msgstr ""
+
+#. Tag: para
+#: master.xml:67
+#, no-c-format
+msgid "Hibernate Search addresses these shortcomings - it indexes your domain model with the help of a few annotations, takes care of database/index synchronization and brings back regular managed objects from free text queries. To achieve this Hibernate Search is combining the power of <ulink url=\"http://www.hibernate.org\">Hibernate</ulink> and <ulink url=\"http://lucene.apache.org\">Apache Lucene</ulink>."
+msgstr ""
+

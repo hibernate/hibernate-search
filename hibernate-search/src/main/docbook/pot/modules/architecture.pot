@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2009-05-26 15:46+0000\n"
+"POT-Creation-Date: 2010-07-01 20:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -158,110 +158,122 @@ msgstr ""
 msgid "This mode targets clustered environments where throughput is critical, and index update delays are affordable. Reliability is ensured by the JMS provider and by having the slaves working on a local copy of the index."
 msgstr ""
 
+#. Tag: title
+#: architecture.xml:178
+#, no-c-format
+msgid "JGroups"
+msgstr ""
+
+#. Tag: para
+#: architecture.xml:180
+#, no-c-format
+msgid "The JGroups based back end works similarly as the JMS one. Designed on the same master/slave pattern, instead of JMS the JGroups toolkit is used as a replication mechanism. This back end can be used as an alternative to JMS one when response time is still critical, but i.e. JNDI service is not available."
+msgstr ""
+
 #. Tag: note
-#: architecture.xml:177
+#: architecture.xml:186
 #, no-c-format
 msgid "Hibernate Search is an extensible architecture. Feel free to drop ideas for other third party back ends to <literal>hibernate-dev@lists.jboss.org</literal>."
 msgstr ""
 
 #. Tag: title
-#: architecture.xml:183
+#: architecture.xml:192
 #, no-c-format
 msgid "Work execution"
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:185
+#: architecture.xml:194
 #, no-c-format
 msgid "The indexing work (done by the back end) can be executed synchronously with the transaction commit (or update operation if out of transaction), or asynchronously."
 msgstr ""
 
 #. Tag: title
-#: architecture.xml:190
+#: architecture.xml:199
 #, no-c-format
 msgid "Synchronous"
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:192
+#: architecture.xml:201
 #, no-c-format
 msgid "This is the safe mode where the back end work is executed in concert with the transaction commit. Under highly concurrent environment, this can lead to throughput limitations (due to the Apache Lucene lock mechanism) and it can increase the system response time if the backend is significantly slower than the transactional process and if a lot of IO operations are involved."
 msgstr ""
 
 #. Tag: title
-#: architecture.xml:201
+#: architecture.xml:210
 #, no-c-format
 msgid "Asynchronous"
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:203
+#: architecture.xml:212
 #, no-c-format
 msgid "This mode delegates the work done by the back end to a different thread. That way, throughput and response time are (to a certain extend) decorrelated from the back end performance. The drawback is that a small delay appears between the transaction commit and the index update and a small overhead is introduced to deal with thread management."
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:210
+#: architecture.xml:219
 #, no-c-format
 msgid "It is recommended to use synchronous execution first and evaluate asynchronous execution if performance problems occur and after having set up a proper benchmark (ie not a lonely cowboy hitting the system in a completely unrealistic way)."
 msgstr ""
 
 #. Tag: title
-#: architecture.xml:219
+#: architecture.xml:228
 #, no-c-format
 msgid "Reader strategy"
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:221
+#: architecture.xml:230
 #, no-c-format
 msgid "When executing a query, Hibernate Search interacts with the Apache Lucene indexes through a reader strategy. Choosing a reader strategy will depend on the profile of the application (frequent updates, read mostly, asynchronous index update etc). See also"
 msgstr ""
 
 #. Tag: title
-#: architecture.xml:228
+#: architecture.xml:237
 #, no-c-format
 msgid "Shared"
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:230
+#: architecture.xml:239
 #, no-c-format
 msgid "With this strategy, Hibernate Search will share the same <classname>IndexReader</classname>, for a given Lucene index, across multiple queries and threads provided that the <classname>IndexReader</classname> is still up-to-date. If the <classname>IndexReader</classname> is not up-to-date, a new one is opened and provided. Each <classname>IndexReader</classname> is made of several <classname>SegmentReader</classname>s. This strategy only reopens segments that have been modified or created after last opening and shares the already loaded segments from the previous instance. This strategy is the default."
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:241
+#: architecture.xml:250
 #, no-c-format
 msgid "The name of this strategy is <literal>shared</literal>."
 msgstr ""
 
 #. Tag: title
-#: architecture.xml:245
+#: architecture.xml:254
 #, no-c-format
 msgid "Not-shared"
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:247
+#: architecture.xml:256
 #, no-c-format
 msgid "Every time a query is executed, a Lucene <classname>IndexReader</classname> is opened. This strategy is not the most efficient since opening and warming up an <classname>IndexReader</classname> can be a relatively expensive operation."
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:253
+#: architecture.xml:262
 #, no-c-format
 msgid "The name of this strategy is <literal>not-shared</literal>."
 msgstr ""
 
 #. Tag: title
-#: architecture.xml:257
+#: architecture.xml:266
 #, no-c-format
 msgid "Custom"
 msgstr ""
 
 #. Tag: para
-#: architecture.xml:259
+#: architecture.xml:268
 #, no-c-format
 msgid "You can write your own reader strategy that suits your application needs by implementing <classname>org.hibernate.search.reader.ReaderProvider</classname>. The implementation must be thread safe."
 msgstr ""

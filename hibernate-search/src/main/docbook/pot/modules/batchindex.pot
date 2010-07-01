@@ -1,0 +1,357 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2010-07-01 20:08+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: application/x-xml2pot; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: batchindex.xml:30
+#, no-c-format
+msgid "Manual index changes"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:32
+#, no-c-format
+msgid "As Hibernate core applies changes to the Database, Hibernate Search detects these changes and will update the index automatically (unless the EventListeners are disabled). Sometimes changes are made to the database without using Hibernate, as when backup is restored or your data is otherwise affected; for these cases Hibernate Search exposes the Manual Index APIs to explicitly update or remove a single entity from the index, or rebuild the index for the whole database, or remove all references to a specific type."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:40
+#, no-c-format
+msgid "All these methods affect the Lucene Index only, no changes are applied to the Database."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:44
+#, no-c-format
+msgid "Adding instances to the Index"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:46
+#, no-c-format
+msgid "Using <classname>FullTextSession</classname>.<methodname>index(T entity)</methodname> you can directly add or update a specific object instance to the index. If this entity was already indexed, then the index will be updated. Changes to the index are only applied at transaction commit."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:52
+#, no-c-format
+msgid "Indexing an entity via <methodname>FullTextSession.index(T entity)</methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: batchindex.xml:55
+#, no-c-format
+msgid ""
+      "FullTextSession fullTextSession = Search.getFullTextSession(session);\n"
+      "Transaction tx = fullTextSession.beginTransaction();\n"
+      "Object customer = fullTextSession.load( Customer.class, 8 );\n"
+      "<emphasis role=\"bold\">fullTextSession.index(customer);</emphasis>\n"
+      "tx.commit(); //index only updated at commit time"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:58
+#, no-c-format
+msgid "In case you want to add all instances for a type, or for all indexed types, the recommended approach is to use a <classname>MassIndexer</classname>: see <xref linkend=\"search-batchindex-massindexer\"/> for more details."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:65
+#, no-c-format
+msgid "Deleting instances from the Index: Purging"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:67
+#, no-c-format
+msgid "It is equally possible to remove an entity or all entities of a given type from a Lucene index without the need to physically remove them from the database. This operation is named purging and is also done through the <classname>FullTextSession</classname>."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:73
+#, no-c-format
+msgid "Purging a specific instance of an entity from the index"
+msgstr ""
+
+#. Tag: programlisting
+#: batchindex.xml:75
+#, no-c-format
+msgid ""
+      "FullTextSession fullTextSession = Search.getFullTextSession(session);\n"
+      "Transaction tx = fullTextSession.beginTransaction();\n"
+      "for (Customer customer : customers) {\n"
+      "    <emphasis role=\"bold\">fullTextSession.purge( Customer.class, customer.getId() );</emphasis>\n"
+      "}\n"
+      "tx.commit(); //index is updated at commit time"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:78
+#, no-c-format
+msgid "Purging will remove the entity with the given id from the Lucene index but will not touch the database."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:81
+#, no-c-format
+msgid "If you need to remove all entities of a given type, you can use the <methodname>purgeAll</methodname> method. This operation removes all entities of the type passed as a parameter as well as all its subtypes."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:87
+#, no-c-format
+msgid "Purging all instances of an entity from the index"
+msgstr ""
+
+#. Tag: programlisting
+#: batchindex.xml:89
+#, no-c-format
+msgid ""
+      "FullTextSession fullTextSession = Search.getFullTextSession(session);\n"
+      "Transaction tx = fullTextSession.beginTransaction();\n"
+      "<emphasis role=\"bold\">fullTextSession.purgeAll( Customer.class );</emphasis>\n"
+      "//optionally optimize the index\n"
+      "//fullTextSession.getSearchFactory().optimize( Customer.class );\n"
+      "tx.commit(); //index changes are applied at commit time"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:92
+#, no-c-format
+msgid "It is recommended to optimize the index after such an operation."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:96
+#, no-c-format
+msgid "Methods <methodname>index</methodname>, <methodname>purge</methodname> and <methodname>purgeAll</methodname> are available on <classname>FullTextEntityManager</classname> as well."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:102
+#, no-c-format
+msgid "All manual indexing methods (<methodname>index</methodname>, <methodname>purge</methodname> and <methodname>purgeAll</methodname>) only affect the index, not the database, nevertheless they are transactional and as such they won't be applied until the transaction is successfully committed, or you make use of <methodname>flushToIndexes</methodname>."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:112
+#, no-c-format
+msgid "Rebuilding the whole Index"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:114
+#, no-c-format
+msgid "If you change the entity mapping to the index, chances are that the whole Index needs to be updated; For example if you decide to index a an existing field using a different analyzer you'll need to rebuild the index for affected types. Also if the Database is replaced (like restored from a backup, imported from a legacy system) you'll want to be able to rebuild the index from existing data. Hibernate Search provides two main strategies to choose from:"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:124
+#, no-c-format
+msgid "Using <classname>FullTextSession</classname>.<methodname>flushToIndexes()</methodname> periodically, while using <classname>FullTextSession</classname>.<methodname>index()</methodname> on all entities."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:129
+#, no-c-format
+msgid "Use a <classname>MassIndexer</classname>."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:134
+#, no-c-format
+msgid "Using flushToIndexes()"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:136
+#, no-c-format
+msgid "This strategy consists in removing the existing index and then adding all entities back to the index using <classname>FullTextSession</classname>.<methodname>purgeAll()</methodname> and <classname>FullTextSession</classname>.<methodname>index()</methodname>, however there are some memory and efficiency contraints. For maximum efficiency Hibernate Search batches index operations and executes them at commit time. If you expect to index a lot of data you need to be careful about memory consumption since all documents are kept in a queue until the transaction commit. You can potentially face an <classname>OutOfMemoryException</classname> if you don't empty the queue periodically: to do this you can use <methodname>fullTextSession.flushToIndexes()</methodname>. Every time <methodname>fullTextSession.flushToIndexes()</methodname> is called (or if the transaction is committed), the batch queue is processed applying all index changes. Be aware that, once flushed, the changes cannot be rolled back."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:154
+#, no-c-format
+msgid "Index rebuilding using index() and flushToIndexes()"
+msgstr ""
+
+#. Tag: programlisting
+#: batchindex.xml:156
+#, no-c-format
+msgid ""
+      "fullTextSession.setFlushMode(FlushMode.MANUAL);\n"
+      "fullTextSession.setCacheMode(CacheMode.IGNORE);\n"
+      "transaction = fullTextSession.beginTransaction();\n"
+      "//Scrollable results will avoid loading too many objects in memory\n"
+      "ScrollableResults results = fullTextSession.createCriteria( Email.class )\n"
+      "    .setFetchSize(BATCH_SIZE)\n"
+      "    .scroll( ScrollMode.FORWARD_ONLY );\n"
+      "int index = 0;\n"
+      "while( results.next() ) {\n"
+      "    index++;\n"
+      "    fullTextSession.index( results.get(0) ); //index each element\n"
+      "    if (index % BATCH_SIZE == 0) {\n"
+      "        fullTextSession.flushToIndexes(); //apply changes to indexes\n"
+      "        fullTextSession.clear(); //free memory since the queue is processed\n"
+      "    }\n"
+      "}\n"
+      "transaction.commit();"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:160
+#, no-c-format
+msgid "<literal>hibernate.search.worker.batch_size</literal> has been deprecated in favor of this explicit API which provides better control"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:164
+#, no-c-format
+msgid "Try to use a batch size that guarantees that your application will not run out of memory: with a bigger batch size objects are fetched faster from database but more memory is needed."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:171
+#, no-c-format
+msgid "Using a MassIndexer"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:172
+#, no-c-format
+msgid "Hibernate Search's <classname>MassIndexer</classname> uses several parallel threads to rebuild the index; you can optionally select which entities need to be reloaded or have it reindex all entities. This approach is optimized for best performance but requires to set the application in maintenance mode: making queries to the index is not recommended when a MassIndexer is busy."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:179
+#, no-c-format
+msgid "Index rebuilding using a MassIndexer"
+msgstr ""
+
+#. Tag: programlisting
+#: batchindex.xml:180
+#, no-c-format
+msgid "fullTextSession.createIndexer().startAndWait();"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:181
+#, no-c-format
+msgid "This will rebuild the index, deleting it and then reloading all entities from the database. Although it's simple to use, some tweaking is recommended to speed up the process: there are several parameters configurable."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:186
+#, no-c-format
+msgid "During the progress of a MassIndexer the content of the index is undefined, make sure that nobody will try to make some query during index rebuilding! If somebody should query the index it will not corrupt but most results will likely be missing."
+msgstr ""
+
+#. Tag: title
+#: batchindex.xml:192
+#, no-c-format
+msgid "Using a tuned MassIndexer"
+msgstr ""
+
+#. Tag: programlisting
+#: batchindex.xml:193
+#, no-c-format
+msgid ""
+      "fullTextSession\n"
+      "        .createIndexer( User.class )\n"
+      "        .batchSizeToLoadObjects( 25 )\n"
+      "        .cacheMode( CacheMode.NORMAL )\n"
+      "        .threadsToLoadObjects( 5 )\n"
+      "        .threadsForSubsequentFetching( 20 )\n"
+      "        .startAndWait();"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:194
+#, no-c-format
+msgid "This will rebuild the index of all User instances (and subtypes), and will create 5 parallel threads to load the User instances using batches of 25 objects per query; these loaded User instances are then pipelined to 20 parallel threads to load the attached lazy collections of User containing some information needed for the index."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:199
+#, no-c-format
+msgid "It is recommended to leave cacheMode to <literal>CacheMode.IGNORE</literal> (the default), as in most reindexing situations the cache will be a useless additional overhead; it might be useful to enable some other <literal>CacheMode</literal> depending on your data: it might increase performance if the main entity is relating to enum-like data included in the index."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:205
+#, no-c-format
+msgid "The \"sweet spot\" of number of threads to achieve best performance is highly dependent on your overall architecture, database design and even data values. To find out the best number of threads for your application it is recommended to use a profiler: all internal thread groups have meaningful names to be easily identified with most tools."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:214
+#, no-c-format
+msgid "The MassIndexer was designed for speed and is unaware of transactions, so there is no need to begin one or committing. Also because it is not transactional it is not recommended to let users use the system during it's processing, as it is unlikely people will be able to find results and the system load might be too high anyway."
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:223
+#, no-c-format
+msgid "Other parameters which also affect indexing time and memory consumption are:"
+msgstr ""
+
+#. Tag: literal
+#: batchindex.xml:228
+#, no-c-format
+msgid "hibernate.search.[default|&lt;indexname&gt;].exclusive_index_use"
+msgstr ""
+
+#. Tag: literal
+#: batchindex.xml:232
+#, no-c-format
+msgid "hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_buffered_docs"
+msgstr ""
+
+#. Tag: literal
+#: batchindex.xml:236
+#, no-c-format
+msgid "hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_field_length"
+msgstr ""
+
+#. Tag: literal
+#: batchindex.xml:240
+#, no-c-format
+msgid "hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_merge_docs"
+msgstr ""
+
+#. Tag: literal
+#: batchindex.xml:244
+#, no-c-format
+msgid "hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.merge_factor"
+msgstr ""
+
+#. Tag: literal
+#: batchindex.xml:248
+#, no-c-format
+msgid "hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.ram_buffer_size"
+msgstr ""
+
+#. Tag: literal
+#: batchindex.xml:252
+#, no-c-format
+msgid "hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.term_index_interval"
+msgstr ""
+
+#. Tag: para
+#: batchindex.xml:256
+#, no-c-format
+msgid "All <literal>.indexwriter</literal> parameters are Lucene specific and Hibernate Search is just passing these parameters through - see <xref linkend=\"lucene-indexing-performance\"/> for more details."
+msgstr ""
+

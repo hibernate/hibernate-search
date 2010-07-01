@@ -1,17 +1,18 @@
-# Chinese translations for PACKAGE package.
-# Automatically generated, 2009.
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2009-05-26 15:46+0000\n"
-"PO-Revision-Date: 2009-05-26 15:46+0000\n"
+"POT-Creation-Date: 2010-07-01 20:08+0000\n"
+"PO-Revision-Date: 2010-07-01 20:08+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
 
 #. Tag: title
 #: lucene-native.xml:30
@@ -317,4 +318,14 @@ msgid ""
 "should be scored the same as documents with multiple occurrences. In this "
 "case your custom implementation of the method <methodname>tf(float freq)</"
 "methodname> should return 1.0."
+msgstr ""
+
+#. Tag: para
+#: lucene-native.xml:196
+#, no-c-format
+msgid ""
+"When two entities share the same index they must declare the same "
+"<classname>Similarity</classname> implementation. Classes in the same class "
+"hierarchy always share the index, so it's not allowed to override the "
+"<classname>Similarity</classname> implementation in a subtype."
 msgstr ""
