@@ -183,7 +183,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 				"shun=false;print_local_addr=true)";
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};

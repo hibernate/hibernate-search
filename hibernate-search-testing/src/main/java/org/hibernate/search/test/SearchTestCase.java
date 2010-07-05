@@ -1,21 +1,20 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
- * 
+ *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
  * Lesser General Public License, as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this distribution; if not, write to:
  * Free Software Foundation, Inc.
@@ -38,39 +37,44 @@ import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Interceptor;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.impl.SessionFactoryImpl;
-import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.RAMDirectoryProvider;
-import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.test.annotations.HibernateTestCase;
 
 /**
  * Base class for Hibernate Search unit tests.
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public abstract class SearchTestCase extends TestCase {
+public abstract class SearchTestCase extends HibernateTestCase {
 
 	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
 
-	public static Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
-	public static Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
-	public static Analyzer simpleAnalyzer = new SimpleAnalyzer();
-	public static Analyzer keywordAnalyzer = new KeywordAnalyzer();
+	public static final Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
+	public static final Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
+	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer();
+	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
+
+	protected static SessionFactory sessions;
+	protected Session session;
 
 	private static File indexDir;
 
-	private SearchFactory searchFactory;
+	private SearchFactoryImplementor searchFactory;
 
 	static {
 		String buildDir = System.getProperty( "build.dir" );
@@ -82,15 +86,78 @@ public abstract class SearchTestCase extends TestCase {
 		log.debug( "Using {} as index directory.", indexDir.getAbsolutePath() );
 	}
 
-	protected void setUp() throws Exception {
-		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
-		ensureIndexesAreEmpty();
+	public SearchTestCase() {
+		super();
 	}
 
-	protected void tearDown() throws Exception {
-		SchemaExport export = new SchemaExport( cfg );
-		export.drop( false, true );
-		searchFactory = null;
+	public SearchTestCase(String x) {
+		super( x );
+	}
+
+	@Override
+	protected void handleUnclosedResources() {
+		if ( session != null && session.isOpen() ) {
+			if ( session.isConnected() ) {
+				session.doWork( new RollbackWork() );
+			}
+			session.close();
+			session = null;
+			fail( "unclosed session" );
+		}
+		else {
+			session = null;
+		}
+	}
+
+	@Override
+	protected void closeResources() {
+		try {
+			if ( session != null && session.isOpen() ) {
+				if ( session.isConnected() ) {
+					session.doWork( new RollbackWork() );
+				}
+				session.close();
+			}
+		}
+		catch ( Exception ignore ) {
+		}
+		try {
+			if ( sessions != null ) {
+				sessions.close();
+				sessions = null;
+			}
+		}
+		catch ( Exception ignore ) {
+		}
+	}
+
+	public Session openSession() throws HibernateException {
+		session = getSessions().openSession();
+		return session;
+	}
+
+	public Session openSession(Interceptor interceptor) throws HibernateException {
+		session = getSessions().openSession( interceptor );
+		return session;
+	}
+
+	protected void setSessions(SessionFactory sessions) {
+		SearchTestCase.sessions = sessions;
+	}
+
+	protected SessionFactory getSessions() {
+		return sessions;
+	}
+
+	protected void configure(Configuration cfg) {
+		super.configure( cfg );
+
+		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
+		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+
+		cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
+		cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
 	}
 
 	protected Directory getDirectory(Class<?> clazz) {
@@ -114,6 +181,11 @@ public abstract class SearchTestCase extends TestCase {
 		return listener;
 	}
 
+	protected void setUp() throws Exception {
+		super.setUp();
+		ensureIndexesAreEmpty();
+	}
+
 	protected void ensureIndexesAreEmpty() {
 		if ( "jms".equals( getCfg().getProperty( "hibernate.search.worker.backend" ) ) ) {
 			log.debug( "JMS based test. Skipping index emptying" );
@@ -122,7 +194,7 @@ public abstract class SearchTestCase extends TestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx;
 		tx = s.beginTransaction();
-		for ( Class<?> clazz : getMappings() ) {
+		for ( Class<?> clazz : getAnnotatedClasses() ) {
 			if ( clazz.getAnnotation( Indexed.class ) != null ) {
 				s.purgeAll( clazz );
 			}
@@ -135,25 +207,17 @@ public abstract class SearchTestCase extends TestCase {
 		if ( searchFactory == null ) {
 			Session session = openSession();
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			searchFactory = fullTextSession.getSearchFactory();
+			searchFactory = ( SearchFactoryImplementor ) fullTextSession.getSearchFactory();
 			fullTextSession.close();
 		}
 		return searchFactory;
-	}
-
-	protected void configure(Configuration cfg) {
-		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
-		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
-		cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
 	}
 
 	protected File getBaseIndexDir() {
 		return indexDir;
 	}
 
-	protected void buildSessionFactory(Class<?>[] classes, String[] packages, String[] xmlFiles) throws Exception {
+	protected void buildConfiguration() throws Exception {
 		if ( getSessions() != null ) {
 			getSessions().close();
 		}
@@ -163,17 +227,16 @@ public abstract class SearchTestCase extends TestCase {
 			if ( recreateSchema() ) {
 				cfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 			}
-			for ( String aPackage : packages ) {
+			for ( String aPackage : getAnnotatedPackages() ) {
 				( ( AnnotationConfiguration ) getCfg() ).addPackage( aPackage );
 			}
-			for ( Class<?> aClass : classes ) {
+			for ( Class<?> aClass : getAnnotatedClasses() ) {
 				( ( AnnotationConfiguration ) getCfg() ).addAnnotatedClass( aClass );
 			}
-			for ( String xmlFile : xmlFiles ) {
+			for ( String xmlFile : getXmlFiles() ) {
 				InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );
 				getCfg().addInputStream( is );
 			}
-			setDialect( Dialect.getDialect() );
 			setSessions( getCfg().buildSessionFactory( /*new TestInterceptor()*/ ) );
 		}
 		catch ( Exception e ) {
@@ -182,14 +245,8 @@ public abstract class SearchTestCase extends TestCase {
 		}
 	}
 
-	protected abstract Class<?>[] getMappings();
-
 	protected String[] getAnnotatedPackages() {
 		return new String[] { };
-	}
-
-	protected static File getIndexDir() {
-		return indexDir;
 	}
 
 	public static Version getTargetLuceneVersion() {
@@ -215,5 +272,4 @@ public abstract class SearchTestCase extends TestCase {
 				.getParentFile()  // target/classes/
 				.getParentFile(); // target
 	}
-
 }

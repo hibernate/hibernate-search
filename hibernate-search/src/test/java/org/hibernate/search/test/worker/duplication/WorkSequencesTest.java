@@ -139,7 +139,7 @@ public class WorkSequencesTest extends SearchTestCase {
 	}
 	
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Domain.class
 		};

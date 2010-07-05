@@ -32,6 +32,7 @@ import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -52,19 +53,19 @@ public class OptimizerPerfTest extends SearchTestCase {
 		FileHelper.delete( sub );
 		sub.mkdir();
 		File[] files = sub.listFiles();
-		for (File file : files) {
+		for ( File file : files ) {
 			if ( file.isDirectory() ) {
 				FileHelper.delete( file );
 			}
 		}
-		//super.setUp(); //we need a fresh session factory each time for index set up
-		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
+		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
+		setCfg( null ); //we need a fresh session factory each time for index set up
 	}
 
 	public void testConcurrency() throws Exception {
@@ -74,15 +75,17 @@ public class OptimizerPerfTest extends SearchTestCase {
 		ReverseWork reverseWork = new ReverseWork( getSessions() );
 		long start = System.currentTimeMillis();
 		int iteration = 100;
-		for (int i = 0; i < iteration; i++) {
+		for ( int i = 0; i < iteration; i++ ) {
 			es.execute( work );
 			es.execute( reverseWork );
 		}
 		while ( work.count < iteration - 1 ) {
 			Thread.sleep( 20 );
 		}
-		System.out.println( iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: " + ( System
-				.currentTimeMillis() - start ) );
+		System.out.println(
+				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: " + ( System
+						.currentTimeMillis() - start )
+		);
 	}
 
 	protected static class Work implements Runnable {
@@ -106,9 +109,9 @@ public class OptimizerPerfTest extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				w = (Worker) s.get( Worker.class, w.getId() );
+				w = ( Worker ) s.get( Worker.class, w.getId() );
 				w.setName( "Gavin" );
-				c = (Construction) s.get( Construction.class, c.getId() );
+				c = ( Construction ) s.get( Construction.class, c.getId() );
 				c.setName( "W Hotel" );
 				tx.commit();
 				s.close();
@@ -116,7 +119,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 				try {
 					Thread.sleep( 50 );
 				}
-				catch (InterruptedException e) {
+				catch ( InterruptedException e ) {
 					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 				}
 
@@ -128,7 +131,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 				try {
 					query = parser.parse( "name:Gavin" );
 				}
-				catch (ParseException e) {
+				catch ( ParseException e ) {
 					throw new RuntimeException( e );
 				}
 				boolean results = fts.createFullTextQuery( query ).list().size() > 0;
@@ -139,15 +142,16 @@ public class OptimizerPerfTest extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				w = (Worker) s.get( Worker.class, w.getId() );
+				w = ( Worker ) s.get( Worker.class, w.getId() );
 				s.delete( w );
-				c = (Construction) s.get( Construction.class, c.getId() );
+				c = ( Construction ) s.get( Construction.class, c.getId() );
 				s.delete( c );
 				tx.commit();
 				s.close();
 				count++;
-			} catch (Throwable t) {
-				t.printStackTrace( );
+			}
+			catch ( Throwable t ) {
+				t.printStackTrace();
 			}
 		}
 	}
@@ -172,23 +176,24 @@ public class OptimizerPerfTest extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				w = (Worker) s.get( Worker.class, w.getId() );
+				w = ( Worker ) s.get( Worker.class, w.getId() );
 				w.setName( "Remi" );
-				c = (Construction) s.get( Construction.class, c.getId() );
+				c = ( Construction ) s.get( Construction.class, c.getId() );
 				c.setName( "Palais des festivals" );
 				tx.commit();
 				s.close();
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				w = (Worker) s.get( Worker.class, w.getId() );
+				w = ( Worker ) s.get( Worker.class, w.getId() );
 				s.delete( w );
-				c = (Construction) s.get( Construction.class, c.getId() );
+				c = ( Construction ) s.get( Construction.class, c.getId() );
 				s.delete( c );
 				tx.commit();
 				s.close();
-			} catch (Throwable t) {
-				t.printStackTrace( );
+			}
+			catch ( Throwable t ) {
+				t.printStackTrace();
 			}
 		}
 	}
@@ -201,7 +206,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Worker.class,
 				Construction.class

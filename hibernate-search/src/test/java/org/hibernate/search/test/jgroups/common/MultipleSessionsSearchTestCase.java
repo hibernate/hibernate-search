@@ -30,7 +30,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.classic.Session;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
 
@@ -66,8 +65,8 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		super.configure( cfg );
 
 		//master
-		cfg.setProperty( "hibernate.search.default.sourceBase", getIndexDir().getAbsolutePath() + masterCopy );
-		cfg.setProperty( "hibernate.search.default.indexBase", getIndexDir().getAbsolutePath() + masterMain );
+		cfg.setProperty( "hibernate.search.default.sourceBase", getBaseIndexDir().getAbsolutePath() + masterCopy );
+		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() + masterMain );
 		cfg.setProperty( "hibernate.search.default.refresh", "1" );
 		cfg.setProperty(
 				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSMasterDirectoryProvider"
@@ -78,8 +77,8 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		super.configure( cfg );
 
 		//slave(s)
-		cfg.setProperty( "hibernate.search.default.sourceBase", getIndexDir().getAbsolutePath() + masterCopy );
-		cfg.setProperty( "hibernate.search.default.indexBase", getIndexDir().getAbsolutePath() + slave );
+		cfg.setProperty( "hibernate.search.default.sourceBase", getBaseIndexDir().getAbsolutePath() + masterCopy );
+		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() + slave );
 		cfg.setProperty( "hibernate.search.default.refresh", "1" );
 		cfg.setProperty(
 				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSSlaveDirectoryProvider"
@@ -88,11 +87,11 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		if ( getIndexDir().exists() ) {
-			FileHelper.delete( getIndexDir() );
+		if ( getBaseIndexDir().exists() ) {
+			FileHelper.delete( getBaseIndexDir() );
 		}
 		super.setUp();
-		buildCommonSessionFactory( getCommonMappings(), getCommonAnnotatedPackages(), getCommonXmlFiles() );
+		buildCommonSessionFactory();
 	}
 
 	@Override
@@ -103,10 +102,10 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		if ( slaveSessionFactory != null ) {
 			slaveSessionFactory.close();
 		}
-		FileHelper.delete( getIndexDir() );
+		FileHelper.delete( getBaseIndexDir() );
 	}
 
-	private void buildCommonSessionFactory(Class<?>[] classes, String[] packages, String[] xmlFiles) throws Exception {
+	private void buildCommonSessionFactory() throws Exception {
 		if ( getSlaveSessionFactory() != null ) {
 			getSlaveSessionFactory().close();
 		}
@@ -116,17 +115,16 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		if ( recreateSchema() ) {
 			commonCfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 		}
-		for ( String aPackage : packages ) {
-			((AnnotationConfiguration) getCommonConfiguration()).addPackage( aPackage );
+		for ( String aPackage : getCommonAnnotatedPackages() ) {
+			( ( AnnotationConfiguration ) getCommonConfiguration() ).addPackage( aPackage );
 		}
-		for ( Class<?> aClass : classes ) {
-			((AnnotationConfiguration) getCommonConfiguration()).addAnnotatedClass( aClass );
+		for ( Class<?> aClass : getCommonAnnotatedClasses() ) {
+			( ( AnnotationConfiguration ) getCommonConfiguration() ).addAnnotatedClass( aClass );
 		}
-		for ( String xmlFile : xmlFiles ) {
+		for ( String xmlFile : getCommonXmlFiles() ) {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );
 			getCommonConfiguration().addInputStream( is );
 		}
-		setDialect( Dialect.getDialect() );
 		slaveSessionFactory = getCommonConfiguration().buildSessionFactory();
 	}
 
@@ -154,7 +152,7 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		return new String[] { };
 	}
 
-	protected abstract Class<?>[] getMappings();
+	protected abstract Class<?>[] getAnnotatedClasses();
 
-	protected abstract Class<?>[] getCommonMappings();
+	protected abstract Class<?>[] getCommonAnnotatedClasses();
 }

@@ -33,6 +33,7 @@ import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -57,14 +58,14 @@ public class WorkerTestCase extends SearchTestCase {
 				FileHelper.delete( file );
 			}
 		}
-		//super.setUp(); //we need a fresh session factory each time for index set up
-		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
+		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
+		setCfg( null ); //we need a fresh session factory each time for index set up
 	}
 
 	public void testConcurrency() throws Exception {
@@ -82,14 +83,16 @@ public class WorkerTestCase extends SearchTestCase {
 			Thread.sleep( 20 );
 		}
 		getSessions().close();
-		System.out.println( iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: " + ( System
-				.currentTimeMillis() - start ) );
+		System.out.println(
+				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: " + ( System
+						.currentTimeMillis() - start )
+		);
 	}
 
 	protected static class Work implements Runnable {
 		private SessionFactory sf;
 		//public volatile int count = 0;
-		public AtomicInteger count = new AtomicInteger(0);
+		public AtomicInteger count = new AtomicInteger( 0 );
 
 		public Work(SessionFactory sf) {
 			this.sf = sf;
@@ -112,9 +115,9 @@ public class WorkerTestCase extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				ee = (Employee) s.get( Employee.class, ee.getId() );
+				ee = ( Employee ) s.get( Employee.class, ee.getId() );
 				ee.setName( "Emmanuel2" );
-				er = (Employer) s.get( Employer.class, er.getId() );
+				er = ( Employer ) s.get( Employer.class, er.getId() );
 				er.setName( "RH2" );
 				tx.commit();
 				s.close();
@@ -130,12 +133,15 @@ public class WorkerTestCase extends SearchTestCase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				FullTextSession fts = new FullTextSessionImpl( s );
-				QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id",
-						SearchTestCase.stopAnalyzer );
+				QueryParser parser = new QueryParser(
+						getTargetLuceneVersion(), "id",
+						SearchTestCase.stopAnalyzer
+				);
 				Query query;
 				try {
 					query = parser.parse( "name:emmanuel2" );
-				} catch ( ParseException e ) {
+				}
+				catch ( ParseException e ) {
 					throw new RuntimeException( e );
 				}
 				boolean results = fts.createFullTextQuery( query ).list().size() > 0;
@@ -147,23 +153,28 @@ public class WorkerTestCase extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				ee = (Employee) s.get( Employee.class, ee.getId() );
+				ee = ( Employee ) s.get( Employee.class, ee.getId() );
 				s.delete( ee );
-				er = (Employer) s.get( Employer.class, er.getId() );
+				er = ( Employer ) s.get( Employer.class, er.getId() );
 				s.delete( er );
 				tx.commit();
 				s.close();
 				// count++;
-			} catch ( Throwable t ) {
+			}
+			catch ( Throwable t ) {
 				t.printStackTrace();
-			} finally {
+			}
+			finally {
 				count.incrementAndGet();
 				try {
-					if ( tx != null && tx.isActive() )
+					if ( tx != null && tx.isActive() ) {
 						tx.rollback();
-					if ( s != null && s.isOpen() )
+					}
+					if ( s != null && s.isOpen() ) {
 						s.close();
-				} catch ( Throwable t ) {
+					}
+				}
+				catch ( Throwable t ) {
 					t.printStackTrace();
 				}
 			}
@@ -191,18 +202,18 @@ public class WorkerTestCase extends SearchTestCase {
 
 			s = sf.openSession();
 			tx = s.beginTransaction();
-			er = (Employer) s.get( Employer.class, er.getId() );
+			er = ( Employer ) s.get( Employer.class, er.getId() );
 			er.setName( "RH2" );
-			ee = (Employee) s.get( Employee.class, ee.getId() );
+			ee = ( Employee ) s.get( Employee.class, ee.getId() );
 			ee.setName( "Emmanuel2" );
 			tx.commit();
 			s.close();
 
 			s = sf.openSession();
 			tx = s.beginTransaction();
-			er = (Employer) s.get( Employer.class, er.getId() );
+			er = ( Employer ) s.get( Employer.class, er.getId() );
 			s.delete( er );
-			ee = (Employee) s.get( Employee.class, ee.getId() );
+			ee = ( Employee ) s.get( Employee.class, ee.getId() );
 			s.delete( ee );
 			tx.commit();
 			s.close();
@@ -220,8 +231,8 @@ public class WorkerTestCase extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getMappings() {
-		return new Class[]{
+	protected Class<?>[] getAnnotatedClasses() {
+		return new Class[] {
 				Employee.class,
 				Employer.class
 		};

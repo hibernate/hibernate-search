@@ -170,7 +170,7 @@ public class CompressionTest extends SearchTestCase {
 	
 	// test setup:
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				LargeDocument.class
 		};

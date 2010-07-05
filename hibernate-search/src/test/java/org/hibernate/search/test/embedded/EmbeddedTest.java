@@ -335,7 +335,7 @@ public class EmbeddedTest extends SearchTestCase {
 		super.configure( cfg );
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Tower.class, Address.class, Product.class, Order.class, Author.class, Country.class,
 				State.class, StateCandidate.class, NonIndexedEntity.class
 		};

@@ -108,7 +108,7 @@ public class IndexTestDontRun extends SearchTestCase {
 		return indexsearcher;
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Boat.class
 		};

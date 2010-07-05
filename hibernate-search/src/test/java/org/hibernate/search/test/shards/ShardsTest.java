@@ -27,24 +27,25 @@ package org.hibernate.search.test.shards;
 import java.io.File;
 import java.util.List;
 
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
-import org.hibernate.search.store.RAMDirectoryProvider;
-import org.hibernate.search.store.FSDirectoryProvider;
-import org.hibernate.search.store.IdHashShardingStrategy;
-import org.hibernate.search.store.DirectoryProvider;
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.store.FSDirectory;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.index.Term;
+import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.FSDirectoryProvider;
+import org.hibernate.search.store.IdHashShardingStrategy;
+import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -66,13 +67,13 @@ public class ShardsTest extends SearchTestCase {
 	public void testIdShardingStrategy() {
 		DirectoryProvider[] dps = new DirectoryProvider[] { new RAMDirectoryProvider(), new RAMDirectoryProvider() };
 		IdHashShardingStrategy shardingStrategy = new IdHashShardingStrategy();
-		shardingStrategy.initialize( null, dps);
-		assertTrue( dps[1] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 1, "1", null) );
-		assertTrue( dps[0] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 2, "2", null) );
+		shardingStrategy.initialize( null, dps );
+		assertTrue( dps[1] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 1, "1", null ) );
+		assertTrue( dps[0] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 2, "2", null ) );
 	}
 
 	public void testBehavior() throws Exception {
-		Session s = openSession( );
+		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		Animal a = new Animal();
 		a.setId( 1 );
@@ -87,10 +88,10 @@ public class ShardsTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		a = (Animal) s.get(Animal.class, 1);
+		a = ( Animal ) s.get( Animal.class, 1 );
 		a.setName( "Mouse" );
 		Furniture fur = new Furniture();
-		fur.setColor( "dark blue");
+		fur.setColor( "dark blue" );
 		s.persist( fur );
 		tx.commit();
 
@@ -107,13 +108,15 @@ public class ShardsTest extends SearchTestCase {
 		assertEquals( "Mixing shared and non sharded properties fails", 3, results.size() );
 		results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear OR color:blue" ) ).list();
 		assertEquals( "Mixing shared and non sharded properties fails with indexreader reuse", 3, results.size() );
-		for (Object o : results) s.delete( o );
+		for ( Object o : results ) {
+			s.delete( o );
+		}
 		tx.commit();
 		s.close();
 	}
 
 	public void testInternalSharding() throws Exception {
-		Session s = openSession( );
+		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		Animal a = new Animal();
 		a.setId( 1 );
@@ -141,7 +144,7 @@ public class ShardsTest extends SearchTestCase {
 		finally {
 			animal00Directory.close();
 		}
-		
+
 		FSDirectory animal01Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.1" ) );
 		try {
 			IndexReader reader = IndexReader.open( animal01Directory );
@@ -158,7 +161,7 @@ public class ShardsTest extends SearchTestCase {
 		}
 
 		tx = s.beginTransaction();
-		a = (Animal) s.get(Animal.class, 1);
+		a = ( Animal ) s.get( Animal.class, 1 );
 		a.setName( "Mouse" );
 		tx.commit();
 
@@ -189,7 +192,9 @@ public class ShardsTest extends SearchTestCase {
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 2, results.size() );
-		for (Object o : results) s.delete( o );
+		for ( Object o : results ) {
+			s.delete( o );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -198,23 +203,23 @@ public class ShardsTest extends SearchTestCase {
 		File sub = getBaseIndexDir();
 		sub.mkdir();
 		File[] files = sub.listFiles();
-		for (File file : files) {
+		for ( File file : files ) {
 			if ( file.isDirectory() ) {
 				FileHelper.delete( file );
 			}
 		}
-		//super.setUp(); //we need a fresh session factory each time for index set up
-		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
+		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
+		setCfg( null );  //we need a fresh session factory each time for index set up
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Animal.class,
 				Furniture.class

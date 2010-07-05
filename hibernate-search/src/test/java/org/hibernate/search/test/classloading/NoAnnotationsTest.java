@@ -24,6 +24,7 @@
  */
 package org.hibernate.search.test.classloading;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.lucene.index.Term;
@@ -31,25 +32,21 @@ import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.hibernate.search.Search;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.test.TestCase;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NoAnnotationsTest extends TestCase {
+public class NoAnnotationsTest extends SearchTestCase {
 	/**
 	 * Tests that @DocumentId is optional. See HSEARCH-104.
 	 *
 	 * @throws Exception in case the test fails.
 	 */
 	public void testConfigurationWithoutAnnotations() throws Exception {
-		FullTextEntityManager em = org.hibernate
-				.search
-				.jpa
-				.Search
-				.getFullTextEntityManager( null );
 		Animal dog = new Animal();
 		dog.setName( "Dog" );
 
@@ -88,9 +85,35 @@ public class NoAnnotationsTest extends TestCase {
 		s.close();
 	}
 
+	protected void buildConfiguration() throws Exception {
+		if ( getSessions() != null ) {
+			getSessions().close();
+		}
+		try {
+			setCfg( new Configuration() );
+			configure( cfg );
+			if ( recreateSchema() ) {
+				cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
+			}
+			for ( String xmlFile : getXmlFiles() ) {
+				InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );
+				getCfg().addInputStream( is );
+			}
+			setSessions( getCfg().buildSessionFactory() );
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
 	protected String[] getXmlFiles() {
 		return new String[] {
 				"org/hibernate/search/test/classloading/Animal.hbm.xml"
 		};
+	}
+
+	protected Class<?>[] getAnnotatedClasses() {
+		return new Class[] { };
 	}
 }

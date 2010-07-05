@@ -193,7 +193,7 @@ public class AnalyzerTest extends SearchTestCase {
 		session.close();
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { MyEntity.class, Article.class };
 	}
 }

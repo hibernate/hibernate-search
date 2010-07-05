@@ -118,7 +118,7 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 
 
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Entity1ForDoc0.class,
 				Entity2ForDoc0.class,

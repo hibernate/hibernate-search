@@ -90,7 +90,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Detective.class,
 				Suspect.class

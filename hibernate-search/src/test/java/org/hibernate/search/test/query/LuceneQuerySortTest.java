@@ -157,7 +157,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 		s.clear();
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
 				Author.class

@@ -36,8 +36,8 @@ public class UnresolvedBridgeTest extends TestCase {
 	public void testSerializableType() throws Exception {
 		AnnotationConfiguration cfg = new AnnotationConfiguration();
 
-		for (int i = 0; i < getMappings().length; i++) {
-			cfg.addAnnotatedClass( getMappings()[i] );
+		for (int i = 0; i < getAnnotatedClasses().length; i++) {
+			cfg.addAnnotatedClass( getAnnotatedClasses()[i] );
 		}
 		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
 		try {
@@ -62,7 +62,7 @@ public class UnresolvedBridgeTest extends TestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Gangster.class
 		};

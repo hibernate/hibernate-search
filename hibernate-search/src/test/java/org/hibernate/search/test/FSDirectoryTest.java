@@ -53,19 +53,19 @@ public class FSDirectoryTest extends SearchTestCase {
 		File sub = getBaseIndexDir();
 		sub.mkdir();
 		File[] files = sub.listFiles();
-		for (File file : files) {
+		for ( File file : files ) {
 			if ( file.isDirectory() ) {
 				FileHelper.delete( file );
 			}
 		}
-		//super.setUp(); //we need a fresh session factory each time for index set up
-		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
+		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
+		setCfg( null );  // we need a fresh session factory each time for index set up
 	}
 
 	public void testEventIntegration() throws Exception {
@@ -100,7 +100,7 @@ public class FSDirectoryTest extends SearchTestCase {
 
 			s = getSessions().openSession();
 			s.getTransaction().begin();
-			Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
+			Document entity = ( Document ) s.get( Document.class, Long.valueOf( 1 ) );
 			entity.setSummary( "Object/relational mapping with EJB3" );
 			s.persist( new Document( "Seam in Action", "", "blah blah blah blah" ) );
 			s.getTransaction().commit();
@@ -181,7 +181,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		s = getSessions().openSession();
 		s.getTransaction().begin();
 		List list = s.createQuery( "from Document" ).list();
-		for (Document document : (List<Document>) list) {
+		for ( Document document : ( List<Document> ) list ) {
 			s.delete( document );
 		}
 		s.getTransaction().commit();
@@ -210,7 +210,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		dir.close();
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Document.class
 		};

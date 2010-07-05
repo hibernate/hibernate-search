@@ -212,7 +212,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return 2;
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				SnowStorm.class
 		};

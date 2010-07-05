@@ -321,7 +321,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		return depts;
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Department.class,
 				Departments.class

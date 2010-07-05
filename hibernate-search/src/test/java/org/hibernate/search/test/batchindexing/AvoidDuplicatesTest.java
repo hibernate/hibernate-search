@@ -25,8 +25,8 @@
 package org.hibernate.search.test.batchindexing;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.search.MatchAllDocsQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -36,34 +36,34 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 
 public class AvoidDuplicatesTest extends SearchTestCase {
-	
+
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
 		Transaction transaction = session.beginTransaction();
-		
+
 		Nation italy = new Nation( "Italy", "IT" );
 		session.persist( italy );
-		
+
 		AncientBook aeneid = new AncientBook();
 		aeneid.setTitle( "Aeneid" );
 		aeneid.getAlternativeTitles().add( "Aeneis" );
 		aeneid.getAlternativeTitles().add( "Eneide" );
 		aeneid.setFirstPublishedIn( italy );
 		session.persist( aeneid );
-		
+
 		AncientBook commedia = new AncientBook();
 		commedia.setTitle( "Commedia" );
 		commedia.getAlternativeTitles().add( "La Commedia" );
 		commedia.getAlternativeTitles().add( "La Divina Commedia" );
 		commedia.setFirstPublishedIn( italy );
 		session.persist( commedia );
-		
+
 		transaction.commit();
 		session.close();
 	}
-	
+
 	public void testReindexedOnce() throws InterruptedException {
 		Assert.assertEquals( 2, countBooksInIndex() );
 		Session session = openSession();
@@ -86,7 +86,7 @@ public class AvoidDuplicatesTest extends SearchTestCase {
 	}
 
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				AncientBook.class,
 				Book.class,

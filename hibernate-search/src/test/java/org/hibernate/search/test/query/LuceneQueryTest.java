@@ -671,7 +671,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	}
 
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
 				AlternateBook.class,

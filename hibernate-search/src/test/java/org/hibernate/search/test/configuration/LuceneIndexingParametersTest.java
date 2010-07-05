@@ -131,7 +131,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertEquals( param.getTransactionIndexParameters(), paramCopy.getTransactionIndexParameters() );
 	}
 	
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
 				Author.class,

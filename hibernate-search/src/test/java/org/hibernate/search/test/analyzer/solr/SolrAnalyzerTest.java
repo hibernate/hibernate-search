@@ -183,7 +183,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		fts.close();
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Team.class
 		};

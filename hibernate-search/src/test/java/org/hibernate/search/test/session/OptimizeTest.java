@@ -28,6 +28,7 @@ import java.io.File;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -46,9 +47,9 @@ public class OptimizeTest extends SearchTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		int loop = 2000;
-		for (int i = 0; i < loop; i++) {
+		for ( int i = 0; i < loop; i++ ) {
 			Email email = new Email();
-			email.setId( (long) i + 1 );
+			email.setId( ( long ) i + 1 );
 			email.setTitle( "JBoss World Berlin" );
 			email.setBody( "Meet the guys who wrote the software" );
 			s.persist( email );
@@ -85,23 +86,23 @@ public class OptimizeTest extends SearchTestCase {
 		File sub = getBaseIndexDir();
 		sub.mkdir();
 		File[] files = sub.listFiles();
-		for (File file : files) {
+		for ( File file : files ) {
 			if ( file.isDirectory() ) {
 				FileHelper.delete( file );
 			}
 		}
-		//super.setUp(); //we need a fresh session factory each time for index set up
-		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
+		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
+		setCfg( null ); //we need a fresh session factory each time for index set up
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Email.class,
 				Domain.class

@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -42,12 +43,12 @@ import org.hibernate.search.test.jgroups.master.TShirt;
  * In case of running test outside Hibernate Search Maven configuration set following VM configuration:
  * <br>
  * <code>
- * 	-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
+ * -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
  * </code>
+ *
  * @author Lukasz Moren
  */
-public class
-		JGroupsCommonTest extends MultipleSessionsSearchTestCase {
+public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 
@@ -127,13 +128,13 @@ public class
 	}
 
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};
 	}
 
-	protected Class<?>[] getCommonMappings() {
+	protected Class<?>[] getCommonAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};

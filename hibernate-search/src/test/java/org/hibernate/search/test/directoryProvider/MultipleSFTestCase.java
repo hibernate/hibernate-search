@@ -94,7 +94,7 @@ public abstract class MultipleSFTestCase extends TestCase {
 
 	protected void setUp() throws Exception {
 		if ( sessionFactories == null || sessionFactories[0] == null || lastTestClass != getClass() ) {
-			buildSessionFactories( getMappings(), getAnnotatedPackages(), getXmlFiles() );
+			buildSessionFactories( getAnnotatedClasses(), getAnnotatedPackages(), getXmlFiles() );
 			lastTestClass = getClass();
 		}
 	}
@@ -105,7 +105,7 @@ public abstract class MultipleSFTestCase extends TestCase {
 		}
 	}
 
-	protected abstract Class[] getMappings();
+	protected abstract Class[] getAnnotatedClasses();
 
 	protected String[] getAnnotatedPackages() {
 		return new String[] { };

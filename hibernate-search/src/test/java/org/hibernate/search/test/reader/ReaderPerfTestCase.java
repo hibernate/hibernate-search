@@ -65,12 +65,11 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 				FileHelper.delete( file );
 			}
 		}
-		//super.setUp(); //we need a fresh session factory each time for index set up
-		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
+		super.setUp();
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Detective.class,
 				Suspect.class
@@ -84,6 +83,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		}
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
+		setCfg( null );  //we need a fresh session factory each time for index set up
 	}
 
 	public boolean insert = true;
@@ -136,7 +136,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		private Random random = new Random();
 		private SessionFactory sf;
 //		public volatile int count = 0;
-		public AtomicInteger count = new AtomicInteger(0);
+		public AtomicInteger count = new AtomicInteger( 0 );
 
 		public Work(SessionFactory sf) {
 			this.sf = sf;
@@ -148,9 +148,11 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			try {
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(),
+				QueryParser parser = new MultiFieldQueryParser(
+						getTargetLuceneVersion(),
 						new String[] { "name", "physicalDescription", "suspectCharge" },
-						SearchTestCase.standardAnalyzer );
+						SearchTestCase.standardAnalyzer
+				);
 				FullTextQuery query = getQuery( "John Doe", parser, s );
 				assertTrue( query.getResultSize() != 0 );
 
@@ -175,28 +177,37 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 				List result = query.list();
 				Object object = result.get( 0 );
 				if ( insert && object instanceof Detective ) {
-					Detective detective = (Detective) object;
-					detective.setPhysicalDescription( detective.getPhysicalDescription() + " Eye"
-							+ firstResult );
+					Detective detective = ( Detective ) object;
+					detective.setPhysicalDescription(
+							detective.getPhysicalDescription() + " Eye"
+									+ firstResult
+					);
 				}
 				else if ( insert && object instanceof Suspect ) {
-					Suspect suspect = (Suspect) object;
-					suspect.setPhysicalDescription( suspect.getPhysicalDescription() + " Eye"
-							+ firstResult );
+					Suspect suspect = ( Suspect ) object;
+					suspect.setPhysicalDescription(
+							suspect.getPhysicalDescription() + " Eye"
+									+ firstResult
+					);
 				}
 				tx.commit();
 				s.close();
 				// count++;
-			} catch ( Throwable t ) {
+			}
+			catch ( Throwable t ) {
 				t.printStackTrace();
-			} finally {
+			}
+			finally {
 				count.incrementAndGet();
 				try {
-					if ( tx != null && tx.isActive() )
+					if ( tx != null && tx.isActive() ) {
 						tx.rollback();
-					if ( s != null && s.isOpen() )
+					}
+					if ( s != null && s.isOpen() ) {
 						s.close();
-				} catch ( Throwable t ) {
+					}
+				}
+				catch ( Throwable t ) {
 					t.printStackTrace();
 				}
 			}
@@ -225,7 +236,8 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		public void run() {
 			Session s = sf.openSession();
 			Transaction tx = s.beginTransaction();
-			QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), 
+			QueryParser parser = new MultiFieldQueryParser(
+					getTargetLuceneVersion(),
 					new String[] { "name", "physicalDescription", "suspectCharge" },
 					SearchTestCase.standardAnalyzer
 			);

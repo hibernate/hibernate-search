@@ -303,7 +303,7 @@ public class InheritanceTest extends SearchTestCase {
 		assertEquals( "Wrong animal name", "Elephant", mammal.getName() );
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Animal.class,
 				Mammal.class,

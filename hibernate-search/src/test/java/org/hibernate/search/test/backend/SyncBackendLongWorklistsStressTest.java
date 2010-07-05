@@ -1,8 +1,7 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -27,9 +26,9 @@ package org.hibernate.search.test.backend;
 import java.io.File;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
+
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.Environment;
@@ -41,31 +40,33 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
 
 public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
-	
+
 	/* needs to be sensibly higher than org.hibernate.search.batchindexing.Executors.QUEUE_MAX_LENGTH */
 	private static final int NUM_SAVED_ENTITIES = 3000;
 
 	public void testWorkLongerThanMaxQueueSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
-		for (int i = 0; i < NUM_SAVED_ENTITIES; i++ ) { 
+		for ( int i = 0; i < NUM_SAVED_ENTITIES; i++ ) {
 			Transaction tx = s.beginTransaction();
-			Clock clock = new Clock( i, "brand num° " + i);
+			Clock clock = new Clock( i, "brand num° " + i );
 			s.persist( clock );
 			tx.commit();
 			s.clear();
 		}
-		
+
 		Transaction tx = s.beginTransaction();
 		// count of entities in database needs to be checked before SF is closed (HSQLDB will forget the entities)
-		Number count = (Number) s.createCriteria( Clock.class ).setProjection( Projections.rowCount() ).uniqueResult();
+		Number count = ( Number ) s.createCriteria( Clock.class )
+				.setProjection( Projections.rowCount() )
+				.uniqueResult();
 		Assert.assertEquals( NUM_SAVED_ENTITIES, count.intValue() );
 		tx.commit();
 		s.close();
-		
+
 		//we need to close the session to wait for all async work to be flushed
 		sessions.close();
-		buildSessionFactory( getMappings(), getAnnotatedPackages(), getXmlFiles() );
-		
+		buildConfiguration();
+
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		int fullTextCount = s.createFullTextQuery( new MatchAllDocsQuery(), Clock.class ).getResultSize();
@@ -75,10 +76,10 @@ public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 	}
 
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Clock.class };
 	}
-	
+
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();
@@ -89,12 +90,11 @@ public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.show_sql", "false" );
 		cfg.setProperty( "hibernate.format_sql", "false" );
 	}
-	
+
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
 	}
-
 }
 

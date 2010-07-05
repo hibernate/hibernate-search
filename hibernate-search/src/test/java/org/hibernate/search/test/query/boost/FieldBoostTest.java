@@ -210,7 +210,7 @@ public class  FieldBoostTest extends SearchTestCase {
 		tx.commit();
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				BoostedDescriptionLibrary.class,
 				BoostedFieldDescriptionLibrary.class,

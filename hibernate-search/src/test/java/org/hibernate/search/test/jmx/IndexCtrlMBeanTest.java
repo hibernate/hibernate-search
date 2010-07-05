@@ -123,6 +123,7 @@ public class IndexCtrlMBeanTest extends SearchTestCase {
 		if ( mbeanServer.isRegistered( indexBeanObjectName ) ) {
 			mbeanServer.unregisterMBean( indexBeanObjectName );
 		}
+		setCfg( null ); // force a rebuild of the configuration
 	}
 
 	protected void configure(Configuration cfg) {
@@ -141,7 +142,7 @@ public class IndexCtrlMBeanTest extends SearchTestCase {
 	}
 
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { Counter.class };
 	}
 

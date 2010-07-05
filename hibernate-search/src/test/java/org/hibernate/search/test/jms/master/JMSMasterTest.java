@@ -213,7 +213,7 @@ public class JMSMasterTest extends SearchTestCase {
 		cfg.setProperty( Environment.WORKER_BACKEND, "lucene" );
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};

@@ -133,7 +133,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 
 	// Test setup options - Entities
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { BusLine.class, BusStop.class };
 	}
 	

@@ -79,7 +79,7 @@ public class NestedContainedInTest extends SearchTestCase {
 	}
 
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				HelpItem.class,
 				HelpItemTag.class,

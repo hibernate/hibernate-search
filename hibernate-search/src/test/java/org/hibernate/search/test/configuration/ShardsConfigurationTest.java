@@ -42,12 +42,10 @@ import org.hibernate.search.test.query.Book;
  * @author Sanne Grinovero
  */
 public class ShardsConfigurationTest extends ConfigurationReadTestCase {
-	
+
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		//super contains these:
-//		cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
-//		cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
+
 		cfg.setProperty( "hibernate.search.default.sharding_strategy.nbr_of_shards", "2" );// permit this?
 		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getCanonicalName() );
 		cfg.setProperty( "hibernate.search.default.2.directory_provider", RAMDirectoryProvider.class.getCanonicalName() );
@@ -64,8 +62,12 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		cfg.setProperty( "hibernate.search.Documents.1.batch.max_merge_docs", "11" );
 		cfg.setProperty( "hibernate.search.Documents.1.transaction.max_buffered_docs", "12" );
 		cfg.setProperty( "hibernate.search.Documents.1.transaction.term_index_interval", "12" );
+
+		//super contains these:
+		//cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
+		//cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
 	}
-	
+
 	public void testCorrectNumberOfShardsDetected() {
 		DirectoryProvider[] docDirProviders = getSearchFactory()
 			.getDirectoryProviders( Document.class );
@@ -76,14 +78,14 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertNotNull( bookDirProviders );
 		assertEquals( 2, bookDirProviders.length );
 	}
-	
+
 	public void testSelectionOfShardingStrategy() {
 		IndexShardingStrategy shardingStrategy = getSearchFactory().getDocumentBuilderIndexedEntity( Document.class )
 				.getDirectoryProviderSelectionStrategy();
 		assertNotNull( shardingStrategy );
 		assertEquals( shardingStrategy.getClass(), UselessShardingStrategy.class );
 	}
-	
+
 	public void testShardingSettingsInherited() {
 		DirectoryProvider[] docDirProviders = getSearchFactory().getDirectoryProviders( Document.class );
 		assertTrue( docDirProviders[0] instanceof RAMDirectoryProvider );
@@ -91,7 +93,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertTrue( docDirProviders[2] instanceof RAMDirectoryProvider );
 		assertValueIsSet( Document.class, 0, BATCH, MAX_BUFFERED_DOCS, 4 );
 	}
-	
+
 	public void testShardN2UsesDefaults() {
 		assertValueIsSet( Document.class, 2, TRANSACTION, MAX_BUFFERED_DOCS, 6 );
 		assertValueIsDefault( Document.class, 2, TRANSACTION, MAX_MERGE_DOCS );
@@ -102,18 +104,18 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertValueIsDefault( Document.class, 2, BATCH, MERGE_FACTOR );
 		assertValueIsDefault( Document.class, 2, BATCH, RAM_BUFFER_SIZE );
 	}
-	
+
 	public void testShardN1_ExplicitParams() {
 		assertValueIsSet( Document.class, 1, TRANSACTION, MAX_BUFFERED_DOCS, 12 );
 		assertValueIsSet( Document.class, 1, BATCH, MAX_MERGE_DOCS, 11 );
 	}
-	
+
 	@Override
 	protected void ensureIndexesAreEmpty() {
 		// skips index emptying to prevent a problem with UselessShardingStrategy
 	}
-	
-	protected Class<?>[] getMappings() {
+
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
 				Author.class,

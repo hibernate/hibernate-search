@@ -198,8 +198,13 @@ public class FilterTest extends SearchTestCase {
 		s.close();
 	}
 
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		setCfg( null ); // force a configuration rebuild
+	}
+
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Driver.class,
 				Soap.class

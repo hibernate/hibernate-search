@@ -153,7 +153,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 	}	
 
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
 	}
 }

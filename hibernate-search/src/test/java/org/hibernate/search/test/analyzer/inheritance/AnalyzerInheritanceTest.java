@@ -100,7 +100,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 	}
 
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { SubClass.class };
 	}
 }

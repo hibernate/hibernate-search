@@ -562,7 +562,7 @@ public class DSLTest extends SearchTestCase {
 	}
 
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Month.class
 		};

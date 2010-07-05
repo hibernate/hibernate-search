@@ -171,7 +171,7 @@ public class JMSSlaveTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.worker.jndi.queue.queue/searchtest", "searchQueue" );
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};

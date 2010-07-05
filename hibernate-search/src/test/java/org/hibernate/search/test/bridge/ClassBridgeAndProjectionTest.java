@@ -65,7 +65,7 @@ public class ClassBridgeAndProjectionTest  extends SearchTestCase {
     }
 
     @Override
-    protected Class<?>[] getMappings() {
+    protected Class<?>[] getAnnotatedClasses() {
         return new Class<?>[] {
                 Student.class,
                 Teacher.class

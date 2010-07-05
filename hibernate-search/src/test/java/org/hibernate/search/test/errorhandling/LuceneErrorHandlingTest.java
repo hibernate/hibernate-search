@@ -105,7 +105,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		Assert.assertEquals( "failed work message", exception.getMessage() );
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class };
 	}
 	

@@ -87,7 +87,7 @@ public class DirectoryProviderForQueryTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Email.class
 		};

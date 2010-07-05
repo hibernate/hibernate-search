@@ -104,7 +104,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 		s.close();
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Author.class,
 				Music.class,

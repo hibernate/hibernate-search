@@ -486,7 +486,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.close();
 	}
 
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
 				Author.class,

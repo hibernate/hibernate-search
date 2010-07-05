@@ -131,6 +131,7 @@ public class ConfigInfoMBeanTest extends SearchTestCase {
 		if ( mbeanServer.isRegistered( configBeanObjectName ) ) {
 			mbeanServer.unregisterMBean( configBeanObjectName );
 		}
+		setCfg( null ); // force a rebuild of the configuration
 	}
 
 	protected void configure(Configuration cfg) {
@@ -139,7 +140,7 @@ public class ConfigInfoMBeanTest extends SearchTestCase {
 	}
 
 	@Override
-	protected Class<?>[] getMappings() {
+	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { Counter.class };
 	}
 }
