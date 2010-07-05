@@ -1,6 +1,30 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ *
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+ */
 package org.hibernate.search.impl;
 
 import java.beans.Introspector;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,16 +36,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
-
-import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
-import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.WritableBuildContext;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
-import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.reflection.MetadataProvider;
@@ -40,6 +60,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
+import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.backend.Worker;
 import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
@@ -56,8 +77,16 @@ import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.jmx.HibernateSearchConfigInfo;
+import org.hibernate.search.jmx.HibernateSearchConfigInfoMBean;
+import org.hibernate.search.jmx.HibernateSearchIndexCtrl;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.reader.ReaderProviderFactory;
+import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.WritableBuildContext;
+import org.hibernate.search.spi.internals.DirectoryProviderData;
+import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -67,8 +96,10 @@ import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.util.StringHelper;
 
 /**
- * Build a search factory
+ * Build a search factory.
+ *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class SearchFactoryBuilder {
 	private static final Logger log = LoggerFactory.make();
@@ -111,25 +142,75 @@ public class SearchFactoryBuilder {
 	Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams;
 
 	public SearchFactoryImplementor buildSearchFactory() {
-		if (rootFactory == null) {
-			if (classes.size() > 0) {
-				throw new SearchException( "Cannot add a class if the original SearchFactory is not passed");
+		SearchFactoryImplementor searchFactoryImplementor;
+		if ( rootFactory == null ) {
+			if ( classes.size() > 0 ) {
+				throw new SearchException( "Cannot add a class if the original SearchFactory is not passed" );
 			}
-			return buildNewSearchFactory();
+			searchFactoryImplementor = buildNewSearchFactory();
 		}
 		else {
-			return buildIncrementalSearchFactory();
+			searchFactoryImplementor = buildIncrementalSearchFactory();
+		}
+
+		String enableJMX = configurationProperties.getProperty( Environment.JMX_ENABLED );
+		if ( "true".equalsIgnoreCase( enableJMX ) ) {
+			enableJMXStatistics( searchFactoryImplementor );
+		}
+		return searchFactoryImplementor;
+	}
+
+	private void enableJMXStatistics(SearchFactoryImplementor searchFactoryImplementor) {
+		HibernateSearchConfigInfo statsBean = new HibernateSearchConfigInfo( searchFactoryImplementor );
+		ObjectName name = createObjectName( HibernateSearchConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
+		registerMBean( statsBean, name );
+
+		// if we have a JNDI bound SessionFactory we can also enable the index control bean
+		if ( StringHelper.isNotEmpty( configurationProperties.getProperty( "hibernate.session_factory_name" ) ) ) {
+			HibernateSearchIndexCtrl indexCtrlBean = new HibernateSearchIndexCtrl( configurationProperties );
+			name = createObjectName( HibernateSearchIndexCtrl.INDEX_CTRL_MBEAN_OBJECT_NAME );
+			registerMBean( indexCtrlBean, name );
+		}
+	}
+
+	private ObjectName createObjectName(String name) {
+		ObjectName objectName;
+		try {
+			objectName = new ObjectName( name );
+		}
+		catch ( MalformedObjectNameException e ) {
+			throw new SearchException( "Invalid JMX Bean name: " + name, e );
+		}
+		return objectName;
+	}
+
+	private void registerMBean(Object stats, ObjectName name) {
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		if ( mbs.isRegistered( name ) ) {
+			try {
+				mbs.unregisterMBean( name );
+			}
+			catch ( Exception e ) {
+				log.warn( "Unable to un-register existing MBean: " + name, e );
+			}
+		}
+
+		try {
+			mbs.registerMBean( stats, name );
+		}
+		catch ( Exception e ) {
+			throw new SearchException( "Unable to enable MBean for Hibernate Search", e );
 		}
 	}
 
 	private SearchFactoryImplementor buildIncrementalSearchFactory() {
 		removeClassesAlreadyManaged();
-		if (classes.size() == 0) {
+		if ( classes.size() == 0 ) {
 			return rootFactory;
 		}
 
 		BuildContext buildContext = new BuildContext();
-		copyStateFromOldFactory(rootFactory);
+		copyStateFromOldFactory( rootFactory );
 		//TODO we don't keep the reflectionManager. Is that an issue?
 		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties );
 		reflectionManager = getReflectionManager( cfg );
@@ -152,7 +233,7 @@ public class SearchFactoryBuilder {
 
 		//update backend
 		final BackendQueueProcessorFactory backend = this.backendQueueProcessorFactory;
-		if ( backend instanceof UpdatableBackendQueueProcessorFactory) {
+		if ( backend instanceof UpdatableBackendQueueProcessorFactory ) {
 			final UpdatableBackendQueueProcessorFactory updatableBackend = ( UpdatableBackendQueueProcessorFactory ) backend;
 			updatableBackend.updateDirectoryProviders( this.dirProviderData.keySet(), buildContext );
 		}
@@ -168,13 +249,13 @@ public class SearchFactoryBuilder {
 	private void removeClassesAlreadyManaged() {
 		Set<Class<?>> remove = new HashSet<Class<?>>();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> containedEntities = rootFactory.getDocumentBuildersContainedEntities();
-		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> indexedEntities = rootFactory.getDocumentBuildersIndexedEntities();	
-		for (Class<?> entity : classes) {
-			if ( indexedEntities.containsKey( entity ) || containedEntities.containsKey(entity) ) {
+		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> indexedEntities = rootFactory.getDocumentBuildersIndexedEntities();
+		for ( Class<?> entity : classes ) {
+			if ( indexedEntities.containsKey( entity ) || containedEntities.containsKey( entity ) ) {
 				remove.add( entity );
 			}
 		}
-		for(Class<?> entity : remove) {
+		for ( Class<?> entity : remove ) {
 			classes.remove( entity );
 		}
 	}
@@ -202,16 +283,18 @@ public class SearchFactoryBuilder {
 
 		configurationProperties = cfg.getProperties();
 		errorHandler = createErrorHandler( configurationProperties );
-		reflectionManager = getReflectionManager(cfg);
+		reflectionManager = getReflectionManager( cfg );
 		BuildContext buildContext = new BuildContext();
 
-		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping(cfg);
-		if ( mapping != null) {
-			if ( ! ( reflectionManager instanceof MetadataProviderInjector )) {
-				throw new SearchException("Programmatic mapping model used but ReflectionManager does not implement "
-						+ MetadataProviderInjector.class.getName() );
+		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping( cfg );
+		if ( mapping != null ) {
+			if ( !( reflectionManager instanceof MetadataProviderInjector ) ) {
+				throw new SearchException(
+						"Programmatic mapping model used but ReflectionManager does not implement "
+								+ MetadataProviderInjector.class.getName()
+				);
 			}
-			MetadataProviderInjector injector = (MetadataProviderInjector) reflectionManager;
+			MetadataProviderInjector injector = ( MetadataProviderInjector ) reflectionManager;
 			MetadataProvider original = injector.getMetadataProvider();
 			injector.setMetadataProvider( new MappingModelMetadataProvider( original, mapping ) );
 		}
@@ -248,10 +331,12 @@ public class SearchFactoryBuilder {
 				DocumentBuilderIndexedEntity<?> documentBuilder = documentBuildersIndexedEntities.get( indexedType );
 				Similarity similarity = documentBuilder.getSimilarity();
 				Similarity prevSimilarity = directoryConfiguration.getSimilarity();
-				if ( prevSimilarity != null && ! prevSimilarity.getClass().equals( similarity.getClass() ) ) {
-					throw new SearchException( "Multiple entities are sharing the same index but are declaring an " +
-							"inconsistent Similarity. When overrriding default Similarity make sure that all types sharing a same index " +
-							"declare the same Similarity implementation." );
+				if ( prevSimilarity != null && !prevSimilarity.getClass().equals( similarity.getClass() ) ) {
+					throw new SearchException(
+							"Multiple entities are sharing the same index but are declaring an " +
+									"inconsistent Similarity. When overrriding default Similarity make sure that all types sharing a same index " +
+									"declare the same Similarity implementation."
+					);
 				}
 				else {
 					directoryConfiguration.setSimilarity( similarity );
@@ -267,8 +352,10 @@ public class SearchFactoryBuilder {
 			filterCachingStrategy = new MRUFilterCachingStrategy();
 		}
 		else {
-			filterCachingStrategy = PluginLoader.instanceFromName( FilterCachingStrategy.class,
-					impl, ImmutableSearchFactory.class, "filterCachingStrategy" );
+			filterCachingStrategy = PluginLoader.instanceFromName(
+					FilterCachingStrategy.class,
+					impl, ImmutableSearchFactory.class, "filterCachingStrategy"
+			);
 		}
 		filterCachingStrategy.initialize( properties );
 		return filterCachingStrategy;
@@ -289,20 +376,21 @@ public class SearchFactoryBuilder {
 	 * Initialize the document builder
 	 * This algorithm seems to be safe for incremental search factories.
 	 */
+
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager, BuildContext buildContext) {
 		ConfigContext context = new ConfigContext( cfg );
 		Iterator<Class<?>> iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
-		initProgrammaticAnalyzers(context, reflectionManager);
-		initProgrammaticallyDefinedFilterDef(reflectionManager);
+		initProgrammaticAnalyzers( context, reflectionManager );
+		initProgrammaticallyDefinedFilterDef( reflectionManager );
 
 		while ( iter.hasNext() ) {
 			Class<?> mappedClass = iter.next();
 			if ( mappedClass == null ) {
 				continue;
 			}
-			@SuppressWarnings( "unchecked" )
+			@SuppressWarnings("unchecked")
 			XClass mappedXClass = reflectionManager.toXClass( mappedClass );
 			if ( mappedXClass == null ) {
 				continue;
@@ -367,7 +455,7 @@ public class SearchFactoryBuilder {
 			);
 		}
 
-		bindFullTextFilterDef(defAnn);
+		bindFullTextFilterDef( defAnn );
 	}
 
 	private void bindFullTextFilterDef(FullTextFilterDef defAnn) {
@@ -419,10 +507,10 @@ public class SearchFactoryBuilder {
 	private void initProgrammaticAnalyzers(ConfigContext context, ReflectionManager reflectionManager) {
 		final Map defaults = reflectionManager.getDefaults();
 
-		if (defaults != null) {
-			AnalyzerDef[] defs = (AnalyzerDef[]) defaults.get( AnalyzerDefs.class );
+		if ( defaults != null ) {
+			AnalyzerDef[] defs = ( AnalyzerDef[] ) defaults.get( AnalyzerDefs.class );
 			if ( defs != null ) {
-				for (AnalyzerDef def : defs) {
+				for ( AnalyzerDef def : defs ) {
 					context.addAnalyzerDef( def );
 				}
 			}
@@ -431,13 +519,13 @@ public class SearchFactoryBuilder {
 
 	private void initProgrammaticallyDefinedFilterDef(ReflectionManager reflectionManager) {
 		@SuppressWarnings("unchecked") Map defaults = reflectionManager.getDefaults();
-		FullTextFilterDef[] filterDefs = (FullTextFilterDef[]) defaults.get( FullTextFilterDefs.class);
-		if (filterDefs != null && filterDefs.length != 0) {
-			for (FullTextFilterDef defAnn : filterDefs) {
+		FullTextFilterDef[] filterDefs = ( FullTextFilterDef[] ) defaults.get( FullTextFilterDefs.class );
+		if ( filterDefs != null && filterDefs.length != 0 ) {
+			for ( FullTextFilterDef defAnn : filterDefs ) {
 				if ( filterDefinitions.containsKey( defAnn.name() ) ) {
-					throw new SearchException("Multiple definition of @FullTextFilterDef.name=" + defAnn.name());
+					throw new SearchException( "Multiple definition of @FullTextFilterDef.name=" + defAnn.name() );
 				}
-				bindFullTextFilterDef(defAnn);
+				bindFullTextFilterDef( defAnn );
 			}
 		}
 	}
@@ -451,8 +539,10 @@ public class SearchFactoryBuilder {
 			return new LogErrorHandler();
 		}
 		else {
-			return PluginLoader.instanceFromName( ErrorHandler.class, errorHandlerClassName,
-				ImmutableSearchFactory.class, "Error Handler" );
+			return PluginLoader.instanceFromName(
+					ErrorHandler.class, errorHandlerClassName,
+					ImmutableSearchFactory.class, "Error Handler"
+			);
 		}
 	}
 
@@ -534,7 +624,9 @@ public class SearchFactoryBuilder {
 
 		public Similarity getSimilarity(DirectoryProvider<?> provider) {
 			Similarity similarity = dirProviderData.get( provider ).getSimilarity();
-			if ( similarity == null ) throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
+			if ( similarity == null ) {
+				throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
+			}
 			return similarity;
 		}
 
@@ -550,6 +642,6 @@ public class SearchFactoryBuilder {
 		public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
 			return ( DocumentBuilderIndexedEntity<T> ) documentBuildersIndexedEntities.get( entityType );
 		}
-		
+
 	}
 }

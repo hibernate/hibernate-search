@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
@@ -37,12 +38,14 @@ import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.naming.Context;
+import javax.naming.NamingException;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
@@ -114,13 +117,13 @@ public class JMSMasterTest extends SearchTestCase {
 	}
 
 	private Queue getMessageQueue() throws Exception {
-		Context ctx = new javax.naming.InitialContext();
+		Context ctx = getJndiInitialContext();
 		return ( Queue ) ctx.lookup( QUEUE_NAME );
 	}
 
 	private QueueSession getQueueSession() throws Exception {
 		if ( queueSession == null ) {
-			Context ctx = new javax.naming.InitialContext();
+			Context ctx = getJndiInitialContext();
 			QueueConnectionFactory factory = ( QueueConnectionFactory ) ctx.lookup( CONNECTION_FACTORY_NAME );
 			QueueConnection conn = factory.createQueueConnection();
 			conn.start();
@@ -128,6 +131,18 @@ public class JMSMasterTest extends SearchTestCase {
 
 		}
 		return queueSession;
+	}
+
+	private Context getJndiInitialContext() throws NamingException {
+		Properties props = new Properties();
+		props.setProperty(
+				Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+		);
+		props.setProperty( Context.PROVIDER_URL, "vm://localhost" );
+		props.setProperty( "connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
+		props.setProperty( "queue.queue/searchtest", "searchQueue" );
+		Context ctx = new javax.naming.InitialContext( props );
+		return ctx;
 	}
 
 	/**
@@ -194,7 +209,7 @@ public class JMSMasterTest extends SearchTestCase {
 
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		// explcitily set the backend even though lucene is default.
+		// explicitly set the backend even though lucene is default.
 		cfg.setProperty( Environment.WORKER_BACKEND, "lucene" );
 	}
 

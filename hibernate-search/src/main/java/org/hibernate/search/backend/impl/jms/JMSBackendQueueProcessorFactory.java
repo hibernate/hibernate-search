@@ -1,8 +1,7 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -24,26 +23,25 @@
  */
 package org.hibernate.search.backend.impl.jms;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
-import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.JNDIHelper;
 
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class JMSBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
 	private String jmsQueueName;
@@ -56,7 +54,7 @@ public class JMSBackendQueueProcessorFactory implements UpdatableBackendQueuePro
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
 
 	public void initialize(Properties props, WorkerBuildContext context) {
-		//TODO proper exception if jms queues and connecitons are not there
+		//TODO proper exception if jms queues and connections are not there
 		this.properties = props;
 		this.jmsConnectionFactoryName = props.getProperty( JMS_CONNECTION_FACTORY );
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
@@ -86,67 +84,30 @@ public class JMSBackendQueueProcessorFactory implements UpdatableBackendQueuePro
 	}
 
 	public void prepareJMSTools() {
-		if ( jmsQueue != null && factory != null ) return;
+		if ( jmsQueue != null && factory != null ) {
+			return;
+		}
 		try {
-			InitialContext initialContext = getInitialContext( properties );
-			factory = (QueueConnectionFactory) initialContext.lookup( jmsConnectionFactoryName );
-			jmsQueue = (Queue) initialContext.lookup( jmsQueueName );
+			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
+			factory = ( QueueConnectionFactory ) initialContext.lookup( jmsConnectionFactoryName );
+			jmsQueue = ( Queue ) initialContext.lookup( jmsQueueName );
 
 		}
-		catch (NamingException e) {
-			throw new SearchException( "Unable to lookup Search queue ("
-					+ ( jmsQueueName != null ?
-					jmsQueueName :
-					"null" ) + ") and connection factory ("
-					+ ( jmsConnectionFactoryName != null ?
-					jmsConnectionFactoryName :
-					"null" ) + ")",
+		catch ( NamingException e ) {
+			throw new SearchException(
+					"Unable to lookup Search queue ("
+							+ ( jmsQueueName != null ?
+							jmsQueueName :
+							"null" ) + ") and connection factory ("
+							+ ( jmsConnectionFactoryName != null ?
+							jmsConnectionFactoryName :
+							"null" ) + ")",
 					e
 			);
 		}
 	}
 
-	private InitialContext getInitialContext(Properties properties) throws NamingException {
-		Properties jndiProps = getJndiProperties( properties );
-		if ( jndiProps.size() == 0 ) {
-			return new InitialContext();
-		}
-		else {
-			return new InitialContext( jndiProps );
-		}
-	}
-
-	private static Properties getJndiProperties(Properties properties) {
-
-		HashSet specialProps = new HashSet();
-		specialProps.add( JNDI_PREFIX + "class" );
-		specialProps.add( JNDI_PREFIX + "url" );
-
-		Iterator iter = properties.keySet().iterator();
-		Properties result = new Properties();
-		while ( iter.hasNext() ) {
-			String prop = (String) iter.next();
-			if ( prop.indexOf( JNDI_PREFIX ) > -1 && !specialProps.contains( prop ) ) {
-				result.setProperty(
-						prop.substring( JNDI_PREFIX.length() ),
-						properties.getProperty( prop )
-				);
-			}
-		}
-
-		String jndiClass = properties.getProperty( JNDI_PREFIX + "class" );
-		String jndiURL = properties.getProperty( JNDI_PREFIX + "url" );
-		// we want to be able to just use the defaults,
-		// if JNDI environment properties are not supplied
-		// so don't put null in anywhere
-		if ( jndiClass != null ) result.put( Context.INITIAL_CONTEXT_FACTORY, jndiClass );
-		if ( jndiURL != null ) result.put( Context.PROVIDER_URL, jndiURL );
-
-		return result;
-	}
-
 	public void close() {
 		// no need to release anything
 	}
-
 }

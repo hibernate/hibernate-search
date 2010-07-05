@@ -24,21 +24,23 @@
  */
 package org.hibernate.search.test.jms.slave;
 
+import java.util.Properties;
 import javax.jms.MessageConsumer;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSession;
 import javax.naming.Context;
+import javax.naming.NamingException;
 
 import org.apache.activemq.broker.BrokerService;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
  * Checks that the Slave in a JMS configuration proplerly places index jobs onto the queue.
@@ -68,7 +70,7 @@ public class JMSSlaveTest extends SearchTestCase {
 	public void testMessageSend() throws Exception {
 		registerMessageListener();
 		SearchQueueChecker.reset();
-		
+
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		TShirt ts = new TShirt();
@@ -82,7 +84,7 @@ public class JMSSlaveTest extends SearchTestCase {
 		tx.commit();
 
 		//need to sleep for the message consumption
-		Thread.sleep(500);
+		Thread.sleep( 500 );
 
 		assertEquals( 1, SearchQueueChecker.queues );
 		assertEquals( 2, SearchQueueChecker.works );
@@ -90,12 +92,12 @@ public class JMSSlaveTest extends SearchTestCase {
 		SearchQueueChecker.reset();
 		s = openSession();
 		tx = s.beginTransaction();
-		ts = (TShirt) s.get( TShirt.class, ts.getId() );
+		ts = ( TShirt ) s.get( TShirt.class, ts.getId() );
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 
 		//need to sleep for the message consumption
-		Thread.sleep(500);
+		Thread.sleep( 500 );
 
 		assertEquals( 1, SearchQueueChecker.queues );
 		assertEquals( 2, SearchQueueChecker.works ); //one update = 2 works
@@ -108,8 +110,8 @@ public class JMSSlaveTest extends SearchTestCase {
 		tx.commit();
 
 		//Need to sleep for the message consumption
-		Thread.sleep(500);
-		
+		Thread.sleep( 500 );
+
 		assertEquals( 1, SearchQueueChecker.queues );
 		assertEquals( 2, SearchQueueChecker.works );
 		s.close();
@@ -137,13 +139,13 @@ public class JMSSlaveTest extends SearchTestCase {
 	}
 
 	private Queue getMessageQueue() throws Exception {
-		Context ctx = new javax.naming.InitialContext();
+		Context ctx = getJndiInitialContext();
 		return ( Queue ) ctx.lookup( QUEUE_NAME );
 	}
 
 	private QueueSession getQueueSession() throws Exception {
 		if ( queueSession == null ) {
-			Context ctx = new javax.naming.InitialContext();
+			Context ctx = getJndiInitialContext();
 			QueueConnectionFactory factory = ( QueueConnectionFactory ) ctx.lookup( CONNECTION_FACTORY_NAME );
 			QueueConnection conn = factory.createQueueConnection();
 			conn.start();
@@ -158,11 +160,33 @@ public class JMSSlaveTest extends SearchTestCase {
 		cfg.setProperty( Environment.WORKER_BACKEND, "jms" );
 		cfg.setProperty( JMSBackendQueueProcessorFactory.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
 		cfg.setProperty( JMSBackendQueueProcessorFactory.JMS_QUEUE, QUEUE_NAME );
+
+		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of jndi properties to create the InitialContext
+		// for the queue processor
+		cfg.setProperty(
+				"hibernate.search.worker.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+		);
+		cfg.setProperty( "hibernate.search.worker.jndi.url", "vm://localhost" );
+		cfg.setProperty( "hibernate.search.worker.jndi.connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
+		cfg.setProperty( "hibernate.search.worker.jndi.queue.queue/searchtest", "searchQueue" );
 	}
 
 	protected Class<?>[] getMappings() {
 		return new Class[] {
 				TShirt.class
 		};
+	}
+
+	private Context getJndiInitialContext() throws NamingException {
+		Properties props = new Properties();
+		props.setProperty(
+				Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+		);
+		props.setProperty( Context.PROVIDER_URL, "vm://localhost" );
+		props.setProperty( "connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
+		props.setProperty( "queue.queue/searchtest", "searchQueue" );
+
+		Context ctx = new javax.naming.InitialContext( props );
+		return ctx;
 	}
 }

@@ -107,6 +107,16 @@ public class LuceneIndexingParameters implements Serializable {
 		return batchIndexParameters;
 	}
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "LuceneIndexingParameters" );
+		sb.append( "{batchIndexParameters=" ).append( batchIndexParameters );
+		sb.append( ", transactionIndexParameters=" ).append( transactionIndexParameters );
+		sb.append( '}' );
+		return sb.toString();
+	}
+
 	public static class ParameterSet implements Serializable {
 		
 		private static final long serialVersionUID = -6121723702279869524L;
@@ -182,8 +192,16 @@ public class LuceneIndexingParameters implements Serializable {
 				return false;
 			return true;
 		}
-		
- 	}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append( "ParameterSet" );
+			sb.append( "{parameters=" ).append( parameters );
+			sb.append( '}' );
+			return sb.toString();
+		}
+	}
 
 	public void applyToWriter(IndexWriter writer, boolean batch) {
 		if ( batch ) {

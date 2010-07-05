@@ -35,9 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
-import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -63,6 +60,9 @@ import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
 import org.hibernate.search.query.dsl.v2.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.internals.DirectoryProviderData;
+import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.LoggerFactory;
@@ -71,7 +71,7 @@ import org.hibernate.util.StringHelper;
 
 /**
  * This implementation is never directly exposed to the user, it is always wrapped into a {@link org.hibernate.search.impl.MutableSearchFactory}
- * 
+ *
  * @author Emmanuel Bernard
  */
 public class ImmutableSearchFactory implements StateSearchFactoryImplementor, WorkerBuildContext {
@@ -121,7 +121,6 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 		this.readerProvider = cfg.readerProvider;
 		this.worker = cfg.worker;
 	}
-
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
 		return backendQueueProcessorFactory;
@@ -202,7 +201,7 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 	}
 
 	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
-		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called");
+		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called" );
 	}
 
 	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
@@ -296,7 +295,7 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 	public Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes) {
 		return indexHierarchy.getIndexedClasses( classes );
 	}
-	
+
 	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
 		BatchBackend batchBackend;
 		String impl = configurationProperties.getProperty( Environment.BATCH_BACKEND );
@@ -304,18 +303,23 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 			batchBackend = new LuceneBatchBackend();
 		}
 		else {
-			batchBackend = PluginLoader.instanceFromName( BatchBackend.class, impl, ImmutableSearchFactory.class,
-					"batchbackend" );
+			batchBackend = PluginLoader.instanceFromName(
+					BatchBackend.class, impl, ImmutableSearchFactory.class,
+					"batchbackend"
+			);
 		}
 		Properties batchBackendConfiguration = new MaskedProperty(
-				this.configurationProperties, Environment.BATCH_BACKEND );
+				this.configurationProperties, Environment.BATCH_BACKEND
+		);
 		batchBackend.initialize( batchBackendConfiguration, progressMonitor, this );
 		return batchBackend;
 	}
 
 	public Similarity getSimilarity(DirectoryProvider<?> provider) {
 		Similarity similarity = dirProviderData.get( provider ).getSimilarity();
-		if ( similarity == null ) throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
+		if ( similarity == null ) {
+			throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
+		}
 		return similarity;
 	}
 

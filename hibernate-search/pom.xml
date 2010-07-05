@@ -22,7 +22,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -76,11 +78,11 @@
             <artifactId>jms</artifactId>
             <scope>provided</scope>
         </dependency>
-		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>jsr250-api</artifactId>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
             <scope>provided</scope>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
@@ -94,6 +96,12 @@
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>simple-jndi</groupId>
+            <artifactId>simple-jndi</artifactId>
+            <version>0.11.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -137,6 +145,10 @@
                             -->
                         <property>
                             <name>java.net.preferIPv4Stack</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>com.sun.management.jmxremote</name>
                             <value>true</value>
                         </property>
                     </systemProperties>
@@ -187,7 +199,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <goals>deploy javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:translate org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:resources org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:generate assembly:assembly</goals>
+                    <goals>deploy javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:translate
+                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:resources
+                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:generate assembly:assembly
+                    </goals>
                 </configuration>
             </plugin>
             <plugin>

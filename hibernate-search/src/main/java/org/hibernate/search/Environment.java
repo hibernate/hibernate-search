@@ -66,12 +66,12 @@ public final class Environment {
 	 * default 1
 	 */
 	public static final String WORKER_THREADPOOL_SIZE = Environment.WORKER_PREFIX + "thread_pool.size";
-	
+
 	/**
 	 * Size of the buffer queue (besides the thread pool size)
 	 * <ul>
-	 * 	<li>only used then execution is async</li>
-	 * 	<li>default infinite</li>
+	 * <li>only used then execution is async</li>
+	 * <li>default infinite</li>
 	 * </ul>
 	 */
 	public static final String WORKER_WORKQUEUE_SIZE = Environment.WORKER_PREFIX + "buffer_queue.max";
@@ -80,28 +80,28 @@ public final class Environment {
 	 * define the reader prefix
 	 */
 	public static final String READER_PREFIX = "hibernate.search.reader.";
-	
+
 	/**
 	 * define the reader strategy used
 	 */
 	public static final String READER_STRATEGY = READER_PREFIX + "strategy";
-	
+
 	/**
 	 * filter caching strategy class (must have a no-arg constructor and implement FilterCachingStrategy)
 	 */
 	public static final String FILTER_CACHING_STRATEGY = "hibernate.search.filter.cache_strategy";
-	
+
 	/**
 	 * number of docidresults cached in hard reference.
 	 */
 	public static final String CACHE_DOCIDRESULTS_SIZE = "hibernate.search.filter.cache_docidresults.size";
-	
+
 	/**
 	 * batch backend implementation class (must have a no-arg constructor and implement BatchBackend)
 	 * also prefix for configuration settings of the batch backend
 	 */
 	public static final String BATCH_BACKEND = "hibernate.search.batchbackend";
-	
+
 	/**
 	 * When set to true a lock on the index will not be released until the
 	 * SearchFactory (or SessionFactory) is closed.
@@ -111,17 +111,19 @@ public final class Environment {
 	 */
 	public static final String EXCLUSIVE_INDEX_USE = "exclusive_index_use";
 
-	/**
-	 *
-	 */
 	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
 
-	
 	/**
 	 * Set to a fully qualified classname of a type implementing org.hibernate.search.exception.ErrorHandler
 	 * to override the error strategy used during processing of the Lucene updates.
 	 * Default is to log errors.
 	 */
 	public static final String ERROR_HANDLER = "hibernate.search.error_handler";
-	
+
+	/**
+	 * If set to {@code true} the JMX Statistics bean gets enabled. For all other values the bean does not
+	 * get enabled.
+	 */
+	public static final String JMX_ENABLED = "hibernate.search.jmx_enabled";
+
 }

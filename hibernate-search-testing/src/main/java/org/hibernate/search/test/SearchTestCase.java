@@ -26,6 +26,7 @@ package org.hibernate.search.test;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
@@ -61,14 +62,14 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 public abstract class SearchTestCase extends TestCase {
 
 	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
-	
+
 	public static Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
 	public static Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
 	public static Analyzer simpleAnalyzer = new SimpleAnalyzer();
 	public static Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static File indexDir;
-	
+
 	private SearchFactory searchFactory;
 
 	static {
@@ -129,7 +130,7 @@ public abstract class SearchTestCase extends TestCase {
 		tx.commit();
 		s.close();
 	}
-	
+
 	protected SearchFactory getSearchFactory() {
 		if ( searchFactory == null ) {
 			Session session = openSession();
@@ -190,9 +191,29 @@ public abstract class SearchTestCase extends TestCase {
 	protected static File getIndexDir() {
 		return indexDir;
 	}
-	
+
 	public static Version getTargetLuceneVersion() {
 		return Version.LUCENE_29;
 	}
-	
+
+	/**
+	 * Returns the target directory of the build.
+	 *
+	 * @return the target directory of the build
+	 */
+	public File getTargetDir() {
+		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		// get a URL reference to something we now is part of the classpath (us)
+		URL myUrl = contextClassLoader.getResource( SearchTestCase.class.getName().replace( '.', '/' ) + ".class" );
+		File myPath = new File( myUrl.getFile() );
+		// navigate back to '/target'
+		return myPath
+				.getParentFile()  // target/classes/org/hibernate/search/test
+				.getParentFile()  // target/classes/org/hibernate/search
+				.getParentFile()  // target/classes/org/hibernate/
+				.getParentFile()  // target/classes/org
+				.getParentFile()  // target/classes/
+				.getParentFile(); // target
+	}
+
 }
