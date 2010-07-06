@@ -27,16 +27,16 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>target/site/apidocs</directory>
+            <directory>target/apidocs</directory>
             <outputDirectory>/dist/docs/api</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>target/docbook/publish/en-US</directory>
-            <outputDirectory>/dist/docs/manual</outputDirectory>
+            <directory>target/docbook/publish</directory>
+            <outputDirectory>/dist/docs/reference</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>..</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <useDefaultExcludes>true</useDefaultExcludes>
             <includes>
                 <include>lgpl.txt</include>
@@ -46,7 +46,7 @@
         </fileSet>
         <fileSet>
             <directory>.</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <useDefaultExcludes>true</useDefaultExcludes>
             <includes>
                 <include>pom.xml</include>
