@@ -27,9 +27,12 @@ package org.hibernate.search.backend.impl;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.slf4j.Logger;
+
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
+import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.WeakIdentityHashMap;
 
 /**
@@ -38,6 +41,8 @@ import org.hibernate.search.util.WeakIdentityHashMap;
  * @author Emmanuel Bernard
  */
 public class PostTransactionWorkQueueSynchronization implements Synchronization {
+
+	private static final Logger log = LoggerFactory.make();
 	
 	/**
 	 * FullTextIndexEventListener is using a WeakIdentityHashMap<Session,Synchronization>
@@ -47,6 +52,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	
 	private final QueueingProcessor queueingProcessor;
 	private boolean consumed;
+	private boolean prepared;
 	private final WeakIdentityHashMap queuePerTransaction;
 	private WorkQueue queue = new WorkQueue();
 
@@ -67,7 +73,13 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	}
 
 	public void beforeCompletion() {
-		queueingProcessor.prepareWorks(queue);
+		if ( prepared ) {
+			log.trace("This transaction has already been processed, ignoring beforeCompletion()");
+		}
+		else {
+			queueingProcessor.prepareWorks(queue);
+			prepared = true;
+		}
 	}
 
 	public void afterCompletion(int i) {
