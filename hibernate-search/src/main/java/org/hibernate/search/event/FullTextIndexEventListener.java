@@ -1,26 +1,25 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
- * 
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ *
+ *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
  */
 package org.hibernate.search.event;
 
@@ -57,6 +56,7 @@ import org.hibernate.event.PostInsertEvent;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
@@ -68,7 +68,6 @@ import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;
 
-import static org.hibernate.search.event.FullTextIndexEventListener.Installation.MULTIPLE_INSTANCE;
 import static org.hibernate.search.event.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
 
 /**
@@ -79,34 +78,46 @@ import static org.hibernate.search.event.FullTextIndexEventListener.Installation
  * @author Emmanuel Bernard
  * @author Mattias Arbin
  * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  */
 //TODO implement and use a LockableDirectoryProvider that wraps a DP to handle the lock inside the LDP
 //TODO make this class final as soon as FullTextIndexCollectionEventListener is removed.
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener, FlushEventListener, Initializable, Destructible {
 
+	private static final Logger log = LoggerFactory.make();
+	private final Installation installation;
+
+	protected boolean used;
+	protected SearchFactoryImplementor searchFactoryImplementor;
+
 	static {
 		Version.touch();
 	}
 
-	private static final Logger log = LoggerFactory.make();
-
-	protected boolean used;
-	protected SearchFactoryImplementor searchFactoryImplementor;
-	private final Installation installation;
-	
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
 	// transient because it's not serializable (and state doesn't need to live longer than a flush).
 	// final because it's initialization should be published to other threads.
 	// ! update the readObject() method in case of name changes !
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
-	private transient final Map<Session,Synchronization> flushSynch = new WeakIdentityHashMap<Session,Synchronization>(0);
+	private transient final Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>(
+			0
+	);
 
+	/**
+	 * @deprecated As of Hibernate Search 3.3. This method was used for instantiating the event listener when configured
+	 *             in a configuration file. Since Hibernate Core 3.6 Hibernate Search will always be automatically enabled if available
+	 *             on the classpath.
+	 */
 	public FullTextIndexEventListener() {
-		this.installation = MULTIPLE_INSTANCE;
+		String msg = "FullTextIndexEventListener default constructor is obsolete. Remove all explicit" +
+				"event listener configuration. As of Hibernate Core 3.6 Hibernate Search will be automatically enabled " +
+				"if it is detected on the classpath.";
+		log.error( msg );
+		throw new SearchException( msg );
 	}
 
 	public FullTextIndexEventListener(Installation installation) {
@@ -118,22 +129,16 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	 */
 
 	public void initialize(Configuration cfg) {
-		/*
-		 * if we know we pass the same instance, we can actually ensure that
-		 *  - initialize() is a no op if already run
-		 *  - avoid ContextHolder altogether
-		 */
-		if ( installation != SINGLE_INSTANCE ) {
-			log.debug( "Storing SearchFactory in ThreadLocal" );
-			searchFactoryImplementor = ContextHolder.getOrBuildSearchFactory( cfg );
+		if(installation != SINGLE_INSTANCE) {
+			throw new SearchException( "Only Installation.SINGLE_INSTANCE is supported" );
 		}
-		else {
-			if ( searchFactoryImplementor == null ) {
-				searchFactoryImplementor = new SearchFactoryBuilder()
-						.configuration( new SearchConfigurationFromHibernateCore( cfg ) )
-						.buildSearchFactory();
-			}
+		
+		if ( searchFactoryImplementor == null ) {
+			searchFactoryImplementor = new SearchFactoryBuilder()
+					.configuration( new SearchConfigurationFromHibernateCore( cfg ) )
+					.buildSearchFactory();
 		}
+
 		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
 		if ( "event".equals( indexingStrategy ) ) {
 			used = searchFactoryImplementor.getDocumentBuildersIndexedEntities().size() != 0;
@@ -141,7 +146,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		else if ( "manual".equals( indexingStrategy ) ) {
 			used = false;
 		}
-		log.debug( "Hibernate Search event listeners " + (used ? "activated" : "desactivated") );
+		log.debug( "Hibernate Search event listeners " + ( used ? "activated" : "deactivated" ) );
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
@@ -188,15 +193,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	public void cleanup() {
 		searchFactoryImplementor.close();
-		temptativeContextCleaning();
-
-	}
-
-	private void temptativeContextCleaning() {
-		if ( installation != SINGLE_INSTANCE ) {
-			//unlikely to work: the thread used for closing is unlikely the thread used for initializing
-			ContextHolder.removeSearchFactoryFromCache( searchFactoryImplementor );
-		}
 	}
 
 	public void onPostRecreateCollection(PostCollectionRecreateEvent event) {
@@ -270,38 +266,38 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	 * Warning: if the synchronization contains a hard reference
 	 * to the Session proper cleanup is not guaranteed and memory leaks
 	 * will happen.
+	 *
 	 * @param eventSource should be the Session doing the flush
-	 * @param synchronization
+	 * @param synchronization the synchronisation instance
 	 */
 	public void addSynchronization(EventSource eventSource, Synchronization synchronization) {
 		this.flushSynch.put( eventSource, synchronization );
 	}
 
-	/* Might want to implement AutoFlushEventListener in future?
-	public void onAutoFlush(AutoFlushEvent event) throws HibernateException {
-		// Currently not needed as auto-flush is not happening
-		// when out of transaction.
-	}
-	*/
-
 	private void writeObject(ObjectOutputStream os) throws IOException {
 		os.defaultWriteObject();
-		temptativeContextCleaning();
 	}
 
 	//needs to implement custom readObject to restore the transient fields
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+
+	private void readObject(ObjectInputStream is)
+			throws IOException, ClassNotFoundException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		is.defaultReadObject();
 		Class<FullTextIndexEventListener> cl = FullTextIndexEventListener.class;
-		Field f = cl.getDeclaredField("flushSynch");
+		Field f = cl.getDeclaredField( "flushSynch" );
 		ReflectionHelper.setAccessible( f );
-		Map<Session,Synchronization> flushSynch = new WeakIdentityHashMap<Session,Synchronization>(0);
+		Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>( 0 );
 		// setting a final field by reflection during a readObject is considered as safe as in a constructor:
 		f.set( this, flushSynch );
 	}
 
 	public static enum Installation {
 		SINGLE_INSTANCE,
+
+		/**
+		 * @deprecated As of Hibernate Search 3.3.
+		 * @see #FullTextIndexEventListener()
+		 */
 		MULTIPLE_INSTANCE
 	}
 }

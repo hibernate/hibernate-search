@@ -39,6 +39,7 @@ import org.hibernate.Filter;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
+import org.hibernate.LobHelper;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.ReplicationMode;
@@ -47,6 +48,7 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.TypeHelper;
 import org.hibernate.UnknownProfileException;
 import org.hibernate.LockOptions;
 import org.hibernate.classic.Session;
@@ -804,5 +806,13 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public void disableFetchProfile(String name) throws UnknownProfileException {
 		session.disableFetchProfile( name );
+	}
+
+	public TypeHelper getTypeHelper() {
+		return session.getTypeHelper();
+	}
+
+	public LobHelper getLobHelper() {
+		return session.getLobHelper();
 	}
 }

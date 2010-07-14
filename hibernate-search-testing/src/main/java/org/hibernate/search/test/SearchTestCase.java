@@ -52,7 +52,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.store.RAMDirectoryProvider;
-import org.hibernate.test.annotations.HibernateTestCase;
+import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
 
 /**
  * Base class for Hibernate Search unit tests.
