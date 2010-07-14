@@ -51,6 +51,7 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.Version;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.Factory;
@@ -102,6 +103,11 @@ import org.hibernate.util.StringHelper;
  * @author Hardy Ferentschik
  */
 public class SearchFactoryBuilder {
+
+	static {
+		Version.touch();
+	}
+	
 	private static final Logger log = LoggerFactory.make();
 	private SearchConfiguration cfg;
 	private MutableSearchFactory rootFactory;

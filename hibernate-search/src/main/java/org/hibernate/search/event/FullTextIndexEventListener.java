@@ -57,6 +57,7 @@ import org.hibernate.event.PostInsertEvent;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.search.Version;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
@@ -86,6 +87,10 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener, FlushEventListener, Initializable, Destructible {
+
+	static {
+		Version.touch();
+	}
 
 	private static final Logger log = LoggerFactory.make();
 
