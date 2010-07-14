@@ -74,9 +74,14 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 
 	public void beforeCompletion() {
 		if ( prepared ) {
-			log.trace("This transaction has already been processed, ignoring beforeCompletion()");
+			if ( log.isTraceEnabled() ) {
+				log.trace("Transaction's beforeCompletion() phase already been processed, ignoring: {}", this.toString() );
+			}
 		}
 		else {
+			if ( log.isTraceEnabled() ) {
+				log.trace("Processing Transaction's beforeCompletion() phase: {}", this.toString() );
+			}
 			queueingProcessor.prepareWorks(queue);
 			prepared = true;
 		}
@@ -85,9 +90,15 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	public void afterCompletion(int i) {
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {
+				if ( log.isTraceEnabled() ) {
+					log.trace("Processing Transaction's afterCompletion() phase for {}. Performing work.", this.toString() );
+				}
 				queueingProcessor.performWorks(queue);
 			}
 			else {
+				if ( log.isTraceEnabled() ) {
+					log.trace("Processing Transaction's afterCompletion() phase for {}. Cancelling work due to transaction status {}", this.toString(), i );
+				}
 				queueingProcessor.cancelWorks(queue);
 			}
 		}
