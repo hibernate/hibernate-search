@@ -257,7 +257,7 @@ public class Rule { ... }</programlisting>
 
     <para>Using a custom <classname>IndexShardingStrategy</classname>
     implementation, it's possible to define what shard a given entity is
-    indexed to. </para>
+    indexed to.</para>
 
     <para>It also allows for optimizing searches by selecting which shard to
     run the query onto. By activating a filter (see <xref
@@ -391,7 +391,8 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</cod
             <entry>Out of the box support for the Apache Lucene back end and
             the JMS back end. Default to <literal>lucene</literal>. Supports
             also <literal>jms</literal>, <literal>blackhole</literal>,
-            <literal>jgroupsMaster</literal> and <literal>jgroupsSlave</literal>.</entry>
+            <literal>jgroupsMaster</literal> and
+            <literal>jgroupsSlave</literal>.</entry>
           </row>
 
           <row>
@@ -442,34 +443,35 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</cod
             lookup the JMS queue from. The queue will be used to post work
             messages.</entry>
           </row>
-          
-          <row>
-           <entry><literal>hibernate.search.worker.jgroups.clusterName</literal></entry>
 
-           <entry>Optional for JGroups back end. Defines the name of JGroups channel.</entry>
-          </row>
-          
           <row>
-           <entry><literal>hibernate.search.worker.jgroups.configurationFile</literal></entry>
+            <entry><literal>hibernate.search.worker.jgroups.clusterName</literal></entry>
 
-           <entry>Optional JGroups network stack configuration. Defines the name of a JGroups
-           configuration file, which must exist on classpath.</entry>
+            <entry>Optional for JGroups back end. Defines the name of JGroups
+            channel.</entry>
           </row>
 
           <row>
-           <entry><literal>hibernate.search.worker.jgroups.configurationXml</literal></entry>
+            <entry><literal>hibernate.search.worker.jgroups.configurationFile</literal></entry>
 
-           <entry>Optional JGroups network stack configuration.
-           Defines a String representing JGroups configuration as XML.</entry>
-           </row>
-           
-           <row>
+            <entry>Optional JGroups network stack configuration. Defines the
+            name of a JGroups configuration file, which must exist on
+            classpath.</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.worker.jgroups.configurationXml</literal></entry>
+
+            <entry>Optional JGroups network stack configuration. Defines a
+            String representing JGroups configuration as XML.</entry>
+          </row>
+
+          <row>
             <entry><literal>hibernate.search.worker.jgroups.configurationString</literal></entry>
 
-            <entry>Optional JGroups network stack configuration.
-            Provides JGroups configuration in plain text.</entry>
-           </row>
-
+            <entry>Optional JGroups network stack configuration. Provides
+            JGroups configuration in plain text.</entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
@@ -606,49 +608,62 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController im
     </section>
   </section>
 
-    <section id="jgroups-backend">
-        <title>JGroups Master/Slave configuration</title>
-        <para>Describes how to configure JGroups Master/Slave back end.
-            Configuration examples illustrated in JMS Master/Slave configuration
-            section (<xref linkend="jms-backend" />) also apply here, only
-            a different backend needs to be set.
-        </para>
-        <section>
-            <title>Slave nodes</title>
-            <para>Every index update operation is sent through a JGroups channel to the master node. Index
-                querying operations are executed on a local index copy.
-            </para>
-            <example><title>JGroups Slave configuration</title>
-       <programlisting>
+  <section id="jgroups-backend">
+    <title>JGroups Master/Slave configuration</title>
+
+    <para>Describes how to configure JGroups Master/Slave back end.
+    Configuration examples illustrated in JMS Master/Slave configuration
+    section (<xref linkend="jms-backend" />) also apply here, only a different
+    backend needs to be set.</para>
+
+    <section>
+      <title>Slave nodes</title>
+
+      <para>Every index update operation is sent through a JGroups channel to
+      the master node. Index querying operations are executed on a local index
+      copy.</para>
+
+      <example>
+        <title>JGroups Slave configuration</title>
+
+        <programlisting>
 ### slave configuration
 ## Backend configuration
 hibernate.search.worker.backend = jgroupsSlave
        </programlisting>
-            </example>
-        </section>
+      </example>
+    </section>
 
-        <section>
-            <title>Master node</title>
-            <para>Every index update operation is taken from a JGroups channel and
-                executed. The master index is copied on a regular basis.
-            </para>
-            <example><title>JGroups Master configuration</title>
-     <programlisting>
+    <section>
+      <title>Master node</title>
+
+      <para>Every index update operation is taken from a JGroups channel and
+      executed. The master index is copied on a regular basis.</para>
+
+      <example>
+        <title>JGroups Master configuration</title>
+
+        <programlisting>
 ### master configuration
 ## Backend configuration
 hibernate.search.worker.backend = jgroupsMaster
      </programlisting>
-            </example>
-        </section>
-         <section>
-            <title>JGroups channel configuration</title>
-            <para>Optionally configuration for JGroups transport protocols
-            (UDP, TCP) and channel name can be defined. It can be applied to both master and slave nodes.
-            There are several ways to configure JGroups transport details.
-            If it is not defined explicity, configuration found in the <literal>
-            flush-udp.xml</literal> file is used.</para>
-             <example><title>JGroups transport protocols configuration</title>
-     <programlisting>
+      </example>
+    </section>
+
+    <section>
+      <title>JGroups channel configuration</title>
+
+      <para>Optionally configuration for JGroups transport protocols (UDP,
+      TCP) and channel name can be defined. It can be applied to both master
+      and slave nodes. There are several ways to configure JGroups transport
+      details. If it is not defined explicity, configuration found in the
+      <literal> flush-udp.xml</literal> file is used.</para>
+
+      <example>
+        <title>JGroups transport protocols configuration</title>
+
+        <programlisting>
 ## configuration
 #udp.xml file needs to be located in the classpath
 hibernate.search.worker.backend.jgroups.configurationFile = udp.xml
@@ -689,19 +704,24 @@ pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):UNICAST(timeout=5000):
 FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true)
 
     </programlisting>
-            </example>
-            <para>Master and slave nodes communicate over JGroups channel
-                  that is identified by this same name. Name of the channel can be defined
-                  explicity, if not default <literal>HSearchCluster</literal> is used.</para>
-            <example><title>JGroups channel name configuration</title>
-                <programlisting>
+      </example>
+
+      <para>Master and slave nodes communicate over JGroups channel that is
+      identified by this same name. Name of the channel can be defined
+      explicity, if not default <literal>HSearchCluster</literal> is
+      used.</para>
+
+      <example>
+        <title>JGroups channel name configuration</title>
+
+        <programlisting>
 ## Backend configuration
 hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
                 </programlisting>
-            </example>
-        </section>
+      </example>
     </section>
-    
+  </section>
+
   <section id="configuration-reader-strategy">
     <title>Reader strategy configuration</title>
 
@@ -743,52 +763,11 @@ hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
     <section>
       <title>Enabling Hibernate Search</title>
 
-      <para>Hibernate Search is enabled out of the box when using Hibernate
-      Annotations or Hibernate EntityManager. If, for some reason you need to
-      disable it, set
-      <literal>hibernate.search.autoregister_listeners</literal> to false.
+      <para>Hibernate Search is enabled out of the box when detected on the
+      classpath by Hibernate Core. If, for some reason you need to disable it,
+      set <literal>hibernate.search.autoregister_listeners</literal> to false.
       Note that there is no performance penalty when the listeners are enabled
       but no entities are annotated as indexed.</para>
-
-      <para>To enable Hibernate Search in Hibernate Core (ie. if you don't use
-      Hibernate Annotations), add the
-      <literal>FullTextIndexEventListener</literal> for the following six
-      Hibernate events and also add it after the default
-      <literal>DefaultFlushEventListener</literal>, as in the following
-      example.</para>
-
-      <example>
-        <title>Explicitly enabling Hibernate Search by configuring the
-        <classname>FullTextIndexEventListener</classname></title>
-
-        <programlisting>&lt;hibernate-configuration&gt;
-     &lt;session-factory&gt;
-        ...
-        &lt;event type="post-update"&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
-        &lt;/event&gt;
-        &lt;event type="post-insert"&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
-        &lt;/event&gt;
-        &lt;event type="post-delete"&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
-        &lt;/event&gt;
-        &lt;event type="post-collection-recreate"&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
-        &lt;/event&gt;
-        &lt;event type="post-collection-remove"&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
-        &lt;/event&gt;
-        &lt;event type="post-collection-update"&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
-        &lt;/event&gt;
-        &lt;event type="flush"&gt;
-            &lt;listener class="org.hibernate.event.def.DefaultFlushEventListener"/&gt;
-            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
-        &lt;/event&gt;
-    &lt;/session-factory&gt;
-&lt;/hibernate-configuration&gt;</programlisting>
-      </example>
     </section>
 
     <section>
@@ -802,7 +781,7 @@ hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
 
       <para>To disable event based indexing, set</para>
 
-      <programlisting>hibernate.search.indexing_strategy manual</programlisting>
+      <programlisting>hibernate.search.indexing_strategy = manual</programlisting>
 
       <note>
         <para>In most case, the JMS backend provides the best of both world, a
@@ -828,15 +807,14 @@ hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
     settings depending on the use case. During indexing operations triggered
     by database modifications, the parameters are grouped by the
     <literal>transaction</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.transaction.&lt;parameter_name&gt;</programlisting>
-    When indexing occurs via <literal>FullTextSession.index()</literal> or
-    via a <classname>MassIndexer</classname> (see
-    <xref linkend="search-batchindex" />), the used properties are those
-    grouped under the <literal>batch</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting></para>
+    When indexing occurs via <literal>FullTextSession.index()</literal> or via
+    a <classname>MassIndexer</classname> (see <xref
+    linkend="search-batchindex" />), the used properties are those grouped
+    under the <literal>batch</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting></para>
 
-    <para>If no value is set for a
-    <literal>.batch</literal> value in a specific shard configuration,
-    Hibernate Search will look at the index section, then at the default
-    section: <programlisting>hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
+    <para>If no value is set for a <literal>.batch</literal> value in a
+    specific shard configuration, Hibernate Search will look at the index
+    section, then at the default section: <programlisting>hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
 hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
 hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     This configuration will result in these settings applied to the second
@@ -867,10 +845,12 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     of Lucene you are using; values shown are relative to version
     <literal>2.4</literal>. For more information about Lucene indexing
     performances, please refer to the Lucene documentation.</para>
-    
-    <warning><para>Previous versions had the <literal>batch</literal>
-    parameters inherit from <literal>transaction</literal> properties.
-    This needs now to be explicitly set.</para></warning>
+
+    <warning>
+      <para>Previous versions had the <literal>batch</literal> parameters
+      inherit from <literal>transaction</literal> properties. This needs now
+      to be explicitly set.</para>
+    </warning>
 
     <table>
       <title>List of indexing performance and behavior properties</title>
@@ -887,18 +867,18 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
         </thead>
 
         <tbody>
-        
-        <row>
+          <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].exclusive_index_use</literal></entry>
 
-            <entry><para>Set to <literal>true</literal> when no other
-            process will need to write to the same index: this will enable
-            Hibernate Search to work in exlusive mode on the index and
-            improve performance in writing changes to the index.</para></entry>
+            <entry><para>Set to <literal>true</literal> when no other process
+            will need to write to the same index: this will enable Hibernate
+            Search to work in exlusive mode on the index and improve
+            performance in writing changes to the index.</para></entry>
 
-            <entry><literal>false</literal> (releases locks as soon as possible)</entry>
+            <entry><literal>false</literal> (releases locks as soon as
+            possible)</entry>
           </row>
-        
+
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_delete_terms</literal></entry>
 
@@ -1015,10 +995,11 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
         </tbody>
       </tgroup>
     </table>
-    
-    <tip><para>When your architecture permits it, always set
-    <literal>hibernate.search.default.exclusive_index_use=true</literal>
-    as it greatly improves efficiency in index writing.</para>
+
+    <tip>
+      <para>When your architecture permits it, always set
+      <literal>hibernate.search.default.exclusive_index_use=true</literal> as
+      it greatly improves efficiency in index writing.</para>
     </tip>
 
     <para>To tune the indexing speed it might be useful to time the object
@@ -1170,16 +1151,16 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
     explicitly declare the exception logging mechanism as seen below:</para>
 
     <para><programlisting>hibernate.search.error_handler log</programlisting>
-    The default exception handling occurs for both synchronous and asynchronous
-    indexing. Hibernate Search provides an easy mechanism to override the
-    default error handling implementation.</para>
+    The default exception handling occurs for both synchronous and
+    asynchronous indexing. Hibernate Search provides an easy mechanism to
+    override the default error handling implementation.</para>
 
     <para>In order to provide your own implementation you must implement the
     <code>ErrorHandler</code> interface, which provides <code>handle (
     ErrorContext context )</code> method. The <code>ErrorContext</code>
-    provides a reference to the primary <code>LuceneWork</code> that failed, the
-    underlying exception and any subsequent <code>LuceneWork</code> that could
-    not be processed due to the primary exception.</para>
+    provides a reference to the primary <code>LuceneWork</code> that failed,
+    the underlying exception and any subsequent <code>LuceneWork</code> that
+    could not be processed due to the primary exception.</para>
 
     <para><programlisting>public interface ErrorContext  {
    List&lt;LuceneWork&gt; getFailingOperations();
@@ -1197,10 +1178,10 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
       //publish error context to some internal error handling system
       ...
    }
-}</programlisting>
-     To register this error handler with Hibernate Search you must declare the
-    <code>CustomErrorHandler</code> fully qualified classname
+}</programlisting> To register this error handler with Hibernate Search you
+    must declare the <code>CustomErrorHandler</code> fully qualified classname
     in the configuration properties:</para>
+
     <para><programlisting>hibernate.search.error_handler CustomerErrorHandler</programlisting></para>
   </section>
 </chapter>
