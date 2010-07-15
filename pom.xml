@@ -127,7 +127,7 @@
     </mailingLists>
 
     <properties>
-        <slf4jVersion>1.5.8</slf4jVersion>
+        <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>2.9.2</luceneVersion>
         <hibernateVersion>3.6.0-SNAPSHOT</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Final</hibernateCommonsAnnotationVersion>
