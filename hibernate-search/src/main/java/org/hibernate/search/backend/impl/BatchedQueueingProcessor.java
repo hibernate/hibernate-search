@@ -136,19 +136,22 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	}
 
 	public void prepareWorks(WorkQueue workQueue) {
-		List<Work> queue = workQueue.getQueue();
-		int initialSize = queue.size();
-		List<LuceneWork> luceneQueue = new ArrayList<LuceneWork>( initialSize ); //TODO load factor for containedIn
-		/**
-		 * Collection work type are process second, so if the owner entity has already been processed for whatever reason
-		 * the work will be ignored.
-		 * However if the owner entity has not been processed, an "UPDATE" work is executed
-		 *
-		 * Processing collection works last is mandatory to avoid reindexing a object to be deleted
-		 */
-		processWorkByLayer( queue, initialSize, luceneQueue, Layer.FIRST );
-		processWorkByLayer( queue, initialSize, luceneQueue, Layer.SECOND );
-		workQueue.setSealedQueue( optimize( luceneQueue ) );
+		final boolean alreadyProcessedAndUnchanged = workQueue.isSealedAndUnchanged();
+		if ( !alreadyProcessedAndUnchanged ) { 
+			List<Work> queue = workQueue.getQueue();
+			int initialSize = queue.size();
+			List<LuceneWork> luceneQueue = new ArrayList<LuceneWork>( initialSize ); //TODO load factor for containedIn
+			/**
+			 * Collection work type are process second, so if the owner entity has already been processed for whatever reason
+			 * the work will be ignored.
+			 * However if the owner entity has not been processed, an "UPDATE" work is executed
+			 *
+			 * Processing collection works last is mandatory to avoid reindexing a object to be deleted
+			 */
+			processWorkByLayer( queue, initialSize, luceneQueue, Layer.FIRST );
+			processWorkByLayer( queue, initialSize, luceneQueue, Layer.SECOND );
+			workQueue.setSealedQueue( optimize( luceneQueue ) );
+		}
 	}
 
 	private List<LuceneWork> optimize(List<LuceneWork> luceneQueue) {

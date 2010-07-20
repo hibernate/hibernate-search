@@ -42,8 +42,10 @@ public class WorkQueue {
 	private List<Work> queue;
 
 	private List<LuceneWork> sealedQueue;
-	//is this class supposed to be
+	//flag indicating if the sealed data has be provided meaning that it should no longer be modified
 	private boolean usedSealedData;
+	//flag indicating if data has been sealed and not modified since
+	private boolean sealedAndUnchanged;
 
 	public WorkQueue(int size) {
 		queue = new ArrayList<Work>(size);
@@ -51,6 +53,10 @@ public class WorkQueue {
 
 	private WorkQueue(List<Work> queue) {
 		this.queue = queue;
+	}
+
+	public boolean isSealedAndUnchanged() {
+		return sealedAndUnchanged;
 	}
 
 	public WorkQueue() {
@@ -62,6 +68,7 @@ public class WorkQueue {
 			//something is wrong fail with exception
 			throw new AssertionFailure( "Attempting to add a work in a used sealed queue" );
 		}
+		this.sealedAndUnchanged = false;
 		queue.add(work);
 	}
 
@@ -72,12 +79,13 @@ public class WorkQueue {
 	public WorkQueue splitQueue() {
 		WorkQueue subQueue = new WorkQueue( queue );
 		this.queue = new ArrayList<Work>( queue.size() );
+		this.sealedAndUnchanged = false;
 		return subQueue;
 	}
 
 	public List<LuceneWork> getSealedQueue() {
 		if (sealedQueue == null) throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
-		usedSealedData = true;
+		this.sealedAndUnchanged = false;
 		return sealedQueue;
 	}
 
@@ -93,11 +101,13 @@ public class WorkQueue {
 		 * when the flush ordering is fixed, add the following line
 		 * queue = Collections.EMPTY_LIST;
 		 */
+		this.sealedAndUnchanged = true;
 		this.sealedQueue = sealedQueue;
 	}
 
 	public void clear() {
 		queue.clear();
+		this.sealedAndUnchanged = false;
 		if (sealedQueue != null) sealedQueue.clear();
 	}
 
