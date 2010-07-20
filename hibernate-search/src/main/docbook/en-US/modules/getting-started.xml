@@ -25,7 +25,7 @@
   -->
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY version "3.2.0.Final">
+<!ENTITY version "3.2.1.Final">
 ]>
 <chapter id="getting-started">
   <title>Getting started</title>
