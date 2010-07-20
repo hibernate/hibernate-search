@@ -82,10 +82,25 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 		if ( isRealTransactionInProgress() ) {
 			//use {Before|After}TransactionCompletionProcess instead of registerTransaction because it does not
 			//swallow transactions.
+			/*
+             * HSEARCH-540: the pre process must be both a BeforeTransactionCompletionProcess and a TX Synchronization.
+             *
+             * In a resource-local tx env, the beforeCommit phase is called after the flush, and prepares work queue.
+             * Also, any exceptions that occur during that are propagated (if a Synchronization was used, the exceptions
+             * would be eaten).
+             *
+             * In a JTA env, the before transaction completion is called before the flush, so not all changes are yet
+             * written. However, Synchronization-s do propagate exceptions, so they can be safely used.
+             */
+
 			final ActionQueue actionQueue = eventSource.getActionQueue();
 			actionQueue.registerProcess( new DelegateToSynchronizationOnBeforeTx( synchronization ) );
+			eventSource.getTransaction().registerSynchronization(
+					new BeforeCommitSynchronizationDelegator( synchronization )
+			);
+
+			//executed in all environments
 			actionQueue.registerProcess( new DelegateToSynchronizationOnAfterTx( synchronization ) );
-//			eventSource.getTransaction().registerSynchronization( synchronization );
 		}
 		else {
 			//registerSynchronization is only called if isRealTransactionInProgress or if
@@ -163,6 +178,22 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			catch ( Exception e ) {
 				throw new HibernateException( "Error while indexing in Hibernate Search (ater transaction completion)", e);
 			}
+		}
+	}
+
+	private static class BeforeCommitSynchronizationDelegator implements Synchronization {
+		private final Synchronization synchronization;
+
+		public BeforeCommitSynchronizationDelegator(Synchronization sync) {
+			this.synchronization = sync;
+		}
+
+		public void beforeCompletion() {
+			this.synchronization.beforeCompletion();
+		}
+
+		public void afterCompletion(int status) {
+			//do not delegate
 		}
 	}
 	
