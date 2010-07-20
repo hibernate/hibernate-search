@@ -42,6 +42,7 @@
         <module>hibernate-search</module>
         <module>hibernate-search-testing</module>
         <module>hibernate-search-archetype</module>
+        <module>hibernate-search-integrationtest</module>
     </modules>
 
     <issueManagement>
