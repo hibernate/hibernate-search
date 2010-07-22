@@ -108,6 +108,7 @@ public class SearchIndexerTest extends TestCase {
 			.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
 			.addAnnotatedClass( Dvd.class )
 			.addAnnotatedClass( Nation.class )
+			.addAnnotatedClass( Book.class )
 			.setProperty( Environment.INDEXING_STRATEGY, "manual" )
 			.build();
 		{
