@@ -59,6 +59,17 @@ public class MyEntity {
 	@Analyzer(impl = Test2Analyzer.class)
 	private String field;
 
+	@Field(index = Index.UN_TOKENIZED)
+	private String notAnalyzed;
+
+	public String getNotAnalyzed() {
+		return notAnalyzed;
+	}
+
+	public void setNotAnalyzed(String notAnalyzed) {
+		this.notAnalyzed = notAnalyzed;
+	}
+
 	@IndexedEmbedded
 	@Embedded
 	private MyComponent component;

@@ -69,6 +69,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.impl.InitContext;
 import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.PassThroughAnalyzer;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.ScopedAnalyzer;
 import org.hibernate.util.StringHelper;
@@ -96,6 +97,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 	protected Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	protected boolean isRoot;
 	protected EntityState entityState;
+	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
 
 	/**
 	 * Constructor used on contained entities not annotated with <code>@Indexed</code> themselves.
@@ -468,7 +470,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		if ( analyzer == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
 		}
-		this.analyzer.addScopedAnalyzer( fieldName, analyzer );
+		addToScopedAnalyzer( fieldName, analyzer, ann.index() );
 	}
 
 	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, InitContext context) {
@@ -488,8 +490,18 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		if ( analyzer == null ) {
 			analyzer = getAnalyzer( member, context );
 		}
-		if ( analyzer != null ) {
-			this.analyzer.addScopedAnalyzer( fieldName, analyzer );
+		addToScopedAnalyzer( fieldName, analyzer, fieldAnn.index() );
+	}
+
+	protected void addToScopedAnalyzer(String fieldName, Analyzer analyzer, Index index) {
+		if ( index == Index.TOKENIZED) {
+			if ( analyzer != null ) {
+				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
+			}
+		}
+		else {
+			//no analyzer is used, add a fake one for queries
+			this.analyzer.addScopedAnalyzer( fieldName, passThroughAnalyzer );
 		}
 	}
 

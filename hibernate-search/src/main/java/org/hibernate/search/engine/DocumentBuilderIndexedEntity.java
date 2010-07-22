@@ -221,7 +221,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 				if ( analyzer == null ) {
 					throw new AssertionFailure( "Analizer should not be undefined" );
 				}
-				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
+				addToScopedAnalyzer( fieldName, analyzer, Index.UN_TOKENIZED );
 			}
 		}
 	}
