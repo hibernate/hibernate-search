@@ -24,12 +24,20 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 @Entity
 public class Nation {
@@ -37,6 +45,7 @@ public class Nation {
 	private Integer id;
 	private String name;
 	private String code;
+	private Set<Book> librariesHave = new HashSet<Book>();
 	
 	public Nation() {}
 	
@@ -70,6 +79,17 @@ public class Nation {
 	
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	@IndexedEmbedded
+	@OneToMany(fetch=FetchType.LAZY)
+	@Fetch(FetchMode.SELECT)
+	public Set<Book> getLibrariesHave() {
+		return librariesHave;
+	}
+	
+	public void setLibrariesHave(Set<Book> librariesHave) {
+		this.librariesHave = librariesHave;
 	}
 	
 }
