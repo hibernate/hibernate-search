@@ -1,6 +1,19 @@
 Hibernate Search Changelog
 ==========================
 
+3.2.1.Final (25-07-2010)
+------------------------
+
+** Bug
+    * [HSEARCH-530] - Entity analyzers (aka scoped analyzers) improperly return random analyzers on field not marked as TOKENIZED
+    * [HSEARCH-534] - circular graphs of IndexedEmbedded might break MassIndexer
+    * [HSEARCH-540] - JTA transaction commit causes AssertionFailure: Access a Sealed WorkQueue which has not been sealed
+
+
+** Improvement
+    * [HSEARCH-565] - update dependencies of branch 3.2
+
+
 3.2.0.Final (05-05-2010)
 ------------------------
 
