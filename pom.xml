@@ -22,14 +22,12 @@
     * 51 Franklin Street, Fifth Floor
     * Boston, MA  02110-1301  USA
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.3.0.Alpha1</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>
@@ -51,9 +49,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/trunk</connection>
-        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/trunk</developerConnection>
-        <url>http://fisheye.jboss.com/browse/Hibernate/search/trunk</url>
+        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/tags/v3_3_0_Alpha1</connection>
+        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/tags/v3_3_0_Alpha1</developerConnection>
+        <url>http://fisheye.jboss.com/browse/Hibernate/search/tags/v3_3_0_Alpha1</url>
     </scm>
 
     <organization>
@@ -472,8 +470,8 @@
                 <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                 <jdbc.url>jdbc:hsqldb:.</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
-                <jdbc.pass/>
-                <jdbc.isolation/>
+                <jdbc.pass />
+                <jdbc.isolation />
             </properties>
         </profile>
         <!--
@@ -500,7 +498,7 @@
                 <jdbc.url>jdbc:mysql://vmg08.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -520,7 +518,7 @@
                 <jdbc.url>jdbc:mysql://vmg02.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -541,7 +539,7 @@
                 </jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -562,7 +560,7 @@
                 <jdbc.url>jdbc:postgresql://vmg01.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -583,7 +581,7 @@
                 <jdbc.url>jdbc:postgresql://vmg03.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -603,7 +601,7 @@
                 <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -634,7 +632,7 @@
                 <jdbc.url>jdbc:db2://dev32.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -659,7 +657,7 @@
                 <jdbc.url>jdbc:db2://dev67.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -684,7 +682,7 @@
                 <jdbc.url>jdbc:db2://vmg06.mw.lab.eng.bos.redhat.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -705,7 +703,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev20.qa.atl.jboss.com:1521:qa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -726,7 +724,7 @@
                 <jdbc.url>jdbc:oracle:thin:@vmg05.mw.lab.eng.bos.redhat.com:1521:qaora10</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -746,7 +744,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -768,7 +766,7 @@
                 </jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -788,7 +786,7 @@
                 <jdbc.url>jdbc:sybase:Tds:vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
