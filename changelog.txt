@@ -1,6 +1,48 @@
 Hibernate Search Changelog
 ==========================
 
+3.3.0.Alpha1 (26-07-2010)
+-------------------------
+
+** Sub-task
+    * [HSEARCH-507] - Rename exact() to keywords() and move fuzzy() and wildcard() back as suboperations of keywords()
+    * [HSEARCH-508] - Support query on multiple fields
+    * [HSEARCH-509] - Add support for all() query and all except ones
+    * [HSEARCH-533] - Use Hibernate Search bridge system to convert input
+    * [HSEARCH-541] - Restructure various initialize contracts to allow SearchFactory implementors to be immutable
+    * [HSEARCH-544] - Provide an immutable SearchFactory implementation
+
+** Bug
+    * [HSEARCH-487] - Find why the zh-CN translation fails
+    * [HSEARCH-530] - Entity analyzers (aka scoped analyzers) improperly return random analyzers on field not marked as TOKENIZED
+    * [HSEARCH-534] - circular graphs of IndexedEmbedded might break MassIndexer
+    * [HSEARCH-536] - IndexingGeneratedCorpusTest raises OOME and hangs
+    * [HSEARCH-537] - SearchIndexerTest fails
+    * [HSEARCH-540] - JTA transaction commit causes AssertionFailure: Access a Sealed WorkQueue which has not been sealed
+    * [HSEARCH-548] - Specify explicit version for deploy and artifact plugins in partent pom
+    * [HSEARCH-560] - Version is displayed after the SearchFactory metadata creation
+    * [HSEARCH-568] - Unable to push stagged releases because hibernate-search-testing does not deploy the sources artifacts
+
+
+** Improvement
+    * [HSEARCH-535] - Always setAccessible to true as it makes property access faster (bypass repetitive security checkings)
+    * [HSEARCH-549] - Isolate Hibernate.initialize / Hibernate.getClass calls into HibernateHelper
+    * [HSEARCH-552] - Raise an exception when the object passed to the worker is not of an unindexed or contained type
+    * [HSEARCH-553] - Mutualize class extraction logic from a Work object
+    * [HSEARCH-559] - Migrate to SLF4J 1.6 for graceful degradation when no slf4j implementation is provided
+    * [HSEARCH-561] - Add tests making use of JTA and Spring in a new module
+
+** New Feature
+    * [HSEARCH-397] - Allow classes to be lazily added to the SearchFactory
+    * [HSEARCH-414] - Add support for a Lucene query builder using a fluent API
+    * [HSEARCH-538] - Allow Hibernate Search to use the @FailureExpected test framework
+
+
+** Task
+    * [HSEARCH-523] - Build the distribution package with the docs in the same directory structure as on the docs server
+    * [HSEARCH-558] - Align Search with Core 3.6
+
+
 3.2.0.Final (05-05-2010)
 ------------------------
 

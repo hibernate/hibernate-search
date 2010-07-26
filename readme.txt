@@ -1,6 +1,6 @@
 Hibernate Search
 ==================================================
-Version: 3.2.0.Final, 05.05.2010
+Version: 3.3.0.Alpha1, 26.07.2010
 
 Description
 -----------
@@ -14,7 +14,7 @@ care of the index synchronization, brings you back managed objects from free tex
 queries.
 Hibernate Search is using Apache Lucene(tm) under the cover.
 
-This version of Hibernate Search requires Hibernate Core 3.5 and above.
+This version of Hibernate Search requires Hibernate Core 3.6 and above.
 
 Instructions
 ------------
