@@ -36,6 +36,13 @@
 
     <dependencies>
 
+        <!-- JBoss TS -->
+        <dependency>
+            <groupId>org.jboss.jbossts</groupId>
+            <artifactId>jbossjta</artifactId>
+            <version>4.11.0.Final</version>
+        </dependency>
+
         <!-- Hibernate -->
         <dependency>
             <groupId>${groupId}</groupId>
