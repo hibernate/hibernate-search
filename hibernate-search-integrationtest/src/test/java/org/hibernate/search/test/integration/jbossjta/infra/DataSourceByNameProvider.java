@@ -8,7 +8,7 @@ import com.arjuna.ats.internal.jdbc.DynamicClass;
 /**
  * @author Emmanuel Bernard
  */
-public class DataSourceByNameProvider implements DynamicClass {
+class DataSourceByNameProvider implements DynamicClass {
 	private final XADataSource datasource;
 	private final String name;
 

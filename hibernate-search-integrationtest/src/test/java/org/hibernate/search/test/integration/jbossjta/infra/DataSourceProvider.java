@@ -4,22 +4,17 @@ import java.sql.SQLException;
 import javax.sql.XADataSource;
 
 import com.arjuna.ats.internal.jdbc.DynamicClass;
-import org.h2.jdbcx.JdbcDataSource;
 
 /**
- * Bind a H2 DataSource to the name "h2"
+ * Bind statically a DataSource to the name "datasource"
  *
  * @author Emmanuel Bernard
  */
-public class H2dataSourceProvider implements DynamicClass {
-	private static String DATASOURCE_NAME = "h2";
+class DataSourceProvider implements DynamicClass {
+	private static String DATASOURCE_NAME = "datasource";
 	private static DynamicClass dynamicClass;
 
-	static {
-		final JdbcDataSource dataSource = new JdbcDataSource();
-		dataSource.setURL( "jdbc:h2:file:./test-tmp/h2db" );
-		dataSource.setUser( "sa" );
-		dataSource.setPassword( "" );
+	static void initialize(XADataSource dataSource) {
 		dynamicClass = new DataSourceByNameProvider( DATASOURCE_NAME, dataSource );
 	}
 

@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 /**
  * @author Emmanuel Bernard
  */
-public class ReadOnlyPersistenceUnitInfo implements PersistenceUnitInfo {
+class ReadOnlyPersistenceUnitInfo implements PersistenceUnitInfo {
 	private final String persistenceUnitName;
 	private final String persistenceProviderClassName;
 	private final PersistenceUnitTransactionType transactionType;

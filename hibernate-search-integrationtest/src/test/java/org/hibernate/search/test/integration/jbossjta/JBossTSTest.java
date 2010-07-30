@@ -7,13 +7,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
+import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.PersistenceUnitTransactionType;
-import javax.sql.XADataSource;
+import javax.sql.DataSource;
 
-import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImple;
-import com.arjuna.ats.jdbc.TransactionalDriver;
 import org.apache.lucene.search.Query;
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -26,11 +26,9 @@ import org.hibernate.ejb.HibernatePersistence;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.v2.QueryBuilder;
-import org.hibernate.search.test.integration.jbossjta.infra.H2dataSourceProvider;
+import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTSStandaloneTransactionManagerLookup;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;
-import org.hibernate.search.test.integration.jbossjta.infra.ReadOnlyPersistenceUnitInfo;
-import org.hibernate.search.test.integration.jbossjta.infra.XADataSourceWrapper;
 import org.hibernate.search.util.FileHelper;
 
 /**
@@ -47,22 +45,29 @@ public class JBossTSTest {
 		FileHelper.delete( tempDirectory );
 		tempDirectory.mkdir();
 
-		TxControl.setDefaultTimeout(0);
-		H2dataSourceProvider dsProvider = new H2dataSourceProvider();
-		final XADataSource h2DataSource = dsProvider.getDataSource( dsProvider.getDataSourceName() );
-		XADataSourceWrapper dsw = new XADataSourceWrapper(
-				dsProvider.getDataSourceName(),
-				h2DataSource
-		);
-		dsw.setProperty( TransactionalDriver.dynamicClass, H2dataSourceProvider.class.getName() );
-		dsw.setProperty( TransactionalDriver.userName, "sa" );
-		dsw.setProperty( TransactionalDriver.password, "" );
+		//DataSource configuration
+		final String url = "jdbc:h2:file:./test-tmp/h2db";
+		final String user = "sa";
+		final String password = "";
+
+		//H2 DataSource creation
+		final JdbcDataSource underlyingDataSource = new JdbcDataSource();
+		underlyingDataSource.setURL( url );
+		underlyingDataSource.setUser( user );
+		underlyingDataSource.setPassword( password );
+
+		//build JBoss-bound DataSource
+		DataSource ds = new JBossTADataSourceBuilder()
+				.setXADataSource( underlyingDataSource )
+				.setUser( user )
+				.setPassword( password )
+				.setTimeout( 0 ) //infinite transaction
+				.createDataSource();
 
 		PersistenceUnitInfoBuilder pub = new PersistenceUnitInfoBuilder();
-		final ReadOnlyPersistenceUnitInfo unitInfo = pub
+		final PersistenceUnitInfo unitInfo = pub
 				.setExcludeUnlistedClasses( true )
-				.setJtaDataSource( dsw )
-				//.setJtaDataSource( ( DataSource) h2DataSource )
+				.setJtaDataSource( ds )
 				.setPersistenceProviderClassName( HibernatePersistence.class.getName() )
 				.setPersistenceUnitName( "jbossjta" )
 				.setPersistenceXMLSchemaVersion( "2.0" )
@@ -70,7 +75,6 @@ public class JBossTSTest {
 				.setValidationMode( ValidationMode.NONE )
 				.setTransactionType( PersistenceUnitTransactionType.JTA )
 				.addManagedClassNames( Tweet.class.getName() )
-						//.addProperty( "hibernate.transaction.factory_class", null )
 				.addProperty(
 						"hibernate.transaction.manager_lookup_class",
 						JBossTSStandaloneTransactionManagerLookup.class.getName()

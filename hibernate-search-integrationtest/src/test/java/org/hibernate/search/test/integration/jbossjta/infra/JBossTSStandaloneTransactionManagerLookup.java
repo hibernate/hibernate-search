@@ -5,7 +5,6 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImple;
-import org.jboss.tm.TransactionManagerFactory;
 
 import org.hibernate.HibernateException;
 import org.hibernate.transaction.TransactionManagerLookup;

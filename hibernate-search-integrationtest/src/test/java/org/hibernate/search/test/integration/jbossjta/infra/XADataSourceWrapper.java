@@ -20,17 +20,15 @@
  */
 package org.hibernate.search.test.integration.jbossjta.infra;
 
-import javax.sql.XADataSource;
-import javax.sql.XAConnection;
-import javax.sql.DataSource;
-import javax.naming.Context;
-import java.sql.SQLException;
-import java.sql.Connection;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Properties;
+import javax.sql.DataSource;
+import javax.sql.XAConnection;
+import javax.sql.XADataSource;
 
 import com.arjuna.ats.jdbc.TransactionalDriver;
-import com.arjuna.ats.jdbc.common.jdbcPropertyManager;
 //import com.arjuna.common.util.propertyservice.PropertyManager;
 
 
@@ -45,7 +43,7 @@ import com.arjuna.ats.jdbc.common.jdbcPropertyManager;
  * @author Emmanuel Bernard
  * @since 2008-05
  */
-public class XADataSourceWrapper implements XADataSource, DataSource {
+class XADataSourceWrapper implements XADataSource, DataSource {
 	private XADataSource _theXADataSource;
 	private final TransactionalDriver _theTransactionalDriver = new TransactionalDriver();
 	private String _name;
