@@ -10,6 +10,7 @@ import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
+import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImple;
 import com.arjuna.ats.jdbc.TransactionalDriver;
 import org.junit.AfterClass;
@@ -36,7 +37,7 @@ public class JBossTSTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-
+		TxControl.setDefaultTimeout(0);
 		H2dataSourceProvider dsProvider = new H2dataSourceProvider();
 		final XADataSource h2DataSource = dsProvider.getDataSource( dsProvider.getDataSourceName() );
 		XADataSourceWrapper dsw = new XADataSourceWrapper(
@@ -66,6 +67,7 @@ public class JBossTSTest {
 				)
 				.addProperty( "hibernate.dialect", H2Dialect.class.getName() )
 				.addProperty( Environment.HBM2DDL_AUTO, "create-drop" )
+				.addProperty( Environment.SHOW_SQL, "true" )
 				.create();
 		final HibernatePersistence hp = new HibernatePersistence();
 		factory = hp.createContainerEntityManagerFactory( unitInfo, new HashMap( ) );
@@ -79,23 +81,23 @@ public class JBossTSTest {
 
 	@Test
 	public void testJBossTS() throws Exception {
-		TransactionManagerImple transaction = new TransactionManagerImple();
-		transaction.begin();;
+		TransactionManagerImple tm = new TransactionManagerImple();
+		tm.begin();
 		EntityManager em = factory.createEntityManager();
-		em.persist( new Tweet("Spice is the essence of life") );
+		Tweet tweet = new Tweet( "Spice is the essence of life" );
+		em.persist( tweet );
 		em.flush();
-		transaction.commit();
+		tm.commit();
 		em.close();
 
-
-		transaction.begin();
+		tm.begin();
 		em = factory.createEntityManager();
 		final List resultList = em.createQuery( "from " + Tweet.class.getName() ).getResultList();
 		Assert.assertEquals( 1, resultList.size() );
 		for (Object o : resultList) {
 			em.remove( o );
 		}
-		transaction.commit();
+		tm.commit();
 
 		em.close();
 	}
