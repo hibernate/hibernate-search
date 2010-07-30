@@ -73,6 +73,8 @@ public class JBossTSTest {
 				.addProperty( "hibernate.dialect", H2Dialect.class.getName() )
 				.addProperty( Environment.HBM2DDL_AUTO, "create-drop" )
 				.addProperty( Environment.SHOW_SQL, "true" )
+				//I don't pool connections by JTA transaction. Leave the work to Hibernate Core
+				.addProperty( Environment.RELEASE_CONNECTIONS, ConnectionReleaseMode.AFTER_TRANSACTION.toString() )
 				.addProperty( "hibernate.search.default.directory_provider", "org.hibernate.search.store.RAMDirectoryProvider" )
 				.create();
 		final HibernatePersistence hp = new HibernatePersistence();
