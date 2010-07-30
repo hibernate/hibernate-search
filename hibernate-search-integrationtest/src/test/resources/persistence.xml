@@ -7,4 +7,11 @@
 		<class>org.hibernate.search.test.integration.jtaspring.Doughnut</class>
 		<class>org.hibernate.search.test.integration.jtaspring.Muffin</class>
 	</persistence-unit>
+
+    <persistence-unit name="jbossjta" transaction-type="JTA">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<properties>
+            <property name="" value=""/>
+		</properties>
+	</persistence-unit>
 </persistence>
