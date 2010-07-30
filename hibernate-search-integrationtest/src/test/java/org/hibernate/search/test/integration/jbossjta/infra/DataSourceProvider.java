@@ -10,7 +10,7 @@ import com.arjuna.ats.internal.jdbc.DynamicClass;
  *
  * @author Emmanuel Bernard
  */
-class DataSourceProvider implements DynamicClass {
+public class DataSourceProvider implements DynamicClass {
 	private static String DATASOURCE_NAME = "datasource";
 	private static DynamicClass dynamicClass;
 
