@@ -95,7 +95,6 @@ public class JBossTSTest {
 	public static void tearDown() {
 		factory.close();
 		FileHelper.delete( tempDirectory );
-		FileHelper.delete( new File("./PutObjectStoreDirHere") );
 	}
 
 	@Test
