@@ -7,11 +7,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
+@Indexed
 public class Tweet {
 	public Tweet() {};
 
@@ -27,6 +30,7 @@ public class Tweet {
 	private String id;
 
 	@Column(name="tweet_text")
+	@Field
 	public String getText() { return text; };
 	public void setText(String text) { this.text = text; }
 	private String text;
