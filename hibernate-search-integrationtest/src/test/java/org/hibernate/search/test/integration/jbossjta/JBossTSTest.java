@@ -1,5 +1,6 @@
 package org.hibernate.search.test.integration.jbossjta;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -39,9 +40,13 @@ import org.hibernate.search.util.FileHelper;
 public class JBossTSTest {
 
 	private static EntityManagerFactory factory;
+	public static File tempDirectory = new File( "./test-tmp" );
 
 	@BeforeClass
 	public static void setUp() throws Exception {
+		FileHelper.delete( tempDirectory );
+		tempDirectory.mkdir();
+
 		TxControl.setDefaultTimeout(0);
 		H2dataSourceProvider dsProvider = new H2dataSourceProvider();
 		final XADataSource h2DataSource = dsProvider.getDataSource( dsProvider.getDataSourceName() );
@@ -85,6 +90,8 @@ public class JBossTSTest {
 	@AfterClass
 	public static void tearDown() {
 		factory.close();
+		FileHelper.delete( tempDirectory );
+		FileHelper.delete( new File("./PutObjectStoreDirHere") );
 	}
 
 	@Test

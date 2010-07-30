@@ -17,7 +17,7 @@ public class H2dataSourceProvider implements DynamicClass {
 
 	static {
 		final JdbcDataSource dataSource = new JdbcDataSource();
-		dataSource.setURL( "jdbc:h2:file:h2db" );
+		dataSource.setURL( "jdbc:h2:file:./test-tmp/h2db" );
 		dataSource.setUser( "sa" );
 		dataSource.setPassword( "" );
 		dynamicClass = new DataSourceByNameProvider( DATASOURCE_NAME, dataSource );
