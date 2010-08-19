@@ -1,3 +1,26 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
+ */
 package org.hibernate.search.impl;
 
 import java.util.Map;
@@ -5,11 +28,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.management.ObjectName;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
 
-import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.Worker;
@@ -22,10 +45,12 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.hibernate.search.stat.Statistics;
+import org.hibernate.search.stat.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
@@ -43,7 +68,7 @@ public class MutableSearchFactory implements StateSearchFactoryImplementor, Sear
 	private volatile StateSearchFactoryImplementor delegate;
 
 	//lock to be acquired every time the underlying searchFactory is rebuilt
-	private final Lock mutating = new ReentrantLock( );
+	private final Lock mutating = new ReentrantLock();
 
 	void setDelegate(StateSearchFactoryImplementor delegate) {
 		this.delegate = delegate;
@@ -145,6 +170,22 @@ public class MutableSearchFactory implements StateSearchFactoryImplementor, Sear
 		return delegate.getErrorHandler();
 	}
 
+	public ObjectName registerMBean(Object bean, String name, boolean allowMultipleObjects) {
+		return delegate.registerMBean( bean, name, allowMultipleObjects );
+	}
+
+	public void unRegisterMBean(ObjectName name) {
+		delegate.unRegisterMBean( name );
+	}
+
+	public boolean isJMXEnabled() {
+		return delegate.isJMXEnabled();
+	}
+
+	public StatisticsImplementor getStatisticsImplementor() {
+		return delegate.getStatisticsImplementor();
+	}
+
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
 		return delegate.getIndexHierarchy();
 	}
@@ -196,7 +237,7 @@ public class MutableSearchFactory implements StateSearchFactoryImplementor, Sear
 	public void addClasses(Class<?>... classes) {
 		//todo optimize the list of
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder().rootFactory( this );
-		for (Class<?> type : classes) {
+		for ( Class<?> type : classes ) {
 			builder.addClass( type );
 		}
 		try {

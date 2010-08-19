@@ -414,7 +414,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		resultSize = queryHits.totalHits;
 
 		if ( stats ) {
-			searchFactoryImplementor.getStatistics().searchExecuted( query.toString(), System.currentTimeMillis() - startTime );
+			searchFactoryImplementor.getStatisticsImplementor().searchExecuted( query.toString(), System.currentTimeMillis() - startTime );
 		}
 
 		return queryHits;

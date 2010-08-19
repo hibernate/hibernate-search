@@ -23,10 +23,19 @@
  */
 package org.hibernate.search.stat;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
+ * Interface which defines several methods allowing to access statistical data. This includes average and maximum
+ * Lucene query time and object loading time.
+ *
  * @author Hardy Ferentschik
  */
 public interface Statistics {
+	public static final String STATISTICS_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=StatisticsMBean";
+
 	/**
 	 * Reset all statistics.
 	 */
@@ -42,7 +51,7 @@ public interface Statistics {
 	/**
 	 * Get the total search time in milliseconds.
 	 */
-	long getSearchQueryTotalTime();	
+	long getSearchQueryTotalTime();
 
 	/**
 	 * Get the time in milliseconds of the slowest search.
@@ -59,7 +68,25 @@ public interface Statistics {
 	 */
 	String getSearchQueryExecutionMaxTimeQueryString();
 
-	void searchExecuted(String searchString, long time);
+	/**
+	 * Get the total object loading in milliseconds.
+	 */
+	long getObjectLoadingTotalTime();
+
+	/**
+	 * Get the time in milliseconds for the slowest object load.
+	 */
+	long getObjectLoadingExecutionMaxTime();
+
+	/**
+	 * Get the average object loading time in milliseconds.
+	 */
+	long getObjectLoadingExecutionAvgTime();
+
+	/**
+	 * Gets the total number of objects loaded
+	 */
+	long getObjectsLoadedCount();
 
 	/**
 	 * Are statistics logged
@@ -70,6 +97,51 @@ public interface Statistics {
 	 * Enable statistics logs (this is a dynamic parameter)
 	 */
 	public void setStatisticsEnabled(boolean b);
+
+	/**
+	 * Returns the Hibernate Search version.
+	 *
+	 * @return the Hibernate Search version
+	 */
+	String getSearchVersion();
+
+	/**
+	 * Returns a list of all indexed classes.
+	 *
+	 * @return list of all indexed classes
+	 */
+	Set<String> getIndexedClassNames();
+
+	/**
+	 * Returns the number of documents for the given entity.
+	 *
+	 * @param entity the fqc of the entity
+	 *
+	 * @return number of documents for the specified entity name
+	 *
+	 * @throws IllegalArgumentException in case the entity name is not valid
+	 */
+	int getNumberOfIndexedEntities(String entity);
+
+	/**
+	 * A list of string representations of the indexing parameters for each directory of the specified entity.
+	 * Defaults are not displayed, but only parameters which are explicitly set via the configuration.
+	 *
+	 * @param entity the fqc of the entity
+	 *
+	 * @return A list of string representations of the indexing parameters for each directory of the specified entity
+	 *
+	 * @throws IllegalArgumentException in case the entity name is not valid
+	 */
+	List<String> getIndexingParameters(String entity);
+
+	/**
+	 * Returns a map of all indexed entities and their document count in the index.
+	 *
+	 * @return a map of all indexed entities and their document count. The map key is the fqc of the entity and
+	 *         the map value is the document count.
+	 */
+	Map<String, Integer> indexedEntitiesCount();
 }
 
 

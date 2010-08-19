@@ -30,31 +30,31 @@ import javax.management.ObjectName;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.jmx.ConfigInfoMBean;
 import org.hibernate.search.jmx.IndexCtrlMBean;
+import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Hardy Ferentschik
  */
 public class NoMBeansEnabledTest extends SearchTestCase {
+	MBeanServer mbeanServer;
 
 	public void testMBeanNotRegisteredWithoutExplicitProperty() throws Exception {
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		mbeanServer = ManagementFactory.getPlatformMBeanServer();
 
-		ObjectName name = new ObjectName( ConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
+		ObjectName name = new ObjectName( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME );
 		assertFalse(
 				"Without '" + Environment.JMX_ENABLED + "' set the configuration info MBean should not be registered",
-				mbs.isRegistered( name )
+				mbeanServer.isRegistered( name )
 		);
 
 		name = new ObjectName( IndexCtrlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
 		assertFalse(
 				"Without '" + Environment.JMX_ENABLED + "' set the index control MBean should not be registered",
-				mbs.isRegistered( name )
+				mbeanServer.isRegistered( name )
 		);
 	}
-
 
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
@@ -66,10 +66,33 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
 		cfg.setProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() );
 		cfg.setProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
+		// not setting the property is effectively the same as setting is explicitly to false
+		// cfg.setProperty( Environment.JMX_ENABLED, "false" );
+	}
+
+	protected void setUp() throws Exception {
+		// make sure that no MBean is registered before the test runs
+		mbeanServer = ManagementFactory.getPlatformMBeanServer();
+		ObjectName statisticsBeanObjectName = new ObjectName( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME );
+		if ( mbeanServer.isRegistered( statisticsBeanObjectName ) ) {
+			mbeanServer.unregisterMBean( statisticsBeanObjectName );
+		}
+		ObjectName indexBeanObjectName = new ObjectName( IndexCtrlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		if ( mbeanServer.isRegistered( indexBeanObjectName ) ) {
+			mbeanServer.unregisterMBean( indexBeanObjectName );
+		}
+
+		// build the new configuration
+		setCfg( null ); // force a rebuild of the configuration
+		super.setUp();
+	}
+
+	protected void tearDown() throws Exception {
+		super.tearDown();
 	}
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { Counter.class };
+		return new Class<?>[] { };
 	}
 }

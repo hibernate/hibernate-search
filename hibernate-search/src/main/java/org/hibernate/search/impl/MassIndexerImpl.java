@@ -1,26 +1,25 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
- * 
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ *
+ *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
  */
 package org.hibernate.search.impl;
 
@@ -28,21 +27,19 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.Environment;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.BatchCoordinator;
 import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.jmx.IndexingProgressMonitorMBean;
 import org.hibernate.search.jmx.IndexingProgressMonitor;
-import org.hibernate.search.jmx.JMXRegistrar;
-import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
+import org.hibernate.search.jmx.IndexingProgressMonitorMBean;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -78,17 +75,12 @@ public class MassIndexerImpl implements MassIndexer {
 		this.searchFactoryImplementor = searchFactory;
 		this.sessionFactory = sessionFactory;
 		rootEntities = toRootEntities( searchFactoryImplementor, entities );
-
-		if ( searchFactory instanceof StateSearchFactoryImplementor ) {
-			StateSearchFactoryImplementor stateSearchFactoryImplementor = ( StateSearchFactoryImplementor ) searchFactory;
-			String enableJMX = stateSearchFactoryImplementor.getConfigurationProperties()
-					.getProperty( Environment.JMX_ENABLED );
-			if ( "true".equalsIgnoreCase( enableJMX ) ) {
-				monitor = new IndexingProgressMonitor();
-				JMXRegistrar.registerMBean(
-						monitor, IndexingProgressMonitorMBean.INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME
-				);
-			}
+		if ( searchFactoryImplementor.isJMXEnabled() ) {
+			ObjectName name = searchFactoryImplementor.registerMBean(
+					new IndexingProgressMonitor(),
+					IndexingProgressMonitorMBean.INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME,
+					true
+			);
 		}
 	}
 
@@ -227,5 +219,4 @@ public class MassIndexerImpl implements MassIndexer {
 		this.objectsLimit = maximum;
 		return this;
 	}
-
 }

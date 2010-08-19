@@ -23,15 +23,10 @@
  */
 
 // $Id:$
-package org.hibernate.search.jmx;
-
-import org.hibernate.search.stat.Statistics;
+package org.hibernate.search.test.proxy;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface StatisticsImplMBean extends Statistics {
-	public static final String STATISTICS_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=StatisticsMBean";
+public interface IAuthor {
 }
-
-

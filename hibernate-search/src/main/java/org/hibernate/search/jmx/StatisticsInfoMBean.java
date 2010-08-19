@@ -21,24 +21,17 @@
  *  51 Franklin Street, Fifth Floor
  *  Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
 
-import java.util.List;
+// $Id:$
+package org.hibernate.search.jmx;
 
-import org.hibernate.Session;
-import org.hibernate.search.engine.EntityInfo;
+import org.hibernate.search.stat.Statistics;
 
 /**
- * Interface defining a set of operations in order to load entities which matched a query. Depending on the type of
- * indexed entities and the type of query different strategies can be used.
- *
- *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public interface Loader {
-	void init(Session session, SearchFactoryImplementor searchFactoryImplementor);
-
-	Object load(EntityInfo entityInfo);
-
-	List load(EntityInfo... entityInfos);
+public interface StatisticsInfoMBean extends Statistics {
+	public static final String STATISTICS_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=StatisticsInfoMBean";
 }
+
+

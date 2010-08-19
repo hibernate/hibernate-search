@@ -1,29 +1,29 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
- * 
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ *
+ *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
  */
 package org.hibernate.search.impl;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +32,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
@@ -56,9 +59,8 @@ import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.jmx.JMXRegistrar;
-import org.hibernate.search.jmx.StatisticsImpl;
-import org.hibernate.search.jmx.StatisticsImplMBean;
+import org.hibernate.search.jmx.StatisticsInfo;
+import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
 import org.hibernate.search.query.dsl.v2.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
@@ -67,6 +69,8 @@ import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.hibernate.search.stat.Statistics;
+import org.hibernate.search.stat.StatisticsImpl;
+import org.hibernate.search.stat.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.LoggerFactory;
@@ -101,7 +105,7 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 	private final Properties configurationProperties;
 	private final ErrorHandler errorHandler;
 	private final PolymorphicIndexHierarchy indexHierarchy;
-	private final Statistics statistics;
+	private final StatisticsImpl statistics;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -125,15 +129,14 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 		this.indexingStrategy = cfg.indexingStrategy;
 		this.readerProvider = cfg.readerProvider;
 		this.worker = cfg.worker;
-		this.statistics = new StatisticsImpl();
+		this.statistics = new StatisticsImpl( this );
 		String enableStats = configurationProperties.getProperty( Environment.JMX_ENABLED );
 		if ( "true".equalsIgnoreCase( enableStats ) ) {
 			statistics.setStatisticsEnabled( true );
 		}
 
-		String enableJMX = configurationProperties.getProperty( Environment.JMX_ENABLED );
-		if ( "true".equalsIgnoreCase( enableJMX ) ) {
-			JMXRegistrar.registerMBean( statistics, StatisticsImplMBean.STATISTICS_MBEAN_OBJECT_NAME );
+		if ( isJMXEnabled() ) {
+			registerMBean( new StatisticsInfo( statistics ), StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME, false );
 		}
 	}
 
@@ -283,6 +286,10 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 		return statistics;
 	}
 
+	public StatisticsImplementor getStatisticsImplementor() {
+		return statistics;
+	}
+
 	public FilterCachingStrategy getFilterCachingStrategy() {
 		return filterCachingStrategy;
 	}
@@ -350,6 +357,54 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 		return errorHandler;
 	}
 
+	public ObjectName registerMBean(Object bean, String name, boolean allowMultipleObjects) {
+		if ( !isJMXEnabled() ) {
+			return null;
+		}
+
+		ObjectName objectName = createObjectName( name );
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		if ( mbs.isRegistered( objectName ) ) {
+			try {
+				mbs.unregisterMBean( objectName );
+			}
+			catch ( Exception e ) {
+				log.warn( "Unable to un-register existing MBean: " + name, e );
+			}
+		}
+
+		try {
+			mbs.registerMBean( bean, objectName );
+		}
+		catch ( Exception e ) {
+			throw new SearchException( "Unable to enable MBean for Hibernate Search", e );
+		}
+		return objectName;
+	}
+
+	public void unRegisterMBean(ObjectName name) {
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		if ( mbs.isRegistered( name ) ) {
+			try {
+				mbs.unregisterMBean( name );
+			}
+			catch ( Exception e ) {
+				log.warn( "Unable to un-register existing MBean: " + name, e );
+			}
+		}
+	}
+
+	private static ObjectName createObjectName(String name) {
+		ObjectName objectName;
+		try {
+			objectName = new ObjectName( name );
+		}
+		catch ( MalformedObjectNameException e ) {
+			throw new SearchException( "Invalid JMX Bean name: " + name, e );
+		}
+		return objectName;
+	}
+
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
 		return indexHierarchy;
 	}
@@ -360,5 +415,10 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 
 	public SearchFactoryImplementor getUninitializedSearchFactory() {
 		return this;
+	}
+
+	public boolean isJMXEnabled() {
+		String enableJMX = getConfigurationProperties().getProperty( Environment.JMX_ENABLED );
+		return "true".equalsIgnoreCase( enableJMX );
 	}
 }

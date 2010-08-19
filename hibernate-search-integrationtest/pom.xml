@@ -12,7 +12,7 @@
 
     <artifactId>hibernate-search-integrationtest</artifactId>
 
-    <name>Hibernate Search integration test</name>
+    <name>Hibernate Search Integration Tests</name>
     <description>Hibernate Search integration tests. In particular with Spring Framework and JTA</description>
 
     <properties>

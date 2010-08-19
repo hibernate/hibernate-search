@@ -41,8 +41,8 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.jmx.ConfigInfoMBean;
 import org.hibernate.search.jmx.IndexCtrlMBean;
+import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -50,7 +50,7 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class IndexCtrlMBeanTest extends SearchTestCase {
 	MBeanServer mbeanServer;
-	ObjectName configBeanObjectName;
+	ObjectName statisticsBeanObjectName;
 	ObjectName indexBeanObjectName;
 
 	public void testIndexCtrlMBeanRegistered() throws Exception {
@@ -84,10 +84,6 @@ public class IndexCtrlMBeanTest extends SearchTestCase {
 	}
 
 	public void testIndexAndPurge() throws Exception {
-		assertEquals(
-				"wrong even type", "manual", mbeanServer.getAttribute( configBeanObjectName, "IndexingStrategy" )
-		);
-
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		Counter counter = new Counter();
@@ -117,21 +113,21 @@ public class IndexCtrlMBeanTest extends SearchTestCase {
 	}
 
 	protected void setUp() throws Exception {
+		setCfg( null ); // force a rebuild of the configuration
 		super.setUp();
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
-		configBeanObjectName = new ObjectName( ConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
+		statisticsBeanObjectName = new ObjectName( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME );
 		indexBeanObjectName = new ObjectName( IndexCtrlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		if ( mbeanServer.isRegistered( configBeanObjectName ) ) {
-			mbeanServer.unregisterMBean( configBeanObjectName );
+		if ( mbeanServer.isRegistered( statisticsBeanObjectName ) ) {
+			mbeanServer.unregisterMBean( statisticsBeanObjectName );
 		}
 		if ( mbeanServer.isRegistered( indexBeanObjectName ) ) {
 			mbeanServer.unregisterMBean( indexBeanObjectName );
 		}
-		setCfg( null ); // force a rebuild of the configuration
 	}
 
 	protected void configure(Configuration cfg) {
@@ -159,7 +155,7 @@ public class IndexCtrlMBeanTest extends SearchTestCase {
 		assertEquals(
 				"wrong number of indexed entities", count,
 				mbeanServer.invoke(
-						configBeanObjectName,
+						statisticsBeanObjectName,
 						"getNumberOfIndexedEntities",
 						new String[] { entity },
 						new String[] { String.class.getName() }

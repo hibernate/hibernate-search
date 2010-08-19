@@ -74,10 +74,7 @@ import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
-import org.hibernate.search.jmx.ConfigInfo;
-import org.hibernate.search.jmx.ConfigInfoMBean;
 import org.hibernate.search.jmx.IndexCtrl;
-import org.hibernate.search.jmx.JMXRegistrar;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -104,7 +101,7 @@ public class SearchFactoryBuilder {
 	static {
 		Version.touch();
 	}
-	
+
 	private static final Logger log = LoggerFactory.make();
 	private SearchConfiguration cfg;
 	private MutableSearchFactory rootFactory;
@@ -158,19 +155,20 @@ public class SearchFactoryBuilder {
 
 		String enableJMX = configurationProperties.getProperty( Environment.JMX_ENABLED );
 		if ( "true".equalsIgnoreCase( enableJMX ) ) {
-			enableJMXStatistics( searchFactoryImplementor );
+			enableIndexCrtlBean( searchFactoryImplementor );
 		}
 		return searchFactoryImplementor;
 	}
 
-	private void enableJMXStatistics(SearchFactoryImplementor searchFactoryImplementor) {
-		ConfigInfo configInfoBean = new ConfigInfo( searchFactoryImplementor );
-		JMXRegistrar.registerMBean( configInfoBean, ConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
+	private void enableIndexCrtlBean(SearchFactoryImplementor searchFactoryImplementor) {
+		if ( !searchFactoryImplementor.isJMXEnabled() ) {
+			return;
+		}
 
 		// if we have a JNDI bound SessionFactory we can also enable the index control bean
 		if ( StringHelper.isNotEmpty( configurationProperties.getProperty( "hibernate.session_factory_name" ) ) ) {
 			IndexCtrl indexCtrlBean = new IndexCtrl( configurationProperties );
-			JMXRegistrar.registerMBean( indexCtrlBean, IndexCtrl.INDEX_CTRL_MBEAN_OBJECT_NAME );
+			searchFactoryImplementor.registerMBean( indexCtrlBean, IndexCtrl.INDEX_CTRL_MBEAN_OBJECT_NAME, false );
 		}
 	}
 
