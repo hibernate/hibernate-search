@@ -121,9 +121,13 @@ public final class Environment {
 	public static final String ERROR_HANDLER = "hibernate.search.error_handler";
 
 	/**
-	 * If set to {@code true} the JMX Statistics bean gets enabled. For all other values the bean does not
+	 * If set to {@code true} JMX beans get enabled. For all other values the beans do not.
 	 * get enabled.
 	 */
 	public static final String JMX_ENABLED = "hibernate.search.jmx_enabled";
 
+	/**
+	 * If set to {@code true} the search statistic will be gathered.
+	 */
+	public static final String GENERATE_STATS = "hibernate.search.generate_statistics";
 }

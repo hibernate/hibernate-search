@@ -56,6 +56,9 @@ import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.jmx.JMXRegistrar;
+import org.hibernate.search.jmx.StatisticsImpl;
+import org.hibernate.search.jmx.StatisticsImplMBean;
 import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
 import org.hibernate.search.query.dsl.v2.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
@@ -63,6 +66,7 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
+import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.LoggerFactory;
@@ -97,6 +101,7 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 	private final Properties configurationProperties;
 	private final ErrorHandler errorHandler;
 	private final PolymorphicIndexHierarchy indexHierarchy;
+	private final Statistics statistics;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -120,6 +125,16 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 		this.indexingStrategy = cfg.indexingStrategy;
 		this.readerProvider = cfg.readerProvider;
 		this.worker = cfg.worker;
+		this.statistics = new StatisticsImpl();
+		String enableStats = configurationProperties.getProperty( Environment.JMX_ENABLED );
+		if ( "true".equalsIgnoreCase( enableStats ) ) {
+			statistics.setStatisticsEnabled( true );
+		}
+
+		String enableJMX = configurationProperties.getProperty( Environment.JMX_ENABLED );
+		if ( "true".equalsIgnoreCase( enableJMX ) ) {
+			JMXRegistrar.registerMBean( statistics, StatisticsImplMBean.STATISTICS_MBEAN_OBJECT_NAME );
+		}
 	}
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
@@ -262,6 +277,10 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 
 	public QueryContextBuilder buildQueryBuilder() {
 		return new ConnectedQueryContextBuilder( this );
+	}
+
+	public Statistics getStatistics() {
+		return statistics;
 	}
 
 	public FilterCachingStrategy getFilterCachingStrategy() {

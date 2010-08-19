@@ -70,6 +70,7 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 				.setProperty( "hibernate.jndi.org.osjava.sj.root", "/Users/hardy/tmp/jndi-entries" )
 				.setProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" )
 				.setProperty( Environment.JMX_ENABLED, "true" )
+				.setProperty( Environment.GENERATE_STATS, "true" )
 				.build();
 		createMany( Book.class, BOOK_NUM );
 		createMany( Dvd.class, DVD_NUM );

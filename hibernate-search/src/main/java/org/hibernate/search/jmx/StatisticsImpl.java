@@ -24,41 +24,60 @@
 package org.hibernate.search.jmx;
 
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.hibernate.search.jmx.StatisticsImplMBean;
-import org.hibernate.search.stat.Statistics;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Hardy Ferentschik
  */
-public class StatisticsImpl implements Statistics, StatisticsImplMBean {
+public class StatisticsImpl implements StatisticsImplMBean {
 	private AtomicLong searchQueryCount = new AtomicLong();
-	private AtomicLong searchExecutionAvgTime = new AtomicLong();
 	private AtomicLong searchExecutionTotalTime = new AtomicLong();
 	private AtomicLong searchExecutionMaxTime = new AtomicLong();
-	private AtomicLong searchExecutionMinTime = new AtomicLong();
 	private volatile String queryExecutionMaxTimeQueryString;
 	private volatile boolean isStatisticsEnabled;
 
+	private final Lock readLock;
+	private final Lock writeLock;
+
+	{
+		ReadWriteLock lock = new ReentrantReadWriteLock();
+		readLock = lock.readLock();
+		writeLock = lock.writeLock();
+	}
 
 	public void clear() {
 		searchQueryCount.set( 0 );
+		searchExecutionTotalTime.set( 0 );
+		searchExecutionMaxTime.set( 0 );
+		queryExecutionMaxTimeQueryString = "";
 	}
 
 	public long getSearchQueryExecutionCount() {
 		return searchQueryCount.get();
 	}
 
+	public long getSearchQueryTotalTime() {
+		return searchExecutionTotalTime.get();
+	}
+
 	public long getSearchQueryExecutionMaxTime() {
 		return searchExecutionMaxTime.get();
 	}
 
-	public long getSearchQueryExecutionMinTime() {
-		return searchExecutionMinTime.get();
-	}
-
 	public long getSearchQueryExecutionAvgTime() {
-		return searchExecutionAvgTime.get();
+		writeLock.lock();
+		try {
+			long avgExecutionTime = 0;
+			if ( searchQueryCount.get() > 0 ) {
+				avgExecutionTime = searchExecutionTotalTime.get() / searchQueryCount.get();
+			}
+			return avgExecutionTime;
+		}
+		finally {
+			writeLock.unlock();
+		}
 	}
 
 	public String getSearchQueryExecutionMaxTimeQueryString() {
@@ -66,26 +85,23 @@ public class StatisticsImpl implements Statistics, StatisticsImplMBean {
 	}
 
 	public void searchExecuted(String searchString, long time) {
-		searchQueryCount.getAndIncrement();
-		boolean isLongestQuery = false;
-		for ( long old = searchExecutionMaxTime.get();
-			  ( time > old ) && ( isLongestQuery = !searchExecutionMaxTime.compareAndSet( old, time ) );
-			  old = searchExecutionMaxTime.get() ) {
-			;
+		readLock.lock();
+		try {
+			boolean isLongestQuery = false;
+			for ( long old = searchExecutionMaxTime.get();
+				  ( time > old ) && ( isLongestQuery = searchExecutionMaxTime.compareAndSet( old, time ) );
+				  old = searchExecutionMaxTime.get() ) {
+				;
+			}
+			if ( isLongestQuery ) {
+				queryExecutionMaxTimeQueryString = searchString;
+			}
+			searchQueryCount.getAndIncrement();
+			searchExecutionTotalTime.addAndGet( time );
 		}
-		if ( isLongestQuery ) {
-			queryExecutionMaxTimeQueryString = searchString;
+		finally {
+			readLock.unlock();
 		}
-
-		boolean isShortestQuery = false;
-		for ( long old = searchExecutionMinTime.get();
-			  ( time < old ) && ( isShortestQuery = !searchExecutionMinTime.compareAndSet( old, time ) );
-			  old = searchExecutionMinTime.get() ) {
-			;
-		}
-
-		searchExecutionTotalTime.getAndAdd( time );
-		searchExecutionAvgTime.getAndSet( searchExecutionTotalTime.get() / searchQueryCount.get() );
 	}
 
 	public boolean isStatisticsEnabled() {

@@ -25,6 +25,7 @@ import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
+import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
@@ -178,6 +179,10 @@ public class MutableSearchFactory implements StateSearchFactoryImplementor, Sear
 
 	public QueryContextBuilder buildQueryBuilder() {
 		return delegate.buildQueryBuilder();
+	}
+
+	public Statistics getStatistics() {
+		return delegate.getStatistics();
 	}
 
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {

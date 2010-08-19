@@ -28,10 +28,12 @@ import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
+import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Provide application wide operations as well as access to the underlying Lucene resources.
+ *
  * @author Emmanuel Bernard
  */
 public interface SearchFactory {
@@ -63,18 +65,20 @@ public interface SearchFactory {
 	/**
 	 * Experimental API
 	 * retrieve an analyzer instance by its definition name
-	 * 
+	 *
 	 * @throws SearchException if the definition name is unknown
 	 */
 	Analyzer getAnalyzer(String name);
-	
+
 	/**
 	 * Retrieves the scoped analyzer for a given class.
-	 * 
+	 *
 	 * @param clazz The class for which to retrieve the analyzer.
+	 *
 	 * @return The scoped analyzer for the specified class.
+	 *
 	 * @throws IllegalArgumentException in case <code>clazz == null</code> or the specified
-	 * class is not an indexed entity.
+	 *                                  class is not an indexed entity.
 	 */
 	Analyzer getAnalyzer(Class<?> clazz);
 
@@ -82,4 +86,11 @@ public interface SearchFactory {
 	 * Return a query builder providing a fluent API to create Lucene queries
 	 */
 	QueryContextBuilder buildQueryBuilder();
+
+	/**
+	 * Retrieve the statistics for this factory.
+	 *
+	 * @return The statistics.
+	 */
+	public Statistics getStatistics();
 }

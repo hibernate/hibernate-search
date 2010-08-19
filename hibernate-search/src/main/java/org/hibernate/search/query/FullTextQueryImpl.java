@@ -53,11 +53,11 @@ import org.slf4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.LockOptions;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.impl.AbstractQueryImpl;
@@ -77,23 +77,20 @@ import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
-import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.reader.ReaderProvider;
-
-import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
-
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.ContextHelper;
-
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
-
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.util.ReflectHelper;
+
+import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
+import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
+import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}.
@@ -401,6 +398,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
 		buildFilters();
 		QueryHits queryHits;
+
+		boolean stats = searchFactoryImplementor.getStatistics().isStatisticsEnabled();
+		long startTime = 0;
+		if ( stats ) {
+			startTime = System.currentTimeMillis();
+		}
+
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
 			queryHits = new QueryHits( searcher, query, filter, sort );
 		}
@@ -408,6 +412,11 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			queryHits = new QueryHits( searcher, query, filter, sort, n );
 		}
 		resultSize = queryHits.totalHits;
+
+		if ( stats ) {
+			searchFactoryImplementor.getStatistics().searchExecuted( query.toString(), System.currentTimeMillis() - startTime );
+		}
+
 		return queryHits;
 	}
 
@@ -902,10 +911,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public <T> T unwrap(Class<T> type) {
-		if ( type == org.apache.lucene.search.Query.class) {
-			return (T) luceneQuery;
+		if ( type == org.apache.lucene.search.Query.class ) {
+			return ( T ) luceneQuery;
 		}
-		throw new IllegalArgumentException("Cannot unwrap " + type.getName() );
+		throw new IllegalArgumentException( "Cannot unwrap " + type.getName() );
 	}
 
 	public LockOptions getLockOptions() {
