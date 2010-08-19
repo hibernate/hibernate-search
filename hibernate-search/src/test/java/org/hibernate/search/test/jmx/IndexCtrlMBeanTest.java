@@ -63,13 +63,21 @@ public class IndexCtrlMBeanTest extends SearchTestCase {
 	public void testAttributesAndOperations() throws Exception {
 		MBeanInfo info = mbeanServer.getMBeanInfo( indexBeanObjectName );
 		MBeanAttributeInfo[] attributes = info.getAttributes();
-		assertEquals( "Wrong number of attributes", 0, attributes.length );
+		assertEquals( "Wrong number of attributes", 3, attributes.length );
+		Set<String> attributeNames = new HashSet<String>();
+		attributeNames.add( "NumberOfObjectLoadingThreads" );
+		attributeNames.add( "NumberOfFetchingThreads" );
+		attributeNames.add( "BatchSize" );
+		for ( MBeanAttributeInfo attribute : attributes ) {
+			assertTrue( attributeNames.contains( attribute.getName() ) );
+		}
 
 		MBeanOperationInfo[] operations = info.getOperations();
-		assertEquals( "Wrong number of operations", 2, operations.length );
+		assertEquals( "Wrong number of operations", 3, operations.length );
 		Set<String> operationNames = new HashSet<String>();
 		operationNames.add( "index" );
 		operationNames.add( "purge" );
+		operationNames.add( "optimize" );
 		for ( MBeanOperationInfo operation : operations ) {
 			assertTrue( operationNames.contains( operation.getName() ) );
 		}

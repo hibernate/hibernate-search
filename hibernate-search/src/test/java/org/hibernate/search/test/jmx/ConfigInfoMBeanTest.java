@@ -60,10 +60,11 @@ public class ConfigInfoMBeanTest extends SearchTestCase {
 	public void testAttributesAndOperations() throws Exception {
 		MBeanInfo info = mbeanServer.getMBeanInfo( configBeanObjectName );
 		MBeanAttributeInfo[] attributes = info.getAttributes();
-		assertEquals( "Wrong number of attributes", 2, attributes.length );
+		assertEquals( "Wrong number of attributes", 3, attributes.length );
 		Set<String> attributeNames = new HashSet<String>();
 		attributeNames.add( "IndexedClassNames" );
 		attributeNames.add( "IndexingStrategy" );
+		attributeNames.add( "SearchVersion" );
 		for ( MBeanAttributeInfo attribute : attributes ) {
 			assertTrue( attributeNames.contains( attribute.getName() ) );
 		}

@@ -146,7 +146,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		else if ( "manual".equals( indexingStrategy ) ) {
 			used = false;
 		}
-		log.debug( "Hibernate Search event listeners mode " + (used ? "activated" : "desactivated") );
+
+		log.debug( "Hibernate Search event listeners " + (used ? "activated" : "deactivated") );
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
