@@ -48,9 +48,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/tags/v3_2_1_Final</connection>
-        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/tags/v3_2_1_Final</developerConnection>
-        <url>http://fisheye.jboss.com/browse/Hibernate/search/tags/v3_2_1_Final</url>
+        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/branches/foobar</connection>
+        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/branches/foobar</developerConnection>
+        <url>http://fisheye.jboss.com/browse/Hibernate/search/branches/foobar</url>
     </scm>
 
     <organization>
