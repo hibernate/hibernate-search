@@ -76,11 +76,7 @@ public class MassIndexerImpl implements MassIndexer {
 		this.sessionFactory = sessionFactory;
 		rootEntities = toRootEntities( searchFactoryImplementor, entities );
 		if ( searchFactoryImplementor.isJMXEnabled() ) {
-			ObjectName name = searchFactoryImplementor.registerMBean(
-					new IndexingProgressMonitor(),
-					IndexingProgressMonitorMBean.INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME,
-					true
-			);
+			monitor = new IndexingProgressMonitor();
 		}
 	}
 

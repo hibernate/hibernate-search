@@ -78,4 +78,9 @@ public interface MassIndexerProgressMonitor {
 	 * ber added to total count
 	 */
 	void addToTotalCount(long count);
+
+	/**
+	 * Called when the indexing is completed.
+	 */
+	void indexingCompleted();
 }

@@ -103,6 +103,7 @@ public class BatchCoordinator implements Runnable {
 		}
 		finally {
 			backend.close();
+			monitor.indexingCompleted();
 		}
 	}
 

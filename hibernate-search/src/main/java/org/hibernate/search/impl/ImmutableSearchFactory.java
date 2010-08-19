@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.impl;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,9 +31,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
@@ -59,6 +55,7 @@ import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.jmx.JMXRegistrar;
 import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
@@ -136,7 +133,9 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 		}
 
 		if ( isJMXEnabled() ) {
-			registerMBean( new StatisticsInfo( statistics ), StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME, false );
+			JMXRegistrar.registerMBean(
+					new StatisticsInfo( statistics ), StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME
+			);
 		}
 	}
 
@@ -355,54 +354,6 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
-	}
-
-	public ObjectName registerMBean(Object bean, String name, boolean allowMultipleObjects) {
-		if ( !isJMXEnabled() ) {
-			return null;
-		}
-
-		ObjectName objectName = createObjectName( name );
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		if ( mbs.isRegistered( objectName ) ) {
-			try {
-				mbs.unregisterMBean( objectName );
-			}
-			catch ( Exception e ) {
-				log.warn( "Unable to un-register existing MBean: " + name, e );
-			}
-		}
-
-		try {
-			mbs.registerMBean( bean, objectName );
-		}
-		catch ( Exception e ) {
-			throw new SearchException( "Unable to enable MBean for Hibernate Search", e );
-		}
-		return objectName;
-	}
-
-	public void unRegisterMBean(ObjectName name) {
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		if ( mbs.isRegistered( name ) ) {
-			try {
-				mbs.unregisterMBean( name );
-			}
-			catch ( Exception e ) {
-				log.warn( "Unable to un-register existing MBean: " + name, e );
-			}
-		}
-	}
-
-	private static ObjectName createObjectName(String name) {
-		ObjectName objectName;
-		try {
-			objectName = new ObjectName( name );
-		}
-		catch ( MalformedObjectNameException e ) {
-			throw new SearchException( "Invalid JMX Bean name: " + name, e );
-		}
-		return objectName;
 	}
 
 	public PolymorphicIndexHierarchy getIndexHierarchy() {

@@ -24,8 +24,12 @@
 package org.hibernate.search.jmx;
 
 import java.util.concurrent.atomic.AtomicLong;
+import javax.management.ObjectName;
+
+import org.slf4j.Logger;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
  * A JMX based mass indexer progress monitor. This monitor will allow you to follow mass indexing progress via JMX.
@@ -33,11 +37,22 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
  * @author Hardy Ferentschik
  */
 public class IndexingProgressMonitor implements IndexingProgressMonitorMBean, MassIndexerProgressMonitor {
+	private static final Logger log = LoggerFactory.make();
 
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final AtomicLong documentsBuiltCounter = new AtomicLong();
 	private final AtomicLong totalCounter = new AtomicLong();
 	private final AtomicLong entitiesLoadedCounter = new AtomicLong();
+
+	private final ObjectName registeredName;
+
+	public IndexingProgressMonitor() {
+		String name = IndexingProgressMonitorMBean.INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME;
+		if ( JMXRegistrar.isNameRegistered( name ) ) {
+			name = name + "@" + Integer.toHexString( hashCode() ); // make the name unique in case there are multiple mass indexers at the same time
+		}
+		registeredName = JMXRegistrar.registerMBean( this, name );
+	}
 
 	public void documentsAdded(long increment) {
 		documentsDoneCounter.addAndGet( increment );
@@ -53,6 +68,11 @@ public class IndexingProgressMonitor implements IndexingProgressMonitorMBean, Ma
 
 	public void addToTotalCount(long count) {
 		totalCounter.addAndGet( count );
+	}
+
+	public void indexingCompleted() {
+		log.info( "Indexing completed. Reindexed {} entities. Unregistering MBean from server", totalCounter.get() );
+		JMXRegistrar.unRegisterMBean( registeredName );
 	}
 
 	public long getLoadedEntitiesCount() {

@@ -170,14 +170,6 @@ public class MutableSearchFactory implements StateSearchFactoryImplementor, Sear
 		return delegate.getErrorHandler();
 	}
 
-	public ObjectName registerMBean(Object bean, String name, boolean allowMultipleObjects) {
-		return delegate.registerMBean( bean, name, allowMultipleObjects );
-	}
-
-	public void unRegisterMBean(ObjectName name) {
-		delegate.unRegisterMBean( name );
-	}
-
 	public boolean isJMXEnabled() {
 		return delegate.isJMXEnabled();
 	}

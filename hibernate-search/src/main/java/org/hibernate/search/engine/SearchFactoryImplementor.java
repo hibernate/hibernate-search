@@ -84,10 +84,6 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 
 	ErrorHandler getErrorHandler();
 
-	ObjectName registerMBean(Object bean, String name, boolean allowMultipleObjects);
-
-	void unRegisterMBean(ObjectName name);
-
 	boolean isJMXEnabled();
 
 	/**
