@@ -34,8 +34,6 @@ import java.util.Set;
  * @author Hardy Ferentschik
  */
 public interface Statistics {
-	public static final String STATISTICS_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=StatisticsMBean";
-
 	/**
 	 * Reset all statistics.
 	 */

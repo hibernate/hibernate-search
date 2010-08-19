@@ -48,7 +48,7 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 
 	private final int BOOK_NUM = 140;
 	private final int ANCIENTBOOK_NUM = 120;
-	private final int DVD_NUM = 10000;
+	private final int DVD_NUM = 200;
 
 	private SentenceInventor sentenceInventor = new SentenceInventor( 7L, 4000 );
 	private FullTextSessionBuilder builder;
@@ -136,9 +136,6 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		purgeAll(); // empty indexes
 		verifyIsEmpty();
 		reindexAll(); // rebuild the indexes
-
-		Thread.sleep( 60000 ); 
-
 		verifyResultNumbers(); // verify the count match again
 		reindexAll(); //tests that purgeAll is automatic:
 		verifyResultNumbers(); //..same numbers again
