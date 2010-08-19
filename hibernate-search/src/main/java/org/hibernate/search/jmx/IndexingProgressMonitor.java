@@ -28,6 +28,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 
 /**
+ * A JMX based mass indexer progress monitor. This monitor will allow you to follow mass indexing progress via JMX.
+ *
  * @author Hardy Ferentschik
  */
 public class IndexingProgressMonitor implements IndexingProgressMonitorMBean, MassIndexerProgressMonitor {
