@@ -1,5 +1,4 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
  * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as

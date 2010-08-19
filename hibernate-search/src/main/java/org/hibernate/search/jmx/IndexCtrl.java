@@ -37,19 +37,47 @@ import org.hibernate.util.ReflectHelper;
 
 
 /**
- * Implementation of the {@code HibernateSearchIndexCtrlMBean} JMX attributes and operations.
+ * Implementation of the {@code IndexCtrlMBean} JMX attributes and operations.
  *
  * @author Hardy Ferentschik
  */
-public class HibernateSearchIndexCtrl implements HibernateSearchIndexCtrlMBean {
+public class IndexCtrl implements IndexCtrlMBean {
 	private static final String HIBERNATE_JNDI_PREFIX = "hibernate.jndi.";
 
 	private final Properties jndiProperties;
 	private final String sessionFactoryJndiName;
 
-	public HibernateSearchIndexCtrl(Properties props) {
+	private int batchSize = 25;
+	private int numberOfObjectLoadingThreads = 2;
+	private int numberOfFetchingThreads = 4;
+
+	public IndexCtrl(Properties props) {
 		this.sessionFactoryJndiName = props.getProperty( "hibernate.session_factory_name" );
 		this.jndiProperties = JNDIHelper.getJndiProperties( props, HIBERNATE_JNDI_PREFIX );
+	}
+
+	public void setBatchSize(int batchSize) {
+		this.batchSize = batchSize;
+	}
+
+	public int getBatchSize() {
+		return batchSize;
+	}
+
+	public void setNumberOfObjectLoadingThreads(int numberOfThreads) {
+		this.numberOfObjectLoadingThreads = numberOfThreads;
+	}
+
+	public int getNumberOfObjectLoadingThreads() {
+		return numberOfObjectLoadingThreads;
+	}
+
+	public void setNumberOfFetchingThreads(int numberOfThreads) {
+		this.numberOfFetchingThreads = numberOfThreads;
+	}
+
+	public int getNumberOfFetchingThreads() {
+		return numberOfFetchingThreads;
 	}
 
 	public void index(String entity) {
@@ -60,15 +88,27 @@ public class HibernateSearchIndexCtrl implements HibernateSearchIndexCtrlMBean {
 		FullTextSession fulltextSession = Search.getFullTextSession( session );
 		try {
 			fulltextSession.createIndexer( clazz )
-					.batchSizeToLoadObjects( 25 )
+					.batchSizeToLoadObjects( batchSize )
 					.cacheMode( CacheMode.NORMAL )
-					.threadsToLoadObjects( 5 )
-					.threadsForSubsequentFetching( 20 )
+					.threadsToLoadObjects( numberOfObjectLoadingThreads )
+					.threadsForSubsequentFetching( numberOfFetchingThreads )
 					.startAndWait();
 		}
 		catch ( InterruptedException e ) {
 			throw new RuntimeException( "Unable to complete indexing" );
 		}
+		session.close();
+	}
+
+	public void optimize(String entity) {
+		Class<?> clazz = getEntityClass( entity );
+
+		SessionFactory factory = getSessionFactory();
+		Session session = factory.openSession();
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		fullTextSession.beginTransaction();
+		fullTextSession.getSearchFactory().optimize( clazz );
+		fullTextSession.getTransaction().commit();
 		session.close();
 	}
 
@@ -87,7 +127,7 @@ public class HibernateSearchIndexCtrl implements HibernateSearchIndexCtrlMBean {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ReflectHelper.classForName( entity, HibernateSearchIndexCtrl.class );
+			clazz = ReflectHelper.classForName( entity, IndexCtrl.class );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );

@@ -32,9 +32,16 @@ import java.util.Set;
  *
  * @author Hardy Ferentschik
  */
-public interface HibernateSearchConfigInfoMBean {
+public interface ConfigInfoMBean {
 
-	public static final String CONFIG_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=HibernateSearchConfigInfoMBean";
+	public static final String CONFIG_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=ConfigInfoMBean";
+
+	/**
+	 * Returns the Hibernate Search version.
+	 *
+	 * @return the Hibernate Search version
+	 */
+	String getSearchVersion();
 
 	/**
 	 * Returns a list of all indexed classes.

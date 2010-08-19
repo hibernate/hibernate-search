@@ -40,7 +40,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.jmx.HibernateSearchConfigInfoMBean;
+import org.hibernate.search.jmx.ConfigInfoMBean;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -123,7 +123,7 @@ public class ConfigInfoMBeanTest extends SearchTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
-		configBeanObjectName = new ObjectName( HibernateSearchConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
+		configBeanObjectName = new ObjectName( ConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
 	}
 
 	protected void tearDown() throws Exception {

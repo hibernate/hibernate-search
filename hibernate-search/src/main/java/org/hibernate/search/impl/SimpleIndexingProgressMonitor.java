@@ -26,17 +26,18 @@ package org.hibernate.search.impl;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.util.LoggerFactory;
+
 /**
- * A very simple implementation of MassIndexerProgressMonitor
- * 
+ * A very simple implementation of {@code MassIndexerProgressMonitor}
+ *
  * @author Sanne Grinovero
  */
 public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor {
-	
+
 	private static final Logger log = LoggerFactory.make();
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final AtomicLong totalCounter = new AtomicLong();
@@ -64,17 +65,16 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 		totalCounter.addAndGet( count );
 		log.info( "Going to reindex {} entities", count );
 	}
-	
+
 	protected int getStatusMessagePeriod() {
 		return 50;
 	}
-	
+
 	protected void printStatusMessage(long starttimems, long totalTodoCount, long doneCount) {
 		long elapsedMs = System.currentTimeMillis() - starttimems;
 		log.info( "{} documents indexed in {} ms", doneCount, elapsedMs );
-		float estimateSpeed = doneCount * 1000f / elapsedMs ;
-		float estimatePercentileComplete = doneCount * 100f / totalTodoCount ;
+		float estimateSpeed = doneCount * 1000f / elapsedMs;
+		float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
 		log.info( "Indexing speed: {} documents/second; progress: {}%", estimateSpeed, estimatePercentileComplete );
 	}
-
 }

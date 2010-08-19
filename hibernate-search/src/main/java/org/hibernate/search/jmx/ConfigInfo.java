@@ -41,22 +41,27 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.Version;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.util.ReflectHelper;
 
 /**
- * Implementation of the {@code HibernateSearchConfigInfoMBean} JMX attributes and operations.
+ * Implementation of the {@code ConfigInfoMBean} JMX attributes and operations.
  *
  * @author Hardy Ferentschik
  */
-public class HibernateSearchConfigInfo implements HibernateSearchConfigInfoMBean {
+public class ConfigInfo implements ConfigInfoMBean {
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
 
-	public HibernateSearchConfigInfo(SearchFactoryImplementor searchFactoryImplementor) {
+	public ConfigInfo(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
+	}
+
+	public String getSearchVersion() {
+		return Version.getVersionString();
 	}
 
 	public Set<String> getIndexedClassNames() {
@@ -119,7 +124,7 @@ public class HibernateSearchConfigInfo implements HibernateSearchConfigInfoMBean
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ReflectHelper.classForName( entity, HibernateSearchConfigInfo.class );
+			clazz = ReflectHelper.classForName( entity, ConfigInfo.class );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );

@@ -30,8 +30,8 @@ import javax.management.ObjectName;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.jmx.HibernateSearchConfigInfoMBean;
-import org.hibernate.search.jmx.HibernateSearchIndexCtrlMBean;
+import org.hibernate.search.jmx.ConfigInfoMBean;
+import org.hibernate.search.jmx.IndexCtrlMBean;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -42,13 +42,13 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 	public void testMBeanNotRegisteredWithoutExplicitProperty() throws Exception {
 		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
-		ObjectName name = new ObjectName( HibernateSearchConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
+		ObjectName name = new ObjectName( ConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
 		assertFalse(
 				"Without '" + Environment.JMX_ENABLED + "' set the configuration info MBean should not be registered",
 				mbs.isRegistered( name )
 		);
 
-		name = new ObjectName( HibernateSearchIndexCtrlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		name = new ObjectName( IndexCtrlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
 		assertFalse(
 				"Without '" + Environment.JMX_ENABLED + "' set the index control MBean should not be registered",
 				mbs.isRegistered( name )

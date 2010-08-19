@@ -29,33 +29,39 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
+import org.hibernate.search.Environment;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.BatchCoordinator;
 import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.jmx.IndexingProgressMonitorMBean;
+import org.hibernate.search.jmx.IndexingProgressMonitor;
+import org.hibernate.search.jmx.JMXRegistrar;
+import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * Prepares and configures a BatchIndexingWorkspace to start rebuilding
  * the indexes for all entity instances in the database.
  * The type of these entities is either all indexed entities or a
  * subset, always including all subtypes.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class MassIndexerImpl implements MassIndexer {
-	
+
 	private static final Logger log = LoggerFactory.make();
-	
+
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final SessionFactory sessionFactory;
 
 	protected Set<Class<?>> rootEntities = new HashSet<Class<?>>();
-	
+
 	// default settings defined here:
 	private int objectLoadingThreads = 2; //loading the main entity
 	private int collectionLoadingThreads = 4; //also responsible for loading of lazy @IndexedEmbedded collections
@@ -68,23 +74,41 @@ public class MassIndexerImpl implements MassIndexer {
 	private boolean optimizeAfterPurge = true;
 	private MassIndexerProgressMonitor monitor = new SimpleIndexingProgressMonitor();
 
-	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory, Class<?>...entities) {
+	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory, Class<?>... entities) {
 		this.searchFactoryImplementor = searchFactory;
 		this.sessionFactory = sessionFactory;
 		rootEntities = toRootEntities( searchFactoryImplementor, entities );
+
+		if ( searchFactory instanceof StateSearchFactoryImplementor ) {
+			StateSearchFactoryImplementor stateSearchFactoryImplementor = ( StateSearchFactoryImplementor ) searchFactory;
+			String enableJMX = stateSearchFactoryImplementor.getConfigurationProperties()
+					.getProperty( Environment.JMX_ENABLED );
+			if ( "true".equalsIgnoreCase( enableJMX ) ) {
+				monitor = new IndexingProgressMonitor();
+				JMXRegistrar.registerMBean(
+						monitor, IndexingProgressMonitorMBean.INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME
+				);
+			}
+		}
 	}
 
 	/**
 	 * From the set of classes a new set is built containing all indexed
 	 * subclasses, but removing then all subtypes of indexed entities.
+	 *
 	 * @param selection
+	 *
 	 * @return a new set of entities
 	 */
 	private static Set<Class<?>> toRootEntities(SearchFactoryImplementor searchFactoryImplementor, Class<?>... selection) {
 		Set<Class<?>> entities = new HashSet<Class<?>>();
 		//first build the "entities" set containing all indexed subtypes of "selection".
-		for (Class<?> entityType : selection) {
-			Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class[] {entityType} );
+		for ( Class<?> entityType : selection ) {
+			Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic(
+					new Class[] {
+							entityType
+					}
+			);
 			if ( targetedClasses.isEmpty() ) {
 				String msg = entityType.getName() + " is not an indexed entity or a subclass of an indexed entity";
 				throw new IllegalArgumentException( msg );
@@ -94,9 +118,9 @@ public class MassIndexerImpl implements MassIndexer {
 		Set<Class<?>> cleaned = new HashSet<Class<?>>();
 		Set<Class<?>> toRemove = new HashSet<Class<?>>();
 		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
-		for (Class<?> type : entities) {
+		for ( Class<?> type : entities ) {
 			boolean typeIsOk = true;
-			for (Class<?> existing : cleaned) {
+			for ( Class<?> existing : cleaned ) {
 				if ( existing.isAssignableFrom( type ) ) {
 					typeIsOk = false;
 					break;
@@ -115,33 +139,37 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	public MassIndexer cacheMode(CacheMode cacheMode) {
-		if ( cacheMode == null )
+		if ( cacheMode == null ) {
 			throw new IllegalArgumentException( "cacheMode must not be null" );
+		}
 		this.cacheMode = cacheMode;
 		return this;
 	}
 
 	public MassIndexer threadsToLoadObjects(int numberOfThreads) {
-		if ( numberOfThreads < 1 )
+		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
+		}
 		this.objectLoadingThreads = numberOfThreads;
 		return this;
 	}
-	
+
 	public MassIndexer batchSizeToLoadObjects(int batchSize) {
-		if ( batchSize < 1 )
+		if ( batchSize < 1 ) {
 			throw new IllegalArgumentException( "batchSize must be at least 1" );
+		}
 		this.objectLoadingBatchSize = batchSize;
 		return this;
 	}
-	
+
 	public MassIndexer threadsForSubsequentFetching(int numberOfThreads) {
-		if ( numberOfThreads < 1 )
+		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
+		}
 		this.collectionLoadingThreads = numberOfThreads;
 		return this;
 	}
-	
+
 	//TODO see MassIndexer interface
 //	public MassIndexer threadsForIndexWriter(int numberOfThreads) {
 //		if ( numberOfThreads < 1 )
@@ -149,7 +177,7 @@ public class MassIndexerImpl implements MassIndexer {
 //		this.writerThreads = numberOfThreads;
 //		return this;
 //	}
-	
+
 	public MassIndexer optimizeOnFinish(boolean optimize) {
 		this.optimizeAtEnd = optimize;
 		return this;
@@ -164,7 +192,7 @@ public class MassIndexerImpl implements MassIndexer {
 		this.purgeAtStart = purgeAll;
 		return this;
 	}
-	
+
 	public Future<?> start() {
 		BatchCoordinator coordinator = createCoordinator();
 		ExecutorService executor = Executors.newFixedThreadPool( 1, "batch coordinator" );
@@ -176,7 +204,7 @@ public class MassIndexerImpl implements MassIndexer {
 			executor.shutdown();
 		}
 	}
-	
+
 	public void startAndWait() throws InterruptedException {
 		BatchCoordinator coordinator = createCoordinator();
 		coordinator.run();
@@ -184,13 +212,15 @@ public class MassIndexerImpl implements MassIndexer {
 			throw new InterruptedException();
 		}
 	}
-	
+
 	protected BatchCoordinator createCoordinator() {
-		return new BatchCoordinator( rootEntities, searchFactoryImplementor, sessionFactory,
+		return new BatchCoordinator(
+				rootEntities, searchFactoryImplementor, sessionFactory,
 				objectLoadingThreads, collectionLoadingThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor );
+				monitor
+		);
 	}
 
 	public MassIndexer limitIndexedObjectsTo(long maximum) {

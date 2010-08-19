@@ -24,7 +24,6 @@
 package org.hibernate.search.impl;
 
 import java.beans.Introspector;
-import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,9 +35,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
@@ -78,9 +74,10 @@ import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
-import org.hibernate.search.jmx.HibernateSearchConfigInfo;
-import org.hibernate.search.jmx.HibernateSearchConfigInfoMBean;
-import org.hibernate.search.jmx.HibernateSearchIndexCtrl;
+import org.hibernate.search.jmx.ConfigInfo;
+import org.hibernate.search.jmx.ConfigInfoMBean;
+import org.hibernate.search.jmx.IndexCtrl;
+import org.hibernate.search.jmx.JMXRegistrar;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -167,45 +164,13 @@ public class SearchFactoryBuilder {
 	}
 
 	private void enableJMXStatistics(SearchFactoryImplementor searchFactoryImplementor) {
-		HibernateSearchConfigInfo statsBean = new HibernateSearchConfigInfo( searchFactoryImplementor );
-		ObjectName name = createObjectName( HibernateSearchConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
-		registerMBean( statsBean, name );
+		ConfigInfo configInfoBean = new ConfigInfo( searchFactoryImplementor );
+		JMXRegistrar.registerMBean( configInfoBean, ConfigInfoMBean.CONFIG_MBEAN_OBJECT_NAME );
 
 		// if we have a JNDI bound SessionFactory we can also enable the index control bean
 		if ( StringHelper.isNotEmpty( configurationProperties.getProperty( "hibernate.session_factory_name" ) ) ) {
-			HibernateSearchIndexCtrl indexCtrlBean = new HibernateSearchIndexCtrl( configurationProperties );
-			name = createObjectName( HibernateSearchIndexCtrl.INDEX_CTRL_MBEAN_OBJECT_NAME );
-			registerMBean( indexCtrlBean, name );
-		}
-	}
-
-	private ObjectName createObjectName(String name) {
-		ObjectName objectName;
-		try {
-			objectName = new ObjectName( name );
-		}
-		catch ( MalformedObjectNameException e ) {
-			throw new SearchException( "Invalid JMX Bean name: " + name, e );
-		}
-		return objectName;
-	}
-
-	private void registerMBean(Object stats, ObjectName name) {
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		if ( mbs.isRegistered( name ) ) {
-			try {
-				mbs.unregisterMBean( name );
-			}
-			catch ( Exception e ) {
-				log.warn( "Unable to un-register existing MBean: " + name, e );
-			}
-		}
-
-		try {
-			mbs.registerMBean( stats, name );
-		}
-		catch ( Exception e ) {
-			throw new SearchException( "Unable to enable MBean for Hibernate Search", e );
+			IndexCtrl indexCtrlBean = new IndexCtrl( configurationProperties );
+			JMXRegistrar.registerMBean( indexCtrlBean, IndexCtrl.INDEX_CTRL_MBEAN_OBJECT_NAME );
 		}
 	}
 

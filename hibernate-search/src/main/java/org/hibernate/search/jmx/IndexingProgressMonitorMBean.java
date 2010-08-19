@@ -24,39 +24,28 @@
 package org.hibernate.search.jmx;
 
 /**
- * Defines the Hibernate Search exposed JMX attributes and operations for index creation and purging.
+ * A MBean for following the progress of mass indexing.
  *
  * @author Hardy Ferentschik
  */
-public interface HibernateSearchIndexCtrlMBean {
+public interface IndexingProgressMonitorMBean {
 
-	public static final String INDEX_CTRL_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=HibernateSearchIndexCtrlMBean";
-
-	/**
-	 * Index the specified entity using the mass indexer.
-	 * <p><b>Note:<br/>
-	 * This method is only available if the Hibernate {@code SessionFactory}
-	 * is available via JNDI.
-	 * </p>
-	 *
-	 * @param entity The fqc of the entity to index
-	 *
-	 * @throws IllegalArgumentException	  in case the entity name is not valid
-	 * @throws UnsupportedOperationException in case the Hibernate {@code SessionFactory} is not bound via JNDI.
-	 */
-	void index(String entity);
+	public static final String INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=IndexingProgressMBean";
 
 	/**
-	 * Purge the index of the specified entity.
-	 * <p><b>Note:<br/>
-	 * This method is only available if the Hibernate {@code SessionFactory}
-	 * is available via JNDI.
-	 * </p>
-	 *
-	 * @param entity The fqc of the entity to index
-	 *
-	 * @throws IllegalArgumentException	  in case the entity name is not valid
-	 * @throws UnsupportedOperationException in case the Hibernate {@code SessionFactory} is not bound via JNDI.
+	 * @return the number of entities loaded so far
 	 */
-	void purge(String entity);
+	long getLoadedEntitiesCount();
+
+	/**
+	 * @return the number of Lucene {@code Document}s added so far
+	 */
+	long getDocumentsAddedCount();
+
+	/**
+	 * @return the total number of entities which need indexing
+	 */
+	long getNumberOfEntitiesToIndex();
 }
+
+
