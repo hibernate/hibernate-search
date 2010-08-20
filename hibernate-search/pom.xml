@@ -226,6 +226,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
+                    <tags>
+                      <tag>
+                        <name>experimental</name>
+                        <placement>a</placement>
+                        <head>Experimental</head>
+                      </tag>
+                    </tags>                    
                     <docfilessubdirs>true</docfilessubdirs>
                     <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
                     <links>

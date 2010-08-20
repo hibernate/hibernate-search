@@ -43,11 +43,12 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * First EXPERIMENTAL BatchBackend; this is not meant to be used as a regular
+ * This is not meant to be used as a regular
  * backend, only to apply batch changes to the index. Several threads
  * are used to make changes to each index, so order of Work processing is not guaranteed.
  * 
  * @author Sanne Grinovero
+ * @experimental First {@code BatchBackend}
  */
 public class LuceneBatchBackend implements BatchBackend {
 	

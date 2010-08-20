@@ -30,7 +30,7 @@ import javax.management.ObjectName;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.jmx.IndexCtrlMBean;
+import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -49,7 +49,7 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 				mbeanServer.isRegistered( name )
 		);
 
-		name = new ObjectName( IndexCtrlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		name = new ObjectName( IndexControlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
 		assertFalse(
 				"Without '" + Environment.JMX_ENABLED + "' set the index control MBean should not be registered",
 				mbeanServer.isRegistered( name )
@@ -77,7 +77,7 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 		if ( mbeanServer.isRegistered( statisticsBeanObjectName ) ) {
 			mbeanServer.unregisterMBean( statisticsBeanObjectName );
 		}
-		ObjectName indexBeanObjectName = new ObjectName( IndexCtrlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		ObjectName indexBeanObjectName = new ObjectName( IndexControlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
 		if ( mbeanServer.isRegistered( indexBeanObjectName ) ) {
 			mbeanServer.unregisterMBean( indexBeanObjectName );
 		}

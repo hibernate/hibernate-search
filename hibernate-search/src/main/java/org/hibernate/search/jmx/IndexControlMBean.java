@@ -26,11 +26,12 @@ package org.hibernate.search.jmx;
 /**
  * Defines the Hibernate Search exposed JMX attributes and operations for index creation and purging.
  *
+ * @experimental This MBean is experimental
  * @author Hardy Ferentschik
  */
-public interface IndexCtrlMBean {
+public interface IndexControlMBean {
 
-	public static final String INDEX_CTRL_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=IndexCtrlMBean";
+	public static final String INDEX_CTRL_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=IndexControlMBean";
 
 	/**
 	 * Sets the batch size for the mass indexer.

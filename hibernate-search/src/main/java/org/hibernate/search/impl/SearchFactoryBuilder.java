@@ -74,7 +74,7 @@ import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
-import org.hibernate.search.jmx.IndexCtrl;
+import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.jmx.JMXRegistrar;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.reader.ReaderProviderFactory;
@@ -168,8 +168,8 @@ public class SearchFactoryBuilder {
 
 		// if we have a JNDI bound SessionFactory we can also enable the index control bean
 		if ( StringHelper.isNotEmpty( configurationProperties.getProperty( "hibernate.session_factory_name" ) ) ) {
-			IndexCtrl indexCtrlBean = new IndexCtrl( configurationProperties );
-			JMXRegistrar.registerMBean( indexCtrlBean, IndexCtrl.INDEX_CTRL_MBEAN_OBJECT_NAME );
+			IndexControl indexCtrlBean = new IndexControl( configurationProperties );
+			JMXRegistrar.registerMBean( indexCtrlBean, IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
 		}
 	}
 

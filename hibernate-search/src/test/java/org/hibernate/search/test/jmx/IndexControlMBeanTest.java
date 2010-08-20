@@ -41,14 +41,14 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.jmx.IndexCtrlMBean;
+import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Hardy Ferentschik
  */
-public class IndexCtrlMBeanTest extends SearchTestCase {
+public class IndexControlMBeanTest extends SearchTestCase {
 	MBeanServer mbeanServer;
 	ObjectName statisticsBeanObjectName;
 	ObjectName indexBeanObjectName;
@@ -117,7 +117,7 @@ public class IndexCtrlMBeanTest extends SearchTestCase {
 		super.setUp();
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
 		statisticsBeanObjectName = new ObjectName( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME );
-		indexBeanObjectName = new ObjectName( IndexCtrlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		indexBeanObjectName = new ObjectName( IndexControlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
 	}
 
 	protected void tearDown() throws Exception {

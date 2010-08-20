@@ -37,11 +37,11 @@ import org.hibernate.util.ReflectHelper;
 
 
 /**
- * Implementation of the {@code IndexCtrlMBean} JMX attributes and operations.
+ * Implementation of the {@code IndexControlMBean} JMX attributes and operations.
  *
  * @author Hardy Ferentschik
  */
-public class IndexCtrl implements IndexCtrlMBean {
+public class IndexControl implements IndexControlMBean {
 	private static final String HIBERNATE_JNDI_PREFIX = "hibernate.jndi.";
 
 	private final Properties jndiProperties;
@@ -51,7 +51,7 @@ public class IndexCtrl implements IndexCtrlMBean {
 	private int numberOfObjectLoadingThreads = 2;
 	private int numberOfFetchingThreads = 4;
 
-	public IndexCtrl(Properties props) {
+	public IndexControl(Properties props) {
 		this.sessionFactoryJndiName = props.getProperty( "hibernate.session_factory_name" );
 		this.jndiProperties = JNDIHelper.getJndiProperties( props, HIBERNATE_JNDI_PREFIX );
 	}
@@ -127,7 +127,7 @@ public class IndexCtrl implements IndexCtrlMBean {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ReflectHelper.classForName( entity, IndexCtrl.class );
+			clazz = ReflectHelper.classForName( entity, IndexControl.class );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );
