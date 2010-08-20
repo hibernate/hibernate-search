@@ -47,17 +47,17 @@ public interface Statistics {
 	long getSearchQueryExecutionCount();
 
 	/**
-	 * Get the total search time in milliseconds.
+	 * Get the total search time in nanoseconds.
 	 */
 	long getSearchQueryTotalTime();
 
 	/**
-	 * Get the time in milliseconds of the slowest search.
+	 * Get the time in nanoseconds of the slowest search.
 	 */
 	long getSearchQueryExecutionMaxTime();
 
 	/**
-	 * Get the average search time in milliseconds.
+	 * Get the average search time in nanoseconds.
 	 */
 	long getSearchQueryExecutionAvgTime();
 
@@ -67,17 +67,17 @@ public interface Statistics {
 	String getSearchQueryExecutionMaxTimeQueryString();
 
 	/**
-	 * Get the total object loading in milliseconds.
+	 * Get the total object loading in nanoseconds.
 	 */
 	long getObjectLoadingTotalTime();
 
 	/**
-	 * Get the time in milliseconds for the slowest object load.
+	 * Get the time in nanoseconds for the slowest object load.
 	 */
 	long getObjectLoadingExecutionMaxTime();
 
 	/**
-	 * Get the average object loading time in milliseconds.
+	 * Get the average object loading time in nanoseconds.
 	 */
 	long getObjectLoadingExecutionAvgTime();
 

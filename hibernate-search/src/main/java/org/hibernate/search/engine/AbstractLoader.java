@@ -46,11 +46,11 @@ public abstract class AbstractLoader implements Loader {
 	public final Object load(EntityInfo entityInfo) {
 		long startTime = 0;
 		if ( takeTimings ) {
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 		}
 		Object loadedObject = executeLoad( entityInfo );
 		if ( takeTimings ) {
-			statisticsImplementor.objectLoadExecuted( 1, System.currentTimeMillis() - startTime );
+			statisticsImplementor.objectLoadExecuted( 1, System.nanoTime() - startTime );
 		}
 		return loadedObject;
 	}
@@ -60,11 +60,11 @@ public abstract class AbstractLoader implements Loader {
 	public List load(EntityInfo... entityInfos) {
 		long startTime = 0;
 		if ( takeTimings ) {
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 		}
 		List loadedObjects = executeLoad( entityInfos );
 		if ( takeTimings ) {
-			statisticsImplementor.objectLoadExecuted( loadedObjects.size(), System.currentTimeMillis() - startTime );
+			statisticsImplementor.objectLoadExecuted( loadedObjects.size(), System.nanoTime() - startTime );
 		}
 		return loadedObjects;
 	}

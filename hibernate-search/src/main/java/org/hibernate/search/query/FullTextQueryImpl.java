@@ -402,7 +402,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		boolean stats = searchFactoryImplementor.getStatistics().isStatisticsEnabled();
 		long startTime = 0;
 		if ( stats ) {
-			startTime = System.currentTimeMillis();
+			startTime = System.nanoTime();
 		}
 
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
@@ -414,7 +414,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		resultSize = queryHits.totalHits;
 
 		if ( stats ) {
-			searchFactoryImplementor.getStatisticsImplementor().searchExecuted( query.toString(), System.currentTimeMillis() - startTime );
+			searchFactoryImplementor.getStatisticsImplementor().searchExecuted( query.toString(), System.nanoTime() - startTime );
 		}
 
 		return queryHits;
