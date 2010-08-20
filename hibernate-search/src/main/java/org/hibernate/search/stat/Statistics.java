@@ -122,18 +122,6 @@ public interface Statistics {
 	int getNumberOfIndexedEntities(String entity);
 
 	/**
-	 * A list of string representations of the indexing parameters for each directory of the specified entity.
-	 * Defaults are not displayed, but only parameters which are explicitly set via the configuration.
-	 *
-	 * @param entity the fqc of the entity
-	 *
-	 * @return A list of string representations of the indexing parameters for each directory of the specified entity
-	 *
-	 * @throws IllegalArgumentException in case the entity name is not valid
-	 */
-	List<String> getIndexingParameters(String entity);
-
-	/**
 	 * Returns a map of all indexed entities and their document count in the index.
 	 *
 	 * @return a map of all indexed entities and their document count. The map key is the fqc of the entity and

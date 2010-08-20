@@ -24,10 +24,8 @@
 package org.hibernate.search.stat;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -52,6 +50,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.util.ReflectHelper;
 
 /**
+ * A concurrent implementation of the {@code Statistics} interface.
+ *
  * @author Hardy Ferentschik
  */
 public class StatisticsImpl implements Statistics, StatisticsImplementor {
@@ -236,15 +236,6 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 			countPerEntity.put( className, getNumberOfIndexedEntities( className ) );
 		}
 		return countPerEntity;
-	}
-
-	public List<String> getIndexingParameters(String entity) {
-		Class<?> clazz = getEntityClass( entity );
-		List<String> indexingParameters = new ArrayList<String>();
-		for ( DirectoryProvider directoryProvider : searchFactoryImplementor.getDirectoryProviders( clazz ) ) {
-			indexingParameters.add( searchFactoryImplementor.getIndexingParameters( directoryProvider ).toString() );
-		}
-		return indexingParameters;
 	}
 
 	private Class<?> getEntityClass(String entity) {

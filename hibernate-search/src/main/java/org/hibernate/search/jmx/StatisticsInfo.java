@@ -25,7 +25,6 @@
 // $Id:$
 package org.hibernate.search.jmx;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -99,10 +98,6 @@ public class StatisticsInfo implements StatisticsInfoMBean {
 
 	public int getNumberOfIndexedEntities(String entity) {
 		return delegate.getNumberOfIndexedEntities( entity );
-	}
-
-	public List<String> getIndexingParameters(String entity) {
-		return delegate.getIndexingParameters( entity );
 	}
 
 	public Map<String, Integer> indexedEntitiesCount() {
