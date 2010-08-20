@@ -133,6 +133,10 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 		}
 
 		if ( isJMXEnabled() ) {
+			// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
+			if(JMXRegistrar.isNameRegistered(  StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME)) {
+				JMXRegistrar.unRegisterMBean( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME );
+			}
 			JMXRegistrar.registerMBean(
 					new StatisticsInfo( statistics ), StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME
 			);

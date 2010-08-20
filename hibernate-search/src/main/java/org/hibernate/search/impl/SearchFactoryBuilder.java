@@ -156,21 +156,31 @@ public class SearchFactoryBuilder {
 
 		String enableJMX = configurationProperties.getProperty( Environment.JMX_ENABLED );
 		if ( "true".equalsIgnoreCase( enableJMX ) ) {
-			enableIndexCrtlBean( searchFactoryImplementor );
+			enableIndexControlBean( searchFactoryImplementor );
 		}
 		return searchFactoryImplementor;
 	}
 
-	private void enableIndexCrtlBean(SearchFactoryImplementor searchFactoryImplementor) {
+	private void enableIndexControlBean(SearchFactoryImplementor searchFactoryImplementor) {
 		if ( !searchFactoryImplementor.isJMXEnabled() ) {
 			return;
 		}
 
-		// if we have a JNDI bound SessionFactory we can also enable the index control bean
-		if ( StringHelper.isNotEmpty( configurationProperties.getProperty( "hibernate.session_factory_name" ) ) ) {
-			IndexControl indexCtrlBean = new IndexControl( configurationProperties );
-			JMXRegistrar.registerMBean( indexCtrlBean, IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
+		if ( StringHelper.isEmpty( configurationProperties.getProperty( "hibernate.session_factory_name" ) ) ) {
+			log.debug(
+					"In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI"
+			);
+			return;
 		}
+
+		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
+		if ( JMXRegistrar.isNameRegistered( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME ) ) {
+			JMXRegistrar.unRegisterMBean( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		}
+
+		IndexControl indexCtrlBean = new IndexControl( configurationProperties );
+		JMXRegistrar.registerMBean( indexCtrlBean, IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
 	}
 
 	private SearchFactoryImplementor buildIncrementalSearchFactory() {

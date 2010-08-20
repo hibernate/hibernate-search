@@ -258,7 +258,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	 *
 	 * @return the target directory of the build
 	 */
-	public File getTargetDir() {
+	public static File getTargetDir() {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 		// get a URL reference to something we now is part of the classpath (us)
 		URL myUrl = contextClassLoader.getResource( SearchTestCase.class.getName().replace( '.', '/' ) + ".class" );

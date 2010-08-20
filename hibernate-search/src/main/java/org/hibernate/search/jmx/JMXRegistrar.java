@@ -52,7 +52,7 @@ public final class JMXRegistrar {
 	 *
 	 * @return The registered object name
 	 */
-	public static ObjectName registerMBean(Object object, String name) {
+	public static String registerMBean(Object object, String name) {
 		ObjectName objectName = createObjectName( name );
 		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 		try {
@@ -61,24 +61,25 @@ public final class JMXRegistrar {
 		catch ( Exception e ) {
 			throw new SearchException( "Unable to enable MBean for Hibernate Search", e );
 		}
-		return objectName;
+		return objectName.toString();
 	}
 
 	/**
 	 * Unregister the MBean with the specified name.
 	 *
-	 * @param name The object name of the bean to unregister. The {@code name} cannot be {@code null}
+	 * @param name The name of the bean to unregister. The {@code name} cannot be {@code null}
 	 *
 	 * @throws IllegalArgumentException In case the object name is {@code null}
 	 */
-	public static void unRegisterMBean(ObjectName name) {
+	public static void unRegisterMBean(String name) {
 		if ( name == null ) {
 			throw new IllegalArgumentException( "The object name cannot be null" );
 		}
+		ObjectName objectName = createObjectName( name );
 		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		if ( mbs.isRegistered( name ) ) {
+		if ( mbs.isRegistered( objectName ) ) {
 			try {
-				mbs.unregisterMBean( name );
+				mbs.unregisterMBean( objectName );
 			}
 			catch ( Exception e ) {
 				log.warn( "Unable to un-register existing MBean: " + name, e );

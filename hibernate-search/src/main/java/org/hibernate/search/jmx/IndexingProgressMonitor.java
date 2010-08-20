@@ -24,7 +24,6 @@
 package org.hibernate.search.jmx;
 
 import java.util.concurrent.atomic.AtomicLong;
-import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 
@@ -44,7 +43,7 @@ public class IndexingProgressMonitor implements IndexingProgressMonitorMBean, Ma
 	private final AtomicLong totalCounter = new AtomicLong();
 	private final AtomicLong entitiesLoadedCounter = new AtomicLong();
 
-	private final ObjectName registeredName;
+	private final String registeredName;
 
 	public IndexingProgressMonitor() {
 		String name = IndexingProgressMonitorMBean.INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME;
@@ -54,36 +53,36 @@ public class IndexingProgressMonitor implements IndexingProgressMonitorMBean, Ma
 		registeredName = JMXRegistrar.registerMBean( this, name );
 	}
 
-	public void documentsAdded(long increment) {
+	public final void documentsAdded(long increment) {
 		documentsDoneCounter.addAndGet( increment );
 	}
 
-	public void documentsBuilt(int number) {
+	public final void documentsBuilt(int number) {
 		documentsBuiltCounter.addAndGet( number );
 	}
 
-	public void entitiesLoaded(int size) {
+	public final void entitiesLoaded(int size) {
 		entitiesLoadedCounter.addAndGet( size );
 	}
 
-	public void addToTotalCount(long count) {
+	public final void addToTotalCount(long count) {
 		totalCounter.addAndGet( count );
 	}
 
-	public void indexingCompleted() {
+	public final void indexingCompleted() {
 		log.info( "Indexing completed. Reindexed {} entities. Unregistering MBean from server", totalCounter.get() );
 		JMXRegistrar.unRegisterMBean( registeredName );
 	}
 
-	public long getLoadedEntitiesCount() {
+	public final long getLoadedEntitiesCount() {
 		return entitiesLoadedCounter.get();
 	}
 
-	public long getDocumentsAddedCount() {
+	public final long getDocumentsAddedCount() {
 		return documentsDoneCounter.get();
 	}
 
-	public long getNumberOfEntitiesToIndex() {
+	public final long getNumberOfEntitiesToIndex() {
 		return totalCounter.get();
 	}
 }
