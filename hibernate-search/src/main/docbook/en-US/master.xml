@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  $Id$ -->
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
@@ -91,6 +90,9 @@
               xmlns:xi="http://www.w3.org/2001/XInclude" />
 
   <xi:include href="modules/optimize.xml"
+              xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+  <xi:include href="modules/jmx.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
 
   <xi:include href="modules/lucene-native.xml"
