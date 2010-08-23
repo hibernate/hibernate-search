@@ -77,7 +77,9 @@ FullTextSession fullTextSession = Search.getFullTextSession(session);    </progr
   <para>If you use the Hibernate Search query DSL, it will look like
   this:</para>
 
-  <programlisting language="JAVA" role="JAVA"><emphasis role="bold">final QueryBuilder b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Myth.class ).get();
+  <programlisting language="JAVA" role="JAVA"><emphasis role="bold">final QueryBuilder b = fullTextSession.getSearchFactory()
+    .buildQueryBuilder().forEntity( Myth.class ).get();
+
 org.apache.lucene.search.Query luceneQuery =
     b.keyword()
         .onField("history").boostedTo(3)
@@ -95,8 +97,9 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
   <example>
     <title>Creating a Lucene query from scratch via the query parser</title>
 
-    <programlisting language="JAVA" role="JAVA"><emphasis role="bold">org.apache.lucene.queryParser.QueryParser parser = 
-    new QueryParser("title", fullTextSession.getSearchFactory().getAnalyzer(Myth.class) );
+    <programlisting language="JAVA" role="JAVA"><emphasis role="bold">SearchFactory searchFactory = fullTextSession.getSearchFactory();
+org.apache.lucene.queryParser.QueryParser parser = 
+    new QueryParser("title", searchFactory.getAnalyzer(Myth.class) );
 try {
     org.apache.lucene.search.Query luceneQuery = parser.parse( "history:storm^3" );
 }
@@ -104,7 +107,7 @@ catch (ParseException e) {
     //handle parsing failure
 }</emphasis>
 
-org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
+org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery(luceneQuery);
 List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
   </example>
 
@@ -121,20 +124,23 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
   <example>
     <title>Creating a Search query using the JPA API</title>
 
-    <programlisting lang="JAVA" role="JAVA">EntityManager em = entityManagerFactory.createEntityManager();
+    <programlisting language="JAVA" role="JAVA">EntityManager em = entityManagerFactory.createEntityManager();
 
 FullTextEntityManager fullTextEntityManager = 
     org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 
 ...
-final QueryBuilder b = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity( Myth.class ).get();
+final QueryBuilder b = fullTextEntityManager.getSearchFactory()
+    .buildQueryBuilder().forEntity( Myth.class ).get();
+
 org.apache.lucene.search.Query luceneQuery =
     b.keyword()
         .onField("history").boostedTo(3)
         .matching("storm")
         .createQuery();
+<emphasis role="bold">javax.persistence.Query fullTextQuery = 
+    fullTextEntityManager.createFullTextQuery( luceneQuery );</emphasis>
 
-<emphasis role="bold">javax.persistence.Query fullTextQuery = fullTextEntityManager.createFullTextQuery( luceneQuery );</emphasis>
 List result = fullTextQuery.getResultList(); //return a list of managed objects  </programlisting>
   </example>
 
@@ -214,15 +220,16 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       <classname>QueryBuilder</classname> from the
       <classname>SearchFactory</classname>.</para>
 
-      <programlisting lang="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory.buildQueryBuilder().forEntity( Myth.class ).get();</programlisting>
+      <programlisting language="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory
+    .buildQueryBuilder().forEntity( Myth.class ).get();</programlisting>
 
       <para>You can also override the analyzer used for a given field or
       fields. This is rarely needed and should be avoided unless you know what
       you are doing (like many things :)).</para>
 
-      <programlisting lang="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory.buildQueryBuilder()
+      <programlisting language="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory.buildQueryBuilder()
     .forEntity( Myth.class )
-        .overridesForField("history","stem_analyzer_definition");
+        .overridesForField("history","stem_analyzer_definition")
     .get();</programlisting>
 
       <para>From the query builder, you are then ready to... build queries.
@@ -234,7 +241,8 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
 
       <para>Here is how you search for a specific word:</para>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB.keyword().onField("history").matching("storm").createQuery();</programlisting>
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = 
+    mythQB.keyword().onField("history").matching("storm").createQuery();</programlisting>
 
       <para><methodname>keyword()</methodname> means that you are trying to
       find a specific word. <methodname>onField()</methodname> tells in which
@@ -265,7 +273,8 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       <para>Let's see how you can search a property that is not of type
       string.</para>
 
-      <programlisting language="JAVA" role="JAVA">@Entity @Indexed class Myth {
+      <programlisting language="JAVA" role="JAVA">@Entity @Indexed 
+public class Myth {
   @Field(index = Index.UN_TOKENIZED) @DateBridge(resolution = Resolution.YEAR)
   public Date getCreationDate() { return creationDate; }
   public Date setCreationDate(Date creationDate) { this.creationDate = creationDate; }
@@ -275,7 +284,9 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
 }
 
 Date birthdate = ...;
-Query luceneQuery = mythQb.keywork().onField("creationDate").matching(birthdate).createQuery();</programlisting>
+Query luceneQuery = 
+    mythQb.keywork().onField("creationDate").matching(birthdate).createQuery();
+</programlisting>
 
       <note>
         <para>In plain Lucene, you would have had to convert the
@@ -305,8 +316,10 @@ Query luceneQuery = mythQb.keywork().onField("creationDate").matching(birthdate)
         @Parameter(name = "maxGramSize", value = "3") } )
   }
 )
-@Entity @Indexed class Myth {
-  @Field(analyzer=@Analyzer(definition="ngram") @DateBridge(resolution = Resolution.YEAR)
+@Entity @Indexed 
+public class Myth {
+  @Field(analyzer=@Analyzer(definition="ngram") 
+  @DateBridge(resolution = Resolution.YEAR)
   public String getName() { return name; }
   public String setName(Date name) { this.name = name; }
   private String name;
@@ -315,7 +328,8 @@ Query luceneQuery = mythQb.keywork().onField("creationDate").matching(birthdate)
 }
 
 Date birthdate = ...;
-Query luceneQuery = mythQb.keywork().onField("name").matching("Sisiphus").createQuery();</programlisting>
+Query luceneQuery = mythQb.keyword().onField("name").matching("Sisiphus").createQuery();
+</programlisting>
 
       <para>The matching word "Sisiphus" will be lower-cased and then split
       into 3-grams: sis, isi, sip, phu, hus. Each of these n-gram will be part
@@ -333,12 +347,17 @@ Query luceneQuery = mythQb.keywork().onField("name").matching("Sisiphus").create
       add them all in the matching clause.</para>
 
       <programlisting language="JAVA" role="JAVA">//search document with storm or lightning in their history
-Query luceneQuery = mythQB.keyword().onField("history").matching("storm lightning").createQuery();</programlisting>
+Query luceneQuery = 
+    mythQB.keyword().onField("history").matching("storm lightning").createQuery();</programlisting>
 
       <para>To search the same word on multiple fields, use the
       <methodname>onFields</methodname> method.</para>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB.keyword().onFields("history","description","name").matching("storm").createQuery();</programlisting>
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+    .keyword()
+    .onFields("history","description","name")
+    .matching("storm")
+    .createQuery();</programlisting>
 
       <para>Sometimes, one field should be treated differently from another
       field even if searching the same term, you can use the
@@ -439,24 +458,23 @@ Query luceneQuery = mythQB
 
       <itemizedlist>
         <listitem>
-          <para>SHOULD: the query query should contain the matching elements
-          of the subquery </para>
+          <para><literal>SHOULD</literal>: the query query should contain the
+          matching elements of the subquery</para>
         </listitem>
 
         <listitem>
-          <para>MUST: the query must contain the matching elements of the
-          subquery</para>
+          <para><literal>MUST</literal>: the query must contain the matching
+          elements of the subquery</para>
         </listitem>
 
         <listitem>
-          <para>MUST NOT: the query must not contain the matching elements of
-          the subquery</para>
+          <para><literal>MUST NOT</literal>: the query must not contain the
+          matching elements of the subquery</para>
         </listitem>
       </itemizedlist>
 
       <para>The subqueries can be any Lucene query including a boolean query
-      itself. Let's look at a few examples:<programlisting language="JAVA"
-      role="JAVA">//look for popular modern myths that are not urban
+      itself. Let's look at a few examples:<programlisting><!--TODO role JAVA fails here. needs to investigate-->//look for popular modern myths that are not urban
 Date twentiethCentury = ...;
 Query luceneQuery = mythQB
     .bool()
@@ -475,7 +493,9 @@ Query luceneQuery = mythQB
 //look for all myths except religious ones
 Query luceneQuery = mythQB
     .all()
-      .except( monthQb.keyword().onField( "description_stem" ).matching( "religion" ).createQuery() )
+      .except( 
+        monthQb.keyword().onField( "description_stem" ).matching( "religion" ).createQuery() 
+      )
     .createQuery();</programlisting></para>
 
       <para>You can apply some options to query types and fields:</para>
@@ -512,7 +532,7 @@ Query luceneQuery = mythQB
 
       <para>Let's check out an example using some of these options</para>
 
-      <programlisting>Query luceneQuery = mythQB
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .bool()
       .should( mythQB.keyword().onField("description").matching("urban").createQuery() )
       .should( mythQB
@@ -525,7 +545,8 @@ Query luceneQuery = mythQB
         .range()
           .boostedTo(5).withConstantScore()
         .onField("starred").above(4).createQuery() )
-    .createQuery();</programlisting>
+    .createQuery();
+</programlisting>
 
       <para>As you can see, Hibernate Search query DSL is a fairly high and
       easy to read query API. By accepting and producing Lucene queries, you
@@ -548,8 +569,9 @@ Query luceneQuery = mythQB
         <example>
           <title>Wrapping a Lucene query into a Hibernate Query</title>
 
-          <programlisting>FullTextSession fullTextSession = Search.getFullTextSession( session );
-org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );</programlisting>
+          <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession( session );
+org.hibernate.Query fullTextQuery = 
+    fullTextSession.createFullTextQuery( luceneQuery );</programlisting>
         </example>
 
         <para>If not specified otherwise, the query will be executed against
@@ -560,9 +582,13 @@ org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQ
         <example>
           <title>Filtering the search result by entity type</title>
 
-          <programlisting>org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+          <programlisting language="JAVA" role="JAVA">org.hibernate.Query fullTextQuery = 
+    fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+
 // or
-fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
+
+fullTextQuery = 
+    fullTextSession.createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
         </example>
 
         <para>The first example returns only matching
@@ -588,7 +614,8 @@ fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Ac
         <example>
           <title>Defining pagination for a search query</title>
 
-          <programlisting>org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+          <programlisting language="JAVA" role="JAVA">org.hibernate.Query fullTextQuery = 
+    fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
 fullTextQuery.setFirstResult(15); //start from the 15th element
 fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
         </example>
@@ -613,10 +640,12 @@ fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
           <title>Specifying a Lucene <classname>Sort</classname> in order to
           sort the results</title>
 
-          <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
+          <programlisting language="JAVA" role="JAVA">
+org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
 org.apache.lucene.search.Sort sort = new Sort(new SortField("title"));
 <emphasis role="bold">query.setSort(sort);</emphasis>
-List results = query.list();</programlisting>
+List results = query.list();
+</programlisting>
         </example>
 
         <para>One can notice the <classname>FullTextQuery</classname>
@@ -639,7 +668,8 @@ List results = query.list();</programlisting>
           <title>Specifying <classname>FetchMode</classname> on a
           query</title>
 
-          <programlisting>Criteria criteria = s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN );
+          <programlisting language="JAVA" role="JAVA">Criteria criteria = 
+    s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN );
 s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisting>
         </example>
 
@@ -668,7 +698,8 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
           <title>Using projection instead of returning the full domain
           object</title>
 
-          <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+          <programlisting>org.hibernate.search.FullTextQuery query = 
+    s.createFullTextQuery( luceneQuery, Book.class );
 query.<emphasis role="bold">setProjection( "id", "summary", "body", "mainAuthor.name" )</emphasis>;
 List results = query.list();
 Object[] firstResult = (Object[]) results.get(0);
@@ -721,8 +752,12 @@ String authorName = firstResult[3];</programlisting>
         <example>
           <title>Using projection in order to retrieve meta data</title>
 
-          <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
-query.<emphasis role="bold">setProjection( FullTextQuery.SCORE, FullTextQuery.THIS, "mainAuthor.name" )</emphasis>;
+          <programlisting>org.hibernate.search.FullTextQuery query = 
+    s.createFullTextQuery( luceneQuery, Book.class );
+query.<emphasis role="bold">setProjection( 
+    FullTextQuery.SCORE, 
+    FullTextQuery.THIS, 
+    "mainAuthor.name" )</emphasis>;
 List results = query.list();
 Object[] firstResult = (Object[]) results.get(0);
 float score = firstResult[0];
@@ -845,13 +880,17 @@ String authorName = firstResult[2];</programlisting>
       <example>
         <title>Determining the result size of a query</title>
 
-        <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
-assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return the number of matching books without loading a single one
+        <programlisting>org.hibernate.search.FullTextQuery query = 
+    s.createFullTextQuery( luceneQuery, Book.class );
+//return the number of matching books without loading a single one
+assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; 
 
-org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+org.hibernate.search.FullTextQuery query = 
+    s.createFullTextQuery( luceneQuery, Book.class );
 query.setMaxResult(10);
 List results = query.list();
-assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return the total number of matching books regardless of pagination</programlisting>
+//return the total number of matching books regardless of pagination
+assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; </programlisting>
       </example>
 
       <note>
@@ -873,11 +912,15 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; //return 
       <example>
         <title>Using ResultTransformer in conjunction with projections</title>
 
-        <programlisting>org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+        <programlisting>org.hibernate.search.FullTextQuery query = 
+    s.createFullTextQuery( luceneQuery, Book.class );
 query.setProjection( "title", "mainAuthor.name" );
 
 <emphasis role="bold">query.setResultTransformer( 
-    new StaticAliasToBeanResultTransformer( BookView.class, "title", "author" ) 
+    new StaticAliasToBeanResultTransformer( 
+        BookView.class, 
+        "title", 
+        "author" ) 
 );</emphasis>
 List&lt;BookView&gt; results = (List&lt;BookView&gt;) query.list();
 for(BookView view : results) {
@@ -931,7 +974,10 @@ for(BookView view : results) {
         projection</title>
 
         <programlisting>FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )
-        .setProjection( FullTextQuery.DOCUMENT_ID, <emphasis role="bold">FullTextQuery.EXPLANATION</emphasis>, FullTextQuery.THIS );
+        .setProjection( 
+             FullTextQuery.DOCUMENT_ID, 
+             <emphasis role="bold">FullTextQuery.EXPLANATION</emphasis>, 
+             FullTextQuery.THIS );
 @SuppressWarnings("unchecked") List&lt;Object[]&gt; results = ftQuery.list();
 for (Object[] result : results) {
     Explanation e = (Explanation) result[1];
