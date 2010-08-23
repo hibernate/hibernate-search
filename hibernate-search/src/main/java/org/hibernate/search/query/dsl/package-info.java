@@ -23,8 +23,9 @@
  * Boston, MA  02110-1301  USA
  */
 /**
- * This package contains various experimentations. Do not use.
- *
  * Provide a domain specific language to write Lucene queries.
+ * 
+ * While this API is slightly subject to change we highly encourage users to
+ * to go for it as it provides many benefits.
  */
 package org.hibernate.search.query.dsl;

@@ -28,7 +28,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.management.ObjectName;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
@@ -43,7 +42,7 @@ import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
+import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.internals.DirectoryProviderData;

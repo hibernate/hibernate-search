@@ -25,7 +25,7 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.ejb.HibernatePersistence;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
-import org.hibernate.search.query.dsl.v2.QueryBuilder;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTSStandaloneTransactionManagerLookup;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;

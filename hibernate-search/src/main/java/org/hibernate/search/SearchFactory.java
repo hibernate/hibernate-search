@@ -25,7 +25,7 @@ package org.hibernate.search;
 
 import org.apache.lucene.analysis.Analyzer;
 
-import org.hibernate.search.query.dsl.v2.QueryContextBuilder;
+import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.store.DirectoryProvider;
