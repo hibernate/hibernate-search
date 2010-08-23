@@ -42,7 +42,8 @@
     </listitem>
 
     <listitem>
-      <para>Creating a Lucene query</para>
+      <para>Creating a Lucene query either via the Hibernate Search query DSL
+      (recommended) or from scratch</para>
     </listitem>
 
     <listitem>
@@ -70,18 +71,40 @@
 FullTextSession fullTextSession = Search.getFullTextSession(session);    </programlisting>
   </example>
 
-  <para>The actual search facility is built on native Lucene queries which the
-  following example illustrates.</para>
+  <para>You then have two options to build the full-text query: the Hibernate
+  Search query DSL or the native Lucene query.</para>
+
+  <para>If you use the Hibernate Search query DSL, it will look like
+  this:</para>
+
+  <programlisting><emphasis role="bold">final QueryBuilder b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Myth.class ).get();
+org.apache.lucene.search.Query luceneQuery =
+    b.keyword()
+        .onField("history").boostedTo(3)
+        .matching("storm")
+        .createQuery();</emphasis>
+
+org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
+List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
+
+  <para>You can alternatively write your Lucene query by hand either using the
+  query parser or the programmatic API. If you are considering the
+  programmatic API, we highly encourage you to use the Hibernate Search query
+  DSL (or a mix of both).</para>
 
   <example>
-    <title>Creating a Lucene query</title>
+    <title>Creating a Lucene query from scratch via the query parser</title>
 
-    <programlisting>org.apache.lucene.queryParser.QueryParser parser = 
-    new QueryParser("title", new StopAnalyzer() );
+    <programlisting><emphasis role="bold">org.apache.lucene.queryParser.QueryParser parser = 
+    new QueryParser("title", fullTextSession.getSearchFactory().getAnalyzer(Myth.class) );
+try {
+    org.apache.lucene.search.Query luceneQuery = parser.parse( "history:storm^3" );
+}
+catch (ParseException e) {
+    //handle parsing failure
+}</emphasis>
 
-org.apache.lucene.search.Query luceneQuery = parser.parse( "summary:Festina Or brand:Seiko" );
-<emphasis role="bold">org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
-        </emphasis>
+org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
 List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
   </example>
 
@@ -92,8 +115,8 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
   <literal>iterate()</literal> and <literal>scroll()</literal> methods can be
   used.</para>
 
-  <para>In case you are using the Java Persistence APIs of Hibernate (aka EJB
-  3.0 Persistence), the same extensions exist:</para>
+  <para>In case you are using the Java Persistence APIs of Hibernate, the same
+  extensions exist:</para>
 
   <example>
     <title>Creating a Search query using the JPA API</title>
@@ -104,12 +127,14 @@ FullTextEntityManager fullTextEntityManager =
     org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 
 ...
-org.apache.lucene.queryParser.QueryParser parser = 
-    new QueryParser("title", new StopAnalyzer() );
+final QueryBuilder b = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity( Myth.class ).get();
+org.apache.lucene.search.Query luceneQuery =
+    b.keyword()
+        .onField("history").boostedTo(3)
+        .matching("storm")
+        .createQuery();
 
-org.apache.lucene.search.Query luceneQuery = parser.parse( "summary:Festina Or brand:Seiko" );
 <emphasis role="bold">javax.persistence.Query fullTextQuery = fullTextEntityManager.createFullTextQuery( luceneQuery );</emphasis>
-
 List result = fullTextQuery.getResultList(); //return a list of managed objects  </programlisting>
   </example>
 
@@ -128,7 +153,12 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
     manipulation API.</para>
 
     <section>
-      <title>Building a Lucene query</title>
+      <title>Building a Lucene query from scratch</title>
+
+      <para>You have several options: use the query parser (fine for simple
+      queries) or the Lucene programmatic API (for more complex use cases).
+      Particularly if you plan on using the programmatic API, we highly
+      recommend you have a look at the Hibernate Search query DSL. </para>
 
       <para>It is out of the scope of this documentation on how to exactly
       build a Lucene query. Please refer to the online Lucene documentation or
@@ -137,7 +167,116 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
     </section>
 
     <section>
+      <title>Building a Lucene query with Hibernate Search query DSL</title>
+
+      <para>Writing full-text queries with the Lucene programmatic API is
+      quite complex. It's even more complex to understand the code once
+      written. Besides the inherent API complexity, you have to remember to
+      convert your parameters to their string equivalent as well as make sure
+      to apply the correct analyzer to the right field (an ngram analyzer will
+      for example use several ngrams as the tokens for a given word and should
+      be searched as such).</para>
+
+      <para>Hibernate Search query DSL make use of a style of API called a
+      fluent API. This is a fancy name for an API that has a few key
+      characteristics:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>it has meaningful method names making a succession of
+          operations reads almost like English</para>
+        </listitem>
+
+        <listitem>
+          <para>it limits the options offered to what makes sense in a given
+          context (thanks to strong typing and IDE autocompletion).</para>
+        </listitem>
+
+        <listitem>
+          <para>It often uses the chaining method pattern</para>
+        </listitem>
+
+        <listitem>
+          <para>it's easy to use</para>
+        </listitem>
+
+        <listitem>
+          <para>it's even easier to read</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Let's see how to use the API. You first need to create a query
+      builder that is attached to a given indexed entity type. This
+      <classname>QueryBuilder</classname> will know what analyzer to use and
+      what field bridge to apply. You can create several
+      <classname>QueryBuilder</classname>s (one for each entity type involved
+      in the root of your query. You get the
+      <classname>QueryBuilder</classname> from the
+      <classname>SearchFactory</classname>.</para>
+
+      <programlisting>QueryBuilder mythQB = searchFactory.buildQueryBuilder().forEntity( Myth.class ).get();</programlisting>
+
+      <para>You can also override the analyzer used for a given field or
+      fields. This is rarely needed and should be avoided unless you know what
+      you are doing (like many things :)).</para>
+
+      <programlisting>QueryBuilder mythQB = searchFactory.buildQueryBuilder()
+    .forEntity( Myth.class )
+        .overridesForField("history","stem_analyzer_definition");
+    .get();</programlisting>
+
+      <para>From the query builder, you are then ready to... build queries.
+      What's interesting is that we build Lucene queries: you can easily mix
+      and match Lucene's query parser generated <classname>Query</classname>
+      objects or a <classname>Query</classname> object you have assembled with
+      the Lucene programmatic API and use them with the Hibernate Search DSL
+      should the DSL be missing some queries.</para>
+
+      <para>Here is how you search for a specific word:</para>
+
+      <programlisting>Query luceneQuery = mythQB.keyword().onField("history").matching("storm").createQuery();</programlisting>
+
+      <para><methodname>keyword()</methodname> means that you are trying to
+      find a specific word. <methodname>onField()</methodname> tells in which
+      lucene field to look. <methodname>matching()</methodname> tells what to
+      look for. And finally <methodname>createQuery()</methodname> does create
+      the Lucene query object. A lot is going on under this line of code.
+      First the value storm is passed through the <literal>history</literal>
+      <classname>FieldBridge</classname>: it does not matter here but you will
+      see that it's quite handy when dealing with numbers or dates. Second the
+      field bridge value is then passed to the analyzer used to index
+      <literal>history</literal>.</para>
+
+      <para>fluent api contextual autocompletion</para>
+
+      <para>analyzer</para>
+
+      <para>query several words</para>
+
+      <para>ignore analyzer</para>
+
+      <para>field bridge (ignore)</para>
+
+      <para>fuzzy wildcard</para>
+
+      <para>range query (form to above below excludeLimit</para>
+
+      <para>phrase query</para>
+
+      <para>boolean queries (must, should must not, all, except)</para>
+
+      <para>multiple fields</para>
+
+      <para>boosted</para>
+
+      <para>list of options</para>
+    </section>
+
+    <section>
       <title>Building a Hibernate Search query</title>
+
+      <para>Let's now see how to build the Hibernate Search query from the
+      Lucene one.</para>
 
       <section>
         <title>Generality</title>
