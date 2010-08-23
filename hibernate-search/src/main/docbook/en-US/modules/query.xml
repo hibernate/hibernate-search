@@ -66,7 +66,7 @@
   <example>
     <title>Creating a FullTextSession</title>
 
-    <programlisting>Session session = sessionFactory.openSession();
+    <programlisting language="JAVA" role="JAVA">Session session = sessionFactory.openSession();
 ...
 FullTextSession fullTextSession = Search.getFullTextSession(session);    </programlisting>
   </example>
@@ -77,7 +77,7 @@ FullTextSession fullTextSession = Search.getFullTextSession(session);    </progr
   <para>If you use the Hibernate Search query DSL, it will look like
   this:</para>
 
-  <programlisting><emphasis role="bold">final QueryBuilder b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Myth.class ).get();
+  <programlisting language="JAVA" role="JAVA"><emphasis role="bold">final QueryBuilder b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Myth.class ).get();
 org.apache.lucene.search.Query luceneQuery =
     b.keyword()
         .onField("history").boostedTo(3)
@@ -95,7 +95,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
   <example>
     <title>Creating a Lucene query from scratch via the query parser</title>
 
-    <programlisting><emphasis role="bold">org.apache.lucene.queryParser.QueryParser parser = 
+    <programlisting language="JAVA" role="JAVA"><emphasis role="bold">org.apache.lucene.queryParser.QueryParser parser = 
     new QueryParser("title", fullTextSession.getSearchFactory().getAnalyzer(Myth.class) );
 try {
     org.apache.lucene.search.Query luceneQuery = parser.parse( "history:storm^3" );
@@ -121,7 +121,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
   <example>
     <title>Creating a Search query using the JPA API</title>
 
-    <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
+    <programlisting lang="JAVA" role="JAVA">EntityManager em = entityManagerFactory.createEntityManager();
 
 FullTextEntityManager fullTextEntityManager = 
     org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
@@ -158,7 +158,7 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       <para>You have several options: use the query parser (fine for simple
       queries) or the Lucene programmatic API (for more complex use cases).
       Particularly if you plan on using the programmatic API, we highly
-      recommend you have a look at the Hibernate Search query DSL. </para>
+      recommend you have a look at the Hibernate Search query DSL.</para>
 
       <para>It is out of the scope of this documentation on how to exactly
       build a Lucene query. Please refer to the online Lucene documentation or
@@ -173,7 +173,7 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       quite complex. It's even more complex to understand the code once
       written. Besides the inherent API complexity, you have to remember to
       convert your parameters to their string equivalent as well as make sure
-      to apply the correct analyzer to the right field (an ngram analyzer will
+      to apply the correct analyzer to the right field (a ngram analyzer will
       for example use several ngrams as the tokens for a given word and should
       be searched as such).</para>
 
@@ -214,13 +214,13 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       <classname>QueryBuilder</classname> from the
       <classname>SearchFactory</classname>.</para>
 
-      <programlisting>QueryBuilder mythQB = searchFactory.buildQueryBuilder().forEntity( Myth.class ).get();</programlisting>
+      <programlisting lang="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory.buildQueryBuilder().forEntity( Myth.class ).get();</programlisting>
 
       <para>You can also override the analyzer used for a given field or
       fields. This is rarely needed and should be avoided unless you know what
       you are doing (like many things :)).</para>
 
-      <programlisting>QueryBuilder mythQB = searchFactory.buildQueryBuilder()
+      <programlisting lang="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory.buildQueryBuilder()
     .forEntity( Myth.class )
         .overridesForField("history","stem_analyzer_definition");
     .get();</programlisting>
@@ -234,42 +234,303 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
 
       <para>Here is how you search for a specific word:</para>
 
-      <programlisting>Query luceneQuery = mythQB.keyword().onField("history").matching("storm").createQuery();</programlisting>
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB.keyword().onField("history").matching("storm").createQuery();</programlisting>
 
       <para><methodname>keyword()</methodname> means that you are trying to
       find a specific word. <methodname>onField()</methodname> tells in which
-      lucene field to look. <methodname>matching()</methodname> tells what to
+      Lucene field to look. <methodname>matching()</methodname> tells what to
       look for. And finally <methodname>createQuery()</methodname> does create
-      the Lucene query object. A lot is going on under this line of code.
-      First the value storm is passed through the <literal>history</literal>
-      <classname>FieldBridge</classname>: it does not matter here but you will
-      see that it's quite handy when dealing with numbers or dates. Second the
-      field bridge value is then passed to the analyzer used to index
-      <literal>history</literal>.</para>
+      the Lucene query object. A lot is going on with this line of
+      code.</para>
 
-      <para>fluent api contextual autocompletion</para>
+      <itemizedlist>
+        <listitem>
+          <para>The value storm is passed through the
+          <literal>history</literal> <classname>FieldBridge</classname>: it
+          does not matter here but you will see that it's quite handy when
+          dealing with numbers or dates.</para>
+        </listitem>
 
-      <para>analyzer</para>
+        <listitem>
+          <para>The field bridge value is then passed to the analyzer used to
+          index <literal>history</literal>. This ensures that the query uses
+          the same term transformation than the indexing (lower case, n-gram,
+          stemming and so on). If the analyzing process generates several
+          terms for a given word, a boolean query is used with the
+          <literal>SHOULD</literal> logic (roughly an <literal>OR</literal>
+          logic).</para>
+        </listitem>
+      </itemizedlist>
 
-      <para>query several words</para>
+      <para>Let's see how you can search a property that is not of type
+      string.</para>
 
-      <para>ignore analyzer</para>
+      <programlisting language="JAVA" role="JAVA">@Entity @Indexed class Myth {
+  @Field(index = Index.UN_TOKENIZED) @DateBridge(resolution = Resolution.YEAR)
+  public Date getCreationDate() { return creationDate; }
+  public Date setCreationDate(Date creationDate) { this.creationDate = creationDate; }
+  private Date creationDate;
+  
+  [...]
+}
 
-      <para>field bridge (ignore)</para>
+Date birthdate = ...;
+Query luceneQuery = mythQb.keywork().onField("creationDate").matching(birthdate).createQuery();</programlisting>
 
-      <para>fuzzy wildcard</para>
+      <note>
+        <para>In plain Lucene, you would have had to convert the
+        <classname>Date</classname> object to its string representation (in
+        this case the year).</para>
+      </note>
 
-      <para>range query (form to above below excludeLimit</para>
+      <para>This works for any object, not just <classname>Date</classname>,
+      provided that the <classname>FieldBridge</classname> has an
+      <methodname>objectToString</methodname> method (all built-in
+      <classname>FieldBridge</classname> implementations do).</para>
 
-      <para>phrase query</para>
+      <para>Let's now have a look at how to search a field that uses ngram
+      analyzers. ngram analyzers do index the succession of ngrams of your
+      words which helps to recover from user typos. For example the 3-grams of
+      the word hibernate are hib, ibe, ber, rna, nat, ate.</para>
 
-      <para>boolean queries (must, should must not, all, except)</para>
+      <programlisting language="JAVA" role="JAVA">@AnalyzerDef(name = "ngram",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class ),
+  filters = {
+    @TokenFilterDef(factory = StandardFilterFactory.class),
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = StopFilterFactory.class),
+    @TokenFilterDef(factory = NGramFilterFactory.class,
+      params = { 
+        @Parameter(name = "minGramSize", value = "3"),
+        @Parameter(name = "maxGramSize", value = "3") } )
+  }
+)
+@Entity @Indexed class Myth {
+  @Field(analyzer=@Analyzer(definition="ngram") @DateBridge(resolution = Resolution.YEAR)
+  public String getName() { return name; }
+  public String setName(Date name) { this.name = name; }
+  private String name;
+  
+  [...]
+}
 
-      <para>multiple fields</para>
+Date birthdate = ...;
+Query luceneQuery = mythQb.keywork().onField("name").matching("Sisiphus").createQuery();</programlisting>
 
-      <para>boosted</para>
+      <para>The matching word "Sisiphus" will be lower-cased and then split
+      into 3-grams: sis, isi, sip, phu, hus. Each of these n-gram will be part
+      of the query. We will then be able to find the Sysiphus myth (with a
+      <literal>y</literal>). All that is transparently done for you.</para>
 
-      <para>list of options</para>
+      <note>
+        <para>If for some reason you do not want a specific field to use the
+        field bridge or the analyzer you can call the
+        <methodname>ignoreAnalyzer()</methodname> or
+        <methodname>ignoreFieldBridge()</methodname> functions</para>
+      </note>
+
+      <para>To search for multiple possible words in the same field, simply
+      add them all in the matching clause.</para>
+
+      <programlisting language="JAVA" role="JAVA">//search document with storm or lightning in their history
+Query luceneQuery = mythQB.keyword().onField("history").matching("storm lightning").createQuery();</programlisting>
+
+      <para>To search the same word on multiple fields, use the
+      <methodname>onFields</methodname> method.</para>
+
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB.keyword().onFields("history","description","name").matching("storm").createQuery();</programlisting>
+
+      <para>Sometimes, one field should be treated differently from another
+      field even if searching the same term, you can use the
+      <methodname>andField()</methodname> method for that.</para>
+
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB.keyword()
+    .onField("history")
+    .andField("name")
+      .boostedTo(5)
+    .andField("description")
+    .matching("storm")
+    .createQuery();</programlisting>
+
+      <para>In the previous example, only field name is boosted to 5.</para>
+
+      <para>To do a fuzzy query (using the Levenshtein distance), start as a
+      <literal>keyword</literal> query and add the fuzzy flag.</para>
+
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+    .keyword()
+      .fuzzy()
+        .withThreshold( .8f )
+        .withPrefixLength( 1 )
+    .onField("history")
+    .matching("starm")
+    .createQuery();</programlisting>
+
+      <para><literal>threshold</literal> is the limit above which two terms
+      are considering matching. It's a decimal between 0 and 1 and defaults to
+      0.5. <literal>prefixLength</literal> is the length of the prefix ignored
+      by the "fuzzyness": while it defaults to 0, a non zero value is
+      recommended for indexes containing a huge amount of distinct
+      terms.</para>
+
+      <para>You can also do wildcard queries (queries where some of parts of
+      the word are unknown. <literal>?</literal> represents a single character
+      and <literal>*</literal> represents any character sequence. Note that
+      for performance purposes, it is recommended that the query does not
+      start with either <literal>?</literal> or <literal>*</literal>.</para>
+
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+    .keyword()
+      .wildcard()
+    .onField("history")
+    .matching("sto*")
+    .createQuery();</programlisting>
+
+      <note>
+        <para>Wildcard queries do not apply the analyzer on the matching
+        terms. Otherwise the risk of <literal>*</literal> or
+        <literal>?</literal> being mangled is too high.</para>
+      </note>
+
+      <para>So far we have been looking for words or sets of words, you can
+      also search exact or approximate sentences. Use the
+      <methodname>phrase()</methodname> query.</para>
+
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+    .phrase()
+    .onField("history")
+    .matching("Thou shalt not kill")
+    .createQuery();</programlisting>
+
+      <para>You can search approximate sentences by adding a slop factor. The
+      slop factor represents the number of other words permitted in the
+      sentence: this works like a within or near operator</para>
+
+      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+    .phrase()
+      .withSlop(3)
+    .onField("history")
+    .matching("Thou kill")
+    .createQuery();</programlisting>
+
+      <para>We are done with queries related to a given word. You can also do
+      range queries (on numbers, dates, strings etc). You can look for a value
+      in between boundaries (included or not) and for a value below or above a
+      given boundary (included or not).</para>
+
+      <programlisting language="JAVA" role="JAVA">//look for 0 &lt;= starred &lt; 3
+Query luceneQuery = mythQB
+    .range()
+    .onField("starred")
+    .from(0).to(3).excludeLimit()
+    .createQuery();
+
+//look for myths strictly BC
+Date beforeChrist = ...;
+Query luceneQuery = mythQB
+    .range()
+    .onField("starred")
+    .below(beforeChrist).excludeLimit()
+    .createQuery();</programlisting>
+
+      <para>Finally, you can aggregate queries together to create more complex
+      queries. These aggregation operators are known as boolean queries where
+      the operators are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>SHOULD: the query query should contain the matching elements
+          of the subquery </para>
+        </listitem>
+
+        <listitem>
+          <para>MUST: the query must contain the matching elements of the
+          subquery</para>
+        </listitem>
+
+        <listitem>
+          <para>MUST NOT: the query must not contain the matching elements of
+          the subquery</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>The subqueries can be any Lucene query including a boolean query
+      itself. Let's look at a few examples:<programlisting language="JAVA"
+      role="JAVA">//look for popular modern myths that are not urban
+Date twentiethCentury = ...;
+Query luceneQuery = mythQB
+    .bool()
+      .must( mythQB.keyword().onField("description").matching("urban").createQuery() )
+        .not()
+      .must( mythQB.range().onField("starred").above(4).createQuery() )
+    .createQuery();
+
+//look for myths that are preferably urban
+Query luceneQuery = mythQB
+    .bool()
+      .should( mythQB.keyword().onField("description").matching("urban").createQuery() )
+      .must( mythQB.range().onField("starred").above(4).createQuery() )
+    .createQuery();
+
+//look for all myths except religious ones
+Query luceneQuery = mythQB
+    .all()
+      .except( monthQb.keyword().onField( "description_stem" ).matching( "religion" ).createQuery() )
+    .createQuery();</programlisting></para>
+
+      <para>You can apply some options to query types and fields:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><methodname>boostedTo</methodname> (on query type and on
+          field): boost the whole query or the specific field to a given
+          factor</para>
+        </listitem>
+
+        <listitem>
+          <para><methodname>withConstantScore</methodname> (on query): all
+          results matching the query have a constant score equals to the
+          boost</para>
+        </listitem>
+
+        <listitem>
+          <para><methodname>filteredBy(Filter) </methodname>(on query): filter
+          query results using the <classname>Filter</classname>
+          instance</para>
+        </listitem>
+
+        <listitem>
+          <para><methodname>ignoreAnalyzer</methodname> (on field): ignore the
+          analyzer when processing this field</para>
+        </listitem>
+
+        <listitem>
+          <para><methodname>ignoreFieldBridge</methodname> (on field): ignore
+          field bridge when processing this field</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Let's check out an example using some of these options</para>
+
+      <programlisting>Query luceneQuery = mythQB
+    .bool()
+      .should( mythQB.keyword().onField("description").matching("urban").createQuery() )
+      .should( mythQB
+        .keyword()
+        .onField("name")
+          .boostedTo(3)
+          .ignoreAnalyzer()
+        .matching("urban").createQuery() )
+      .must( mythQB
+        .range()
+          .boostedTo(5).withConstantScore()
+        .onField("starred").above(4).createQuery() )
+    .createQuery();</programlisting>
+
+      <para>As you can see, Hibernate Search query DSL is a fairly high and
+      easy to read query API. By accepting and producing Lucene queries, you
+      can easily incorporate query types not (yet) supported by the DSL.
+      Please give us feedback!</para>
     </section>
 
     <section>
