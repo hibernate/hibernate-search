@@ -760,6 +760,8 @@ hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
   <section id="search-configuration-event" revision="2">
     <title>Enabling Hibernate Search and automatic indexing</title>
 
+    <para>Let's discover how to enable Hibernate Search in your system.</para>
+
     <section>
       <title>Enabling Hibernate Search</title>
 
