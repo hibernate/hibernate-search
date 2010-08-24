@@ -32,7 +32,7 @@ import org.apache.lucene.search.Filter;
 import org.slf4j.Logger;
 
 import org.hibernate.search.util.LoggerFactory;
-import org.hibernate.util.SoftLimitMRUCache;
+import org.hibernate.search.util.SoftLimitMRUCache;
 
 /**
  * A slightly different version of Lucene's original <code>CachingWrapperFilter</code> which
@@ -58,6 +58,12 @@ public class CachingWrapperFilter extends Filter {
 	private final Filter filter;
 
 	/**
+	 * Under memory pressure the JVM will release all Soft references,
+	 * so pushing it too high will invalidate all eventually useful other caches.
+	 */
+	private static final int HARD_TO_SOFT_RATIO = 15;
+
+	/**
 	 * @param filter Filter to cache results of
 	 */
 	public CachingWrapperFilter(Filter filter) {
@@ -69,8 +75,9 @@ public class CachingWrapperFilter extends Filter {
 	 */
 	public CachingWrapperFilter(Filter filter, int size) {
 		this.filter = filter;
-		log.debug( "Initialising SoftLimitMRUCache with hard ref size of {}", size );
-		this.cache = new SoftLimitMRUCache( size );
+		final int softRefSize = size * HARD_TO_SOFT_RATIO;
+		log.debug( "Initialising SoftLimitMRUCache with hard ref size of {} and a soft ref of {}", size, softRefSize );
+		this.cache = new SoftLimitMRUCache( size, softRefSize );
 	}	
 
 	@Override
