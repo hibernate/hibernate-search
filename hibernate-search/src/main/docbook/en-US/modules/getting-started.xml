@@ -25,7 +25,7 @@
   -->
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY version "3.3.0.Alpha1">
+<!ENTITY version "3.3.0.Beta1">
 ]>
 <chapter id="getting-started">
   <title>Getting started</title>
@@ -63,7 +63,7 @@
           <row>
             <entry>Hibernate Core</entry>
 
-            <entry>This instructions have been tested against Hibernate 3.5.
+            <entry>This instructions have been tested against Hibernate 3.6.
             You will need <literal>hibernate-core.jar</literal> and its
             transitive dependencies from the <literal>lib</literal> directory
             of the distribution. Refer to <literal>README.txt</literal> in the
@@ -82,7 +82,7 @@
             has its own set of annotations (<emphasis>@Indexed, @DocumentId,
             @Field,...</emphasis>) for which there exists so far no
             alternative configuration. The tutorial is tested against version
-            3.5 of Hibernate Annotations (part of the Hibernate Core
+            3.6 of Hibernate Annotations (part of the Hibernate Core
             distribution).</entry>
           </row>
         </tbody>

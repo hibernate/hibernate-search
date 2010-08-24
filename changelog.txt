@@ -1,6 +1,31 @@
 Hibernate Search Changelog
 ==========================
 
+3.3.0.Beta1 (25-08-2010)
+------------------------
+
+** Bug
+    * [HSEARCH-585] - ClassBridgeAndProjectionTest and NestedContainedInTest hang when run against PostgreSQL due to missing transactions
+
+
+** Improvement
+    * [HSEARCH-580] - Copy SoftLimitMRUCache into Hibernate Search codebase to no longer depend on Hibernate Core internals
+    * [HSEARCH-581] - No longer use Hibernate Core's Helper classes: use Commons Annotations Helpers instead
+    * [HSEARCH-582] - Move Query DSL package to org.hibernate.search.query.dsl
+    * [HSEARCH-583] - Add enforcer plugin to Search master pom to enforce JDK 6
+
+** New Feature
+    * [HSEARCH-135] - Create a RAMDirectoryProvider from an existing Lucene FSDirectory
+    * [HSEARCH-278] - Create a Search Statistic JMX Bean
+
+
+** Task
+    * [HSEARCH-562] - Convert or add JBossTS usage to the integrationtest module
+    * [HSEARCH-563] - Document the DSL query language
+    * [HSEARCH-564] - Document the API changes of the semi public APIs
+    * [HSEARCH-584] - Upgrade to Hibernate Core 3.6.0.Beta3
+
+    
 3.3.0.Alpha1 (26-07-2010)
 -------------------------
 
