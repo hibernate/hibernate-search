@@ -58,6 +58,7 @@ import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
+import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.impl.AbstractQueryImpl;
@@ -86,7 +87,6 @@ import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
-import org.hibernate.util.ReflectHelper;
 
 import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;

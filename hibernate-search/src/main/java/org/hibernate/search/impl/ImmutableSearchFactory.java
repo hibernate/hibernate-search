@@ -37,6 +37,7 @@ import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
@@ -72,7 +73,6 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
-import org.hibernate.util.StringHelper;
 
 /**
  * This implementation is never directly exposed to the user, it is always wrapped into a {@link org.hibernate.search.impl.MutableSearchFactory}

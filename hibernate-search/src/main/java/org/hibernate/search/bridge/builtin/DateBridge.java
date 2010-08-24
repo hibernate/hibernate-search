@@ -30,11 +30,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.lucene.document.DateTools;
+
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.util.StringHelper;
 
 /**
  * Bridge a java.util.Date to a String, truncated to the resolution

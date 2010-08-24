@@ -26,7 +26,7 @@ package org.hibernate.search.bridge.builtin;
 
 import java.math.BigInteger;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 
 /**
  * Map a <code>BigInteger</code> element.

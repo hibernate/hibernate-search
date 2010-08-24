@@ -24,10 +24,10 @@
  */
 package org.hibernate.search.bridge.builtin;
 
+import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.SearchException;
-import org.hibernate.util.StringHelper;
-import org.hibernate.util.ReflectHelper;
 
 /**
  * Convert a Class back and forth

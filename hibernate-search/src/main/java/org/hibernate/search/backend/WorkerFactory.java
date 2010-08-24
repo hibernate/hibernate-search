@@ -27,12 +27,12 @@ package org.hibernate.search.backend;
 import java.util.Map;
 import java.util.Properties;
 
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.impl.TransactionalWorker;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.util.PluginLoader;
-import org.hibernate.util.StringHelper;
 
 /**
  * @author Emmanuel Bernard

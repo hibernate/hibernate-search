@@ -39,7 +39,7 @@ import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.slf4j.Logger;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;

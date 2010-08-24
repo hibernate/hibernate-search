@@ -27,7 +27,7 @@ package org.hibernate.search.bridge.builtin;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 

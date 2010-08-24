@@ -30,10 +30,10 @@ import javax.naming.InitialContext;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.util.JNDIHelper;
-import org.hibernate.util.ReflectHelper;
 
 
 /**

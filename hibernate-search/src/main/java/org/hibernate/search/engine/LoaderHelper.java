@@ -27,7 +27,8 @@ package org.hibernate.search.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.annotations.common.util.ReflectHelper;
+
 
 /**
  * @author Emmanuel Bernard

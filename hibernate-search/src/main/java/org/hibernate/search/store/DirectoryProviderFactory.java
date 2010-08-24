@@ -31,6 +31,7 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.SearchException;
@@ -43,7 +44,6 @@ import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.PluginLoader;
-import org.hibernate.util.StringHelper;
 
 /**
  * Create a Lucene directory provider which can be configured

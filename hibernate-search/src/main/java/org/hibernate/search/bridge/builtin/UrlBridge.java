@@ -27,9 +27,9 @@ package org.hibernate.search.bridge.builtin;
 import java.net.URL;
 import java.net.MalformedURLException;
 
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.SearchException;
-import org.hibernate.util.StringHelper;
 
 /**
  * Bridge for <code>URL</code>s.

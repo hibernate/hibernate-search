@@ -24,11 +24,11 @@
  */
 package org.hibernate.search.bridge.builtin;
 
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.util.StringHelper;
 import org.apache.lucene.document.DateTools;
 
 import java.util.Date;

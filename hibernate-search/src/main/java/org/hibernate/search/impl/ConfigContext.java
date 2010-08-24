@@ -34,6 +34,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -41,8 +43,6 @@ import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.util.DelegateNamedAnalyzer;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
-import org.hibernate.util.ReflectHelper;
-import org.hibernate.util.StringHelper;
 import org.slf4j.Logger;
 
 /**

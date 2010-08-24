@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -60,7 +61,6 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
-import org.hibernate.util.StringHelper;
 
 /**
  * Batch work until {@link #performWorks} is called.

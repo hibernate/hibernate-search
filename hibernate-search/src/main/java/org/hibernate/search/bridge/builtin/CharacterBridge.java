@@ -24,7 +24,7 @@
  */
 package org.hibernate.search.bridge.builtin;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 
 /**
  * Map a character element

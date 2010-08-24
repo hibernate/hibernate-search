@@ -46,6 +46,7 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -71,7 +72,6 @@ import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PassThroughAnalyzer;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.ScopedAnalyzer;
-import org.hibernate.util.StringHelper;
 
 /**
  * Set up and provide a manager for classes which are indexed via <code>@IndexedEmbedded</code>, but themselves do not

@@ -35,7 +35,7 @@ import java.util.Collections;
 import org.apache.solr.common.ResourceLoader;
 import org.apache.solr.util.plugin.ResourceLoaderAware;
 
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
 
 /**

@@ -24,8 +24,8 @@
  */
 package org.hibernate.search.util;
 
+import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
-import org.hibernate.util.ReflectHelper;
 
 /**
  * Utility class to load instances of other classes by using a fully qualified name,

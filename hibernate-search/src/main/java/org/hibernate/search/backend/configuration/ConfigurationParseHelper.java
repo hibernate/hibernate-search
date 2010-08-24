@@ -26,7 +26,7 @@ package org.hibernate.search.backend.configuration;
 
 import java.util.Properties;
 
-import org.hibernate.util.StringHelper;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 
 /**
