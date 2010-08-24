@@ -41,6 +41,10 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Emmanuel Bernard
  */
 public interface WorkerBuildContext extends BuildContext {
+	/**
+	 * Register the backend queue processor factory. Should only be called by the Worker implementation.
+	 * TODO should we move it to a different interface
+	 */
 	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 
 	OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider);
