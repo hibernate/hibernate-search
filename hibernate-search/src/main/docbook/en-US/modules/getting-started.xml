@@ -108,7 +108,7 @@
       <title>Adding the JBoss maven repository to
       <filename>settings.xml</filename></title>
 
-      <programlisting>&lt;settings&gt;
+      <programlisting language="XML" role="XML">&lt;settings&gt;
   ...
   &lt;profiles&gt;
     ...
@@ -118,7 +118,7 @@
         &lt;repository&gt;
           &lt;id&gt;jboss-public-repository-group&lt;/id&gt;
           &lt;name&gt;JBoss Public Maven Repository Group&lt;/name&gt;
-          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public/&lt;/url&gt;
+          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public-jboss/&lt;/url&gt;
           &lt;layout&gt;default&lt;/layout&gt;
           &lt;releases&gt;
             &lt;enabled&gt;true&lt;/enabled&gt;
@@ -134,7 +134,7 @@
         &lt;pluginRepository&gt;
           &lt;id&gt;jboss-public-repository-group&lt;/id&gt;
           &lt;name&gt;JBoss Public Maven Repository Group&lt;/name&gt;
-          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public/&lt;/url&gt;
+          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public-jboss/&lt;/url&gt;
           &lt;layout&gt;default&lt;/layout&gt;
           &lt;releases&gt;
             &lt;enabled&gt;true&lt;/enabled&gt;
@@ -154,8 +154,7 @@
     &lt;activeProfile&gt;jboss-public-repository&lt;/activeProfile&gt;
   &lt;/activeProfiles&gt;
   ...
-&lt;/settings&gt;
-    </programlisting>
+&lt;/settings&gt;</programlisting>
     </example>
 
     <para>Then add the following dependencies to your pom.xml:</para>
@@ -171,7 +170,7 @@
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
-   &lt;version&gt;3.5.0-Final&lt;/version&gt;
+   &lt;version&gt;3.6.0-Beta3&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
     </example>
 
@@ -450,13 +449,19 @@ fullTextEntityManager.createIndexer().startAndWait();</programlisting>
     <example>
       <title>Using Hibernate Session to create and execute a search</title>
 
-      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 
 // create native Lucene query
-String[] fields = new String[]{"title", "subtitle", "authors.name", "publicationDate"};
-MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-org.apache.lucene.search.Query query = parser.parse( "Java rocks!" );
+QueryBuilder qb = fullTextSession.getSearchFactory()
+    .buildQueryBuilder().forEntity( Book.class ).get();
+org.apache.lucene.search.Query query = qb
+  .keyword()
+  .onFields("title", "subtitle", "authors.name", "publicationDate")
+  .matching("Java rocks!");
+  .createQuery();
+//alternatively you can wa\rite the Lucene query using the Lucene query parser
+//or their programmatic API. The Hibernate Search DSL is recommended though
 
 // wrap Lucene query in a org.hibernate.Query
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery(query, Book.class);
@@ -471,15 +476,21 @@ session.close();  </programlisting>
     <example>
       <title>Using JPA to create and execute a search</title>
 
-      <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
+      <programlisting language="JAVA" role="JAVA">EntityManager em = entityManagerFactory.createEntityManager();
 FullTextEntityManager fullTextEntityManager = 
     org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 em.getTransaction().begin();
 
 // create native Lucene query
-String[] fields = new String[]{"title", "subtitle", "authors.name", "publicationDate"};
-MultiFieldQueryParser parser = new MultiFieldQueryParser(fields, new StandardAnalyzer());
-org.apache.lucene.search.Query query = parser.parse( "Java rocks!" );
+QueryBuilder qb = fullTextSession.getSearchFactory()
+    .buildQueryBuilder().forEntity( Book.class ).get();
+org.apache.lucene.search.Query query = qb
+  .keyword()
+  .onFields("title", "subtitle", "authors.name", "publicationDate")
+  .matching("Java rocks!");
+  .createQuery();
+//alternatively you can wa\rite the Lucene query using the Lucene query parser
+//or their programmatic API. The Hibernate Search DSL is recommended though
 
 // wrap Lucene query in a javax.persistence.Query
 javax.persistence.Query persistenceQuery = fullTextEntityManager.createFullTextQuery(query, Book.class);
