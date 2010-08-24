@@ -693,9 +693,10 @@ public class MyEntity {
           </listitem>
 
           <listitem>
-              <para>a list of char filters: each char filter is responsible to
-              pre-process input characters before the tokenization. Char filters can add,
-              change or remove characters; one common usage is for characters normalization</para>
+            <para>a list of char filters: each char filter is responsible to
+            pre-process input characters before the tokenization. Char filters
+            can add, change or remove characters; one common usage is for
+            characters normalization</para>
           </listitem>
 
           <listitem>
@@ -710,20 +711,20 @@ public class MyEntity {
           </listitem>
         </itemizedlist>
 
-        <para>This separation of tasks - a list of char filters, and a tokenizer followed by a list of
-        filters - allows for easy reuse of each individual component and let
-        you build your customized analyzer in a very flexible way (just like
-        Lego). Generally speaking the <classname>char filters</classname> do some
-        pre-processing in the character input, then the <classname>Tokenizer</classname> starts
-        the tokenizing process by turning the character input into tokens which
+        <para>This separation of tasks - a list of char filters, and a
+        tokenizer followed by a list of filters - allows for easy reuse of
+        each individual component and let you build your customized analyzer
+        in a very flexible way (just like Lego). Generally speaking the
+        <classname>char filters</classname> do some pre-processing in the
+        character input, then the <classname>Tokenizer</classname> starts the
+        tokenizing process by turning the character input into tokens which
         are then further processed by the <classname>TokenFilter</classname>s.
         Hibernate Search supports this infrastructure by utilizing the Solr
         analyzer framework. Make sure to add<filename> solr-core.jar and
         </filename><filename>solr-solrj.jar</filename> to your classpath to
-        use analyzer definitions. In case you also want to use the
-        snowball stemmer also include the
-        <filename>lucene-snowball.jar.</filename> Other Solr analyzers might
-        depend on more libraries. For example, the
+        use analyzer definitions. In case you also want to use the snowball
+        stemmer also include the <filename>lucene-snowball.jar.</filename>
+        Other Solr analyzers might depend on more libraries. For example, the
         <classname>PhoneticFilterFactory</classname> depends on <ulink
         url="http://commons.apache.org/codec">commons-codec</ulink>. Your
         distribution of Hibernate Search provides these dependencies in its
@@ -754,21 +755,20 @@ public class Team {
         </example>
 
         <para>A char filter is defined by its factory which is responsible for
-        building the char filter and using the optional list of parameters.
-        In our example, a mapping char filter is used, and will replace
+        building the char filter and using the optional list of parameters. In
+        our example, a mapping char filter is used, and will replace
         characters in the input based on the rules specified in the mapping
-        file. A tokenizer is also defined by its factory.
-        This example use the standard tokenizer. A filter is defined by its factory
-        which is responsible for creating the filter instance using the
-        optional parameters. In our example, the StopFilter filter is built
-        reading the dedicated words property file and is expected to ignore
-        case. The list of parameters is dependent on the tokenizer or filter
-        factory.</para>
+        file. A tokenizer is also defined by its factory. This example use the
+        standard tokenizer. A filter is defined by its factory which is
+        responsible for creating the filter instance using the optional
+        parameters. In our example, the StopFilter filter is built reading the
+        dedicated words property file and is expected to ignore case. The list
+        of parameters is dependent on the tokenizer or filter factory.</para>
 
         <warning>
-          <para>Filters and char filters are applied in the order they are defined in the
-          <classname>@AnalyzerDef</classname> annotation. Make sure to think
-          twice about this order.</para>
+          <para>Filters and char filters are applied in the order they are
+          defined in the <classname>@AnalyzerDef</classname> annotation. Make
+          sure to think twice about this order.</para>
         </warning>
 
         <para>Once defined, an analyzer definition can be reused by an
@@ -815,14 +815,15 @@ public class Team {
       <section>
         <title>Available analyzers</title>
 
-        <para>Solr and Lucene come with a lot of useful default char filters, tokenizers and
-        filters. You can find a complete list of char filter factories, tokenizer factories and
-        filter factories at <ulink
+        <para>Solr and Lucene come with a lot of useful default char filters,
+        tokenizers and filters. You can find a complete list of char filter
+        factories, tokenizer factories and filter factories at <ulink
         url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters</ulink>.
         Let check a few of them.</para>
 
         <table>
           <title>Some of the available char filters</title>
+
           <tgroup cols="3">
             <thead>
               <row>
@@ -833,22 +834,23 @@ public class Team {
                 <entry align="center">parameters</entry>
               </row>
             </thead>
+
             <tbody>
               <row>
                 <entry>MappingCharFilterFactory</entry>
 
-                <entry>Replaces one or more characters with one or more characters, based on mappings
-                specified in the resource file</entry>
+                <entry>Replaces one or more characters with one or more
+                characters, based on mappings specified in the resource
+                file</entry>
 
-                <entry><para><literal>mapping</literal>: points to a resource file containing the mappings
-                using the format:
-                <literallayout>
-                    "á" => "a"
-                    "ñ" => "n"
-                    "ø" => "o"
-                </literallayout>
-                </para></entry>
+                <entry><para><literal>mapping</literal>: points to a resource
+                file containing the mappings using the format: <literallayout>
+                    "á" =&gt; "a"
+                    "ñ" =&gt; "n"
+                    "ø" =&gt; "o"
+                </literallayout> </para></entry>
               </row>
+
               <row>
                 <entry>HTMLStripCharFilterFactory</entry>
 
@@ -858,7 +860,6 @@ public class Team {
               </row>
             </tbody>
           </tgroup>
-
         </table>
 
         <table>
@@ -888,7 +889,8 @@ public class Team {
                 <entry>HTMLStripStandardTokenizerFactory</entry>
 
                 <entry>Remove HTML tags, keep the text and pass it to a
-                StandardTokenizer. @Deprecated, use the HTMLStripCharFilterFactory instead</entry>
+                StandardTokenizer. @Deprecated, use the
+                HTMLStripCharFilterFactory instead</entry>
 
                 <entry>none</entry>
               </row>
@@ -1088,13 +1090,20 @@ public class BlogEntry {
           you are unsure, use the same analyzers.</para>
         </note>
 
-        <para>You can retrieve the scoped analyzer for a given entity used at
-        indexing time by Hibernate Search. A scoped analyzer is an analyzer
-        which applies the right analyzers depending on the field indexed:
-        multiple analyzers can be defined on a given entity each one working
-        on an individual field, a scoped analyzer unify all these analyzers
-        into a context-aware analyzer. While the theory seems a bit complex,
-        using the right analyzer in a query is very easy.</para>
+        <para>If you use the Hibernate Search query DSL (see <xref
+        linkend="search-query-querydsl" />), you don't have to think about it.
+        The query DSL does use the right analyzer transparently for
+        you.</para>
+
+        <para>If you write your Lucene query using the Lucene programmatic API
+        or the Lucene query parser, you can retrieve the scoped analyzer for a
+        given entity used at indexing time by Hibernate Search. A scoped
+        analyzer is an analyzer which applies the right analyzers depending on
+        the field indexed: multiple analyzers can be defined on a given entity
+        each one working on an individual field, a scoped analyzer unify all
+        these analyzers into a context-aware analyzer. While the theory seems
+        a bit complex, using the right analyzer in a query is very
+        easy.</para>
 
         <example>
           <title>Using the scoped analyzer when building a full-text
@@ -1446,20 +1455,26 @@ public class DateSplitBridge implements FieldBridge {
 <emphasis role="bold">@FieldBridge(impl = DateSplitBridge.class)</emphasis>
 private Date date;                </programlisting>
         </example>
-        
-        <para>In the previous example the fields where not added directly to Document
-        but we where delegating this task to the <classname>LuceneOptions</classname> helper; this will apply the
-        options you have selected on <literal>@Field</literal>, like <literal>Store</literal>
-        or <literal>TermVector</literal> options, or apply the choosen <classname>@Boost</classname>
-        value. It is especially useful to encapsulate the complexity of <literal>COMPRESS</literal>
-        implementations so it's recommended to delegate to <classname>LuceneOptions</classname> to add fields to the
+
+        <para>In the previous example the fields where not added directly to
+        Document but we where delegating this task to the
+        <classname>LuceneOptions</classname> helper; this will apply the
+        options you have selected on <literal>@Field</literal>, like
+        <literal>Store</literal> or <literal>TermVector</literal> options, or
+        apply the choosen <classname>@Boost</classname> value. It is
+        especially useful to encapsulate the complexity of
+        <literal>COMPRESS</literal> implementations so it's recommended to
+        delegate to <classname>LuceneOptions</classname> to add fields to the
         <classname>Document</classname>, but nothing stops you from editing
-        the <classname>Document</classname> directly and ignore the <classname>LuceneOptions</classname> in case you need to.
-        </para>
-        <tip><para>Classes like <classname>LuceneOptions</classname> are created to shield your application from
-        changes in Lucene API and simplify your code. Use them if you can, but if you need more flexibility
-        you're not required to.</para></tip>
-        
+        the <classname>Document</classname> directly and ignore the
+        <classname>LuceneOptions</classname> in case you need to.</para>
+
+        <tip>
+          <para>Classes like <classname>LuceneOptions</classname> are created
+          to shield your application from changes in Lucene API and simplify
+          your code. Use them if you can, but if you need more flexibility
+          you're not required to.</para>
+        </tip>
       </section>
 
       <section>
@@ -1722,8 +1737,8 @@ public class Address {
  ....
 }</programlisting>
             </example></para>
-        </example>
-        The next section demonstrates how to programmatically define analyzers.</para>
+        </example> The next section demonstrates how to programmatically
+      define analyzers.</para>
     </section>
 
     <section>

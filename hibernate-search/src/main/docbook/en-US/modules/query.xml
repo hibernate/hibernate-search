@@ -172,7 +172,7 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       Action.</para>
     </section>
 
-    <section>
+    <section id="search-query-querydsl">
       <title>Building a Lucene query with Hibernate Search query DSL</title>
 
       <para>Writing full-text queries with the Lucene programmatic API is
@@ -493,8 +493,11 @@ Query luceneQuery = mythQB
 //look for all myths except religious ones
 Query luceneQuery = mythQB
     .all()
-      .except( 
-        monthQb.keyword().onField( "description_stem" ).matching( "religion" ).createQuery() 
+      .except( monthQb
+        .keyword()
+        .onField( "description_stem" 
+        .matching( "religion" )
+        .createQuery() 
       )
     .createQuery();</programlisting></para>
 
