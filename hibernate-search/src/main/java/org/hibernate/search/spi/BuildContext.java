@@ -13,7 +13,7 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 public interface BuildContext {
 	/**
-	 * Returns the SessionFactoryImplementor instance. Do not use until after the initialize and/or stard method is
+	 * Returns the SessionFactoryImplementor instance. Do not use until after the initialize and/or start method is
 	 * fully executed.
 	 * Implementations should not cache values provided by the SessionFactoryImplementor but rather access them
 	 * each time: when the configuration is dynamically updated, new changes are available through the
