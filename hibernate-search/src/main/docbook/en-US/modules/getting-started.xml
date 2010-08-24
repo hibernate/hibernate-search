@@ -162,7 +162,7 @@
     <example>
       <title>Maven dependencies for Hibernate Search</title>
 
-      <programlisting>&lt;dependency&gt;
+      <programlisting language="XML" role="XML">&lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
    &lt;version&gt;&version;&lt;/version&gt;
@@ -208,7 +208,7 @@
       <literal><filename>hibernate.cfg.xml</filename></literal> or
       <filename>persistence.xml</filename></title>
 
-      <programlisting>...
+      <programlisting language="XML" role="XML">...
 &lt;property name="hibernate.search.default.directory_provider" 
           value="org.hibernate.search.store.FSDirectoryProvider"/&gt; 
 
@@ -244,7 +244,7 @@
       <title>Example entities Book and Author before adding Hibernate Search
       specific annotations</title>
 
-      <programlisting>package example;
+      <programlisting language="JAVA" role="JAVA">package example;
 ...
 @Entity
 public class Book {
@@ -268,7 +268,7 @@ public class Book {
   ...
 }</programlisting>
 
-      <programlisting>package example;
+      <programlisting language="JAVA" role="JAVA">package example;
 ...
 @Entity
 public class Author {
@@ -351,7 +351,7 @@ public class Author {
       <title>Example entities after adding Hibernate Search
       annotations</title>
 
-      <programlisting>package example;
+      <programlisting language="JAVA" role="JAVA">package example;
 ...
 @Entity
 <emphasis role="bold">@Indexed</emphasis>
@@ -382,7 +382,7 @@ public class Book {
   ... 
 }</programlisting>
 
-      <programlisting>package example;
+      <programlisting language="JAVA" role="JAVA">package example;
 ...
 @Entity
 public class Author {
@@ -417,14 +417,14 @@ public class Author {
     <example>
       <title>Using Hibernate Session to index data</title>
 
-      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
 fullTextSession.createIndexer().startAndWait();</programlisting>
     </example>
 
     <example>
       <title>Using JPA to index data</title>
 
-      <programlisting>EntityManager em = entityManagerFactory.createEntityManager();
+      <programlisting language="JAVA" role="JAVA">EntityManager em = entityManagerFactory.createEntityManager();
 FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
 fullTextEntityManager.createIndexer().startAndWait();</programlisting>
     </example>
@@ -464,7 +464,8 @@ org.apache.lucene.search.Query query = qb
 //or their programmatic API. The Hibernate Search DSL is recommended though
 
 // wrap Lucene query in a org.hibernate.Query
-org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery(query, Book.class);
+org.hibernate.Query hibQuery = 
+    fullTextSession.createFullTextQuery(query, Book.class);
 
 // execute search
 List result = hibQuery.list();
@@ -493,7 +494,8 @@ org.apache.lucene.search.Query query = qb
 //or their programmatic API. The Hibernate Search DSL is recommended though
 
 // wrap Lucene query in a javax.persistence.Query
-javax.persistence.Query persistenceQuery = fullTextEntityManager.createFullTextQuery(query, Book.class);
+javax.persistence.Query persistenceQuery = 
+    fullTextEntityManager.createFullTextQuery(query, Book.class);
 
 // execute search
 List result = persistenceQuery.getResultList();
@@ -560,7 +562,7 @@ em.close();  </programlisting>
       <title>Using <classname>@AnalyzerDef</classname> and the Solr framework
       to define and use an analyzer</title>
 
-      <programlisting>package example;
+      <programlisting language="JAVA">package example;
 ...
 @Entity
 @Indexed
