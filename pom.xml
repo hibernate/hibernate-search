@@ -27,7 +27,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>3.3.0.Beta1</version>
+    <version>3.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>
@@ -49,9 +49,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/tags/v3_3_0_Beta1</connection>
-        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/tags/v3_3_0_Beta1</developerConnection>
-        <url>http://fisheye.jboss.com/browse/Hibernate/search/tags/v3_3_0_Beta1</url>
+        <connection>scm:svn:http://anonsvn.jboss.org/repos/hibernate/search/trunk</connection>
+        <developerConnection>scm:svn:https://svn.jboss.org/repos/hibernate/search/trunk</developerConnection>
+        <url>http://fisheye.jboss.com/browse/Hibernate/search/trunk</url>
     </scm>
 
     <organization>
