@@ -1,3 +1,27 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
+ */
+
 package org.hibernate.search.test.embedded.nested.containedIn;
 
 import org.apache.lucene.index.Term;
@@ -16,26 +40,25 @@ import org.hibernate.search.test.SearchTestCase;
 public class NestedContainedInTest extends SearchTestCase {
 
 	public void testAddHelpItem() {
+		openSession();
 		String tagName = "animal";
 		createHelpItem( tagName );
-		openSession(  );
 		doQuery( tagName );
 		session.close();
 	}
 
 	public void testChangeTagName() {
-
+		openSession();
 		String tagName = "animal";
 		createHelpItem( tagName );
 
-		openSession(  );
 		HelpItem check = doQuery( tagName );
-
 		Tag tag = check.getTags().get( 0 ).getTag();
 
-		Transaction tx = session.beginTransaction();
 		String newTagName = "automobile";
 		tag.setName( newTagName );
+
+		Transaction tx = session.beginTransaction();
 		session.saveOrUpdate( tag );
 		tx.commit();
 
@@ -44,7 +67,6 @@ public class NestedContainedInTest extends SearchTestCase {
 	}
 
 	private void createHelpItem(String tagName) {
-		openSession(  );
 		Transaction tx = session.beginTransaction();
 		HelpItem helpItem = new HelpItem();
 		helpItem.setTitle( "The quick brown fox jumps over the lazy dog." );
@@ -64,10 +86,10 @@ public class NestedContainedInTest extends SearchTestCase {
 		session.save( helpItemTag );
 
 		tx.commit();
-		session.close();
 	}
 
 	private HelpItem doQuery(String tagName) {
+		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		Query termQuery = new TermQuery( new Term( "tags.tag.name", tagName ) );
 		FullTextQuery fullTextQuery =
@@ -75,6 +97,7 @@ public class NestedContainedInTest extends SearchTestCase {
 		HelpItem check = ( HelpItem ) fullTextQuery.uniqueResult();
 		assertNotNull( "No HelpItem with Tag '" + tagName + "' found in Lucene index.", check );
 		assertTrue( check.getTags().get( 0 ).getTag().getName().equals( tagName ) );
+		tx.commit();
 		return check;
 	}
 
