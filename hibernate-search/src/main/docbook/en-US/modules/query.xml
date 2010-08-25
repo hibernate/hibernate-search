@@ -448,7 +448,7 @@ Query luceneQuery = mythQB
 Date beforeChrist = ...;
 Query luceneQuery = mythQB
     .range()
-    .onField("starred")
+    .onField("creationDate")
     .below(beforeChrist).excludeLimit()
     .createQuery();</programlisting>
 
@@ -481,9 +481,14 @@ Query luceneQuery = mythQB
       .must( mythQB.keyword().onField("description").matching("urban").createQuery() )
         .not()
       .must( mythQB.range().onField("starred").above(4).createQuery() )
+      .must( mythQB
+        .range()
+        .onField("creationDate")
+        .above(twentiethCentury)
+        .createQuery() )
     .createQuery();
 
-//look for myths that are preferably urban
+//look for popular myths that are preferably urban
 Query luceneQuery = mythQB
     .bool()
       .should( mythQB.keyword().onField("description").matching("urban").createQuery() )
