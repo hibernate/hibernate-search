@@ -42,6 +42,9 @@ public class Document {
 	private String summary;
 	private String text;
 
+	public Document() {
+	}
+
 	public Document(String title, String summary, String text) {
 		super();
 		this.summary = summary;
