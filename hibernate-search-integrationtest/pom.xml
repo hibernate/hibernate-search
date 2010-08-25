@@ -18,6 +18,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-release-version>3.0.2.RELEASE</spring-release-version>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <build>
