@@ -505,7 +505,7 @@
 
         <!-- The MySQL 5 test envionment -->
         <profile>
-            <id>mysql5</id>
+            <id>mysql50</id>
             <dependencies>
                 <dependency>
                     <groupId>mysql</groupId>
@@ -566,13 +566,13 @@
 
         <!-- The PostgreSQL 8.2.4 test envionment -->
         <profile>
-            <id>postgresql824</id>
+            <id>postgresql82</id>
             <dependencies>
                 <dependency>
                     <groupId>postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>8.2-504</version>
-                    <classifier>jdbc3</classifier>
+                    <version>8.4-701</version>
+                    <classifier>jdbc4</classifier>
                 </dependency>
             </dependencies>
             <properties>
@@ -587,13 +587,13 @@
 
         <!-- The PostgreSQL 8.3.7 test environment -->
         <profile>
-            <id>postgresql837</id>
+            <id>postgresql83</id>
             <dependencies>
                 <dependency>
                     <groupId>postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>8.2-504</version>
-                    <classifier>jdbc3</classifier>
+                    <version>8.4-701</version>
+                    <classifier>jdbc4</classifier>
                 </dependency>
             </dependencies>
             <properties>
@@ -659,7 +659,7 @@
 
         <!-- The DB2 9.1 test envionment (using 9x drivers)-->
         <profile>
-            <id>db2v91</id>
+            <id>db2-91</id>
             <dependencies>
                 <dependency>
                     <groupId>com.ibm</groupId>
@@ -684,7 +684,7 @@
 
         <!-- The DB2 9.7 test envionment (using 9x drivers)-->
         <profile>
-            <id>db2v97</id>
+            <id>db2-97</id>
             <dependencies>
                 <dependency>
                     <groupId>com.ibm</groupId>
@@ -819,6 +819,7 @@
                     <groupId>com.microsoft.sqlserver</groupId>
                     <artifactId>msjdbc</artifactId>
                     <version>2.0.1008.2</version>
+					<classifier>4</classifier>
                 </dependency>
             </dependencies>
             <properties>
@@ -839,6 +840,7 @@
                     <groupId>com.microsoft.sqlserver</groupId>
                     <artifactId>msjdbc</artifactId>
                     <version>2.0.1008.2</version>
+					<classifier>4</classifier>
                 </dependency>
             </dependencies>
             <properties>
