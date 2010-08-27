@@ -571,8 +571,7 @@
                 <dependency>
                     <groupId>postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>8.4-701</version>
-                    <classifier>jdbc4</classifier>
+                    <version>8.4-701.jdbc4</version>
                 </dependency>
             </dependencies>
             <properties>
@@ -592,8 +591,7 @@
                 <dependency>
                     <groupId>postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>8.4-701</version>
-                    <classifier>jdbc4</classifier>
+                    <version>8.4-701.jdbc4</version>
                 </dependency>
             </dependencies>
             <properties>
