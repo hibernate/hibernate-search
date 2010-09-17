@@ -36,7 +36,7 @@ import org.apache.lucene.analysis.TokenStream;
  *
  * @author Emmanuel Bernard
  */
-public class DelegateNamedAnalyzer extends Analyzer {
+public final class DelegateNamedAnalyzer extends Analyzer {
 	private String name;
 	private Analyzer delegate;
 

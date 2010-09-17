@@ -24,6 +24,9 @@
  */
 package org.hibernate.search.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
 
@@ -108,6 +111,49 @@ public class PluginLoader {
 			return (T) instance;
 		}
 	}
+
+	public static <T> T instanceFromConstructor(Class<T> targetSuperType, Class<?> classToLoad, Class<?> parameterType, Object parameterValue, String componentDescription) {
+		checkClassType( classToLoad, componentDescription );
+		//checkHasValidconstructor( classToLoad, componentDescription );
+		Object instance = null;
+		try {
+			Constructor constructor = classToLoad.getConstructor( parameterType );
+			instance =  constructor.newInstance( parameterValue );
+		}
+		catch ( IllegalAccessException e ) {
+			throw new SearchException(
+					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
+					". Class or constructor is not accessible.", e );
+		}
+		catch ( InstantiationException e ) {
+			throw new SearchException(
+					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
+					". Verify it has a no-args public constructor and is not abstract.", e );
+		}
+		catch ( NoSuchMethodException e ) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+		catch ( InvocationTargetException e ) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+		if ( ! targetSuperType.isInstance( instance ) ) {
+			// have a proper error message according to interface implementation or subclassing
+			if ( targetSuperType.isInterface() ) {
+				throw new SearchException(
+						"Wrong configuration of " + componentDescription + ": class " + classToLoad.getName()
+						+ " does not implement interface " + targetSuperType.getName() );
+			}
+			else {
+				throw new SearchException(
+						"Wrong configuration of " + componentDescription + ": class " + classToLoad.getName()
+						+ " is not a subtype of " + targetSuperType.getName() );
+			}
+		}
+		else {
+			return (T) instance;
+		}
+	}
+
 
 	private static void checkClassType(Class<?> classToLoad, String componentDescription) {
 		if ( classToLoad.isInterface() ) {

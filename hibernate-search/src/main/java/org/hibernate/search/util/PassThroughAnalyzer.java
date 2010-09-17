@@ -17,7 +17,7 @@ import org.apache.lucene.util.AttributeSource;
  *
  * @author Emmanuel Bernard
  */
-public class PassThroughAnalyzer extends Analyzer {
+public final class PassThroughAnalyzer extends Analyzer {
 
 	
 

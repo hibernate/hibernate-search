@@ -38,6 +38,7 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.search.Similarity;
+import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -70,6 +71,7 @@ import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PassThroughAnalyzer;
+import org.hibernate.search.util.PluginLoader;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.ScopedAnalyzer;
 
@@ -253,7 +255,8 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 		else {
 			try {
-				return ( Analyzer ) analyzerClass.newInstance();
+				return ( Analyzer ) PluginLoader.instanceFromConstructor( Analyzer.class, analyzerClass, Version.class,
+						Version.LUCENE_30, "");
 			}
 			catch ( ClassCastException e ) {
 				throw new SearchException(
@@ -261,7 +264,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 						e
 				);
 			}
-			catch ( Exception e ) {
+			catch ( Exception e ) {				
 				throw new SearchException(
 						"Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e
 				);

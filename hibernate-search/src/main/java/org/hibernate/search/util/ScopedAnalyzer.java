@@ -38,7 +38,7 @@ import org.apache.lucene.analysis.TokenStream;
  * 
  * @author Emmanuel Bernard
  */
-public class ScopedAnalyzer extends Analyzer {
+public final class ScopedAnalyzer extends Analyzer {
 	private Analyzer globalAnalyzer;
 	private Map<String, Analyzer> scopedAnalyzers = new HashMap<String, Analyzer>();
 

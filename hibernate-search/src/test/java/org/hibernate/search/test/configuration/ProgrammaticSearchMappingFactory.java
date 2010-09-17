@@ -27,10 +27,10 @@ package org.hibernate.search.test.configuration;
 import java.lang.annotation.ElementType;
 
 import org.apache.lucene.search.DefaultSimilarity;
-import org.apache.solr.analysis.EnglishPorterFilterFactory;
 import org.apache.solr.analysis.GermanStemFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
+import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FilterCacheModeType;
@@ -55,7 +55,7 @@ public class ProgrammaticSearchMappingFactory {
 						.param( "maxGramSize", "3" )
 				.analyzerDef( "en", StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
-					.filter( EnglishPorterFilterFactory.class )
+					.filter( SnowballPorterFilterFactory.class )
 				.analyzerDef( "de", StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( GermanStemFilterFactory.class )

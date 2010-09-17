@@ -1,26 +1,25 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
- * 
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ *
+ *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
  */
 package org.hibernate.search.test.util;
 
@@ -33,6 +32,7 @@ import junit.framework.Assert;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.slf4j.Logger;
 
 import org.hibernate.search.util.LoggerFactory;
@@ -48,16 +48,10 @@ public class AnalyzerUtils {
 
 	public static Token[] tokensFromAnalysis(Analyzer analyzer, String field, String text) throws IOException {
 		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
+		TermAttribute term = stream.addAttribute( TermAttribute.class );
 		List<Token> tokenList = new ArrayList<Token>();
-		Token reusableToken = new Token();
-		while ( true ) {
-
-			Token token = stream.next( reusableToken );
-			if ( token == null ) {
-				break;
-			}
-
-			tokenList.add( ( Token ) token.clone() );
+		while ( stream.incrementToken() ) {
+			tokenList.add( new Token( term.term(), 0, 0 ) );
 		}
 
 		return tokenList.toArray( new Token[tokenList.size()] );

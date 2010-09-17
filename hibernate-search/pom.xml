@@ -58,10 +58,10 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-snowball</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.lucene</groupId>-->
+            <!--<artifactId>lucene-snowball</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>
@@ -244,7 +244,7 @@
                     <doctitle>Hibernate Search ${project.version}</doctitle>
                     <windowtitle>Hibernate Search ${project.version}</windowtitle>
                     <bottom>
-                        <![CDATA[Copyright &copy; ${inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
+                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
                 </configuration>
                 <executions>
                     <execution>
@@ -298,7 +298,7 @@
                 <configuration>
                     <bytecodeInjections>
                         <bytecodeInjection>
-                            <expression>${pom.version}</expression>
+                            <expression>${project.version}</expression>
                             <targetMembers>
                                 <methodBodyReturn>
                                     <className>org.hibernate.search.Version</className>

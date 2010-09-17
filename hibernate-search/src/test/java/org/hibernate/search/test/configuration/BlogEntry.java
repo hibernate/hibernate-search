@@ -30,9 +30,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.apache.solr.analysis.EnglishPorterFilterFactory;
 import org.apache.solr.analysis.GermanStemFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
+import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -51,7 +51,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-						@TokenFilterDef(factory = EnglishPorterFilterFactory.class
+						@TokenFilterDef(factory = SnowballPorterFilterFactory.class
 						)
 				}),
 		@AnalyzerDef(name = "de",

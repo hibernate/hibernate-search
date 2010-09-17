@@ -1,26 +1,25 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
- * 
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ *
+ *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
  */
 package org.hibernate.search.impl;
 
@@ -33,6 +32,8 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Similarity;
+import org.apache.lucene.util.Version;
+import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.util.StringHelper;
@@ -43,20 +44,18 @@ import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.util.DelegateNamedAnalyzer;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PluginLoader;
-import org.slf4j.Logger;
 
 /**
  * Provides access to some default configuration settings (eg default <code>Analyzer</code> or default
  * <code>Similarity</code>) and checks whether certain optional libraries are available.
  *
- *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public class ConfigContext {
-	
+
 	private static final Logger log = LoggerFactory.make();
-	
+
 	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
@@ -65,8 +64,8 @@ public class ConfigContext {
 	private final boolean jpaPresent;
 
 	public ConfigContext(SearchConfiguration cfg) {
-		defaultAnalyzer = initAnalyzer(cfg);
-		defaultSimilarity = initSimilarity(cfg);
+		defaultAnalyzer = initAnalyzer( cfg );
+		defaultSimilarity = initSimilarity( cfg );
 		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
 		jpaPresent = isPresent( "javax.persistence.Id" );
 	}
@@ -82,7 +81,7 @@ public class ConfigContext {
 
 	public Analyzer buildLazyAnalyzer(String name) {
 		final DelegateNamedAnalyzer delegateNamedAnalyzer = new DelegateNamedAnalyzer( name );
-		lazyAnalyzers.add(delegateNamedAnalyzer);
+		lazyAnalyzers.add( delegateNamedAnalyzer );
 		return delegateNamedAnalyzer;
 	}
 
@@ -93,8 +92,8 @@ public class ConfigContext {
 	/**
 	 * Initializes the Lucene analyzer to use by reading the analyzer class from the configuration and instantiating it.
 	 *
-	 * @param cfg
-	 *            The current configuration.
+	 * @param cfg The current configuration.
+	 *
 	 * @return The Lucene analyzer to use for tokenisation.
 	 */
 	private Analyzer initAnalyzer(SearchConfiguration cfg) {
@@ -103,14 +102,21 @@ public class ConfigContext {
 		if ( analyzerClassName != null ) {
 			try {
 				analyzerClass = ReflectHelper.classForName( analyzerClassName );
-			} catch (Exception e) {
+			}
+			catch ( Exception e ) {
 				return buildLazyAnalyzer( analyzerClassName );
 			}
-		} else {
+		}
+		else {
 			analyzerClass = StandardAnalyzer.class;
 		}
-		Analyzer defaultAnalyzer = PluginLoader.instanceFromClass( Analyzer.class,
-				analyzerClass, "Lucene analyzer" );
+		Analyzer defaultAnalyzer = PluginLoader.instanceFromConstructor(
+				Analyzer.class,
+				analyzerClass,
+				Version.class,
+				Version.LUCENE_30,
+				"Lucene analyzer"
+		);
 		return defaultAnalyzer;
 	}
 
@@ -118,19 +124,21 @@ public class ConfigContext {
 	 * Initializes the Lucene similarity to use.
 	 *
 	 * @param cfg the search configuration.
+	 *
 	 * @return returns the default similarity class.
 	 */
 	private Similarity initSimilarity(SearchConfiguration cfg) {
-		String similarityClassName = cfg.getProperty(Environment.SIMILARITY_CLASS);
+		String similarityClassName = cfg.getProperty( Environment.SIMILARITY_CLASS );
 		Similarity defaultSimilarity;
 		if ( StringHelper.isEmpty( similarityClassName ) ) {
-			defaultSimilarity =  Similarity.getDefault();
+			defaultSimilarity = Similarity.getDefault();
 		}
 		else {
 			defaultSimilarity = PluginLoader.instanceFromName(
-					Similarity.class, similarityClassName, ConfigContext.class, "default similarity" );
+					Similarity.class, similarityClassName, ConfigContext.class, "default similarity"
+			);
 		}
-		log.debug( "Using default similarity implementation: {}", defaultSimilarity.getClass().getName() );		
+		log.debug( "Using default similarity implementation: {}", defaultSimilarity.getClass().getName() );
 		return defaultSimilarity;
 	}
 
@@ -145,7 +153,7 @@ public class ConfigContext {
 	public Map<String, Analyzer> initLazyAnalyzers() {
 		Map<String, Analyzer> initializedAnalyzers = new HashMap<String, Analyzer>( analyzerDefs.size() );
 
-		for (DelegateNamedAnalyzer namedAnalyzer : lazyAnalyzers) {
+		for ( DelegateNamedAnalyzer namedAnalyzer : lazyAnalyzers ) {
 			String name = namedAnalyzer.getName();
 			if ( initializedAnalyzers.containsKey( name ) ) {
 				namedAnalyzer.setDelegate( initializedAnalyzers.get( name ) );
@@ -157,14 +165,14 @@ public class ConfigContext {
 					initializedAnalyzers.put( name, analyzer );
 				}
 				else {
-					throw new SearchException("Analyzer found with an unknown definition: " + name);
+					throw new SearchException( "Analyzer found with an unknown definition: " + name );
 				}
 			}
 		}
 
 		//initialize the remaining definitions
 		for ( Map.Entry<String, AnalyzerDef> entry : analyzerDefs.entrySet() ) {
-			if ( ! initializedAnalyzers.containsKey( entry.getKey() ) ) {
+			if ( !initializedAnalyzers.containsKey( entry.getKey() ) ) {
 				final Analyzer analyzer = buildAnalyzer( entry.getValue() );
 				initializedAnalyzers.put( entry.getKey(), analyzer );
 			}
@@ -173,8 +181,10 @@ public class ConfigContext {
 	}
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {
-		if ( ! solrPresent ) {
-			throw new SearchException( "Use of @AnalyzerDef while Solr is not present in the classpath. Add apache-solr-analyzer.jar" );
+		if ( !solrPresent ) {
+			throw new SearchException(
+					"Use of @AnalyzerDef while Solr is not present in the classpath. Add apache-solr-analyzer.jar"
+			);
 		}
 		// SolrAnalyzerBuilder references Solr classes.
 		// InitContext should not (directly or indirectly) load a Solr class to avoid hard dependency

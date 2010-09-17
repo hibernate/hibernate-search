@@ -24,11 +24,16 @@
  */
 package org.hibernate.search.test.analyzer;
 
+import org.apache.lucene.util.Version;
+
 /**
  * @author Emmanuel Bernard
  */
-public class Test2Analyzer extends AbstractTestAnalyzer {
+public final class Test2Analyzer extends AbstractTestAnalyzer {
 	private final String[] tokens = { "sound", "cat", "speed" };
+
+	public Test2Analyzer(Version version) {
+	}
 
 	protected String[] getTokens() {
 		return tokens;
