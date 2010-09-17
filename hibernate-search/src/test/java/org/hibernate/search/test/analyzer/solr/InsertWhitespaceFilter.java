@@ -43,7 +43,7 @@ public final class InsertWhitespaceFilter extends TokenFilter {
 
 	public InsertWhitespaceFilter(TokenStream in) {
 		super( in );
-		termAtt = (TermAttribute) addAttribute(TermAttribute.class);
+		termAtt = addAttribute(TermAttribute.class);
 	}
 
 	@Override

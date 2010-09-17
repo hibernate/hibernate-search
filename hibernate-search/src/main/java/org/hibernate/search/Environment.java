@@ -28,7 +28,7 @@ package org.hibernate.search;
  * @author Hardy Ferentschik
  */
 public final class Environment {
-	
+
 	private Environment() {
 	}
 
@@ -133,4 +133,9 @@ public final class Environment {
 	 * If set to {@code true} the search statistic will be gathered.
 	 */
 	public static final String GENERATE_STATS = "hibernate.search.generate_statistics";
+
+	/**
+	 * The Lucene match version parameter. Needed since Lucene 3.x
+	 */
+	public static final String LUCENE_MATCH_VERSION = "hibernate.search.lucene_version";
 }

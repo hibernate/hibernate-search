@@ -37,6 +37,8 @@ public interface LuceneOptions {
 
 	void addFieldToDocument(String name, String indexedString, Document document);
 
+	boolean isCompressed();
+
 	/**
 	 * Might be removed in version 3.3 to better support Lucene 3
 	 * which is missing COMPRESS Store Type.
@@ -62,6 +64,4 @@ public interface LuceneOptions {
 	 * @deprecated likely to be removed in version 3.3, use #addFieldToDocument
 	 */
 	Float getBoost();
-
-	boolean isCompressed();
 }

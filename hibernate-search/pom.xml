@@ -55,13 +55,9 @@
             <artifactId>lucene-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-solr-analyzers</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.lucene</groupId>-->
-            <!--<artifactId>lucene-snowball</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>

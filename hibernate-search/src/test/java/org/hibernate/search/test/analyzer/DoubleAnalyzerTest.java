@@ -80,5 +80,4 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-
 }

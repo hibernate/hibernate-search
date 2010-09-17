@@ -22,7 +22,9 @@
   ~  51 Franklin Street, Fifth Floor
   ~  Boston, MA  02110-1301  USA
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate</groupId>
@@ -37,6 +39,7 @@
     <inceptionYear>2006</inceptionYear>
 
     <modules>
+        <module>hibernate-search-solr-analyzers</module>
         <module>hibernate-search</module>
         <module>hibernate-search-testing</module>
         <module>hibernate-search-archetype</module>
@@ -127,7 +130,7 @@
 
     <properties>
         <slf4jVersion>1.6.1</slf4jVersion>
-        <luceneVersion>3.1-dev</luceneVersion>
+        <luceneVersion>3.0.2</luceneVersion>
         <hibernateVersion>3.6.0.Beta3</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Final</hibernateCommonsAnnotationVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -170,6 +173,37 @@
                 <version>${luceneVersion}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-collation</artifactId>
+                <version>${luceneVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.ibm.icu</groupId>
+                        <artifactId>icu4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-spellchecker</artifactId>
+                <version>${luceneVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-solr-analyzers</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.transaction</groupId>
                 <artifactId>jta</artifactId>
                 <version>1.1</version>
@@ -187,11 +221,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-annotations</artifactId>
-                <version>${hibernateVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>${hibernateVersion}</version>
             </dependency>
@@ -201,81 +230,10 @@
                 <version>${hibernateVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-core</artifactId>
-                <version>3.1-dev</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-httpclient</groupId>
-                        <artifactId>commons-httpclient</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>woodstox</groupId>
-                        <artifactId>wstx-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.java.dev.stax-utils</groupId>
-                        <artifactId>stax-utils</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.solr</groupId>
-                        <artifactId>solr-lucene-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-fileupload</groupId>
-                        <artifactId>commons-fileupload</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.solr</groupId>
-                        <artifactId>solr-commons-csv</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.lucene</groupId>
-                        <artifactId>lucene-highlighter</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.lucene</groupId>
-                        <artifactId>lucene-queries</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.lucene</groupId>
-                        <artifactId>lucene-memory</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.lucene</groupId>
-                        <artifactId>lucene-misc</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>wstx-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.geronimo.specs</groupId>
-                        <artifactId>geronimo-stax-api_1.0_spec</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.lucene</groupId>
-                        <artifactId>lucene-spellchecker</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.lucene</groupId>
-                        <artifactId>lucene-analyzers</artifactId>
-                    </exclusion>
-                    <!--<exclusion>-->
-                        <!--<groupId>org.apache.lucene</groupId>-->
-                        <!--<artifactId>lucene-snowball</artifactId>-->
-                    <!--</exclusion>-->
-                </exclusions>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-snowball</artifactId>
+                <version>${luceneVersion}</version>
             </dependency>
-            <!--<dependency>-->
-                <!--<groupId>org.apache.lucene</groupId>-->
-                <!--<artifactId>lucene-snowball</artifactId>-->
-                <!--<version>${luceneVersion}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers</artifactId>
@@ -491,8 +449,8 @@
                 <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
                 <jdbc.url>jdbc:hsqldb:.</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
-                <jdbc.pass />
-                <jdbc.isolation />
+                <jdbc.pass/>
+                <jdbc.isolation/>
             </properties>
         </profile>
         <!--
@@ -519,7 +477,7 @@
                 <jdbc.url>jdbc:mysql://vmg08.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -539,7 +497,7 @@
                 <jdbc.url>jdbc:mysql://vmg02.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -560,7 +518,7 @@
                 </jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -580,7 +538,7 @@
                 <jdbc.url>jdbc:postgresql://vmg01.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -600,7 +558,7 @@
                 <jdbc.url>jdbc:postgresql://vmg03.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -620,7 +578,7 @@
                 <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -651,7 +609,7 @@
                 <jdbc.url>jdbc:db2://dev32.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -676,7 +634,7 @@
                 <jdbc.url>jdbc:db2://dev67.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -701,7 +659,7 @@
                 <jdbc.url>jdbc:db2://vmg06.mw.lab.eng.bos.redhat.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -722,7 +680,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev20.qa.atl.jboss.com:1521:qa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -743,7 +701,7 @@
                 <jdbc.url>jdbc:oracle:thin:@vmg05.mw.lab.eng.bos.redhat.com:1521:qaora10</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -763,7 +721,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -785,7 +743,7 @@
                 </jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -805,7 +763,7 @@
                 <jdbc.url>jdbc:sybase:Tds:vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
@@ -817,7 +775,7 @@
                     <groupId>com.microsoft.sqlserver</groupId>
                     <artifactId>msjdbc</artifactId>
                     <version>2.0.1008.2</version>
-					<classifier>4</classifier>
+                    <classifier>4</classifier>
                 </dependency>
             </dependencies>
             <properties>
@@ -838,7 +796,7 @@
                     <groupId>com.microsoft.sqlserver</groupId>
                     <artifactId>msjdbc</artifactId>
                     <version>2.0.1008.2</version>
-					<classifier>4</classifier>
+                    <classifier>4</classifier>
                 </dependency>
             </dependencies>
             <properties>

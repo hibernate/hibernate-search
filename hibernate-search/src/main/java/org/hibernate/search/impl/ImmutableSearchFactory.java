@@ -127,7 +127,7 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 		this.readerProvider = cfg.readerProvider;
 		this.worker = cfg.worker;
 		this.statistics = new StatisticsImpl( this );
-		String enableStats = configurationProperties.getProperty( Environment.JMX_ENABLED );
+		String enableStats = configurationProperties.getProperty( Environment.GENERATE_STATS );
 		if ( "true".equalsIgnoreCase( enableStats ) ) {
 			statistics.setStatisticsEnabled( true );
 		}

@@ -39,7 +39,7 @@
     
     <dependencies>
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search</artifactId>
             <version>${project.version}</version>
         </dependency>

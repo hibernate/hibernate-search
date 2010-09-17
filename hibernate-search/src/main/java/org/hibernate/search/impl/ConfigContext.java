@@ -52,9 +52,10 @@ import org.hibernate.search.util.PluginLoader;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConfigContext {
+public final class ConfigContext {
 
 	private static final Logger log = LoggerFactory.make();
+	private static final Version DEFAULT_LUCENE_MATCH_VERSION = Version.LUCENE_30;
 
 	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
@@ -63,7 +64,10 @@ public class ConfigContext {
 	private final boolean solrPresent;
 	private final boolean jpaPresent;
 
+	private final Version luceneMatchVersion;
+
 	public ConfigContext(SearchConfiguration cfg) {
+		luceneMatchVersion = getLuceneMatchVersion( cfg );
 		defaultAnalyzer = initAnalyzer( cfg );
 		defaultSimilarity = initSimilarity( cfg );
 		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
@@ -110,14 +114,7 @@ public class ConfigContext {
 		else {
 			analyzerClass = StandardAnalyzer.class;
 		}
-		Analyzer defaultAnalyzer = PluginLoader.instanceFromConstructor(
-				Analyzer.class,
-				analyzerClass,
-				Version.class,
-				Version.LUCENE_30,
-				"Lucene analyzer"
-		);
-		return defaultAnalyzer;
+		return PluginLoader.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
 	}
 
 	/**
@@ -148,6 +145,10 @@ public class ConfigContext {
 
 	public Similarity getDefaultSimilarity() {
 		return defaultSimilarity;
+	}
+
+	public Version getLuceneMatchVersion() {
+		return luceneMatchVersion;
 	}
 
 	public Map<String, Analyzer> initLazyAnalyzers() {
@@ -186,26 +187,50 @@ public class ConfigContext {
 					"Use of @AnalyzerDef while Solr is not present in the classpath. Add apache-solr-analyzer.jar"
 			);
 		}
+
 		// SolrAnalyzerBuilder references Solr classes.
 		// InitContext should not (directly or indirectly) load a Solr class to avoid hard dependency
 		// unless necessary
 		// the current mechanism (check Solr class presence and call SolrAnalyzerBuilder if needed
 		// seems to be sufficient on Apple VM (derived from Sun's
-		// TODO check on other VMs and be ready for a more reflexive approach
-		return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef );
+		return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion );
 	}
 
 	public boolean isJpaPresent() {
 		return jpaPresent;
 	}
 
-	private boolean isPresent(String classname) {
+	private boolean isPresent(String className) {
 		try {
-			ReflectHelper.classForName( classname, ConfigContext.class );
+			ReflectHelper.classForName( className, ConfigContext.class );
 			return true;
 		}
 		catch ( Exception e ) {
 			return false;
 		}
+	}
+
+	private Version getLuceneMatchVersion(SearchConfiguration cfg) {
+		Version version;
+		String tmp = cfg.getProperty( Environment.LUCENE_MATCH_VERSION );
+		if ( StringHelper.isEmpty( tmp ) ) {
+			version = DEFAULT_LUCENE_MATCH_VERSION;
+		}
+		else {
+			try {
+				version = Version.valueOf( tmp );
+			}
+			catch ( IllegalArgumentException e ) {
+				StringBuilder msg = new StringBuilder( tmp );
+				msg.append( " is a invalid value for the Lucene match version. Possible values are: " );
+				for ( Version v : Version.values() ) {
+					msg.append( v.toString() );
+					msg.append( ", " );
+				}
+				msg.delete( msg.lastIndexOf( "," ), msg.length() - 1 );
+				throw new SearchException( msg.toString() );
+			}
+		}
+		return version;
 	}
 }

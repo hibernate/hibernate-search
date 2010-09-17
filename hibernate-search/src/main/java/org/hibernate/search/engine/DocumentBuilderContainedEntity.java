@@ -255,8 +255,7 @@ public class DocumentBuilderContainedEntity<T> implements DocumentBuilder {
 		}
 		else {
 			try {
-				return ( Analyzer ) PluginLoader.instanceFromConstructor( Analyzer.class, analyzerClass, Version.class,
-						Version.LUCENE_30, "");
+				return PluginLoader.analyzerInstanceFromClass(  analyzerClass, context.getLuceneMatchVersion() );
 			}
 			catch ( ClassCastException e ) {
 				throw new SearchException(

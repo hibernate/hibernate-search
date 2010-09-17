@@ -34,7 +34,6 @@ import org.apache.solr.analysis.TokenFilterFactory;
 import org.apache.solr.analysis.TokenizerChain;
 import org.apache.solr.analysis.TokenizerFactory;
 import org.apache.solr.common.ResourceLoader;
-import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.util.plugin.ResourceLoaderAware;
 
 import org.hibernate.search.SearchException;
@@ -47,13 +46,15 @@ import org.hibernate.search.util.HibernateSearchResourceLoader;
 
 /**
  * Instances of this class are used to build Lucene analyzers which are defined using the solr <code>TokenFilterFactory</code>.
- * To make the dependency to the solr framework optional only this class has direct dependecies to solr. Solr dependencies
+ * To make the dependency to the solr framework optional only this class has direct dependencies to solr. Solr dependencies
  * are not supposed to be used anywhere else (except the actual configuration of the analyzers in the domain model).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 final class SolrAnalyzerBuilder {
+	private static final String SOLR_LUCENE_VERSION_PARAM = "luceneMatchVersion";
+
 	private SolrAnalyzerBuilder() {
 	}
 
@@ -61,13 +62,14 @@ final class SolrAnalyzerBuilder {
 	 * Builds a Lucene <code>Analyzer</code> from the specified <code>AnalyzerDef</code> annotation.
 	 *
 	 * @param analyzerDef The <code>AnalyzerDef</code> annotation as found in the annotated domain class.
+	 * @param luceneMatchVersion The lucene version (required since Lucene 3.x)
 	 *
 	 * @return a Lucene <code>Analyzer</code>
 	 */
-	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {
+	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) {
 		TokenizerDef token = analyzerDef.tokenizer();
 		TokenizerFactory tokenFactory = ( TokenizerFactory ) instantiate( token.factory() );
-		tokenFactory.init( getMapOfParameters( token.params() ) );
+		tokenFactory.init( getMapOfParameters( token.params(), luceneMatchVersion ) );
 
 		final int length = analyzerDef.filters().length;
 		final int charLength = analyzerDef.charFilters().length;
@@ -77,7 +79,7 @@ final class SolrAnalyzerBuilder {
 		for ( int index = 0; index < length; index++ ) {
 			TokenFilterDef filterDef = analyzerDef.filters()[index];
 			filters[index] = ( TokenFilterFactory ) instantiate( filterDef.factory() );
-			filters[index].init( getMapOfParameters( filterDef.params() ) );
+			filters[index].init( getMapOfParameters( filterDef.params(), luceneMatchVersion ) );
 			if ( filters[index] instanceof ResourceLoaderAware ) {
 				( ( ResourceLoaderAware ) filters[index] ).inform( resourceLoader );
 			}
@@ -85,7 +87,7 @@ final class SolrAnalyzerBuilder {
 		for ( int index = 0; index < charFilters.length; index++ ) {
 			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
 			charFilters[index] = ( CharFilterFactory ) instantiate( charFilterDef.factory() );
-			charFilters[index].init( getMapOfParameters( charFilterDef.params() ) );
+			charFilters[index].init( getMapOfParameters( charFilterDef.params(), luceneMatchVersion ) );
 			if ( charFilters[index] instanceof ResourceLoaderAware ) {
 				( ( ResourceLoaderAware ) charFilters[index] ).inform( resourceLoader );
 			}
@@ -103,17 +105,14 @@ final class SolrAnalyzerBuilder {
 		catch ( InstantiationException e ) {
 			throw new SearchException( "Unable to instantiate class: " + clazz, e );
 		}
-		catch ( Throwable e) {
-			throw new SearchException( "foo");
-		}
 	}
 
-	private static Map<String, String> getMapOfParameters(Parameter[] params) {
+	private static Map<String, String> getMapOfParameters(Parameter[] params, Version luceneMatchVersion) {
 		Map<String, String> mapOfParams = new HashMap<String, String>( params.length );
 		for ( Parameter param : params ) {
 			mapOfParams.put( param.name(), param.value() );
 		}
-		mapOfParams.put( IndexSchema.LUCENE_MATCH_VERSION_PARAM, Version.LUCENE_30.toString() );
+		mapOfParams.put( SOLR_LUCENE_VERSION_PARAM, luceneMatchVersion.toString() );
 		return Collections.unmodifiableMap( mapOfParams );
 	}
 }
