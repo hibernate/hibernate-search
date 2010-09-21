@@ -1,26 +1,25 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
- * 
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ *
+ *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
  */
 package org.hibernate.search.store;
 
@@ -43,7 +42,7 @@ import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.PluginLoader;
+import org.hibernate.search.util.ClassLoaderHelper;
 
 /**
  * Create a Lucene directory provider which can be configured
@@ -102,7 +101,7 @@ public class DirectoryProviderFactory {
 			}
 		}
 		else {
-			shardingStrategy = PluginLoader.instanceFromName( IndexShardingStrategy.class,
+			shardingStrategy = ClassLoaderHelper.instanceFromName( IndexShardingStrategy.class,
 					shardingStrategyName, DirectoryProviderFactory.class, "IndexShardingStrategy" );
 		}
 		shardingStrategy.initialize(
@@ -124,7 +123,7 @@ public class DirectoryProviderFactory {
 			provider = new FSDirectoryProvider();
 		}
 		else {
-			provider = PluginLoader.instanceFromName( DirectoryProvider.class, className,
+			provider = ClassLoaderHelper.instanceFromName( DirectoryProvider.class, className,
 					DirectoryProviderFactory.class, "directory provider" );
 		}
 		try {
@@ -176,7 +175,7 @@ public class DirectoryProviderFactory {
 	 * in a global scope it will take priority on local transaction parameters.
 	 * </p>
 	 *
-	 * @param searchFactoryImplementor the search factory.
+	 * @param context the build context.
 	 * @param directoryProperties	  The properties extracted from the configuration.
 	 * @param provider				 The directory provider for which to configure the indexing parameters.
 	 */

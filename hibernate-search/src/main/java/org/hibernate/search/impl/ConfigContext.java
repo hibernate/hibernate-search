@@ -41,9 +41,9 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.DelegateNamedAnalyzer;
 import org.hibernate.search.util.LoggerFactory;
-import org.hibernate.search.util.PluginLoader;
 
 /**
  * Provides access to some default configuration settings (eg default <code>Analyzer</code> or default
@@ -114,7 +114,7 @@ public final class ConfigContext {
 		else {
 			analyzerClass = StandardAnalyzer.class;
 		}
-		return PluginLoader.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
+		return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
 	}
 
 	/**
@@ -131,7 +131,7 @@ public final class ConfigContext {
 			defaultSimilarity = Similarity.getDefault();
 		}
 		else {
-			defaultSimilarity = PluginLoader.instanceFromName(
+			defaultSimilarity = ClassLoaderHelper.instanceFromName(
 					Similarity.class, similarityClassName, ConfigContext.class, "default similarity"
 			);
 		}

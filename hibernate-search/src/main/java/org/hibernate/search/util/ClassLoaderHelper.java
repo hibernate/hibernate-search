@@ -41,9 +41,9 @@ import org.hibernate.search.SearchException;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class PluginLoader {
+public class ClassLoaderHelper {
 
-	private PluginLoader() {
+	private ClassLoaderHelper() {
 	}
 
 	/**

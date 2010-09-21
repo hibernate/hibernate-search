@@ -87,8 +87,8 @@ import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.LoggerFactory;
-import org.hibernate.search.util.PluginLoader;
 import org.hibernate.search.util.ReflectionHelper;
 
 /**
@@ -332,7 +332,7 @@ public class SearchFactoryBuilder {
 			filterCachingStrategy = new MRUFilterCachingStrategy();
 		}
 		else {
-			filterCachingStrategy = PluginLoader.instanceFromName(
+			filterCachingStrategy = ClassLoaderHelper.instanceFromName(
 					FilterCachingStrategy.class,
 					impl, ImmutableSearchFactory.class, "filterCachingStrategy"
 			);
@@ -519,7 +519,7 @@ public class SearchFactoryBuilder {
 			return new LogErrorHandler();
 		}
 		else {
-			return PluginLoader.instanceFromName(
+			return ClassLoaderHelper.instanceFromName(
 					ErrorHandler.class, errorHandlerClassName,
 					ImmutableSearchFactory.class, "Error Handler"
 			);
