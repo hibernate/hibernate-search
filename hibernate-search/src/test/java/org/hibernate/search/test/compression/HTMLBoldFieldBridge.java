@@ -24,41 +24,50 @@
  */
 package org.hibernate.search.test.compression;
 
+import java.util.zip.DataFormatException;
+
+import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+
+import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
- * This FieldBridge is storing strings in the index wrapping the
- * entity value in html bold tags.
- * It's using deprecated method "getStore" to verify backwards compatibility
- * Almost useless, needed for CompressionTest
- * @see LuceneOptions
+ * This FieldBridge is storing strings in the index wrapping the entity value in html bold tags.
+ *
  * @author Sanne Grinovero
+ * @see LuceneOptions
  */
 public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		String fieldValue = objectToString( value );
-		Field field = new Field( name, fieldValue, luceneOptions.getStore(),
-				luceneOptions.getIndex(), luceneOptions.getTermVector() );
-		field.setBoost( luceneOptions.getBoost() );
-		document.add( field );
+		luceneOptions.addFieldToDocument( name, fieldValue, document );
 	}
 
 	public Object get(String name, Document document) {
 		Field field = document.getField( name );
-		String stringValue = field.stringValue();
-		return stringValue.substring( 3, stringValue.length()-4 );
+			String stringValue;
+			if ( field.isBinary() ) {
+				try {
+					stringValue = CompressionTools.decompressString( field.getBinaryValue() );
+				}
+				catch ( DataFormatException e) {
+					throw new SearchException( "Field " + name + " looks like binary but couldn't be decompressed" );
+				}
+			}
+			else {
+				stringValue = field.stringValue();
+			}
+			return stringValue.substring( 3, stringValue.length() - 4 );
 	}
 
 	public String objectToString(Object value) {
 		String originalValue = value.toString();
-		String fieldValue = "<b>" + originalValue + "</b>";
-		return fieldValue;
+		return  "<b>" + originalValue + "</b>";
 	}
-
 }
 

@@ -35,8 +35,19 @@ import org.apache.lucene.document.Field;
  */
 public interface LuceneOptions {
 
-	void addFieldToDocument(String name, String indexedString, Document document);
+	/**
+	 * Add a new field with the name {@code fieldName} to the Lucene Document {@code document} using the value
+	 * {@code indexedString}.
+	 *
+	 * @param fieldName The field name
+	 * @param indexedString The value to index
+	 * @param document the document to which to add the the new field
+	 */
+	void addFieldToDocument(String fieldName, String indexedString, Document document);
 
+	/**
+	 * @return {@code true} if the field value is compressed, {@code false} otherwise.
+	 */
 	boolean isCompressed();
 
 	/**

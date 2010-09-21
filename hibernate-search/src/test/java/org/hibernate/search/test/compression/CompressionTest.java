@@ -47,10 +47,16 @@ import org.hibernate.search.Search;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
+/**
+ * @author Sanne Grinovero
+ * @author Hardy Ferentschik
+ */
 public class CompressionTest extends SearchTestCase {
 
 	/**
-	 * verifies the fields are really stored in compressed format
+	 * Verifies the fields are really stored in compressed format
+	 *
+	 * @throws Exception in case the test fails
 	 */
 	public void testFieldWasCompressed() throws Exception {
 		DirectoryProvider[] directoryProviders = getSearchFactory().getDirectoryProviders( LargeDocument.class );
@@ -64,30 +70,29 @@ public class CompressionTest extends SearchTestCase {
 			Document document = indexReader.document( doc.doc );
 			{
 				Field[] fields = document.getFields( "title" );
-				Assert.assertEquals( 1, fields.length );
-//				Assert.assertFalse( fields[0].isCompressed() );
-				Assert.assertTrue( fields[0].isIndexed() );
-				Assert.assertTrue( fields[0].isStored() );
-				Assert.assertEquals(
+				assertEquals( 1, fields.length );
+				assertTrue( fields[0].isIndexed() );
+				assertTrue( fields[0].isStored() );
+				assertFalse( isCompressed( fields[0] ) );
+				assertEquals(
 						"Hibernate in Action, third edition",
 						fields[0].stringValue()
 				);
 			}
 			{
 				Field[] fields = document.getFields( "abstract" );
-				Assert.assertEquals( 1, fields.length );
-//				Assert.assertTrue( isCompressed( fields[0] ) );
-//				Assert.assertTrue( fields[0].isCompressed() );
-				Assert.assertEquals(
+				assertEquals( 1, fields.length );
+				assertTrue( isCompressed( fields[0] ) );
+				assertEquals(
 						"<b>JPA2 with Hibernate</b>",
 						restoreValue( fields[0] )
 				);
 			}
 			{
 				Field[] fields = document.getFields( "text" );
-				Assert.assertEquals( 1, fields.length );
-				Assert.assertTrue( isCompressed( fields[0] ) );
-				Assert.assertEquals(
+				assertEquals( 1, fields.length );
+				assertTrue( isCompressed( fields[0] ) );
+				assertEquals(
 						"This is a placeholder for the new text that you should write",
 						restoreValue( fields[0] )
 				);
@@ -99,25 +104,28 @@ public class CompressionTest extends SearchTestCase {
 	}
 
 	/**
-	 * Verifies the compressed fields are also searchable
+	 * Verifies the compressed fields are also searchable.
+	 *
+	 * @throws Exception in case the test fails
 	 */
-//	public void testCompressedFieldSearch() throws ParseException {
-//		assertFindsN( 1, "title:third" );
-//		assertFindsN( 1, "abstract:jpa2" );
-//		assertFindsN( 1, "text:write" );
-//		assertFindsN( 0, "text:jpa2" );
-//	}
+	public void testCompressedFieldSearch() throws Exception {
+		assertFindsN( 1, "title:third" );
+		assertFindsN( 1, "abstract:jpa2" );
+		assertFindsN( 1, "text:write" );
+		assertFindsN( 0, "text:jpa2" );
+	}
 
 	private void assertFindsN(int expectedToFind, String queryString) throws ParseException {
 		openSession().beginTransaction();
 		try {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			QueryParser qparser = new QueryParser( getTargetLuceneVersion(), "", new SimpleAnalyzer() );
-			Query query = qparser.parse( queryString );
+			QueryParser queryParser = new QueryParser( getTargetLuceneVersion(), "", new SimpleAnalyzer() );
+			Query query = queryParser.parse( queryString );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
 					query,
 					LargeDocument.class
 			);
+			@SuppressWarnings("unchecked")
 			List<LargeDocument> list = fullTextQuery.list();
 			Assert.assertEquals( expectedToFind, list.size() );
 			if ( expectedToFind == 1 ) {
@@ -133,28 +141,26 @@ public class CompressionTest extends SearchTestCase {
 	/**
 	 * Verify that projection is able to inflate stored data
 	 */
-//	public void testProjectionOnCompressedFields() {
-//		openSession().beginTransaction();
-//		try {
-//			FullTextSession fullTextSession = Search.getFullTextSession( session );
-//			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
-//					new MatchAllDocsQuery(),
-//					LargeDocument.class
-//			);
-//			List list = fullTextQuery.setProjection( "title", "abstract", "text" ).list();
-//			Assert.assertEquals( 1, list.size() );
-//			Object[] results = ( Object[] ) list.get( 0 );
-//			Assert.assertEquals( "Hibernate in Action, third edition", results[0] );
-//			Assert.assertEquals( "JPA2 with Hibernate", results[1] );
-//			Assert.assertEquals( "This is a placeholder for the new text that you should write", results[2] );
-//		}
-//		finally {
-//			session.getTransaction().commit();
-//			session.close();
-//		}
-//	}
-
-	// test helpers:
+	public void testProjectionOnCompressedFields() {
+		openSession().beginTransaction();
+		try {
+			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
+					new MatchAllDocsQuery(),
+					LargeDocument.class
+			);
+			List list = fullTextQuery.setProjection( "title", "abstract", "text" ).list();
+			Assert.assertEquals( 1, list.size() );
+			Object[] results = ( Object[] ) list.get( 0 );
+			Assert.assertEquals( "Hibernate in Action, third edition", results[0] );
+			Assert.assertEquals( "JPA2 with Hibernate", results[1] );
+			Assert.assertEquals( "This is a placeholder for the new text that you should write", results[2] );
+		}
+		finally {
+			session.getTransaction().commit();
+			session.close();
+		}
+	}
 
 	private String restoreValue(Field field) throws DataFormatException {
 		if ( field.isBinary() ) {
@@ -167,10 +173,19 @@ public class CompressionTest extends SearchTestCase {
 	}
 
 	private boolean isCompressed(Field field) {
-		return field.isBinary(); // ( field.isBinary() || field.isCompressed() );
+		if ( !field.isBinary() ) {
+			return false;
+		}
+		else {
+			try {
+				CompressionTools.decompressString( field.getBinaryValue() );
+				return true;
+			}
+			catch ( DataFormatException e ) {
+				return false;
+			}
+		}
 	}
-
-	// test setup:
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {

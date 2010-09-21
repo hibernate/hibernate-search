@@ -59,7 +59,6 @@ class LuceneOptionsImpl implements LuceneOptions {
 
 	public void addFieldToDocument(String name, String indexedString, Document document) {
 		//Do not add fields on empty strings, seems a sensible default in most situations
-		//TODO if Store, probably also save empty ones
 		if ( StringHelper.isNotEmpty( indexedString ) ) {
 			if ( !( indexMode.equals( Index.NO ) && storeCompressed ) ) {
 				standardFieldAdd( name, indexedString, document );
