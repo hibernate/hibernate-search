@@ -54,7 +54,12 @@ public class DocumentExtractor {
 
 	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
-		this.projection = projection;
+		if ( projection != null ) {
+			this.projection = projection.clone();
+		}
+		else {
+			this.projection = null;
+		}
 		this.queryHits = queryHits;
 		this.allowFieldSelection = allowFieldSelection;
 		initFieldSelection( projection, idFieldNames );
@@ -88,6 +93,7 @@ public class DocumentExtractor {
 
 	private EntityInfo extract(Document document) {
 		Class clazz = DocumentBuilderIndexedEntity.getDocumentClass( document );
+		String idName =  DocumentBuilderIndexedEntity.getDocumentIdName( searchFactoryImplementor, clazz );
 		Serializable id = DocumentBuilderIndexedEntity.getDocumentId( searchFactoryImplementor, clazz, document );
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
@@ -95,7 +101,7 @@ public class DocumentExtractor {
 					searchFactoryImplementor, clazz, document, projection
 			);
 		}
-		return new EntityInfo( clazz, id, projected );
+		return new EntityInfo( clazz, idName, id, projected );
 	}
 
 	public EntityInfo extract(int index) throws IOException {

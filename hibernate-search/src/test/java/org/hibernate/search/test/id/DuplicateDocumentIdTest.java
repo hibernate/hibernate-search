@@ -23,48 +23,39 @@
  */
 package org.hibernate.search.test.id;
 
-import java.util.List;
-
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.search.Search;
+import org.hibernate.HibernateException;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ImplicitIdTest extends SearchTestCase {
+public class DuplicateDocumentIdTest extends SearchTestCase {
+
+	public void setUp() {
+		// don't call super.setUp - we want to build the configuration in the test
+	}
 
 	/**
-	 * Tests that @DocumentId is optional. See HSEARCH-104.
+	 * Tests that an exception is thrown in case @DocumentId is specified on more than one property
 	 *
 	 * @throws Exception in case the test fails.
 	 */
-	public void testImplicitDocumentId() throws Exception {
-		Animal dog = new Animal();
-		dog.setName( "Dog" );
-
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		s.save( dog );
-		tx.commit();
-		s.clear();
-
-		tx = s.beginTransaction();
-		List results = Search.getFullTextSession( s ).createFullTextQuery(
-				new TermQuery( new Term( "name", "dog" ) )
-		).list();
-		assertEquals( 1, results.size() );
-		tx.commit();
-		s.close();
+	public void testDuplicateDocumentId() throws Exception {
+		try {
+			buildConfiguration();
+			fail( "Building of configuration should fail, because Foo defines multiple document ids." );
+		}
+		catch ( HibernateException e ) { // getting a HibernateException here, because the listener registration fails
+			assertEquals(
+					"More than one @DocumentId specified on entity org.hibernate.search.test.id.Foo",
+					e.getCause().getMessage()
+			);
+		}
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Animal.class
+				Foo.class
 		};
 	}
 }

@@ -62,7 +62,9 @@ public abstract class AbstractLoader implements Loader {
 		if ( takeTimings ) {
 			startTime = System.nanoTime();
 		}
+
 		List loadedObjects = executeLoad( entityInfos );
+		
 		if ( takeTimings ) {
 			statisticsImplementor.objectLoadExecuted( loadedObjects.size(), System.nanoTime() - startTime );
 		}
