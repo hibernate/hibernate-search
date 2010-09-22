@@ -32,7 +32,7 @@ import org.hibernate.annotations.common.util.ReflectHelper;
 /**
  * @author Emmanuel Bernard
  */
-public abstract class LoaderHelper {
+public class LoaderHelper {
 	private static final List<Class> objectNotFoundExceptions;
 
 	static {
@@ -53,6 +53,9 @@ public abstract class LoaderHelper {
 		catch ( ClassNotFoundException e ) {
 			//leave it alone
 		}
+	}
+
+	private LoaderHelper() {
 	}
 
 	public static boolean isObjectNotFoundException(RuntimeException e) {
