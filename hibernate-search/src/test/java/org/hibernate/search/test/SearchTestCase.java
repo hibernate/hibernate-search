@@ -72,17 +72,26 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	protected static SessionFactory sessions;
 	protected Session session;
 
+	private static File targetDir;
 	private static File indexDir;
 
 	private SearchFactoryImplementor searchFactory;
 
 	static {
-		String buildDir = System.getProperty( "build.dir" );
-		if ( buildDir == null ) {
-			buildDir = ".";
-		}
-		File current = new File( buildDir );
-		indexDir = new File( current, "indextemp" );
+		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		// get a URL reference to something we now is part of the classpath (us)
+		URL myUrl = contextClassLoader.getResource( SearchTestCase.class.getName().replace( '.', '/' ) + ".class" );
+		File myPath = new File( myUrl.getFile() );
+		// navigate back to '/target'
+		targetDir = myPath
+				.getParentFile()  // target/classes/org/hibernate/search/test
+				.getParentFile()  // target/classes/org/hibernate/search
+				.getParentFile()  // target/classes/org/hibernate/
+				.getParentFile()  // target/classes/org
+				.getParentFile()  // target/classes/
+				.getParentFile(); // target
+
+		indexDir = new File( targetDir, "indextemp" );
 		log.debug( "Using {} as index directory.", indexDir.getAbsolutePath() );
 	}
 
@@ -259,17 +268,6 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	 * @return the target directory of the build
 	 */
 	public static File getTargetDir() {
-		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-		// get a URL reference to something we now is part of the classpath (us)
-		URL myUrl = contextClassLoader.getResource( SearchTestCase.class.getName().replace( '.', '/' ) + ".class" );
-		File myPath = new File( myUrl.getFile() );
-		// navigate back to '/target'
-		return myPath
-				.getParentFile()  // target/classes/org/hibernate/search/test
-				.getParentFile()  // target/classes/org/hibernate/search
-				.getParentFile()  // target/classes/org/hibernate/
-				.getParentFile()  // target/classes/org
-				.getParentFile()  // target/classes/
-				.getParentFile(); // target
+		return targetDir;
 	}
 }
