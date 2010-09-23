@@ -22,7 +22,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader;
+package org.hibernate.search.test.performance.reader;
 
 import java.io.File;
 import java.util.List;

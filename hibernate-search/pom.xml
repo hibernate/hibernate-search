@@ -125,10 +125,6 @@
                     <forkMode>once</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <systemProperties>
-                        <property>
-                            <name>build.dir</name>
-                            <value>${basedir}/target</value>
-                        </property>
                         <!--
                                 Following is the default jgroups mcast address. If you find the testsuite runs very slowly,
                                 there may be problems with multicast on the interface JGroups uses by default on
@@ -154,7 +150,6 @@
                     </systemProperties>
                     <excludes>
                         <exclude>**/classloading/*.java</exclude>
-                        <exclude>**/*PerfTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

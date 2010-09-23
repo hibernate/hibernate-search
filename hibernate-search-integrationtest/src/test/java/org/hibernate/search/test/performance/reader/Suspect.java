@@ -22,23 +22,24 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.optimizer;
+package org.hibernate.search.test.performance.reader;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Column;
 
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
 @Indexed
-public class Construction {
+public class Suspect {
 	@Id
 	@GeneratedValue
 	@DocumentId
@@ -46,16 +47,11 @@ public class Construction {
 	@Field(index = Index.TOKENIZED)
 	private String name;
 	@Field(index = Index.TOKENIZED)
-	private String address;
+	private String physicalDescription;
+	@Field(index = Index.TOKENIZED)
+	@Column(length = 500)
+	private String suspectCharge;
 
-
-	public Construction() {
-	}
-
-	public Construction(String name, String address) {
-		this.name = name;
-		this.address = address;
-	}
 
 	public Integer getId() {
 		return id;
@@ -73,11 +69,19 @@ public class Construction {
 		this.name = name;
 	}
 
-	public String getAddress() {
-		return address;
+	public String getPhysicalDescription() {
+		return physicalDescription;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setPhysicalDescription(String physicalDescription) {
+		this.physicalDescription = physicalDescription;
+	}
+
+	public String getSuspectCharge() {
+		return suspectCharge;
+	}
+
+	public void setSuspectCharge(String suspectCharge) {
+		this.suspectCharge = suspectCharge;
 	}
 }

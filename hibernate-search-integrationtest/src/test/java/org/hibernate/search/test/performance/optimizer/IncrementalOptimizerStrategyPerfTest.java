@@ -22,46 +22,15 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader.performance;
-
-import java.io.IOException;
-
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.index.IndexWriter;
+package org.hibernate.search.test.performance.optimizer;
 
 /**
- * @author Sanne Grinovero
+ * @author Emmanuel Bernard
  */
-public class IndexFillRunnable implements Runnable {
-
-	private volatile int jobSeed = 0;
-	private final IndexWriter iw;
-
-	public IndexFillRunnable(IndexWriter iw) {
-		super();
-		this.iw = iw;
+//having name end in *PerfTest disables it from functional tests
+public class IncrementalOptimizerStrategyPerfTest extends OptimizerPerfTest {
+	protected void configure(org.hibernate.cfg.Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( "hibernate.search.default.optimizer.transaction_limit.max", "10" );
 	}
-
-	public void run() {
-		Field f1 = new Field( "name", "Some One " + jobSeed++, Store.NO, Index.ANALYZED );
-		Field f2 = new Field(
-				"physicalDescription",
-				" just more people sitting around and filling my index... ",
-				Store.NO,
-				Index.ANALYZED
-		);
-		Document d = new Document();
-		d.add( f1 );
-		d.add( f2 );
-		try {
-			iw.addDocument( d );
-		}
-		catch ( IOException e ) {
-			e.printStackTrace();
-		}
-	}
-
 }

@@ -22,16 +22,29 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader.performance;
+package org.hibernate.search.test.performance.reader;
+
+import java.util.concurrent.CountDownLatch;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
 
 /**
+ * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class NotSharedReaderPerfTest extends ReaderPerformance {
-
-	@Override
-	protected String getReaderStrategyName() {
-		return "not-shared";
+public class SearchActivity extends AbstractActivity {
+	
+	SearchActivity(SessionFactory sf, CountDownLatch startSignal) {
+		super(sf, startSignal);
 	}
 
+	@Override
+	protected void doAction(FullTextSession s, int jobSeed) {
+		FullTextQuery q = getQuery( "John Doe", s, Detective.class);
+		q.setMaxResults( 10 );
+		q.getResultSize();
+	}
+	
 }

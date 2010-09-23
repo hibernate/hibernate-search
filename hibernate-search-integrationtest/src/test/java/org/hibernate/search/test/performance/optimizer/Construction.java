@@ -22,30 +22,62 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader.performance;
+package org.hibernate.search.test.performance.optimizer;
 
-import java.util.concurrent.CountDownLatch;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.test.reader.Detective;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
 
 /**
  * @author Emmanuel Bernard
- * @author Sanne Grinovero
  */
-public class SearchActivity extends AbstractActivity {
-	
-	SearchActivity(SessionFactory sf, CountDownLatch startSignal) {
-		super(sf, startSignal);
+@Entity
+@Indexed
+public class Construction {
+	@Id
+	@GeneratedValue
+	@DocumentId
+	private Integer id;
+	@Field(index = Index.TOKENIZED)
+	private String name;
+	@Field(index = Index.TOKENIZED)
+	private String address;
+
+
+	public Construction() {
 	}
 
-	@Override
-	protected void doAction(FullTextSession s, int jobSeed) {
-		FullTextQuery q = getQuery( "John Doe", s, Detective.class);
-		q.setMaxResults( 10 );
-		q.getResultSize();
+	public Construction(String name, String address) {
+		this.name = name;
+		this.address = address;
 	}
-	
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
 }

@@ -22,19 +22,18 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader;
+package org.hibernate.search.test.performance.reader;
 
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
-import org.hibernate.search.reader.SharedReaderProvider;
+import org.hibernate.search.reader.SharingBufferReaderProvider;
 
 /**
- * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-@SuppressWarnings("deprecation")
-public class SharedReaderPerfTest extends ReaderPerfTestCase {
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.READER_STRATEGY, SharedReaderProvider.class.getCanonicalName() );
+public class BufferSharingReaderPerfTest extends ReaderPerformance {
+
+	@Override
+	protected String getReaderStrategyName() {
+		return SharingBufferReaderProvider.class.getName();
 	}
+
 }

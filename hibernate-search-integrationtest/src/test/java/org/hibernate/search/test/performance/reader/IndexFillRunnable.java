@@ -22,17 +22,46 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader;
+package org.hibernate.search.test.performance.reader;
 
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import java.io.IOException;
+
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.index.IndexWriter;
 
 /**
- * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-public class NotSharedReaderPerfTest extends ReaderPerfTestCase {
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.READER_STRATEGY, "not-shared" );
+public class IndexFillRunnable implements Runnable {
+
+	private volatile int jobSeed = 0;
+	private final IndexWriter iw;
+
+	public IndexFillRunnable(IndexWriter iw) {
+		super();
+		this.iw = iw;
 	}
+
+	public void run() {
+		Field f1 = new Field( "name", "Some One " + jobSeed++, Store.NO, Index.ANALYZED );
+		Field f2 = new Field(
+				"physicalDescription",
+				" just more people sitting around and filling my index... ",
+				Store.NO,
+				Index.ANALYZED
+		);
+		Document d = new Document();
+		d.add( f1 );
+		d.add( f2 );
+		try {
+			iw.addDocument( d );
+		}
+		catch ( IOException e ) {
+			e.printStackTrace();
+		}
+	}
+
 }

@@ -22,18 +22,32 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader;
+package org.hibernate.search.test.performance.reader;
 
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
-import org.hibernate.search.reader.SharingBufferReaderProvider;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
 
 /**
- * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-public class SharedBufferedReaderPerfTest extends ReaderPerfTestCase {
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getCanonicalName() );
+public class UpdateActivity extends AbstractActivity {
+
+	UpdateActivity(SessionFactory sf, CountDownLatch startSignal) {
+		super(sf, startSignal);
 	}
+
+	@Override
+	protected void doAction(FullTextSession s, int jobSeed) {
+		FullTextQuery q = getQuery( "John", s, Detective.class );
+		List list = q.setMaxResults( 1 ).list();
+		for ( Object o : list){
+			Detective detective = (Detective) o;
+			detective.setPhysicalDescription( "old" );
+		}
+	}
+
 }

@@ -22,33 +22,39 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader.performance;
+package org.hibernate.search.test.performance.reader;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.test.reader.Detective;
 
 /**
+ * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class UpdateActivity extends AbstractActivity {
-
-	UpdateActivity(SessionFactory sf, CountDownLatch startSignal) {
+public class InsertActivity extends AbstractActivity {
+	
+	InsertActivity(SessionFactory sf, CountDownLatch startSignal) {
 		super(sf, startSignal);
 	}
 
 	@Override
 	protected void doAction(FullTextSession s, int jobSeed) {
-		FullTextQuery q = getQuery( "John", s, Detective.class );
-		List list = q.setMaxResults( 1 ).list();
-		for ( Object o : list){
-			Detective detective = (Detective) o;
-			detective.setPhysicalDescription( "old" );
+		Detective detective = new Detective();
+		detective.setName("John Doe " + jobSeed);
+		detective.setBadge("123455" + jobSeed);
+		detective.setPhysicalDescription("Blond green eye etc etc");
+		s.persist(detective);
+		Suspect suspect = new Suspect();
+		suspect.setName("Jane Doe " + jobSeed);
+		suspect.setPhysicalDescription("brunette, short, 30-ish");
+		if (jobSeed % 20 == 0) {
+			suspect.setSuspectCharge("thief liar ");
+		} else {
+			suspect.setSuspectCharge(" It's 1875 in London. The police have captured career criminal Montmorency. In the process he has been grievously wounded and it is up to a young surgeon to treat his wounds. During his recovery Montmorency learns of the city's new sewer system and sees in it the perfect underground highway for his thievery.  Washington Post columnist John Kelly recommends this title for middle schoolers, especially to be read aloud.");
 		}
+		s.persist(suspect);
 	}
 
 }

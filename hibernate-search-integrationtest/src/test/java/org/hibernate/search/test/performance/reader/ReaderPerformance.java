@@ -22,7 +22,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader.performance;
+package org.hibernate.search.test.performance.reader;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,8 +40,6 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.hibernate.search.Environment;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.reader.Detective;
-import org.hibernate.search.test.reader.Suspect;
 import org.hibernate.search.util.FileHelper;
 
 /**

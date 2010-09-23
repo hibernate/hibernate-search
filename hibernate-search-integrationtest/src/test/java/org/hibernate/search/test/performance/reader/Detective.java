@@ -22,24 +22,23 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.reader;
+package org.hibernate.search.test.performance.reader;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
 
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
 @Indexed
-public class Suspect {
+public class Detective {
 	@Id
 	@GeneratedValue
 	@DocumentId
@@ -48,9 +47,8 @@ public class Suspect {
 	private String name;
 	@Field(index = Index.TOKENIZED)
 	private String physicalDescription;
-	@Field(index = Index.TOKENIZED)
-	@Column(length = 500)
-	private String suspectCharge;
+	@Field(index = Index.UN_TOKENIZED)
+	private String badge;
 
 
 	public Integer getId() {
@@ -77,11 +75,11 @@ public class Suspect {
 		this.physicalDescription = physicalDescription;
 	}
 
-	public String getSuspectCharge() {
-		return suspectCharge;
+	public String getBadge() {
+		return badge;
 	}
 
-	public void setSuspectCharge(String suspectCharge) {
-		this.suspectCharge = suspectCharge;
+	public void setBadge(String badge) {
+		this.badge = badge;
 	}
 }
