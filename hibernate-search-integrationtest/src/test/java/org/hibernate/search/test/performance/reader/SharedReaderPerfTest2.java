@@ -25,14 +25,15 @@ package org.hibernate.search.test.performance.reader;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.reader.SharingBufferReaderProvider;
+import org.hibernate.search.reader.SharedReaderProvider;
 
 /**
  * @author Emmanuel Bernard
  */
-public class SharedBufferedReaderPerfTest extends ReaderPerfTestCase {
+@SuppressWarnings("deprecation")
+public class SharedReaderPerfTest2 extends ReaderPerfTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getCanonicalName() );
+		cfg.setProperty( Environment.READER_STRATEGY, SharedReaderProvider.class.getCanonicalName() );
 	}
 }
