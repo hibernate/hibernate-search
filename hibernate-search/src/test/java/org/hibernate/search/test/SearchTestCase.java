@@ -26,6 +26,7 @@ package org.hibernate.search.test;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Properties;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
@@ -93,6 +94,36 @@ public abstract class SearchTestCase extends HibernateTestCase {
 
 		indexDir = new File( targetDir, "indextemp" );
 		log.debug( "Using {} as index directory.", indexDir.getAbsolutePath() );
+	}
+
+	// some system properties needed for JGroups
+	static {
+		Properties properties = System.getProperties();
+
+		// Following is the default jgroups mcast address. If you find the testsuite runs very slowly,
+		// there may be problems with multicast on the interface JGroups uses by default on
+		// your machine. You can try to resolve setting 'jgroups.bind_addr' as a system-property
+		// to the jvm launching maven and setting the value to an interface where you know multicast works
+		String ip4Stack = "java.net.preferIPv4Stack";
+		if ( properties.containsKey( ip4Stack ) ) {
+			log.debug( "Found explicit value for '" + ip4Stack + "' Using value: " + properties.get( ip4Stack ) );
+		}
+		else {
+			log.debug( "'" + ip4Stack + "' property not set. Setting it explicitly to 'true'" );
+			System.setProperty( ip4Stack, "true" );
+		}
+
+		// There are problems with multicast and IPv6 on some OS/JDK combos, so we tell Java
+        // to use IPv4. If you have problems with multicast when running the tests you can
+        // try setting this to 'false', although typically that won't be helpful.
+		String bindAddress = "jgroups.bind_addr";
+		if ( properties.containsKey( bindAddress ) ) {
+			log.debug( "Found explicit value for '" + bindAddress + "' Using value: " + properties.get( bindAddress ) );
+		}
+		else {
+			log.debug( "'" + bindAddress + "' property not set. Setting it explicitly to '127.0.0.1'" );
+			System.setProperty( "jgroups.bind_addr", "127.0.0.1" );
+		}
 	}
 
 	public SearchTestCase() {

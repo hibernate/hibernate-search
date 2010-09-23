@@ -125,32 +125,11 @@
                     <forkMode>once</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <systemProperties>
-                        <!--
-                                Following is the default jgroups mcast address. If you find the testsuite runs very slowly,
-                                there may be problems with multicast on the interface JGroups uses by default on
-                                your machine. You can try to resolve setting 'jgroups.bind_addr' as a system-property
-                                to the jvm launching maven and setting the value to an interface where you know multicast works
-                            -->
-                        <property>
-                            <name>jgroups.bind_addr</name>
-                            <value>127.0.0.1</value>
-                        </property>
-                        <!-- There are problems with multicast and IPv6 on some OS/JDK combos, so we tell Java
-                                to use IPv4. If you have problems with multicast when running the tests you can
-                                try setting this to 'false', although typically that won't be helpful.
-                            -->
-                        <property>
-                            <name>java.net.preferIPv4Stack</name>
-                            <value>true</value>
-                        </property>
                         <property>
                             <name>com.sun.management.jmxremote</name>
                             <value>true</value>
                         </property>
                     </systemProperties>
-                    <excludes>
-                        <exclude>**/classloading/*.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
