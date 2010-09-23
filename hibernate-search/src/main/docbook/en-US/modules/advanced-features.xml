@@ -33,13 +33,13 @@
     <para>The <classname>SearchFactory</classname> object keeps track of the
     underlying Lucene resources for Hibernate Search, it's also a convenient
     way to access Lucene natively. The <classname>SearchFactory</classname>
-    can be accessed from a <classname>FullTextSession</classname>:</para>
+    can be accessed from a<classname>FullTextSession</classname>:</para>
 
     <example>
       <title>Accessing the <classname>SearchFactory</classname></title>
 
       <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
-SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
+SearchFactory searchFactory = fullTextSession.getSearchFactory();           </programlisting>
     </example>
   </section>
 
@@ -53,15 +53,15 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlistin
     <classname>DirectoryProvider</classname>s per indexed class. One directory
     provider can be shared amongst several indexed classes if the classes
     share the same underlying index directory. While usually not the case, a
-    given entity can have several <classname>DirectoryProvider</classname>s if
-    the index is sharded (see <xref
+    given entity can have several<classname>DirectoryProvider</classname>s if
+    the index is sharded (see<xref
     linkend="search-configuration-directory-sharding" />).</para>
 
     <example>
       <title>Accessing the Lucene <classname>Directory</classname></title>
 
       <programlisting>DirectoryProvider[] provider = searchFactory.getDirectoryProviders(Order.class);
-org.apache.lucene.store.Directory directory = provider[0].getDirectory();</programlisting>
+org.apache.lucene.store.Directory directory = provider[0].getDirectory();           </programlisting>
     </example>
 
     <para>In this example, directory points to the lucene index storing
@@ -73,7 +73,7 @@ org.apache.lucene.store.Directory directory = provider[0].getDirectory();</progr
   <section>
     <title>Using an IndexReader</title>
 
-    <para>Queries in Lucene are executed on an <literal>IndexReader</literal>.
+    <para>Queries in Lucene are executed on an<literal>IndexReader</literal>.
     Hibernate Search caches all index readers to maximize performance. Your
     code can access this cached resources, but you have to follow some "good
     citizen" rules.</para>
@@ -88,14 +88,14 @@ ReaderProvider readerProvider = searchFactory.getReaderProvider();
 IndexReader reader = readerProvider.openReader(orderProvider, clientProvider);
 
 try {
-    //do read-only operations on the reader
+   //do read-only operations on the reader
 }
 finally {
-    readerProvider.closeReader(reader);
-}</programlisting>
+   readerProvider.closeReader(reader);
+}          </programlisting>
     </example>
 
-    <para>The ReaderProvider (described in <xref
+    <para>The ReaderProvider (described in<xref
     linkend="search-architecture-readerstrategy" />), will open an IndexReader
     on top of the index(es) referenced by the directory providers. Because
     this <classname>IndexReader</classname> is shared amongst several clients,
@@ -130,10 +130,10 @@ finally {
     methods defined in this class match the factors of the following formula
     calculating the score of query q for document d:</para>
 
-    <para><emphasis role="bold">score(q,d) = coord(q,d) · queryNorm(q) ·
-    ∑<subscript>t in q</subscript> ( tf(t in d) ·
-    idf(t)<superscript>2</superscript> · t.getBoost() · norm(t,d)
-    )</emphasis></para>
+    <para><emphasis role="bold">score(q,d) = coord(q,d) · queryNorm(q) · ∑
+    <subscript>t in q</subscript> ( tf(t in d) · idf(t)
+    <superscript>2</superscript> · t.getBoost() · norm(t,d) )
+    </emphasis></para>
 
     <para><informaltable align="left" width="">
         <tgroup cols="2">
@@ -187,7 +187,7 @@ finally {
             </row>
           </tbody>
         </tgroup>
-      </informaltable>It is beyond the scope of this manual to explain this
+      </informaltable> It is beyond the scope of this manual to explain this
     formula in more detail. Please refer to
     <classname>Similarity</classname>'s Javadocs for more information.</para>
 
@@ -198,76 +198,86 @@ finally {
     <constant>hibernate.search.similarity</constant>. The default value is
     <classname>org.apache.lucene.search.DefaultSimilarity</classname>.
     Additionally you can override the default similarity on class level using
-    the <literal>@Similarity</literal> annotation.<programlisting>@Entity
+    the <literal>@Similarity</literal> annotation. <programlisting>@Entity
 @Indexed
 <emphasis role="bold">@Similarity(impl = DummySimilarity.class)</emphasis>
 public class Book {
-   ...
-}</programlisting>As an example, let's assume it is not important how often a
-    term appears in a document. Documents with a single occurrence of the term
-    should be scored the same as documents with multiple occurrences. In this
-    case your custom implementation of the method <methodname>tf(float
-    freq)</methodname> should return 1.0.</para>
-    
-    <warning><para>When two entities share the same index they must declare the
-    same <classname>Similarity</classname> implementation. Classes in the same
-    class hierarchy always share the index, so it's not allowed to override the
-    <classname>Similarity</classname> implementation in a subtype.</para></warning>
-    
+...
+}           </programlisting> As an example, let's assume it is not important
+    how often a term appears in a document. Documents with a single occurrence
+    of the term should be scored the same as documents with multiple
+    occurrences. In this case your custom implementation of the method
+    <methodname>tf(float freq) </methodname> should return 1.0.</para>
+
+    <warning>
+      <para>When two entities share the same index they must declare the same
+      <classname>Similarity</classname> implementation. Classes in the same
+      class hierarchy always share the index, so it's not allowed to override
+      the <classname>Similarity</classname> implementation in a
+      subtype.</para>
+    </warning>
   </section>
 
-  <section id="search-jmx">
-  <title>JMX integration</title>
+  <section id="section-monitoring">
+    <title>Monitoring</title>
 
-  <para>Hibernate Search offers, similar to Hibernate Core, the ability to
-  manage several aspects of Search via JMX. In order to use this functionality
-  you have to set the <literal>hibernate.search.jmx_enabled</literal> property
-  in your configuration. Setting this property will give you access to the
-  Mbeans <classname>StatisticsInfoMBean</classname>,
-  <classname>IndexControlMBean</classname> and
-  <classname>IndexingProgressMonitorMBean</classname>. Depending on the
-  configuration and state of Search not all beans are available at all times.
-  Lets have a closer look at the different MBeans.</para>
+    <para>Hibernate Search offers access to a
+    <classname>Statistics</classname> object via
+    <methodname>SearchFactory.getStatistics()</methodname>. It allows you for
+    example to determine which classes are indexed and how many entities are
+    in the index. This information is always available. However, by specifying
+    the <literal>hibernate.search.generate_statistics</literal> property in
+    your configuration you can also collect total and average Lucene query and
+    object loading timings. </para>
 
-  <section>
-    <title>StatisticsInfoMBean</title>
+    <section>
+      <title>JMX</title>
 
-    <para>This MBean gives you access to information like the total number of
-    indexed entities as well as total and average Lucene query and object
-    loading times. Setting the property
-    <literal>hibernate.search.jmx_enabled</literal> will automatically
-    register the MBean, however query and object loading timings will not be
-    taken unless you also specify
-    <literal>hibernate.search.generate_statistics</literal> in your
-    configuration. The statistics offered by
-    <classname>StatisticsInfoMBean</classname> are also available
-    programmatically via <code>SearchFactory.getStatistics()</code>.</para>
+      <para>You can also enable access to the statistics via JMX. Setting the
+      property <literal>hibernate.search.jmx_enabled</literal> will
+      automatically register the <classname>StatisticsInfoMBean</classname>.
+      Depending on your the configuration the
+      <classname>IndexControlMBean</classname> and
+      <classname>IndexingProgressMonitorMBean</classname> will also be
+      registered. Lets have a closer look at the different MBeans.<tip>
+          <para>If you want to access your JMX beans remotely via JConsole
+          make sure to set the system property
+          <varname>com.sun.management.jmxremote</varname> to
+          <constant>true</constant>.</para>
+        </tip></para>
+
+      <section>
+        <title>StatisticsInfoMBean</title>
+
+        <para>This MBean gives you access to <classname>Statistics</classname>
+        object as desribed in the previous section.</para>
+      </section>
+
+      <section>
+        <title>IndexControlMBean</title>
+
+        <para>This MBean allows to build, optimize and purge the index for a
+        given entity. Indexing occurs via the mass indexing API (see<xref
+        linkend="search-batchindex-massindexer" />). A requirement for this
+        bean to be registered in JMX is, that the Hibernate
+        <classname>SessionFactory</classname> is bound to JNDI via the
+        <literal>hibernate.session_factory_name</literal> property. Refer to
+        the Hibernate Core manual for more information on how to configure
+        JNDI. The <classname>IndexControlMBean</classname> and its API are for
+        now experimental.</para>
+      </section>
+
+      <section>
+        <title>IndexingProgressMonitorMBean</title>
+
+        <para>This MBean is an implementation
+        <classname>MassIndexerProgressMonitor</classname> interface. If
+        <literal>hibernate.search.jmx_enabled</literal> is enabled and the
+        mass indexer API is used the indexing progress can be followed via
+        this bean. The bean will only be bound to JMX while indexing is in
+        progress. Once indexing is completed the MBean is not longer
+        available.</para>
+      </section>
+    </section>
   </section>
-
-  <section>
-    <title>IndexControlMBean</title>
-
-    <para>This MBean allows to build, optimize and purge the index for a given
-    entity. Indexing occurs via the mass indexing API (see <xref
-    linkend="search-batchindex-massindexer" />). A requirement for this bean
-    to be registered in JMX is, that the Hibernate
-    <classname>SessionFactory</classname> is bound to JNDI via the
-    <literal>hibernate.session_factory_name</literal> property. Refer to the
-    Hibernate Core manual for more information on how to configure JNDI. The
-    <classname>IndexControlMBean</classname> and its API have to be considered
-    experimental.</para>
-  </section>
-
-  <section>
-    <title>IndexingProgressMonitorMBean</title>
-
-    <para>This MBean is an implementation
-    <classname>MassIndexerProgressMonitor</classname> interface. If
-    <literal>hibernate.search.jmx_enabled</literal> is enabled and the mass
-    indexer API is used the indexing progress can be followed via this bean.
-    The bean will only be bound to JMX while indexing is in progress. Once
-    indexing is completed the MBean is not longer available.</para>
-  </section>
-</section>  
-
 </chapter>
