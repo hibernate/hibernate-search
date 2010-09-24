@@ -26,6 +26,7 @@ package org.hibernate.search.engine;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,7 +48,6 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.ReflectHelper;
-import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.DocumentId;
@@ -83,7 +83,7 @@ import org.hibernate.search.util.ReflectionHelper;
  * @author Richard Hallier
  * @author Hardy Ferentschik
  */
-public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEntity<T> {
+public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> {
 	private static final Logger log = LoggerFactory.make();
 
 	/**
@@ -153,9 +153,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		this.shardingStrategy = shardingStrategy;
 	}
 
-	protected void init(XClass clazz, ConfigContext context) {
-		super.init( clazz, context );
-
+	protected void initSubClass(XClass clazz, ConfigContext context) {
 		// special case @ProvidedId
 		ProvidedId provided = findProvidedId( clazz, reflectionManager );
 		if ( provided != null ) {
@@ -175,6 +173,10 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 					clazz.getName()
 			);
 		}
+	}
+
+	protected void subClassSpecificCheck(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
+		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context );
 	}
 
 	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
@@ -278,8 +280,6 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		return id;
 	}
 
-	//TODO could we use T instead of EntityClass?
-
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
 		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition
 
@@ -358,7 +358,9 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 			throw new AssertionFailure( "Unknown WorkType: " + workType );
 		}
 
-		super.addWorkToQueue( entityClass, entity, id, workType, queue, searchFactoryImplementor );
+		if ( workType.searchForContainers() ) {
+			processContainedInInstances( entity, queue, metadata, searchFactoryImplementor );
+		}
 	}
 
 	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, boolean isBatch) {
@@ -424,7 +426,7 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		}
 
 		// needed for field access: I cannot work in the proxied version
-		Object unproxiedInstance = unproxy( instance );
+		Object unproxiedInstance = HibernateHelper.unproxy( instance );
 
 		// process the class bridges
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
@@ -528,16 +530,6 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 		}
 	}
 
-	private Object unproxy(Object value) {
-		//FIXME this service should be part of Core?
-		if ( value instanceof HibernateProxy ) {
-			// .getImplementation() initializes the data by side effect
-			value = ( ( HibernateProxy ) value ).getHibernateLazyInitializer()
-					.getImplementation();
-		}
-		return value;
-	}
-
 	public String getIdentifierName() {
 		return idGetter.getName();
 	}
@@ -593,6 +585,8 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 	 * An IllegalStateException otherwise
 	 * <p/>
 	 * If the id is provided, we can't extract it from the entity
+	 *
+	 * @param entity The entity for which to return the id. Cannot be {@code null}.
 	 *
 	 * @return entity id
 	 */
@@ -803,5 +797,27 @@ public class DocumentBuilderIndexedEntity<T> extends DocumentBuilderContainedEnt
 				return;
 			}
 		}
+	}
+
+	/**
+	 * Determines the property name for the document id. It is either the name of the property itself or the
+	 * value of the name attribute of the <code>idAnnotation</code>.
+	 *
+	 * @param member the property used as id property.
+	 * @param idAnnotation the id annotation
+	 *
+	 * @return property name to be used as document id.
+	 */
+	private String getIdAttributeName(XProperty member, Annotation idAnnotation) {
+		String name = null;
+		try {
+			Method m = idAnnotation.getClass().getMethod( "name" );
+			name = ( String ) m.invoke( idAnnotation );
+		}
+		catch ( Exception e ) {
+			// ignore
+		}
+
+		return ReflectionHelper.getAttributeName( member, name );
 	}
 }
