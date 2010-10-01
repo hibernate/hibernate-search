@@ -269,10 +269,13 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					elementType = ElementType.METHOD;
 				}
 				else {
-					throw new SearchException( "Error in programmatic mapping. Method " + propertyName + " is not a property getter" );
+					//this is a non getter method, so let it go and delegate
+					entityType = null;
+					propertyName = null;
 				}
 			}
 			else {
+				//this is a non supported element, so let it go and delegate
 				entityType = null;
 				propertyName = null;
 			}
