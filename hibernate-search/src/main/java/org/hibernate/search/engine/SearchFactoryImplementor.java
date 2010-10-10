@@ -26,7 +26,6 @@ package org.hibernate.search.engine;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.management.ObjectName;
 
 import org.apache.lucene.search.Similarity;
 

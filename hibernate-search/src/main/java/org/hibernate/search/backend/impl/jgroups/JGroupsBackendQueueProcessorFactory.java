@@ -39,7 +39,6 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;

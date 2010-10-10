@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 
@@ -39,7 +38,6 @@ import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.jmx.IndexingProgressMonitor;
-import org.hibernate.search.jmx.IndexingProgressMonitorMBean;
 import org.hibernate.search.util.LoggerFactory;
 
 /**

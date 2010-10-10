@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;

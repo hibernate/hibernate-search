@@ -26,7 +26,6 @@ package org.hibernate.search.util;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.hibernate.annotations.common.reflection.XMember;

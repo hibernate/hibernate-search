@@ -294,7 +294,7 @@ public class TestableSharingBufferReaderProvider extends SharingBufferReaderProv
 		}
 
 //		@Override not defined in Lucene 3.0, existed before
-		protected void doCommit() throws IOException {
+		protected void doCommit() {
 			throw new UnsupportedOperationException();
 		}
 
