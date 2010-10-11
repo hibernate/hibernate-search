@@ -435,6 +435,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				// don't return just Integer.MAX_VALUE due to a bug in Lucene - see HSEARCH-330
 				return Integer.MAX_VALUE - 1;
 			}
+			if (tmpMaxResult == 0) {
+				return 1; // Lucene enforces that at least one top doc will be retrieved. See also HSEARCH-604
+			}
 			else {
 				return ( int ) tmpMaxResult;
 			}

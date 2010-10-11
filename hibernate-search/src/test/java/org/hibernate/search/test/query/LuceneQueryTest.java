@@ -1,8 +1,7 @@
-/* $Id$
- * 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -29,6 +28,7 @@ import java.util.List;
 
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.FetchMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
@@ -39,10 +39,10 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.stat.Statistics;
 
-
 /**
  * @author Emmanuel Bernard
  * @author John Griffin
+ * @author Hardy Ferentschik
  */
 public class LuceneQueryTest extends SearchTestCase {
 
@@ -53,7 +53,11 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		clock = new Clock( 2, "Festina" );
 		s.save( clock );
-		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
 		s.save( book );
 		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
 		s.save( book );
@@ -85,7 +89,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with no class filter", 2, result.size() );
-		for (Object element : result) {
+		for ( Object element : result ) {
 			assertTrue( HibernateHelper.isInitialized( element ) );
 			s.delete( element );
 		}
@@ -96,7 +100,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "Query with delete objects", 0, result.size() );
 
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -108,7 +114,11 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		clock = new Clock( 2, "Festina" );
 		s.save( clock );
-		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
 		s.save( book );
 		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
 		s.save( book );
@@ -121,7 +131,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		Statistics stats = s.getSessionFactory().getStatistics();
 		stats.clear();
 		boolean enabled = stats.isStatisticsEnabled();
-		if ( !enabled ) stats.setStatisticsEnabled( true );
+		if ( !enabled ) {
+			stats.setStatisticsEnabled( true );
+		}
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
 		assertEquals( "Exection of getResultSize without actual results", 2, hibQuery.getResultSize() );
 		assertEquals( "No entity should be loaded", 0, stats.getEntityLoadCount() );
@@ -131,8 +143,12 @@ public class LuceneQueryTest extends SearchTestCase {
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "2 entities should be loaded", 2, stats.getEntityLoadCount() );
-		if ( !enabled ) stats.setStatisticsEnabled( false );
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		if ( !enabled ) {
+			stats.setStatisticsEnabled( false );
+		}
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -144,7 +160,11 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		clock = new Clock( 2, "Festina" );
 		s.save( clock );
-		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
 		s.save( book );
 		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
 		s.save( book );
@@ -178,7 +198,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "first result out of limit", 0, result.size() );
 
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -190,7 +212,11 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		clock = new Clock( 2, "Festina" );
 		s.save( clock );
-		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
 		s.save( book );
 		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
 		s.save( book );
@@ -224,7 +250,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNotNull( result );
 		assertFalse( result.hasNext() );
 
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -236,7 +264,11 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.save( clock );
 		clock = new Clock( 2, "Festina" );
 		s.save( clock );
-		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
 		s.save( book );
 		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
 		s.save( book );
@@ -267,12 +299,15 @@ public class LuceneQueryTest extends SearchTestCase {
 		while ( result.next() ) {
 			s.delete( result.get()[0] );
 		}
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
 
 	// Technically this is checked by other tests but let's do it anyway. J.G.
+
 	public void testDefaultFetchSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -294,7 +329,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertTrue( projections.isFirst() );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -319,7 +356,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -355,7 +394,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertEquals( "incorrect entityInfo returned", 1002, result[0] );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -399,7 +440,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNull( result );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -425,7 +468,43 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNull( "non-null entity infos returned", result );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
+		tx.commit();
+		s.close();
+	}
+
+	/**
+	 * Test for HSEARCH-604. Tests that max result 0 does not throw an exception.
+	 *
+	 * @throws Exception in case the test fails.
+	 */
+	public void testMaxResultZero() throws Exception {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		prepEmployeeIndex( s );
+
+		s.clear();
+		Transaction tx = s.beginTransaction();
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "dept", SearchTestCase.standardAnalyzer );
+		Query query = parser.parse( "dept:foo" );
+		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		hibQuery.setFirstResult( 0 );
+		hibQuery.setMaxResults( 0 );
+
+		List result = hibQuery.list();
+        assertTrue( "We should get the empty result list", result.isEmpty() );
+
+		hibQuery.setFirstResult( 1 );
+		hibQuery.setMaxResults( 0 );
+
+		result = hibQuery.list();
+        assertTrue( "We should get the empty result list", result.isEmpty() );
+		
+		//cleanup
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -443,25 +522,24 @@ public class LuceneQueryTest extends SearchTestCase {
 		hibQuery.setProjection( "id", "lastname", "dept" );
 
 
-
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();
 		results.next();
-		assertTrue("beforeFirst() pointer incorrect", results.isFirst());
+		assertTrue( "beforeFirst() pointer incorrect", results.isFirst() );
 
 		results.afterLast();
 		results.previous();
-		assertTrue("afterLast() pointer incorrect", results.isLast());
+		assertTrue( "afterLast() pointer incorrect", results.isLast() );
 
 		// Let's see if a bad reverse scroll screws things up
 		results.scroll( -8 );
 		results.next();
-		assertTrue("large negative scroll() pointer incorrect", results.isFirst());
+		assertTrue( "large negative scroll() pointer incorrect", results.isFirst() );
 
 		// And test a bad forward scroll.
 		results.scroll( 10 );
 		results.previous();
-		assertTrue("large positive scroll() pointer incorrect", results.isLast());
+		assertTrue( "large positive scroll() pointer incorrect", results.isLast() );
 
 		// Finally, let's test a REAL screwup.
 		hibQuery.setFirstResult( 3 );
@@ -470,14 +548,16 @@ public class LuceneQueryTest extends SearchTestCase {
 		results = hibQuery.scroll();
 		results.first();
 		Object[] result = results.get();
-		assertEquals(1004, result[0]);
+		assertEquals( 1004, result[0] );
 
 		results.last();
 		result = results.get();
-		assertEquals(1004, result[0]);
+		assertEquals( 1004, result[0] );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -487,9 +567,15 @@ public class LuceneQueryTest extends SearchTestCase {
 		Transaction tx = s.beginTransaction();
 		Clock clock = new Clock( 1, "Seiko" );
 		s.save( clock );
-		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
 		s.save( book );
-		AlternateBook alternateBook = new AlternateBook( 1, "La chute de la petite reine a travers les yeux de Festina" );
+		AlternateBook alternateBook = new AlternateBook(
+				1, "La chute de la petite reine a travers les yeux de Festina"
+		);
 		s.save( alternateBook );
 		tx.commit();
 		s.clear();
@@ -529,11 +615,13 @@ public class LuceneQueryTest extends SearchTestCase {
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with no class filter", 2, result.size() );
-		for (Object element : result) {
+		for ( Object element : result ) {
 			assertTrue( HibernateHelper.isInitialized( element ) );
 			s.delete( element );
 		}
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -541,7 +629,11 @@ public class LuceneQueryTest extends SearchTestCase {
 	public void testCriteria() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		Book book = new Book( 1, "La chute de la petite reine a travers les yeux de Festina", "La chute de la petite reine a travers les yeux de Festina, blahblah" );
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
 		s.save( book );
 		Author emmanuel = new Author();
 		emmanuel.setName( "Emmanuel" );
@@ -561,7 +653,8 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertFalse( "Association should not be inintialized", HibernateHelper.isInitialized( book.getAuthors() ) );
 
 		result = s.createFullTextQuery( query ).setCriteriaQuery(
-				s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN ) ).list();
+				s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN )
+		).list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit criteria", 1, result.size() );
 		book = (Book) result.get( 0 );
@@ -572,7 +665,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		Author author = book.getAuthors().iterator().next();
 		book.getAuthors().remove( author );
 
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -603,7 +698,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertNull( projection );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -626,7 +723,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertEquals( 0, result.size() );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -649,7 +748,9 @@ public class LuceneQueryTest extends SearchTestCase {
 		assertFalse( iter.hasNext() );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Employee.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
