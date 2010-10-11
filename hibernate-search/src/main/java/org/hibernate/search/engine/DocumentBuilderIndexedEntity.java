@@ -336,23 +336,23 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		if ( workType == WorkType.ADD ) {
-			String idInString = idBridge.objectToString( id );
+			String idInString = objectToString(idBridge, idKeywordName, id);
 			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
 		}
 		else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
-			String idInString = idBridge.objectToString( id );
+			String idInString = objectToString(idBridge, idKeywordName, id);
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		else if ( workType == WorkType.PURGE_ALL ) {
 			queue.add( new PurgeAllLuceneWork( entityClass ) );
 		}
 		else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
-			String idInString = idBridge.objectToString( id );
+			String idInString = objectToString(idBridge, idKeywordName, id);
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
 		}
 		else if ( workType == WorkType.INDEX ) {
-			String idInString = idBridge.objectToString( id );
+			String idInString = objectToString(idBridge, idKeywordName, id);
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 			queue.add( createAddWork( entityClass, entity, id, idInString, true ) );
 		}
@@ -363,6 +363,22 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( workType.searchForContainers() ) {
 			processContainedInInstances( entity, queue, metadata, searchFactoryImplementor );
 		}
+	}
+
+	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value) {
+		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
+				.setClass(beanClass)
+				.setFieldBridge(bridge)
+				.setFieldName(fieldName);
+		return contextualBridge.objectToString(value);
+	}
+
+	private String objectToString(StringBridge bridge, String fieldName, Object value) {
+		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
+				.setClass(beanClass)
+				.setStringBridge(bridge)
+				.setFieldName(fieldName);
+		return contextualBridge.objectToString(value);
 	}
 
 	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, boolean isBatch) {
@@ -589,7 +605,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			return new Term( idKeywordName, ( String ) id );
 		}
 
-		return new Term( idKeywordName, idBridge.objectToString( id ) );
+		return new Term( idKeywordName, objectToString(idBridge, idKeywordName, id));
 	}
 
 	public TwoWayFieldBridge getIdBridge() {
@@ -776,17 +792,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			throw new AssertionFailure( "Field name should not be null" );
 		}
 		if ( fieldName.equals( idKeywordName ) ) {
-			return idBridge.objectToString( value );
+			return objectToString(idBridge, idKeywordName, value);
 		}
 		else {
 			FieldBridge bridge = getBridge( metadata, fieldName );
 			if ( bridge != null ) {
 				final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
 				if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return ( ( TwoWayFieldBridge ) bridge ).objectToString( value );
+					return objectToString( ( TwoWayFieldBridge ) bridge, fieldName, value );
 				}
 				else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return ( ( StringBridge ) bridge ).objectToString( value );
+					return objectToString(( StringBridge ) bridge, fieldName, value );
 				}
 				throw new SearchException(
 						"FieldBridge " + bridgeClass + "does not have a objectToString method: field "

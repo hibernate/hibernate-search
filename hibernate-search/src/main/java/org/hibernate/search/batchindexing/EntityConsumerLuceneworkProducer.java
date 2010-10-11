@@ -38,6 +38,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.util.ContextualException2WayBridge;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.HibernateHelper;
@@ -132,7 +133,11 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 		Class<?> clazz = HibernateHelper.getClass( entity );
 		DocumentBuilderIndexedEntity docBuilder = documentBuilders.get( clazz );
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
-		String idInString = idBridge.objectToString( id );
+		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
+				.setClass(clazz)
+				.setFieldName(docBuilder.getIdKeywordName())
+				.setFieldBridge(idBridge);
+		String idInString = contextualBridge.objectToString( id );
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
 		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, true );

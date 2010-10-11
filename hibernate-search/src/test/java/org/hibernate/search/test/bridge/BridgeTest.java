@@ -356,12 +356,51 @@ public class BridgeTest extends SearchTestCase {
 		s.close();
 	}
 
+	public void testIncorrectObjectToStringBridge() throws Exception {
+		IncorrectObjectToString incorrect = new IncorrectObjectToString();
+		incorrect.setName("test");
+
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		try {
+			s.persist( incorrect );
+			s.flush();
+			s.clear();
+			s.delete( incorrect );
+			s.flush();
+			tx.commit();
+			fail("Incorrect bridge should fail");
+		}
+		catch (BridgeException e) {
+			tx.rollback();
+		}
+		catch (HibernateException e) {
+			final Throwable throwable = e.getCause();
+			if (throwable instanceof BridgeException) {
+				//expected
+				assertTrue( throwable.getMessage().contains( "class: " + Incorrect.class.getName() ) );
+				assertTrue( throwable.getMessage().contains("path: id") );
+				tx.rollback();
+			}
+			else {
+				e.printStackTrace();
+				fail("Incorrect bridge should raise a SearchException: " + e.toString() );
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail("Incorrect bridge should raise a SearchException");
+		}
+		s.close();
+	}
+
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Cloud.class,
 				Incorrect.class,
-				Incorrect2.class
+				Incorrect2.class,
+				IncorrectObjectToString.class
 		};
 	}
 

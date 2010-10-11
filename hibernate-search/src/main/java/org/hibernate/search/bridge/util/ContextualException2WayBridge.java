@@ -1,6 +1,7 @@
 package org.hibernate.search.bridge.util;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
@@ -10,10 +11,12 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  */
 public class ContextualException2WayBridge extends ContextualExceptionBridge implements TwoWayFieldBridge {
 	private TwoWayFieldBridge delegate;
+	private StringBridge stringBridge;
 
 	public ContextualException2WayBridge setFieldBridge(TwoWayFieldBridge delegate) {
 		super.setFieldBridge(delegate);
 		this.delegate = delegate;
+		this.stringBridge = null;
 		return this;
 	}
 
@@ -38,7 +41,12 @@ public class ContextualException2WayBridge extends ContextualExceptionBridge imp
 
 	public String objectToString(Object object) {
 		try {
-			return delegate.objectToString(object);
+			if (delegate != null) {
+				return delegate.objectToString(object);
+			}
+			else {
+				return stringBridge.objectToString(object);
+			}
 		}
 		catch (Exception e) {
 			throw buildBridgeException(e, "objectToString");
@@ -52,6 +60,13 @@ public class ContextualException2WayBridge extends ContextualExceptionBridge imp
 
 	public ContextualException2WayBridge popMethod() {
 		super.popMethod();
+		return this;
+	}
+
+	//FIXME yuk, create a cleaner inheritance for a ContextualExceptionStringBridge
+	public ContextualException2WayBridge setStringBridge(StringBridge bridge) {
+		this.stringBridge = bridge;
+		this.delegate = null;
 		return this;
 	}
 }
