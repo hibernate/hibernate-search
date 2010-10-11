@@ -27,6 +27,7 @@ package org.hibernate.search.backend.impl;
 import java.io.Serializable;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
+import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
 
@@ -92,12 +93,19 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
              * In a JTA env, the before transaction completion is called before the flush, so not all changes are yet
              * written. However, Synchronization-s do propagate exceptions, so they can be safely used.
              */
-
 			final ActionQueue actionQueue = eventSource.getActionQueue();
-			actionQueue.registerProcess( new DelegateToSynchronizationOnBeforeTx( synchronization ) );
-			eventSource.getTransaction().registerSynchronization(
-					new BeforeCommitSynchronizationDelegator( synchronization )
-			);
+			boolean isLocal = isLocalTransaction();
+			if ( isLocal ) {
+				//if local tx never use Synchronization
+				actionQueue.registerProcess( new DelegateToSynchronizationOnBeforeTx( synchronization ) );
+			}
+			else {
+				//TODO could we remove the action queue registration in this case?
+				actionQueue.registerProcess( new DelegateToSynchronizationOnBeforeTx( synchronization ) );
+				eventSource.getTransaction().registerSynchronization(
+						new BeforeCommitSynchronizationDelegator( synchronization )
+				);
+			}
 
 			//executed in all environments
 			actionQueue.registerProcess( new DelegateToSynchronizationOnAfterTx( synchronization ) );
@@ -116,7 +124,13 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			}
 		}
 	}
-	
+
+	private boolean isLocalTransaction() {
+		//TODO make it better but I don't know how we can optimize it.
+		final TransactionManager transactionManager = eventSource.getFactory().getTransactionManager();
+		return transactionManager == null;
+	}
+
 	private FullTextIndexEventListener getIndexWorkFlushEventListener() {
 		if ( this.flushListener != null) {
 			//for the "transient" case: might have been nullified.
