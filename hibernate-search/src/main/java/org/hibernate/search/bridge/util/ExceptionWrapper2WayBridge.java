@@ -11,13 +11,13 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 public class ExceptionWrapper2WayBridge extends ExceptionWrapperBridge implements TwoWayFieldBridge {
 	private TwoWayFieldBridge delegate;
 
-	public ExceptionWrapper2WayBridge setDelegate(TwoWayFieldBridge delegate) {
+	public ExceptionWrapper2WayBridge setFieldBridge(TwoWayFieldBridge delegate) {
 		super.setFieldBridge(delegate);
 		this.delegate = delegate;
 		return this;
 	}
 
-	public ExceptionWrapper2WayBridge setClass(Class<?> clazz, String path) {
+	public ExceptionWrapper2WayBridge setClass(Class<?> clazz) {
 		super.setClass(clazz);
 		return this;
 	}

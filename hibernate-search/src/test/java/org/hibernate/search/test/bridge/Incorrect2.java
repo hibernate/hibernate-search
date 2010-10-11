@@ -1,9 +1,6 @@
 package org.hibernate.search.test.bridge;
 
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.*;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.ClassBridge;
 
@@ -17,7 +14,7 @@ import javax.persistence.Id;
  */
 @Entity
 @Indexed
-public class Incorrect {
+public class Incorrect2 {
 	@Id @GeneratedValue
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }
@@ -30,9 +27,20 @@ public class Incorrect {
 	private SubIncorrect subIncorrect;
 
 	public static class SubIncorrect {
-		@Field( bridge = @FieldBridge(impl = ClassBridge.class) )
+		@Field( bridge = @FieldBridge(impl = ErrorOnGetBridge.class), store = Store.YES)
 		public String getName() { return name; }
 		public void setName(String name) { this.name = name; }
 		private String name;
+	}
+
+	public static class ErrorOnGetBridge implements TwoWayStringBridge {
+
+		public Object stringToObject(String stringValue) {
+			throw new RuntimeException("Failure");
+		}
+
+		public String objectToString(Object object) {
+			return object.toString();
+		}
 	}
 }

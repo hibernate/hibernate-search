@@ -43,13 +43,11 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.*;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.builtin.CalendarBridge;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -272,7 +270,7 @@ public class BridgeTest extends SearchTestCase {
 		assertEquals( "20001215", bridge.objectToString( c ) );
 	}
 
-	public void testIncorrectBridge() throws Exception {
+	public void testIncorrectSetBridge() throws Exception {
 		Incorrect incorrect = new Incorrect();
 		incorrect.setSubIncorrect(new Incorrect.SubIncorrect());
 		incorrect.getSubIncorrect().setName("This is a name not a class");
@@ -295,7 +293,6 @@ public class BridgeTest extends SearchTestCase {
 			final Throwable throwable = e.getCause();
 			if (throwable instanceof BridgeException) {
 				//expected
-				System.out.println( throwable.getMessage() );
 				assertTrue( throwable.getMessage().contains( "class: " + Incorrect.class.getName() ) );
 				assertTrue( throwable.getMessage().contains("path: subIncorrect.name") );
 				tx.rollback();
@@ -312,11 +309,59 @@ public class BridgeTest extends SearchTestCase {
 		s.close();
 	}
 
+	public void testIncorrectGetBridge() throws Exception {
+		Incorrect2 incorrect = new Incorrect2();
+		incorrect.setSubIncorrect(new Incorrect2.SubIncorrect());
+		incorrect.getSubIncorrect().setName("This is a name not a class");
+
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+		s.persist( incorrect );
+		tx.commit();
+		s.clear();
+		tx = s.beginTransaction();
+		final QueryBuilder builder = s.getSearchFactory().buildQueryBuilder().forEntity(Incorrect2.class).get();
+		final Query query = builder.keyword().onField("subIncorrect.name").matching("name").createQuery();
+
+		try {
+			final FullTextQuery textQuery = s.createFullTextQuery(query, Incorrect2.class).setProjection("subIncorrect.name");
+			final List results = textQuery.list();
+			fail("Incorrect bridge should fail");
+		}
+		catch (BridgeException e) {
+			tx.rollback();
+		}
+		catch (HibernateException e) {
+			final Throwable throwable = e.getCause();
+			if (throwable instanceof BridgeException) {
+				//expected
+				//System.out.println( throwable.getMessage() );
+				assertTrue( throwable.getMessage().contains( "class: " + Incorrect2.class.getName() ) );
+				assertTrue( throwable.getMessage().contains("path: subIncorrect.name") );
+				tx.rollback();
+			}
+			else {
+				e.printStackTrace();
+				fail("Incorrect bridge should raise a SearchException: " + e.toString() );
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail("Incorrect bridge should raise a SearchException");
+		}
+
+		tx = s.beginTransaction();
+		s.delete( s.get( Incorrect2.class, incorrect.getId() ) );
+		tx.commit();
+		s.close();
+	}
+
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Cloud.class,
-				Incorrect.class
+				Incorrect.class,
+				Incorrect2.class
 		};
 	}
 
