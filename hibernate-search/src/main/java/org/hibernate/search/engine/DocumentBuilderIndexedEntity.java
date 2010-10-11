@@ -40,6 +40,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
+import org.hibernate.search.bridge.util.ExceptionWrapperBridge;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -411,7 +412,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				Store.YES,
 				Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO, idBoost
 		);
-		idBridge.set( idKeywordName, id, doc, luceneOptions );
+		new ExceptionWrapperBridge()
+				.setFieldBridge(idBridge)
+				.setClassAndMethod(entityType, null)
+				.setFieldName(idKeywordName)
+				.set( idKeywordName, id, doc, luceneOptions );
 
 		// finally add all other document fields
 		Set<String> processedFieldNames = new HashSet<String>();
@@ -428,23 +433,37 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = HibernateHelper.unproxy( instance );
 
+		ExceptionWrapperBridge wrapperBridge = new ExceptionWrapperBridge()
+				.setClassAndMethod(beanClass, null);
+
 		// process the class bridges
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
-			fb.set(
-					propertiesMetadata.classNames.get( i ), unproxiedInstance,
-					doc, propertiesMetadata.getClassLuceneOptions( i )
-			);
+			final String fieldName = propertiesMetadata.classNames.get(i);
+			wrapperBridge
+					.setFieldBridge(fb)
+					.setFieldName( fieldName )
+					.set(
+							fieldName, unproxiedInstance,
+							doc, propertiesMetadata.getClassLuceneOptions( i )
+					);
 		}
 
 		// process the indexed fields
 		for ( int i = 0; i < propertiesMetadata.fieldNames.size(); i++ ) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-			propertiesMetadata.fieldBridges.get( i ).set(
-					propertiesMetadata.fieldNames.get( i ), value, doc,
-					propertiesMetadata.getFieldLuceneOptions( i, value )
-			);
+
+			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get(i);
+			final String fieldName = propertiesMetadata.fieldNames.get(i);
+			wrapperBridge
+					.setFieldBridge(fieldBridge)
+					.setClassAndMethod( beanClass, member.getName() )
+					.setFieldName( fieldName )
+					.set(
+						fieldName, value, doc,
+						propertiesMetadata.getFieldLuceneOptions( i, value )
+					);
 		}
 
 		// allow analyzer override for the fields added by the class and field bridges

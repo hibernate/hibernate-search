@@ -40,12 +40,15 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.builtin.CalendarBridge;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -267,13 +270,51 @@ public class BridgeTest extends SearchTestCase {
 		bridgeParams.put( CalendarBridge.RESOLUTION_PARAMETER, Resolution.DAY.toString() );
 		bridge.setParameterValues( bridgeParams );
 		assertEquals( "20001215", bridge.objectToString( c ) );
+	}
 
+	public void testIncorrectBridge() throws Exception {
+		Incorrect incorrect = new Incorrect();
+		incorrect.setSubIncorrect(new Incorrect.SubIncorrect());
+		incorrect.getSubIncorrect().setName("This is a name not a class");
+
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		try {
+			s.persist( incorrect );
+			s.flush();
+			s.clear();
+			s.delete( incorrect );
+			s.flush();
+			tx.commit();
+			fail("Incorrect bridge should fail");
+		}
+		catch (BridgeException e) {
+			tx.rollback();
+		}
+		catch (HibernateException e) {
+			final Throwable throwable = e.getCause();
+			if (throwable instanceof BridgeException) {
+				//expected
+				System.out.println( throwable.getMessage() );
+				tx.rollback();
+			}
+			else {
+				e.printStackTrace();
+				fail("Incorrect bridge should raise a SearchException: " + e.toString() );
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			fail("Incorrect bridge should raise a SearchException");
+		}
+		s.close();
 	}
 
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Cloud.class
+				Cloud.class,
+				Incorrect.class
 		};
 	}
 
