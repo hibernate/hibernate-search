@@ -14,7 +14,7 @@ import javax.persistence.Id;
  */
 @Entity
 @Indexed
-public class Incorrect2 {
+public class IncorrectGet {
 	@Id @GeneratedValue
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }

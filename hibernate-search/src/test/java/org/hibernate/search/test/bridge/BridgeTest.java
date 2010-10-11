@@ -271,8 +271,8 @@ public class BridgeTest extends SearchTestCase {
 	}
 
 	public void testIncorrectSetBridge() throws Exception {
-		Incorrect incorrect = new Incorrect();
-		incorrect.setSubIncorrect(new Incorrect.SubIncorrect());
+		IncorrectSet incorrect = new IncorrectSet();
+		incorrect.setSubIncorrect(new IncorrectSet.SubIncorrect());
 		incorrect.getSubIncorrect().setName("This is a name not a class");
 
 		org.hibernate.Session s = openSession();
@@ -293,7 +293,7 @@ public class BridgeTest extends SearchTestCase {
 			final Throwable throwable = e.getCause();
 			if (throwable instanceof BridgeException) {
 				//expected
-				assertTrue( throwable.getMessage().contains( "class: " + Incorrect.class.getName() ) );
+				assertTrue( throwable.getMessage().contains( "class: " + IncorrectSet.class.getName() ) );
 				assertTrue( throwable.getMessage().contains("path: subIncorrect.name") );
 				tx.rollback();
 			}
@@ -310,8 +310,8 @@ public class BridgeTest extends SearchTestCase {
 	}
 
 	public void testIncorrectGetBridge() throws Exception {
-		Incorrect2 incorrect = new Incorrect2();
-		incorrect.setSubIncorrect(new Incorrect2.SubIncorrect());
+		IncorrectGet incorrect = new IncorrectGet();
+		incorrect.setSubIncorrect(new IncorrectGet.SubIncorrect());
 		incorrect.getSubIncorrect().setName("This is a name not a class");
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -320,11 +320,11 @@ public class BridgeTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 		tx = s.beginTransaction();
-		final QueryBuilder builder = s.getSearchFactory().buildQueryBuilder().forEntity(Incorrect2.class).get();
+		final QueryBuilder builder = s.getSearchFactory().buildQueryBuilder().forEntity(IncorrectGet.class).get();
 		final Query query = builder.keyword().onField("subIncorrect.name").matching("name").createQuery();
 
 		try {
-			final FullTextQuery textQuery = s.createFullTextQuery(query, Incorrect2.class).setProjection("subIncorrect.name");
+			final FullTextQuery textQuery = s.createFullTextQuery(query, IncorrectGet.class).setProjection("subIncorrect.name");
 			final List results = textQuery.list();
 			fail("Incorrect bridge should fail");
 		}
@@ -336,7 +336,7 @@ public class BridgeTest extends SearchTestCase {
 			if (throwable instanceof BridgeException) {
 				//expected
 				//System.out.println( throwable.getMessage() );
-				assertTrue( throwable.getMessage().contains( "class: " + Incorrect2.class.getName() ) );
+				assertTrue( throwable.getMessage().contains( "class: " + IncorrectGet.class.getName() ) );
 				assertTrue( throwable.getMessage().contains("path: subIncorrect.name") );
 				tx.rollback();
 			}
@@ -351,7 +351,7 @@ public class BridgeTest extends SearchTestCase {
 		}
 
 		tx = s.beginTransaction();
-		s.delete( s.get( Incorrect2.class, incorrect.getId() ) );
+		s.delete( s.get( IncorrectGet.class, incorrect.getId() ) );
 		tx.commit();
 		s.close();
 	}
@@ -378,7 +378,7 @@ public class BridgeTest extends SearchTestCase {
 			final Throwable throwable = e.getCause();
 			if (throwable instanceof BridgeException) {
 				//expected
-				assertTrue( throwable.getMessage().contains( "class: " + Incorrect.class.getName() ) );
+				assertTrue( throwable.getMessage().contains( "class: " + IncorrectSet.class.getName() ) );
 				assertTrue( throwable.getMessage().contains("path: id") );
 				tx.rollback();
 			}
@@ -398,8 +398,8 @@ public class BridgeTest extends SearchTestCase {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Cloud.class,
-				Incorrect.class,
-				Incorrect2.class,
+				IncorrectSet.class,
+				IncorrectGet.class,
 				IncorrectObjectToString.class
 		};
 	}
