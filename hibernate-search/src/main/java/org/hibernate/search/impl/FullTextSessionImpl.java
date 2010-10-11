@@ -100,6 +100,9 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 
 	public FullTextSessionImpl(org.hibernate.Session session) {
+		if ( session  == null ) {
+			throw new IllegalArgumentException("Unable to create a FullTextSession from an null Session object");
+		}
 		this.session = ( Session ) session;
 		this.transactionContext = new EventSourceTransactionContext( ( EventSource ) session );
 		this.sessionImplementor = ( SessionImplementor ) session;

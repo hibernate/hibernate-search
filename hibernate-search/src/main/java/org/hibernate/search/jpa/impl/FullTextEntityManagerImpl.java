@@ -54,6 +54,9 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	private FullTextSession ftSession;
 
 	public FullTextEntityManagerImpl(EntityManager em) {
+		if ( em  == null ) {
+			throw new IllegalArgumentException("Unable to create a FullTextEntityManager from a null EntityManager");
+		}
 		this.em = em;
 	}
 
