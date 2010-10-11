@@ -8,21 +8,21 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  *
  * @author Emmanuel Bernard
  */
-public class ExceptionWrapper2WayBridge extends ExceptionWrapperBridge implements TwoWayFieldBridge {
+public class ContextualException2WayBridge extends ContextualExceptionBridge implements TwoWayFieldBridge {
 	private TwoWayFieldBridge delegate;
 
-	public ExceptionWrapper2WayBridge setFieldBridge(TwoWayFieldBridge delegate) {
+	public ContextualException2WayBridge setFieldBridge(TwoWayFieldBridge delegate) {
 		super.setFieldBridge(delegate);
 		this.delegate = delegate;
 		return this;
 	}
 
-	public ExceptionWrapper2WayBridge setClass(Class<?> clazz) {
+	public ContextualException2WayBridge setClass(Class<?> clazz) {
 		super.setClass(clazz);
 		return this;
 	}
 
-	public ExceptionWrapper2WayBridge setFieldName(String fieldName) {
+	public ContextualException2WayBridge setFieldName(String fieldName) {
 		super.setFieldName(fieldName);
 		return this;
 	}
@@ -45,12 +45,12 @@ public class ExceptionWrapper2WayBridge extends ExceptionWrapperBridge implement
 		}
 	}
 
-	public ExceptionWrapper2WayBridge pushMethod(String name) {
+	public ContextualException2WayBridge pushMethod(String name) {
 		super.pushMethod(name);
 		return this;
 	}
 
-	public ExceptionWrapper2WayBridge popMethod() {
+	public ContextualException2WayBridge popMethod() {
 		super.popMethod();
 		return this;
 	}

@@ -4,34 +4,32 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Wrap the exception with an exception provide contextual feedback
  *
  * @author Emmanuel Bernard
  */
-public class ExceptionWrapperBridge implements FieldBridge {
+public class ContextualExceptionBridge implements FieldBridge {
 	private FieldBridge delegate;
 	protected Class<?> clazz;
 	protected List<String> path = new ArrayList<String>(5);
 	protected String fieldName;
 
-	public ExceptionWrapperBridge setFieldBridge(FieldBridge delegate) {
+	public ContextualExceptionBridge setFieldBridge(FieldBridge delegate) {
 		this.delegate = delegate;
 		return this;
 	}
 
-	public ExceptionWrapperBridge setClass(Class<?> clazz) {
+	public ContextualExceptionBridge setClass(Class<?> clazz) {
 		this.clazz = clazz;
 		return this;
 	}
 
-	public ExceptionWrapperBridge setFieldName(String fieldName) {
+	public ContextualExceptionBridge setFieldName(String fieldName) {
 		this.fieldName = fieldName;
 		return this;
 	}
@@ -64,12 +62,12 @@ public class ExceptionWrapperBridge implements FieldBridge {
 		}
 	}
 
-	public ExceptionWrapperBridge pushMethod(String name) {
+	public ContextualExceptionBridge pushMethod(String name) {
 		path.add(name);
 		return this;
 	}
 
-	public ExceptionWrapperBridge popMethod() {
+	public ContextualExceptionBridge popMethod() {
 		path.remove( path.size() - 1 );
 		return this;
 	}

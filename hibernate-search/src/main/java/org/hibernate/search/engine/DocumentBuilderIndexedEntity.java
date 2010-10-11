@@ -40,8 +40,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
-import org.hibernate.search.bridge.util.ExceptionWrapper2WayBridge;
-import org.hibernate.search.bridge.util.ExceptionWrapperBridge;
+import org.hibernate.search.bridge.util.ContextualException2WayBridge;
+import org.hibernate.search.bridge.util.ContextualExceptionBridge;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -413,7 +413,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				Store.YES,
 				Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO, idBoost
 		);
-		final ExceptionWrapperBridge contextualBridge = new ExceptionWrapperBridge()
+		final ContextualExceptionBridge contextualBridge = new ContextualExceptionBridge()
 				.setFieldBridge(idBridge)
 				.setClass(entityType)
 				.setFieldName(idKeywordName);
@@ -436,7 +436,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									 PropertiesMetadata propertiesMetadata,
 									 Map<String, String> fieldToAnalyzerMap,
 									 Set<String> processedFieldNames,
-									 ExceptionWrapperBridge contextualBridge) {
+									 ContextualExceptionBridge contextualBridge) {
 		if ( instance == null ) {
 			return;
 		}
@@ -638,7 +638,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
 		final String fieldName = builderIndexedEntity.getIdKeywordName();
-		ExceptionWrapper2WayBridge contextualBridge = new ExceptionWrapper2WayBridge();
+		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
 		contextualBridge
 				.setClass(clazz)
 				.setFieldName(fieldName)
@@ -666,7 +666,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
-		ExceptionWrapper2WayBridge contextualBridge = new ExceptionWrapper2WayBridge();
+		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
 		contextualBridge.setClass(clazz);
 		if ( builderIndexedEntity.idKeywordName != null ) {
 			final XMember member = builderIndexedEntity.idGetter;
@@ -693,7 +693,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	private static void populateResult(String fieldName, FieldBridge fieldBridge, Store store,
-									   String[] fields, Object[] result, Document document, ExceptionWrapper2WayBridge contextualBridge) {
+									   String[] fields, Object[] result, Document document, ContextualException2WayBridge contextualBridge) {
 		int matchingPosition = getFieldPosition( fields, fieldName );
 		if ( matchingPosition != -1 ) {
 			//TODO make use of an isTwoWay() method
@@ -715,7 +715,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 	}
 
-	private static void processFieldsForProjection(PropertiesMetadata metadata, String[] fields, Object[] result, Document document, ExceptionWrapper2WayBridge contextualBridge) {
+	private static void processFieldsForProjection(PropertiesMetadata metadata, String[] fields, Object[] result, Document document, ContextualException2WayBridge contextualBridge) {
 		//process base fields
 		final int nbrFoEntityFields = metadata.fieldNames.size();
 		for ( int index = 0; index < nbrFoEntityFields; index++ ) {
