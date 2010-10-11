@@ -336,7 +336,7 @@ public class Author {
     (<literal>@ManyToMany</literal>, <literal>@*ToOne</literal> and
     <literal>@Embedded</literal>) as part of the owning entity. This is needed
     since a Lucene index document is a flat data structure which does not know
-    anything about object relations. To ensure that the authors' name wil be
+    anything about object relations. To ensure that the authors' name will be
     searchable you have to make sure that the names are indexed as part of the
     book itself. On top of <literal>@IndexedEmbedded</literal> you will also
     have to mark all fields of the associated entity you want to have included
