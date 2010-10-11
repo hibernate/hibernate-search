@@ -296,6 +296,8 @@ public class BridgeTest extends SearchTestCase {
 			if (throwable instanceof BridgeException) {
 				//expected
 				System.out.println( throwable.getMessage() );
+				assertTrue( throwable.getMessage().contains( "class: " + Incorrect.class.getName() ) );
+				assertTrue( throwable.getMessage().contains("path: subIncorrect.name") );
 				tx.rollback();
 			}
 			else {

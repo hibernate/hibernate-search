@@ -6,6 +6,10 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 /**
  * Wrap the exception with an exception provide contextual feedback
  *
@@ -14,7 +18,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 public class ExceptionWrapperBridge implements FieldBridge {
 	private FieldBridge delegate;
 	protected Class<?> clazz;
-	protected String path;
+	protected List<String> path = new ArrayList<String>(5);
 	protected String fieldName;
 
 	public ExceptionWrapperBridge setFieldBridge(FieldBridge delegate) {
@@ -22,9 +26,8 @@ public class ExceptionWrapperBridge implements FieldBridge {
 		return this;
 	}
 
-	public ExceptionWrapperBridge setClassAndMethod(Class<?> clazz, String path) {
+	public ExceptionWrapperBridge setClass(Class<?> clazz) {
 		this.clazz = clazz;
-		this.path = path;
 		return this;
 	}
 
@@ -37,10 +40,14 @@ public class ExceptionWrapperBridge implements FieldBridge {
 		StringBuilder error = new StringBuilder("Exception while calling bridge#");
 		error.append(method);
 		if ( clazz != null ) {
-			error.append("\n\tclass: ").append(clazz);
+			error.append("\n\tclass: ").append( clazz.getName() );
 		}
-		if ( path != null ) {
-			error.append("\n\tpath: ").append(path);
+		if ( path.size() > 0 ) {
+			error.append("\n\tpath: ");
+			for(String pathNode : path) {
+				error.append(pathNode).append(".");
+			}
+			error.deleteCharAt( error.length() - 1 );
 		}
 		if ( fieldName != null ) {
 			error.append("\n\tfield bridge: ").append(fieldName);
@@ -55,5 +62,15 @@ public class ExceptionWrapperBridge implements FieldBridge {
 		catch (Exception e) {
 			throw buildBridgeException(e, "set");
 		}
+	}
+
+	public ExceptionWrapperBridge pushMethod(String name) {
+		path.add(name);
+		return this;
+	}
+
+	public ExceptionWrapperBridge popMethod() {
+		path.remove( path.size() - 1 );
+		return this;
 	}
 }

@@ -412,20 +412,24 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				Store.YES,
 				Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO, idBoost
 		);
-		new ExceptionWrapperBridge()
+		final ExceptionWrapperBridge contextualBridge = new ExceptionWrapperBridge()
 				.setFieldBridge(idBridge)
-				.setClassAndMethod(entityType, null)
-				.setFieldName(idKeywordName)
-				.set( idKeywordName, id, doc, luceneOptions );
+				.setClass(entityType)
+				.setFieldName(idKeywordName);
+		contextualBridge.set( idKeywordName, id, doc, luceneOptions );
 
 		// finally add all other document fields
 		Set<String> processedFieldNames = new HashSet<String>();
-		buildDocumentFields( instance, doc, metadata, fieldToAnalyzerMap, processedFieldNames );
+		buildDocumentFields( instance, doc, metadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge );
 		return doc;
 	}
 
-	private void buildDocumentFields(Object instance, Document doc, PropertiesMetadata propertiesMetadata, Map<String, String> fieldToAnalyzerMap,
-									 Set<String> processedFieldNames) {
+	private void buildDocumentFields(Object instance,
+									 Document doc,
+									 PropertiesMetadata propertiesMetadata,
+									 Map<String, String> fieldToAnalyzerMap,
+									 Set<String> processedFieldNames,
+									 ExceptionWrapperBridge contextualBridge) {
 		if ( instance == null ) {
 			return;
 		}
@@ -433,14 +437,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = HibernateHelper.unproxy( instance );
 
-		ExceptionWrapperBridge wrapperBridge = new ExceptionWrapperBridge()
-				.setClassAndMethod(beanClass, null);
-
 		// process the class bridges
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
 			final String fieldName = propertiesMetadata.classNames.get(i);
-			wrapperBridge
+			contextualBridge
 					.setFieldBridge(fb)
 					.setFieldName( fieldName )
 					.set(
@@ -456,14 +457,15 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get(i);
 			final String fieldName = propertiesMetadata.fieldNames.get(i);
-			wrapperBridge
+			contextualBridge
 					.setFieldBridge(fieldBridge)
-					.setClassAndMethod( beanClass, member.getName() )
+					.pushMethod( member.getName() )
 					.setFieldName( fieldName )
 					.set(
 						fieldName, value, doc,
 						propertiesMetadata.getFieldLuceneOptions( i, value )
 					);
+			contextualBridge.popMethod();
 		}
 
 		// allow analyzer override for the fields added by the class and field bridges
@@ -474,6 +476,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// recursively process embedded objects
 		for ( int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++ ) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
+			contextualBridge.pushMethod( member.getName() );
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 			//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
 
@@ -485,26 +488,26 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				case ARRAY:
 					for ( Object arrayValue : ( Object[] ) value ) {
 						buildDocumentFields(
-								arrayValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames
+								arrayValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge
 						);
 					}
 					break;
 				case COLLECTION:
 					for ( Object collectionValue : ( Collection ) value ) {
 						buildDocumentFields(
-								collectionValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames
+								collectionValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge
 						);
 					}
 					break;
 				case MAP:
 					for ( Object collectionValue : ( ( Map ) value ).values() ) {
 						buildDocumentFields(
-								collectionValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames
+								collectionValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge
 						);
 					}
 					break;
 				case OBJECT:
-					buildDocumentFields( value, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames );
+					buildDocumentFields( value, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge );
 					break;
 				default:
 					throw new AssertionFailure(
@@ -512,6 +515,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									+ propertiesMetadata.embeddedContainers.get( i )
 					);
 			}
+			contextualBridge.popMethod();
 		}
 	}
 

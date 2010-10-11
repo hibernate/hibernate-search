@@ -17,8 +17,8 @@ public class ExceptionWrapper2WayBridge extends ExceptionWrapperBridge implement
 		return this;
 	}
 
-	public ExceptionWrapper2WayBridge setClassAndMethod(Class<?> clazz, String path) {
-		super.setClassAndMethod(clazz, path);
+	public ExceptionWrapper2WayBridge setClass(Class<?> clazz, String path) {
+		super.setClass(clazz);
 		return this;
 	}
 
@@ -43,5 +43,15 @@ public class ExceptionWrapper2WayBridge extends ExceptionWrapperBridge implement
 		catch (Exception e) {
 			throw buildBridgeException(e, "objectToString");
 		}
+	}
+
+	public ExceptionWrapper2WayBridge pushMethod(String name) {
+		super.pushMethod(name);
+		return this;
+	}
+
+	public ExceptionWrapper2WayBridge popMethod() {
+		super.popMethod();
+		return this;
 	}
 }
