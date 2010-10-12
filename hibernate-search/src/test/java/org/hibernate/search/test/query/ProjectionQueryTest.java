@@ -24,6 +24,7 @@
  */
 package org.hibernate.search.test.query;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
@@ -31,8 +32,9 @@ import java.util.Map;
 import java.util.Date;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.Query;
+import org.apache.lucene.search.*;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -309,6 +311,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "THIS incorrect", "Jackson", ( ( Employee ) projection[3] ).getLastname() );
 		assertEquals( "THIS incorrect", projection[3], s.get( Employee.class, ( Serializable ) projection[0] ) );
 		assertTrue( "SCORE incorrect", projection[4] instanceof Float );
+		assertFalse( "SCORE should not be a NaN", Float.isNaN( (Float) projection[4] ) );
 		assertTrue( "DOCUMENT incorrect", projection[5] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 5, ( ( Document ) projection[5] ).getFields().size() );
 		assertEquals( "ID incorrect", 1001, projection[6] );
@@ -337,6 +340,18 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "dept incorrect", "Accounting", projection[7] );
 		assertNotNull( "Date", projection[8] );
 		assertNotNull( "Lucene internal doc id", projection[9] );
+
+		hibQuery.setSort( new Sort( new SortField("lastname", SortField.STRING_VAL) ) );
+		hibQuery.setProjection(
+				FullTextQuery.THIS, FullTextQuery.SCORE
+		);
+
+		result = hibQuery.list();
+
+		projection = ( Object[] ) result.get( 0 );
+
+		assertTrue( "SCORE incorrect", projection[1] instanceof Float );
+		assertFalse( "SCORE should not be a NaN", Float.isNaN( (Float) projection[1] ) );
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {

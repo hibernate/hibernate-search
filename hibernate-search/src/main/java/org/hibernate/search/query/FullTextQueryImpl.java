@@ -357,7 +357,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public Explanation explain(int documentId) {
 		Explanation explanation = null;
-		Searcher searcher = buildSearcher( searchFactoryImplementor );
+		Searcher searcher = buildSearcher( searchFactoryImplementor, true );
 		if ( searcher == null ) {
 			throw new SearchException(
 					"Unable to build explanation for document id:"
@@ -690,15 +690,20 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				0;
 	}
 
+	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
+		return buildSearcher(searchFactoryImplementor, null);
+	}
+
 	/**
 	 * Build the index searcher for this fulltext query.
 	 *
 	 * @param searchFactoryImplementor the search factory.
+	 * @param forceScoring if true, force SCORE computation, if false, force not to compute score, if null used best choice
 	 *
 	 * @return the <code>IndexSearcher</code> for this query (can be <code>null</code>.
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
-	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
+	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
 		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
 		List<DirectoryProvider> targetedDirectories = new ArrayList<DirectoryProvider>();
 		Set<String> idFieldNames = new HashSet<String>();
@@ -784,6 +789,27 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				)
 		);
 		is.setSimilarity( searcherSimilarity );
+
+		//handle the sort and projection
+		final String[] projection = this.indexProjection;
+		if ( Boolean.TRUE.equals( forceScoring ) ) {
+			is.setDefaultFieldSortScoring(true, true);
+		}
+		else if ( Boolean.FALSE.equals( forceScoring ) ) {
+			is.setDefaultFieldSortScoring(false, false);
+		}
+		else if ( this.sort != null && projection != null ) {
+			boolean activate = false;
+			for(String field : projection) {
+				if ( SCORE.equals(field) ) {
+					activate = true;
+					break;
+				}
+			}
+			if (activate) {
+				is.setDefaultFieldSortScoring(true, false);
+			}
+		}
 		return is;
 	}
 
@@ -832,7 +858,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	public int getResultSize() {
 		if ( resultSize == null ) {
 			//get result size without object initialization
-			IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
+			IndexSearcher searcher = buildSearcher( searchFactoryImplementor, false );
 			if ( searcher == null ) {
 				resultSize = 0;
 			}
