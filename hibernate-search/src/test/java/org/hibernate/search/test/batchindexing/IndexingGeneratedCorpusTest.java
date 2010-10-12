@@ -1,4 +1,4 @@
-/*
+/* $Id$
  * Hibernate, Relational Persistence for Idiomatic Java
  *
  *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
@@ -29,7 +29,9 @@ import junit.framework.TestCase;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
+import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
@@ -46,6 +48,7 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 
 	private final int BOOK_NUM = 140;
 	private final int ANCIENTBOOK_NUM = 120;
+	private final int SECRETBOOK_NUM = 20;
 	private final int DVD_NUM = 200;
 
 	private SentenceInventor sentenceInventor = new SentenceInventor( 7L, 4000 );
@@ -61,12 +64,14 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 				.addAnnotatedClass( Dvd.class )
 				.addAnnotatedClass( AncientBook.class )
 				.addAnnotatedClass( Nation.class )
+				.addAnnotatedClass( SecretBook.class )
 				.setProperty( "hibernate.show_sql", "false" ) // too verbose for this test
 				.setProperty( LuceneBatchBackend.CONCURRENT_WRITERS, "4" )
 				.build();
 		createMany( Book.class, BOOK_NUM );
 		createMany( Dvd.class, DVD_NUM );
 		createMany( AncientBook.class, ANCIENTBOOK_NUM );
+		createMany( SecretBook.class, SECRETBOOK_NUM );
 		storeAllBooksInNation();
 	}
 
@@ -170,6 +175,14 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 				countByFT( Book.class )
 		);
 		assertEquals(
+				ANCIENTBOOK_NUM + BOOK_NUM + SECRETBOOK_NUM,
+				countByDatabaseCriteria( Book.class )
+		);
+		assertEquals(
+				SECRETBOOK_NUM,
+				countByDatabaseCriteria( SecretBook.class )
+		);
+		assertEquals(
 				ANCIENTBOOK_NUM,
 				countByFT( AncientBook.class )
 		);
@@ -208,6 +221,20 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		}
 		assertEquals( bySize, byResultSize );
 		return bySize;
+	}
+	
+	private long countByDatabaseCriteria(Class<? extends TitleAble> type) {
+		Session session = builder.openFullTextSession();
+		try {
+			Number countAsNumber = (Number) session
+					.createCriteria( type )
+					.setProjection( Projections.rowCount() )
+					.uniqueResult();
+			return countAsNumber.longValue();
+		}
+		finally {
+			session.close();
+		}
 	}
 
 }
