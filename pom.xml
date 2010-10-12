@@ -39,7 +39,7 @@
     <inceptionYear>2006</inceptionYear>
 
     <modules>
-        <module>hibernate-search-solr-analyzers</module>
+        <module>hibernate-search-analyzers</module>
         <module>hibernate-search</module>
         <module>hibernate-search-testing</module>
         <module>hibernate-search-archetype</module>
@@ -190,7 +190,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-solr-analyzers</artifactId>
+                <artifactId>hibernate-search-analyzers</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

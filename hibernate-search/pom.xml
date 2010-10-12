@@ -56,7 +56,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-solr-analyzers</artifactId>
+            <artifactId>hibernate-search-analyzers</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

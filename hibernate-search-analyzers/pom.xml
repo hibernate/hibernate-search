@@ -34,10 +34,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-solr-analyzers</artifactId>
+    <artifactId>hibernate-search-analyzers</artifactId>
 
     <name>Hibernate Search Analyzer Framework</name>
-    <description>Hibernate Search Analyzer Framework</description>
+    <description>Hibernate Search Analyzer Framework based on Apache Solr</description>
 
     <dependencies>
         <dependency>
@@ -55,10 +55,6 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-collation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-spellchecker</artifactId>
         </dependency>
 
         <!-- Apache Commons -->
