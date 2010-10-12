@@ -43,7 +43,10 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.*;
+import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.builtin.CalendarBridge;
@@ -257,9 +260,9 @@ public class BridgeTest extends SearchTestCase {
 		s.delete( s.get( Cloud.class, cloud.getId() ) );
 		tx.commit();
 		s.close();
-		
+
 		//now unit-test the bridge directly:
-		
+
 		CalendarBridge bridge = new CalendarBridge();
 		HashMap<String, String> bridgeParams = new HashMap<String, String>();
 		bridgeParams.put( CalendarBridge.RESOLUTION_PARAMETER, Resolution.YEAR.toString() );
@@ -378,7 +381,7 @@ public class BridgeTest extends SearchTestCase {
 			final Throwable throwable = e.getCause();
 			if (throwable instanceof BridgeException) {
 				//expected
-				assertTrue( throwable.getMessage().contains( "class: " + IncorrectSet.class.getName() ) );
+				assertTrue( throwable.getMessage().contains( "class: " + IncorrectObjectToString.class.getName() ) );
 				assertTrue( throwable.getMessage().contains("path: id") );
 				tx.rollback();
 			}
