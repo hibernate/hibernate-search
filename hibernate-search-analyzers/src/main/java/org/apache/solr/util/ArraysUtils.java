@@ -1,3 +1,4 @@
+// original code from Apache Solr - ported to work with Lucene 3.x and reformatted to Search coding style
 package org.apache.solr.util;
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more

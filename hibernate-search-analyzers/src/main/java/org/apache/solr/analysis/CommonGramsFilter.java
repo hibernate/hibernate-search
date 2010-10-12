@@ -1,3 +1,4 @@
+// original code from Apache Solr - ported to work with Lucene 3.x and reformatted to Search coding style
 /*
  * Licensed under the Apache License, 
  * Version 2.0 (the "License"); you may not use this file except in compliance with the License.
