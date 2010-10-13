@@ -27,7 +27,16 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
 /**
+ * A helper class for building Field objects and associating them to Documents.
  * A wrapper class for Lucene parameters needed for indexing.
+ *
+ * The recommended approach to index is to use {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
+ * as all the options delcared by the user are transparently carried over. Compression is also provided transparently.
+
+ * {code}
+ * String fieldValue = convertToString(value);
+ * luceneOptions.addFieldToDocument(name, fieldValue, document);
+ * {code}
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
@@ -38,6 +47,13 @@ public interface LuceneOptions {
 	/**
 	 * Add a new field with the name {@code fieldName} to the Lucene Document {@code document} using the value
 	 * {@code indexedString}.
+	 * If the indexedString is null then the field is not added to the document.
+	 *
+	 * The field options are following the user declaration:
+	 *  - stored or not
+	 *  - compressed or not
+	 *  - what type of indexing strategy
+	 *  - what type of term vector strategy
 	 *
 	 * @param fieldName The field name
 	 * @param indexedString The value to index
@@ -46,33 +62,56 @@ public interface LuceneOptions {
 	void addFieldToDocument(String fieldName, String indexedString, Document document);
 
 	/**
-	 * @return {@code true} if the field value is compressed, {@code false} otherwise.
-	 */
-	boolean isCompressed();
-
-	/**
-	 * Might be removed in version 3.3 to better support Lucene 3
-	 * which is missing COMPRESS Store Type.
+	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
+	 * over manually building your Field objects and adding them to the Document.
+	 *
 	 * To use compression either use #addFieldToDocument or refer
 	 * to Lucene documentation to implement your own compression
 	 * strategy.
 	 *
-	 * @deprecated use addToDocument to add fields to the Document if possible
+	 * @return the compression strategy declared by the user {@code true} if the field value is compressed, {@code false} otherwise.
+	 */
+	boolean isCompressed();
+
+	/**
+	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
+	 * over manually building your Field objects and adding them to the Document.
+	 *
+	 * Return the storage strategy declared by the user
+	 * {@code org.apache.lucene.document.Field.Store.YES} if the field is stored
+	 * {@code org.apache.lucene.document.Field.Store.NO} otherwise.
+	 *
+	 * To determine if the field must be compressed, use {@link #isCompressed()}.
+	 *
+	 * Starting from version 3.3, Store.COMPRESS is no longer returned, use {@link #isCompressed()}
+	 *
+	 * To use compression either use #addFieldToDocument or refer
+	 * to Lucene documentation to implement your own compression
+	 * strategy.
 	 */
 	Field.Store getStore();
 
 	/**
-	 * @deprecated likely to be removed in version 3.3, use #addFieldToDocument
+	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
+	 * over manually building your Field objects and adding them to the Document.
+	 *
+	 * Return the indexing strategy declared by the user
 	 */
 	Field.Index getIndex();
 
 	/**
-	 * @deprecated likely to be removed in version 3.3, use #addFieldToDocument
+	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
+	 * over manually building your Field objects and adding them to the Document.
+	 *
+	 * Return the term vector strategy declared by the user
 	 */
 	Field.TermVector getTermVector();
 
 	/**
-	 * @deprecated likely to be removed in version 3.3, use #addFieldToDocument
+	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
+	 * over manually building your Field objects and adding them to the Document.
+	 *
+	 * Return the boost factor declared by the user
 	 */
 	Float getBoost();
 }

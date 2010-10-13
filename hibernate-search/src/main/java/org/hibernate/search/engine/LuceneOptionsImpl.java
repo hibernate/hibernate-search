@@ -103,9 +103,6 @@ class LuceneOptionsImpl implements LuceneOptions {
 		return this.indexMode;
 	}
 
-	/**
-	 * @deprecated likely to be removed in 3.3
-	 */
 	public org.apache.lucene.document.Field.Store getStore() {
 		if ( storeUncompressed || storeCompressed ) {
 			return org.apache.lucene.document.Field.Store.YES;
