@@ -9,7 +9,7 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>/dist/lib</outputDirectory>
+            <outputDirectory>/dist/lib/required</outputDirectory>
             <scope>runtime</scope>
             <excludes>
                 <exclude>jgroups:jgroups</exclude>
@@ -22,6 +22,23 @@
             <includes>
                 <include>jgroups:jgroups</include>
                 <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
+            </includes>
+        </dependencySet>
+
+        <!--
+        Need to manually put the optional analyzer dependencies into their place.
+        The maven-assembly-plugin does not have any options to handle <optional/> dependencies
+        They are added as test dependencies in the pom.
+        -->
+        <dependencySet>
+            <outputDirectory>/dist/lib/optional</outputDirectory>
+            <scope>test</scope>
+            <includes>
+                <include>org.apache.lucene:lucene-snowball</include>
+                <include>org.apache.lucene:lucene-collation</include>
+                <include>commons-codec:commons-codec</include>
+                <include>commons-io:commons-io</include>
+                <include>org.slf4j:slf4j-log4j12</include>
             </includes>
         </dependencySet>
 
