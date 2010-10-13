@@ -11,7 +11,26 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>/dist/lib</outputDirectory>
             <scope>runtime</scope>
+            <excludes>
+                <exclude>jgroups:jgroups</exclude>
+                <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
+            </excludes>
         </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>/dist/lib/optional</outputDirectory>
+            <includes>
+                <include>jgroups:jgroups</include>
+                <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>/dist/lib/provided</outputDirectory>
+            <scope>provided</scope>
+        </dependencySet>
+
     </dependencySets>
 
     <fileSets>
@@ -44,6 +63,15 @@
                 <include>changelog.txt</include>
             </includes>
         </fileSet>
+        <!-- Include the APL2 into the dist as well, because the Solr code is originally licensed under APL -->
+        <fileSet>
+            <directory>../hibernate-search-analyzers</directory>
+            <outputDirectory/>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <includes>
+                <include>license.txt</include>
+            </includes>
+        </fileSet>
         <fileSet>
             <directory>.</directory>
             <outputDirectory/>
@@ -52,6 +80,6 @@
                 <include>pom.xml</include>
                 <include>src/**/*</include>
             </includes>
-        </fileSet>        
+        </fileSet>
     </fileSets>
 </assembly>
