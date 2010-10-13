@@ -25,7 +25,6 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="search-mapping" revision="3">
-
   <title>Mapping entities to the index structure</title>
 
   <para>All the metadata information needed to index entities is described
@@ -679,11 +678,11 @@ public class MyEntity {
       <section>
         <title>Analyzer definitions</title>
 
-        <para>Analyzers can become quite complex to deal with for which reason
-        Hibernate Search introduces the notion of analyzer definitions. An
+        <para>Analyzers can become quite complex to deal with. For this reason
+        introduces Hibernate Search the notion of analyzer definitions. An
         analyzer definition can be reused by many
-        <classname>@Analyzer</classname> declarations. An analyzer definition
-        is composed of:</para>
+        <classname>@Analyzer</classname> declarations and is composed
+        of:</para>
 
         <itemizedlist>
           <listitem>
@@ -713,23 +712,39 @@ public class MyEntity {
         <para>This separation of tasks - a list of char filters, and a
         tokenizer followed by a list of filters - allows for easy reuse of
         each individual component and let you build your customized analyzer
-        in a very flexible way (just like Lego). Generally speaking the
-        <classname>char filters</classname> do some pre-processing in the
-        character input, then the <classname>Tokenizer</classname> starts the
-        tokenizing process by turning the character input into tokens which
-        are then further processed by the <classname>TokenFilter</classname>s.
-        Hibernate Search supports this infrastructure by utilizing the Solr
-        analyzer framework. Make sure to add<filename> solr-core.jar and
-        </filename><filename>solr-solrj.jar</filename> to your classpath to
-        use analyzer definitions. In case you also want to use the snowball
-        stemmer also include the <filename>lucene-snowball.jar.</filename>
-        Other Solr analyzers might depend on more libraries. For example, the
-        <classname>PhoneticFilterFactory</classname> depends on <ulink
-        url="http://commons.apache.org/codec">commons-codec</ulink>. Your
-        distribution of Hibernate Search provides these dependencies in its
-        <filename>lib</filename> directory.</para>
+        in a very flexible way (just like Lego). Generally speaking the char
+        filters do some pre-processing in the character input, then the
+        <classname>Tokenizer</classname> starts the tokenizing process by
+        turning the character input into tokens which are then further
+        processed by the <classname>TokenFilter</classname>s. Hibernate Search
+        supports this infrastructure by utilizing the Solr analyzer framework.
+        </para>
 
-        <example>
+        <tip>
+          <para>Some of the analyzers and filters will require additional
+          dependencies. For example to use the snowball stemmer you have to
+          also include the <literal>lucene-snowball</literal> jar and for the
+          <classname>PhoneticFilterFactory</classname> you need the <ulink
+          url="http://commons.apache.org/codec">commons-codec</ulink> jar.
+          Your distribution of Hibernate Search provides these dependencies in
+          its <filename>lib/optional</filename> directory. Have a look at
+          <xref linkend="table-available-tokenizers" /> and <xref
+          linkend="table-available-filters" /> to see which anaylzers and
+          filters have additional dependencies</para>
+        </tip>
+
+        <para>Let's have a look at a concrete example now - <xref
+        linkend="example-analyzer-def" />. First a char filter is defined by
+        its factory. In our example, a mapping char filter is used, and will
+        replace characters in the input based on the rules specified in the
+        mapping file. Next a tokenizer is defined. This example uses the
+        standard tokenizer. Last but not least, a list of filters is defined
+        by their factories. In our example, the
+        <classname>StopFilter</classname> filter is built reading the
+        dedicated words property file. The filter is also expected to ignore
+        case.</para>
+
+        <example id="example-analyzer-def">
           <title><classname>@AnalyzerDef</classname> and the Solr
           framework</title>
 
@@ -753,29 +768,19 @@ public class Team {
 }</programlisting>
         </example>
 
-        <para>A char filter is defined by its factory which is responsible for
-        building the char filter and using the optional list of parameters. In
-        our example, a mapping char filter is used, and will replace
-        characters in the input based on the rules specified in the mapping
-        file. A tokenizer is also defined by its factory. This example use the
-        standard tokenizer. A filter is defined by its factory which is
-        responsible for creating the filter instance using the optional
-        parameters. In our example, the StopFilter filter is built reading the
-        dedicated words property file and is expected to ignore case. The list
-        of parameters is dependent on the tokenizer or filter factory.</para>
-
-        <warning>
+        <tip>
           <para>Filters and char filters are applied in the order they are
-          defined in the <classname>@AnalyzerDef</classname> annotation. Make
-          sure to think twice about this order.</para>
-        </warning>
+          defined in the <classname>@AnalyzerDef</classname> annotation. Order
+          matters!</para>
+        </tip>
 
         <para>Once defined, an analyzer definition can be reused by an
-        <classname>@Analyzer</classname> declaration using the definition name
-        rather than declaring an implementation class.</para>
+        <classname>@Analyzer</classname> declaration as seen in <xref
+        linkend="example-referencing-analyzer-def" />.</para>
 
         <example>
-          <title>Referencing an analyzer by name</title>
+          <title id="example-referencing-analyzer-def" remap="">Referencing an
+          analyzer by name</title>
 
           <programlisting>@Entity
 @Indexed
@@ -798,17 +803,17 @@ public class Team {
         </example>
 
         <para>Analyzer instances declared by
-        <classname>@AnalyzerDef</classname> are available by their name in the
-        <classname>SearchFactory</classname>.</para>
+        <classname>@AnalyzerDef</classname> are also available by their name
+        in the <classname>SearchFactory</classname> which is quite useful wen
+        building queries.</para>
 
         <programlisting>Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("customanalyzer");</programlisting>
 
-        <para>This is quite useful wen building queries. Fields in queries
-        should be analyzed with the same analyzer used to index the field so
-        that they speak a common "language": the same tokens are reused
-        between the query and the indexing process. This rule has some
-        exceptions but is true most of the time. Respect it unless you know
-        what you are doing.</para>
+        <para>Fields in queries should be analyzed with the same analyzer used
+        to index the field so that they speak a common "language": the same
+        tokens are reused between the query and the indexing process. This
+        rule has some exceptions but is true most of the time. Respect it
+        unless you know what you are doing.</para>
       </section>
 
       <section>
@@ -820,23 +825,25 @@ public class Team {
         url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters</ulink>.
         Let check a few of them.</para>
 
-        <table>
-          <title>Some of the available char filters</title>
+        <table id="table-available-char-filters">
+          <title>Example of available char filters</title>
 
-          <tgroup cols="3">
+          <tgroup cols="4">
             <thead>
               <row>
                 <entry align="center">Factory</entry>
 
                 <entry align="center">Description</entry>
 
-                <entry align="center">parameters</entry>
+                <entry align="center">Parameters</entry>
+
+                <entry align="center">Additional dependencies</entry>
               </row>
             </thead>
 
             <tbody>
               <row>
-                <entry>MappingCharFilterFactory</entry>
+                <entry><classname>MappingCharFilterFactory</classname></entry>
 
                 <entry>Replaces one or more characters with one or more
                 characters, based on mappings specified in the resource
@@ -848,12 +855,16 @@ public class Team {
                     "ñ" =&gt; "n"
                     "ø" =&gt; "o"
                 </literallayout> </para></entry>
+
+                <entry>none</entry>
               </row>
 
               <row>
-                <entry>HTMLStripCharFilterFactory</entry>
+                <entry><classname>HTMLStripCharFilterFactory</classname></entry>
 
                 <entry>Remove HTML standard tags, keeping the text</entry>
+
+                <entry>none</entry>
 
                 <entry>none</entry>
               </row>
@@ -861,87 +872,114 @@ public class Team {
           </tgroup>
         </table>
 
-        <table>
-          <title>Some of the available tokenizers</title>
+        <table id="table-available-tokenizers">
+          <title>Example of available tokenizers</title>
 
-          <tgroup cols="3">
+          <tgroup cols="4">
             <thead>
               <row>
                 <entry align="center">Factory</entry>
 
                 <entry align="center">Description</entry>
 
-                <entry align="center">parameters</entry>
+                <entry align="center">Parameters</entry>
+
+                <entry align="center">Additional dependencies</entry>
               </row>
             </thead>
 
             <tbody>
               <row>
-                <entry>StandardTokenizerFactory</entry>
+                <entry><classname>StandardTokenizerFactory</classname></entry>
 
                 <entry>Use the Lucene StandardTokenizer</entry>
+
+                <entry>none</entry>
 
                 <entry>none</entry>
               </row>
 
               <row>
-                <entry>HTMLStripStandardTokenizerFactory</entry>
+                <entry><classname>HTMLStripStandardTokenizerFactory</classname></entry>
 
                 <entry>Remove HTML tags, keep the text and pass it to a
                 StandardTokenizer. @Deprecated, use the
                 HTMLStripCharFilterFactory instead</entry>
 
                 <entry>none</entry>
+
+                <entry>none</entry>
+              </row>
+
+              <row>
+                <entry><classname>PatternTokenizerFactory</classname></entry>
+
+                <entry>Breaks text at the specified regular expression
+                pattern. </entry>
+
+                <entry><para><literal>pattern</literal>: the regular
+                expression to use for tokenizing</para><para>group: says which
+                pattern group to extract into tokens</para></entry>
+
+                <entry><literal>commons-io</literal></entry>
               </row>
             </tbody>
           </tgroup>
         </table>
 
-        <table>
-          <title>Some of the available filters</title>
+        <table id="table-available-filters">
+          <title>Examples of available filters</title>
 
-          <tgroup cols="3">
+          <tgroup cols="4">
             <thead>
               <row>
                 <entry align="center">Factory</entry>
 
                 <entry align="center">Description</entry>
 
-                <entry align="center">parameters</entry>
+                <entry align="center">Parameters</entry>
+
+                <entry align="center">Additional dependencies</entry>
               </row>
             </thead>
 
             <tbody>
               <row>
-                <entry>StandardFilterFactory</entry>
+                <entry><classname>StandardFilterFactory</classname></entry>
 
                 <entry>Remove dots from acronyms and 's from words</entry>
 
                 <entry>none</entry>
-              </row>
-
-              <row>
-                <entry>LowerCaseFilterFactory</entry>
-
-                <entry>Lowercase words</entry>
 
                 <entry>none</entry>
               </row>
 
               <row>
-                <entry>StopFilterFactory</entry>
+                <entry><classname>LowerCaseFilterFactory</classname></entry>
 
-                <entry>remove words (tokens) matching a list of stop
+                <entry>Lowercases all words</entry>
+
+                <entry>none</entry>
+
+                <entry>none</entry>
+              </row>
+
+              <row>
+                <entry><classname>StopFilterFactory</classname></entry>
+
+                <entry>Remove words (tokens) matching a list of stop
                 words</entry>
 
                 <entry><para><literal>words</literal>: points to a resource
                 file containing the stop words</para><para>ignoreCase: true if
                 <literal>case</literal> should be ignore when comparing stop
                 words, <literal>false</literal> otherwise </para></entry>
+
+                <entry>none</entry>
               </row>
 
               <row>
-                <entry>SnowballPorterFilterFactory</entry>
+                <entry><classname>SnowballPorterFilterFactory</classname></entry>
 
                 <entry>Reduces a word to it's root in a given language. (eg.
                 protect, protects, protection share the same root). Using such
@@ -950,14 +988,55 @@ public class Team {
                 <entry><literal>language</literal>: Danish, Dutch, English,
                 Finnish, French, German, Italian, Norwegian, Portuguese,
                 Russian, Spanish, Swedish and a few more</entry>
+
+                <entry><literal>lucene-snowball</literal></entry>
               </row>
 
               <row>
-                <entry>ISOLatin1AccentFilterFactory</entry>
+                <entry><classname>ISOLatin1AccentFilterFactory</classname></entry>
 
-                <entry>remove accents for languages like French</entry>
+                <entry>Remove accents for languages like French</entry>
 
                 <entry>none</entry>
+
+                <entry>none</entry>
+              </row>
+
+              <row>
+                <entry><classname>PhoneticFilterFactory</classname></entry>
+
+                <entry>Inserts phonetically similar tokens into the token
+                stream</entry>
+
+                <entry><para><literal>encoder</literal>: One of
+                DoubleMetaphone, Metaphone, Soundex or
+                RefinedSoundex</para><para>inject: <constant>true</constant>
+                will add tokens to the stream, <constant>false</constant> will
+                replace the existing token
+                </para><para><literal>maxCodeLength</literal>: sets the
+                maximum length of the code to be generated. Supported only for
+                Metaphone and DoubleMetaphone encodings</para></entry>
+
+                <entry><literal>commons-codec</literal></entry>
+              </row>
+
+              <row>
+                <entry><classname>CollationKeyFilterFactory</classname></entry>
+
+                <entry>Converts each token into its
+                <classname>java.text.CollationKey</classname>, and then
+                encodes the <classname>CollationKey</classname> with
+                <classname>IndexableBinaryStringTools</classname>, to allow it
+                to be stored as an index term. </entry>
+
+                <entry><literal>custom</literal>, <literal>language</literal>,
+                <literal>country</literal>, <literal>variant</literal>,
+                <literal>strength</literal>, <literal>decomposition
+                </literal>see Lucene's
+                <classname>CollationKeyFilter</classname> javadocs for more
+                info</entry>
+
+                <entry><literal>lucene-collation, commons-io</literal></entry>
               </row>
             </tbody>
           </tgroup>
