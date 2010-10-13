@@ -76,6 +76,10 @@ public class ProjectionLoader implements Loader {
 		}
 	}
 
+	public Object loadWithoutTiming(EntityInfo entityInfo) {
+		throw new AssertionFailure("This method is not meant to be used on ProjectionLoader");
+	}
+
 	private void initThisProjectionFlag(EntityInfo entityInfo) {
 		if ( projectThis == null ) {
 			projectThis = entityInfo.indexesOfThis.size() != 0;

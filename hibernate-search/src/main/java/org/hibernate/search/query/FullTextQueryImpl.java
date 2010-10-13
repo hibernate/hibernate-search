@@ -997,6 +997,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
 
+		public Object loadWithoutTiming(EntityInfo entityInfo) {
+			throw new UnsupportedOperationException( "noLoader should not be used" );
+		}
+
 		public List load(EntityInfo... entityInfos) {
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}

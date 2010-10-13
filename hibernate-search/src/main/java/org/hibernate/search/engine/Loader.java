@@ -40,5 +40,7 @@ public interface Loader {
 
 	Object load(EntityInfo entityInfo);
 
+	Object loadWithoutTiming(EntityInfo entityInfo);
+
 	List load(EntityInfo... entityInfos);
 }
