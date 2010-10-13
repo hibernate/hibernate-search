@@ -232,7 +232,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private Loader getProjectionLoader(ObjectLoaderBuilder loaderBuilder) {
 		ProjectionLoader loader = new ProjectionLoader();
 		loader.init( ( Session ) session, searchFactoryImplementor, resultTransformer, loaderBuilder, indexProjection );
-		loader.setEntityTypes( indexedTargetedEntities );
 		return loader;
 	}
 
