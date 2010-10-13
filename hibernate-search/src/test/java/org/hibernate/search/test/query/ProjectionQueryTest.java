@@ -35,6 +35,9 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -42,6 +45,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -53,6 +57,53 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class ProjectionQueryTest extends SearchTestCase {
 
+	/**
+	 * HSEARCH-546
+	 */
+	public void testProjectionOfThisAndEAGERFetching() throws Exception {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+
+		Transaction tx = s.beginTransaction();
+		Spouse spouse = new Spouse();
+		spouse.setFirstName("Christina");
+		s.save(spouse);
+		Husband h = new Husband();
+		h.setLastName("Roberto");
+		h.setSpouse(spouse);
+		s.save(h);
+		tx.commit();
+
+		s.clear();
+		tx = s.beginTransaction();
+		final QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity(Husband.class).get();
+		Query query = qb.keyword().onField("lastName").matching("Roberto").createQuery();
+		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Husband.class );
+		hibQuery.setProjection( FullTextQuery.THIS );
+		Criteria fetchingStrategy = s.createCriteria(Husband.class);
+		fetchingStrategy.setFetchMode("spouse", FetchMode.JOIN);
+		hibQuery.setCriteriaQuery(fetchingStrategy);
+
+		List result = hibQuery.list();
+		assertNotNull( result );
+
+		Object[] projection = ( Object[] ) result.get( 0 );
+		assertNotNull( projection );
+		final Husband husband = (Husband) projection[0];
+
+		assertTrue( Hibernate.isInitialized( husband.getSpouse() ) );
+
+		//cleanup
+		for ( Object element : s.createQuery( "from " + Husband.class.getName() ).list() ) {
+			s.delete( element );
+		}
+		for ( Object element : s.createQuery( "from " + Spouse.class.getName() ).list() ) {
+			s.delete( element );
+		}
+
+		tx.commit();
+		s.close();
+	}
+	
 	/**
 	 * HSEARCH-296
 	 *
@@ -75,6 +126,11 @@ public class ProjectionQueryTest extends SearchTestCase {
 		Object[] projection = ( Object[] ) result.get( 0 );
 		assertNotNull( projection );
 		assertEquals( "Wrong projected class", Employee.class, projection[0] );
+
+		//cleanup
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
 
 		tx.commit();
 		s.close();
@@ -505,7 +561,9 @@ public class ProjectionQueryTest extends SearchTestCase {
 		return new Class[] {
 				Book.class,
 				Author.class,
-				Employee.class
+				Employee.class,
+				Husband.class,
+				Spouse.class
 		};
 	}
 }
