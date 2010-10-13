@@ -215,65 +215,23 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * @return The loader instance to use to load the results of the query.
 	 */
 	private Loader getLoader() {
-		Loader loader;
+		ObjectLoaderBuilder loaderBuilder = new ObjectLoaderBuilder()
+				.criteria(criteria)
+				.targetedEntities(targetedEntities)
+				.indexedTargetedEntities(indexedTargetedEntities)
+				.session(session)
+				.searchFactory(searchFactoryImplementor);
 		if ( indexProjection != null ) {
-			loader = getProjectionLoader();
-		}
-		else if ( criteria != null ) {
-			loader = getCriteriaLoader();
-		}
-		else if ( targetedEntities.size() == 1 ) {
-			loader = getSingleEntityLoader();
+			return getProjectionLoader( loaderBuilder );
 		}
 		else {
-			loader = getMultipleEntitiesLoader();
+			return loaderBuilder.buildLoader();
 		}
-		return loader;
 	}
 
-	private Loader getMultipleEntitiesLoader() {
-		final MultiClassesQueryLoader multiClassesLoader = new MultiClassesQueryLoader();
-		multiClassesLoader.init( ( Session ) session, searchFactoryImplementor );
-		multiClassesLoader.setEntityTypes( indexedTargetedEntities );
-		return multiClassesLoader;
-	}
-
-	private Loader getSingleEntityLoader() {
-		final QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( ( Session ) session, searchFactoryImplementor );
-		queryLoader.setEntityType( targetedEntities.iterator().next() );
-		return queryLoader;
-	}
-
-	private Loader getCriteriaLoader() {
-		if ( targetedEntities.size() > 1 ) {
-			throw new SearchException( "Cannot mix criteria and multiple entity types" );
-		}
-		Class entityType = targetedEntities.size() == 0 ? null : targetedEntities.iterator().next();
-		if ( criteria instanceof CriteriaImpl ) {
-			String targetEntity = ( ( CriteriaImpl ) criteria ).getEntityOrClassName();
-			if ( entityType != null && !entityType.getName().equals( targetEntity ) ) {
-				throw new SearchException( "Criteria query entity should match query entity" );
-			}
-			else {
-				try {
-					entityType = ReflectHelper.classForName( targetEntity );
-				}
-				catch ( ClassNotFoundException e ) {
-					throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
-				}
-			}
-		}
-		QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( ( Session ) session, searchFactoryImplementor );
-		queryLoader.setEntityType( entityType );
-		queryLoader.setCriteria( criteria );
-		return queryLoader;
-	}
-
-	private Loader getProjectionLoader() {
+	private Loader getProjectionLoader(ObjectLoaderBuilder loaderBuilder) {
 		ProjectionLoader loader = new ProjectionLoader();
-		loader.init( ( Session ) session, searchFactoryImplementor, resultTransformer, indexProjection );
+		loader.init( ( Session ) session, searchFactoryImplementor, resultTransformer, loaderBuilder, indexProjection );
 		loader.setEntityTypes( indexedTargetedEntities );
 		return loader;
 	}

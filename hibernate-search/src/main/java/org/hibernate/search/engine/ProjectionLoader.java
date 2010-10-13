@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
+import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.query.ObjectLoaderBuilder;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -40,21 +42,23 @@ import org.hibernate.transform.ResultTransformer;
 public class ProjectionLoader implements Loader {
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Session session;
-	private MultiClassesQueryLoader objectLoader;
+	private Loader objectLoader;
 	private Boolean projectThis;
 	private ResultTransformer transformer;
 	private String[] aliases;
 	private Set<Class<?>> entityTypes;
+	private ObjectLoaderBuilder loaderBuilder;
 
 	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
 
-	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, ResultTransformer transformer, String[] aliases) {
+	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, ResultTransformer transformer, ObjectLoaderBuilder loaderBuilder, String[] aliases) {
 		init( session, searchFactoryImplementor );
 		this.transformer = transformer;
 		this.aliases = aliases;
+		this.loaderBuilder = loaderBuilder;
 	}
 
 	public void setEntityTypes(Set<Class<?>> entityTypes) {
@@ -84,10 +88,7 @@ public class ProjectionLoader implements Loader {
 		if ( projectThis == null ) {
 			projectThis = entityInfo.indexesOfThis.size() != 0;
 			if ( projectThis ) {
-				MultiClassesQueryLoader loader = new MultiClassesQueryLoader();
-				loader.init( session, searchFactoryImplementor );
-				loader.setEntityTypes( entityTypes );
-				objectLoader = loader;
+				objectLoader = loaderBuilder.buildLoader();
 			}
 		}
 	}
@@ -105,7 +106,7 @@ public class ProjectionLoader implements Loader {
 				for ( int index : entityInfo.indexesOfThis ) {
 					// set one by one to avoid loosing null objects (skipped in the objectLoader.load( EntityInfo[] ))
 					// use objectLoader.executeLoad to prevent measuring load time again (see AbstractLoader)
-					entityInfo.projection[index] = objectLoader.executeLoad( entityInfo );
+					entityInfo.projection[index] = objectLoader.loadWithoutTiming( entityInfo );
 				}
 			}
 		}
