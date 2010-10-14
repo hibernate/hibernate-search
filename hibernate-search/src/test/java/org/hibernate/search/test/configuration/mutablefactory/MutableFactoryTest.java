@@ -70,9 +70,9 @@ public class MutableFactoryTest extends TestCase {
 		ManualConfiguration configuration = new ManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
 		//FIXME downcasting of MSF. create a getDelegate() ?
-		MutableSearchFactory sf = (MutableSearchFactory) new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
-		sf = (MutableSearchFactory) builder.rootFactory( sf )
+		sf = builder.rootFactory( sf )
 				.addClass( A.class )
 				.buildSearchFactory();
 

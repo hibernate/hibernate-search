@@ -118,8 +118,12 @@ public class SearchFactoryBuilder {
 		return this;
 	}
 
-	public SearchFactoryBuilder rootFactory(MutableSearchFactory factory) {
-		this.rootFactory = factory;
+	public SearchFactoryBuilder rootFactory(SearchFactoryIntegrator factory) {
+		//We know that the only expected concrete type is MutableSearchFactory
+		//This could fail if some fancy framework proxy the object but at this stage they likely won't
+		//even proxy SearchFactoryIntegrator.
+		//If that happens we can provide a unwrap method to SearchFactory
+		this.rootFactory = (MutableSearchFactory) factory;
 		return this;
 	}
 
