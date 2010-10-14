@@ -25,7 +25,6 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="search-configuration">
-
   <title>Configuration</title>
 
   <section id="search-configuration-directory" revision="1">
@@ -365,48 +364,99 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     <title>Worker configuration</title>
 
     <para>It is possible to refine how Hibernate Search interacts with Lucene
-    through the worker configuration. The work can be executed to the Lucene
-    directory or sent to a JMS queue for later processing. When processed to
-    the Lucene directory, the work can be processed synchronously or
-    asynchronously to the transaction commit.</para>
+    through the worker configuration. There exist several architectural
+    components and possible extension points. Let's have a closer look.
+    </para>
 
-    <para>You can define the worker configuration using the following
-    properties</para>
+    <para>First there is a <classname>Worker</classname>. An implementation of
+    the <classname>Worker</classname> interface is reponsible for receiving
+    all entity changes, queuing them by context and applying them once a
+    context ends. The most intuative context, especially in connection with
+    ORM, is the transaction. For this reason Hibernate Search will per default
+    use the <classname>TransactionalWorker</classname> to scope all changes
+    per transaction. One can, however, imagine a scenario where the context
+    depends for example on the number of entity changes or some other
+    application (lifecycle) events. For this reason the
+    <classname>Worker</classname> implementation is configurable as shown in
+    <xref linkend="table-worker-configuration" />.</para>
 
-    <table>
-      <title>worker configuration</title>
+    <table id="table-worker-configuration">
+      <title>Scope configuration</title>
 
       <tgroup cols="2">
         <tbody>
           <row>
-            <entry>Property</entry>
+            <entry><emphasis role="bold">Property</emphasis></entry>
 
-            <entry>Description</entry>
+            <entry><emphasis role="bold">Description</emphasis></entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.backend</literal></entry>
+            <entry><literal>hibernate.search.worker.scope</literal></entry>
 
-            <entry>Out of the box support for the Apache Lucene back end and
-            the JMS back end. Default to <literal>lucene</literal>. Supports
-            also <literal>jms</literal>, <literal>blackhole</literal>,
-            <literal>jgroupsMaster</literal> and
-            <literal>jgroupsSlave</literal>.</entry>
+            <entry>The fully qualifed class name of the
+            <classname>Worker</classname> implementation to use. If this
+            property is not set, empty or <literal>transaction</literal> the
+            default <classname>TransactionalWorker</classname> is
+            used.</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.worker.*</literal></entry>
+
+            <entry>All configuration properties prefixed with
+            <literal>hibernate.search.worker</literal> are passed to the
+            Worker during initialization. This allows adding custom, worker
+            specific parameters.</entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.worker.batch_size</literal></entry>
+
+            <entry>Defines the maximum number of indexing operation batched
+            per context. Once the limit is reached indexing will be triggered
+            even though the context has not ended yet. This property only
+            works if the <classname>Worker</classname> implementation
+            delegates the queued work to BatchedQueueingProcessor (which is
+            what the <classname>TransactionalWorker</classname> does)</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <para>Once a context ends it is time to prepare and apply the index
+    changes. This can be done synchronously or asynchronously from within a
+    new thread. Synchronous updates have the advantage that the index is at
+    all times in sync with the databases. Asynchronous updates, on the other
+    hand, can help to minimize the user response time. The drawback is
+    potential discrepancies between database and index states. Lets look at
+    the configuration options shown in <xref
+    linkend="table-work-execution-configuration" />.</para>
+
+    <table id="table-work-execution-configuration">
+      <title>Execution configuration</title>
+
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry><emphasis role="bold">Property</emphasis></entry>
+
+            <entry><emphasis role="bold">Description</emphasis></entry>
           </row>
 
           <row>
             <entry><literal>hibernate.search.worker.execution</literal></entry>
 
-            <entry>Supports synchronous and asynchronous execution. Default to
-            <literal><literal>sync</literal></literal>. Supports also
-            <literal>async</literal>.</entry>
+            <entry><para><literal>sync</literal>: synchronous execution
+            (default)</para><para><literal>async</literal>: asynchronous
+            execution</para></entry>
           </row>
 
           <row>
             <entry><literal>hibernate.search.worker.thread_pool.size</literal></entry>
 
-            <entry>Defines the number of threads in the pool. useful only for
-            asynchronous execution. Default to 1.</entry>
+            <entry>Defines the number of threads in the pool for asynchronous
+            execution. Defaults to 1.</entry>
           </row>
 
           <row>
@@ -417,6 +467,69 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
             infinite. If the limit is reached, the work is done by the main
             thread.</entry>
           </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <para>So far all work is done within the same Virtual Machine (VM), no
+    matter which execution mode. The total amount of work has not changed for
+    the single VM. Luckily there is a better approach, namely delegation. It
+    is possible to send the indexing work to a different server by configuring
+    hibernate.search.worker.backend - see <xref
+    linkend="table-backend-configuration" />.</para>
+
+    <table id="table-backend-configuration">
+      <title>Backend configuration</title>
+
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry><emphasis role="bold">Property</emphasis></entry>
+
+            <entry><emphasis role="bold">Description</emphasis></entry>
+          </row>
+
+          <row>
+            <entry><literal>hibernate.search.worker.backend</literal></entry>
+
+            <entry><para><literal>lucene</literal>: The default backend which
+            runs index updates in the same VM. Also used when the property is
+            undefined or empty.</para><para><literal>jms</literal>: JMS
+            backend. Index updates are send to a JMS queue to be processed by
+            an indexing master. See <xref
+            linkend="table-jms-backend-configuration" /> for additional
+            configuration options and <xref linkend="jms-backend" /> for a
+            more detailed descripton of this
+            setup.</para><para><literal>jgroupsMaster</literal> or
+            <literal>jgroupsSlave</literal>: Backend using <ulink
+            url="http://www.jgroups.org/">JGroups</ulink> as communication
+            layer. See <xref linkend="table-jgroups-backend-configuration" />
+            for additional configuration options and <xref
+            linkend="jgroups-backend" /> for a more detailed description of
+            this setup.</para><para><literal>blackhole</literal>: Mainly a
+            test/developer setting which ignores all indexing
+            work</para><para>You can also specify the fully qualified name of
+            a class implementing
+            <classname>BackendQueueProcessorFactory</classname>. This way you
+            can implement your own communication layer. The implementation is
+            responsilbe for returning a <classname>Runnable</classname>
+            instance which on execution will process the index
+            work.</para></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <table id="table-jms-backend-configuration">
+      <title>JMS backend configuration</title>
+
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry><emphasis role="bold">Property</emphasis></entry>
+
+            <entry><emphasis role="bold">Description</emphasis></entry>
+          </row>
 
           <row>
             <entry><literal>hibernate.search.worker.jndi.*</literal></entry>
@@ -426,8 +539,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           </row>
 
           <row>
-            <entry><literal>
-            hibernate.search.worker.jms.connection_factory</literal></entry>
+            <entry><literal>hibernate.search.worker.jms.connection_factory</literal></entry>
 
             <entry>Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS connection factory from
@@ -441,6 +553,20 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
             <entry>Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS queue from. The queue will be used to post work
             messages.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <table id="table-jgroups-backend-configuration">
+      <title>JGroups backend configuration</title>
+
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry><emphasis role="bold">Property</emphasis></entry>
+
+            <entry><emphasis role="bold">Description</emphasis></entry>
           </row>
 
           <row>
@@ -474,6 +600,17 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
         </tbody>
       </tgroup>
     </table>
+
+    <warning>
+      <para>As you probably noticed, some of the shown properties are
+      correlated which means that not all combinations of property values make
+      sense. In fact you can end up with a non-functional configuration. This
+      is especially true for the case that you provide your own
+      implementations of some of the shown interfaces. Make sure to study the
+      existing code before you write your own <classname>Worker</classname> or
+      <classname>BackendQueueProcessorFactory</classname>
+      implementation.</para>
+    </warning>
   </section>
 
   <section id="jms-backend">
