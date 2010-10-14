@@ -34,6 +34,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
+import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -65,7 +67,6 @@ import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.StatisticsImpl;
 import org.hibernate.search.stat.StatisticsImplementor;
@@ -79,7 +80,7 @@ import org.hibernate.search.util.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class ImmutableSearchFactory implements StateSearchFactoryImplementor, WorkerBuildContext {
+public class ImmutableSearchFactory implements SearchFactoryImplementorWithShareableState, WorkerBuildContext {
 
 	static {
 		Version.touch();
@@ -110,22 +111,22 @@ public class ImmutableSearchFactory implements StateSearchFactoryImplementor, Wo
 	private final Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams;
 	private final String indexingStrategy;
 
-	public ImmutableSearchFactory(SearchFactoryBuilder cfg) {
-		this.analyzers = cfg.analyzers;
-		this.backendQueueProcessorFactory = cfg.backendQueueProcessorFactory;
-		this.cacheBitResultsSize = cfg.cacheBitResultsSize;
-		this.configurationProperties = cfg.configurationProperties;
-		this.dirProviderData = cfg.dirProviderData;
-		this.dirProviderIndexingParams = cfg.dirProviderIndexingParams;
-		this.documentBuildersIndexedEntities = cfg.documentBuildersIndexedEntities;
-		this.documentBuildersContainedEntities = cfg.documentBuildersContainedEntities;
-		this.errorHandler = cfg.errorHandler;
-		this.filterCachingStrategy = cfg.filterCachingStrategy;
-		this.filterDefinitions = cfg.filterDefinitions;
-		this.indexHierarchy = cfg.indexHierarchy;
-		this.indexingStrategy = cfg.indexingStrategy;
-		this.readerProvider = cfg.readerProvider;
-		this.worker = cfg.worker;
+	public ImmutableSearchFactory(SearchFactoryState state) {
+		this.analyzers = state.getAnalyzers();
+		this.backendQueueProcessorFactory = state.getBackendQueueProcessorFactory();
+		this.cacheBitResultsSize = state.getCacheBitResultsSize();
+		this.configurationProperties = state.getConfigurationProperties();
+		this.dirProviderData = state.getDirectoryProviderData();
+		this.dirProviderIndexingParams = state.getDirectoryProviderIndexingParams();
+		this.documentBuildersIndexedEntities = state.getDocumentBuildersIndexedEntities();
+		this.documentBuildersContainedEntities = state.getDocumentBuildersContainedEntities();
+		this.errorHandler = state.getErrorHandler();
+		this.filterCachingStrategy = state.getFilterCachingStrategy();
+		this.filterDefinitions = state.getFilterDefinitions();
+		this.indexHierarchy = state.getIndexHierarchy();
+		this.indexingStrategy = state.getIndexingStrategy();
+		this.readerProvider = state.getReaderProvider();
+		this.worker = state.getWorker();
 		this.statistics = new StatisticsImpl( this );
 		String enableStats = configurationProperties.getProperty( Environment.GENERATE_STATS );
 		if ( "true".equalsIgnoreCase( enableStats ) ) {

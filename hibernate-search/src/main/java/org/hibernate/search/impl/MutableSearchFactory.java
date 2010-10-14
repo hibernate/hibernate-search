@@ -47,7 +47,7 @@ import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.internals.StateSearchFactoryImplementor;
+import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
@@ -60,21 +60,25 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  *
  * @author Emmanuel Bernard
  */
-public class MutableSearchFactory implements StateSearchFactoryImplementor, SearchFactoryIntegrator {
+public class MutableSearchFactory implements SearchFactoryImplementorWithShareableState, SearchFactoryIntegrator {
 	//a reference to the same instance of this class is help by clients and various HSearch services
 	//when changing the SearchFactory internals, only the underlying delegate should be changed.
 	//the volatile ensure that the state is replicated upong underlying factory switch.
-	private volatile StateSearchFactoryImplementor delegate;
+	private volatile SearchFactoryImplementorWithShareableState delegate;
 
 	//lock to be acquired every time the underlying searchFactory is rebuilt
 	private final Lock mutating = new ReentrantLock();
 
-	void setDelegate(StateSearchFactoryImplementor delegate) {
+	void setDelegate(SearchFactoryImplementorWithShareableState delegate) {
 		this.delegate = delegate;
 	}
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
 		return delegate.getBackendQueueProcessorFactory();
+	}
+
+	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
+		delegate.setBackendQueueProcessorFactory(backendQueueProcessorFactory);
 	}
 
 	public Map<String, FilterDef> getFilterDefinitions() {
