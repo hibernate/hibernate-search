@@ -33,6 +33,7 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
+import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
@@ -41,7 +42,6 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.MutableSearchFactory;
-import org.hibernate.search.impl.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.FSDirectoryProvider;

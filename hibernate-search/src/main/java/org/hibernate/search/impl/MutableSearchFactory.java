@@ -44,6 +44,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
+import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -69,7 +70,7 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	//lock to be acquired every time the underlying searchFactory is rebuilt
 	private final Lock mutating = new ReentrantLock();
 
-	void setDelegate(SearchFactoryImplementorWithShareableState delegate) {
+	public void setDelegate(SearchFactoryImplementorWithShareableState delegate) {
 		this.delegate = delegate;
 	}
 

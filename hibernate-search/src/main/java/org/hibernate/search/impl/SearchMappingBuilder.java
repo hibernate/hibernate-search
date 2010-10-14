@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 /**
  * package class extracting the SearchMappingFactory if needed
  */
-class SearchMappingBuilder {
+public class SearchMappingBuilder {
 	private static final Logger LOG = LoggerFactory.make();
 
 	private SearchMappingBuilder() {

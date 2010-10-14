@@ -14,7 +14,7 @@ import org.hibernate.search.cfg.SearchMapping;
 /**
  * @author Emmanuel Bernard
  */
-class IncrementalSearchConfiguration implements SearchConfiguration {
+public class IncrementalSearchConfiguration implements SearchConfiguration {
 	private final ReflectionManager reflectionManager = new JavaReflectionManager();
 	private final List<Class<?>> classes;
 	private final Map<String, Class<?>> classesByName = new HashMap<String, Class<?>>();

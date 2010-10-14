@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.impl;
+package org.hibernate.search.spi;
 
 import java.beans.Introspector;
 import java.lang.reflect.Method;
@@ -37,6 +37,13 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
+import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.impl.ImmutableSearchFactory;
+import org.hibernate.search.impl.IncrementalSearchConfiguration;
+import org.hibernate.search.impl.MappingModelMetadataProvider;
+import org.hibernate.search.impl.MutableSearchFactory;
+import org.hibernate.search.impl.MutableSearchFactoryState;
+import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.slf4j.Logger;
