@@ -232,7 +232,7 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public void addClasses(Class<?>... classes) {
 		//todo optimize the list of
-		final SearchFactoryBuilder builder = new SearchFactoryBuilder().rootFactory( this );
+		final SearchFactoryBuilder builder = new SearchFactoryBuilder().currentFactory( this );
 		for ( Class<?> type : classes ) {
 			builder.addClass( type );
 		}

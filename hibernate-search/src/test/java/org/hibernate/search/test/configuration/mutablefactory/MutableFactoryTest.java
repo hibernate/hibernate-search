@@ -72,7 +72,7 @@ public class MutableFactoryTest extends TestCase {
 		//FIXME downcasting of MSF. create a getDelegate() ?
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
-		sf = builder.rootFactory( sf )
+		sf = builder.currentFactory( sf )
 				.addClass( A.class )
 				.buildSearchFactory();
 
@@ -94,7 +94,7 @@ public class MutableFactoryTest extends TestCase {
 
 		searcher.close();
 
-		sf = (MutableSearchFactory) builder.rootFactory( sf )
+		sf = (MutableSearchFactory) builder.currentFactory( sf )
 				.addClass( B.class )
 				.buildSearchFactory();
 
