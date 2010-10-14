@@ -42,10 +42,9 @@ public abstract class WorkerFactory {
 		Properties props = cfg.getProperties();
 		Properties workerProperties = new Properties();
 		for ( Map.Entry entry : props.entrySet() ) {
-			String key = ( String ) entry.getKey();
+			String key = (String) entry.getKey();
 			if ( key.startsWith( Environment.WORKER_PREFIX ) ) {
-				//key.substring( Environment.WORKER_PREFIX.length() )
-				workerProperties.setProperty( key, ( String ) entry.getValue() );
+				workerProperties.setProperty( key, (String) entry.getValue() );
 			}
 		}
 		return workerProperties;
