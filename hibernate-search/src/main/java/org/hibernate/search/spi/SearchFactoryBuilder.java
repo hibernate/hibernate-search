@@ -177,9 +177,11 @@ public class SearchFactoryBuilder {
 		if ( classes.size() == 0 ) {
 			return rootFactory;
 		}
+		factoryState.copyStateFromOldFactory( rootFactory );
+
 		final Properties configurationProperties = factoryState.getConfigurationProperties();
 		BuildContext buildContext = new BuildContext();
-		factoryState.copyStateFromOldFactory( rootFactory );
+		
 		//TODO we don't keep the reflectionManager. Is that an issue?
 		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties );
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
