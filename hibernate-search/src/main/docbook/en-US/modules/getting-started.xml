@@ -169,7 +169,7 @@
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
-   &lt;version&gt;3.6.0-Beta3&lt;/version&gt;
+   &lt;version&gt;3.6.0.Final&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
     </example>
 
