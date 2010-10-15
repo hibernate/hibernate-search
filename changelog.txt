@@ -1,6 +1,50 @@
 Hibernate Search Changelog
 ==========================
 
+3.3.0.Beta2 (15-10-2010)
+------------------------
+
+** Sub-task
+    * [HSEARCH-435] - New token stream API, is there a benefit, work on our part?
+    * [HSEARCH-449] - Consider LUCENE-1575 carefully: not scoring by default?
+    * [HSEARCH-457] - Analyzers in Lucene 3.0 don't have a default constructor
+    * [HSEARCH-593] - Upgrade/Update Solr analyzer framework
+    * [HSEARCH-596] - Add isCompressed() to LuceneOptions
+
+** Bug
+    * [HSEARCH-528] - MassIndexer attempts to index non-indexed subclasses of indexed types
+    * [HSEARCH-545] - Unable to project FullTextQuery.SCORE when using a custom Sort
+    * [HSEARCH-546] - ProjectionLoader ignores FetchMode.JOIN set via a Criteria
+    * [HSEARCH-554] - Documentation about worker configuration is not up to date
+    * [HSEARCH-587] - Maven release:perform fails
+    * [HSEARCH-588] - Query DSL documentation has incorrect queries
+    * [HSEARCH-589] - org.hibernate.search.test.TransactionTest fails under PostgreSQL 8.4
+    * [HSEARCH-591] - Programmatic mapping raises exception when a non getter method is parsed by the metadata binder
+    * [HSEARCH-594] - Typos in Hibernate Search documentation
+    * [HSEARCH-600] - Sync Hibernate Search with Hibernate Core 3.6.0.Final
+    * [HSEARCH-604] - Add better exception handling for FulltextQueryImpl.calculateTopDocsRetrievalSize()
+    * [HSEARCH-606] - Exceptions during indexing are logged but swallowed when using local transactions (not JTA)
+
+** Deprecation
+    * [HSEARCH-572] - Reconsider deprecating luceneOptions.getStore(), luceneOptions.getIndex() etc
+
+** Improvement
+    * [HSEARCH-556] - Throw meaningful error on Search static helper methods used with null argument
+    * [HSEARCH-575] - More useful error message on bridge indexing failure
+    * [HSEARCH-586] - Rework the JMX chapter as a monitoring chapter describing the programmatic API and then how to expose it via JMX
+    * [HSEARCH-592] - Make sure that all tests can be run from within the IDE
+
+** New Feature
+    * [HSEARCH-555] - Properly expose as public API the SearchFactoryBuilder
+    * [HSEARCH-574] - Allow @DocumentId and @Id to be put on different members
+
+
+** Task
+    * [HSEARCH-371] - Refactor DocumentBuilder and introduce abstract base class
+    * [HSEARCH-590] - update test db profile id against dballocator's schema and update jdbc driver version
+    * [HSEARCH-602] - Create new hibernate-search-infinispan skeleton module
+
+
 3.3.0.Beta1 (25-08-2010)
 ------------------------
 
