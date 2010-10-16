@@ -1,8 +1,11 @@
 package org.hibernate.search.test.bridge;
 
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.bridge.builtin.ClassBridge;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;

@@ -39,7 +39,6 @@ import org.slf4j.Logger;
 
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
 

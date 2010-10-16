@@ -57,7 +57,7 @@ public class ChainedFilter extends Filter {
 		return chainedFilters.size() == 0;
 	}
 
-	public BitSet bits(IndexReader reader) throws IOException {
+	public BitSet bits(IndexReader reader) {
 		throw new UnsupportedOperationException();
 	}
 	

@@ -3,7 +3,6 @@ package org.hibernate.search.test.bridge;
 import org.hibernate.search.annotations.*;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
