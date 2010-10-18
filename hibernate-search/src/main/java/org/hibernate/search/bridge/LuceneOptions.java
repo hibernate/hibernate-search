@@ -31,11 +31,14 @@ import org.apache.lucene.document.Field;
  * A wrapper class for Lucene parameters needed for indexing.
  *
  * The recommended approach to index is to use {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
- * as all the options delcared by the user are transparently carried over. Compression is also provided transparently.
-
+ * or {@link #addNumericFieldToDocument(String, Object, org.apache.lucene.document.Document)} as all the options declared by
+ * the user are transparently carried over. Compression is also provided transparently.
  * {code}
  * String fieldValue = convertToString(value);
  * luceneOptions.addFieldToDocument(name, fieldValue, document);
+ * // Numeric
+ * Double aDouble = ...
+ * luceneOptions.addNumericFieldToDocument(name, value, document);
  * {code}
  *
  * @author Emmanuel Bernard
@@ -43,6 +46,15 @@ import org.apache.lucene.document.Field;
  * @author Hardy Ferentschik
  */
 public interface LuceneOptions {
+
+	/**
+	 * Add a new NumericField with the name {@code fieldName} to the Lucene Document {@code document}
+	 * using the value {@code numericValue}. If the value is not numeric then the field is not added to the document
+	 * @param fieldName The name of the field
+	 * @param numericValue The numeric value, either an Int, Long, Float or Double
+	 * @param document the document to which to add the the new field
+	 */
+	void addNumericFieldToDocument(String fieldName, Object numericValue, Document document);
 
 	/**
 	 * Add a new field with the name {@code fieldName} to the Lucene Document {@code document} using the value

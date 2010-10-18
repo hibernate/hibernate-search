@@ -47,6 +47,10 @@ public class ContainedInMapping {
 		return new FieldMapping(property, entity, mapping);
 	}
 
+	public NumericFieldMapping numericField() {
+		return new NumericFieldMapping(property, entity, mapping);
+	}
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping(name, type, entity, mapping);
 	}

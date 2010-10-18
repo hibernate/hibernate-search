@@ -34,6 +34,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
@@ -91,6 +92,27 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.delete( firstResult[1] );
 		tx.commit();
 		s.close();
+	}
+
+	public void testNumeric() throws Exception {
+		Item item = new Item();
+		item.setPrice(34.54d);
+
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+		s.persist( item );
+		tx.commit();
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		NumericRangeQuery<Double> q = NumericRangeQuery.newDoubleRange("price", 34.5d, 34.6d, true, true);
+		FullTextQuery query = s.createFullTextQuery(q, Item.class);
+		assertEquals("Numeric field via programmatic config",1,query.getResultSize());
+
+		tx.commit();
+		s.close();
+
 	}
 
 	public void testAnalyzerDef() throws Exception{

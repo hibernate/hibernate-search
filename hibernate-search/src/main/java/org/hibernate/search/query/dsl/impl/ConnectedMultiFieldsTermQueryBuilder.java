@@ -39,6 +39,9 @@ import org.apache.lucene.search.WildcardQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.TermTermination;
 
@@ -81,7 +84,12 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	public Query createQuery(FieldContext fieldContext) {
 		final Query perFieldQuery;
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
-		String text = fieldContext.isIgnoreFieldBridge() ? 
+		FieldBridge fieldBridge = documentBuilder.getBridge(fieldContext.getField());
+		if(fieldBridge instanceof NumericFieldBridge) {
+			return NumericFieldUtils.createExactMatchQuery(fieldContext.getField(), value);
+		}
+
+		String text = fieldContext.isIgnoreFieldBridge() ?
 					value.toString() :
 					documentBuilder.objectToString( fieldContext.getField(), value );
 		if ( fieldContext.isIgnoreAnalyzer() ) {

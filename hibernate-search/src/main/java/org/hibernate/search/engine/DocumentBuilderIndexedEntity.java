@@ -39,6 +39,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.bridge.util.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.ContextualExceptionBridge;
 import org.slf4j.Logger;
@@ -183,6 +184,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
 		Annotation idAnnotation = getIdAnnotation( member, context );
+		NumericField numericFieldAnn = member.getAnnotation(NumericField.class);
 		if ( idAnnotation != null ) {
 			String attributeName = getIdAttributeName( member, idAnnotation );
 			if ( isRoot ) {
@@ -194,7 +196,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				}
 				idKeywordName = prefix + attributeName;
 
-				FieldBridge fieldBridge = BridgeFactory.guessType( null, member, reflectionManager );
+				FieldBridge fieldBridge = BridgeFactory.guessType( null, numericFieldAnn, member, reflectionManager );
 				if ( fieldBridge instanceof TwoWayFieldBridge ) {
 					idBridge = ( TwoWayFieldBridge ) fieldBridge;
 				}
@@ -216,8 +218,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				propertiesMetadata.fieldStore.add( Store.YES );
 				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
 				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
-				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
+				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, null, member, reflectionManager ) );
 				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
+				propertiesMetadata.precisionSteps.add( getPrecisionStep( null ) );
 				propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
 				// property > entity analyzer (no field analyzer)
 				Analyzer analyzer = getAnalyzer( member, context );
@@ -821,6 +824,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		else {
 			return null;
 		}
+	}
+
+	public FieldBridge getBridge(String fieldName) {
+		return getBridge(metadata,fieldName);
 	}
 
 	private FieldBridge getBridge(PropertiesMetadata metadata, String fieldName) {
