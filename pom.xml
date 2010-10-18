@@ -189,7 +189,7 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-analyzers</artifactId>
-                <version>${project.version}</version>
+                <version>${project.parent.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -317,6 +317,36 @@
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.2</version>
                 </plugin>
+ <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-archetype-plugin</artifactId>
+                <version>2.0-alpha-5</version>
+                <executions>
+                    <execution>
+                        <id>generate-archetype-install</id>
+                        <phase>install</phase>
+                        <configuration>
+                            <archetypePostPhase>install</archetypePostPhase>
+			    <propertyFile>archetype.properties</propertyFile>
+                        </configuration>
+                        <goals>
+                            <goal>create-from-project</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generate-archetype-deploy</id>
+                        <phase>deploy</phase>
+                        <configuration>
+                            <archetypePostPhase>deploy</archetypePostPhase>
+			    <propertyFile>archetype.properties</propertyFile>
+                        </configuration>
+                        <goals>
+                            <goal>create-from-project</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -388,11 +418,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-archetype-plugin</artifactId>
-                    <version>2.0-alpha-5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
