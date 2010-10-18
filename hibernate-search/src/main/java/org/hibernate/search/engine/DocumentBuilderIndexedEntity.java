@@ -40,6 +40,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.util.NumericUtils;
+import org.hibernate.search.bridge.NumericFieldBridge;
 import org.hibernate.search.bridge.util.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.ContextualExceptionBridge;
 import org.slf4j.Logger;
@@ -194,7 +196,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				}
 				idKeywordName = prefix + attributeName;
 
-				FieldBridge fieldBridge = BridgeFactory.guessType( null, member, reflectionManager );
+				FieldBridge fieldBridge = BridgeFactory.guessType( null, null, member, reflectionManager );
 				if ( fieldBridge instanceof TwoWayFieldBridge ) {
 					idBridge = ( TwoWayFieldBridge ) fieldBridge;
 				}
@@ -216,8 +218,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				propertiesMetadata.fieldStore.add( Store.YES );
 				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
 				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
-				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, member, reflectionManager ) );
+				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, null, member, reflectionManager ) );
 				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
+				propertiesMetadata.precisionSteps.add( getPrecisionStep( null ) );
 				propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
 				// property > entity analyzer (no field analyzer)
 				Analyzer analyzer = getAnalyzer( member, context );
@@ -377,6 +380,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
 				.setClass(beanClass)
 				.setStringBridge(bridge)
+				.setFieldName(fieldName);
+		return contextualBridge.objectToString(value);
+	}
+
+	private String objectToString(NumericFieldBridge bridge, String fieldName, Object value) {
+		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
+				.setClass(beanClass)
 				.setFieldName(fieldName);
 		return contextualBridge.objectToString(value);
 	}
@@ -803,6 +813,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				}
 				else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
 					return objectToString(( StringBridge ) bridge, fieldName, value );
+				}
+				else if (NumericFieldBridge.class.isAssignableFrom( bridgeClass )) {
+					return  objectToString(( NumericFieldBridge ) bridge, fieldName, value);
 				}
 				throw new SearchException(
 						"FieldBridge " + bridgeClass + "does not have a objectToString method: field "

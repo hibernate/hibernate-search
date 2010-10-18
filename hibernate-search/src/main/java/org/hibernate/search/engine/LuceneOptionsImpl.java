@@ -28,6 +28,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.TermVector;
+import org.apache.lucene.document.NumericField;
+import org.apache.lucene.util.NumericUtils;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.annotations.Store;
@@ -47,6 +49,12 @@ class LuceneOptionsImpl implements LuceneOptions {
 	private final TermVector termVector;
 	private final Float boost;
 	private final Store storeType;
+	private int precisionStep = NumericUtils.PRECISION_STEP_DEFAULT;
+
+	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost, int precisionStep) {
+		this(store,indexMode,termVector,boost);
+		this.precisionStep = precisionStep;
+	}
 
 	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost) {
 		this.indexMode = indexMode;
@@ -67,6 +75,17 @@ class LuceneOptionsImpl implements LuceneOptions {
 				compressedFieldAdd( name, indexedString, document );
 			}
 		}
+	}
+
+	public NumericField createNumericField(String name) {
+		return new NumericField(name,precisionStep,storeUncompressed ? Field.Store.YES : Field.Store.NO, true);
+	}
+
+	public void addNumericFieldToDocument(NumericField field, Document document) {
+		if ( boost != null ) {
+			field.setBoost( boost );
+		}
+		document.add( field );
 	}
 
 	private void standardFieldAdd(String name, String indexedString, Document document) {

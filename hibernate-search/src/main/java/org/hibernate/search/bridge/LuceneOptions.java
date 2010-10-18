@@ -25,6 +25,7 @@ package org.hibernate.search.bridge;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumericField;
 
 /**
  * A helper class for building Field objects and associating them to Documents.
@@ -43,6 +44,10 @@ import org.apache.lucene.document.Field;
  * @author Hardy Ferentschik
  */
 public interface LuceneOptions {
+
+	void addNumericFieldToDocument(NumericField numericField, Document document);
+
+	NumericField createNumericField(String name);
 
 	/**
 	 * Add a new field with the name {@code fieldName} to the Lucene Document {@code document} using the value

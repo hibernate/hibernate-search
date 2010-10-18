@@ -62,6 +62,8 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Similarity;
@@ -362,8 +364,17 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		
 		private void createFields(PropertyDescriptor property) {
 			final Collection<Map<String,Object>> fields = property.getFields();
+			final Collection<Map<String,Object>> numericFields = property.getNumericFields();
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
+			List<NumericField> numericFieldAnnotations = new ArrayList<NumericField>( numericFields.size() );
+			for(Map<String, Object> numericField : numericFields) {
+				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( NumericField.class );
+				for ( Map.Entry<String, Object> entry : numericField.entrySet() ) {
+					fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				numericFieldAnnotations.add( (NumericField) AnnotationFactory.create( fieldAnnotation ) );
+			}
 			for(Map<String, Object> field : fields) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
 				for ( Map.Entry<String, Object> entry : field.entrySet() ) {
@@ -406,11 +417,16 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				fieldAnnotations.add( (org.hibernate.search.annotations.Field) AnnotationFactory.create( fieldAnnotation ) );
 			}
 			AnnotationDescriptor fieldsAnnotation = new AnnotationDescriptor( Fields.class );
+			AnnotationDescriptor numericFieldsAnnotation = new AnnotationDescriptor( NumericFields.class );
 
 			final org.hibernate.search.annotations.Field[] fieldArray =
 					new org.hibernate.search.annotations.Field[fieldAnnotations.size()];
 			final org.hibernate.search.annotations.Field[] fieldAsArray = fieldAnnotations.toArray( fieldArray );
-	
+
+			final NumericField[] numericFieldArray = new NumericField[numericFieldAnnotations.size()];
+			final NumericField[] numericFieldAsArray = numericFieldAnnotations.toArray( numericFieldArray );
+	        numericFieldsAnnotation.setValue( "value", numericFieldAsArray);
+			annotations.put( NumericFields.class, AnnotationFactory.create( numericFieldsAnnotation ));
 			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
 			createDateBridge(property);

@@ -36,6 +36,7 @@ public class Item {
 	@Id @GeneratedValue
 	private Integer id;
 	private String description;
+	private Double price;
 	
 	
 	@ManyToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
@@ -66,4 +67,11 @@ public class Item {
 		this.description = description;
 	}
 
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
 }

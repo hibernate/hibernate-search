@@ -42,7 +42,7 @@ public class FieldMapping {
 	private final EntityDescriptor entity;
 	private final PropertyDescriptor property;
 	private final Map<String, Object> field = new HashMap<String, Object>();
-
+	
 	public FieldMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this.mapping = mapping;
 		this.entity = entity;
@@ -97,6 +97,10 @@ public class FieldMapping {
 
 	public FieldMapping field() {
 		return new FieldMapping(property, entity, mapping);
+	}
+
+	public NumericFieldMapping numeric() {
+		return new NumericFieldMapping(property,entity,mapping);
 	}
 
 	public PropertyMapping property(String name, ElementType type) {

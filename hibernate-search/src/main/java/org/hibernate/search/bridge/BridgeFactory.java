@@ -41,6 +41,7 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.builtin.StringBridge;
@@ -67,6 +68,7 @@ import org.hibernate.search.bridge.builtin.EnumBridge;
  */
 public class BridgeFactory {
 	private static Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
+	private static Map<String, NumericFieldBridge> numericBridges = new HashMap<String, NumericFieldBridge>();
 
 	private BridgeFactory() {
 	}
@@ -111,6 +113,11 @@ public class BridgeFactory {
 	public static final FieldBridge CALENDAR_MINUTE = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MINUTE );
 	public static final FieldBridge CALENDAR_SECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_SECOND );
 
+	public static final NumericFieldBridge INT_NUMERIC = new IntNumericFieldBridge();
+	public static final NumericFieldBridge LONG_NUMERIC = new LongNumericFieldBrigde();
+	public static final NumericFieldBridge FLOAT_NUMERIC = new FloatNumericFieldBridge();
+	public static final NumericFieldBridge DOUBLE_NUMERIC = new DoubleNumericFieldBrige();
+
     public static final TwoWayFieldBridge DATE_MILLISECOND =
 			new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MILLISECOND );
 
@@ -142,6 +149,15 @@ public class BridgeFactory {
 
 		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
         builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND);
+
+		numericBridges.put(Integer.class.getName(), INT_NUMERIC );
+		numericBridges.put(int.class.getName(), INT_NUMERIC );
+		numericBridges.put(Long.class.getName(), LONG_NUMERIC );
+		numericBridges.put(long.class.getName(), LONG_NUMERIC );
+		numericBridges.put(Double.class.getName(), DOUBLE_NUMERIC );
+		numericBridges.put(double.class.getName(), DOUBLE_NUMERIC );
+		numericBridges.put(Float.class.getName(), FLOAT_NUMERIC );
+		numericBridges.put(float.class.getName(), FLOAT_NUMERIC );
 	}
 
 	/**
@@ -193,7 +209,7 @@ public class BridgeFactory {
 		return bridge;
 	}
 
-	public static FieldBridge guessType(Field field, XMember member, ReflectionManager reflectionManager) {
+	public static FieldBridge guessType(Field field, NumericField numericField, XMember member, ReflectionManager reflectionManager) {
 		FieldBridge bridge;
 		org.hibernate.search.annotations.FieldBridge bridgeAnn;
 		//@Field bridge has priority over @FieldBridge
@@ -215,6 +231,9 @@ public class BridgeFactory {
             Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class ).resolution();
 			bridge = getCalendarField( resolution );
        	}
+		else if ( numericField != null ) {
+			bridge = numericBridges.get( member.getType().getName() );
+		}
 		else {
 			//find in built-ins
 			XClass returnType = member.getType();

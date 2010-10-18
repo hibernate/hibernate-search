@@ -37,6 +37,7 @@ public class PropertyDescriptor {
 	private ElementType type;
 	private String name;
 	private Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
+	private Collection<Map<String, Object>> numericFields = new ArrayList<Map<String, Object>>();
 	private Map<String, Object> dateBridge= new HashMap<String, Object>();
 	private Map<String, Object> calendarBridge= new HashMap<String, Object>();
 	private Map<String,Object> indexEmbedded;
@@ -59,6 +60,10 @@ public class PropertyDescriptor {
 		fields.add( field );
 	}
 
+	public void addNumericField(Map<String, Object> numericField) {
+		numericFields.add( numericField );
+	}
+
 	public void setDateBridge(Map<String,Object> dateBridge) {
 		this.dateBridge = dateBridge;
 	}
@@ -68,6 +73,10 @@ public class PropertyDescriptor {
 	
 	public Collection<Map<String, Object>> getFields() {
 		return fields;
+	}
+
+	public Collection<Map<String, Object>> getNumericFields() {
+		return numericFields;
 	}
 
 	public Map<String, Object> getDocumentId() {
