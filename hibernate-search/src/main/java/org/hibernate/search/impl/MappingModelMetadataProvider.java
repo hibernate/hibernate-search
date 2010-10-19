@@ -422,7 +422,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final org.hibernate.search.annotations.Field[] fieldArray =
 					new org.hibernate.search.annotations.Field[fieldAnnotations.size()];
 			final org.hibernate.search.annotations.Field[] fieldAsArray = fieldAnnotations.toArray( fieldArray );
-
+			
 			final NumericField[] numericFieldArray = new NumericField[numericFieldAnnotations.size()];
 			final NumericField[] numericFieldAsArray = numericFieldAnnotations.toArray( numericFieldArray );
 	        numericFieldsAnnotation.setValue( "value", numericFieldAsArray);
