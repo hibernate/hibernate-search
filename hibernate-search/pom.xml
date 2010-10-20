@@ -248,34 +248,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/dist.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <goals>deploy javadoc:javadoc org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:translate
-                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:resources
-                        org.jboss.maven.plugins:maven-jdocbook-plugin:2.2.3:generate assembly:assembly
-                    </goals>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-injection-plugin</artifactId>
                 <executions>
