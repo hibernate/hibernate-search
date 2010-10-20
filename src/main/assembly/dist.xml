@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  ~ indicated by the @author tags or express copyright attribution
+  ~ statements applied by the authors.  All third-party contributions are
+  ~ distributed under license by Red Hat, Inc.
+  ~
+  ~ This copyrighted material is made available to anyone wishing to use, modify,
+  ~ copy, or redistribute it subject to the terms and conditions of the GNU
+  ~ Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~ for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this distribution; if not, write to:
+  ~ Free Software Foundation, Inc.
+  ~ 51 Franklin Street, Fifth Floor
+  ~ Boston, MA  02110-1301  USA
+  -->
+
+<assembly>
+    <id>dist</id>
+    <formats>
+        <format>tar.gz</format>
+        <format>zip</format>
+    </formats>
+
+    <!-- Configure the module artifacts which make it into the distribution bundle -->
+    <moduleSets>
+        <moduleSet>
+            <includes>
+                <include>org.hibernate:hibernate-search</include>
+            </includes>
+            <sources>
+                <includeModuleDirectory>false</includeModuleDirectory>
+                <fileSets>
+                    <fileSet>
+                        <directory>target/apidocs</directory>
+                        <outputDirectory>docs/api</outputDirectory>
+                    </fileSet>
+                    <fileSet>
+                        <directory>target/docbook/publish</directory>
+                        <outputDirectory>docs/reference</outputDirectory>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>.</outputDirectory>
+                <unpack>false</unpack>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>/dist/lib/required</outputDirectory>
+                        <scope>runtime</scope>
+                        <excludes>
+                            <exclude>jgroups:jgroups</exclude>
+                            <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
+                        </excludes>
+                    </dependencySet>
+
+                    <dependencySet>
+                        <outputDirectory>/dist/lib/optional</outputDirectory>
+                        <includes>
+                            <include>jgroups:jgroups</include>
+                            <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
+                        </includes>
+                    </dependencySet>
+
+                    <!--
+                            Need to manually put the optional analyzer dependencies into their place.
+                            The maven-assembly-plugin does not have any options to handle <optional/> dependencies
+                            They are added as test dependencies in the pom.
+                            -->
+                    <dependencySet>
+                        <outputDirectory>/dist/lib/optional</outputDirectory>
+                        <scope>test</scope>
+                        <includes>
+                            <include>org.apache.lucene:lucene-snowball</include>
+                            <include>org.apache.lucene:lucene-collation</include>
+                            <include>commons-codec:commons-codec</include>
+                            <include>commons-io:commons-io</include>
+                            <include>org.slf4j:slf4j-log4j12</include>
+                        </includes>
+                    </dependencySet>
+
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>/dist/lib/provided</outputDirectory>
+                        <scope>provided</scope>
+                    </dependencySet>
+                </dependencySets>
+            </binaries>
+        </moduleSet>
+    </moduleSets>
+
+    <files>
+        <file>
+            <source>readme.txt</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>lgpl.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>changelog.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>hibernate-search-analyzers/license.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+    </files>
+
+    <fileSets>
+        <!-- Include all sources -->
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory>project</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+                <exclude>readme.txt</exclude>
+                <exclude>lgpl.txt</exclude>
+                <exclude>changelog.txt</exclude>
+                <exclude>.git</exclude>
+                <exclude>.gitignore</exclude>
+                <exclude>**/target/**</exclude>
+                <exclude>**/.idea/**</exclude>
+                <exclude>**/*.iml</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+
+</assembly>
