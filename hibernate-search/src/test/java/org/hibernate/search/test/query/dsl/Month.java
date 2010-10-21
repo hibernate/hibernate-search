@@ -35,6 +35,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 
 /**
@@ -54,6 +55,11 @@ public class Month {
 		this.monthValue = monthValue;
 	}
 
+	public Month(String name, int monthValue, String mythology, String history, Date estimatedCreation, double mmRain) {
+		this(name,monthValue,mythology,history, estimatedCreation);
+		this.mmRain = mmRain;
+	}
+
 	@Id @GeneratedValue
 	public Integer getId() { return id; }
 	public void setId(Integer id) { this.id = id; }
@@ -63,6 +69,11 @@ public class Month {
 	public int getMonthValue() { return monthValue; }
 	public void setMonthValue(int monthValue) { this.monthValue = monthValue; }
 	private int monthValue;
+
+	@Field @NumericField
+	public double mmRain;
+	public void setmmRain(double mmRain) { this.mmRain = mmRain; }
+	public double getmmRain() { return mmRain; }
 
 	@Field
 	public String getName() { return name; }

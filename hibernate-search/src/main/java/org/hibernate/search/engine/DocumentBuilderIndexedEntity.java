@@ -384,13 +384,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return contextualBridge.objectToString(value);
 	}
 
-	private String objectToString(NumericFieldBridge bridge, String fieldName, Object value) {
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
-				.setClass(beanClass)
-				.setFieldName(fieldName);
-		return contextualBridge.objectToString(value);
-	}
-
 	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, boolean isBatch) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap );
@@ -815,7 +808,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 					return objectToString(( StringBridge ) bridge, fieldName, value );
 				}
 				else if (NumericFieldBridge.class.isAssignableFrom( bridgeClass )) {
-					return  objectToString(( NumericFieldBridge ) bridge, fieldName, value);
+					return ((NumericFieldBridge) bridge ).toPrefixedCode( value );
 				}
 				throw new SearchException(
 						"FieldBridge " + bridgeClass + "does not have a objectToString method: field "
