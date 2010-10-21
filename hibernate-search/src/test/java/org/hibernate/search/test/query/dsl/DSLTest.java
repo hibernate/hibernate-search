@@ -83,7 +83,7 @@ public class DSLTest extends SearchTestCase {
 				.ignoreFieldBridge()
 				.matching( "2" )
 				.createQuery();
-
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 		transaction.commit();
 	}
 
