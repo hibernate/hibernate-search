@@ -423,6 +423,27 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	public void testNumericRangeQueries() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb.range()
+				.onField( "mmRain" )
+				.ignoreAnalyzer()
+				.from(0.23d)
+				.to(0.24d)
+				.createQuery();
+
+		List results = fullTextSession.createFullTextQuery(query, Month.class).list();
+
+		assertEquals("test range numeric ", 1, results.size());
+		assertEquals("test range numeric ", "January", ((Month)results.get(0)).getName());
+
+
+		transaction.commit();
+	}
+
 
 	public void testNumericFieldsTermQuery() {
 		Transaction transaction = fullTextSession.beginTransaction();

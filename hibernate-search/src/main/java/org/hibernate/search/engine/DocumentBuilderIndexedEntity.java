@@ -828,6 +828,19 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 	}
 
+	public int precisionStep(String fieldName) {
+		for (int index = 0; index < metadata.fieldNames.size(); index++) {
+			if (fieldName.equals(metadata.fieldNames.get( index )) ) {
+				 return metadata.precisionSteps.get( index );
+			}
+		}
+		return NumericUtils.PRECISION_STEP_DEFAULT;
+	}
+
+	public FieldBridge getBridge(String fieldName) {
+		return getBridge(metadata,fieldName);
+	}
+
 	private FieldBridge getBridge(PropertiesMetadata metadata, String fieldName) {
 		//process base fields
 		FieldBridge fieldBridge = getBridge( metadata.fieldNames, metadata.fieldBridges, fieldName );

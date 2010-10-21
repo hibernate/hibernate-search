@@ -2,6 +2,8 @@ package org.hibernate.search.bridge;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.util.NumericUtils;
 
 /**
@@ -24,6 +26,8 @@ public abstract class NumericFieldBridge implements FieldBridge {
 
 	public abstract String toPrefixedCode(Object value);
 
+	public abstract Class getClazz();
+
 	public Object get(String name, Document document) {
 		NumericField numericField = (NumericField) document.getFieldable(name);
 		return numericField.getNumericValue();
@@ -42,6 +46,11 @@ class LongNumericFieldBrigde extends NumericFieldBridge {
 	public String toPrefixedCode(Object value) {
 		return NumericUtils.longToPrefixCoded((Long) value);
 	}
+
+	@Override
+	public Class getClazz() {
+		return Long.class;
+	}
 }
 
 class DoubleNumericFieldBrige extends NumericFieldBridge {
@@ -54,6 +63,11 @@ class DoubleNumericFieldBrige extends NumericFieldBridge {
 	@Override
 	public String toPrefixedCode(Object value) {
 		return NumericUtils.doubleToPrefixCoded((Double) value);
+	}
+
+	@Override
+	public Class getClazz() {
+		return Double.class;
 	}
 }
 
@@ -68,6 +82,11 @@ class IntNumericFieldBridge extends NumericFieldBridge {
 	public String toPrefixedCode(Object value) {
 		return NumericUtils.intToPrefixCoded((Integer) value);
 	}
+
+	@Override
+	public Class getClazz() {
+		return Integer.class;
+	}
 }
 
 class FloatNumericFieldBridge extends NumericFieldBridge {
@@ -80,5 +99,10 @@ class FloatNumericFieldBridge extends NumericFieldBridge {
 	@Override
 	public String toPrefixedCode(Object value) {
 		return NumericUtils.floatToPrefixCoded((Float) value);
+	}
+
+	@Override
+	public Class getClazz() {
+		return Float.class;
 	}
 }

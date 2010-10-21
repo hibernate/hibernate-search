@@ -29,10 +29,13 @@ import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.NumericFieldBridge;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
@@ -106,15 +109,40 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		final String upperTerm = toString == null ?
 				null :
 				Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
-		
-		perFieldQuery = new TermRangeQuery(
-				fieldName,
-				lowerTerm,
-				upperTerm,
-				!rangeContext.isExcludeFrom(),
-				!rangeContext.isExcludeTo()
-		);
+
+		FieldBridge fieldBridge = documentBuilder.getBridge(fieldName);
+		if(NumericFieldBridge.class.isAssignableFrom(FieldBridge.class)) {
+			    perFieldQuery = rangeForNumeric(fieldName, fromObject, toObject, fieldBridge, !rangeContext.isExcludeFrom(),!rangeContext.isExcludeTo() );
+		} else {
+
+				perFieldQuery = new TermRangeQuery(
+					fieldName,
+					lowerTerm,
+					upperTerm,
+					!rangeContext.isExcludeFrom(),
+					!rangeContext.isExcludeTo()
+				);
+		}
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
+	}
+
+
+	public NumericRangeQuery rangeForNumeric(String fieldName, Object from, Object to,
+											 FieldBridge fieldBridge, boolean includeLower, boolean includeUpper) {
+		Class clazz = ( (NumericFieldBridge) fieldBridge ).getClazz();
+		if(clazz.isAssignableFrom(Double.class)) {
+			return NumericRangeQuery.newDoubleRange(fieldName,(Double)from,(Double)to,includeLower,includeUpper);
+		 }
+		if(clazz.isAssignableFrom(Long.class)) {
+			return NumericRangeQuery.newLongRange(fieldName,(Long)from,(Long)to,includeLower,includeUpper);
+		 }
+		if(clazz.isAssignableFrom(Integer.class)) {
+			return NumericRangeQuery.newIntRange(fieldName,(Integer)from,(Integer)to,includeLower,includeUpper);
+		 }
+		if(clazz.isAssignableFrom(Float.class)) {
+			return NumericRangeQuery.newFloatRange(fieldName,(Float)from,(Float)to,includeLower,includeUpper) ;
+		}
+		return null;
 	}
 
 

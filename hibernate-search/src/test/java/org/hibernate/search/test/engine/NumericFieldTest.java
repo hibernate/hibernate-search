@@ -3,6 +3,7 @@ package org.hibernate.search.test.engine;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -41,7 +42,7 @@ public class NumericFieldTest extends SearchTestCase {
 
 	}
 
-	public void testIndexAndSearchLongNumericField() {
+	public void testIndexAndSearchNumericField() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
 		session.save(new Location(3L, 4L, 0.5510d, 56.12d, 34, "Random text", 45.56d));
