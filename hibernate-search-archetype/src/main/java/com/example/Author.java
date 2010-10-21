@@ -1,4 +1,3 @@
-// $Id: com.example.Author.java 17630 2009-10-06 13:38:43Z sannegrinovero $
 package com.example;
 
 import javax.persistence.Entity;

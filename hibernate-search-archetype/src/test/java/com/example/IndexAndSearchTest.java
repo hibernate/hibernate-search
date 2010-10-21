@@ -1,4 +1,4 @@
-package com.example;// $Id: com.example.IndexAndSearchTest.java 18745 2010-02-09 13:00:22Z sannegrinovero $
+package com.example;
 
 import java.util.HashMap;
 import java.util.List;
