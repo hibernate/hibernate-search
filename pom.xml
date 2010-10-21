@@ -447,29 +447,29 @@
         <!-- =============================== -->
         <!-- Database profiles               -->
         <!-- =============================== -->
-        <!-- HSQLDB is the default (eventually move to H2) -->
+        <!-- H2 is the default -->
         <profile>
-            <id>hsqldb</id>
+            <id>h2</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>hsqldb</groupId>
-                    <artifactId>hsqldb</artifactId>
-                    <version>1.8.0.2</version>
-                    <scope>test</scope>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>1.2.134</version>
                 </dependency>
             </dependencies>
             <properties>
-                <db.dialect>org.hibernate.dialect.HSQLDialect</db.dialect>
-                <jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-                <jdbc.url>jdbc:hsqldb:.</jdbc.url>
+                <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
+                <jdbc.driver>org.h2.Driver</jdbc.driver>
+                <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
                 <jdbc.pass/>
                 <jdbc.isolation/>
             </properties>
         </profile>
+
         <!--
             ###################################################################
             Profiles naming db instances in the Red Hat QA/QE lab
