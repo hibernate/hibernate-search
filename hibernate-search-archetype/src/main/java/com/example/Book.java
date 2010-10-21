@@ -1,4 +1,3 @@
-// $Id: com.example.Book.java 17630 2009-10-06 13:38:43Z sannegrinovero $
 package com.example;
 
 import java.util.Date;

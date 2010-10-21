@@ -1,5 +1,4 @@
-/* $Id: FullTextQuery.java 19002 2010-03-16 01:28:07Z hardy.ferentschik $
- *
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
  * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
