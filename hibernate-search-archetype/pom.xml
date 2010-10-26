@@ -63,10 +63,31 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-archetype-plugin</artifactId>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-archetype-plugin</artifactId>-->
+            <!--</plugin>-->
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>archetype</id>
+            <activation>
+                <file>
+                    <exists>archetype.properties</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                          <groupId>org.apache.maven.plugins</groupId>
+                          <artifactId>maven-archetype-plugin</artifactId>
+                    </plugin>
+                </plugins>
+
+            </build>
+        </profile>
+
+
+    </profiles>
 </project>
