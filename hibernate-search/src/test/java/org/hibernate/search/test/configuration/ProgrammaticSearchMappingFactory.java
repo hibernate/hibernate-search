@@ -52,10 +52,10 @@ public class ProgrammaticSearchMappingFactory {
 					.filter( NGramFilterFactory.class )
 						.param( "minGramSize", "3" )
 						.param( "maxGramSize", "3" )
-				.analyzerDef( "en", StandardTokenizerFactory.class )
+				.analyzerDef( "english", StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( SnowballPorterFilterFactory.class )
-				.analyzerDef( "de", StandardTokenizerFactory.class )
+				.analyzerDef( "deutsch", StandardTokenizerFactory.class )
 					.filter( LowerCaseFilterFactory.class )
 					.filter( GermanStemFilterFactory.class )
 				.entity( Address.class )
@@ -150,6 +150,5 @@ public class ProgrammaticSearchMappingFactory {
 								.store(Store.YES)
 								.dateBridge(Resolution.DAY);
 		return mapping;
-
 	}
 }
