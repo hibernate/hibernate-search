@@ -75,8 +75,7 @@ public interface SearchConfiguration {
 	ReflectionManager getReflectionManager();
 
 	/**
-	 * returns the programmatic configuration or null
-	 * //TODO remove hard dep with solr classes
+	 * @return the programmatic configuration or {@code null}
 	 */
 	SearchMapping getProgrammaticMapping();
 }
