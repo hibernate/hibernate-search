@@ -31,6 +31,7 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.FilterDef;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.reader.ReaderProvider;
@@ -76,4 +77,6 @@ public interface SearchFactoryState {
 	PolymorphicIndexHierarchy getIndexHierarchy();
 
 	Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams();
+
+	ServiceManager getServiceManager();
 }

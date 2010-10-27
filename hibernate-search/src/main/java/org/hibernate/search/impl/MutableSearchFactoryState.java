@@ -31,6 +31,7 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.FilterDef;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.reader.ReaderProvider;
@@ -63,6 +64,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private ErrorHandler errorHandler;
 	private PolymorphicIndexHierarchy indexHierarchy;
 	private Map<DirectoryProvider, LuceneIndexingParameters> directoryProviderIndexingParams;
+	private ServiceManager serviceManager;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -80,6 +82,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		errorHandler = oldFactoryState.getErrorHandler();
 		indexHierarchy = oldFactoryState.getIndexHierarchy();
 		directoryProviderIndexingParams = oldFactoryState.getDirectoryProviderIndexingParams();
+		serviceManager = oldFactoryState.getServiceManager();
+	}
+
+	public ServiceManager getServiceManager() {
+		return serviceManager;
+	}
+
+	public void setServiceManager(ServiceManager serviceManager) {
+		this.serviceManager = serviceManager;
 	}
 
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {

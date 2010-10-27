@@ -40,6 +40,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.FilterDef;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
@@ -188,6 +189,10 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams() {
 		return delegate.getDirectoryProviderIndexingParams();
+	}
+
+	public ServiceManager getServiceManager() {
+		return delegate.getServiceManager();
 	}
 
 	public ReaderProvider getReaderProvider() {

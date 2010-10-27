@@ -34,6 +34,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
+
+import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.slf4j.Logger;
@@ -110,6 +113,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	 */
 	private final Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams;
 	private final String indexingStrategy;
+	private final ServiceManager serviceManager;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -127,6 +131,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.indexingStrategy = state.getIndexingStrategy();
 		this.readerProvider = state.getReaderProvider();
 		this.worker = state.getWorker();
+		this.serviceManager = state.getServiceManager();
 		this.statistics = new StatisticsImpl( this );
 		String enableStats = configurationProperties.getProperty( Environment.GENERATE_STATS );
 		if ( "true".equalsIgnoreCase( enableStats ) ) {
@@ -181,6 +186,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 					log.error( "DirectoryProvider raises an exception on stop() ", e );
 				}
 			}
+
+			serviceManager.stopServices();
 		}
 	}
 
@@ -318,6 +325,14 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return this.dirProviderData.get( dp ).getDirLock();
 	}
 
+	public <T> T registerServiceUse(Class<ServiceProvider<T>> provider) {
+		return serviceManager.registerServiceUse( provider );
+	}
+
+	public void unregisterServiceUse(Class<ServiceProvider<?>> provider) {
+		serviceManager.unregisterServiceUse( provider );
+	}
+
 	public int getFilterCacheBitResultsSize() {
 		return cacheBitResultsSize;
 	}
@@ -367,6 +382,10 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	public Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams() {
 		return dirProviderIndexingParams;
+	}
+
+	public ServiceManager getServiceManager() {
+		return serviceManager;
 	}
 
 	public SearchFactoryImplementor getUninitializedSearchFactory() {

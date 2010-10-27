@@ -68,6 +68,7 @@ import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.EntityState;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.filter.CachingWrapperFilter;
@@ -239,9 +240,8 @@ public class SearchFactoryBuilder {
 	private SearchFactoryImplementor buildNewSearchFactory() {
 		createCleanFactoryState();
 
-		factoryState.setConfigurationProperties( cfg.getProperties() );
-		factoryState.setErrorHandler( createErrorHandler( factoryState.getConfigurationProperties() ) );
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
+
 		BuildContext buildContext = new BuildContext();
 
 		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping( cfg );
@@ -333,6 +333,9 @@ public class SearchFactoryBuilder {
 			factoryState.setDirectoryProviderData( new HashMap<DirectoryProvider<?>, DirectoryProviderData>() );
 			factoryState.setFilterDefinitions( new HashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
+			factoryState.setConfigurationProperties( cfg.getProperties() );
+			factoryState.setErrorHandler( createErrorHandler( factoryState.getConfigurationProperties() ) );
+			factoryState.setServiceManager( new ServiceManager( factoryState.getConfigurationProperties() ) );
 		}
 	}
 
@@ -601,6 +604,14 @@ public class SearchFactoryBuilder {
 
 		public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
 			return factoryState.getDirectoryProviderData().get( dp ).getDirLock();
+		}
+
+		public <T> T registerServiceUse(Class<ServiceProvider<T>> provider) {
+			return factoryState.getServiceManager().registerServiceUse( provider );
+		}
+
+		public void unregisterServiceUse(Class<ServiceProvider<?>> provider) {
+			factoryState.getServiceManager().unregisterServiceUse( provider );
 		}
 
 		public Similarity getSimilarity(DirectoryProvider<?> provider) {

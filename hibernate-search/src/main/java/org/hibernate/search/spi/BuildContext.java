@@ -67,4 +67,23 @@ public interface BuildContext {
 	 * @return
 	 */
 	ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> provider);
+
+	/**
+	 * Declare the use of a service.
+	 * All callers of this method must call #unregisterServiceUse(Class<ServiceProvider<?>> provider)
+	 * or the service will not be released
+	 *
+	 * @param provider of the service
+	 * @param <T> class of the service
+	 * @return the service instance
+	 */
+	<T> T registerServiceUse(Class<ServiceProvider<T>> provider);
+
+	/**
+	 * Release a service from duty. Each call to #registerServiceUse should be coupled with
+	 * a call to #unregisterServiceUse when the service is no longer needed.
+	 * 
+	 * @param provider of thr service
+	 */
+	void unregisterServiceUse(Class<ServiceProvider<?>> provider);
 }
