@@ -35,6 +35,10 @@ import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 
+import org.hibernate.annotations.common.reflection.XAnnotatedElement;
+import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.annotations.common.reflection.XPackage;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
@@ -46,8 +50,8 @@ import org.hibernate.search.util.DelegateNamedAnalyzer;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
- * Provides access to some default configuration settings (eg default <code>Analyzer</code> or default
- * <code>Similarity</code>) and checks whether certain optional libraries are available.
+ * Provides access to some default configuration settings (eg default {@code Analyzer} or default
+ * {@code Similarity}) and checks whether certain optional libraries are available.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -57,7 +61,20 @@ public final class ConfigContext {
 	private static final Logger log = LoggerFactory.make();
 	private static final Version DEFAULT_LUCENE_MATCH_VERSION = Version.LUCENE_30;
 
+	/**
+	 * Constant used as definition point it is a global (programmatic) definition and there is no annotated element
+	 * connected to it
+	 */
+	private static final String PROGRAMMATIC_ANALYZER_DEFINITION = "PROGRAMMATIC_ANALYZER_DEFINITION";
+
 	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
+
+	/**
+	 * Used to keep track of duplicated analyzer definitions. The key of the map is the analyzer definition
+	 * name and the value is a string defining the location of the definition.
+	 */
+	private final Map<String, String> analyzerDefinitionPoints = new HashMap<String, String>();
+
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
 	private final Similarity defaultSimilarity;
@@ -74,12 +91,34 @@ public final class ConfigContext {
 		jpaPresent = isPresent( "javax.persistence.Id" );
 	}
 
-	public void addAnalyzerDef(AnalyzerDef ann) {
-		//FIXME somehow remember where the analyzerDef comes from and raise an exception if an analyzerDef
-		//with the same name from two different places are added
-		//multiple adding from the same place is required to deal with inheritance hierarchy processed multiple times
-		if ( ann != null && analyzerDefs.put( ann.name(), ann ) != null ) {
-			//throw new SearchException("Multiple AnalyzerDef with the same name: " + name);
+	/**
+	 * Add an analyzer definition which was defined as annotation.
+	 *
+	 * @param analyzerDef the analyzer definition annotation
+	 * @param annotatedElement the annotated element it was defined on
+	 */
+	public void addAnalyzerDef(AnalyzerDef analyzerDef, XAnnotatedElement annotatedElement) {
+		if ( analyzerDef == null ) {
+			return;
+		}
+		addAnalyzerDef( analyzerDef, buildAnnotationDefinitionPoint( annotatedElement ) );
+	}
+
+	public void addGlobalAnalyzerDef(AnalyzerDef analyzerDef) {
+		addAnalyzerDef( analyzerDef, PROGRAMMATIC_ANALYZER_DEFINITION );
+	}
+
+	private void addAnalyzerDef(AnalyzerDef analyzerDef, String annotationDefinitionPoint) {
+		String analyzerDefinitionName = analyzerDef.name();
+
+		if ( analyzerDefinitionPoints.containsKey( analyzerDefinitionName ) ) {
+			if ( !analyzerDefinitionPoints.get( analyzerDefinitionName ).equals( annotationDefinitionPoint ) ) {
+				throw new SearchException( "Multiple analyzer definitions with the same name: " + analyzerDef.name() );
+			}
+		}
+		else {
+			analyzerDefs.put( analyzerDefinitionName, analyzerDef );
+			analyzerDefinitionPoints.put( analyzerDefinitionName, annotationDefinitionPoint );
 		}
 	}
 
@@ -232,5 +271,27 @@ public final class ConfigContext {
 			}
 		}
 		return version;
+	}
+
+	/**
+	 * @param annotatedElement an annotated element
+	 *
+	 * @return a string which identifies the location/point the annotation was placed on. Something of the
+	 *         form package.[[className].[field|member]]
+	 */
+	private String buildAnnotationDefinitionPoint(XAnnotatedElement annotatedElement) {
+		if ( annotatedElement instanceof XClass ) {
+			return ( (XClass) annotatedElement ).getName();
+		}
+		else if ( annotatedElement instanceof XMember ) {
+			XMember member = (XMember) annotatedElement;
+			return member.getType().getName() + '.' + member.getName();
+		}
+		else if ( annotatedElement instanceof XPackage ) {
+			return ( (XPackage) annotatedElement ).getName();
+		}
+		else {
+			throw new SearchException( "Unknown XAnnoatedElement: " + annotatedElement );
+		}
 	}
 }
