@@ -57,6 +57,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 		Configuration config = new AnnotationConfiguration();
 		config.addAnnotatedClass( Entity1.class );
 		config.addAnnotatedClass( Entity2.class );
+		config.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		try {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
@@ -73,6 +74,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 	public void testDuplicatedProgrammaticAnalyzerDefinitionThrowsException() throws Exception {
 		Configuration config = new AnnotationConfiguration();
 		config.getProperties().put( Environment.MODEL_MAPPING, createSearchMapping() );
+		config.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		try {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
