@@ -269,7 +269,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 			if ( member.isArray() ) {
 				@SuppressWarnings("unchecked")
-				T[] array = ( T[] ) value;
+				T[] array = (T[]) value;
 				for ( T arrayValue : array ) {
 					processSingleContainedInInstance( queue, searchFactoryImplementor, arrayValue );
 				}
@@ -443,11 +443,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		AnalyzerDefs defs = annotatedElement.getAnnotation( AnalyzerDefs.class );
 		if ( defs != null ) {
 			for ( AnalyzerDef def : defs.value() ) {
-				context.addAnalyzerDef( def );
+				context.addAnalyzerDef( def, annotatedElement );
 			}
 		}
 		AnalyzerDef def = annotatedElement.getAnnotation( AnalyzerDef.class );
-		context.addAnalyzerDef( def );
+		context.addAnalyzerDef( def, annotatedElement );
 	}
 
 	private void checkForAnalyzerDiscriminator(XAnnotatedElement annotatedElement, PropertiesMetadata propertiesMetadata) {
@@ -470,7 +470,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			}
 
 			if ( annotatedElement instanceof XMember ) {
-				propertiesMetadata.discriminatorGetter = ( XMember ) annotatedElement;
+				propertiesMetadata.discriminatorGetter = (XMember) annotatedElement;
 			}
 		}
 	}
@@ -495,7 +495,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			}
 			Class<?> similarityClass = similarityAnn.impl();
 			try {
-				similarity = ( Similarity ) similarityClass.newInstance();
+				similarity = (Similarity) similarityClass.newInstance();
 			}
 			catch ( Exception e ) {
 				log.error(
@@ -692,12 +692,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( Map.class.equals( member.getCollectionClass() ) ) {
 			//hum
 			@SuppressWarnings("unchecked")
-			Collection<T> tmpCollection = ( ( Map<?, T> ) value ).values();
+			Collection<T> tmpCollection = ( (Map<?, T>) value ).values();
 			collection = tmpCollection;
 		}
 		else {
 			@SuppressWarnings("unchecked")
-			Collection<T> tmpCollection = ( Collection<T> ) value;
+			Collection<T> tmpCollection = (Collection<T>) value;
 			collection = tmpCollection;
 		}
 		return collection;
@@ -732,7 +732,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 */
 	private <T> void addWorkForEmbeddedValue(T value, List<LuceneWork> queue, Class<T> valueClass,
 											 DocumentBuilderIndexedEntity<T> builderIndexedEntity, SearchFactoryImplementor searchFactoryImplementor) {
-		Serializable id = ( Serializable ) ReflectionHelper.getMemberValue( value, builderIndexedEntity.idGetter );
+		Serializable id = (Serializable) ReflectionHelper.getMemberValue( value, builderIndexedEntity.idGetter );
 		if ( id != null ) {
 			builderIndexedEntity.addWorkToQueue(
 					valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor
