@@ -23,8 +23,11 @@
  */
 package org.hibernate.search.util;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.util.Enumeration;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.util.Version;
@@ -44,6 +47,19 @@ import org.hibernate.search.SearchException;
 public class ClassLoaderHelper {
 
 	private ClassLoaderHelper() {
+	}
+
+	public static Enumeration<URL> getResources(String resourceName, Class<?> caller) {
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		if (loader == null) {
+			loader = caller.getClassLoader();
+		}
+		try {
+			return loader.getResources( resourceName );
+		}
+		catch ( IOException e) {
+			throw new SearchException( "Unable to load resource " + resourceName, e );
+		}
 	}
 
 	/**
