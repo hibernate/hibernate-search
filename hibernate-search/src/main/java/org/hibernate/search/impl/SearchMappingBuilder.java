@@ -56,7 +56,7 @@ public class SearchMappingBuilder {
 	 * 3) hibernate.search.model_mapping defines a class that cannot be found
 	 * 4) Cannot invoke the @Factory method to get new instance of SearchMapping
 	 * 
-	 * @param SearchConfigruation
+	 * @param cfg the search configuration
 	 * @return SearchMapping
 	 */
 	public static SearchMapping getSearchMapping(SearchConfiguration cfg) {
