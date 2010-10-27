@@ -325,11 +325,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return this.dirProviderData.get( dp ).getDirLock();
 	}
 
-	public <T> T registerServiceUse(Class<ServiceProvider<T>> provider) {
+	public <T> T registerServiceUse(Class<? extends ServiceProvider<T>> provider) {
 		return serviceManager.registerServiceUse( provider );
 	}
 
-	public void unregisterServiceUse(Class<ServiceProvider<?>> provider) {
+	public void unregisterServiceUse(Class<? extends ServiceProvider<?>> provider) {
 		serviceManager.unregisterServiceUse( provider );
 	}
 

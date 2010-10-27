@@ -69,15 +69,21 @@ public class ServiceManager {
 		}
 	}
 
-	public <T> T registerServiceUse(Class<ServiceProvider<T>> serviceProviderClass) {
+	public <T> T registerServiceUse(Class<? extends ServiceProvider<T>> serviceProviderClass) {
 		@SuppressWarnings( "unchecked")
 		final ServiceProviderWrapper wrapper = providers.get( serviceProviderClass );
+		if (wrapper == null) {
+			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
+		}
 		wrapper.increaseCounter();
 		return (T) wrapper.getServiceProvider().getService();
 	}
 
-	public void unregisterServiceUse(Class<ServiceProvider<?>> serviceProviderClass) {
+	public void unregisterServiceUse(Class<? extends ServiceProvider<?>> serviceProviderClass) {
 		final ServiceProviderWrapper wrapper = providers.get( serviceProviderClass );
+		if (wrapper == null) {
+			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
+		}
 		wrapper.decreaseCounter();
 	}
 

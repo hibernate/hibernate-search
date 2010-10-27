@@ -77,7 +77,7 @@ public interface BuildContext {
 	 * @param <T> class of the service
 	 * @return the service instance
 	 */
-	<T> T registerServiceUse(Class<ServiceProvider<T>> provider);
+	<T> T registerServiceUse(Class<? extends ServiceProvider<T>> provider);
 
 	/**
 	 * Release a service from duty. Each call to #registerServiceUse should be coupled with
@@ -85,5 +85,5 @@ public interface BuildContext {
 	 * 
 	 * @param provider of thr service
 	 */
-	void unregisterServiceUse(Class<ServiceProvider<?>> provider);
+	void unregisterServiceUse(Class<? extends ServiceProvider<?>> provider);
 }
