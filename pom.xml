@@ -66,7 +66,6 @@
         <license>
             <name>GNU Lesser General Public License</name>
             <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
-            <comments>See discussion at http://hibernate.org/356.html for more details.</comments>
         </license>
     </licenses>
 
@@ -336,35 +335,35 @@
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.2</version>
                 </plugin>
- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-archetype-plugin</artifactId>
-                <version>2.0-alpha-5</version>
-                <executions>
-                    <execution>
-                        <id>generate-archetype-install</id>
-                        <phase>install</phase>
-                        <configuration>
-                            <archetypePostPhase>install</archetypePostPhase>
-			    <propertyFile>archetype.properties</propertyFile>
-                        </configuration>
-                        <goals>
-                            <goal>create-from-project</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>generate-archetype-deploy</id>
-                        <phase>deploy</phase>
-                        <configuration>
-                            <archetypePostPhase>deploy</archetypePostPhase>
-			    <propertyFile>archetype.properties</propertyFile>
-                        </configuration>
-                        <goals>
-                            <goal>create-from-project</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-archetype-plugin</artifactId>
+                    <version>2.0-alpha-5</version>
+                    <executions>
+                        <execution>
+                            <id>generate-archetype-install</id>
+                            <phase>install</phase>
+                            <configuration>
+                                <archetypePostPhase>install</archetypePostPhase>
+                                <propertyFile>archetype.properties</propertyFile>
+                            </configuration>
+                            <goals>
+                                <goal>create-from-project</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>generate-archetype-deploy</id>
+                            <phase>deploy</phase>
+                            <configuration>
+                                <archetypePostPhase>deploy</archetypePostPhase>
+                                <propertyFile>archetype.properties</propertyFile>
+                            </configuration>
+                            <goals>
+                                <goal>create-from-project</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
