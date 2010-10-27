@@ -114,7 +114,7 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 		}
 
 		public void remove() {
-			throw new UnsupportedOperationException( "Cannot modify Hibenrate Core metadata" );
+			throw new UnsupportedOperationException( "Cannot modify Hibernate Core metadata" );
 		}
 	}
 }
