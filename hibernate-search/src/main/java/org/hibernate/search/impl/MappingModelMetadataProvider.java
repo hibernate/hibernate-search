@@ -34,8 +34,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
 import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
@@ -43,6 +43,7 @@ import org.hibernate.annotations.common.reflection.AnnotationReader;
 import org.hibernate.annotations.common.reflection.Filter;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.ReflectionUtil;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -87,7 +88,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 	private final MetadataProvider delegate;
 	private final SearchMapping mapping;
-	private final Map<AnnotatedElement, AnnotationReader> cache = new HashMap<AnnotatedElement, AnnotationReader>(100);
+	private final Map<AnnotatedElement, AnnotationReader> cache = new HashMap<AnnotatedElement, AnnotationReader>( 100 );
 	private Map<Object, Object> defaults;
 
 	public MappingModelMetadataProvider(MetadataProvider delegate, SearchMapping mapping) {
@@ -96,78 +97,82 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	public Map<Object, Object> getDefaults() {
-		if (defaults == null) {
+		if ( defaults == null ) {
 			final Map<Object, Object> delegateDefaults = delegate.getDefaults();
 			defaults = delegateDefaults == null ?
 					new HashMap<Object, Object>() :
-					new HashMap<Object, Object>(delegateDefaults);
+					new HashMap<Object, Object>( delegateDefaults );
 			defaults.put( AnalyzerDefs.class, createAnalyzerDefArray() );
-			if (!mapping.getFullTextFilerDefs().isEmpty()) {
-				defaults.put(FullTextFilterDefs.class, createFullTextFilterDefsForMapping());
+			if ( !mapping.getFullTextFilerDefs().isEmpty() ) {
+				defaults.put( FullTextFilterDefs.class, createFullTextFilterDefsForMapping() );
 			}
 		}
 		return defaults;
 	}
 
-	
-
 	public AnnotationReader getAnnotationReader(AnnotatedElement annotatedElement) {
-		AnnotationReader reader = cache.get(annotatedElement);
-		if (reader == null) {
-			reader = new MappingModelAnnotationReader( mapping, delegate, annotatedElement);
+		AnnotationReader reader = cache.get( annotatedElement );
+		if ( reader == null ) {
+			reader = new MappingModelAnnotationReader( mapping, delegate, annotatedElement );
 			cache.put( annotatedElement, reader );
 		}
 		return reader;
 	}
 
 	private AnalyzerDef[] createAnalyzerDefArray() {
-		AnalyzerDef[] defs = new AnalyzerDef[ mapping.getAnalyzerDefs().size() ];
+		List<String> globalAnalyzerDefNames = new ArrayList<String>();
+		AnalyzerDef[] defs = new AnalyzerDef[mapping.getAnalyzerDefs().size()];
 		int index = 0;
 		for ( Map<String, Object> analyzerDef : mapping.getAnalyzerDefs() ) {
-			defs[index] = createAnalyzerDef( analyzerDef );
+			AnalyzerDef def = createAnalyzerDef( analyzerDef );
+			if ( globalAnalyzerDefNames.contains( def.name() ) ) {
+				throw new SearchException( "Multiple analyzer definitions with the same name: " + def.name() );
+			}
+			globalAnalyzerDefNames.add( def.name() );
+			defs[index] = def;
 			index++;
 		}
 		return defs;
 	}
-	
+
 	private FullTextFilterDef[] createFullTextFilterDefsForMapping() {
 		Set<Map<String, Object>> fullTextFilterDefs = mapping.getFullTextFilerDefs();
 		FullTextFilterDef[] filters = new FullTextFilterDef[fullTextFilterDefs.size()];
 		int index = 0;
-		for(Map<String,Object> filterDef : fullTextFilterDefs) {
-			filters[index] = createFullTextFilterDef(filterDef);
+		for ( Map<String, Object> filterDef : fullTextFilterDefs ) {
+			filters[index] = createFullTextFilterDef( filterDef );
 			index++;
 		}
 		return filters;
 	}
-	
-	private static FullTextFilterDef createFullTextFilterDef(Map<String,Object> filterDef) {
+
+	private static FullTextFilterDef createFullTextFilterDef(Map<String, Object> filterDef) {
 		AnnotationDescriptor fullTextFilterDefAnnotation = new AnnotationDescriptor( FullTextFilterDef.class );
-		for (Entry<String, Object> entry : filterDef.entrySet()) {
-			fullTextFilterDefAnnotation.setValue(entry.getKey(), entry.getValue());
+		for ( Entry<String, Object> entry : filterDef.entrySet() ) {
+			fullTextFilterDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 		}
-		
+
 		return AnnotationFactory.create( fullTextFilterDefAnnotation );
 	}
 
 	private static FullTextFilterDef[] createFullTextFilterDefArray(Set<Map<String, Object>> fullTextFilterDefs) {
 		FullTextFilterDef[] filters = new FullTextFilterDef[fullTextFilterDefs.size()];
 		int index = 0;
-		for(Map<String,Object> filterDef : fullTextFilterDefs) {
-			filters[index] = createFullTextFilterDef(filterDef);
+		for ( Map<String, Object> filterDef : fullTextFilterDefs ) {
+			filters[index] = createFullTextFilterDef( filterDef );
 			index++;
 		}
 		return filters;
 	}
-	
+
 	private AnalyzerDef createAnalyzerDef(Map<String, Object> analyzerDef) {
 		AnnotationDescriptor analyzerDefAnnotation = new AnnotationDescriptor( AnalyzerDef.class );
 		for ( Map.Entry<String, Object> entry : analyzerDef.entrySet() ) {
 			if ( entry.getKey().equals( "tokenizer" ) ) {
 				AnnotationDescriptor tokenizerAnnotation = new AnnotationDescriptor( TokenizerDef.class );
-				@SuppressWarnings( "unchecked" )
+				@SuppressWarnings("unchecked")
 				Map<String, Object> tokenizer = (Map<String, Object>) entry.getValue();
-				for( Map.Entry<String, Object> tokenizerEntry : tokenizer.entrySet() ) {
+				for ( Map.Entry<String, Object> tokenizerEntry : tokenizer.entrySet() ) {
 					if ( tokenizerEntry.getKey().equals( "params" ) ) {
 						addParamsToAnnotation( tokenizerAnnotation, tokenizerEntry );
 					}
@@ -178,7 +183,9 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				analyzerDefAnnotation.setValue( "tokenizer", AnnotationFactory.create( tokenizerAnnotation ) );
 			}
 			else if ( entry.getKey().equals( "filters" ) ) {
-				@SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters( (List<Map<String, Object>>) entry.getValue() );
+				@SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters(
+						(List<Map<String, Object>>) entry.getValue()
+				);
 				analyzerDefAnnotation.setValue( "filters", filtersArray );
 			}
 			else {
@@ -189,14 +196,14 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	static private void addParamsToAnnotation(AnnotationDescriptor annotationDescriptor, Map.Entry<String, Object> entry) {
-		@SuppressWarnings("unchecked") Parameter[] paramsArray = createParams( ( List<Map<String, Object>> ) entry.getValue() );
+		@SuppressWarnings("unchecked") Parameter[] paramsArray = createParams( (List<Map<String, Object>>) entry.getValue() );
 		annotationDescriptor.setValue( "params", paramsArray );
 	}
 
 	private TokenFilterDef[] createFilters(List<Map<String, Object>> filters) {
 		TokenFilterDef[] filtersArray = new TokenFilterDef[filters.size()];
 		int index = 0;
-		for (Map<String, Object> filter : filters) {
+		for ( Map<String, Object> filter : filters ) {
 			AnnotationDescriptor filterAnn = new AnnotationDescriptor( TokenFilterDef.class );
 			for ( Map.Entry<String, Object> filterEntry : filter.entrySet() ) {
 				if ( filterEntry.getKey().equals( "params" ) ) {
@@ -213,12 +220,12 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	private static Parameter[] createParams(List<Map<String, Object>> params) {
-		Parameter[] paramArray = new Parameter[ params.size() ];
+		Parameter[] paramArray = new Parameter[params.size()];
 		int index = 0;
-		for ( Map<String, Object> entry : params) {
+		for ( Map<String, Object> entry : params ) {
 			AnnotationDescriptor paramAnnotation = new AnnotationDescriptor( Parameter.class );
-			paramAnnotation.setValue( "name", entry.get("name") );
-			paramAnnotation.setValue( "value", entry.get("value") );
+			paramAnnotation.setValue( "name", entry.get( "name" ) );
+			paramAnnotation.setValue( "value", entry.get( "value" ) );
 			paramArray[index] = AnnotationFactory.create( paramAnnotation );
 			index++;
 		}
@@ -288,23 +295,25 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			if ( annotationsArray == null ) {
 				annotations = new HashMap<Class<? extends Annotation>, Annotation>();
 				delegatesAnnotationReading();
-				if (entityType != null) {
+				if ( entityType != null ) {
 					final EntityDescriptor entity = mapping.getEntityDescriptor( entityType );
-					if (entity != null) {
-						if (propertyName == null) {
+					if ( entity != null ) {
+						if ( propertyName == null ) {
 							//entityType overriding
 							createIndexed( entity );
 						}
 						else {
-							final PropertyDescriptor property = entity.getPropertyDescriptor( propertyName, elementType );
-							if (property != null) {
+							final PropertyDescriptor property = entity.getPropertyDescriptor(
+									propertyName, elementType
+							);
+							if ( property != null ) {
 								// property name overriding
 								createDocumentId( property );
 								createAnalyzerDiscriminator( property );
 								createFields( property );
-								createIndexEmbedded(property);
-								createContainedIn(property);
-								
+								createIndexEmbedded( property );
+								createContainedIn( property );
+
 							}
 						}
 					}
@@ -316,40 +325,40 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				populateAnnotationArray();
 			}
 		}
-		
+
 
 		private void createDateBridge(PropertyDescriptor property) {
-			Map<String, Object> map = property.getDateBridge();	
-			for(Map.Entry<String, Object> entry: map.entrySet()) {
-					AnnotationDescriptor dateBrigeAnnotation = new AnnotationDescriptor( DateBridge.class );
-					dateBrigeAnnotation.setValue(entry.getKey(), entry.getValue());
-					annotations.put( DateBridge.class, AnnotationFactory.create( dateBrigeAnnotation ) );	
+			Map<String, Object> map = property.getDateBridge();
+			for ( Map.Entry<String, Object> entry : map.entrySet() ) {
+				AnnotationDescriptor dateBrigeAnnotation = new AnnotationDescriptor( DateBridge.class );
+				dateBrigeAnnotation.setValue( entry.getKey(), entry.getValue() );
+				annotations.put( DateBridge.class, AnnotationFactory.create( dateBrigeAnnotation ) );
 			}
 		}
 
 		private void createCalendarBridge(PropertyDescriptor property) {
 			Map<String, Object> map = property.getCalendarBridge();
-			for(Map.Entry<String, Object> entry: map.entrySet()) {
+			for ( Map.Entry<String, Object> entry : map.entrySet() ) {
 				AnnotationDescriptor calendarBrigeAnnotation = new AnnotationDescriptor( CalendarBridge.class );
-				calendarBrigeAnnotation.setValue(entry.getKey(), entry.getValue());
-				annotations.put( CalendarBridge.class, AnnotationFactory.create( calendarBrigeAnnotation ) );	
+				calendarBrigeAnnotation.setValue( entry.getKey(), entry.getValue() );
+				annotations.put( CalendarBridge.class, AnnotationFactory.create( calendarBrigeAnnotation ) );
 			}
 		}
-		
+
 		private void createDocumentId(PropertyDescriptor property) {
 			Map<String, Object> documentId = property.getDocumentId();
-			if (documentId != null) {
+			if ( documentId != null ) {
 				AnnotationDescriptor documentIdAnnotation = new AnnotationDescriptor( DocumentId.class );
 				for ( Map.Entry<String, Object> entry : documentId.entrySet() ) {
 					documentIdAnnotation.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( DocumentId.class, AnnotationFactory.create( documentIdAnnotation ) );	
+				annotations.put( DocumentId.class, AnnotationFactory.create( documentIdAnnotation ) );
 			}
 		}
-		
+
 		private void createAnalyzerDiscriminator(PropertyDescriptor property) {
 			Map<String, Object> analyzerDiscriminator = property.getAnalyzerDiscriminator();
-			if (analyzerDiscriminator != null) {
+			if ( analyzerDiscriminator != null ) {
 				AnnotationDescriptor analyzerDiscriminatorAnn = new AnnotationDescriptor( AnalyzerDiscriminator.class );
 				for ( Map.Entry<String, Object> entry : analyzerDiscriminator.entrySet() ) {
 					analyzerDiscriminatorAnn.setValue( entry.getKey(), entry.getValue() );
@@ -358,37 +367,37 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 		}
 
-		
+
 		private void createFields(PropertyDescriptor property) {
-			final Collection<Map<String,Object>> fields = property.getFields();
+			final Collection<Map<String, Object>> fields = property.getFields();
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
-			for(Map<String, Object> field : fields) {
+			for ( Map<String, Object> field : fields ) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
 				for ( Map.Entry<String, Object> entry : field.entrySet() ) {
 					if ( entry.getKey().equals( "analyzer" ) ) {
 						AnnotationDescriptor analyzerAnnotation = new AnnotationDescriptor( Analyzer.class );
-						@SuppressWarnings( "unchecked" )
+						@SuppressWarnings("unchecked")
 						Map<String, Object> analyzer = (Map<String, Object>) entry.getValue();
-						for( Map.Entry<String, Object> analyzerEntry : analyzer.entrySet() ) {
+						for ( Map.Entry<String, Object> analyzerEntry : analyzer.entrySet() ) {
 							analyzerAnnotation.setValue( analyzerEntry.getKey(), analyzerEntry.getValue() );
 						}
 						fieldAnnotation.setValue( "analyzer", AnnotationFactory.create( analyzerAnnotation ) );
 					}
 					else if ( entry.getKey().equals( "boost" ) ) {
 						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
-						@SuppressWarnings( "unchecked" )
+						@SuppressWarnings("unchecked")
 						Map<String, Object> boost = (Map<String, Object>) entry.getValue();
-						for( Map.Entry<String, Object> boostEntry : boost.entrySet() ) {
+						for ( Map.Entry<String, Object> boostEntry : boost.entrySet() ) {
 							boostAnnotation.setValue( boostEntry.getKey(), boostEntry.getValue() );
 						}
 						fieldAnnotation.setValue( "boost", AnnotationFactory.create( boostAnnotation ) );
 					}
 					else if ( entry.getKey().equals( "bridge" ) ) {
 						AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
-						@SuppressWarnings( "unchecked" )
+						@SuppressWarnings("unchecked")
 						Map<String, Object> bridge = (Map<String, Object>) entry.getValue();
-						for( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
+						for ( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
 							if ( bridgeEntry.getKey().equals( "params" ) ) {
 								addParamsToAnnotation( bridgeAnnotation, bridgeEntry );
 							}
@@ -397,7 +406,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 							}
 						}
 						fieldAnnotation.setValue( "bridge", AnnotationFactory.create( bridgeAnnotation ) );
-					} 
+					}
 					else {
 						fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
 					}
@@ -409,53 +418,54 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final org.hibernate.search.annotations.Field[] fieldArray =
 					new org.hibernate.search.annotations.Field[fieldAnnotations.size()];
 			final org.hibernate.search.annotations.Field[] fieldAsArray = fieldAnnotations.toArray( fieldArray );
-	
+
 			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
-			createDateBridge(property);
-			createCalendarBridge(property);
-			createDynamicBoost(property);
-			
+			createDateBridge( property );
+			createCalendarBridge( property );
+			createDynamicBoost( property );
+
 		}
 
 		private void createDynamicBoost(PropertyDescriptor property) {
-			if (property.getDynamicBoost() != null) {
+			if ( property.getDynamicBoost() != null ) {
 				AnnotationDescriptor dynamicBoostAnn = new AnnotationDescriptor( DynamicBoost.class );
-				Set<Entry<String,Object>> entrySet = property.getDynamicBoost().entrySet();
-				for (Entry<String, Object> entry : entrySet) {
-					dynamicBoostAnn.setValue(entry.getKey(), entry.getValue());
+				Set<Entry<String, Object>> entrySet = property.getDynamicBoost().entrySet();
+				for ( Entry<String, Object> entry : entrySet ) {
+					dynamicBoostAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put(DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ));
+				annotations.put( DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ) );
 			}
 		}
+
 		private void createContainedIn(PropertyDescriptor property) {
-			if (property.getContainedIn() != null) {
+			if ( property.getContainedIn() != null ) {
 				Map<String, Object> containedIn = property.getContainedIn();
 				AnnotationDescriptor containedInAnn = new AnnotationDescriptor( ContainedIn.class );
-				Set<Entry<String,Object>> entrySet = containedIn.entrySet();
-				for (Entry<String, Object> entry : entrySet) {
-					containedInAnn.setValue(entry.getKey(), entry.getValue());
+				Set<Entry<String, Object>> entrySet = containedIn.entrySet();
+				for ( Entry<String, Object> entry : entrySet ) {
+					containedInAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put(ContainedIn.class,AnnotationFactory.create(containedInAnn));
+				annotations.put( ContainedIn.class, AnnotationFactory.create( containedInAnn ) );
 			}
 		}
 
 		private void createIndexEmbedded(PropertyDescriptor property) {
 			Map<String, Object> indexEmbedded = property.getIndexEmbedded();
-			if (indexEmbedded != null) {
-				AnnotationDescriptor indexEmbeddedAnn = new AnnotationDescriptor(IndexedEmbedded.class);
-				Set<Entry<String,Object>> entrySet = indexEmbedded.entrySet();
-				for (Entry<String, Object> entry : entrySet) {
-					indexEmbeddedAnn.setValue(entry.getKey(), entry.getValue());
+			if ( indexEmbedded != null ) {
+				AnnotationDescriptor indexEmbeddedAnn = new AnnotationDescriptor( IndexedEmbedded.class );
+				Set<Entry<String, Object>> entrySet = indexEmbedded.entrySet();
+				for ( Entry<String, Object> entry : entrySet ) {
+					indexEmbeddedAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put(IndexedEmbedded.class, AnnotationFactory.create(indexEmbeddedAnn));
+				annotations.put( IndexedEmbedded.class, AnnotationFactory.create( indexEmbeddedAnn ) );
 			}
 		}
 
 		private void createIndexed(EntityDescriptor entity) {
 			Class<? extends Annotation> annotationType = Indexed.class;
 			AnnotationDescriptor annotation = new AnnotationDescriptor( annotationType );
-			if (entity.getIndexed() != null) {
+			if ( entity.getIndexed() != null ) {
 				for ( Map.Entry<String, Object> entry : entity.getIndexed().entrySet() ) {
 					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
@@ -485,68 +495,69 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 				annotations.put( AnalyzerDiscriminator.class, AnnotationFactory.create( annotation ) );
 			}
-			if (entity.getFullTextFilterDefs().size() > 0)  {
+			if ( entity.getFullTextFilterDefs().size() > 0 ) {
 				AnnotationDescriptor fullTextFilterDefsAnnotation = new AnnotationDescriptor( FullTextFilterDefs.class );
-				FullTextFilterDef[] fullTextFilterDefArray = createFullTextFilterDefArray(entity.getFullTextFilterDefs());
-				fullTextFilterDefsAnnotation.setValue("value", fullTextFilterDefArray);
+				FullTextFilterDef[] fullTextFilterDefArray = createFullTextFilterDefArray( entity.getFullTextFilterDefs() );
+				fullTextFilterDefsAnnotation.setValue( "value", fullTextFilterDefArray );
 				annotations.put( FullTextFilterDefs.class, AnnotationFactory.create( fullTextFilterDefsAnnotation ) );
 			}
-			if (entity.getProvidedId() != null) {
-				createProvidedId(entity);
+			if ( entity.getProvidedId() != null ) {
+				createProvidedId( entity );
 			}
-			
-			if (entity.getClassBridgeDefs().size() > 0) {
+
+			if ( entity.getClassBridgeDefs().size() > 0 ) {
 				AnnotationDescriptor classBridgesAnn = new AnnotationDescriptor( ClassBridges.class );
-				ClassBridge[] classBridesDefArray  = createClassBridgesDefArray(entity.getClassBridgeDefs());
-				classBridgesAnn.setValue("value", classBridesDefArray);
-				annotations.put(ClassBridges.class, AnnotationFactory.create( classBridgesAnn ));
+				ClassBridge[] classBridesDefArray = createClassBridgesDefArray( entity.getClassBridgeDefs() );
+				classBridgesAnn.setValue( "value", classBridesDefArray );
+				annotations.put( ClassBridges.class, AnnotationFactory.create( classBridgesAnn ) );
 			}
-			
-			if (entity.getDynamicBoost() != null) {
+
+			if ( entity.getDynamicBoost() != null ) {
 				AnnotationDescriptor dynamicBoostAnn = new AnnotationDescriptor( DynamicBoost.class );
-				Set<Entry<String,Object>> entrySet = entity.getDynamicBoost().entrySet();
-				for (Entry<String, Object> entry : entrySet) {
-					dynamicBoostAnn.setValue(entry.getKey(), entry.getValue());
+				Set<Entry<String, Object>> entrySet = entity.getDynamicBoost().entrySet();
+				for ( Entry<String, Object> entry : entrySet ) {
+					dynamicBoostAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put(DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ));
+				annotations.put( DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ) );
 			}
-			
+
 		}
 
 		private ClassBridge[] createClassBridgesDefArray(Set<Map<String, Object>> classBridgeDefs) {
 			ClassBridge[] classBridgeDefArray = new ClassBridge[classBridgeDefs.size()];
 			int index = 0;
-			for(Map<String,Object> classBridgeDef : classBridgeDefs) {
-				classBridgeDefArray[index] = createClassBridge(classBridgeDef);
+			for ( Map<String, Object> classBridgeDef : classBridgeDefs ) {
+				classBridgeDefArray[index] = createClassBridge( classBridgeDef );
 				index++;
 			}
-			
+
 			return classBridgeDefArray;
 		}
 
-		
+
 		private ClassBridge createClassBridge(Map<String, Object> classBridgeDef) {
-			AnnotationDescriptor annotation	= new AnnotationDescriptor( ClassBridge.class );
-			Set<Entry<String,Object>> entrySet = classBridgeDef.entrySet();
-			for (Entry<String, Object> entry : entrySet) {
-				if (entry.getKey().equals("params")) {
-					addParamsToAnnotation(annotation, entry);
-				} else {
-					annotation.setValue(entry.getKey(), entry.getValue());
+			AnnotationDescriptor annotation = new AnnotationDescriptor( ClassBridge.class );
+			Set<Entry<String, Object>> entrySet = classBridgeDef.entrySet();
+			for ( Entry<String, Object> entry : entrySet ) {
+				if ( entry.getKey().equals( "params" ) ) {
+					addParamsToAnnotation( annotation, entry );
+				}
+				else {
+					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
 			}
 			return AnnotationFactory.create( annotation );
 		}
 
 		private void createProvidedId(EntityDescriptor entity) {
-			AnnotationDescriptor annotation	= new AnnotationDescriptor( ProvidedId.class );
-			Set<Entry<String,Object>> entrySet = entity.getProvidedId().entrySet();
-			for (Entry<String, Object> entry : entrySet) {
-				if (entry.getKey().equals("bridge")) {
+			AnnotationDescriptor annotation = new AnnotationDescriptor( ProvidedId.class );
+			Set<Entry<String, Object>> entrySet = entity.getProvidedId().entrySet();
+			for ( Entry<String, Object> entry : entrySet ) {
+				if ( entry.getKey().equals( "bridge" ) ) {
 					AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
 					@SuppressWarnings("unchecked")
 					Map<String, Object> bridge = (Map<String, Object>) entry.getValue();
-					for( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
+					for ( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
 						if ( bridgeEntry.getKey().equals( "params" ) ) {
 							addParamsToAnnotation( bridgeAnnotation, bridgeEntry );
 						}
@@ -555,17 +566,18 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 						}
 					}
 					annotation.setValue( "bridge", AnnotationFactory.create( bridgeAnnotation ) );
-				} else {
-					annotation.setValue(entry.getKey(), entry.getValue());
+				}
+				else {
+					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
 			}
 			annotations.put( ProvidedId.class, AnnotationFactory.create( annotation ) );
 		}
-		
+
 		private void populateAnnotationArray() {
-			annotationsArray = new Annotation[ annotations.size() ];
+			annotationsArray = new Annotation[annotations.size()];
 			int index = 0;
-			for( Annotation ann: annotations.values() ) {
+			for ( Annotation ann : annotations.values() ) {
 				annotationsArray[index] = ann;
 				index++;
 			}
@@ -577,13 +589,13 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 		}
 
-		@SuppressWarnings( "unchecked" )
+		@SuppressWarnings("unchecked")
 		public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
 			initAnnotations();
 			return (T) annotations.get( annotationType );
 		}
 
-		@SuppressWarnings( "unchecked" )
+		@SuppressWarnings("unchecked")
 		public <T extends Annotation> boolean isAnnotationPresent(Class<T> annotationType) {
 			initAnnotations();
 			return (T) annotations.get( annotationType ) != null;
