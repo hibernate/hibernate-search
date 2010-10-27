@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.configuration;
 
-import java.lang.annotation.ElementType;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,10 +37,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.apache.solr.analysis.LowerCaseFilterFactory;
-import org.apache.solr.analysis.NGramFilterFactory;
-import org.apache.solr.analysis.SnowballPorterFilterFactory;
-import org.apache.solr.analysis.StandardTokenizerFactory;
+import org.slf4j.Logger;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -50,18 +47,13 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.analyzer.inheritance.ISOLatin1Analyzer;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.util.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Bernard
@@ -699,44 +691,10 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		return depts;
 	}
 	
-	
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.getProperties().put( Environment.MODEL_MAPPING, ProgrammaticSearchMappingFactory.class.getName() );
-	}
-
-	public void NotUseddefineMapping() {
-		SearchMapping mapping = new SearchMapping();
-		mapping.analyzerDef( "stem", StandardTokenizerFactory.class )
-					.tokenizerParam( "name", "value" )
-					.tokenizerParam(  "name2", "value2" )
-					.filter( LowerCaseFilterFactory.class )
-					.filter( SnowballPorterFilterFactory.class)
-						.param("language", "English")
-				.analyzerDef( "ngram", StandardTokenizerFactory.class )
-					.tokenizerParam( "name", "value" )
-					.tokenizerParam(  "name2", "value2" )
-					.filter( LowerCaseFilterFactory.class )
-					.filter( NGramFilterFactory.class)
-						.param("minGramSize", "3")
-						.param("maxGramSize", "3")
-				.entity(Address.class).indexed().indexName("Address_Index")
-					.property("street1", ElementType.FIELD)
-						.field()
-						.field()
-							.name("street1_iso")
-							.store( Store.YES )
-							.index( Index.TOKENIZED )
-							.analyzer( ISOLatin1Analyzer.class)
-						.field()
-							.name("street1_ngram")
-							.analyzer("ngram")
-				.entity(User.class).indexed()
-					.property("name", ElementType.METHOD)
-						.field()
-				.analyzerDef( "minimal", StandardTokenizerFactory.class  );
-
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {
@@ -751,7 +709,5 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				DynamicBoostedDescLibrary.class
 				
 		};
-	}
-	
-	
+	}	
 }
