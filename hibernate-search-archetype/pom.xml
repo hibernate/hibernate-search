@@ -1,11 +1,17 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- 
-        The link to the hibernate-search parent POM only exists out of convenience.
-        If you want to continue using this quick-start project you should remove this
-        entry.
+        The link to the hibernate-search parent POM only exists out of convenience since we are creating
+        this archetype from an existing module of the Hibernate Search code base.
+        If you want to know more about this process check the maven-archetype-plugin documentation
+        http://maven.apache.org/archetype/maven-archetype-plugin, epecially the goal create-from-project
+      
+        If you want to use this quick-start project as the base for your own application you should remove the
+        <parent> entry. See also the other pointers in this pom!
     -->
     <parent>
         <artifactId>hibernate-search-parent</artifactId>
@@ -16,13 +22,14 @@
     <groupId>com.example</groupId>
     <artifactId>hibernate-search-archetype</artifactId>
     <packaging>jar</packaging>
-    <name>Hibernate Search Archetype</name>
+    <name>Hibernate Search Quickstart</name>
     <url>http://www.myorganization.org</url>
 
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search</artifactId>
+            <!-- When removing the <parent> node you will have to explicitly set the hibernate-search version -->
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -33,6 +40,8 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
+            <!-- When removing the <parent> node you have to explicitly set the Hibernate Entity Manager version -->
+            <!--<version></version>-->
         </dependency>
         <dependency>
             <groupId>hsqldb</groupId>
@@ -45,6 +54,15 @@
             <version>4.7</version>
             <scope>test</scope>
         </dependency>
+        <!-- When removing the <parent> you will have to add a slf4j logging binding. Within Hibernate we are using
+             slf4j-log4j12, but it is up to you to chose your own binding. See also http://www.slf4j.org/codes.html
+         -->
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>slf4j-log4j12</artifactId>-->
+            <!--<version></version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>
@@ -63,13 +81,10 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-archetype-plugin</artifactId>-->
-            <!--</plugin>-->
         </plugins>
     </build>
     <profiles>
+        <!-- When removing the <parent> node the profile can be removed -->
         <profile>
             <id>archetype</id>
             <activation>
@@ -80,14 +95,11 @@
             <build>
                 <plugins>
                     <plugin>
-                          <groupId>org.apache.maven.plugins</groupId>
-                          <artifactId>maven-archetype-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-archetype-plugin</artifactId>
                     </plugin>
                 </plugins>
-
             </build>
         </profile>
-
-
     </profiles>
 </project>
