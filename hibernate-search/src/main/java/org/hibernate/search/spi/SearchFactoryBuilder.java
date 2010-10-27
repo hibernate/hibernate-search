@@ -38,15 +38,6 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
-import org.hibernate.search.impl.ConfigContext;
-import org.hibernate.search.impl.ImmutableSearchFactory;
-import org.hibernate.search.impl.IncrementalSearchConfiguration;
-import org.hibernate.search.impl.MappingModelMetadataProvider;
-import org.hibernate.search.impl.MutableSearchFactory;
-import org.hibernate.search.impl.MutableSearchFactoryState;
-import org.hibernate.search.impl.SearchMappingBuilder;
-import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
-import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.reflection.MetadataProvider;
@@ -83,13 +74,20 @@ import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.impl.ImmutableSearchFactory;
+import org.hibernate.search.impl.IncrementalSearchConfiguration;
+import org.hibernate.search.impl.MappingModelMetadataProvider;
+import org.hibernate.search.impl.MutableSearchFactory;
+import org.hibernate.search.impl.MutableSearchFactoryState;
+import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.jmx.JMXRegistrar;
 import org.hibernate.search.reader.ReaderProviderFactory;
-import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -110,6 +108,7 @@ public class SearchFactoryBuilder {
 	}
 
 	private static final Logger log = LoggerFactory.make();
+
 	private SearchConfiguration cfg;
 	private MutableSearchFactory rootFactory;
 	private final List<Class<?>> classes = new ArrayList<Class<?>>();
@@ -186,7 +185,7 @@ public class SearchFactoryBuilder {
 
 		final Properties configurationProperties = factoryState.getConfigurationProperties();
 		BuildContext buildContext = new BuildContext();
-		
+
 		//TODO we don't keep the reflectionManager. Is that an issue?
 		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties );
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
@@ -211,7 +210,7 @@ public class SearchFactoryBuilder {
 		//update backend
 		final BackendQueueProcessorFactory backend = factoryState.getBackendQueueProcessorFactory();
 		if ( backend instanceof UpdatableBackendQueueProcessorFactory ) {
-			final UpdatableBackendQueueProcessorFactory updatableBackend = ( UpdatableBackendQueueProcessorFactory ) backend;
+			final UpdatableBackendQueueProcessorFactory updatableBackend = (UpdatableBackendQueueProcessorFactory) backend;
 			updatableBackend.updateDirectoryProviders( factoryState.getDirectoryProviderData().keySet(), buildContext );
 		}
 		//safe for incremental init at least the ShredBufferReaderProvider
@@ -253,7 +252,7 @@ public class SearchFactoryBuilder {
 								+ MetadataProviderInjector.class.getName()
 				);
 			}
-			MetadataProviderInjector injector = ( MetadataProviderInjector ) reflectionManager;
+			MetadataProviderInjector injector = (MetadataProviderInjector) reflectionManager;
 			MetadataProvider original = injector.getMetadataProvider();
 			injector.setMetadataProvider( new MappingModelMetadataProvider( original, mapping ) );
 		}
@@ -280,7 +279,7 @@ public class SearchFactoryBuilder {
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg.getProperties() ) );
 		factoryState.setCacheBitResultsSize(
 				ConfigurationParseHelper.getIntValue(
-					cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
+						cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 				)
 		);
 		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );
@@ -476,10 +475,10 @@ public class SearchFactoryBuilder {
 		final Map defaults = reflectionManager.getDefaults();
 
 		if ( defaults != null ) {
-			AnalyzerDef[] defs = ( AnalyzerDef[] ) defaults.get( AnalyzerDefs.class );
+			AnalyzerDef[] defs = (AnalyzerDef[]) defaults.get( AnalyzerDefs.class );
 			if ( defs != null ) {
 				for ( AnalyzerDef def : defs ) {
-					context.addAnalyzerDef( def );
+					context.addGlobalAnalyzerDef( def );
 				}
 			}
 		}
@@ -487,7 +486,7 @@ public class SearchFactoryBuilder {
 
 	private void initProgrammaticallyDefinedFilterDef(ReflectionManager reflectionManager) {
 		@SuppressWarnings("unchecked") Map defaults = reflectionManager.getDefaults();
-		FullTextFilterDef[] filterDefs = ( FullTextFilterDef[] ) defaults.get( FullTextFilterDefs.class );
+		FullTextFilterDef[] filterDefs = (FullTextFilterDef[]) defaults.get( FullTextFilterDefs.class );
 		if ( filterDefs != null && filterDefs.length != 0 ) {
 			final Map<String, FilterDef> filterDefinitions = factoryState.getFilterDefinitions();
 			for ( FullTextFilterDef defAnn : filterDefs ) {
@@ -588,7 +587,9 @@ public class SearchFactoryBuilder {
 		}
 
 		public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-			return Collections.unmodifiableSet( factoryState.getDirectoryProviderData().get( directoryProvider ).getClasses() );
+			return Collections.unmodifiableSet(
+					factoryState.getDirectoryProviderData().get( directoryProvider ).getClasses()
+			);
 		}
 
 		public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
@@ -617,7 +618,8 @@ public class SearchFactoryBuilder {
 
 		@SuppressWarnings("unchecked")
 		public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-			return ( DocumentBuilderIndexedEntity<T> ) factoryState.getDocumentBuildersIndexedEntities().get( entityType );
+			return (DocumentBuilderIndexedEntity<T>) factoryState.getDocumentBuildersIndexedEntities()
+					.get( entityType );
 		}
 
 	}
