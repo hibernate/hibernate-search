@@ -187,17 +187,25 @@ finally {
             </row>
           </tbody>
         </tgroup>
-      </informaltable> It is beyond the scope of this manual to explain this
+      </informaltable>It is beyond the scope of this manual to explain this
     formula in more detail. Please refer to
     <classname>Similarity</classname>'s Javadocs for more information.</para>
 
-    <para>Hibernate Search provides two ways to modify Lucene's similarity
-    calculation. First you can set the default similarity by specifying the
-    fully specified classname of your <classname>Similarity</classname>
+    <para>Hibernate Search provides three ways to modify Lucene's similarity
+    calculation. </para>
+
+    <para>First you can set the default similarity by specifying the fully
+    specified classname of your <classname>Similarity</classname>
     implementation using the property
     <constant>hibernate.search.similarity</constant>. The default value is
-    <classname>org.apache.lucene.search.DefaultSimilarity</classname>.
-    Additionally you can override the default similarity on class level using
+    <classname>org.apache.lucene.search.DefaultSimilarity</classname>. </para>
+
+    <para>You can also override the similarity used for a specific index by
+    setting the <literal>similarity</literal> property</para>
+
+    <programlisting>hibernate.search.default.similarity my.custom.Similarity</programlisting>
+
+    <para>Finally you can override the default similarity on class level using
     the <literal>@Similarity</literal> annotation. <programlisting>@Entity
 @Indexed
 <emphasis role="bold">@Similarity(impl = DummySimilarity.class)</emphasis>
@@ -215,6 +223,10 @@ public class Book {
       class hierarchy always share the index, so it's not allowed to override
       the <classname>Similarity</classname> implementation in a
       subtype.</para>
+
+      <para>Likewise, it does not make sense to define the similarity via the
+      index setting and the class-level setting as they would conflict. Such a
+      configuration will be rejected.</para>
     </warning>
   </section>
 
@@ -228,7 +240,7 @@ public class Book {
     in the index. This information is always available. However, by specifying
     the <literal>hibernate.search.generate_statistics</literal> property in
     your configuration you can also collect total and average Lucene query and
-    object loading timings. </para>
+    object loading timings.</para>
 
     <section>
       <title>JMX</title>
