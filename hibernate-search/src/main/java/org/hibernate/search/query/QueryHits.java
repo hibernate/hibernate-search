@@ -51,21 +51,23 @@ public class QueryHits {
 	public final Sort sort;
 	public final int totalHits;
 	public TopDocs topDocs;
+	private TimeoutManager timeoutManager;
 
-	public QueryHits(Searcher searcher, org.apache.lucene.search.Query preparedQuery, Filter filter, Sort sort)
+	public QueryHits(Searcher searcher, org.apache.lucene.search.Query preparedQuery, Filter filter, Sort sort, TimeoutManager timeoutManager)
 			throws IOException {
-		this( searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE );
+		this( searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager );
 	}
 
 	public QueryHits(Searcher searcher, org.apache.lucene.search.Query preparedQuery, Filter filter, Sort sort,
-					 Integer n )
+					 Integer n, TimeoutManager timeoutManager )
 			throws IOException {
+		this.timeoutManager = timeoutManager;
 		this.preparedQuery = preparedQuery;
 		this.searcher = searcher;
 		this.filter = filter;
 		this.sort = sort;
 		updateTopDocs( n );
-		totalHits = topDocs.totalHits;
+		this.totalHits = topDocs.totalHits;
 	}
 
 	public Document doc(int index) throws IOException {
@@ -98,7 +100,9 @@ public class QueryHits {
 	}
 
 	public Explanation explain(int index) throws IOException {
-		return searcher.explain( preparedQuery, docId( index ) );
+		final Explanation explanation = searcher.explain( preparedQuery, docId( index ) );
+		timeoutManager.isTimedOut();
+		return explanation;
 	}
 
 	private void updateTopDocs(int n) throws IOException {
@@ -108,5 +112,6 @@ public class QueryHits {
 		else {
 			topDocs = searcher.search( preparedQuery, filter, n, sort );
 		}
+		timeoutManager.isTimedOut();
 	}
 }

@@ -67,6 +67,7 @@ import org.hibernate.transform.ResultTransformer;
  * @author Emmanuel Bernard
  */
 public class FullTextQueryImpl implements FullTextQuery {
+	//TODO write a wrapper to transform the query time out into a JPA query time out.
 	private final org.hibernate.search.FullTextQuery query;
 	private final Session session;
 	private Integer firstResult;

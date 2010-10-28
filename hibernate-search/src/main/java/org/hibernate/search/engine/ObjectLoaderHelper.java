@@ -36,6 +36,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -70,7 +71,9 @@ public class ObjectLoaderHelper {
 
 	public static void initializeObjects(EntityInfo[] entityInfos,
 										 Criteria criteria, Class<?> entityType,
-										 SearchFactoryImplementor searchFactoryImplementor) {
+										 SearchFactoryImplementor searchFactoryImplementor,
+										 TimeoutManager timeoutManager) {
+		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
 			return;
@@ -99,6 +102,13 @@ public class ObjectLoaderHelper {
 			disjunction.add( Restrictions.in( idName, ids ) );
 		}
 		criteria.add( disjunction );
+		//not best effort so fail fast
+		if ( ! timeoutManager.isBestEffort() ) {
+			final Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
+			if ( timeLeftInSecond != null ) {
+				criteria.setTimeout( timeLeftInSecond.intValue() );
+			}
+		}
 		criteria.list(); //load all objects
 	}
 
