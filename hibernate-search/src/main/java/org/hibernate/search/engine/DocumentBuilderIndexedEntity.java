@@ -70,6 +70,7 @@ import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
@@ -144,14 +145,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param shardingStrategy The sharding strategy used for the indexed entity.
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */
-	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, DirectoryProvider[] directoryProviders,
-										IndexShardingStrategy shardingStrategy, ReflectionManager reflectionManager) {
+	public DocumentBuilderIndexedEntity(
+			XClass clazz, ConfigContext context, DirectoryProviderFactory.DirectoryProviders providerWrapper, ReflectionManager reflectionManager) {
 
-		super( clazz, context, reflectionManager );
+		super( clazz, context, providerWrapper.getSimilarity(), reflectionManager );
 
 		this.entityState = EntityState.INDEXED;
-		this.directoryProviders = directoryProviders;
-		this.shardingStrategy = shardingStrategy;
+		this.directoryProviders = providerWrapper.getProviders();
+		this.shardingStrategy = providerWrapper.getSelectionStrategy();
 	}
 
 	protected void initSubClass(XClass clazz, ConfigContext context) {

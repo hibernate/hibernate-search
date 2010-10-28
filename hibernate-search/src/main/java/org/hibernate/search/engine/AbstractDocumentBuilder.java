@@ -99,7 +99,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 * @param context Handle to default configuration settings.
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */
-	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, ReflectionManager reflectionManager) {
+	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity, ReflectionManager reflectionManager) {
 
 		if ( xClass == null ) {
 			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
@@ -109,6 +109,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		this.beanXClass = xClass;
 		this.reflectionManager = reflectionManager;
 		this.beanClass = reflectionManager.toClass( xClass );
+		this.similarity = similarity; //set the index similarity before the class level one to detect conflict
+
 		init( xClass, context );
 
 		if ( metadata.containedInGetters.size() == 0 ) {
@@ -490,7 +492,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( similarityAnn != null ) {
 			if ( similarity != null ) {
 				throw new SearchException(
-						"Multiple Similarities defined in the same class hierarchy: " + beanXClass.getName()
+						"Multiple similarities defined in the same class hierarchy or on the index settings: " + beanXClass.getName()
 				);
 			}
 			Class<?> similarityClass = similarityAnn.impl();

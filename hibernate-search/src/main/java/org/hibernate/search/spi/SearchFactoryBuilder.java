@@ -374,9 +374,12 @@ public class SearchFactoryBuilder {
 				);
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
-				final DocumentBuilderIndexedEntity<?> documentBuilder = new DocumentBuilderIndexedEntity(
-						mappedXClass, context, providers.getProviders(), providers.getSelectionStrategy(),
-						reflectionManager
+				final DocumentBuilderIndexedEntity<?> documentBuilder =
+						new DocumentBuilderIndexedEntity(
+								mappedXClass,
+								context,
+								providers,
+								reflectionManager
 				);
 
 				indexingHierarchy.addIndexedClass( mappedClass );

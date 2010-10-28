@@ -114,6 +114,11 @@ public final class Environment {
 	 */
 	public static final String EXCLUSIVE_INDEX_USE = "exclusive_index_use";
 
+	/**
+	 * Define the similarity class name for a given index
+	 */
+	public static final String SIMILARITY_CLASS_PER_INDEX = "similarity";
+
 	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
 
 	/**

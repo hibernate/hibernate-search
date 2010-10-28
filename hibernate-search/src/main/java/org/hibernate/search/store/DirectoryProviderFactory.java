@@ -27,9 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.lucene.search.Similarity;
+
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.WritableBuildContext;
@@ -106,7 +109,16 @@ public class DirectoryProviderFactory {
 		}
 		shardingStrategy.initialize(
 				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers );
-		return new DirectoryProviders( shardingStrategy, providers );
+		final String similarityClassName = indexProps[0].getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
+		Similarity similarityInstance = null;
+		if ( similarityClassName != null ) {
+			similarityInstance = ClassLoaderHelper.instanceFromName(
+					Similarity.class,
+					similarityClassName,
+					DirectoryProviderFactory.class,
+					"Similarity class for index " + directoryProviderName  );
+		}
+		return new DirectoryProviders( shardingStrategy, providers, similarityInstance );
 	}
 
 	public void startDirectoryProviders() {
@@ -251,10 +263,12 @@ public class DirectoryProviderFactory {
 	public static class DirectoryProviders {
 		private final IndexShardingStrategy shardingStrategy;
 		private final DirectoryProvider[] providers;
+		private final Similarity similarity;
 
-		public DirectoryProviders(IndexShardingStrategy shardingStrategy, DirectoryProvider[] providers) {
+		public DirectoryProviders(IndexShardingStrategy shardingStrategy, DirectoryProvider[] providers, Similarity similarity) {
 			this.shardingStrategy = shardingStrategy;
 			this.providers = providers;
+			this.similarity = similarity;
 		}
 
 		public IndexShardingStrategy getSelectionStrategy() {
@@ -263,6 +277,10 @@ public class DirectoryProviderFactory {
 
 		public DirectoryProvider[] getProviders() {
 			return providers;
+		}
+
+		public Similarity getSimilarity() {
+			return similarity;
 		}
 	}
 	

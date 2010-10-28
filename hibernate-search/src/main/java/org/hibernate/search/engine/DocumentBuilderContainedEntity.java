@@ -52,7 +52,7 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */
 	public DocumentBuilderContainedEntity(XClass xClass, ConfigContext context, ReflectionManager reflectionManager) {
-		super( xClass, context, reflectionManager );
+		super( xClass, context, null, reflectionManager );
 	}
 
 	protected void initSubClass(XClass clazz, ConfigContext context) {	
