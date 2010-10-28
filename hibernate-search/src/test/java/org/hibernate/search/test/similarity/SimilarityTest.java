@@ -25,6 +25,8 @@ package org.hibernate.search.test.similarity;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextSession;
@@ -40,6 +42,26 @@ import org.apache.lucene.index.Term;
  * @author Emmanuel Bernard
  */
 public class SimilarityTest extends SearchTestCase {
+
+	public void testIndexLevelSimilarity() throws Exception {
+		Configuration config = new Configuration();
+		config.addAnnotatedClass( Can.class );
+		config.addAnnotatedClass( Trash.class );
+		config.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		config.setProperty( "hibernate.search.default.similarity", DummySimilarity.class.getName() );
+		try {
+			config.buildSessionFactory();
+			fail( "Session creation should have failed due to duplicate similarity definition" );
+		}
+		catch ( HibernateException e ) { // the SearchException will be wrapped in a HibernateException
+			assertTrue(
+					e.getCause().getMessage().startsWith(
+							"Multiple similarities defined"
+					)
+			);
+		}
+	}
+
 	public void testClassAndGlobalSimilarity() throws Exception {
 	    Session s = openSession(  );
 		Transaction tx = s.beginTransaction();
