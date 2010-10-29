@@ -24,6 +24,7 @@
 
 package org.hibernate.search.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.spi.ServiceProvider;
 
 /**
  * @author Emmanuel Bernard
@@ -73,5 +75,9 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 
 	public SearchMapping getProgrammaticMapping() {
 		return null;
+	}
+
+	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+		return Collections.emptyMap();
 	}
 }

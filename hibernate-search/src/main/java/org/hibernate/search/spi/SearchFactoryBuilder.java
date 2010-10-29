@@ -335,7 +335,7 @@ public class SearchFactoryBuilder {
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
 			factoryState.setErrorHandler( createErrorHandler( factoryState.getConfigurationProperties() ) );
-			factoryState.setServiceManager( new ServiceManager( factoryState.getConfigurationProperties() ) );
+			factoryState.setServiceManager( new ServiceManager( cfg ) );
 		}
 	}
 

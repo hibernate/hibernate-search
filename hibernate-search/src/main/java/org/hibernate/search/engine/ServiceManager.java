@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.LoggerFactory;
@@ -26,11 +27,13 @@ public class ServiceManager {
 	private static final Logger log = LoggerFactory.make();
 
 	//barrier protected by the Hibernate Search instantiation
-	private final Map<Class<ServiceProvider<?>>,ServiceProviderWrapper> providers = new HashMap<Class<ServiceProvider<?>>,ServiceProviderWrapper>();
+	private final Map<Class<ServiceProvider<?>>,ServiceProviderWrapper> managedProviders = new HashMap<Class<ServiceProvider<?>>,ServiceProviderWrapper>();
+	private final Map<Class<? extends ServiceProvider<?>>,Object> providedProviders = new HashMap<Class<? extends ServiceProvider<?>>,Object>();
 	private final Properties properties;
 
-	public ServiceManager(Properties properties) {
-		this.properties = properties;
+	public ServiceManager(SearchConfiguration cfg) {
+		this.properties = cfg.getProperties();
+		this.providedProviders.putAll( cfg.getProvidedServices() );
 		listAndInstantiateServiceProviders();
 	}
 
@@ -54,7 +57,7 @@ public class ServiceManager {
 							@SuppressWarnings( "unchecked")
 							final Class<ServiceProvider<?>> serviceProviderClass =
 									( Class<ServiceProvider<?>> ) serviceProvider.getClass();
-							providers.put( serviceProviderClass, new ServiceProviderWrapper(serviceProvider) );
+							managedProviders.put( serviceProviderClass, new ServiceProviderWrapper(serviceProvider) );
 						}
 						name = reader.readLine();
 					}
@@ -70,8 +73,15 @@ public class ServiceManager {
 	}
 
 	public <T> T registerServiceUse(Class<? extends ServiceProvider<T>> serviceProviderClass) {
+		//provided services have priority over managed services
+		if ( providedProviders.containsKey( serviceProviderClass ) ) {
+			//we use containsKey as the service itself might be null
+			//TODO be safer and throw a cleaner exception
+			return (T) providedProviders.get( serviceProviderClass );
+		}
+
 		@SuppressWarnings( "unchecked")
-		final ServiceProviderWrapper wrapper = providers.get( serviceProviderClass );
+		final ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
 		if (wrapper == null) {
 			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
 		}
@@ -80,7 +90,12 @@ public class ServiceManager {
 	}
 
 	public void unregisterServiceUse(Class<? extends ServiceProvider<?>> serviceProviderClass) {
-		final ServiceProviderWrapper wrapper = providers.get( serviceProviderClass );
+		//provided services have priority over managed services
+		if ( providedProviders.containsKey( serviceProviderClass ) ) {
+			return;
+		}
+		
+		final ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
 		if (wrapper == null) {
 			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
 		}
@@ -88,7 +103,7 @@ public class ServiceManager {
 	}
 
 	public void stopServices() {
-		for (ServiceProviderWrapper wrapper :  providers.values() ) {
+		for (ServiceProviderWrapper wrapper :  managedProviders.values() ) {
 			if ( wrapper.getCounter() != 0 ) {
 				log.warn( "service provider has been used but not released: {}", wrapper.getServiceProvider().getClass() );
 			}

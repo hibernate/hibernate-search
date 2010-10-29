@@ -31,6 +31,7 @@ import java.util.HashMap;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.search.spi.ServiceProvider;
 
 /**
  * Manually defines the configuration
@@ -39,12 +40,14 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
  * @author Emmanuel Bernard
  */
 public class ManualConfiguration implements SearchConfiguration {
-	final Map<String,Class<?>>  classes;
-	final Properties properties;
+	private final Map<String,Class<?>>  classes;
+	private final Properties properties;
+	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
 
 	public ManualConfiguration() {
 		classes = new HashMap<String,Class<?>>();
 		properties = new Properties( );
+		providedServices = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
 	}
 
 	public ManualConfiguration addProperty(String key , String value) {
@@ -79,5 +82,9 @@ public class ManualConfiguration implements SearchConfiguration {
 
 	public SearchMapping getProgrammaticMapping() {
 		return null;
+	}
+
+	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+		return providedServices;
 	}
 }

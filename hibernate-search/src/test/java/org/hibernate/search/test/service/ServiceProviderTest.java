@@ -23,6 +23,20 @@ public class ServiceProviderTest extends TestCase {
 		assertFalse( MyServiceProvider.isActive() );
 	}
 
+	public void testProvidedService() throws Exception {
+		ProvidedServiceProvider.resetActive();
+		assertNull( ProvidedServiceProvider.isActive() );
+		final ManualConfiguration configuration = new ManualConfiguration();
+		configuration
+				.addProperty( "hibernate.search.default.directory_provider", ProvidedServiceDirectoryProvider.class.getName() )
+				.addClass( Telephone.class )
+				.getProvidedServices().put( ProvidedServiceProvider.class, new ProvidedService(true) );
+		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		assertNull( ProvidedServiceProvider.isActive() );
+		sf.close();
+		assertNull( ProvidedServiceProvider.isActive() );
+	}
+
 	public void testServiceNotFound() throws Exception {
 		final ManualConfiguration configuration = new ManualConfiguration();
 		configuration.addProperty( "hibernate.search.default.directory_provider", NoServiceDirectoryProvider.class.getName() )

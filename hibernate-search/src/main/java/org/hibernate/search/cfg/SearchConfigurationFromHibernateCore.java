@@ -23,13 +23,16 @@
  */
 package org.hibernate.search.cfg;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.search.spi.ServiceProvider;
 
 /**
  * Search configuration implementation wrapping an Hibernate Core configuration
@@ -80,6 +83,10 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 
 	public SearchMapping getProgrammaticMapping() {
 		return null;
+	}
+
+	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+		return Collections.emptyMap();
 	}
 
 	private static class ClassIterator implements Iterator<Class<?>> {
