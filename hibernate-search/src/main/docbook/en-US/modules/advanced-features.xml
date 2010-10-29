@@ -192,13 +192,13 @@ finally {
     <classname>Similarity</classname>'s Javadocs for more information.</para>
 
     <para>Hibernate Search provides three ways to modify Lucene's similarity
-    calculation. </para>
+    calculation.</para>
 
     <para>First you can set the default similarity by specifying the fully
     specified classname of your <classname>Similarity</classname>
     implementation using the property
     <constant>hibernate.search.similarity</constant>. The default value is
-    <classname>org.apache.lucene.search.DefaultSimilarity</classname>. </para>
+    <classname>org.apache.lucene.search.DefaultSimilarity</classname>.</para>
 
     <para>You can also override the similarity used for a specific index by
     setting the <literal>similarity</literal> property</para>
@@ -228,68 +228,5 @@ public class Book {
       index setting and the class-level setting as they would conflict. Such a
       configuration will be rejected.</para>
     </warning>
-  </section>
-
-  <section id="section-monitoring">
-    <title>Monitoring</title>
-
-    <para>Hibernate Search offers access to a
-    <classname>Statistics</classname> object via
-    <methodname>SearchFactory.getStatistics()</methodname>. It allows you for
-    example to determine which classes are indexed and how many entities are
-    in the index. This information is always available. However, by specifying
-    the <literal>hibernate.search.generate_statistics</literal> property in
-    your configuration you can also collect total and average Lucene query and
-    object loading timings.</para>
-
-    <section>
-      <title>JMX</title>
-
-      <para>You can also enable access to the statistics via JMX. Setting the
-      property <literal>hibernate.search.jmx_enabled</literal> will
-      automatically register the <classname>StatisticsInfoMBean</classname>.
-      Depending on your the configuration the
-      <classname>IndexControlMBean</classname> and
-      <classname>IndexingProgressMonitorMBean</classname> will also be
-      registered. Lets have a closer look at the different MBeans.<tip>
-          <para>If you want to access your JMX beans remotely via JConsole
-          make sure to set the system property
-          <varname>com.sun.management.jmxremote</varname> to
-          <constant>true</constant>.</para>
-        </tip></para>
-
-      <section>
-        <title>StatisticsInfoMBean</title>
-
-        <para>This MBean gives you access to <classname>Statistics</classname>
-        object as desribed in the previous section.</para>
-      </section>
-
-      <section>
-        <title>IndexControlMBean</title>
-
-        <para>This MBean allows to build, optimize and purge the index for a
-        given entity. Indexing occurs via the mass indexing API (see<xref
-        linkend="search-batchindex-massindexer" />). A requirement for this
-        bean to be registered in JMX is, that the Hibernate
-        <classname>SessionFactory</classname> is bound to JNDI via the
-        <literal>hibernate.session_factory_name</literal> property. Refer to
-        the Hibernate Core manual for more information on how to configure
-        JNDI. The <classname>IndexControlMBean</classname> and its API are for
-        now experimental.</para>
-      </section>
-
-      <section>
-        <title>IndexingProgressMonitorMBean</title>
-
-        <para>This MBean is an implementation
-        <classname>MassIndexerProgressMonitor</classname> interface. If
-        <literal>hibernate.search.jmx_enabled</literal> is enabled and the
-        mass indexer API is used the indexing progress can be followed via
-        this bean. The bean will only be bound to JMX while indexing is in
-        progress. Once indexing is completed the MBean is not longer
-        available.</para>
-      </section>
-    </section>
   </section>
 </chapter>
