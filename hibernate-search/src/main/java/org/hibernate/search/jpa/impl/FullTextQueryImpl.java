@@ -25,13 +25,16 @@ package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.FlushModeType;
+import javax.persistence.LockTimeoutException;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+import javax.persistence.PessimisticLockException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.LockModeType;
@@ -44,8 +47,10 @@ import org.apache.lucene.search.Explanation;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
+import org.hibernate.LockOptions;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.QueryException;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.Session;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.StaleStateException;
@@ -91,7 +96,17 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	public int getResultSize() {
-		return query.getResultSize();
+		try {
+			return query.getResultSize();
+		}
+		catch ( QueryTimeoutException e ) {
+			throwQueryTimeoutException( e );
+		}
+		return 0;
+	}
+
+	private void throwQueryTimeoutException(QueryTimeoutException e) {
+		throw new javax.persistence.QueryTimeoutException( e.getMessage(), e, this );
 	}
 
 	public FullTextQuery setCriteriaQuery(Criteria criteria) {
@@ -121,6 +136,10 @@ public class FullTextQueryImpl implements FullTextQuery {
 		try {
 			return query.list();
 		}
+		catch ( QueryTimeoutException e ) {
+			throwQueryTimeoutException( e );
+			return null; //never happens
+		}
 		catch ( QueryExecutionRequestException he ) {
 			//TODO when an illegal state exception should be raised?
 			throw new IllegalStateException( he );
@@ -143,9 +162,21 @@ public class FullTextQueryImpl implements FullTextQuery {
 			PersistenceException pe = wrapStaleStateException( ( StaleStateException ) e );
 			throwPersistenceException( pe );
 		}
+		else if ( e instanceof org.hibernate.OptimisticLockException ) {
+			PersistenceException converted = wrapLockException( (HibernateException) e, null );
+			throwPersistenceException( converted );
+		}
+		else if ( e instanceof org.hibernate.PessimisticLockException ) {
+			PersistenceException converted = wrapLockException( (HibernateException) e, null );
+			throwPersistenceException( converted );
+		}
 		else if ( e instanceof ConstraintViolationException ) {
 			//FIXME this is bad cause ConstraintViolationException happens in other circumstances
 			throwPersistenceException( new EntityExistsException( e ) );
+		}
+		else if ( e instanceof org.hibernate.QueryTimeoutException ) {
+			javax.persistence.QueryTimeoutException converted = new javax.persistence.QueryTimeoutException(e.getMessage(), e);
+			throwPersistenceException( converted );
 		}
 		else if ( e instanceof ObjectNotFoundException ) {
 			throwPersistenceException( new EntityNotFoundException( e.getMessage() ) );
@@ -166,6 +197,28 @@ public class FullTextQueryImpl implements FullTextQuery {
 		else {
 			throwPersistenceException( new PersistenceException( e ) );
 		}
+	}
+
+	public PersistenceException wrapLockException(HibernateException e, LockOptions lockOptions) {
+		PersistenceException pe;
+		if ( e instanceof org.hibernate.OptimisticLockException ) {
+			org.hibernate.OptimisticLockException ole = ( org.hibernate.OptimisticLockException ) e;
+			pe = new OptimisticLockException( ole.getMessage(), ole, ole.getEntity() );
+		}
+		else if ( e instanceof org.hibernate.PessimisticLockException ) {
+			org.hibernate.PessimisticLockException ple = ( org.hibernate.PessimisticLockException ) e;
+			if ( lockOptions != null && lockOptions.getTimeOut() > -1 ) {
+				// assume lock timeout occurred if a timeout or NO WAIT was specified
+				pe = new LockTimeoutException( ple.getMessage(), ple, ple.getEntity() );
+			}
+			else {
+				pe = new PessimisticLockException( ple.getMessage(), ple, ple.getEntity() );
+			}
+		}
+		else {
+			pe = new OptimisticLockException( e );
+		}
+		return pe;
 	}
 
 	void throwPersistenceException(PersistenceException e) {
@@ -222,6 +275,10 @@ public class FullTextQueryImpl implements FullTextQuery {
 				return result.get( 0 );
 			}
 			return null; //should never happen
+		}
+		catch ( QueryTimeoutException e ) {
+			throwQueryTimeoutException( e );
+			return null; //never happens
 		}
 		catch ( QueryExecutionRequestException he ) {
 			throw new IllegalStateException( he );
@@ -281,6 +338,17 @@ public class FullTextQueryImpl implements FullTextQuery {
 
 	public Query setHint(String hintName, Object value) {
 		hints.put( hintName, value );
+		if ( "javax.persistence.query.timeout".equals( hintName ) ) {
+			if ( value == null ) {
+				//nothing
+			}
+			else if ( value instanceof String ) {
+				query.setTimeout( new Long( (String) value ).longValue(), TimeUnit.MILLISECONDS );
+			}
+			else if ( value instanceof Number ) {
+				query.setTimeout( ( (Number) value ).longValue(), TimeUnit.MILLISECONDS );
+			}
+		}
 		return this;
 	}
 

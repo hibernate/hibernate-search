@@ -29,6 +29,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.ObjectLoaderBuilder;
+import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -45,17 +46,18 @@ public class ProjectionLoader implements Loader {
 	private String[] aliases;
 	private ObjectLoaderBuilder loaderBuilder;
 
-	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
+	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, TimeoutManager timeoutManager) {
 	}
 
-	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, ResultTransformer transformer, ObjectLoaderBuilder loaderBuilder, String[] aliases) {
-		init(session, searchFactoryImplementor);
+	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, ResultTransformer transformer, ObjectLoaderBuilder loaderBuilder, String[] aliases, TimeoutManager timeoutManager) {
+		init(session, searchFactoryImplementor, timeoutManager);
 		this.transformer = transformer;
 		this.aliases = aliases;
 		this.loaderBuilder = loaderBuilder;
 	}
 
 	public Object load(EntityInfo entityInfo) {
+		//no need to timeouManage here, the underlying loader is the real time consumer
 		initThisProjectionFlag(entityInfo);
 		if (projectThis) {
 			for (int index : entityInfo.indexesOfThis) {
@@ -84,6 +86,7 @@ public class ProjectionLoader implements Loader {
 	}
 
 	public List load(EntityInfo... entityInfos) {
+		//no need to timeouManage here, the underlying loader is the real time consumer
 		List results = new ArrayList(entityInfos.length);
 		if (entityInfos.length == 0) {
 			return results;

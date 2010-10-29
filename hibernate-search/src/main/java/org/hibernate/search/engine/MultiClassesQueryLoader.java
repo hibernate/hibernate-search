@@ -33,6 +33,7 @@ import java.util.Set;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.query.TimeoutManager;
 
 /**
  * A loader which loads objects of multiple types.
@@ -43,11 +44,13 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	private Session session;
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private List<RootEntityMetadata> entityMatadata;
+	private TimeoutManager timeoutManager;
 
-	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
+	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, TimeoutManager timeoutManager) {
 		super.init( session, searchFactoryImplementor );
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.timeoutManager = timeoutManager;
 	}
 
 	public void setEntityTypes(Set<Class<?>> entityTypes) {
@@ -73,7 +76,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	}
 
 	public Object executeLoad(EntityInfo entityInfo) {
-		return ObjectLoaderHelper.load( entityInfo, session );
+		final Object result = ObjectLoaderHelper.load( entityInfo, session );
+		timeoutManager.isTimedOut();
+		return result;
 	}
 
 	public List executeLoad(EntityInfo... entityInfos) {
@@ -117,7 +122,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			final EntityInfo[] bucketEntityInfos = value.toArray( new EntityInfo[value.size()] );
 
 			ObjectLoaderHelper.initializeObjects( bucketEntityInfos,
-					key.criteria, key.rootEntity, searchFactoryImplementor);
+					key.criteria, key.rootEntity, searchFactoryImplementor, timeoutManager);
+			timeoutManager.isTimedOut();
+
 		}
 		return ObjectLoaderHelper.returnAlreadyLoadedObjectsInCorrectOrder( entityInfos, session );
 	}

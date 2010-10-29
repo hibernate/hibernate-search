@@ -47,6 +47,7 @@ public class ObjectLoaderBuilder {
 	private SessionImplementor session;
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Set<Class<?>> indexedTargetedEntities;
+	private TimeoutManager timeoutManager;
 
 	public ObjectLoaderBuilder criteria(Criteria criteria) {
 		this.criteria = criteria;
@@ -72,14 +73,14 @@ public class ObjectLoaderBuilder {
 
 	private Loader getMultipleEntitiesLoader() {
 		final MultiClassesQueryLoader multiClassesLoader = new MultiClassesQueryLoader();
-		multiClassesLoader.init( (Session) session, searchFactoryImplementor );
+		multiClassesLoader.init( (Session) session, searchFactoryImplementor, timeoutManager );
 		multiClassesLoader.setEntityTypes( indexedTargetedEntities );
 		return multiClassesLoader;
 	}
 
 	private Loader getSingleEntityLoader() {
 		final QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( ( Session ) session, searchFactoryImplementor );
+		queryLoader.init( ( Session ) session, searchFactoryImplementor, timeoutManager );
 		queryLoader.setEntityType( targetedEntities.iterator().next() );
 		return queryLoader;
 	}
@@ -104,7 +105,7 @@ public class ObjectLoaderBuilder {
 			}
 		}
 		QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( ( Session ) session, searchFactoryImplementor );
+		queryLoader.init( ( Session ) session, searchFactoryImplementor, timeoutManager );
 		queryLoader.setEntityType( entityType );
 		queryLoader.setCriteria( criteria );
 		return queryLoader;
@@ -122,6 +123,11 @@ public class ObjectLoaderBuilder {
 
 	public ObjectLoaderBuilder indexedTargetedEntities(Set<Class<?>> indexedTargetedEntities) {
 		this.indexedTargetedEntities = indexedTargetedEntities;
+		return this;
+	}
+
+	public ObjectLoaderBuilder timeoutManager(TimeoutManager timeoutManager) {
+		this.timeoutManager = timeoutManager;
 		return this;
 	}
 }

@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -117,6 +118,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private final Map<String, FullTextFilterImpl> filterDefinitions = new HashMap<String, FullTextFilterImpl>();
 	private int fetchSize = 1;
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
+	private final TimeoutManager timeoutManager;
 
 
 	/**
@@ -139,6 +141,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			String msg = "None of the specified entity types or any of their subclasses are indexed.";
 			throw new IllegalArgumentException( msg );
 		}
+		timeoutManager = new TimeoutManager( );
 	}
 
 	/**
@@ -167,13 +170,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//user stops using it
 		//scrollable is better in this area
 
+		timeoutManager.start( luceneQuery );
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
 			return new IteratorImpl( Collections.EMPTY_LIST, noLoader );
 		}
 		try {
-			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
+			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize()  );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
 
@@ -184,8 +188,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			);
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
+				//TODO should we measure on each extractor?
+				if ( index % 10 == 0 ) timeoutManager.isTimedOut();
 			}
 			Loader loader = getLoader();
+			//stop timeout manager, the iterator pace is in the user's hands
+			timeoutManager.stop();
 			return new IteratorImpl( infos, loader );
 		}
 		catch ( IOException e ) {
@@ -215,7 +223,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				.targetedEntities(targetedEntities)
 				.indexedTargetedEntities(indexedTargetedEntities)
 				.session(session)
-				.searchFactory(searchFactoryImplementor);
+				.searchFactory(searchFactoryImplementor)
+				.timeoutManager(timeoutManager);
 		if ( indexProjection != null ) {
 			return getProjectionLoader( loaderBuilder );
 		}
@@ -226,13 +235,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	private Loader getProjectionLoader(ObjectLoaderBuilder loaderBuilder) {
 		ProjectionLoader loader = new ProjectionLoader();
-		loader.init( ( Session ) session, searchFactoryImplementor, resultTransformer, loaderBuilder, indexProjection );
+		loader.init( ( Session ) session, searchFactoryImplementor, resultTransformer, loaderBuilder, indexProjection, timeoutManager );
 		return loader;
 	}
 
 	public ScrollableResults scroll() throws HibernateException {
 		//keep the searcher open until the resultset is closed
-
+		timeoutManager.start( luceneQuery );
 		//find the directories
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		//FIXME: handle null searcher
@@ -244,6 +253,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
 			);
 			Loader loader = getLoader();
+			//stop timeout manager, the iterator pace is in the user's hands
+			timeoutManager.stop();
 			return new ScrollableResultsImpl(
 					searcher, first, max, fetchSize, extractor, loader, searchFactoryImplementor, this.session
 			);
@@ -267,6 +278,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public List list() throws HibernateException {
 		//find the directories
+		timeoutManager.start(luceneQuery);
 		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
 			return Collections.EMPTY_LIST;
@@ -283,9 +295,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			);
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
+				//TODO should we measure on each extractor?
+				if ( index % 10 == 0 ) timeoutManager.isTimedOut();
 			}
 			Loader loader = getLoader();
 			List list = loader.load( infos.toArray( new EntityInfo[infos.size()] ) );
+			//no need to timeoutManager.isTimedOut from this point, we don't do anything intensive
 			if ( resultTransformer == null || loader instanceof ProjectionLoader ) {
 				//stay consistent with transformTuple which can only be executed during a projection
 				return list;
@@ -308,6 +323,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public Explanation explain(int documentId) {
+		//don't use TimeoutManager here as explain is a dev tool when things are weird... or slow :)
 		Explanation explanation = null;
 		Searcher searcher = buildSearcher( searchFactoryImplementor, true );
 		if ( searcher == null ) {
@@ -358,10 +374,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
-			queryHits = new QueryHits( searcher, query, filter, sort );
+			queryHits = new QueryHits( searcher, query, filter, sort, timeoutManager );
 		}
 		else {
-			queryHits = new QueryHits( searcher, query, filter, sort, n );
+			queryHits = new QueryHits( searcher, query, filter, sort, n, timeoutManager );
 		}
 		resultSize = queryHits.totalHits;
 
@@ -809,6 +825,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public int getResultSize() {
 		if ( resultSize == null ) {
+			//the timeoutManager does not need to be stopped nor reset as a start does indeed reset
+			timeoutManager.start( luceneQuery );
 			//get result size without object initialization
 			IndexSearcher searcher = buildSearcher( searchFactoryImplementor, false );
 			if ( searcher == null ) {
@@ -934,6 +952,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		filterDefinitions.remove( name );
 	}
 
+	@Override
+	public FullTextQuery setTimeout(int timeout) {
+		return setTimeout( timeout, TimeUnit.SECONDS );
+	}
+
+	public FullTextQuery setTimeout(long timeout, TimeUnit timeUnit) {
+		super.setTimeout( (int)timeUnit.toSeconds( timeout ) );
+		timeoutManager.setTimeout( timeout, timeUnit );
+		return this;
+	}
+
 	private SearchFactoryImplementor getSearchFactoryImplementor() {
 		if ( searchFactoryImplementor == null ) {
 			searchFactoryImplementor = ContextHelper.getSearchFactoryBySFI( session );
@@ -942,7 +971,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private static Loader noLoader = new Loader() {
-		public void init(Session session, SearchFactoryImplementor searchFactoryImplementor) {
+		public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, TimeoutManager timeoutManager) {
 		}
 
 		public Object load(EntityInfo entityInfo) {
