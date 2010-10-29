@@ -477,19 +477,19 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			catch ( IllegalAccessException e ) {
 				throw new SearchException(
 						"Unable to access @Factory method: "
-								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName()
+								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
 				);
 			}
 			catch ( InvocationTargetException e ) {
 				throw new SearchException(
 						"Unable to access @Factory method: "
-								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName()
+								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
 				);
 			}
 			catch ( ClassCastException e ) {
 				throw new SearchException(
 						"@Key method does not return a org.apache.lucene.search.Filter class: "
-								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName()
+								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
 				);
 			}
 		}
