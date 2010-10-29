@@ -819,6 +819,78 @@ String authorName = firstResult[2];</programlisting>
           </listitem>
         </itemizedlist>
       </section>
+
+      <section>
+        <title>Limiting the time of a query</title>
+
+        <para>You can decide to stop a query if when it takes more than a
+        predefined amount of time. Note that this is a best effort basis but
+        if Hibernate Search still has significant work to do and if we are
+        beyond the time limit, a <classname>QueryTimeoutException</classname>
+        will be raised
+        (<classname>org.hibernate.QueryTimeoutException</classname> or
+        <classname>javax.persistence.QueryTimeoutException</classname>
+        depending on your programmatic API).</para>
+
+        <para>To define the limit when using the native Hibernate APIs, use
+        one of the following approaches</para>
+
+        <example>
+          <title>Defining a timeout in query execution</title>
+
+          <programlisting>Query luceneQuery = ...;
+FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
+
+//define the timeout in seconds
+query.setTimeout(5);
+
+//alternatively, define the timeout in any given time unit
+query.setTimeout(450, TimeUnit.MILLISECONDS);
+
+try {
+    query.list();
+}
+catch (org.hibernate.QueryTimeoutException e) {
+    //do something, too slow
+}</programlisting>
+        </example>
+
+        <para>Likewise <literal>getResultSize()</literal>,
+        <methodname>iterate()</methodname> and
+        <methodname>scroll()</methodname> honor the timeout but only until the
+        end of the method call. That simply means that the methods of
+        <classname>Iterable</classname> or the
+        <classname>ScrollableResults</classname> ignore the timeout.</para>
+
+        <note>
+          <para><methodname>explain()</methodname> does not honor the timeout:
+          this method is used for debug purposes and in particular to find out
+          why a query is slow ;)</para>
+        </note>
+
+        <para>When using JPA, simply use the standard way of limiting query
+        execution time.</para>
+
+        <example>
+          <title>Defining a timeout in query execution</title>
+
+          <programlisting>Query luceneQuery = ...;
+FullTextQuery query = fullTextEM.createFullTextQuery(luceneQuery, User.class);
+
+//define the timeout in milliseconds
+query.setHint( "javax.persistence.query.timeout", 450 );
+
+try {
+    query.getResultList();
+}
+catch (javax.persistence.QueryTimeoutException e) {
+    //do something, too slow
+}</programlisting>
+        </example>
+
+        <para>Remember, this is a best effort basis and not a guarantee to
+        stop passed a certain time.</para>
+      </section>
     </section>
   </section>
 
