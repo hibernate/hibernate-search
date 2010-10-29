@@ -1,6 +1,31 @@
 Hibernate Search Changelog
 ==========================
 
+3.3.0.Beta3 (1-11-2010)
+-----------------------
+
+** Bug
+    * [HSEARCH-608] - Index not created if path contains tilde like ~/.lucene/
+    * [HSEARCH-616] - Factory method invocation in FullTextQueryImpl swallows exception
+
+
+** Improvement
+    * [HSEARCH-405] - Be able to set Similarity per index in configuration properties
+    * [HSEARCH-424] - Update to Lucene 3.0
+    * [HSEARCH-569] - duplicate identifiers on @AnalyzerDef are accepted and don't warn about the inconsistent configuration
+
+** New Feature
+    * [HSEARCH-374] - Timeout support for full-text searches
+    * [HSEARCH-603] - Support pluggable services and expose them to pluggable components like DirectoryProviders and ReaderProviders
+
+
+** Task
+    * [HSEARCH-524] - Migrate unit tests to H2 (instead of HSQLDB) for inclusion in the Hudson train
+    * [HSEARCH-607] - Consider creating a distribution project
+    * [HSEARCH-613] - Automatic archetype install and deploy
+    * [HSEARCH-617] - Move monitoring section as top level chapter
+
+
 3.3.0.Beta2 (15-10-2010)
 ------------------------
 
