@@ -25,7 +25,6 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="search-query" xreflabel="Querying">
-
   <title>Querying</title>
 
   <para>The second most important capability of Hibernate Search is the
@@ -777,44 +776,46 @@ String authorName = firstResult[2];</programlisting>
 
         <itemizedlist>
           <listitem>
-            <para>FullTextQuery.THIS: returns the initialized and managed
-            entity (as a non projected query would have done).</para>
+            <para><classname>FullTextQuery.THIS</classname>: returns the
+            initialized and managed entity (as a non projected query would
+            have done).</para>
           </listitem>
 
           <listitem>
-            <para>FullTextQuery.DOCUMENT: returns the Lucene Document related
-            to the object projected.</para>
+            <para><classname>FullTextQuery.DOCUMENT</classname>: returns the
+            Lucene Document related to the object projected.</para>
           </listitem>
 
           <listitem>
-            <para>FullTextQuery.OBJECT_CLASS: returns the class of the indexed
-            entity.</para>
+            <para><classname>FullTextQuery.OBJECT_CLASS</classname>: returns
+            the class of the indexed entity.</para>
           </listitem>
 
           <listitem>
-            <para>FullTextQuery.SCORE: returns the document score in the
-            query. Scores are handy to compare one result against an other for
-            a given query but are useless when comparing the result of
-            different queries.</para>
+            <para><classname>FullTextQuery.SCORE</classname>: returns the
+            document score in the query. Scores are handy to compare one
+            result against an other for a given query but are useless when
+            comparing the result of different queries.</para>
           </listitem>
 
           <listitem>
-            <para>FullTextQuery.ID: the id property value of the projected
-            object.</para>
+            <para><classname>FullTextQuery.ID</classname>: the id property
+            value of the projected object.</para>
           </listitem>
 
           <listitem>
-            <para>FullTextQuery.DOCUMENT_ID: the Lucene document id. Careful,
-            Lucene document id can change overtime between two different
-            IndexReader opening (this feature is experimental).</para>
+            <para><classname>FullTextQuery.DOCUMENT_ID</classname>: the Lucene
+            document id. Careful, Lucene document id can change overtime
+            between two different IndexReader opening (this feature is
+            experimental).</para>
           </listitem>
 
           <listitem>
-            <para>FullTextQuery.EXPLANATION: returns the Lucene Explanation
-            object for the matching object/document in the given query. Do not
-            use if you retrieve a lot of data. Running explanation typically
-            is as costly as running the whole Lucene query per matching
-            element. Make sure you use projection!</para>
+            <para><classname>FullTextQuery.EXPLANATION</classname>: returns
+            the Lucene Explanation object for the matching object/document in
+            the given query. Do not use if you retrieve a lot of data. Running
+            explanation typically is as costly as running the whole Lucene
+            query per matching element. Make sure you use projection!</para>
           </listitem>
         </itemizedlist>
       </section>
