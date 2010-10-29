@@ -123,6 +123,186 @@ finally {
   </section>
 
   <section>
+    <title>Use external services in Hibernate Search components
+    (experimental)</title>
+
+    <para>By components, this section means any of the pluggable
+    contracts:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><classname>DirectoryProvider</classname></para>
+      </listitem>
+
+      <listitem>
+        <para><classname>ReaderProvider</classname></para>
+      </listitem>
+
+      <listitem>
+        <para><classname>OptimizerStrategy</classname></para>
+      </listitem>
+
+      <listitem>
+        <para><classname>BackendQueueProcessorFactory</classname></para>
+      </listitem>
+
+      <listitem>
+        <para><classname>Worker</classname></para>
+      </listitem>
+    </itemizedlist>
+
+    <para><classname>DirectoryProvider</classname> is the most useful use
+    case.</para>
+
+    <para>Some of these compnents need to access a service either available in
+    the environment or whose lifecycle is bound to the
+    <classname>SearchFactory</classname>. Sometimes, you even want the same
+    service to be shared amongst several instances of these contract. One
+    example is the ability the share an Infinispan cache instance between
+    several directory providers to store the various indexes using the same
+    underlying infrastructure.</para>
+
+    <section>
+      <title>Exposing a service</title>
+
+      <para>To expose a service, you need to implement
+      <classname>org.hibernate.search.spi.ServiceProvider&lt;T&gt;</classname>.
+      <classname>T</classname> is the type of the service you want to use.
+      Services are retrieved in Hibernate Search components via its
+      <classname>ServiceProvider</classname> class implementation.</para>
+
+      <section>
+        <title>Managed services</title>
+
+        <para>If your service ought to be started when Hibernate Search starts
+        and stopped when Hibernate Search stop, you can use a managed service.
+        Make sure to properly implement the <methodname>start</methodname> and
+        <methodname>stop</methodname> methods of
+        <classname>ServiceProvider</classname>. When the service is requested,
+        the <methodname>getService</methodname> method is called.</para>
+
+        <example>
+          <title>Example of ServiceProvider implementation</title>
+
+          <programlisting>public class CacheServiceProvider implements ServiceProvider&lt;Cache&gt; {
+    private CacheManager manager;
+
+    public void start(Properties properties) {
+        //read configuration
+        manager = new CacheManager(properties);
+    }
+
+    public Cache getService() {
+        return manager.getCache(DEFAULT);
+    }
+
+    void stop() {
+        manager.close();
+    }
+}</programlisting>
+        </example>
+
+        <note>
+          <para>The <classname>ServiceProvider</classname> implementation must
+          have a no-arg constructor.</para>
+        </note>
+
+        <para>To be transparently discoverable, such service should have an
+        accompanying
+        <filename>META-INF/services/org.hibernate.search.spi.ServiceProvider</filename>
+        whose content list the (various) service provider
+        implementation(s).</para>
+
+        <example>
+          <title>Content of
+          META-INF/services/org.hibernate.search.spi.ServiceProvider</title>
+
+          <programlisting>com.acme.infra.hibernate.CacheServiceProvider</programlisting>
+        </example>
+      </section>
+
+      <section>
+        <title>Provided services</title>
+
+        <para>Alternatively, the service can be provided by the environment
+        bootstrapping Hibernate Search. For example, Infinispan which uses
+        Hibernate Search as its internal search engine can pass the
+        <classname>CacheContainer</classname> to Hibernate Search. In this
+        case, the <classname>CacheContainer</classname> instance is not
+        managed by Hibernate Search and the <methodname>start</methodname> /
+        <methodname>stop</methodname> methods of its corresponding service
+        provider will not be used.</para>
+
+        <note>
+          <para>Provided services have priority over managed services. If a
+          provider service is registered with the same
+          <classname>ServiceProvider</classname> class as a managed service,
+          the provided service will be used.</para>
+        </note>
+
+        <para>The provided services are passed to Hibernate Search via the
+        <classname>SearchConfiguration</classname> interface
+        (<methodname>getProvidedServices</methodname>).</para>
+
+        <important>
+          <para>Provided services are used by frameworks controlling the
+          lifecycle of Hibernate Search and not by traditional users.</para>
+        </important>
+
+        <para>If, as a user, you want to retrieve a service instance from the
+        environment, use registry services like JNDI and look the service up
+        in the provider.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Using a service</title>
+
+      <para>Many of of the pluggable contracts of Hibernate Search can use
+      services. Services are accessible via the
+      <classname>BuildContext</classname> interface.</para>
+
+      <example>
+        <title>Example of a directory provider using a cache service</title>
+
+        <programlisting>public CustomDirectoryProvider implements DirectoryProvider&lt;RAMDirectory&gt; {
+    private BuildContext context;
+
+    public void initialize(
+        String directoryProviderName, 
+        Properties properties, 
+        BuildContext context) {
+        //initialize
+        this.context = context;
+    }
+
+    public void start() {
+        Cache cache = context.requestService( CacheServiceProvider.class );
+        //use cache
+    }
+
+    public RAMDirectory getDirectory() {
+        // use cache
+    }
+
+    public stop() {
+        //stop services
+        context.releaseService( CacheServiceProvider.class );
+    } 
+}</programlisting>
+      </example>
+
+      <para>When you request a service, an instance of the service is served
+      to you. Make sure to then release the service. It is fundamental. Note
+      that the service can be released in the
+      <methodname>DirectoryProvider.stop</methodname> method if the
+      <classname>DirectoryProvider</classname> uses the service during its
+      lifetime or could be released right away of the service is simply used
+      at initialization time.</para>
+    </section>
+  </section>
+
+  <section>
     <title>Customizing Lucene's scoring formula</title>
 
     <para>Lucene allows the user to customize its scoring formula by extending
