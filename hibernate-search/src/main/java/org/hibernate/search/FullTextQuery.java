@@ -23,6 +23,8 @@
  */
 package org.hibernate.search;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Explanation;
@@ -140,4 +142,15 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *  - org.apache.lucene.search.Query the underlying lucene query
 	 */
 	<T> T unwrap(Class<T> type);
+
+	/**
+	 * Define a timeout period for a given unit of time.
+	 * Note that this is time out is on a best effort basis.
+	 * When the query goes beyond the timeout, a {@link org.hibernate.QueryTimeoutException} is raised.
+	 *
+	 * @param timeout time out period
+	 * @param timeUnit time out unit
+	 *
+	 */
+	FullTextQuery setTimeout(long timeout, TimeUnit timeUnit);
 }

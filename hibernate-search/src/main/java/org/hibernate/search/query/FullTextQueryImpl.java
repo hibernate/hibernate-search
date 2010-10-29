@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -949,6 +950,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public void disableFullTextFilter(String name) {
 		filterDefinitions.remove( name );
+	}
+
+	@Override
+	public FullTextQuery setTimeout(int timeout) {
+		return setTimeout( timeout, TimeUnit.SECONDS );
+	}
+
+	public FullTextQuery setTimeout(long timeout, TimeUnit timeUnit) {
+		super.setTimeout( (int)timeUnit.toSeconds( timeout ) );
+		timeoutManager.setTimeout( timeout, timeUnit );
+		return this;
 	}
 
 	private SearchFactoryImplementor getSearchFactoryImplementor() {

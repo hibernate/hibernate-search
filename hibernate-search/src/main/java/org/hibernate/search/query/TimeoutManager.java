@@ -1,6 +1,7 @@
 package org.hibernate.search.query;
 
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Query;
 
@@ -25,15 +26,6 @@ public class TimeoutManager {
 		if ( timeout == null ) return;
 		this.luceneQuery = luceneQuery;
 		this.start = System.nanoTime();
-	}
-
-	/**
-	 * Timeout in milliseconds
-	 *
-	 * @param timeout
-	 */
-	public void setTimeoutInMilliseconds(long timeout) {
-		this.timeout = timeout * 1000000;
 	}
 
 	public Long getTimeoutLeftInMilliseconds() {
@@ -88,5 +80,9 @@ public class TimeoutManager {
 
 	public void stop() {
 		this.timeout = null;
+	}
+
+	public void setTimeout(long timeout, TimeUnit timeUnit) {
+		this.timeout = timeUnit.toNanos( timeout );
 	}
 }
