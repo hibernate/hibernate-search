@@ -77,7 +77,7 @@ public class TimeoutManager {
 			timedOut = elapsedTime > timeout;
 			if ( ! bestEffort ) {
 				throw new QueryTimeoutException(
-						"Full-text query took longer than expected (in ms): " + elapsedTime/1000,
+						"Full-text query took longer than expected (in microsecond): " + TimeUnit.NANOSECONDS.toMicros( elapsedTime ),
 						( SQLException) null,
 						luceneQuery.toString()
 				);
