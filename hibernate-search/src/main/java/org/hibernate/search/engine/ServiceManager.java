@@ -72,7 +72,7 @@ public class ServiceManager {
 		}
 	}
 
-	public <T> T registerServiceUse(Class<? extends ServiceProvider<T>> serviceProviderClass) {
+	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass) {
 		//provided services have priority over managed services
 		if ( providedProviders.containsKey( serviceProviderClass ) ) {
 			//we use containsKey as the service itself might be null
@@ -89,7 +89,7 @@ public class ServiceManager {
 		return (T) wrapper.getServiceProvider().getService();
 	}
 
-	public void unregisterServiceUse(Class<? extends ServiceProvider<?>> serviceProviderClass) {
+	public void releaseService(Class<? extends ServiceProvider<?>> serviceProviderClass) {
 		//provided services have priority over managed services
 		if ( providedProviders.containsKey( serviceProviderClass ) ) {
 			return;

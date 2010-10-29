@@ -606,12 +606,12 @@ public class SearchFactoryBuilder {
 			return factoryState.getDirectoryProviderData().get( dp ).getDirLock();
 		}
 
-		public <T> T registerServiceUse(Class<? extends ServiceProvider<T>> provider) {
-			return factoryState.getServiceManager().registerServiceUse( provider );
+		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
+			return factoryState.getServiceManager().requestService( provider );
 		}
 
-		public void unregisterServiceUse(Class<? extends ServiceProvider<?>> provider) {
-			factoryState.getServiceManager().unregisterServiceUse( provider );
+		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
+			factoryState.getServiceManager().releaseService( provider );
 		}
 
 		public Similarity getSimilarity(DirectoryProvider<?> provider) {

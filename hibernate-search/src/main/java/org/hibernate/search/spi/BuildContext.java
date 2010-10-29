@@ -70,20 +70,21 @@ public interface BuildContext {
 
 	/**
 	 * Declare the use of a service.
-	 * All callers of this method must call #unregisterServiceUse(Class<ServiceProvider<?>> provider)
+	 * All callers of this method must call
+	 * (@link #releaseService}
 	 * or the service will not be released
 	 *
 	 * @param provider of the service
 	 * @param <T> class of the service
 	 * @return the service instance
 	 */
-	<T> T registerServiceUse(Class<? extends ServiceProvider<T>> provider);
+	<T> T requestService(Class<? extends ServiceProvider<T>> provider);
 
 	/**
-	 * Release a service from duty. Each call to #registerServiceUse should be coupled with
-	 * a call to #unregisterServiceUse when the service is no longer needed.
+	 * Release a service from duty. Each call to (@link #requestService} should be coupled with
+	 * a call to (@link #releaseService} when the service is no longer needed.
 	 * 
 	 * @param provider of thr service
 	 */
-	void unregisterServiceUse(Class<? extends ServiceProvider<?>> provider);
+	void releaseService(Class<? extends ServiceProvider<?>> provider);
 }

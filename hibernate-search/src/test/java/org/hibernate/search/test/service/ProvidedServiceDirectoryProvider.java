@@ -21,7 +21,7 @@ public class ProvidedServiceDirectoryProvider extends RAMDirectoryProvider {
 
 	@Override
 	public void start() {
-		final ProvidedService foo = context.registerServiceUse( ProvidedServiceProvider.class );
+		final ProvidedService foo = context.requestService( ProvidedServiceProvider.class );
 		if (foo == null) throw new RuntimeException( "service should be started" );
 		if ( ! foo.isProvided() ) throw new RuntimeException( "provided service should be used" ); 
 		super.start();
@@ -30,6 +30,6 @@ public class ProvidedServiceDirectoryProvider extends RAMDirectoryProvider {
 	@Override
 	public void stop() {
 		super.stop();
-		context.unregisterServiceUse( ProvidedServiceProvider.class );
+		context.releaseService( ProvidedServiceProvider.class );
 	}
 }

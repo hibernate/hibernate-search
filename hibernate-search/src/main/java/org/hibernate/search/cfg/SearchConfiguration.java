@@ -87,7 +87,7 @@ public interface SearchConfiguration {
 	 *
 	 * Return the provided services (provider and instance at stake)
 	 * These services are passed untouched by Hibernate Search via the
-	 * {@link org.hibernate.search.spi.BuildContext#registerServiceUse(Class)} API
+	 * {@link org.hibernate.search.spi.BuildContext#requestService(Class)} API
 	 *
 	 * Note that the lifecycle methods:
 	 *  - {@link org.hibernate.search.spi.ServiceProvider#start(java.util.Properties)}

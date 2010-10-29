@@ -21,7 +21,7 @@ public class NoServiceDirectoryProvider extends RAMDirectoryProvider {
 
 	@Override
 	public void start() {
-		final MyService foo = context.registerServiceUse( NoMetadataFileServiceProvider.class );
+		final MyService foo = context.requestService( NoMetadataFileServiceProvider.class );
 		if (foo == null) throw new RuntimeException( "service should be started" );
 		super.start();
 	}
@@ -29,6 +29,6 @@ public class NoServiceDirectoryProvider extends RAMDirectoryProvider {
 	@Override
 	public void stop() {
 		super.stop();
-		context.unregisterServiceUse( NoMetadataFileServiceProvider.class );
+		context.releaseService( NoMetadataFileServiceProvider.class );
 	}
 }
