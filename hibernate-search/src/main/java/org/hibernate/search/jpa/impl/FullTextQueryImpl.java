@@ -25,6 +25,7 @@ package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.FlushModeType;
@@ -282,6 +283,17 @@ public class FullTextQueryImpl implements FullTextQuery {
 
 	public Query setHint(String hintName, Object value) {
 		hints.put( hintName, value );
+		if ( "javax.persistence.query.timeout".equals( hintName ) ) {
+			if ( value == null ) {
+				//nothing
+			}
+			else if ( value instanceof String ) {
+				query.setTimeout( new Long( (String) value ).longValue(), TimeUnit.MILLISECONDS );
+			}
+			else if ( value instanceof Number ) {
+				query.setTimeout( ( (Number) value ).longValue(), TimeUnit.MILLISECONDS );
+			}
+		}
 		return this;
 	}
 
