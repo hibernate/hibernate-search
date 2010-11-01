@@ -7,8 +7,8 @@ Hibernate Search Changelog
 ** Bug
     * [HSEARCH-608] - Index not created if path contains tilde like ~/.lucene/
     * [HSEARCH-616] - Factory method invocation in FullTextQueryImpl swallows exception
-
-
+    * [HSEARCH-619] - Update documentation about hibernate-search-analyzers module
+    
 ** Improvement
     * [HSEARCH-405] - Be able to set Similarity per index in configuration properties
     * [HSEARCH-424] - Update to Lucene 3.0
