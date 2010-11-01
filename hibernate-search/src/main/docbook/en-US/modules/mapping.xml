@@ -717,8 +717,22 @@ public class MyEntity {
         <classname>Tokenizer</classname> starts the tokenizing process by
         turning the character input into tokens which are then further
         processed by the <classname>TokenFilter</classname>s. Hibernate Search
-        supports this infrastructure by utilizing the Solr analyzer framework.
-        </para>
+        supports this infrastructure by utilizing the Solr analyzer
+        framework.</para>
+
+        <warning>
+          <para>Prior to Search version 3.3.0.Beta2 it was required to add the
+          Solr dependency <emphasis>org.apache.solr:solr-core</emphasis> when
+          you wanted to use the analyzer definition framework. As of version
+          3.3.0.Beta2 this is not the case anymore. The required Solr code is
+          encapsulated in the artifact
+          <emphasis>org.hibernate:hibernate-search-analyzers</emphasis>. In
+          case you are using maven just add the following dependency (see also
+          <ulink
+          url="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-593">HSEARCH-593</ulink>):<programlisting>&lt;groupId&gt;org.hibernate&lt;/groupId&gt; 
+&lt;artifactId&gt;hibernate-search-analyzers&lt;/artifactId&gt;
+&lt;version&gt;&version;&lt;/version&gt;</programlisting></para>
+        </warning>
 
         <tip>
           <para>Some of the analyzers and filters will require additional
@@ -915,7 +929,7 @@ public class Team {
                 <entry><classname>PatternTokenizerFactory</classname></entry>
 
                 <entry>Breaks text at the specified regular expression
-                pattern. </entry>
+                pattern.</entry>
 
                 <entry><para><literal>pattern</literal>: the regular
                 expression to use for tokenizing</para><para>group: says which
@@ -1027,7 +1041,7 @@ public class Team {
                 <classname>java.text.CollationKey</classname>, and then
                 encodes the <classname>CollationKey</classname> with
                 <classname>IndexableBinaryStringTools</classname>, to allow it
-                to be stored as an index term. </entry>
+                to be stored as an index term.</entry>
 
                 <entry><literal>custom</literal>, <literal>language</literal>,
                 <literal>country</literal>, <literal>variant</literal>,
