@@ -52,7 +52,7 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git//github.com:hibernate/hibernate-serch.git</connection>
+        <connection>scm:git:git//github.com:hibernate/hibernate-search.git</connection>
         <developerConnection>scm:git:git//github.com:hibernate/hibernate-search.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-search</url>
     </scm>
