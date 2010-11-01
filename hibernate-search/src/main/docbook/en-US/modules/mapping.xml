@@ -175,9 +175,9 @@ public class Essay {
       specified in the same scope as @Field or @DocumentId.
       @NumericField can be specified for Integer, Long, Float and Double properties
       and at index time the value will be indexed using a
-      <ulink url="http://en.wikipedia.org/wiki/Trie">Trie structure</ulink>
+      <ulink url="http://en.wikipedia.org/wiki/Trie">Trie structure</ulink>.
       When a property is indexed as @NumericField, it enables efficient
-      range query and sorting, orders of magnitude faster then doing the same query
+      range query and sorting, orders of magnitude faster than doing the same query
       on standard @Field properties.
 
       The @NumericField annotation accept the following parameters:
@@ -196,7 +196,7 @@ public class Essay {
                 <row>
                   <entry align="left">forField</entry>
 
-                  <entry>(Optional) Specify the name of of the related @Field that will ne indexed as numeric
+                  <entry>(Optional) Specify the name of of the related @Field that will be indexed as numeric.
                   It's only mandatory when the property contains more than a @Field declaration
                   </entry>
                 </row>
@@ -204,9 +204,9 @@ public class Essay {
                 <row>
                   <entry align="left">precisionStep</entry>
 
-                  <entry>(Optional) Fine tune the way the Trie structure is stored in the index. Smaller precisionSteps
-                  leads to more disk space usage and faster range and sort queries. Larger values leads to less space
-                  used and range query performance more like range with normal @Fields. Default value is 4.</entry>
+                  <entry>(Optional) Change the way that the Trie structure is stored in the index. Smaller precisionSteps
+                  lead to more disk space usage and faster range and sort queries. Larger values lead to less space
+                  used and range query performance more close to the range query in normal @Fields. Default value is 4.</entry>
                 </row>
 
               </tbody>
