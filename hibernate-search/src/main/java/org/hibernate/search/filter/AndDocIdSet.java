@@ -26,49 +26,64 @@ package org.hibernate.search.filter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import static java.lang.Math.max;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.OpenBitSet;
 
+import static java.lang.Math.max;
+
 /**
  * A DocIdSet built as applying "AND" operation to a list of other DocIdSet(s).
  * The DocIdSetIterator returned will return only document ids contained
  * in all DocIdSet(s) handed to the constructor.
- * 
+ *
  * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  */
 public class AndDocIdSet extends DocIdSet {
-	
+
 	private DocIdSet docIdBitSet;
 	private final List<DocIdSet> andedDocIdSets;
 	private final int maxDocNumber;
-	
+
 	public AndDocIdSet(List<DocIdSet> andedDocIdSets, int maxDocs) {
-		if ( andedDocIdSets == null || andedDocIdSets.size() < 2 )
+		if ( andedDocIdSets == null || andedDocIdSets.size() < 2 ) {
 			throw new IllegalArgumentException( "To \"and\" some DocIdSet(s) they should be at least 2" );
+		}
 		this.andedDocIdSets = new ArrayList<DocIdSet>( andedDocIdSets ); // make a defensive mutable copy
 		this.maxDocNumber = maxDocs;
 	}
-	
-	private synchronized DocIdSet buildBitset() throws IOException {
-		if ( docIdBitSet != null ) return docIdBitSet; // check for concurrent initialization
+
+	@Override
+	public DocIdSetIterator iterator() throws IOException {
+		return buildBitSet().iterator();
+	}
+
+	@Override
+	public boolean isCacheable() {
+		return true;
+	}
+
+	private synchronized DocIdSet buildBitSet() throws IOException {
+		if ( docIdBitSet != null ) {
+			return docIdBitSet;
+		} // check for concurrent initialization
 		//TODO if all andedDocIdSets are actually DocIdBitSet, use their internal BitSet instead of next algo.
 		//TODO if some andedDocIdSets are DocIdBitSet, merge them first.
 		int size = andedDocIdSets.size();
 		DocIdSetIterator[] iterators = new DocIdSetIterator[size];
-		for (int i=0; i<size; i++) {
+		for ( int i = 0; i < size; i++ ) {
 			// build all iterators
-			iterators[i] = andedDocIdSets.get(i).iterator();
+			iterators[i] = andedDocIdSets.get( i ).iterator();
 		}
 		andedDocIdSets.clear(); // contained DocIdSets are not needed any more, release them.
 		docIdBitSet = makeDocIdSetOnAgreedBits( iterators ); // before returning hold a copy as cache
 		return docIdBitSet;
 	}
 
-	private final DocIdSet makeDocIdSetOnAgreedBits(final DocIdSetIterator[] iterators) throws IOException {
-		final int iteratorSize = iterators.length;
+	private DocIdSet makeDocIdSetOnAgreedBits(final DocIdSetIterator[] iterators) throws IOException {
+		final int numberOfIterators = iterators.length;
 		int targetPosition = Integer.MIN_VALUE;
 		int votes = 0;
 		// Each iterator can vote "ok" for the current target to
@@ -77,25 +92,27 @@ public class AndDocIdSet extends DocIdSet {
 		// for the others and he is considered "first" in the voting round (every iterator votes for himself ;-)
 		int i = 0;
 		//iterator initialize, just one "next" for each DocIdSetIterator
-		for ( ; i<iteratorSize; i++ ) {
+		for (; i < numberOfIterators; i++ ) {
 			final DocIdSetIterator iterator = iterators[i];
 			final int position = iterator.nextDoc();
-			if ( position==DocIdSetIterator.NO_MORE_DOCS ) {
+			if ( position == DocIdSetIterator.NO_MORE_DOCS ) {
 				//current iterator has no values, so skip all
 				return DocIdSet.EMPTY_DOCIDSET;
 			}
-			if ( targetPosition==position ) {
+			if ( targetPosition == position ) {
 				votes++; //stopped as same position of others
 			}
 			else {
 				targetPosition = max( targetPosition, position );
-				if (targetPosition==position) //means it changed
-					votes=1;
+				if ( targetPosition == position ) //means it changed
+				{
+					votes = 1;
+				}
 			}
 		}
 		final OpenBitSet result = new OpenBitSet( maxDocNumber );
 		// end iterator initialize
-		if (votes==iteratorSize) {
+		if ( votes == numberOfIterators ) {
 			result.fastSet( targetPosition );
 			targetPosition++;
 		}
@@ -105,10 +122,11 @@ public class AndDocIdSet extends DocIdSet {
 		while ( true ) {
 			final DocIdSetIterator iterator = iterators[i];
 			final int position = iterator.advance( targetPosition );
-			if ( position==DocIdSetIterator.NO_MORE_DOCS )
-				return result; //exit condition
+			if ( position == DocIdSetIterator.NO_MORE_DOCS ) {
+				return result;
+			} //exit condition
 			if ( position == targetPosition ) {
-				if ( ++votes == iteratorSize ) {
+				if ( ++votes == numberOfIterators ) {
 					result.fastSet( position );
 					votes = 0;
 					targetPosition++;
@@ -118,18 +136,7 @@ public class AndDocIdSet extends DocIdSet {
 				votes = 1;
 				targetPosition = position;
 			}
-			i = ++i % iteratorSize;
+			i = ++i % numberOfIterators;
 		}
 	}
-
-	@Override
-	public DocIdSetIterator iterator() throws IOException {
-		return buildBitset().iterator();
-	}
-	
-	@Override
-	public boolean isCacheable() {
-		return true;
-	}
-	
 }
