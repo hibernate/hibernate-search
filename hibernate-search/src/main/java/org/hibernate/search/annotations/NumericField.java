@@ -1,7 +1,5 @@
 package org.hibernate.search.annotations;
 
-import org.hibernate.search.bridge.util.NumericFieldUtils;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,10 +16,16 @@ public @interface NumericField {
 	/**
 	 * Precision step for numeric field. The less, more terms will be present in the index
 	 */
-	int precisionStep() default NumericFieldUtils.PRECISION_STEP_DEFAULT;
+	int precisionStep() default PRECISION_STEP_DEFAULT;
 
 	/**
 	 * Field name it refers to. If omitted, refers to the @Field annotation in case there's only one
 	 */
 	String forField() default "";
+
+	/**
+	 * Default precision step.
+	 * (Mimic Lucene's default precision step value)
+	 */
+	static final int PRECISION_STEP_DEFAULT = 4;
 }

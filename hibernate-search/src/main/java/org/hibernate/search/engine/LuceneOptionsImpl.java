@@ -51,7 +51,7 @@ class LuceneOptionsImpl implements LuceneOptions {
 	private final TermVector termVector;
 	private final Float boost;
 	private final Store storeType;
-	private int precisionStep = NumericFieldUtils.PRECISION_STEP_DEFAULT;
+	private int precisionStep = org.hibernate.search.annotations.NumericField.PRECISION_STEP_DEFAULT;
 
 	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost, int precisionStep) {
 		this(store,indexMode,termVector,boost);

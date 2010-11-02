@@ -38,7 +38,6 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
-import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -658,7 +657,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	protected Integer getPrecisionStep(NumericField numericFieldAnn) {
-		return numericFieldAnn==null ? NumericFieldUtils.PRECISION_STEP_DEFAULT : numericFieldAnn.precisionStep();
+		return numericFieldAnn==null ? NumericField.PRECISION_STEP_DEFAULT : numericFieldAnn.precisionStep();
 	}
 
 	private String buildEmbeddedPrefix(String prefix, IndexedEmbedded embeddedAnn, XProperty member) {

@@ -13,8 +13,6 @@ import org.hibernate.search.SearchException;
  */
 public class NumericFieldUtils {
 
-	public static final int PRECISION_STEP_DEFAULT = NumericUtils.PRECISION_STEP_DEFAULT;
-
 	public static Query createNumericRangeQuery(String fieldName, Object from, Object to,
 												boolean includeLower, boolean includeUpper) {
 		Class numericClass = from.getClass();
