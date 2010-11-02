@@ -25,17 +25,20 @@ package org.hibernate.search.test.filter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import junit.framework.TestCase;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
-import org.hibernate.search.filter.AndDocIdSet;
+import org.apache.lucene.util.OpenBitSet;
+import org.apache.lucene.util.SortedVIntList;
 
-import junit.framework.TestCase;
+import org.hibernate.search.filter.AndDocIdSet;
 
 /**
  * Functionality testcase for org.hibernate.search.filter.AndDocIdSet.
@@ -44,38 +47,39 @@ import junit.framework.TestCase;
  * The numbers show the AndDocIdSet should be used only when it's not
  * possible to rely on a BitSet; in this class however we use BitSet
  * as it's useful to test the implementation.
- * 
+ *
+ * @author Sanne Grinovero
  * @see AndDocIdSet
  * @see BitSet
- * @author Sanne Grinovero
  */
 public class AndDocIdSetsTest extends TestCase {
-	
-	static final List<Integer> testDataFrom0to9 =  toImmutableList( 0,1,2,3,4,5,6,7,8,9 );
-	static final List<Integer> testDataFrom1to10 = toImmutableList( 1,2,3,4,5,6,7,8,9,10 );
-	static final List<Integer> testDataFrom1to9 = toImmutableList( 1,2,3,4,5,6,7,8,9 );
 
-	private static final List<Integer> toImmutableList(int... is) {
+	static final List<Integer> testDataFrom0to9 = toImmutableList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 );
+	static final List<Integer> testDataFrom1to10 = toImmutableList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+	static final List<Integer> testDataFrom1to9 = toImmutableList( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
+
+	private static List<Integer> toImmutableList(int... is) {
 		List<Integer> l = new ArrayList<Integer>( is.length );
-		for ( int i=0; i<is.length; i++ ) {
-			l.add( Integer.valueOf( is[i] ) );
+		for ( int i1 : is ) {
+			l.add( i1 );
 		}
 		return Collections.unmodifiableList( l );
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	List<Integer> andLists(List<Integer>... lists) {
-		if (lists.length==0) {
+		if ( lists.length == 0 ) {
 			return Collections.EMPTY_LIST;
 		}
 		List<Integer> result = new ArrayList<Integer>( lists[0] );
-		for (int i=1; i<lists.length; i++) {
+		for ( int i = 1; i < lists.length; i++ ) {
 			result.retainAll( lists[i] );
 		}
 		return result;
 	}
-	
+
 	// auto-testing of test utility methods for AND operations on test arrays
+
 	@SuppressWarnings("unchecked")
 	public void testAndingArrays() {
 		List<Integer> andLists = andLists( testDataFrom0to9, testDataFrom1to10 );
@@ -83,25 +87,26 @@ public class AndDocIdSetsTest extends TestCase {
 		assertFalse( andLists.contains( Integer.valueOf( 0 ) ) );
 		assertFalse( andLists.contains( Integer.valueOf( 10 ) ) );
 		assertTrue( andLists.equals( testDataFrom1to9 ) );
-		DocIdSet docIdSet0_9 = arrayToDocIdSet(testDataFrom0to9);
-		DocIdSet docIdSet1_10 = arrayToDocIdSet(testDataFrom1to10);
-		DocIdSet docIdSet1_9 = arrayToDocIdSet(testDataFrom1to9);
+		DocIdSet docIdSet0_9 = arrayToDocIdSet( testDataFrom0to9 );
+		DocIdSet docIdSet1_10 = arrayToDocIdSet( testDataFrom1to10 );
+		DocIdSet docIdSet1_9 = arrayToDocIdSet( testDataFrom1to9 );
 		assertTrue( docIdSetsEqual( docIdSet0_9, docIdSet0_9 ) );
 		assertTrue( docIdSetsEqual( docIdSet1_10, docIdSet1_10 ) );
 		assertFalse( docIdSetsEqual( docIdSet1_10, docIdSet1_9 ) );
 		assertFalse( docIdSetsEqual( docIdSet0_9, docIdSet1_9 ) );
 	}
-	
+
 	// auto-testing of test utility methods for conversion in DocIdSetIterator
+
 	public void testIteratorMatchesTestArray() throws IOException {
-		DocIdSet docIdSet0_9 = arrayToDocIdSet(testDataFrom0to9);
+		DocIdSet docIdSet0_9 = arrayToDocIdSet( testDataFrom0to9 );
 		DocIdSetIterator docIdSetIterator = docIdSet0_9.iterator();
 		assertTrue( docIdSetIterator.nextDoc() != DocIdSetIterator.NO_MORE_DOCS );
 		assertEquals( 0, docIdSetIterator.docID() );
-		assertEquals( 9, docIdSetIterator.advance(9) );
-		assertEquals( DocIdSetIterator.NO_MORE_DOCS, docIdSetIterator.advance(10) );
+		assertEquals( 9, docIdSetIterator.advance( 9 ) );
+		assertEquals( DocIdSetIterator.NO_MORE_DOCS, docIdSetIterator.advance( 10 ) );
 	}
-	
+
 	public void testAndDocIdSets() {
 		List<DocIdSet> filters = new ArrayList<DocIdSet>( 2 );
 		filters.add( arrayToDocIdSet( testDataFrom0to9 ) );
@@ -110,26 +115,26 @@ public class AndDocIdSetsTest extends TestCase {
 		DocIdSet testedSet = new AndDocIdSet( filters, 10 );
 		assertTrue( docIdSetsEqual( expected, testedSet ) );
 	}
-	
-	public void testOnRandomBigArrays(){
+
+	public void testOnRandomBigArrays() {
 		onRandomBigArraysTest( 13L );
 		onRandomBigArraysTest( 9L );
 		onRandomBigArraysTest( 71L );
 	}
-	
+
 	public void onRandomBigArraysTest(long randomSeed) {
 		List<BitSet> filtersData = makeRandomBitSetList( randomSeed, 4, 1000000, 1500000 );
 		BitSet expectedBitset = applyANDOnBitSets( filtersData );
 		List<DocIdSet> filters = toDocIdSetList( filtersData );
 		DocIdBitSet expectedDocIdSet = new DocIdBitSet( expectedBitset );
 		DocIdSet testedSet = new AndDocIdSet( filters, 1500000 );
-		assertTrue( docIdSetsEqual(expectedDocIdSet, testedSet) );
+		assertTrue( docIdSetsEqual( expectedDocIdSet, testedSet ) );
 	}
-	
+
 	private static List<DocIdSet> toDocIdSetList(List<BitSet> filtersData) {
 		List<DocIdSet> docIdSets = new ArrayList<DocIdSet>( filtersData.size() );
-		for (BitSet bitSet : filtersData) {
-			docIdSets.add ( new DocIdBitSet(bitSet) );
+		for ( BitSet bitSet : filtersData ) {
+			docIdSets.add( new DocIdBitSet( bitSet ) );
 		}
 		return docIdSets;
 	}
@@ -142,41 +147,45 @@ public class AndDocIdSetsTest extends TestCase {
 		compareAndingPerformance( 4, 100000000, 150000000 );
 		compareAndingPerformance( 8, 100000000, 150000000 );
 	}
-	
+
 	private static void compareAndingPerformance(final int listSize,
-			final int minBitsSize, final int maxBitsSize) throws IOException {
+												 final int minBitsSize, final int maxBitsSize) throws IOException {
 		List<BitSet> filtersData = makeRandomBitSetList( 13L, listSize, minBitsSize, maxBitsSize );
 		DocIdSet andedByBitsResult = null;
 		DocIdSet andedByIterationResult = null;
 		{
 			long startTime = System.currentTimeMillis();
-			for ( int i=0; i<1000; i++ ) {
+			for ( int i = 0; i < 1000; i++ ) {
 				BitSet expectedBitset = applyANDOnBitSets( filtersData );
 				andedByBitsResult = new DocIdBitSet( expectedBitset );
 				// iteration is needed to have a fair comparison with other impl:
 				iterateOnResults( andedByBitsResult );
 			}
 			long totalTimeMs = System.currentTimeMillis() - startTime;
-			System.out.println( "Time to \"AND " + listSize + 
-				" BitSets and iterate on results\" 1000 times: " +
-				totalTimeMs + "ms. (" +
-				minBitsSize +" minimum BitSet size)");
+			System.out.println(
+					"Time to \"AND " + listSize +
+							" BitSets and iterate on results\" 1000 times: " +
+							totalTimeMs + "ms. (" +
+							minBitsSize + " minimum BitSet size)"
+			);
 		}
 		List<DocIdSet> docIdSetList = toDocIdSetList( filtersData );
 		{
 			long startTime = System.currentTimeMillis();
-			for ( int i=0; i<1000; i++ ) {
+			for ( int i = 0; i < 1000; i++ ) {
 				andedByIterationResult = new AndDocIdSet( docIdSetList, maxBitsSize );
 				// iteration is needed because the AND is been done lazily on iterator access:
 				iterateOnResults( andedByIterationResult );
 			}
 			long totalTimeMs = System.currentTimeMillis() - startTime;
-			System.out.println( "Time to \"use AndDocIdSet iterator on " + listSize + 
-				" Filters and iterate on results\" 1000 times: " +
-				totalTimeMs + "ms. (" +
-				minBitsSize +" minimum BitSet size)");
+			System.out.println(
+					"Time to \"use AndDocIdSet iterator on " + listSize +
+							" Filters and iterate on results\" 1000 times: " +
+							totalTimeMs + "ms. (" +
+							minBitsSize + " minimum BitSet size)"
+			);
 		}
-		System.out.println(" Results are same: " + docIdSetsEqual( andedByBitsResult, andedByIterationResult ) );
+		System.out.println( " Results are same: " + docIdSetsEqual( andedByBitsResult, andedByIterationResult ) );
 	}
 
 	private static void iterateOnResults(DocIdSet docIdBitSet) throws IOException {
@@ -188,10 +197,10 @@ public class AndDocIdSetsTest extends TestCase {
 		while ( currentDoc != DocIdSetIterator.NO_MORE_DOCS );
 	}
 
-	private static final BitSet applyANDOnBitSets(final List<BitSet> filtersData) {
+	private static BitSet applyANDOnBitSets(final List<BitSet> filtersData) {
 		BitSet andedBitSet = null;
-		for (BitSet bits : filtersData) {
-			if ( andedBitSet==null ) {
+		for ( BitSet bits : filtersData ) {
+			if ( andedBitSet == null ) {
 				andedBitSet = (BitSet) bits.clone();
 			}
 			else {
@@ -202,48 +211,61 @@ public class AndDocIdSetsTest extends TestCase {
 	}
 
 	private static List<BitSet> makeRandomBitSetList(final long randomSeed, final int listSize,
-			final int minBitsSize, final int maxBitsSize) {
+													 final int minBitsSize, final int maxBitsSize) {
 		Random r = new Random( randomSeed ); //have a fixed Seed for repeatable tests
-		List<BitSet> restulList = new ArrayList<BitSet>( listSize );
-		for (int i=0; i<listSize; i++) {
-			int arraySize = minBitsSize + r.nextInt( maxBitsSize-minBitsSize );
-			restulList.add( makeRandomBitSet( r, arraySize) );
+		List<BitSet> resultList = new ArrayList<BitSet>( listSize );
+		for ( int i = 0; i < listSize; i++ ) {
+			int arraySize = minBitsSize + r.nextInt( maxBitsSize - minBitsSize );
+			resultList.add( makeRandomBitSet( r, arraySize ) );
 		}
-		return restulList;
+		return resultList;
 	}
-	
-	private static BitSet makeRandomBitSet(final Random randomSource, final int maxSize){
+
+	private static BitSet makeRandomBitSet(final Random randomSource, final int maxSize) {
 		BitSet bitSet = new BitSet();
-		for ( int datai=0; datai<maxSize; datai++ ) {
+		for ( int datai = 0; datai < maxSize; datai++ ) {
 			// each bit has 50% change to be set:
-			if ( randomSource.nextBoolean() ) bitSet.set( datai );
+			if ( randomSource.nextBoolean() ) {
+				bitSet.set( datai );
+			}
 		}
 		return bitSet;
 	}
-	
+
 	/**
-	 * converts a list of Integers representing Document ids
+	 * Converts a list of Integers representing Document ids
 	 * into a Lucene DocIdSet
-	 * @param docIdList
-	 * @return
+	 *
+	 * @param docIdList list of integers to convert
+	 *
+	 * @return a instance of {@code DocIdBitSet} filled with the integers from the specified list
 	 */
 	public DocIdSet arrayToDocIdSet(List<Integer> docIdList) {
 		BitSet bitset = new BitSet();
-		for (int i : docIdList) {
-			bitset.set(i);
+		for ( int i : docIdList ) {
+			bitset.set( i );
 		}
-		return new DocIdBitSet(bitset);
+		return new DocIdBitSet( bitset );
 	}
-	
+
+	public DocIdSet integersToDocIdSet(int... integers) {
+		BitSet bitset = new BitSet();
+		for ( int i : integers ) {
+			bitset.set( i );
+		}
+		return new DocIdBitSet( bitset );
+	}
+
 	/**
-	 * @param expected
-	 * @param tested
+	 * @param expected the doc id set as expected
+	 * @param actual the doc id test as returned by the test
+	 *
 	 * @return true if the two DocIdSet are equal: contain the same number of ids, same order and all are equal
 	 */
-	public static final boolean docIdSetsEqual(DocIdSet expected, DocIdSet tested) {
-		try{
+	public static boolean docIdSetsEqual(DocIdSet expected, DocIdSet actual) {
+		try {
 			DocIdSetIterator iterA = expected.iterator();
-			DocIdSetIterator iterB = tested.iterator();
+			DocIdSetIterator iterB = actual.iterator();
 			int nextA;
 			int nextB;
 			do {
@@ -253,12 +275,47 @@ public class AndDocIdSetsTest extends TestCase {
 					return false;
 				}
 				assertEquals( iterA.docID(), iterB.docID() );
-			} while ( nextA !=  DocIdSetIterator.NO_MORE_DOCS );
+			} while ( nextA != DocIdSetIterator.NO_MORE_DOCS );
 		}
-		catch (IOException ioe) {
+		catch ( IOException ioe ) {
 			fail( "these DocIdSetIterator instances should not throw any exceptions" );
 		}
 		return true;
 	}
 
+	// HSEARCH-610
+	public void testWithOpenBitSet() throws IOException {
+		DocIdSet idSet1 = new OpenBitSet( new long[] { 1121 }, 1 );  // bits 0, 5, 6, 10
+		DocIdSet idSet2 = new OpenBitSet( new long[] { 64 }, 1 ); // bit 6
+		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
+
+		DocIdSet expected = integersToDocIdSet( 6 );
+		assertTrue( docIdSetsEqual( expected, actual ) );
+	}
+
+	// HSEARCH-610
+	public void testWithDocIdBitSet() throws IOException {
+		DocIdSet idSet1 = integersToDocIdSet( 0, 5, 6, 10 );
+		DocIdSet idSet2 = integersToDocIdSet( 6 );
+		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
+
+		DocIdSet expected = integersToDocIdSet( 6 );
+		assertTrue( docIdSetsEqual( expected, actual ) );
+	}
+
+	// HSEARCH-610
+	public void testWithSortedVIntList() throws IOException {
+		SortedVIntList idSet1 = new SortedVIntList( 0, 5, 6, 10 );
+		SortedVIntList idSet2 = new SortedVIntList( 6 );
+		AndDocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
+
+		DocIdSet expected = integersToDocIdSet( 6 );
+		assertTrue( docIdSetsEqual( expected, actual ) );
+	}
+
+	private AndDocIdSet createAndDocIdSet(DocIdSet... docIdSets) {
+		List<DocIdSet> list = new ArrayList<DocIdSet>();
+		list.addAll( Arrays.asList( docIdSets ) );
+		return new AndDocIdSet( list, 100 );
+	}
 }
