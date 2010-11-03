@@ -172,7 +172,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 		timeoutManager.start( luceneQuery );
 		//find the directories
-		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
+		IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
 			return new IteratorImpl( Collections.EMPTY_LIST, noLoader );
 		}
@@ -201,7 +201,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 		finally {
 			try {
-				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
+				closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
 			}
 			catch ( SearchException e ) {
 				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
@@ -243,7 +243,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//keep the searcher open until the resultset is closed
 		timeoutManager.start( luceneQuery );
 		//find the directories
-		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
+		IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor );
 		//FIXME: handle null searcher
 		try {
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
@@ -256,13 +256,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			//stop timeout manager, the iterator pace is in the user's hands
 			timeoutManager.stop();
 			return new ScrollableResultsImpl(
-					searcher, first, max, fetchSize, extractor, loader, searchFactoryImplementor, this.session
+					searcher.getSearcher(), first, max, fetchSize, extractor, loader, searchFactoryImplementor, this.session
 			);
 		}
 		catch ( IOException e ) {
 			//close only in case of exception
 			try {
-				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
+				closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
 			}
 			catch ( SearchException ee ) {
 				//we have the initial issue already
@@ -279,7 +279,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	public List list() throws HibernateException {
 		//find the directories
 		timeoutManager.start(luceneQuery);
-		IndexSearcher searcher = buildSearcher( searchFactoryImplementor );
+		IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
 			return Collections.EMPTY_LIST;
 		}
@@ -314,7 +314,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 		finally {
 			try {
-				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
+				closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
 			}
 			catch ( SearchException e ) {
 				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
@@ -325,7 +325,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	public Explanation explain(int documentId) {
 		//don't use TimeoutManager here as explain is a dev tool when things are weird... or slow :)
 		Explanation explanation = null;
-		Searcher searcher = buildSearcher( searchFactoryImplementor, true );
+		IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor, true );
 		if ( searcher == null ) {
 			throw new SearchException(
 					"Unable to build explanation for document id:"
@@ -335,7 +335,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		try {
 			org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
 			buildFilters();
-			explanation = searcher.explain( query, documentId );
+			explanation = searcher.getSearcher().explain( query, documentId );
 		}
 		catch ( IOException e ) {
 			throw new HibernateException( "Unable to query Lucene index and build explanation", e );
@@ -343,7 +343,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		finally {
 			//searcher cannot be null
 			try {
-				closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
+				closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
 			}
 			catch ( SearchException e ) {
 				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
@@ -362,7 +362,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 *
 	 * @throws IOException in case there is an error executing the lucene search.
 	 */
-	private QueryHits getQueryHits(Searcher searcher, Integer n) throws IOException {
+	private QueryHits getQueryHits(IndexSearcherWithPayload searcher, Integer n) throws IOException {
 		org.apache.lucene.search.Query query = filterQueryByClasses( luceneQuery );
 		buildFilters();
 		QueryHits queryHits;
@@ -658,7 +658,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				0;
 	}
 
-	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
+	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
 		return buildSearcher(searchFactoryImplementor, null);
 	}
 
@@ -671,7 +671,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * @return the <code>IndexSearcher</code> for this query (can be <code>null</code>.
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
-	private IndexSearcher buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
+	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
 		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
 		List<DirectoryProvider> targetedDirectories = new ArrayList<DirectoryProvider>();
 		Set<String> idFieldNames = new HashSet<String>();
@@ -761,10 +761,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//handle the sort and projection
 		final String[] projection = this.indexProjection;
 		if ( Boolean.TRUE.equals( forceScoring ) ) {
-			is.setDefaultFieldSortScoring(true, true);
+			return new IndexSearcherWithPayload( is, true, true );
 		}
 		else if ( Boolean.FALSE.equals( forceScoring ) ) {
-			is.setDefaultFieldSortScoring(false, false);
+			return new IndexSearcherWithPayload( is, false, false );
 		}
 		else if ( this.sort != null && projection != null ) {
 			boolean activate = false;
@@ -775,10 +775,11 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				}
 			}
 			if (activate) {
-				is.setDefaultFieldSortScoring(true, false);
+				return new IndexSearcherWithPayload( is, true, false );
 			}
 		}
-		return is;
+		//default
+		return new IndexSearcherWithPayload( is, false, false );
 	}
 
 	private void populateDirectories(List<DirectoryProvider> directories, DocumentBuilderIndexedEntity builder) {
@@ -828,7 +829,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			//the timeoutManager does not need to be stopped nor reset as a start does indeed reset
 			timeoutManager.start( luceneQuery );
 			//get result size without object initialization
-			IndexSearcher searcher = buildSearcher( searchFactoryImplementor, false );
+			IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor, false );
 			if ( searcher == null ) {
 				resultSize = 0;
 			}
@@ -846,7 +847,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				finally {
 					//searcher cannot be null
 					try {
-						closeSearcher( searcher, searchFactoryImplementor.getReaderProvider() );
+						closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
 						//searchFactoryImplementor.getReaderProvider().closeReader( searcher.getIndexReader() );
 					}
 					catch ( SearchException e ) {
