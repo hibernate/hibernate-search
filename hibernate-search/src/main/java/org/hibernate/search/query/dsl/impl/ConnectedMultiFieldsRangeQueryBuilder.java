@@ -33,6 +33,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
@@ -85,37 +88,47 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	}
 
 	public Query createQuery(FieldContext fieldContext) {
-		final Query perFieldQuery;
+		Query perFieldQuery;
 		final String fieldName = fieldContext.getField();
 		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
 
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 
-		final Object fromObject = rangeContext.getFrom();
-		final String fromString  = fieldContext.isIgnoreFieldBridge() ?
-				fromObject == null ? null : fromObject.toString() :
-				documentBuilder.objectToString( fieldName, fromObject );
-		final String lowerTerm = fromString == null ?
-				null :
-				Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
+		FieldBridge fieldBridge = documentBuilder.getBridge(fieldContext.getField());
 
+
+		final Object fromObject = rangeContext.getFrom();
 		final Object toObject = rangeContext.getTo();
-		final String toString  = fieldContext.isIgnoreFieldBridge() ?
-				toObject == null ? null : toObject.toString() :
-				documentBuilder.objectToString( fieldName, toObject );
-		final String upperTerm = toString == null ?
-				null :
-				Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
-		
-		perFieldQuery = new TermRangeQuery(
-				fieldName,
-				lowerTerm,
-				upperTerm,
-				!rangeContext.isExcludeFrom(),
-				!rangeContext.isExcludeTo()
-		);
+
+		if (fieldBridge!=null && NumericFieldBridge.class.isAssignableFrom(fieldBridge.getClass())) {
+			perFieldQuery = NumericFieldUtils.createNumericRangeQuery(fieldName, fromObject, toObject, !rangeContext.isExcludeTo(), !rangeContext.isExcludeFrom() );
+		} else {
+
+			final String fromString  = fieldContext.isIgnoreFieldBridge() ?
+					fromObject == null ? null : fromObject.toString() :
+					documentBuilder.objectToString( fieldName, fromObject );
+			final String lowerTerm = fromString == null ?
+					null :
+					Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
+
+			final String toString  = fieldContext.isIgnoreFieldBridge() ?
+					toObject == null ? null : toObject.toString() :
+					documentBuilder.objectToString( fieldName, toObject );
+			final String upperTerm = toString == null ?
+					null :
+					Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
+
+			perFieldQuery = new TermRangeQuery(
+					fieldName,
+					lowerTerm,
+					upperTerm,
+					!rangeContext.isExcludeFrom(),
+					!rangeContext.isExcludeTo()
+			);
+		}
+
+
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
-
 
 }

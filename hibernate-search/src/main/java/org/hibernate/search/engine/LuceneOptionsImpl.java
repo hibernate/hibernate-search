@@ -28,16 +28,20 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.TermVector;
+import org.apache.lucene.document.NumericField;
 
 import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.util.NumericFieldUtils;
 
 /**
  * A wrapper class for Lucene parameters needed for indexing.
  *
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
+ * @author Gustavo Fernandes
  */
 class LuceneOptionsImpl implements LuceneOptions {
 
@@ -47,6 +51,12 @@ class LuceneOptionsImpl implements LuceneOptions {
 	private final TermVector termVector;
 	private final Float boost;
 	private final Store storeType;
+	private int precisionStep = org.hibernate.search.annotations.NumericField.PRECISION_STEP_DEFAULT;
+
+	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost, int precisionStep) {
+		this(store,indexMode,termVector,boost);
+		this.precisionStep = precisionStep;
+	}
 
 	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost) {
 		this.indexMode = indexMode;
@@ -65,6 +75,24 @@ class LuceneOptionsImpl implements LuceneOptions {
 			}
 			if ( storeCompressed ) {
 				compressedFieldAdd( name, indexedString, document );
+			}
+		}
+	}
+
+	public void addNumericFieldToDocument(String fieldName, Object value, Document document) {
+		if ( storeType == Store.COMPRESS ) {
+			throw new SearchException("Error indexing field "+fieldName+", @NumericField cannot be compressed");
+		}
+		if (value != null) {
+			NumericField numericField = new NumericField(
+					fieldName, precisionStep, storeType != Store.NO ? Field.Store.YES : Field.Store.NO, true);
+			NumericFieldUtils.setNumericValue(value, numericField);
+			if ( boost != null ) {
+				numericField.setBoost( boost );
+			}
+
+			if (numericField.getNumericValue() != null) {
+				document.add( numericField );
 			}
 		}
 	}

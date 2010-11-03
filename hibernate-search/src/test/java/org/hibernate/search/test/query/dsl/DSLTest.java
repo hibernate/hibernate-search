@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.lucene.document.DateTools;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
@@ -84,7 +85,6 @@ public class DSLTest extends SearchTestCase {
 				.matching( "2" )
 				.createQuery();
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-
 		transaction.commit();
 	}
 
@@ -424,6 +424,48 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	public void testNumericRangeQueries() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb.range()
+				.onField( "raindropInMm" )
+				.from(0.23d)
+				.to(0.24d)
+				.createQuery();
+
+		assertTrue(query.getClass().isAssignableFrom(NumericRangeQuery.class));
+
+		List results = fullTextSession.createFullTextQuery(query, Month.class).list();
+
+		assertEquals("test range numeric ", 1, results.size());
+		assertEquals("test range numeric ", "January", ((Month)results.get(0)).getName());
+
+
+		transaction.commit();
+	}
+
+
+	public void testNumericFieldsTermQuery() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb.keyword()
+				.onField( "raindropInMm" )
+				.matching(0.231d)
+				.createQuery();
+
+		assertTrue(query.getClass().isAssignableFrom(NumericRangeQuery.class));
+
+		assertEquals(
+				"test term numeric ", 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize()
+		);
+
+		transaction.commit();
+	}
+
 
 //	public void testTermQueryOnAnalyzer() throws Exception {
 //		FullTextSession fullTextSession = indexTestData();
@@ -545,7 +587,8 @@ public class DSLTest extends SearchTestCase {
 						1,
 						"Month of colder and whitening",
 						"Historically colder than any other month in the northern hemisphere",
-						calendar.getTime()
+						calendar.getTime(),
+						0.231d
 				)
 		);
 		calendar.set( 100 + 1900, 2, 12, 0, 0, 0 );
@@ -555,7 +598,8 @@ public class DSLTest extends SearchTestCase {
 						2,
 						"Month of snowboarding",
 						"Historically, the month where we make babies while watching the whitening landscape",
-						calendar.getTime()
+						calendar.getTime(),
+						0.435d
 				)
 		);
 		tx.commit();

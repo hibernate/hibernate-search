@@ -34,6 +34,7 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.util.NumericUtils;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
@@ -44,6 +45,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -462,6 +464,50 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	public void testProjectionInNumericFields() throws Exception {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+
+
+		Transaction tx = s.beginTransaction();
+		FootballTeam chelsea = new FootballTeam(1, "Chelsea", 0.5d, 4);
+		FootballTeam manUtd = new FootballTeam(2, "Manchester United", 700.5d, 18);
+		FootballTeam liverpool = new FootballTeam(3, "Liverpool", 502.4d, 18);
+		s.save( manUtd );
+		s.save( liverpool );
+		s.save( chelsea );
+
+		tx.commit();
+
+		s.clear();
+		tx = s.beginTransaction();
+
+		Query query = NumericFieldUtils.createNumericRangeQuery("debtInMillions", 600d, 800d, true, true);
+
+		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, FootballTeam.class );
+		hibQuery.setProjection("nrTitles", "name", "debtInMillions");
+
+		List result = hibQuery.list();
+		assertEquals(1, result.size());
+
+		Object[] projection = ( Object[] ) result.get( 0 );
+		assertNotNull( projection );
+		assertTrue( "Numeric int Field not projected", projection[0] instanceof Integer );
+		assertTrue( "String Field not projected", projection[1] instanceof String );
+		assertTrue( "Numeric double Field not projected", projection[2] instanceof Double );
+
+		assertEquals(18, projection[0]);
+		assertEquals("Manchester United", projection[1]);
+		assertEquals(700.5d, projection[2]);
+
+		//cleanup
+		for ( Object element : s.createQuery( "from " + FootballTeam.class.getName() ).list() ) {
+			s.delete( element );
+		}
+		tx.commit();
+		s.close();
+
+	}
+
 	private void prepEmployeeIndex(FullTextSession s) {
 		Transaction tx = s.beginTransaction();
 		Employee e1 = new Employee( 1000, "Griffin", "ITech" );
@@ -562,7 +608,8 @@ public class ProjectionQueryTest extends SearchTestCase {
 				Author.class,
 				Employee.class,
 				Husband.class,
-				Spouse.class
+				Spouse.class,
+				FootballTeam.class
 		};
 	}
 }

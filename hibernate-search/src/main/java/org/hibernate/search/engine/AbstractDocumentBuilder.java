@@ -35,6 +35,9 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.search.Similarity;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.NumericFields;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -480,11 +483,24 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private void checkForFields(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context) {
 		org.hibernate.search.annotations.Fields fieldsAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Fields.class );
+		NumericFields numericAnns = member.getAnnotation( NumericFields.class );
 		if ( fieldsAnn != null ) {
 			for ( org.hibernate.search.annotations.Field fieldAnn : fieldsAnn.value() ) {
-				bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, context );
+				bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, getNumericExtension(fieldAnn,numericAnns), context );
 			}
 		}
+	}
+
+	private NumericField getNumericExtension(org.hibernate.search.annotations.Field fieldAnn, NumericFields numericFields) {
+		if(numericFields == null) {
+			return null;
+		}
+		for (NumericField numericField: numericFields.value()) {
+			if(numericField.forField().equals(fieldAnn.name())) {
+				return numericField;
+			}
+		}
+		return null;
 	}
 
 	private void checkForSimilarity(XClass currClass) {
@@ -511,8 +527,13 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private void checkForField(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context) {
 		org.hibernate.search.annotations.Field fieldAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Field.class );
+		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
+		DocumentId idAnn = member.getAnnotation(DocumentId.class);
 		if ( fieldAnn != null ) {
-			bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, context );
+			bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, numericFieldAnn, context );
+		}
+		if ( (fieldAnn == null && idAnn == null) && numericFieldAnn != null) {
+			throw new SearchException("@NumericField without a @Field on property '" + member.getName() +"'");
 		}
 	}
 
@@ -614,7 +635,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		addToScopedAnalyzer( fieldName, analyzer, ann.index() );
 	}
 
-	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, ConfigContext context) {
+	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, NumericField numericFieldAnn, ConfigContext context) {
 		ReflectionHelper.setAccessible( member );
 		propertiesMetadata.fieldGetters.add( member );
 		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
@@ -624,7 +645,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
 		propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
 		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
-		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, member, reflectionManager ) );
+		propertiesMetadata.precisionSteps.add( getPrecisionStep( numericFieldAnn ) );
+		propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( fieldAnn, numericFieldAnn, member, reflectionManager ) );
 
 		// Field > property > entity analyzer
 		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer(), context );
@@ -632,6 +654,10 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			analyzer = getAnalyzer( member, context );
 		}
 		addToScopedAnalyzer( fieldName, analyzer, fieldAnn.index() );
+	}
+
+	protected Integer getPrecisionStep(NumericField numericFieldAnn) {
+		return numericFieldAnn==null ? NumericField.PRECISION_STEP_DEFAULT : numericFieldAnn.precisionStep();
 	}
 
 	private String buildEmbeddedPrefix(String prefix, IndexedEmbedded embeddedAnn, XProperty member) {
@@ -766,6 +792,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		public final List<Field.Index> fieldIndex = new ArrayList<Field.Index>();
 		public final List<Float> fieldBoosts = new ArrayList<Float>();
 		public final List<BoostStrategy> dynamicFieldBoosts = new ArrayList<BoostStrategy>();
+		public final List<Integer> precisionSteps = new ArrayList<Integer>();
 
 		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
 		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
@@ -800,7 +827,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 					fieldStore.get( i ),
 					fieldIndex.get( i ),
 					fieldTermVectors.get( i ),
-					fieldBoosts.get( i ) * dynamicFieldBoosts.get( i ).defineBoost( value )
+					fieldBoosts.get( i ) * dynamicFieldBoosts.get( i ).defineBoost( value ),
+					precisionSteps.get(i)
 			);
 			return options;
 		}

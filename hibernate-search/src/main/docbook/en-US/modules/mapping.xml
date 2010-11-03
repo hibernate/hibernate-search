@@ -171,6 +171,50 @@ public class Essay {
         </listitem>
       </itemizedlist>
 
+      <para>There's a companion annotation called @NumericField that can be
+      specified in the same scope as @Field or @DocumentId.
+      @NumericField can be specified for Integer, Long, Float and Double properties
+      and at index time the value will be indexed using a
+      <ulink url="http://en.wikipedia.org/wiki/Trie">Trie structure</ulink>.
+      When a property is indexed as @NumericField, it enables efficient
+      range query and sorting, orders of magnitude faster than doing the same query
+      on standard @Field properties.
+
+      The @NumericField annotation accept the following parameters:
+
+      <informaltable align="left" width="">
+            <tgroup cols="2">
+              <thead>
+                <row>
+                  <entry align="center">Value</entry>
+
+                  <entry align="center">Definition</entry>
+                </row>
+              </thead>
+
+              <tbody>
+                <row>
+                  <entry align="left">forField</entry>
+
+                  <entry>(Optional) Specify the name of of the related @Field that will be indexed as numeric.
+                  It's only mandatory when the property contains more than a @Field declaration
+                  </entry>
+                </row>
+
+                <row>
+                  <entry align="left">precisionStep</entry>
+
+                  <entry>(Optional) Change the way that the Trie structure is stored in the index. Smaller precisionSteps
+                  lead to more disk space usage and faster range and sort queries. Larger values lead to less space
+                  used and range query performance more close to the range query in normal @Fields. Default value is 4.</entry>
+                </row>
+
+              </tbody>
+            </tgroup>
+          </informaltable>
+
+      </para>
+
       <para>Whether or not you want to store the original data in the index
       depends on how you wish to use the index query result. For a regular
       Hibernate Search usage storing is not necessary. However you might want
@@ -193,7 +237,7 @@ public class Essay {
       id.</para>
 
       <example id="example-annotated-entity">
-        <title>Adding <classname>@DocumentId</classname> ad
+        <title>Adding <classname>@DocumentId</classname> and
         <classname>@Field</classname> annotations to an indexed entity</title>
 
         <programlisting>@Entity
@@ -211,13 +255,17 @@ public class Essay {
     @Lob
     <emphasis role="bold">@Field(index=Index.TOKENIZED)</emphasis>
     public String getText() { return text; }
+
+    <emphasis role="bold">@Field @NumericField( precisionStep = 6)</emphasis>
+    public float getGrade() { return grade; }
 }</programlisting>
       </example>
 
       <para><xref linkend="example-annotated-entity" /> define an index with
-      three fields: <literal>id</literal> , <literal>Abstract</literal> and
-      <literal>text</literal> . Note that by default the field name is
-      decapitalized, following the JavaBean specification</para>
+      four fields: <literal>id</literal> , <literal>Abstract</literal>,
+      <literal>text</literal> and <literal>grade</literal> . Note that by default the field name is
+      decapitalized, following the JavaBean specification</para>. The <literal>grade</literal> field
+      is annotated as Numeric with a slightly larger precisionStep than the default
     </section>
 
     <section>
