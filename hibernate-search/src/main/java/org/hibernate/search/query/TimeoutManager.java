@@ -41,12 +41,25 @@ public class TimeoutManager {
 			return null;
 		}
 		else {
-			long left = timeout - (System.nanoTime() - start);
+			final long currentTime = System.nanoTime();
+			if ( isTimedOut( currentTime ) ) {
+				//0 means no limit so we return the lowest possible value
+				return 1l;
+			}
+			long left = timeout - ( currentTime - start);
+			long result;
 			if ( left % factor == 0 ) {
-				return left / factor;
+				result = left / factor;
 			}
 			else {
-				return (left / factor) + 1;
+				result = (left / factor) + 1;
+			}
+			if ( result <= 0 ) {
+				//0 means no limit so we return the lowest possible value
+				return 1l;
+			}
+			else {
+				return result;
 			}
 		}
 	}
@@ -64,8 +77,16 @@ public class TimeoutManager {
 		if ( timedOut ) {
 			return true;
 		}
+		return isTimedOut( System.nanoTime() );
+	}
+
+	private boolean isTimedOut(long currentTime) {
+		if ( timeout == null ) return false;
+		if ( timedOut ) {
+			return true;
+		}
 		else {
-			final long elapsedTime = System.nanoTime() - start;
+			final long elapsedTime = currentTime - start;
 			timedOut = elapsedTime > timeout;
 			if ( ! bestEffort ) {
 				throw new QueryTimeoutException(
