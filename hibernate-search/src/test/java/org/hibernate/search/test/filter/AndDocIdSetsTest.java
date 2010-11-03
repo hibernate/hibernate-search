@@ -49,6 +49,7 @@ import org.hibernate.search.filter.AndDocIdSet;
  * as it's useful to test the implementation.
  *
  * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  * @see AndDocIdSet
  * @see BitSet
  */
@@ -284,6 +285,7 @@ public class AndDocIdSetsTest extends TestCase {
 	}
 
 	// HSEARCH-610
+
 	public void testWithOpenBitSet() throws IOException {
 		DocIdSet idSet1 = new OpenBitSet( new long[] { 1121 }, 1 );  // bits 0, 5, 6, 10
 		DocIdSet idSet2 = new OpenBitSet( new long[] { 64 }, 1 ); // bit 6
@@ -294,6 +296,7 @@ public class AndDocIdSetsTest extends TestCase {
 	}
 
 	// HSEARCH-610
+
 	public void testWithDocIdBitSet() throws IOException {
 		DocIdSet idSet1 = integersToDocIdSet( 0, 5, 6, 10 );
 		DocIdSet idSet2 = integersToDocIdSet( 6 );
@@ -304,12 +307,22 @@ public class AndDocIdSetsTest extends TestCase {
 	}
 
 	// HSEARCH-610
+
 	public void testWithSortedVIntList() throws IOException {
 		SortedVIntList idSet1 = new SortedVIntList( 0, 5, 6, 10 );
 		SortedVIntList idSet2 = new SortedVIntList( 6 );
 		AndDocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
 
 		DocIdSet expected = integersToDocIdSet( 6 );
+		assertTrue( docIdSetsEqual( expected, actual ) );
+	}
+
+	public void testEmptyDocIdSet() throws Exception {
+		DocIdSet idSet1 = new DocIdBitSet( new BitSet() );
+		DocIdSet idSet2 = integersToDocIdSet( 0, 5, 6, 10 );
+		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
+
+		DocIdSet expected = DocIdSet.EMPTY_DOCIDSET;
 		assertTrue( docIdSetsEqual( expected, actual ) );
 	}
 
