@@ -83,45 +83,29 @@ public class AndDocIdSet extends DocIdSet {
 	}
 
 	private DocIdSet makeDocIdSetOnAgreedBits(final DocIdSetIterator[] iterators) throws IOException {
+		final OpenBitSet result = new OpenBitSet( maxDocNumber );
 		final int numberOfIterators = iterators.length;
-		int targetPosition = Integer.MIN_VALUE;
-		int votes = 0;
+
+		int targetPosition = findFirstTargetPosition( iterators, result );
+
+		if ( targetPosition == DocIdSetIterator.NO_MORE_DOCS ) {
+			return DocIdSet.EMPTY_DOCIDSET;
+		}
+
 		// Each iterator can vote "ok" for the current target to
 		// be reached; when all agree the bit is set.
 		// if an iterator disagrees (it jumped longer), it's current position becomes the new targetPosition
 		// for the others and he is considered "first" in the voting round (every iterator votes for himself ;-)
+
 		int i = 0;
-		//iterator initialize, just one "next" for each DocIdSetIterator
-		for (; i < numberOfIterators; i++ ) {
-			final DocIdSetIterator iterator = iterators[i];
-			final int position = iterator.nextDoc();
-			if ( position == DocIdSetIterator.NO_MORE_DOCS ) {
-				//current iterator has no values, so skip all
-				return DocIdSet.EMPTY_DOCIDSET;
-			}
-			if ( targetPosition == position ) {
-				votes++; //stopped as same position of others
-			}
-			else {
-				targetPosition = max( targetPosition, position );
-				if ( targetPosition == position ) //means it changed
-				{
-					votes = 1;
-				}
-			}
-		}
-		final OpenBitSet result = new OpenBitSet( maxDocNumber );
-		// end iterator initialize
-		if ( votes == numberOfIterators ) {
-			result.fastSet( targetPosition );
-			targetPosition++;
-		}
-		i = 0;
-		votes = 0; //could be smarter but would make the code even more complex for a minor optimization out of cycle.
+		int votes = 0; //could be smarter but would make the code even more complex for a minor optimization out of cycle.
 		// enter main loop:
 		while ( true ) {
 			final DocIdSetIterator iterator = iterators[i];
-			final int position = iterator.advance( targetPosition );
+			int position = targetPosition;
+			if ( !iteratorAlreadyOnTargetPosition( targetPosition, iterator ) ) {
+				position = iterator.advance( targetPosition );
+			}
 			if ( position == DocIdSetIterator.NO_MORE_DOCS ) {
 				return result;
 			} //exit condition
@@ -138,5 +122,42 @@ public class AndDocIdSet extends DocIdSet {
 			}
 			i = ++i % numberOfIterators;
 		}
+	}
+
+	// see  HSEARCH-610
+	private boolean iteratorAlreadyOnTargetPosition(int targetPosition, DocIdSetIterator iterator) {
+		return iterator.docID() == targetPosition;
+	}
+
+	private int findFirstTargetPosition(final DocIdSetIterator[] iterators, OpenBitSet result) throws IOException {
+		int targetPosition = iterators[0].nextDoc();
+		if ( targetPosition == DocIdSetIterator.NO_MORE_DOCS ) {
+			// first iterator has no values, so skip all
+			return DocIdSetIterator.NO_MORE_DOCS;
+		}
+
+		boolean allIteratorsShareSameFirstTarget = true;
+
+		//iterator initialize, just one "next" for each DocIdSetIterator
+		for ( int i = 1; i < iterators.length; i++ ) {
+			final DocIdSetIterator iterator = iterators[i];
+			final int position = iterator.nextDoc();
+			if ( position == DocIdSetIterator.NO_MORE_DOCS ) {
+				//current iterator has no values, so skip all
+				return DocIdSetIterator.NO_MORE_DOCS;
+			}
+			if ( targetPosition != position ) {
+				targetPosition = max( targetPosition, position );
+				allIteratorsShareSameFirstTarget = false;
+			}
+		}
+		// end iterator initialize
+
+		if ( allIteratorsShareSameFirstTarget ) {
+			result.fastSet( targetPosition );
+			targetPosition++;
+		}
+
+		return targetPosition;
 	}
 }
