@@ -106,4 +106,8 @@ public class TimeoutManager {
 	public void setTimeout(long timeout, TimeUnit timeUnit) {
 		this.timeout = timeUnit.toNanos( timeout );
 	}
+
+	public void forceTimedOut() {
+		this.timedOut = Boolean.TRUE;
+	}
 }

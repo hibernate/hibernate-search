@@ -24,6 +24,7 @@
 package org.hibernate.search.query;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
@@ -32,12 +33,14 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.Weight;
 
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.search.SearchException;
 
 /**
@@ -54,7 +57,7 @@ public class QueryHits {
 	public final IndexSearcherWithPayload searcher;
 	public final Filter filter;
 	public final Sort sort;
-	public final int totalHits;
+	public int totalHits;
 	public TopDocs topDocs;
 	private TimeoutManager timeoutManager;
 
@@ -100,7 +103,10 @@ public class QueryHits {
 		if ( index >= topDocs.scoreDocs.length ) {
 			updateTopDocs( 2 * index );
 		}
-
+		//if the refresh timed out, raise an exception
+		if ( timeoutManager.isTimedOut() && index >= topDocs.scoreDocs.length ) {
+			throw new QueryTimeoutException("Timeout period exceeded. Cannot load document: " + index, (SQLException) null, preparedQuery.toString() );
+		}
 		return topDocs.scoreDocs[index];
 	}
 
@@ -118,8 +124,12 @@ public class QueryHits {
 		return explanation;
 	}
 
-	private void updateTopDocs(int n) throws IOException {
-		TopDocsCollector<?> topCollector;
+	/*
+	 * return true if all requested elements are loaded
+	 */
+	private boolean updateTopDocs(int n) throws IOException {
+		final TopDocsCollector<?> topCollector;
+		Collector maybeTimeLimitingCollector; //need that because TimeLimitingCollector is not a TopDocsCollector
 		//copied from IndexSearcher#search
 		//we only accept indexSearcher atm which means we can copy its the Collector creation strategy
 		final int maxDocs = Math.min( n, searcher.getSearcher().maxDoc() );
@@ -138,8 +148,23 @@ public class QueryHits {
 					!weight.scoresDocsOutOfOrder()
 			);
 		}
-		searcher.getSearcher().search(weight, filter, topCollector);
+		maybeTimeLimitingCollector = topCollector;
+		if ( timeoutManager.isBestEffort() ) {
+			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
+			if ( timeoutLeft != null ) {
+				maybeTimeLimitingCollector = new TimeLimitingCollector(topCollector, timeoutLeft );
+			}
+		}
+		try {
+			searcher.getSearcher().search(weight, filter, maybeTimeLimitingCollector);
+		}
+		catch ( TimeLimitingCollector.TimeExceededException e ) {
+			//we have reached the time limit and stopped before the end
+			//TimeoutManager.isTimedOut should be above that limit but set if for safety
+			timeoutManager.forceTimedOut();
+			topDocs = topCollector.topDocs();
+		}
 		topDocs = topCollector.topDocs();
-		timeoutManager.isTimedOut();
+		return timeoutManager.isTimedOut();
 	}
 }

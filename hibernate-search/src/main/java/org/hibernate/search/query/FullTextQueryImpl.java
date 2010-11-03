@@ -55,6 +55,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -186,10 +187,15 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			DocumentExtractor extractor = new DocumentExtractor(
 					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
 			);
-			for ( int index = first; index <= max; index++ ) {
-				infos.add( extractor.extract( index ) );
-				//TODO should we measure on each extractor?
-				if ( index % 10 == 0 ) timeoutManager.isTimedOut();
+			try {
+				for ( int index = first; index <= max; index++ ) {
+					infos.add( extractor.extract( index ) );
+					//TODO should we measure on each extractor?
+					if ( index % 10 == 0 ) timeoutManager.isTimedOut();
+				}
+			}
+			catch ( QueryTimeoutException e ) {
+				reactOnQueryTimeoutExceptionWhileExtracting( e );
 			}
 			Loader loader = getLoader();
 			//stop timeout manager, the iterator pace is in the user's hands
@@ -206,6 +212,16 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			catch ( SearchException e ) {
 				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
 			}
+		}
+	}
+
+	private void reactOnQueryTimeoutExceptionWhileExtracting(QueryTimeoutException e) {
+		if ( timeoutManager.isBestEffort() ) {
+			//we stop where we are return what we have
+			//TODO expose timeout exceeded
+		}
+		else {
+			throw e;
 		}
 	}
 
@@ -293,10 +309,15 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			DocumentExtractor extractor = new DocumentExtractor(
 					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
 			);
-			for ( int index = first; index <= max; index++ ) {
-				infos.add( extractor.extract( index ) );
-				//TODO should we measure on each extractor?
-				if ( index % 10 == 0 ) timeoutManager.isTimedOut();
+			try {
+				for ( int index = first; index <= max; index++ ) {
+					infos.add( extractor.extract( index ) );
+					//TODO should we measure on each extractor?
+					if ( index % 10 == 0 ) timeoutManager.isTimedOut();
+				}
+			}
+			catch ( QueryTimeoutException e ) {
+				reactOnQueryTimeoutExceptionWhileExtracting( e );
 			}
 			Loader loader = getLoader();
 			List list = loader.load( infos.toArray( new EntityInfo[infos.size()] ) );
