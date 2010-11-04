@@ -96,11 +96,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
 
 	/**
-	 * Constructor used on contained entities not annotated with <code>@Indexed</code> themselves.
+	 * Constructor used on contained entities not annotated with {@code @Indexed} themselves.
 	 *
-	 * @param xClass The class for which to build a <code>DocumentBuilderContainedEntity</code>.
-	 * @param context Handle to default configuration settings.
-	 * @param reflectionManager Reflection manager to use for processing the annotations.
+	 * @param xClass The class for which to build a {@code}DocumentBuilderContainedEntity}
+	 * @param context Handle to default configuration settings
+	 * @param similarity The index level similarity
+	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 */
 	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity, ReflectionManager reflectionManager) {
 
@@ -760,7 +761,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 */
 	private <T> void addWorkForEmbeddedValue(T value, List<LuceneWork> queue, Class<T> valueClass,
 											 DocumentBuilderIndexedEntity<T> builderIndexedEntity, SearchFactoryImplementor searchFactoryImplementor) {
-		Serializable id = (Serializable) ReflectionHelper.getMemberValue( value, builderIndexedEntity.idGetter );
+		Serializable id = (Serializable) ReflectionHelper.getMemberValue( value, builderIndexedEntity.getIdGetter() );
 		if ( id != null ) {
 			builderIndexedEntity.addWorkToQueue(
 					valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor

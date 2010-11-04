@@ -39,9 +39,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
-import org.hibernate.search.annotations.NumericField;
-import org.hibernate.search.bridge.util.ContextualException2WayBridge;
-import org.hibernate.search.bridge.util.ContextualExceptionBridge;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -49,11 +46,11 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
@@ -69,6 +66,8 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.util.ContextualException2WayBridge;
+import org.hibernate.search.bridge.util.ContextualExceptionBridge;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
@@ -114,12 +113,12 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	/**
 	 * The class member used as document id.
 	 */
-	protected XMember idGetter;
+	private XMember idGetter;
 
 	/**
 	 * Name of the document id field.
 	 */
-	protected String idKeywordName;
+	private String idKeywordName;
 
 	/**
 	 * Boost specified on the document id.
@@ -140,11 +139,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
 	 *
-	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>.
-	 * @param context Handle to default configuration settings.
-	 * @param directoryProviders Arrays of directory providers for the underlying Lucene indexes of the indexed entity.
-	 * @param shardingStrategy The sharding strategy used for the indexed entity.
-	 * @param reflectionManager Reflection manager to use for processing the annotations.
+	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>
+	 * @param context Handle to default configuration settings
+	 * @param providerWrapper wrapper for access to directory providers for the underlying Lucene indexes
+	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 */
 	public DocumentBuilderIndexedEntity(
 			XClass clazz, ConfigContext context, DirectoryProviderFactory.DirectoryProviders providerWrapper, ReflectionManager reflectionManager) {
@@ -154,6 +152,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		this.entityState = EntityState.INDEXED;
 		this.directoryProviders = providerWrapper.getProviders();
 		this.shardingStrategy = providerWrapper.getSelectionStrategy();
+	}
+
+	public XMember getIdGetter() {
+		return idGetter;
 	}
 
 	protected void initSubClass(XClass clazz, ConfigContext context) {
@@ -184,7 +186,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
 		Annotation idAnnotation = getIdAnnotation( member, context );
-		NumericField numericFieldAnn = member.getAnnotation(NumericField.class);
+		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
 		if ( idAnnotation != null ) {
 			String attributeName = getIdAttributeName( member, idAnnotation );
 			if ( isRoot ) {
@@ -198,7 +200,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 				FieldBridge fieldBridge = BridgeFactory.guessType( null, numericFieldAnn, member, reflectionManager );
 				if ( fieldBridge instanceof TwoWayFieldBridge ) {
-					idBridge = ( TwoWayFieldBridge ) fieldBridge;
+					idBridge = (TwoWayFieldBridge) fieldBridge;
 				}
 				else {
 					throw new SearchException(
@@ -339,23 +341,23 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		if ( workType == WorkType.ADD ) {
-			String idInString = objectToString(idBridge, idKeywordName, id);
+			String idInString = objectToString( idBridge, idKeywordName, id );
 			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
 		}
 		else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
-			String idInString = objectToString(idBridge, idKeywordName, id);
+			String idInString = objectToString( idBridge, idKeywordName, id );
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		else if ( workType == WorkType.PURGE_ALL ) {
 			queue.add( new PurgeAllLuceneWork( entityClass ) );
 		}
 		else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
-			String idInString = objectToString(idBridge, idKeywordName, id);
+			String idInString = objectToString( idBridge, idKeywordName, id );
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
 		}
 		else if ( workType == WorkType.INDEX ) {
-			String idInString = objectToString(idBridge, idKeywordName, id);
+			String idInString = objectToString( idBridge, idKeywordName, id );
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 			queue.add( createAddWork( entityClass, entity, id, idInString, true ) );
 		}
@@ -370,18 +372,18 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value) {
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
-				.setClass(beanClass)
-				.setFieldBridge(bridge)
-				.setFieldName(fieldName);
-		return contextualBridge.objectToString(value);
+				.setClass( beanClass )
+				.setFieldBridge( bridge )
+				.setFieldName( fieldName );
+		return contextualBridge.objectToString( value );
 	}
 
 	private String objectToString(StringBridge bridge, String fieldName, Object value) {
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
-				.setClass(beanClass)
-				.setStringBridge(bridge)
-				.setFieldName(fieldName);
-		return contextualBridge.objectToString(value);
+				.setClass( beanClass )
+				.setStringBridge( bridge )
+				.setFieldName( fieldName );
+		return contextualBridge.objectToString( value );
 	}
 
 	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, boolean isBatch) {
@@ -433,14 +435,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO, idBoost
 		);
 		final ContextualExceptionBridge contextualBridge = new ContextualExceptionBridge()
-				.setFieldBridge(idBridge)
-				.setClass(entityType)
-				.setFieldName(idKeywordName);
-		if ( idGetter != null) {
+				.setFieldBridge( idBridge )
+				.setClass( entityType )
+				.setFieldName( idKeywordName );
+		if ( idGetter != null ) {
 			contextualBridge.pushMethod( idGetter.getName() );
 		}
 		contextualBridge.set( idKeywordName, id, doc, luceneOptions );
-		if ( idGetter != null) {
+		if ( idGetter != null ) {
 			contextualBridge.popMethod();
 		}
 
@@ -466,9 +468,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// process the class bridges
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
-			final String fieldName = propertiesMetadata.classNames.get(i);
+			final String fieldName = propertiesMetadata.classNames.get( i );
 			contextualBridge
-					.setFieldBridge(fb)
+					.setFieldBridge( fb )
 					.setFieldName( fieldName )
 					.set(
 							fieldName, unproxiedInstance,
@@ -481,15 +483,15 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 
-			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get(i);
-			final String fieldName = propertiesMetadata.fieldNames.get(i);
+			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get( i );
+			final String fieldName = propertiesMetadata.fieldNames.get( i );
 			contextualBridge
-					.setFieldBridge(fieldBridge)
+					.setFieldBridge( fieldBridge )
 					.pushMethod( member.getName() )
 					.setFieldName( fieldName )
 					.set(
-						fieldName, value, doc,
-						propertiesMetadata.getFieldLuceneOptions( i, value )
+							fieldName, value, doc,
+							propertiesMetadata.getFieldLuceneOptions( i, value )
 					);
 			contextualBridge.popMethod();
 		}
@@ -512,28 +514,45 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			PropertiesMetadata embeddedMetadata = propertiesMetadata.embeddedPropertiesMetadata.get( i );
 			switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
 				case ARRAY:
-					for ( Object arrayValue : ( Object[] ) value ) {
+					for ( Object arrayValue : (Object[]) value ) {
 						buildDocumentFields(
-								arrayValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge
+								arrayValue,
+								doc,
+								embeddedMetadata,
+								fieldToAnalyzerMap,
+								processedFieldNames,
+								contextualBridge
 						);
 					}
 					break;
 				case COLLECTION:
-					for ( Object collectionValue : ( Collection ) value ) {
+					for ( Object collectionValue : (Collection) value ) {
 						buildDocumentFields(
-								collectionValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge
+								collectionValue,
+								doc,
+								embeddedMetadata,
+								fieldToAnalyzerMap,
+								processedFieldNames,
+								contextualBridge
 						);
 					}
 					break;
 				case MAP:
-					for ( Object collectionValue : ( ( Map ) value ).values() ) {
+					for ( Object collectionValue : ( (Map) value ).values() ) {
 						buildDocumentFields(
-								collectionValue, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge
+								collectionValue,
+								doc,
+								embeddedMetadata,
+								fieldToAnalyzerMap,
+								processedFieldNames,
+								contextualBridge
 						);
 					}
 					break;
 				case OBJECT:
-					buildDocumentFields( value, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge );
+					buildDocumentFields(
+							value, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge
+					);
 					break;
 				default:
 					throw new AssertionFailure(
@@ -568,7 +587,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 		// now we give the discriminator the opportunity to specify a analyzer per field level
 		for ( Object o : doc.getFields() ) {
-			Fieldable field = ( Fieldable ) o;
+			Fieldable field = (Fieldable) o;
 			if ( !processedFieldNames.contains( field.name() ) ) {
 				String analyzerName = discriminator.getAnalyzerDefinitionName( value, unproxiedInstance, field.name() );
 				if ( analyzerName != null ) {
@@ -605,24 +624,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	public Term getTerm(Serializable id) {
 		if ( idProvided ) {
-			return new Term( idKeywordName, ( String ) id );
+			return new Term( idKeywordName, (String) id );
 		}
 
-		return new Term( idKeywordName, objectToString(idBridge, idKeywordName, id));
+		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id ) );
 	}
 
 	public TwoWayFieldBridge getIdBridge() {
 		return idBridge;
-	}
-
-	public static Class getDocumentClass(Document document) {
-		String className = document.get( CLASS_FIELDNAME );
-		try {
-			return ReflectHelper.classForName( className );
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new SearchException( "Unable to load indexed class: " + className, e );
-		}
 	}
 
 	public String getIdKeywordName() {
@@ -643,151 +652,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( entity == null || idGetter == null ) {
 			throw new IllegalStateException( "Cannot guess id form entity" );
 		}
-		return ( Serializable ) ReflectionHelper.getMemberValue( entity, idGetter );
-	}
-
-	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document) {
-		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				clazz
-		);
-		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
-		}
-
-
-		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
-		final String fieldName = builderIndexedEntity.getIdKeywordName();
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
-		contextualBridge
-				.setClass(clazz)
-				.setFieldName(fieldName)
-				.setFieldBridge(fieldBridge)
-				.pushMethod( "identifier" );
-		return ( Serializable ) contextualBridge.get(fieldName, document );
-	}
-
-	public static String getDocumentIdName(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				clazz
-		);
-		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
-		}
-		return builderIndexedEntity.getIdentifierName();
-	}
-
-	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields) {
-		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				clazz
-		);
-		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
-		}
-		final int fieldNbr = fields.length;
-		Object[] result = new Object[fieldNbr];
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
-		contextualBridge.setClass(clazz);
-		if ( builderIndexedEntity.idKeywordName != null ) {
-			final XMember member = builderIndexedEntity.idGetter;
-			if ( member != null) {
-				contextualBridge.pushMethod( member.getName() );
-			}
-			populateResult(
-					builderIndexedEntity.idKeywordName,
-					builderIndexedEntity.idBridge,
-					Store.YES,
-					fields,
-					result,
-					document,
-					contextualBridge
-			);
-			if ( member != null) {
-				contextualBridge.popMethod();
-			}
-		}
-
-		final PropertiesMetadata metadata = builderIndexedEntity.metadata;
-		processFieldsForProjection( metadata, fields, result, document, contextualBridge );
-		return result;
-	}
-
-	private static void populateResult(String fieldName, FieldBridge fieldBridge, Store store,
-									   String[] fields, Object[] result, Document document, ContextualException2WayBridge contextualBridge) {
-		int matchingPosition = getFieldPosition( fields, fieldName );
-		if ( matchingPosition != -1 ) {
-			//TODO make use of an isTwoWay() method
-			if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
-				contextualBridge.setFieldName(fieldName).setFieldBridge( ( TwoWayFieldBridge ) fieldBridge );
-				result[matchingPosition] = contextualBridge.get( fieldName, document );
-				if ( log.isTraceEnabled() ) {
-					log.trace( "Field {} projected as {}", fieldName, result[matchingPosition] );
-				}
-			}
-			else {
-				if ( store == Store.NO ) {
-					throw new SearchException( "Projecting an unstored field: " + fieldName );
-				}
-				else {
-					throw new SearchException( "FieldBridge is not a TwoWayFieldBridge: " + fieldBridge.getClass() );
-				}
-			}
-		}
-	}
-
-	private static void processFieldsForProjection(PropertiesMetadata metadata, String[] fields, Object[] result, Document document, ContextualException2WayBridge contextualBridge) {
-		//process base fields
-		final int nbrFoEntityFields = metadata.fieldNames.size();
-		for ( int index = 0; index < nbrFoEntityFields; index++ ) {
-			final String fieldName = metadata.fieldNames.get(index);
-			contextualBridge.pushMethod( metadata.fieldGetters.get(index).getName() );
-			populateResult(
-					fieldName,
-					metadata.fieldBridges.get( index ),
-					metadata.fieldStore.get( index ),
-					fields,
-					result,
-					document,
-					contextualBridge
-			);
-			contextualBridge.popMethod();
-		}
-
-		//process fields of embedded
-		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
-		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
-			//there is nothing we can do for collections
-			if ( metadata.embeddedContainers.get( index ) == PropertiesMetadata.Container.OBJECT ) {
-				contextualBridge.pushMethod( metadata.embeddedGetters.get( index ).getName() );
-				processFieldsForProjection(
-						metadata.embeddedPropertiesMetadata.get( index ), fields, result, document, contextualBridge
-				);
-				contextualBridge.popMethod();
-			}
-		}
-
-		//process class bridges
-		final int nbrOfClassBridges = metadata.classBridges.size();
-		for ( int index = 0; index < nbrOfClassBridges; index++ ) {
-			populateResult(
-					metadata.classNames.get( index ),
-					metadata.classBridges.get( index ),
-					metadata.classStores.get( index ),
-					fields,
-					result,
-					document,
-					contextualBridge
-			);
-		}
-	}
-
-	private static int getFieldPosition(String[] fields, String fieldName) {
-		int fieldNbr = fields.length;
-		for ( int index = 0; index < fieldNbr; index++ ) {
-			if ( fieldName.equals( fields[index] ) ) {
-				return index;
-			}
-		}
-		return -1;
+		return (Serializable) ReflectionHelper.getMemberValue( entity, idGetter );
 	}
 
 	public String objectToString(String fieldName, Object value) {
@@ -795,17 +660,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			throw new AssertionFailure( "Field name should not be null" );
 		}
 		if ( fieldName.equals( idKeywordName ) ) {
-			return objectToString(idBridge, idKeywordName, value);
+			return objectToString( idBridge, idKeywordName, value );
 		}
 		else {
 			FieldBridge bridge = getBridge( metadata, fieldName );
 			if ( bridge != null ) {
 				final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
 				if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return objectToString( ( TwoWayFieldBridge ) bridge, fieldName, value );
+					return objectToString( (TwoWayFieldBridge) bridge, fieldName, value );
 				}
 				else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return objectToString(( StringBridge ) bridge, fieldName, value );
+					return objectToString( (StringBridge) bridge, fieldName, value );
 				}
 				throw new SearchException(
 						"FieldBridge " + bridgeClass + "does not have a objectToString method: field "
@@ -827,7 +692,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public FieldBridge getBridge(String fieldName) {
-		return getBridge(metadata,fieldName);
+		return getBridge( metadata, fieldName );
 	}
 
 	private FieldBridge getBridge(PropertiesMetadata metadata, String fieldName) {
@@ -891,7 +756,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		String name = null;
 		try {
 			Method m = idAnnotation.getClass().getMethod( "name" );
-			name = ( String ) m.invoke( idAnnotation );
+			name = (String) m.invoke( idAnnotation );
 		}
 		catch ( Exception e ) {
 			// ignore

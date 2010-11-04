@@ -91,12 +91,12 @@ public class DocumentExtractor {
 	}
 
 	private EntityInfo extract(Document document) {
-		Class clazz = DocumentBuilderIndexedEntity.getDocumentClass( document );
-		String idName =  DocumentBuilderIndexedEntity.getDocumentIdName( searchFactoryImplementor, clazz );
-		Serializable id = DocumentBuilderIndexedEntity.getDocumentId( searchFactoryImplementor, clazz, document );
+		Class clazz = DocumentBuilderHelper.getDocumentClass( document );
+		String idName =  DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
+		Serializable id = DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document );
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
-			projected = DocumentBuilderIndexedEntity.getDocumentFields(
+			projected = DocumentBuilderHelper.getDocumentFields(
 					searchFactoryImplementor, clazz, document, projection
 			);
 		}
