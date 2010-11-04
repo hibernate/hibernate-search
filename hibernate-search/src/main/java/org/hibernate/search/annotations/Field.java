@@ -35,51 +35,47 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Mark a property as indexable
+ * Annotation used for marking a property as indexable.
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.METHOD, ElementType.FIELD } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface Field {
 	/**
-	 * Field name, default to the JavaBean property name
+	 * @return Returns the field name. Defaults to the JavaBean property name.
 	 */
 	String name() default "";
 
 	/**
-	 * Should the value be stored in the document
-	 * defaults to no.
+	 * @return Returns a {@code Store} enum type indicating whether the value should be stored in the document. Defaults to {@code Store.NO}.
 	 */
 	Store store() default Store.NO;
 
 	/**
-	 * Defines how the Field should be indexed
-	 * defaults to tokenized
+	 * @return Returns a {@code Index} enum defining how the value should be indexed. Defaults to {@code Index.TOKENIZED}.
 	 */
 	Index index() default Index.TOKENIZED;
 
 	/**
-	 * Define term vector storage requirements,
-	 * default to NO.
+	 * @return Returns a {@code TermVector} enum defining if and how term vectors are stored. Defaults to {@code TermVector.NO}.
 	 */
 	TermVector termVector() default TermVector.NO;
 
 	/**
-	 * Define an analyzer for the field, default to
-	 * the inherited analyzer
+	 * @return Returns the analyzer for the field. Defaults to the inherited analyzer.
 	 */
 	Analyzer analyzer() default @Analyzer;
 
-
 	/**
-	 * Boost factor, default 1
+	 * @return Returns the boost factor for the field. Default boost factor is 1.0.
 	 */
-	Boost boost() default @Boost( value = 1.0F );
+	Boost boost() default @Boost(value = 1.0F);
 
 	/**
-	 * Field bridge used. Default is autowired.
+	 * @return Returns the field bridge used for this field. Default is autowired.
 	 */
 	FieldBridge bridge() default @FieldBridge;
 }
