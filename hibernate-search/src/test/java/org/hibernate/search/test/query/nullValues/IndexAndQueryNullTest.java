@@ -45,8 +45,6 @@ import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
  */
 public class IndexAndQueryNullTest extends SearchTestCase {
 
-	// HSEARCH-115
-
 	public void testIndexAndSearchNull() throws Exception {
 		Value fooValue = new Value( "foo" );
 		Value nullValue = new Value( null );
