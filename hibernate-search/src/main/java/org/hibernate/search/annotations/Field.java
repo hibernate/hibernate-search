@@ -44,6 +44,8 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface Field {
+	public static final String NO_NULL_INDEXING = "VALUE USED AS DEFAULT FOR nullIndexToken";
+
 	/**
 	 * @return Returns the field name. Defaults to the JavaBean property name.
 	 */
@@ -78,4 +80,10 @@ public @interface Field {
 	 * @return Returns the field bridge used for this field. Default is autowired.
 	 */
 	FieldBridge bridge() default @FieldBridge;
+
+	/**
+	 * @return Returns the value to be used for indexing {@code null}. Per default {@code Field.NO_NULL_INDEXING} is returned indicating that
+	 *         null values are not indexed.
+	 */
+	String nullIndexToken() default NO_NULL_INDEXING;
 }
