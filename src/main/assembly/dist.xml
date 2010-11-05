@@ -60,6 +60,7 @@
                         <excludes>
                             <exclude>jgroups:jgroups</exclude>
                             <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
+                            <exclude>org.apache.lucene:lucene-analyzers</exclude>
                         </excludes>
                     </dependencySet>
 
@@ -80,6 +81,7 @@
                         <outputDirectory>/dist/lib/optional</outputDirectory>
                         <scope>test</scope>
                         <includes>
+	                        <include>org.apache.lucene:lucene-analyzers</include>
                             <include>org.apache.lucene:lucene-snowball</include>
                             <include>org.apache.lucene:lucene-collation</include>
                             <include>commons-codec:commons-codec</include>
