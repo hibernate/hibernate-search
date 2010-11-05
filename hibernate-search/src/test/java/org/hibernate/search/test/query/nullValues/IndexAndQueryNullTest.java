@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 
@@ -77,20 +78,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
-		parser.setAllowLeadingWildcard( true );
-		Query query = parser.parse( "*" );
-		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
-		fullTextQuery.setProjection(
-				FullTextQuery.DOCUMENT
-		);
-		fullTextQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
-		List mappedResults = fullTextQuery.list();
-		assertTrue( "Wrong result size", mappedResults.size() == 1 );
-
-		Map map = (Map) mappedResults.get( 0 );
-		Document document = (Document) map.get( FullTextQuery.DOCUMENT );
-		assertNotNull( document );
+		Document document = getSingleIndexedDocument( fullTextSession );
 
 		String indexedNullString = document.get( "value" );
 		assertEquals( "The null value should be indexed as _null_", "_null_", indexedNullString );
@@ -145,6 +133,36 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
+		Document document = getSingleIndexedDocument( fullTextSession );
+
+		String indexedNullString = document.get( "fallback" );
+		assertEquals( "The null value should be indexed as 'fubar'", "fubar", indexedNullString );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	public void testNullIndexingWithCustomFieldBridge() throws Exception {
+		Value nullValue = new Value( null );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		session.save( nullValue );
+		tx.commit();
+
+		fullTextSession.clear();
+		tx = fullTextSession.beginTransaction();
+
+		Document document = getSingleIndexedDocument( fullTextSession );
+
+		String indexedNullString = document.get( "dummy" );
+		assertEquals( "The null value should be indexed as '_dummy_'", "_dummy_", indexedNullString );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	private Document getSingleIndexedDocument(FullTextSession fullTextSession) throws ParseException {
 		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
 		parser.setAllowLeadingWildcard( true );
 		Query query = parser.parse( "*" );
@@ -159,12 +177,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		Map map = (Map) mappedResults.get( 0 );
 		Document document = (Document) map.get( FullTextQuery.DOCUMENT );
 		assertNotNull( document );
-
-		String indexedNullString = document.get( "fallback" );
-		assertEquals( "The null value should be indexed as 'fubar'", "fubar", indexedNullString );
-
-		tx.commit();
-		fullTextSession.close();
+		return document;
 	}
 
 

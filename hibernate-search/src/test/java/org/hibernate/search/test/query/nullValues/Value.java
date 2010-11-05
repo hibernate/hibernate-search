@@ -28,6 +28,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -46,6 +47,11 @@ public class Value {
 
 	@Field(store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 	private String fallback;
+
+	@Field(store = Store.YES,
+			indexNullAs = "_dummy_",
+			bridge = @FieldBridge(impl = DummyStringBridge.class))
+	private String dummy;
 
 	public Value() {
 	}
@@ -76,6 +82,14 @@ public class Value {
 
 	public void setFallback(String fallback) {
 		this.fallback = fallback;
+	}
+
+	public String getDummy() {
+		return dummy;
+	}
+
+	public void setDummy(String dummy) {
+		this.dummy = dummy;
 	}
 }
 
