@@ -22,9 +22,10 @@
   ~  51 Franklin Street, Fifth Floor
   ~  Boston, MA  02110-1301  USA
   -->
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY version "3.3.0.Beta3">
+<!ENTITY % BOOK_ENTITIES SYSTEM "../hsearch.ent">
+%BOOK_ENTITIES;
 ]>
 <chapter id="getting-started">
   <title>Getting started</title>

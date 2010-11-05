@@ -22,11 +22,9 @@
   ~  51 Franklin Street, Fifth Floor
   ~  Boston, MA  02110-1301  USA
   -->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY version "WORKING">
-<!ENTITY copyrightYear "2004">
-<!ENTITY copyrightHolder "Red Hat Inc., Emmanuel Bernard and the various authors">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "hsearch.ent">
+%BOOK_ENTITIES;
 ]>
 <book>
   <bookinfo>
