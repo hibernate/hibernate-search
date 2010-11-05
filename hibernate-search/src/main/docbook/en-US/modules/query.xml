@@ -920,7 +920,7 @@ catch (javax.persistence.QueryTimeoutException e) {
         <para>Alternatively, you can return the number of results fetched when
         the time limit is reached. Note that only the Lucene part of the query
         is influenced by this limit. It is possible that, if you retrieve
-        managed object, it takes longer to fetch these objects. </para>
+        managed object, it takes longer to fetch these objects.</para>
 
         <note>
           <para>This approach is not compatible with the
@@ -964,6 +964,11 @@ if ( query.hasPartialResults() ) {
     displayWarningToUser();
 }</programlisting>
         </example>
+
+        <para>If you use the JPA API,
+        <methodname>limitFetchingTime</methodname> and
+        <methodname>hasPartialResults</methodname> are also available to
+        you.</para>
 
         <warning>
           <para>This approach is considered experimental</para>
