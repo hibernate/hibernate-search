@@ -826,22 +826,39 @@ String authorName = firstResult[2];</programlisting>
       <section>
         <title>Limiting the time of a query</title>
 
-        <para>You can decide to stop a query if when it takes more than a
-        predefined amount of time. Note that this is a best effort basis but
-        if Hibernate Search still has significant work to do and if we are
-        beyond the time limit, a <classname>QueryTimeoutException</classname>
-        will be raised
-        (<classname>org.hibernate.QueryTimeoutException</classname> or
-        <classname>javax.persistence.QueryTimeoutException</classname>
-        depending on your programmatic API).</para>
+        <para>You can limit the time a query takes in Hibernate Search in two
+        ways:</para>
 
-        <para>To define the limit when using the native Hibernate APIs, use
-        one of the following approaches</para>
+        <itemizedlist>
+          <listitem>
+            <para>raise an exception when the limit is reached</para>
+          </listitem>
 
-        <example>
-          <title>Defining a timeout in query execution</title>
+          <listitem>
+            <para>limit to the number of results retrieved when the time limit
+            is raised</para>
+          </listitem>
+        </itemizedlist>
 
-          <programlisting>Query luceneQuery = ...;
+        <section>
+          <title>Raise an exception on time limit</title>
+
+          <para>You can decide to stop a query if when it takes more than a
+          predefined amount of time. Note that this is a best effort basis but
+          if Hibernate Search still has significant work to do and if we are
+          beyond the time limit, a
+          <classname>QueryTimeoutException</classname> will be raised
+          (<classname>org.hibernate.QueryTimeoutException</classname> or
+          <classname>javax.persistence.QueryTimeoutException</classname>
+          depending on your programmatic API).</para>
+
+          <para>To define the limit when using the native Hibernate APIs, use
+          one of the following approaches</para>
+
+          <example>
+            <title>Defining a timeout in query execution</title>
+
+            <programlisting>Query luceneQuery = ...;
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
@@ -856,28 +873,28 @@ try {
 catch (org.hibernate.QueryTimeoutException e) {
     //do something, too slow
 }</programlisting>
-        </example>
+          </example>
 
-        <para>Likewise <literal>getResultSize()</literal>,
-        <methodname>iterate()</methodname> and
-        <methodname>scroll()</methodname> honor the timeout but only until the
-        end of the method call. That simply means that the methods of
-        <classname>Iterable</classname> or the
-        <classname>ScrollableResults</classname> ignore the timeout.</para>
+          <para>Likewise <literal>getResultSize()</literal>,
+          <methodname>iterate()</methodname> and
+          <methodname>scroll()</methodname> honor the timeout but only until
+          the end of the method call. That simply means that the methods of
+          <classname>Iterable</classname> or the
+          <classname>ScrollableResults</classname> ignore the timeout.</para>
 
-        <note>
-          <para><methodname>explain()</methodname> does not honor the timeout:
-          this method is used for debug purposes and in particular to find out
-          why a query is slow ;)</para>
-        </note>
+          <note>
+            <para><methodname>explain()</methodname> does not honor the
+            timeout: this method is used for debug purposes and in particular
+            to find out why a query is slow ;)</para>
+          </note>
 
-        <para>When using JPA, simply use the standard way of limiting query
-        execution time.</para>
+          <para>When using JPA, simply use the standard way of limiting query
+          execution time.</para>
 
-        <example>
-          <title>Defining a timeout in query execution</title>
+          <example>
+            <title>Defining a timeout in query execution</title>
 
-          <programlisting>Query luceneQuery = ...;
+            <programlisting>Query luceneQuery = ...;
 FullTextQuery query = fullTextEM.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in milliseconds
@@ -889,10 +906,68 @@ try {
 catch (javax.persistence.QueryTimeoutException e) {
     //do something, too slow
 }</programlisting>
+          </example>
+
+          <para>Remember, this is a best effort basis and not a guarantee to
+          stop passed a certain time.</para>
+        </section>
+      </section>
+
+      <section>
+        <title>Limit the number of results when the time limit is reached
+        (EXPERIMENTAL)</title>
+
+        <para>Alternatively, you can return the number of results fetched when
+        the time limit is reached. Note that only the Lucene part of the query
+        is influenced by this limit. It is possible that, if you retrieve
+        managed object, it takes longer to fetch these objects. </para>
+
+        <note>
+          <para>This approach is not compatible with the
+          <classname>setTimeout</classname> approach.</para>
+        </note>
+
+        <para>To define this soft limit, use the following approach</para>
+
+        <example>
+          <title>Defining a time limit in query execution</title>
+
+          <programlisting>Query luceneQuery = ...;
+FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
+
+//define the timeout in seconds
+query.limitFetchingTime(500, TimeUnit.MILLISECONDS);
+List results = query.list();</programlisting>
         </example>
 
-        <para>Remember, this is a best effort basis and not a guarantee to
-        stop passed a certain time.</para>
+        <para>Likewise <literal>getResultSize()</literal>,
+        <methodname>iterate()</methodname> and
+        <methodname>scroll()</methodname> honor the time limit but only until
+        the end of the method call. That simply means that the methods of
+        <classname>Iterable</classname> or the
+        <classname>ScrollableResults</classname> ignore the timeout.</para>
+
+        <para>You can determine if the results have been partially loaded by
+        invoking the <methodname>hasPartialResults</methodname> method.</para>
+
+        <example>
+          <title>Determines when a query returns partial results</title>
+
+          <programlisting>Query luceneQuery = ...;
+FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
+
+//define the timeout in seconds
+query.limitFetchingTime(500, TimeUnit.MILLISECONDS);
+List results = query.list();
+
+if ( query.hasPartialResults() ) {
+    displayWarningToUser();
+}</programlisting>
+        </example>
+
+        <warning>
+          <para>This approach is considered experimental</para>
+        </warning>
       </section>
     </section>
   </section>
