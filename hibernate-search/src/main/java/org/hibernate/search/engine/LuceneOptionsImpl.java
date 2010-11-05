@@ -36,6 +36,8 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.util.NumericFieldUtils;
 
+import static org.hibernate.search.annotations.NumericField.PRECISION_STEP_DEFAULT;
+
 /**
  * A wrapper class for Lucene parameters needed for indexing.
  *
@@ -51,20 +53,22 @@ class LuceneOptionsImpl implements LuceneOptions {
 	private final TermVector termVector;
 	private final Float boost;
 	private final Store storeType;
-	private int precisionStep = org.hibernate.search.annotations.NumericField.PRECISION_STEP_DEFAULT;
-
-	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost, int precisionStep) {
-		this(store,indexMode,termVector,boost);
-		this.precisionStep = precisionStep;
-	}
+	private final int precisionStep;
+	private final String indexNullAs;
 
 	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost) {
+		this( store, indexMode, termVector, boost, null, PRECISION_STEP_DEFAULT );
+	}
+
+	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost, String indexNullAs, int precisionStep) {
 		this.indexMode = indexMode;
 		this.termVector = termVector;
 		this.boost = boost;
 		this.storeType = store;
 		this.storeCompressed = store.equals( Store.COMPRESS );
 		this.storeUncompressed = store.equals( Store.YES );
+		this.indexNullAs = indexNullAs;
+		this.precisionStep = precisionStep;
 	}
 
 	public void addFieldToDocument(String name, String indexedString, Document document) {
@@ -81,17 +85,18 @@ class LuceneOptionsImpl implements LuceneOptions {
 
 	public void addNumericFieldToDocument(String fieldName, Object value, Document document) {
 		if ( storeType == Store.COMPRESS ) {
-			throw new SearchException("Error indexing field "+fieldName+", @NumericField cannot be compressed");
+			throw new SearchException( "Error indexing field " + fieldName + ", @NumericField cannot be compressed" );
 		}
-		if (value != null) {
+		if ( value != null ) {
 			NumericField numericField = new NumericField(
-					fieldName, precisionStep, storeType != Store.NO ? Field.Store.YES : Field.Store.NO, true);
-			NumericFieldUtils.setNumericValue(value, numericField);
+					fieldName, precisionStep, storeType != Store.NO ? Field.Store.YES : Field.Store.NO, true
+			);
+			NumericFieldUtils.setNumericValue( value, numericField );
 			if ( boost != null ) {
 				numericField.setBoost( boost );
 			}
 
-			if (numericField.getNumericValue() != null) {
+			if ( numericField.getNumericValue() != null ) {
 				document.add( numericField );
 			}
 		}
@@ -121,6 +126,10 @@ class LuceneOptionsImpl implements LuceneOptions {
 		else {
 			return 1.0f;
 		}
+	}
+
+	public String indexNullAs() {
+		return indexNullAs;
 	}
 
 	public boolean isCompressed() {

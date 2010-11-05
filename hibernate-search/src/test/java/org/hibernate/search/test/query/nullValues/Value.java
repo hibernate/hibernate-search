@@ -29,6 +29,7 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Hardy Ferentschik
@@ -40,7 +41,7 @@ public class Value {
 	@GeneratedValue
 	private int id;
 
-	@Field
+	@Field(store = Store.YES, nullIndexToken = "__null")
 	private String value;
 
 	public Value() {

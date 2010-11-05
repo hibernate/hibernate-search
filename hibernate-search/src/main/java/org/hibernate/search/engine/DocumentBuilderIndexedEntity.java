@@ -220,6 +220,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				propertiesMetadata.fieldStore.add( Store.YES );
 				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
 				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
+				propertiesMetadata.fieldNullTokens.add( null );
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, null, member, reflectionManager ) );
 				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
 				propertiesMetadata.precisionSteps.add( getPrecisionStep( null ) );
@@ -432,7 +433,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// now add the entity id to the document
 		LuceneOptions luceneOptions = new LuceneOptionsImpl(
 				Store.YES,
-				Field.Index.NOT_ANALYZED_NO_NORMS, Field.TermVector.NO, idBoost
+				Field.Index.NOT_ANALYZED_NO_NORMS,
+				Field.TermVector.NO,
+				idBoost
 		);
 		final ContextualExceptionBridge contextualBridge = new ContextualExceptionBridge()
 				.setFieldBridge( idBridge )

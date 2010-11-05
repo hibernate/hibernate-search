@@ -39,7 +39,9 @@ public class String2FieldBridgeAdaptor implements FieldBridge {
 
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		String indexedString = stringBridge.objectToString( value );
+		if(indexedString == null && luceneOptions.indexNullAs() != null) {
+			indexedString = luceneOptions.indexNullAs();
+		}
 		luceneOptions.addFieldToDocument( name, indexedString, document );
 	}
-
 }

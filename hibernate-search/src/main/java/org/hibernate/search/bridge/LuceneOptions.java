@@ -33,13 +33,14 @@ import org.apache.lucene.document.Field;
  * The recommended approach to index is to use {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
  * or {@link #addNumericFieldToDocument(String, Object, org.apache.lucene.document.Document)} as all the options declared by
  * the user are transparently carried over. Compression is also provided transparently.
- * {code}
- * String fieldValue = convertToString(value);
+ * <pre>
+ * {@code String fieldValue = convertToString(value);
  * luceneOptions.addFieldToDocument(name, fieldValue, document);
  * // Numeric
  * Double aDouble = ...
  * luceneOptions.addNumericFieldToDocument(name, value, document);
- * {code}
+ * }
+ * </pre>
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
@@ -53,10 +54,12 @@ public interface LuceneOptions {
 	 * If the indexedString is null then the field is not added to the document.
 	 *
 	 * The field options are following the user declaration:
-	 *  - stored or not
-	 *  - compressed or not
-	 *  - what type of indexing strategy
-	 *  - what type of term vector strategy
+	 * <ul>
+	 * <li> stored or not </li>
+	 * <li> compressed or not </li>
+	 * <li> what type of indexing strategy </li>
+	 * <li> what type of term vector strategy </li>
+	 * </ul>
 	 *
 	 * @param fieldName The field name
 	 * @param indexedString The value to index
@@ -67,6 +70,7 @@ public interface LuceneOptions {
 	/**
 	 * Add a new NumericField with the name {@code fieldName} to the Lucene Document {@code document}
 	 * using the value {@code numericValue}. If the value is not numeric then the field is not added to the document
+	 *
 	 * @param fieldName The name of the field
 	 * @param numericValue The numeric value, either an Int, Long, Float or Double
 	 * @param document the document to which to add the the new field
@@ -89,7 +93,6 @@ public interface LuceneOptions {
 	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
 	 * over manually building your Field objects and adding them to the Document.
 	 *
-	 * Return the storage strategy declared by the user
 	 * {@code org.apache.lucene.document.Field.Store.YES} if the field is stored
 	 * {@code org.apache.lucene.document.Field.Store.NO} otherwise.
 	 *
@@ -100,6 +103,8 @@ public interface LuceneOptions {
 	 * To use compression either use #addFieldToDocument or refer
 	 * to Lucene documentation to implement your own compression
 	 * strategy.
+	 *
+	 * @return Returns the store strategy declared by the user
 	 */
 	Field.Store getStore();
 
@@ -107,7 +112,7 @@ public interface LuceneOptions {
 	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
 	 * over manually building your Field objects and adding them to the Document.
 	 *
-	 * Return the indexing strategy declared by the user
+	 * @return Returns the indexing strategy declared by the user
 	 */
 	Field.Index getIndex();
 
@@ -115,7 +120,7 @@ public interface LuceneOptions {
 	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
 	 * over manually building your Field objects and adding them to the Document.
 	 *
-	 * Return the term vector strategy declared by the user
+	 * @return Returns the term vector strategy declared by the user
 	 */
 	Field.TermVector getTermVector();
 
@@ -123,7 +128,13 @@ public interface LuceneOptions {
 	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
 	 * over manually building your Field objects and adding them to the Document.
 	 *
-	 * Return the boost factor declared by the user
+	 * @return Returns the boost factor declared by the user
 	 */
 	Float getBoost();
+
+	/**
+	 * @return Returns the string for indexing {@code null} values. {@code null} is returned in case no null token has
+	 *         been specified.
+	 */
+	String indexNullAs();
 }
