@@ -70,7 +70,7 @@ import org.hibernate.search.bridge.builtin.UrlBridge;
  * @author Emmanuel Bernard
  * @author John Griffin
  */
-public class BridgeFactory {
+public final class BridgeFactory {
 	private static Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
 	private static Map<String, NumericFieldBridge> numericBridges = new HashMap<String, NumericFieldBridge>();
 
@@ -78,29 +78,17 @@ public class BridgeFactory {
 	}
 
 	public static final TwoWayFieldBridge CHARACTER = new TwoWayString2FieldBridgeAdaptor( new CharacterBridge() );
-
 	public static final TwoWayFieldBridge DOUBLE = new TwoWayString2FieldBridgeAdaptor( new DoubleBridge() );
-
 	public static final TwoWayFieldBridge FLOAT = new TwoWayString2FieldBridgeAdaptor( new FloatBridge() );
-
 	public static final TwoWayFieldBridge SHORT = new TwoWayString2FieldBridgeAdaptor( new ShortBridge() );
-
 	public static final TwoWayFieldBridge INTEGER = new TwoWayString2FieldBridgeAdaptor( new IntegerBridge() );
-
 	public static final TwoWayFieldBridge LONG = new TwoWayString2FieldBridgeAdaptor( new LongBridge() );
-
 	public static final TwoWayFieldBridge BIG_INTEGER = new TwoWayString2FieldBridgeAdaptor( new BigIntegerBridge() );
-
 	public static final TwoWayFieldBridge BIG_DECIMAL = new TwoWayString2FieldBridgeAdaptor( new BigDecimalBridge() );
-
 	public static final TwoWayFieldBridge STRING = new TwoWayString2FieldBridgeAdaptor( new StringBridge() );
-
 	public static final TwoWayFieldBridge BOOLEAN = new TwoWayString2FieldBridgeAdaptor( new BooleanBridge() );
-
 	public static final TwoWayFieldBridge CLAZZ = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge() );
-
 	public static final TwoWayFieldBridge Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
-
 	public static final TwoWayFieldBridge Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
 
 	public static final FieldBridge DATE_YEAR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
@@ -162,23 +150,21 @@ public class BridgeFactory {
 		numericBridges.put( double.class.getName(), DOUBLE_NUMERIC );
 		numericBridges.put( Float.class.getName(), FLOAT_NUMERIC );
 		numericBridges.put( float.class.getName(), FLOAT_NUMERIC );
-
 	}
 
 	/**
-	 * This extracts and instantiates the implementation class from a ClassBridge
-	 * annotation.
+	 * This extracts and instantiates the implementation class from a {@code ClassBridge} annotation.
 	 *
-	 * @param cb the ClassBridge
+	 * @param cb the class bridge annotation
+	 * @param clazz the {@code XClass} on which the annotation is defined on
 	 *
-	 * @return FieldBridge
+	 * @return Returns the specified {@code FieldBridge} instance
 	 */
-	public static FieldBridge extractType(ClassBridge cb) {
+	public static FieldBridge extractType(ClassBridge cb, XClass clazz) {
 		FieldBridge bridge = null;
 
 		if ( cb != null ) {
 			Class<?> impl = cb.impl();
-			//TODO better error information ( see guessType() )
 			if ( impl != null ) {
 				try {
 					Object instance = impl.newInstance();
@@ -208,7 +194,9 @@ public class BridgeFactory {
 					}
 				}
 				catch ( Exception e ) {
-					throw new HibernateException( "Unable to instantiate ClassBridge for " + impl.getName(), e );
+					final String msg = "Unable to instantiate ClassBridge of type " + impl.getName() + " defined on "
+							+ clazz.getName();
+					throw new HibernateException( msg, e );
 				}
 			}
 		}
@@ -263,11 +251,8 @@ public class BridgeFactory {
 		return bridge;
 	}
 
-	/**
-	 * assume not null bridgeAnn
-	 */
 	private static FieldBridge doExtractType(org.hibernate.search.annotations.FieldBridge bridgeAnn, String memberName) {
-		assert bridgeAnn != null : "doExtractType assume bridge instance not null";
+		assert bridgeAnn != null : "@FieldBridge instance cannot be null";
 		FieldBridge bridge;
 		Class impl = bridgeAnn.impl();
 		if ( impl == void.class ) {
@@ -353,7 +338,7 @@ public class BridgeFactory {
 	/**
 	 * Takes in a fieldBridge and will return you a TwoWayFieldBridge instance.
 	 *
-	 * @param fieldBridge
+	 * @param fieldBridge the field bridge annotation
 	 *
 	 * @return a TwoWayFieldBridge instance if the Field Bridge is an instance of a TwoWayFieldBridge.
 	 *
