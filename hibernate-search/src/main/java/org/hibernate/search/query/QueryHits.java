@@ -149,14 +149,28 @@ public class QueryHits {
 			);
 		}
 		maybeTimeLimitingCollector = topCollector;
+		boolean timeoutAt0 = false;
 		if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT ) {
 			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
 			if ( timeoutLeft != null ) {
+				if (timeoutLeft == 0l) {
+					if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT && timeoutManager.isTimedOut() ) {
+						timeoutManager.forceTimedOut();
+						timeoutAt0 = true;
+					}
+				}
 				maybeTimeLimitingCollector = new TimeLimitingCollector(topCollector, timeoutLeft );
+			}
+			else {
+				if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT && timeoutManager.isTimedOut() ) {
+					timeoutManager.forceTimedOut();
+				}
 			}
 		}
 		try {
-			searcher.getSearcher().search(weight, filter, maybeTimeLimitingCollector);
+			if (!timeoutAt0) {
+				searcher.getSearcher().search(weight, filter, maybeTimeLimitingCollector);
+			}
 		}
 		catch ( TimeLimitingCollector.TimeExceededException e ) {
 			//we have reached the time limit and stopped before the end

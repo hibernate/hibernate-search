@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
@@ -104,8 +105,11 @@ public class ObjectLoaderHelper {
 		criteria.add( disjunction );
 		//not best effort so fail fast
 		if ( timeoutManager.getType() != TimeoutManager.Type.LIMIT ) {
-			final Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
+			Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
 			if ( timeLeftInSecond != null ) {
+				if (timeLeftInSecond == 0) {
+					timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting(null);
+				}
 				criteria.setTimeout( timeLeftInSecond.intValue() );
 			}
 		}

@@ -48,7 +48,7 @@ public class TimeoutManager {
 			final long currentTime = System.nanoTime();
 			if ( isTimedOut( currentTime ) ) {
 				//0 means no limit so we return the lowest possible value
-				return 1l;
+				return 0l;
 			}
 			long left = timeout - ( currentTime - start);
 			long result;
@@ -60,7 +60,7 @@ public class TimeoutManager {
 			}
 			if ( result <= 0 ) {
 				//0 means no limit so we return the lowest possible value
-				return 1l;
+				return 0l;
 			}
 			else {
 				return result;
@@ -112,6 +112,10 @@ public class TimeoutManager {
 
 	public void forceTimedOut() {
 		this.timedOut = Boolean.TRUE;
+		if ( type == Type.LIMIT) {
+			//we stop where we are return what we have
+			this.partialResults = true;
+		}
 	}
 
 	public void raiseExceptionOnTimeout() {
@@ -134,6 +138,9 @@ public class TimeoutManager {
 			this.partialResults = true;
 		}
 		else {
+			if ( e == null) {
+				e = new QueryTimeoutException( "Timeout period exceeded", (SQLException) null, luceneQuery.toString() );
+			}
 			throw e;
 		}
 	}
