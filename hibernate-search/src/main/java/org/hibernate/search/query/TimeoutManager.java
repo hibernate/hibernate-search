@@ -98,7 +98,8 @@ public class TimeoutManager {
 	public void stop() {
 		this.timeout = null;
 		this.type = Type.NONE;
-		this.partialResults = false;
+		//don't reset, we need it for the query API even when the manager is stopped.
+		//this.partialResults = false;
 	}
 
 	public void setTimeout(long timeout, TimeUnit timeUnit) {
