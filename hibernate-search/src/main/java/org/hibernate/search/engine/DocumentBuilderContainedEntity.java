@@ -68,7 +68,7 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 		 * When the internal object is changed, we apply the {Add|Update}Work on containedIns
 		 */
 		if ( workType.searchForContainers() ) {
-			processContainedInInstances( entity, queue, metadata, searchFactoryImplementor );
+			processContainedInInstances( entity, queue, getMetadata(), searchFactoryImplementor );
 		}
 	}
 }

@@ -67,6 +67,8 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.NullEncodingTwoWayFieldBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.HibernateHelper;
@@ -83,18 +85,19 @@ import org.hibernate.search.util.ScopedAnalyzer;
 public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private static final Logger log = LoggerFactory.make();
 
-	protected final PropertiesMetadata metadata = new PropertiesMetadata();
-	protected final XClass beanXClass;
-	protected final Class<?> beanClass;
-	protected Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
-	protected ReflectionManager reflectionManager; //available only during initialization and post-initialization
-	protected int level = 0;
-	protected int maxLevel = Integer.MAX_VALUE;
-	protected final ScopedAnalyzer analyzer = new ScopedAnalyzer();
-	protected Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
-	protected boolean isRoot;
-	protected EntityState entityState;
+	private final PropertiesMetadata metadata = new PropertiesMetadata();
+	private final XClass beanXClass;
+	private final Class<?> beanClass;
+	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
+	private int level = 0;
+	private int maxLevel = Integer.MAX_VALUE;
+	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
+	private Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
+	private boolean isRoot;
+	private EntityState entityState;
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
+
+	protected ReflectionManager reflectionManager; //available only during initialization and post-initialization
 
 	/**
 	 * Constructor used on contained entities not annotated with {@code @Indexed} themselves.
@@ -133,6 +136,18 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		return isRoot;
 	}
 
+	public Class<?> getBeanClass() {
+		return beanClass;
+	}
+
+	public XClass getBeanXClass() {
+		return beanXClass;
+	}
+
+	public PropertiesMetadata getMetadata() {
+		return metadata;
+	}
+
 	public Similarity getSimilarity() {
 		return similarity;
 	}
@@ -143,6 +158,10 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	public EntityState getEntityState() {
 		return entityState;
+	}
+
+	public void setEntityState(EntityState entityState) {
+		this.entityState = entityState;
 	}
 
 	public Set<Class<?>> getMappedSubclasses() {
@@ -388,14 +407,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( classBridgesAnn != null ) {
 			ClassBridge[] classBridges = classBridgesAnn.value();
 			for ( ClassBridge cb : classBridges ) {
-				bindClassBridgeAnnotation( prefix, propertiesMetadata, cb, context );
+				bindClassBridgeAnnotation( prefix, propertiesMetadata, cb, clazz, context );
 			}
 		}
 
 		// Check for any ClassBridge style of annotations.
 		ClassBridge classBridgeAnn = clazz.getAnnotation( ClassBridge.class );
 		if ( classBridgeAnn != null ) {
-			bindClassBridgeAnnotation( prefix, propertiesMetadata, classBridgeAnn, context );
+			bindClassBridgeAnnotation( prefix, propertiesMetadata, classBridgeAnn, clazz, context );
 		}
 
 		checkForAnalyzerDiscriminator( clazz, propertiesMetadata );
@@ -626,13 +645,13 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void bindClassBridgeAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, ConfigContext context) {
+	private void bindClassBridgeAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, XClass clazz, ConfigContext context) {
 		String fieldName = prefix + ann.name();
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( ann.store() );
 		propertiesMetadata.classIndexes.add( getIndex( ann.index() ) );
 		propertiesMetadata.classTermVectors.add( getTermVector( ann.termVector() ) );
-		propertiesMetadata.classBridges.add( BridgeFactory.extractType( ann ) );
+		propertiesMetadata.classBridges.add( BridgeFactory.extractType( ann, clazz ) );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
 
 		Analyzer analyzer = getAnalyzer( ann.analyzer(), context );
@@ -656,8 +675,21 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
 		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
 		propertiesMetadata.precisionSteps.add( getPrecisionStep( numericFieldAnn ) );
-		propertiesMetadata.fieldBridges
-				.add( BridgeFactory.guessType( fieldAnn, numericFieldAnn, member, reflectionManager ) );
+
+		// null token
+		String indexNullAs = fieldAnn.indexNullAs();
+		if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL ) ) {
+			indexNullAs = null;
+		} else if(indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN )) {
+			indexNullAs = context.getDefaultNullToken();
+		}
+		propertiesMetadata.fieldNullTokens.add( indexNullAs );
+
+		FieldBridge fieldBridge = BridgeFactory.guessType( fieldAnn, numericFieldAnn, member, reflectionManager );
+		if ( indexNullAs != null && fieldBridge instanceof TwoWayFieldBridge ) {
+			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, indexNullAs );
+		}
+		propertiesMetadata.fieldBridges.add( fieldBridge );
 
 		// Field > property > entity analyzer
 		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer(), context );
@@ -665,14 +697,6 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			analyzer = getAnalyzer( member, context );
 		}
 		addToScopedAnalyzer( fieldName, analyzer, fieldAnn.index() );
-
-		// null token
-		String indexNullAs = fieldAnn.nullIndexToken();
-		if(indexNullAs.equals(org.hibernate.search.annotations.Field.NO_NULL_INDEXING)) {
-			propertiesMetadata.fieldNullTokens.add( null );
-		} else {
-			propertiesMetadata.fieldNullTokens.add( indexNullAs );
-		}
 	}
 
 	protected Integer getPrecisionStep(NumericField numericFieldAnn) {
@@ -760,7 +784,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			DocumentBuilderContainedEntity<T> builderContainedEntity =
 					searchFactoryImplementor.getDocumentBuilderContainedEntity( valueClass );
 			if ( builderContainedEntity != null ) {
-				processContainedInInstances( value, queue, builderContainedEntity.metadata, searchFactoryImplementor );
+				processContainedInInstances( value, queue, builderContainedEntity.getMetadata(), searchFactoryImplementor );
 			}
 		}
 		else {

@@ -60,6 +60,7 @@ public final class ConfigContext {
 
 	private static final Logger log = LoggerFactory.make();
 	private static final Version DEFAULT_LUCENE_MATCH_VERSION = Version.LUCENE_30;
+	private static final String  DEFAULT_NULL_INDEX_TOKEN = "_null_";
 
 	/**
 	 * Constant used as definition point it is a global (programmatic) definition and there is no annotated element
@@ -80,8 +81,8 @@ public final class ConfigContext {
 	private final Similarity defaultSimilarity;
 	private final boolean solrPresent;
 	private final boolean jpaPresent;
-
 	private final Version luceneMatchVersion;
+	private final String nullToken;
 
 	public ConfigContext(SearchConfiguration cfg) {
 		luceneMatchVersion = getLuceneMatchVersion( cfg );
@@ -89,6 +90,7 @@ public final class ConfigContext {
 		defaultSimilarity = initSimilarity( cfg );
 		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
 		jpaPresent = isPresent( "javax.persistence.Id" );
+		nullToken = initNullToken(cfg);
 	}
 
 	/**
@@ -176,6 +178,18 @@ public final class ConfigContext {
 		}
 		log.debug( "Using default similarity implementation: {}", defaultSimilarity.getClass().getName() );
 		return defaultSimilarity;
+	}
+
+	private String initNullToken(SearchConfiguration cfg) {
+		String defaultNullIndexToken = cfg.getProperty( Environment.DEFAULT_NULL_TOKEN );
+		if(StringHelper.isEmpty( defaultNullIndexToken )) {
+			defaultNullIndexToken = DEFAULT_NULL_INDEX_TOKEN;
+		}
+		return defaultNullIndexToken;
+	}
+
+	public String getDefaultNullToken() {
+		return nullToken;
 	}
 
 	public Analyzer getDefaultAnalyzer() {

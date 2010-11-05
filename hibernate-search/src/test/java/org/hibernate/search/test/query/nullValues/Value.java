@@ -41,8 +41,11 @@ public class Value {
 	@GeneratedValue
 	private int id;
 
-	@Field(store = Store.YES, nullIndexToken = "__null")
+	@Field(store = Store.YES, indexNullAs = "_null_")
 	private String value;
+
+	@Field(store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+	private String fallback;
 
 	public Value() {
 	}
@@ -65,6 +68,14 @@ public class Value {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public String getFallback() {
+		return fallback;
+	}
+
+	public void setFallback(String fallback) {
+		this.fallback = fallback;
 	}
 }
 

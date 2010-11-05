@@ -149,7 +149,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 		super( clazz, context, providerWrapper.getSimilarity(), reflectionManager );
 
-		this.entityState = EntityState.INDEXED;
+		setEntityState( EntityState.INDEXED );
 		this.directoryProviders = providerWrapper.getProviders();
 		this.shardingStrategy = providerWrapper.getSelectionStrategy();
 	}
@@ -191,7 +191,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			String attributeName = getIdAttributeName( member, idAnnotation );
 			if ( isRoot ) {
 				if ( explicitDocumentId ) {
-					throw new SearchException( "More than one @DocumentId specified on entity " + beanClass.getName() );
+					throw new SearchException( "More than one @DocumentId specified on entity " + getBeanClass().getName() );
 				}
 				if ( idAnnotation instanceof DocumentId ) {
 					explicitDocumentId = true;
@@ -367,13 +367,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		if ( workType.searchForContainers() ) {
-			processContainedInInstances( entity, queue, metadata, searchFactoryImplementor );
+			processContainedInInstances( entity, queue, getMetadata(), searchFactoryImplementor );
 		}
 	}
 
 	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value) {
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
-				.setClass( beanClass )
+				.setClass( getBeanClass() )
 				.setFieldBridge( bridge )
 				.setFieldName( fieldName );
 		return contextualBridge.objectToString( value );
@@ -381,7 +381,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	private String objectToString(StringBridge bridge, String fieldName, Object value) {
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
-				.setClass( beanClass )
+				.setClass( getBeanClass() )
 				.setStringBridge( bridge )
 				.setFieldName( fieldName );
 		return contextualBridge.objectToString( value );
@@ -417,7 +417,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 		Document doc = new Document();
 		final Class<?> entityType = HibernateHelper.getClass( instance );
-		doc.setBoost( metadata.getClassBoost( instance ) );
+		doc.setBoost( getMetadata().getClassBoost( instance ) );
 
 		// add the class name of the entity to the document
 		Field classField =
@@ -451,7 +451,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 		// finally add all other document fields
 		Set<String> processedFieldNames = new HashSet<String>();
-		buildDocumentFields( instance, doc, metadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge );
+		buildDocumentFields( instance, doc, getMetadata(), fieldToAnalyzerMap, processedFieldNames, contextualBridge );
 		return doc;
 	}
 
@@ -606,14 +606,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public DirectoryProvider[] getDirectoryProviders() {
-		if ( entityState != EntityState.INDEXED ) {
+		if ( getEntityState() != EntityState.INDEXED ) {
 			throw new AssertionFailure( "Contained in only entity: getDirectoryProvider should not have been called." );
 		}
 		return directoryProviders;
 	}
 
 	public IndexShardingStrategy getDirectoryProviderSelectionStrategy() {
-		if ( entityState != EntityState.INDEXED ) {
+		if ( getEntityState() != EntityState.INDEXED ) {
 			throw new AssertionFailure(
 					"Contained in only entity: getDirectoryProviderSelectionStrategy should not have been called."
 			);
@@ -666,7 +666,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			return objectToString( idBridge, idKeywordName, value );
 		}
 		else {
-			FieldBridge bridge = getBridge( metadata, fieldName );
+			FieldBridge bridge = getBridge( getMetadata(), fieldName );
 			if ( bridge != null ) {
 				final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
 				if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
@@ -677,11 +677,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				}
 				throw new SearchException(
 						"FieldBridge " + bridgeClass + "does not have a objectToString method: field "
-								+ fieldName + " in " + beanXClass
+								+ fieldName + " in " + getBeanXClass()
 				);
 			}
 		}
-		throw new SearchException( "Unable to find field " + fieldName + " in " + beanXClass );
+		throw new SearchException( "Unable to find field " + fieldName + " in " + getBeanXClass() );
 	}
 
 	private FieldBridge getBridge(List<String> names, List<FieldBridge> bridges, String fieldName) {
@@ -695,7 +695,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public FieldBridge getBridge(String fieldName) {
-		return getBridge( metadata, fieldName );
+		return getBridge( getMetadata(), fieldName );
 	}
 
 	private FieldBridge getBridge(PropertiesMetadata metadata, String fieldName) {
@@ -732,13 +732,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			allowFieldSelectionInProjection = false;
 			return;
 		}
-		for ( FieldBridge bridge : metadata.fieldBridges ) {
+		for ( FieldBridge bridge : getMetadata().fieldBridges ) {
 			if ( !( bridge instanceof TwoWayStringBridge || bridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
 				allowFieldSelectionInProjection = false;
 				return;
 			}
 		}
-		for ( FieldBridge bridge : metadata.classBridges ) {
+		for ( FieldBridge bridge : getMetadata().classBridges ) {
 			if ( !( bridge instanceof TwoWayStringBridge || bridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
 				allowFieldSelectionInProjection = false;
 				return;

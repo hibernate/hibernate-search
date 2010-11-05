@@ -117,7 +117,7 @@ public final class DocumentBuilderHelper {
 			}
 		}
 
-		final AbstractDocumentBuilder.PropertiesMetadata metadata = builderIndexedEntity.metadata;
+		final AbstractDocumentBuilder.PropertiesMetadata metadata = builderIndexedEntity.getMetadata();
 		processFieldsForProjection( metadata, fields, result, document, contextualBridge );
 		return result;
 	}

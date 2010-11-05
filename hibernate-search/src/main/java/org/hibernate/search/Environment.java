@@ -143,4 +143,9 @@ public final class Environment {
 	 * The Lucene match version parameter. Needed since Lucene 3.x
 	 */
 	public static final String LUCENE_MATCH_VERSION = "hibernate.search.lucene_version";
+
+	/**
+	 * Parameter name used to configure the default null token
+	 */
+	public static final String DEFAULT_NULL_TOKEN = "hibernate.search.default_null_token";	
 }
