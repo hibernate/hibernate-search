@@ -24,13 +24,14 @@
 package org.hibernate.search.bridge.builtin;
 
 import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.bridge.TwoWayStringBridge;
 
 /**
  * Map a character element
  *
  * @author Davide D'Alto
  */
-public class CharacterBridge implements org.hibernate.search.bridge.TwoWayStringBridge {
+public class CharacterBridge implements TwoWayStringBridge {
 
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
