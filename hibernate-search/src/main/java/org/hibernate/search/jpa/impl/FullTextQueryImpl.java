@@ -332,6 +332,15 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return query.explain( documentId );
 	}
 
+	public FullTextQuery limitFetchingTime(long timeout, TimeUnit timeUnit) {
+		query.limitFetchingTime( timeout, timeUnit );
+		return this;
+	}
+
+	public boolean hasPartialResults() {
+		return query.hasPartialResults();
+	}
+
 	public int executeUpdate() {
 		throw new IllegalStateException( "Update not allowed in FullTextQueries" );
 	}
