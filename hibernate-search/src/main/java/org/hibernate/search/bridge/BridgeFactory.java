@@ -27,10 +27,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Calendar;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
@@ -43,26 +43,26 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.builtin.BigDecimalBridge;
+import org.hibernate.search.bridge.builtin.BigIntegerBridge;
+import org.hibernate.search.bridge.builtin.BooleanBridge;
+import org.hibernate.search.bridge.builtin.CalendarBridge;
+import org.hibernate.search.bridge.builtin.CharacterBridge;
+import org.hibernate.search.bridge.builtin.DateBridge;
+import org.hibernate.search.bridge.builtin.DoubleBridge;
 import org.hibernate.search.bridge.builtin.DoubleNumericFieldBridge;
+import org.hibernate.search.bridge.builtin.EnumBridge;
+import org.hibernate.search.bridge.builtin.FloatBridge;
 import org.hibernate.search.bridge.builtin.FloatNumericFieldBridge;
+import org.hibernate.search.bridge.builtin.IntegerBridge;
 import org.hibernate.search.bridge.builtin.IntegerNumericFieldBridge;
+import org.hibernate.search.bridge.builtin.LongBridge;
 import org.hibernate.search.bridge.builtin.LongNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.builtin.StringBridge;
-import org.hibernate.search.bridge.builtin.CharacterBridge;
-import org.hibernate.search.bridge.builtin.DoubleBridge;
-import org.hibernate.search.bridge.builtin.FloatBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
-import org.hibernate.search.bridge.builtin.IntegerBridge;
-import org.hibernate.search.bridge.builtin.LongBridge;
-import org.hibernate.search.bridge.builtin.BigIntegerBridge;
-import org.hibernate.search.bridge.builtin.BigDecimalBridge;
-import org.hibernate.search.bridge.builtin.BooleanBridge;
-import org.hibernate.search.bridge.builtin.UrlBridge;
+import org.hibernate.search.bridge.builtin.StringBridge;
 import org.hibernate.search.bridge.builtin.UriBridge;
-import org.hibernate.search.bridge.builtin.DateBridge;
-import org.hibernate.search.bridge.builtin.CalendarBridge;
-import org.hibernate.search.bridge.builtin.EnumBridge;
+import org.hibernate.search.bridge.builtin.UrlBridge;
 
 /**
  * This factory is responsible for creating and initializing build-in and custom <i>FieldBridges</i>.
@@ -110,7 +110,7 @@ public class BridgeFactory {
 	public static final FieldBridge DATE_MINUTE = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MINUTE );
 	public static final FieldBridge DATE_SECOND = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_SECOND );
 
-    public static final FieldBridge CALENDAR_YEAR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_YEAR );
+	public static final FieldBridge CALENDAR_YEAR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_YEAR );
 	public static final FieldBridge CALENDAR_MONTH = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MONTH );
 	public static final FieldBridge CALENDAR_DAY = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_DAY );
 	public static final FieldBridge CALENDAR_HOUR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_HOUR );
@@ -122,10 +122,10 @@ public class BridgeFactory {
 	public static final NumericFieldBridge FLOAT_NUMERIC = new FloatNumericFieldBridge();
 	public static final NumericFieldBridge DOUBLE_NUMERIC = new DoubleNumericFieldBridge();
 
-    public static final TwoWayFieldBridge DATE_MILLISECOND =
+	public static final TwoWayFieldBridge DATE_MILLISECOND =
 			new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MILLISECOND );
 
-    public static final TwoWayFieldBridge CALENDAR_MILLISECOND =
+	public static final TwoWayFieldBridge CALENDAR_MILLISECOND =
 			new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MILLISECOND );
 
 
@@ -152,16 +152,16 @@ public class BridgeFactory {
 		builtInBridges.put( URI.class.getName(), Uri );
 
 		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
-        builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND);
+		builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND );
 
-		numericBridges.put(Integer.class.getName(), INT_NUMERIC );
-		numericBridges.put(int.class.getName(), INT_NUMERIC );
-		numericBridges.put(Long.class.getName(), LONG_NUMERIC );
-		numericBridges.put(long.class.getName(), LONG_NUMERIC );
-		numericBridges.put(Double.class.getName(), DOUBLE_NUMERIC );
-		numericBridges.put(double.class.getName(), DOUBLE_NUMERIC );
-		numericBridges.put(Float.class.getName(), FLOAT_NUMERIC );
-		numericBridges.put(float.class.getName(), FLOAT_NUMERIC );
+		numericBridges.put( Integer.class.getName(), INT_NUMERIC );
+		numericBridges.put( int.class.getName(), INT_NUMERIC );
+		numericBridges.put( Long.class.getName(), LONG_NUMERIC );
+		numericBridges.put( long.class.getName(), LONG_NUMERIC );
+		numericBridges.put( Double.class.getName(), DOUBLE_NUMERIC );
+		numericBridges.put( double.class.getName(), DOUBLE_NUMERIC );
+		numericBridges.put( Float.class.getName(), FLOAT_NUMERIC );
+		numericBridges.put( float.class.getName(), FLOAT_NUMERIC );
 
 	}
 
@@ -170,16 +170,16 @@ public class BridgeFactory {
 	 * annotation.
 	 *
 	 * @param cb the ClassBridge
+	 *
 	 * @return FieldBridge
 	 */
-	public static FieldBridge extractType(ClassBridge cb)
-	{
+	public static FieldBridge extractType(ClassBridge cb) {
 		FieldBridge bridge = null;
 
 		if ( cb != null ) {
 			Class<?> impl = cb.impl();
 			//TODO better error information ( see guessType() )
-			if (impl != null) {
+			if ( impl != null ) {
 				try {
 					Object instance = impl.newInstance();
 					if ( FieldBridge.class.isAssignableFrom( impl ) ) {
@@ -187,14 +187,17 @@ public class BridgeFactory {
 					}
 					else if ( org.hibernate.search.bridge.TwoWayStringBridge.class.isAssignableFrom( impl ) ) {
 						bridge = new TwoWayString2FieldBridgeAdaptor(
-								(org.hibernate.search.bridge.TwoWayStringBridge) instance );
+								(org.hibernate.search.bridge.TwoWayStringBridge) instance
+						);
 					}
 					else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
 						bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
 					}
 					else {
-						throw new SearchException("@ClassBridge implementation implements none of the field bridge interfaces: "
-								+ impl );
+						throw new SearchException(
+								"@ClassBridge implementation implements none of the field bridge interfaces: "
+										+ impl
+						);
 					}
 					if ( cb.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
 						Map<String, String> params = new HashMap<String, String>( cb.params().length );
@@ -204,12 +207,14 @@ public class BridgeFactory {
 						( (ParameterizedBridge) instance ).setParameterValues( params );
 					}
 				}
-				catch (Exception e) {
+				catch ( Exception e ) {
 					throw new HibernateException( "Unable to instantiate ClassBridge for " + impl.getName(), e );
 				}
 			}
 		}
-		if ( bridge == null ) throw new SearchException( "Unable to guess FieldBridge for " + ClassBridge.class.getName() );
+		if ( bridge == null ) {
+			throw new SearchException( "Unable to guess FieldBridge for " + ClassBridge.class.getName() );
+		}
 
 		return bridge;
 	}
@@ -229,13 +234,15 @@ public class BridgeFactory {
 			bridge = doExtractType( bridgeAnn, memberName );
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
-			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.DateBridge.class ).resolution();
-        	bridge = getDateField( resolution );
+			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.DateBridge.class )
+					.resolution();
+			bridge = getDateField( resolution );
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
-            Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class ).resolution();
+			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class )
+					.resolution();
 			bridge = getCalendarField( resolution );
-       	}
+		}
 		else if ( numericField != null ) {
 			bridge = numericBridges.get( member.getType().getName() );
 		}
@@ -244,23 +251,28 @@ public class BridgeFactory {
 			XClass returnType = member.getType();
 			bridge = builtInBridges.get( returnType.getName() );
 			if ( bridge == null && returnType.isEnum() ) {
-				@SuppressWarnings( "unchecked" )
+				@SuppressWarnings("unchecked")
 				final Class<? extends Enum> enumClass = reflectionManager.toClass( returnType );
 				bridge = new TwoWayString2FieldBridgeAdaptor( new EnumBridge( enumClass ) );
 			}
 		}
 		//TODO add classname
-		if ( bridge == null ) throw new SearchException( "Unable to guess FieldBridge for " + memberName );
+		if ( bridge == null ) {
+			throw new SearchException( "Unable to guess FieldBridge for " + memberName );
+		}
 		return bridge;
 	}
 
-	/** assume not null bridgeAnn */
+	/**
+	 * assume not null bridgeAnn
+	 */
 	private static FieldBridge doExtractType(org.hibernate.search.annotations.FieldBridge bridgeAnn, String memberName) {
 		assert bridgeAnn != null : "doExtractType assume bridge instance not null";
 		FieldBridge bridge;
 		Class impl = bridgeAnn.impl();
-		if (impl == void.class)
-			throw new SearchException("@FieldBridge with no implementation class defined in: " + memberName );
+		if ( impl == void.class ) {
+			throw new SearchException( "@FieldBridge with no implementation class defined in: " + memberName );
+		}
 		try {
 			Object instance = impl.newInstance();
 			if ( FieldBridge.class.isAssignableFrom( impl ) ) {
@@ -268,14 +280,16 @@ public class BridgeFactory {
 			}
 			else if ( TwoWayStringBridge.class.isAssignableFrom( impl ) ) {
 				bridge = new TwoWayString2FieldBridgeAdaptor(
-						( TwoWayStringBridge) instance );
+						(TwoWayStringBridge) instance
+				);
 			}
 			else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
 				bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
 			}
 			else {
-				throw new SearchException("@FieldBridge implementation implements none of the field bridge interfaces: "
-						+ impl + " in " + memberName
+				throw new SearchException(
+						"@FieldBridge implementation implements none of the field bridge interfaces: "
+								+ impl + " in " + memberName
 				);
 			}
 			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
@@ -286,15 +300,15 @@ public class BridgeFactory {
 				( (ParameterizedBridge) instance ).setParameterValues( params );
 			}
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			//TODO add classname
-			throw new SearchException( "Unable to instanciate FieldBridge for " + memberName, e );
+			throw new SearchException( "Unable to instantiate FieldBridge for " + memberName, e );
 		}
 		return bridge;
 	}
 
 	public static FieldBridge getDateField(Resolution resolution) {
-		switch (resolution) {
+		switch ( resolution ) {
 			case YEAR:
 				return DATE_YEAR;
 			case MONTH:
@@ -315,8 +329,8 @@ public class BridgeFactory {
 	}
 
 
-    public static FieldBridge getCalendarField(Resolution resolution) {
-		switch (resolution) {
+	public static FieldBridge getCalendarField(Resolution resolution) {
+		switch ( resolution ) {
 			case YEAR:
 				return CALENDAR_YEAR;
 			case MONTH:
@@ -349,7 +363,7 @@ public class BridgeFactory {
 	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge) {
 		FieldBridge fb = extractType( fieldBridge );
 		if ( fb instanceof TwoWayFieldBridge ) {
-			return ( TwoWayFieldBridge ) fb;
+			return (TwoWayFieldBridge) fb;
 		}
 		else {
 			throw new SearchException( "FieldBridge passed in is not an instance of " + TwoWayFieldBridge.class.getSimpleName() );
@@ -379,6 +393,4 @@ public class BridgeFactory {
 
 		return bridge;
 	}
-
-
 }

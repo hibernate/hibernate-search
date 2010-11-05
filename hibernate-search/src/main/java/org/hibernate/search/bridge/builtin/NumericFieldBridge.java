@@ -7,7 +7,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 /**
  * Bridge to index numeric values using a Trie structure (multiple terms representing different precisions)
  *
- * @author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 public abstract class NumericFieldBridge implements TwoWayFieldBridge {
 

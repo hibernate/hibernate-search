@@ -23,12 +23,14 @@
  */
 package org.hibernate.search.bridge.builtin;
 
+import org.hibernate.search.bridge.TwoWayStringBridge;
+
 /**
  * Map a string element
  *
  * @author Emmanuel Bernard
  */
-public class StringBridge implements org.hibernate.search.bridge.TwoWayStringBridge {
+public class StringBridge implements TwoWayStringBridge {
 	public Object stringToObject(String stringValue) {
 		return stringValue;
 	}
