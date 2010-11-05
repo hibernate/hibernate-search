@@ -27,10 +27,14 @@ import java.io.Serializable;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.LoggerFactory;
@@ -62,9 +66,13 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 		checkType( work );
 		Serializable id = work.getId();
 		log.trace( "Removing {}#{} by id using an IndexWriter.", managedType, id );
-		Term idTerm = builder.getTerm( id );
 		try {
-			writer.deleteDocuments( idTerm );
+			if( isIdNumeric( work.getEntityClass() ) ) {
+				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdentifierName(), id ) );
+			} else {
+				Term idTerm = builder.getTerm( id );
+				writer.deleteDocuments( idTerm );
+			}
 		}
 		catch ( Exception e ) {
 			String message = "Unable to remove " + managedType + "#" + id + " from index.";

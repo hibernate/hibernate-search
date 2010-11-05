@@ -29,7 +29,11 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
@@ -67,7 +71,12 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
-		TermQuery idQueryTerm = new TermQuery( builder.getTerm( id ) );
+		Query idQueryTerm;
+		if ( isIdNumeric( entityType ) ) {
+			idQueryTerm = NumericFieldUtils.createExactMatchQuery( builder.getIdentifierName(), id );
+		} else {
+			idQueryTerm = new TermQuery( builder.getTerm( id ) );
+		}
 		entityDeletionQuery.add( idQueryTerm, BooleanClause.Occur.MUST );
 
 		Term classNameQueryTerm =  new Term( DocumentBuilder.CLASS_FIELDNAME, entityType.getName() );
@@ -81,6 +90,11 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 			String message = "Unable to remove " + entityType + "#" + id + " from index.";
 			throw new SearchException( message, e );
 		}
+	}
+
+	protected boolean isIdNumeric(Class<?> entityType) {
+		TwoWayFieldBridge idBridge = workspace.getDocumentBuilder(entityType).getIdBridge();
+		return idBridge instanceof NumericFieldBridge;
 	}
 
 	public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
