@@ -216,13 +216,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private void reactOnQueryTimeoutExceptionWhileExtracting(QueryTimeoutException e) {
-		if ( timeoutManager.isBestEffort() ) {
-			//we stop where we are return what we have
-			//TODO expose timeout exceeded
-		}
-		else {
-			throw e;
-		}
+		timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting(e);
 	}
 
 	/**
@@ -982,7 +976,18 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	public FullTextQuery setTimeout(long timeout, TimeUnit timeUnit) {
 		super.setTimeout( (int)timeUnit.toSeconds( timeout ) );
 		timeoutManager.setTimeout( timeout, timeUnit );
+		timeoutManager.raiseExceptionOnTimeout();
 		return this;
+	}
+
+	public FullTextQuery limitFetchingTime(long timeout, TimeUnit timeUnit) {
+		timeoutManager.setTimeout( timeout, timeUnit );
+		timeoutManager.limitFetchingOnTimeout();
+		return this;
+	}
+
+	public boolean hasPartialResults() {
+		return timeoutManager.hasPartialResults();
 	}
 
 	private SearchFactoryImplementor getSearchFactoryImplementor() {

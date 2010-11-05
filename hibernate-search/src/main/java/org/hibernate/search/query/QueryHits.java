@@ -149,7 +149,7 @@ public class QueryHits {
 			);
 		}
 		maybeTimeLimitingCollector = topCollector;
-		if ( timeoutManager.isBestEffort() ) {
+		if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT ) {
 			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
 			if ( timeoutLeft != null ) {
 				maybeTimeLimitingCollector = new TimeLimitingCollector(topCollector, timeoutLeft );

@@ -153,4 +153,29 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 */
 	FullTextQuery setTimeout(long timeout, TimeUnit timeUnit);
+
+	/**
+	 * *Experimental* API, subject to change or removal
+	 *
+	 * Limit the time used by Hibernate Search to execute the query. When the limit is reached, results already
+	 * fetched are returned. This time limit is a best effort. The query will likely run for longer than the
+	 * provided time.
+	 *
+	 * The time limit only applies to the interactions between Hibernate Search and Lucene. In other words,
+	 * a query to the database will not be limited.
+	 *
+	 * If the limit is reached and all results are not yet fetched, {@link #hasPartialResults()} returns true.
+	 *
+	 * @param timeout time out period
+	 * @param timeUnit time out unit
+	 */
+	FullTextQuery limitFetchingTime(long timeout, TimeUnit timeUnit);
+
+	/**
+	 * *Experimental* API, subject to change or removal
+	 *
+	 * When using {@link #limitFetchingTime(long, java.util.concurrent.TimeUnit)} }, returns true if partial results are returned (ie if the time limit has been reached
+	 * and the result fetching process has been terminated.
+	 */	
+	boolean hasPartialResults();
 }

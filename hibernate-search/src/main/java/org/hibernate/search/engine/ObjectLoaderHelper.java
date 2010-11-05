@@ -103,7 +103,7 @@ public class ObjectLoaderHelper {
 		}
 		criteria.add( disjunction );
 		//not best effort so fail fast
-		if ( ! timeoutManager.isBestEffort() ) {
+		if ( timeoutManager.getType() != TimeoutManager.Type.LIMIT ) {
 			final Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
 			if ( timeLeftInSecond != null ) {
 				criteria.setTimeout( timeLeftInSecond.intValue() );
