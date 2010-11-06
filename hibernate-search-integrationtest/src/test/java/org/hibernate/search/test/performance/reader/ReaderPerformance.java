@@ -141,12 +141,13 @@ public abstract class ReaderPerformance extends SearchTestCase {
 			}
 		}
 		executor.shutdown();
-		long startTime = System.currentTimeMillis();
+		long startTime = System.nanoTime();
 		startSignal.countDown();//start!
 		executor.awaitTermination( 600, TimeUnit.SECONDS );
-		long endTime = System.currentTimeMillis();
+		long endTime = System.nanoTime();
 		System.out.println(
-				"Performance test for " + getReaderStrategyName() + ": " + ( endTime - startTime ) + "ms. (" +
+				"Performance test for " + getReaderStrategyName() + ": "
+						+ TimeUnit.NANOSECONDS.toMillis( endTime - startTime ) + "ms. (" +
 						( TOTAL_WORK_BATCHES * SEARCHERS_PER_BATCH ) + " searches, " +
 						( TOTAL_WORK_BATCHES * INSERTIONS_PER_BATCH ) + " insertions, " +
 						( TOTAL_WORK_BATCHES * UPDATES_PER_BATCH ) + " updates)"

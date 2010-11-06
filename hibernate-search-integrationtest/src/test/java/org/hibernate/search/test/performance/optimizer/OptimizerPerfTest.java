@@ -26,6 +26,7 @@ package org.hibernate.search.test.performance.optimizer;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
@@ -71,7 +72,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
 		Work work = new Work( getSessions() );
 		ReverseWork reverseWork = new ReverseWork( getSessions() );
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		int iteration = 100;
 		for ( int i = 0; i < iteration; i++ ) {
 			es.execute( work );
@@ -81,8 +82,8 @@ public class OptimizerPerfTest extends SearchTestCase {
 			Thread.sleep( 20 );
 		}
 		System.out.println(
-				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: " + ( System
-						.currentTimeMillis() - start )
+				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: "
+						+ TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start )
 		);
 	}
 

@@ -26,6 +26,7 @@ package org.hibernate.search.test.worker;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.analysis.StopAnalyzer;
@@ -72,7 +73,7 @@ public class WorkerTestCase extends SearchTestCase {
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
 		Work work = new Work( getSessions() );
 		ReverseWork reverseWork = new ReverseWork( getSessions() );
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		int iteration = 100;
 		for ( int i = 0; i < iteration; i++ ) {
 			es.execute( work );
@@ -83,8 +84,8 @@ public class WorkerTestCase extends SearchTestCase {
 		}
 		getSessions().close();
 		System.out.println(
-				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: " + ( System
-						.currentTimeMillis() - start )
+				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: "
+						+ TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start )
 		);
 	}
 

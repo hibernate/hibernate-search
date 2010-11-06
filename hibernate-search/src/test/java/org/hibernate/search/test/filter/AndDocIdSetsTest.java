@@ -30,6 +30,7 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 import org.apache.lucene.search.DocIdSet;
@@ -155,14 +156,14 @@ public class AndDocIdSetsTest extends TestCase {
 		DocIdSet andedByBitsResult = null;
 		DocIdSet andedByIterationResult = null;
 		{
-			long startTime = System.currentTimeMillis();
+			long startTime = System.nanoTime();
 			for ( int i = 0; i < 1000; i++ ) {
 				BitSet expectedBitset = applyANDOnBitSets( filtersData );
 				andedByBitsResult = new DocIdBitSet( expectedBitset );
 				// iteration is needed to have a fair comparison with other impl:
 				iterateOnResults( andedByBitsResult );
 			}
-			long totalTimeMs = System.currentTimeMillis() - startTime;
+			long totalTimeMs = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - startTime );
 			System.out.println(
 					"Time to \"AND " + listSize +
 							" BitSets and iterate on results\" 1000 times: " +
@@ -172,13 +173,13 @@ public class AndDocIdSetsTest extends TestCase {
 		}
 		List<DocIdSet> docIdSetList = toDocIdSetList( filtersData );
 		{
-			long startTime = System.currentTimeMillis();
+			long startTime = System.nanoTime();
 			for ( int i = 0; i < 1000; i++ ) {
 				andedByIterationResult = new AndDocIdSet( docIdSetList, maxBitsSize );
 				// iteration is needed because the AND is been done lazily on iterator access:
 				iterateOnResults( andedByIterationResult );
 			}
-			long totalTimeMs = System.currentTimeMillis() - startTime;
+			long totalTimeMs = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - startTime );
 			System.out.println(
 					"Time to \"use AndDocIdSet iterator on " + listSize +
 							" Filters and iterate on results\" 1000 times: " +

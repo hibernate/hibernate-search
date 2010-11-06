@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.impl;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	private static final Logger log = LoggerFactory.make();
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final AtomicLong totalCounter = new AtomicLong();
-	private volatile long startTimeMs;
+	private volatile long startTime;
 
 	public void entitiesLoaded(int size) {
 		//not used
@@ -49,10 +50,10 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	public void documentsAdded(long increment) {
 		long current = documentsDoneCounter.addAndGet( increment );
 		if ( current == increment ) {
-			startTimeMs = System.currentTimeMillis();
+			startTime = System.nanoTime();
 		}
 		if ( current % getStatusMessagePeriod() == 0 ) {
-			printStatusMessage( startTimeMs, totalCounter.get(), current );
+			printStatusMessage( startTime, totalCounter.get(), current );
 		}
 	}
 
@@ -73,8 +74,8 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 		return 50;
 	}
 
-	protected void printStatusMessage(long starttimems, long totalTodoCount, long doneCount) {
-		long elapsedMs = System.currentTimeMillis() - starttimems;
+	protected void printStatusMessage(long starttime, long totalTodoCount, long doneCount) {
+		long elapsedMs = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - starttime );
 		log.info( "{} documents indexed in {} ms", doneCount, elapsedMs );
 		float estimateSpeed = doneCount * 1000f / elapsedMs;
 		float estimatePercentileComplete = doneCount * 100f / totalTodoCount;

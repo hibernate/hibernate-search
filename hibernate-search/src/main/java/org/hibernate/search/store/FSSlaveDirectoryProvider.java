@@ -30,6 +30,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.store.FSDirectory;
@@ -232,7 +233,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		}
 
 		public void run() {
-			long start = System.currentTimeMillis();
+			long start = System.nanoTime();
 			try {
 				File sourceFile = determineCurrentSourceFile();
 				if ( sourceFile == null ) {
@@ -262,7 +263,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 					log.trace( "Copying {} into {}", sourceFile, destinationFile );
 					FileHelper.synchronize( sourceFile, destinationFile, true, copyChunkSize );
 					current = index;
-					log.trace( "Copy for {} took {} ms", indexName, ( System.currentTimeMillis() - start ) );
+					log.trace( "Copy for {} took {} ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
 				}
 				catch ( IOException e ) {
 					//don't change current

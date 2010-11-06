@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.analysis.StopAnalyzer;
@@ -118,7 +119,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
 		Work work = new Work( getSessions() );
 		ReverseWork reverseWork = new ReverseWork( getSessions() );
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		int iteration = 100;
 		log.info( "Starting worker threads." );
 		for ( int i = 0; i < iteration; i++ ) {
@@ -128,7 +129,8 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		while ( work.count.get() < iteration - 1 ) {
 			Thread.sleep( 20 );
 		}
-		log.debug( iteration + " iterations in " + nThreads + " threads: " + ( System.currentTimeMillis() - start ) );
+		log.debug( iteration + " iterations in " + nThreads + " threads: "
+				+ TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
 	}
 
 	protected class Work implements Runnable {

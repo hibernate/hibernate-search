@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -93,7 +94,7 @@ public class SearcherThread implements Runnable {
 	public void runLucene() {
 		try {
 			Query q = getQuery();
-			long start = System.currentTimeMillis();
+			long start = System.nanoTime();
 			// Search
 			TopDocs hits = indexsearcher.search( q, 1000 );
 			List<String> names = new ArrayList<String>(100);
@@ -102,7 +103,7 @@ public class SearcherThread implements Runnable {
 				names.add( doc.get( "name" ) );
 			}
 			int resultSize = hits.totalHits;
-			long totalTime = System.currentTimeMillis() - start;
+			long totalTime = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start );
 //			log.error( "Lucene [ Thread-id : " + threadId + " ] Total time taken for search is : " + totalTime + "ms with total no. of matching records : " + hits.length() );
 			setTime( totalTime );
 		}
@@ -144,10 +145,10 @@ public class SearcherThread implements Runnable {
 			FullTextSession ftSession = Search.getFullTextSession( sf.openSession(  ) );
 			final FullTextQuery textQuery = ftSession.createFullTextQuery( q, Boat.class )
 					.setMaxResults( 100 ).setProjection( "name" );
-			long start = System.currentTimeMillis();
+			long start = System.nanoTime();
 			List results = textQuery.list();
 			int resultSize = textQuery.getResultSize();
-			long totalTime = System.currentTimeMillis() - start;
+			long totalTime = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start );
 			ftSession.close();
 //			log.error( "HSearch [ Thread-id : " + threadId + " ] Total time taken for search is : " + totalTime + "ms with total no. of matching records : " + resultSize );
 			setTime( totalTime );

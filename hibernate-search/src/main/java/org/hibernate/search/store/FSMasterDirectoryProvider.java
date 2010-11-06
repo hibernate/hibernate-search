@@ -30,6 +30,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
@@ -217,7 +218,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			//TODO get rid of current and use the marker file instead?
 			directoryProviderLock.lock();
 			try {
-				long start = System.currentTimeMillis();//keep time after lock is acquired for correct measure
+				long start = System.nanoTime();//keep time after lock is acquired for correct measure
 				int oldIndex = current;
 				int index = oldIndex == 1 ? 2 : 1;
 				File destinationFile = new File( destination, Integer.valueOf(index).toString() );
@@ -240,7 +241,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				catch( IOException e ) {
 					log.warn( "Unable to create current marker in source of " + indexName, e );
 				}
-				log.trace( "Copy for {} took {} ms", indexName, (System.currentTimeMillis() - start) );
+				log.trace( "Copy for {} took {} ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
 			}
 			finally {
 				directoryProviderLock.unlock();

@@ -55,7 +55,7 @@ public class IndexTestDontRun extends SearchTestCase {
 	}
 
 	public void notestInit() throws Exception {
-		long time = System.currentTimeMillis();
+		long time = System.nanoTime();
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		for (int i = 0; i < 50000; i++) {
@@ -63,7 +63,7 @@ public class IndexTestDontRun extends SearchTestCase {
 		}
 		tx.commit();
 		s.close();
-		System.out.println( " init time = " + ( System.currentTimeMillis() - time ) );
+		System.out.println( " init time = " + TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - time ) );
 	}
 	
 	public void testPerformance() throws Exception {
