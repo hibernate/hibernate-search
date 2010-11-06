@@ -237,7 +237,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			try {
 				File sourceFile = determineCurrentSourceFile();
 				if ( sourceFile == null ) {
-					log.error( "Unable to determine current in source directory" );
+					log.warn( "Unable to determine current in source directory, will try again during the next synchronization" );
 					return;
 				}
 
