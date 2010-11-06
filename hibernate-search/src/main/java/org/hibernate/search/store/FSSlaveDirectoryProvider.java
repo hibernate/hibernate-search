@@ -37,6 +37,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.search.Environment;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
@@ -79,9 +80,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		this.directoryProviderName = directoryProviderName;
 		//source guessing
 		sourceIndexDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, false );
-		if ( !new File( sourceIndexDir, "current1" ).exists() && !new File( sourceIndexDir, "current2" ).exists() ) {
-			throw new IllegalStateException( "No current marker in source directory" );
-		}
+		checkCurrentMarkerInSource();
 		log.debug( "Source directory: {}", sourceIndexDir.getPath() );
 		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
 		log.debug( "Index directory: {}", indexDir.getPath() );
@@ -93,6 +92,41 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
 		current = 0; //publish all state to other threads
+	}
+
+	private void checkCurrentMarkerInSource() {
+		int retry;
+		try {
+			retry = Integer.parseInt( properties.getProperty( Environment.RETRY_MARKER_LOOKUP, "0" ) );
+			if (retry < 0) {
+				throw new NumberFormatException( );
+			}
+		}
+		catch ( NumberFormatException e ) {
+			throw new SearchException("retry_marker_lookup options must be a positive number: "
+					+ properties.getProperty( Environment.RETRY_MARKER_LOOKUP ) );
+		}
+		boolean currentMarkerInSource = false;
+		for ( int tried = 0 ; tried <= retry ; tried++ ) {
+			//we try right away the first time
+			if ( tried > 0) {
+				try {
+					Thread.sleep( TimeUnit.SECONDS.toMillis( 5 ) );
+				}
+				catch ( InterruptedException e ) {
+					//continue
+				}
+			}
+			currentMarkerInSource =
+					new File( sourceIndexDir, "current1" ).exists()
+					|| new File(sourceIndexDir, "current2").exists();
+			if (currentMarkerInSource) {
+				break;
+			}
+		}
+		if ( !currentMarkerInSource ) {
+			throw new IllegalStateException( "No current marker in source directory. Has the master being started once already?" );
+		}
 	}
 
 	public void start() {
@@ -125,7 +159,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 					sourceCurrent = 2;
 				}
 				else {
-					throw new AssertionFailure( "No current file marker found in source directory: " + sourceIndexDir.getPath() );
+					throw new SearchException( "No current file marker found in source directory: " + sourceIndexDir.getPath() );
 				}
 				try {
 					FileHelper.synchronize(

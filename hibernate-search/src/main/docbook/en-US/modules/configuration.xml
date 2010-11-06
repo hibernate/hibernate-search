@@ -148,7 +148,10 @@
             16MB.</para><para><literal> locking_strategy</literal> : optional,
             see <xref
             linkend="search-configuration-directory-lockfactories" />
-            </para></entry>
+            </para><para><literal> retry_marker_lookup</literal> : optional,
+            default to 0. Defines how many times, we look for the marker files
+            in the source directory before failing. Waiting 5 seconds between
+            each try. </para></entry>
           </row>
         </tbody>
       </tgroup>
@@ -368,8 +371,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
 
     <para>It is possible to refine how Hibernate Search interacts with Lucene
     through the worker configuration. There exist several architectural
-    components and possible extension points. Let's have a closer look.
-    </para>
+    components and possible extension points. Let's have a closer look.</para>
 
     <para>First there is a <classname>Worker</classname>. An implementation of
     the <classname>Worker</classname> interface is reponsible for receiving

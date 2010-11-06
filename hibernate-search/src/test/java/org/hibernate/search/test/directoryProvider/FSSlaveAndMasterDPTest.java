@@ -26,6 +26,7 @@ package org.hibernate.search.test.directoryProvider;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.queryParser.QueryParser;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
@@ -75,6 +77,11 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	 * The lucene index directory which is specific to the slave node.
 	 */
 	private String slave = "/slave";
+
+	/**
+	 * The lucene index directory which is specific to the slave node.
+	 */
+	private String slaveUnready = "/slaveUnready";
 
 	/**
 	 * Verifies that copies of the master get properly copied to the slaves.
@@ -198,6 +205,11 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		if ( !slaveFile.mkdirs() ) {
 			throw new HibernateException( "Unable to setup slave directory" );
 		}
+
+		File slaveUnreadyFile = new File( root, slaveUnready );
+		if ( !slaveUnreadyFile.mkdirs() ) {
+			throw new HibernateException( "Unable to setup slave directory" );
+		}
 		super.setUp();
 	}
 
@@ -215,6 +227,31 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return new Class[] {
 				SnowStorm.class
 		};
+	}
+
+	public void testSourceNotReady() throws Exception {
+		int retries = 1;
+		Configuration cfg = new Configuration();
+		//slave(s)
+		cfg.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy + "nooooot" );
+		cfg.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave );
+		cfg.setProperty( "hibernate.search.default.refresh", "1" ); //every second
+		cfg.setProperty(
+				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSSlaveDirectoryProvider"
+		);
+		cfg.setProperty(
+				"hibernate.search.default.retry_marker_lookup", new Integer(retries).toString()
+		);
+		cfg.addAnnotatedClass( SnowStorm.class );
+		long start = System.nanoTime();
+		try {
+			cfg.buildSessionFactory();
+		}
+		catch ( HibernateException e ) {
+			assertTrue( "expected configuration failure", e.getCause() instanceof SearchException );
+			final long elapsedTime = TimeUnit.NANOSECONDS.toSeconds( System.nanoTime() - start );
+			assertTrue( "Should be around 10 seconds: " + elapsedTime, elapsedTime > retries*5 - 1 ); // -1 for safety
+		}
 	}
 
 	protected void configure(Configuration[] cfg) {

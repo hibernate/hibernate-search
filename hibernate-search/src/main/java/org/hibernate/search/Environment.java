@@ -115,6 +115,17 @@ public final class Environment {
 	public static final String EXCLUSIVE_INDEX_USE = "exclusive_index_use";
 
 	/**
+	 * Number of times we retry the logic looking for marker files in master's directory before
+	 * giving up and raising an exception.
+	 * This setting is the suffix of an index using FSSlaveDirectoryProvider
+	 *
+	 * Note that we try again after 5 seconds.
+	 *
+	 * Default to 0 (ie no retry).
+	 */
+	public static final String RETRY_MARKER_LOOKUP = "retry_marker_lookup"; 
+
+	/**
 	 * Define the similarity class name for a given index
 	 */
 	public static final String SIMILARITY_CLASS_PER_INDEX = "similarity";
