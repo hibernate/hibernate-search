@@ -36,6 +36,7 @@ import org.apache.solr.analysis.TokenizerFactory;
 import org.apache.solr.common.ResourceLoader;
 import org.apache.solr.util.plugin.ResourceLoaderAware;
 
+import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
@@ -67,32 +68,48 @@ final class SolrAnalyzerBuilder {
 	 * @return a Lucene <code>Analyzer</code>
 	 */
 	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) {
+		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader();
 		TokenizerDef token = analyzerDef.tokenizer();
 		TokenizerFactory tokenFactory = ( TokenizerFactory ) instantiate( token.factory() );
-		tokenFactory.init( getMapOfParameters( token.params(), luceneMatchVersion ) );
+		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( token.params(), luceneMatchVersion );
+		tokenFactory.init( tokenMapsOfParameters );
+		injectResourceLoader( tokenFactory, defaultResourceLoader, tokenMapsOfParameters );
 
 		final int length = analyzerDef.filters().length;
 		final int charLength = analyzerDef.charFilters().length;
 		TokenFilterFactory[] filters = new TokenFilterFactory[length];
 		CharFilterFactory[] charFilters = new CharFilterFactory[charLength];
-		ResourceLoader resourceLoader = new HibernateSearchResourceLoader();
 		for ( int index = 0; index < length; index++ ) {
 			TokenFilterDef filterDef = analyzerDef.filters()[index];
 			filters[index] = ( TokenFilterFactory ) instantiate( filterDef.factory() );
-			filters[index].init( getMapOfParameters( filterDef.params(), luceneMatchVersion ) );
-			if ( filters[index] instanceof ResourceLoaderAware ) {
-				( ( ResourceLoaderAware ) filters[index] ).inform( resourceLoader );
-			}
+			final Map<String, String> mapOfParameters = getMapOfParameters( filterDef.params(), luceneMatchVersion );
+			filters[index].init( mapOfParameters );
+			injectResourceLoader( filters[index], defaultResourceLoader, mapOfParameters );
 		}
 		for ( int index = 0; index < charFilters.length; index++ ) {
 			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
 			charFilters[index] = ( CharFilterFactory ) instantiate( charFilterDef.factory() );
-			charFilters[index].init( getMapOfParameters( charFilterDef.params(), luceneMatchVersion ) );
-			if ( charFilters[index] instanceof ResourceLoaderAware ) {
-				( ( ResourceLoaderAware ) charFilters[index] ).inform( resourceLoader );
-			}
+			final Map<String, String> mapOfParameters = getMapOfParameters(
+					charFilterDef.params(), luceneMatchVersion
+			);
+			charFilters[index].init( mapOfParameters );
+			injectResourceLoader( charFilters[index], defaultResourceLoader, mapOfParameters );
 		}
 		return new TokenizerChain( charFilters, tokenFactory, filters );
+	}
+
+	private static void injectResourceLoader(Object processor, ResourceLoader defaultResourceLoader, Map<String, String> mapOfParameters) {
+		if ( processor instanceof ResourceLoaderAware ) {
+			String charset = mapOfParameters.get( Environment.RESOURCE_CHARSET );
+			final ResourceLoader localResourceLoader;
+			if ( charset != null ) {
+				localResourceLoader = new HibernateSearchResourceLoader( charset );
+			}
+			else {
+				localResourceLoader = defaultResourceLoader;
+			}
+			( ( ResourceLoaderAware ) processor ).inform( localResourceLoader );
+		}
 	}
 
 	private static Object instantiate(Class clazz) {

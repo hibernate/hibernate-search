@@ -294,8 +294,6 @@ public class Essay {
       default the field name is decapitalized, following the JavaBean
       specification. The <literal>grade</literal> field is annotated as
       Numeric with a slightly larger precisionStep than the default/</para>
-
-      
     </section>
 
     <section>
@@ -865,6 +863,36 @@ public class Team {
           defined in the <classname>@AnalyzerDef</classname> annotation. Order
           matters!</para>
         </tip>
+
+        <para>Some tokenizers, token filters or char filters load resources
+        like a configuration or metadata file. This is the case for the stop
+        filter and the synonym filter. If the resource charset is not using
+        the VM default, you can explicitly specify it by adding a
+        <literal>resource_charset</literal> parameter.</para>
+
+        <example id="example-analyzer-def">
+          <title>Use a specific charset to load the property file</title>
+
+          <programlisting>@AnalyzerDef(name="customanalyzer",
+        charFilters = {
+                @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
+                    @Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+                })
+        },
+        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+        filters = {
+                @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
+                @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+                @TokenFilterDef(factory = StopFilterFactory.class, params = {
+                    @Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
+                    @Parameter(name="resource_charset", value = "UTF-16BE"),
+                    @Parameter(name="ignoreCase", value="true")
+                })
+})
+public class Team {
+    ...
+}</programlisting>
+        </example>
 
         <para>Once defined, an analyzer definition can be reused by an
         <classname>@Analyzer</classname> declaration as seen in <xref

@@ -147,5 +147,10 @@ public final class Environment {
 	/**
 	 * Parameter name used to configure the default null token
 	 */
-	public static final String DEFAULT_NULL_TOKEN = "hibernate.search.default_null_token";	
+	public static final String DEFAULT_NULL_TOKEN = "hibernate.search.default_null_token";
+
+	/**
+	 * Tokenizer or filter parameter describing the charset used to load associated resources if needed.
+	 */
+	public static final String RESOURCE_CHARSET = "resource_charset";
 }

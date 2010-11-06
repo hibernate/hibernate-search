@@ -41,6 +41,16 @@ import org.hibernate.search.SearchException;
  * @author Emmanuel Bernard
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
+	private final String charset;
+
+	public HibernateSearchResourceLoader() {
+		this.charset = null;
+	}
+
+	public HibernateSearchResourceLoader(String charset) {
+		this.charset = charset;
+	}
+
 	public InputStream openResource(String resource) throws IOException {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream( resource );
 	}
@@ -48,7 +58,10 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 	public List<String> getLines(String resource) throws IOException {
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader( new InputStreamReader( openResource( resource ) ) );
+			final InputStreamReader charsetAwareReader;
+			final InputStream stream = openResource( resource );
+			charsetAwareReader = charset == null ? new InputStreamReader( stream ) : new InputStreamReader( stream, charset );
+			reader = new BufferedReader( charsetAwareReader );
 			List<String> results = new ArrayList<String>();
 			String line = reader.readLine();
 			while ( line != null ) {
