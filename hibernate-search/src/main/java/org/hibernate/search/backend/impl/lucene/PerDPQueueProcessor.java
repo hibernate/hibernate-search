@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.slf4j.Logger;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -120,7 +121,11 @@ class PerDPQueueProcessor implements Runnable {
 				workspace.closeIndexWriter();
 			}
 			finally {
-				workspace.forceLockRelease();
+				//LockObtainFailedException is wrapped in a SearchException by the workspace
+				//LockObtainFailedException should never ever release the lock
+				if ( ! (tw.getCause() instanceof LockObtainFailedException) ) {
+					workspace.forceLockRelease();
+				}
 			}
 		}
 	}
