@@ -34,7 +34,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.Clock;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;

@@ -35,7 +35,6 @@ import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.ManualConfiguration;

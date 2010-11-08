@@ -40,7 +40,6 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.store.IdHashShardingStrategy;
 import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;

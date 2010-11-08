@@ -44,7 +44,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;

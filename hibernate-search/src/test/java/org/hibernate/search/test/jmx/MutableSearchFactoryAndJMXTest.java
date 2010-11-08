@@ -29,7 +29,6 @@ import junit.framework.TestCase;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualConfiguration;
 

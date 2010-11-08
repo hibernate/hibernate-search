@@ -25,7 +25,6 @@
 package org.hibernate.search.test.engine;
 
 import org.hibernate.search.Search;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**

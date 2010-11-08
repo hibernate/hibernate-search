@@ -26,7 +26,6 @@ package org.hibernate.search.test.similarity;
 import java.util.List;
 
 import org.hibernate.HibernateException;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextSession;

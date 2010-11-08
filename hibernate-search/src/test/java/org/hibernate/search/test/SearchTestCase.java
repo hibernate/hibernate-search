@@ -52,7 +52,6 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
 
 /**

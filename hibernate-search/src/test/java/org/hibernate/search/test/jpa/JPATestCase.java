@@ -35,7 +35,6 @@ import javax.persistence.Persistence;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.util.Version;

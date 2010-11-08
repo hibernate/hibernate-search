@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.worker;
 
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.Environment;
 import org.hibernate.cfg.Configuration;
 import org.apache.lucene.analysis.StopAnalyzer;

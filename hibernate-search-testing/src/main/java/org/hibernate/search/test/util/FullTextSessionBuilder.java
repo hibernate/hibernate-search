@@ -32,8 +32,6 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.FSDirectoryProvider;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.util.FileHelper;
 import org.slf4j.Logger;
 

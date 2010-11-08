@@ -24,7 +24,6 @@
 package org.hibernate.search.test.bridge;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.cfg.AnnotationConfiguration;
 import junit.framework.TestCase;
 
