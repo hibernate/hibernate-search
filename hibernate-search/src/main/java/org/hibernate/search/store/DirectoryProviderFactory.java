@@ -34,7 +34,6 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.WritableBuildContext;
@@ -158,6 +157,9 @@ public class DirectoryProviderFactory {
 		}
 		try {
 			provider.initialize( directoryProviderName, indexProps, context );
+		}
+		catch ( SearchException e ) {
+			throw e;
 		}
 		catch (Exception e) {
 			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
