@@ -29,7 +29,6 @@ import junit.framework.TestCase;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualConfiguration;
 
@@ -43,7 +42,7 @@ public class MutableSearchFactoryAndJMXTest extends TestCase {
 		simpleJndiDir.mkdir();
 
 		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() )
+				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
 				.addProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" )
 				.addProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() )

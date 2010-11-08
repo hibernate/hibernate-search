@@ -37,7 +37,6 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -58,7 +57,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 		Configuration config = new AnnotationConfiguration();
 		config.addAnnotatedClass( Entity1.class );
 		config.addAnnotatedClass( Entity2.class );
-		config.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		try {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
@@ -75,7 +74,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 	public void testDuplicatedProgrammaticAnalyzerDefinitionThrowsException() throws Exception {
 		Configuration config = new AnnotationConfiguration();
 		config.getProperties().put( Environment.MODEL_MAPPING, createSearchMapping() );
-		config.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		try {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );

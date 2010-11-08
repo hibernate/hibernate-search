@@ -44,8 +44,6 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.FSDirectoryProvider;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.test.util.ManualConfiguration;
@@ -68,7 +66,7 @@ public class MutableFactoryTest extends TestCase {
 
 	public void testAddingClassFullModel() throws Exception {
 		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+				.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		//FIXME downcasting of MSF. create a getDelegate() ?
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
@@ -119,7 +117,7 @@ public class MutableFactoryTest extends TestCase {
 
 	public void testAddingClassSimpleAPI() throws Exception {
 		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+				.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 
 		sf.addClasses( A.class );
@@ -190,7 +188,7 @@ public class MutableFactoryTest extends TestCase {
 	private void doTestMultiThreadedClasses(File indexDir) throws Exception {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() )
+				.addProperty( "hibernate.search.default.directory_provider", "filesystem" )
 				.addProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		List<DoAddClasses> runnables = new ArrayList<DoAddClasses>(10);

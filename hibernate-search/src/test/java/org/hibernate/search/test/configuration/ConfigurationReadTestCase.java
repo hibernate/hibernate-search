@@ -30,7 +30,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
 
@@ -118,7 +117,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 			for ( Class annotated : mapping ) {
 				( configuration ).addAnnotatedClass( annotated );
 			}
-			configuration.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+			configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
 			configuration.buildSessionFactory();
 			fail();
 		} catch (HibernateException e) {

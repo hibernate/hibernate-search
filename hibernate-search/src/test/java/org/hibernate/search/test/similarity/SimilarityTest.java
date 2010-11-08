@@ -26,7 +26,6 @@ package org.hibernate.search.test.similarity;
 import java.util.List;
 
 import org.hibernate.HibernateException;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextSession;
@@ -47,7 +46,7 @@ public class SimilarityTest extends SearchTestCase {
 		Configuration config = new Configuration();
 		config.addAnnotatedClass( Can.class );
 		config.addAnnotatedClass( Trash.class );
-		config.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		config.setProperty( "hibernate.search.default.similarity", DummySimilarity.class.getName() );
 		try {
 			config.buildSessionFactory();

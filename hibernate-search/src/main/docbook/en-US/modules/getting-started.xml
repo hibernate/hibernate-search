@@ -210,7 +210,7 @@
 
       <programlisting language="XML" role="XML">...
 &lt;property name="hibernate.search.default.directory_provider" 
-          value="org.hibernate.search.store.FSDirectoryProvider"/&gt; 
+          value="filesystem"/&gt; 
 
 &lt;property name="hibernate.search.default.indexBase" 
           value="/var/lucene/indexes"/&gt; 
@@ -223,16 +223,15 @@
     property. Apache Lucene has the notion of a <literal>Directory</literal>
     to store the index files. Hibernate Search handles the initialization and
     configuration of a Lucene <literal>Directory</literal> instance via a
-    <literal>DirectoryProvider</literal>. In this tutorial we will use a
-    subclass of <literal>DirectoryProvider</literal> called
-    <classname>FSDirectoryProvider</classname>. This will give us the ability
-    to physically inspect the Lucene indexes created by Hibernate Search (eg
-    via <ulink url="http://www.getopt.org/luke/">Luke</ulink>). Once you have
-    a working configuration you can start experimenting with other directory
-    providers (see <xref linkend="search-configuration-directory" />). Next to
-    the directory provider you also have to specify the default root directory
-    for all indexes via
-    <literal>hibernate.search.default.indexBase</literal>.</para>
+    <literal>DirectoryProvider</literal>. In this tutorial we will use a a
+    directory provider storing the index in the file system. This will give us
+    the ability to physically inspect the Lucene indexes created by Hibernate
+    Search (eg via <ulink url="http://www.getopt.org/luke/">Luke</ulink>).
+    Once you have a working configuration you can start experimenting with
+    other directory providers (see <xref
+    linkend="search-configuration-directory" />). Next to the directory
+    provider you also have to specify the default root directory for all
+    indexes via <literal>hibernate.search.default.indexBase</literal>.</para>
 
     <para>Lets assume that your application contains the Hibernate managed
     classes <classname>example.Book</classname> and

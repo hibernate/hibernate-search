@@ -44,7 +44,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
@@ -284,7 +283,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
-		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 

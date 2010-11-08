@@ -85,7 +85,7 @@
 				
 				<!-- Hibernate Search -->
 				<entry key="hibernate.search.default.indexBase" value="." />
-				<entry key="hibernate.search.default.directory_provider" value="org.hibernate.search.store.RAMDirectoryProvider" />
+				<entry key="hibernate.search.default.directory_provider" value="ram" />
 				<entry key="hibernate.search.worker.execution" value="async" />
 				<entry key="hibernate.search.default.optimizer.transaction_limit.max" value="100" />
 				<entry key="hibernate.search.worker.thread_pool.size" value="1" />

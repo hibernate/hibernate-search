@@ -32,8 +32,6 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.FSDirectoryProvider;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.util.FileHelper;
 import org.slf4j.Logger;
 
@@ -87,13 +85,11 @@ public class FullTextSessionBuilder {
 	 */
 	public FullTextSessionBuilder useRAMDirectoryProvider(boolean use) {
 		 if ( use ) {
-			 cfg.setProperty( "hibernate.search.default.directory_provider",
-						RAMDirectoryProvider.class.getName() );
+			 cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 			 usingFileSystem = false;
 		 }
 		 else {
-			 cfg.setProperty( "hibernate.search.default.directory_provider",
-						FSDirectoryProvider.class.getName() );
+			 cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 			 usingFileSystem = true;
 		 }
 		return this;

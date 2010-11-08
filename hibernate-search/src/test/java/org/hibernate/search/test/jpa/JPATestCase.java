@@ -35,7 +35,6 @@ import javax.persistence.Persistence;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
-import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.util.Version;
@@ -123,7 +122,7 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 		}
 
 		//Search config
-		config.put( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		config.put( "hibernate.search.default.directory_provider", "ram" );
 		config.put( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 
 		return config;
