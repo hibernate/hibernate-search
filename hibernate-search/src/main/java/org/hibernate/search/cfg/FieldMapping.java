@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
+
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -46,7 +47,7 @@ public class FieldMapping {
 		this.mapping = mapping;
 		this.entity = entity;
 		this.property = property;
-		property.addField(field);
+		property.addField( field );
 	}
 
 	public FieldMapping name(String fieldName) {
@@ -75,7 +76,7 @@ public class FieldMapping {
 		field.put( "boost", boostAnn );
 		return this;
 	}
-	
+
 	public FieldBridgeMapping bridge(Class<?> impl) {
 		return new FieldBridgeMapping( impl, field, this, property, entity, mapping );
 	}
@@ -94,32 +95,37 @@ public class FieldMapping {
 		return this;
 	}
 
+	public FieldMapping indexNullAs(String indexNullAs) {
+		field.put( "indexNullAs", indexNullAs );
+		return this;
+	}
+
 	public FieldMapping field() {
-		return new FieldMapping(property, entity, mapping);
+		return new FieldMapping( property, entity, mapping );
 	}
 
 	public NumericFieldMapping numericField() {
-		return new NumericFieldMapping(property,entity,mapping);
+		return new NumericFieldMapping( property, entity, mapping );
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, mapping);
+		return new PropertyMapping( name, type, entity, mapping );
 	}
 
 	public DateBridgeMapping dateBridge(Resolution resolution) {
-		return new DateBridgeMapping(mapping, entity, property, resolution);
+		return new DateBridgeMapping( mapping, entity, property, resolution );
 	}
-	
+
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 
 	public CalendarBridgeMapping calendarBridge(Resolution resolution) {
-		return new CalendarBridgeMapping(mapping,entity,property, resolution);
+		return new CalendarBridgeMapping( mapping, entity, property, resolution );
 	}
 
 }
