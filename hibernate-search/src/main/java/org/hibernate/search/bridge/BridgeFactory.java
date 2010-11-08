@@ -217,9 +217,8 @@ public final class BridgeFactory {
 		else {
 			bridgeAnn = member.getAnnotation( org.hibernate.search.annotations.FieldBridge.class );
 		}
-		final String memberName = member.getName();
 		if ( bridgeAnn != null ) {
-			bridge = doExtractType( bridgeAnn, memberName );
+			bridge = doExtractType( bridgeAnn, member, reflectionManager );
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
 			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.DateBridge.class )
@@ -239,24 +238,37 @@ public final class BridgeFactory {
 			XClass returnType = member.getType();
 			bridge = builtInBridges.get( returnType.getName() );
 			if ( bridge == null && returnType.isEnum() ) {
+				//we return one enum type bridge instance per property as it is customized per ReturnType
 				@SuppressWarnings("unchecked")
-				final Class<? extends Enum> enumClass = reflectionManager.toClass( returnType );
-				bridge = new TwoWayString2FieldBridgeAdaptor( new EnumBridge( enumClass ) );
+				final EnumBridge enumBridge = new EnumBridge();
+				populateReturnType( reflectionManager.toClass( member.getType() ), EnumBridge.class, enumBridge );
+				bridge = new TwoWayString2FieldBridgeAdaptor( enumBridge );
 			}
 		}
 		//TODO add classname
 		if ( bridge == null ) {
-			throw new SearchException( "Unable to guess FieldBridge for " + memberName );
+			throw new SearchException( "Unable to guess FieldBridge for " + member.getName() );
 		}
 		return bridge;
 	}
 
-	private static FieldBridge doExtractType(org.hibernate.search.annotations.FieldBridge bridgeAnn, String memberName) {
+	private static FieldBridge doExtractType(
+			org.hibernate.search.annotations.FieldBridge bridgeAnn,
+			XMember member,
+			ReflectionManager reflectionManager) {
+		return doExtractType( bridgeAnn, member.getName(), reflectionManager.toClass( member.getType() ) );
+	}
+
+
+	private static FieldBridge doExtractType(
+			org.hibernate.search.annotations.FieldBridge bridgeAnn,
+			String appliedOnName,
+			Class<?> appliedOnType) {
 		assert bridgeAnn != null : "@FieldBridge instance cannot be null";
 		FieldBridge bridge;
 		Class impl = bridgeAnn.impl();
 		if ( impl == void.class ) {
-			throw new SearchException( "@FieldBridge with no implementation class defined in: " + memberName );
+			throw new SearchException( "@FieldBridge with no implementation class defined in: " + appliedOnName );
 		}
 		try {
 			Object instance = impl.newInstance();
@@ -274,7 +286,7 @@ public final class BridgeFactory {
 			else {
 				throw new SearchException(
 						"@FieldBridge implementation implements none of the field bridge interfaces: "
-								+ impl + " in " + memberName
+								+ impl + " in " + appliedOnName
 				);
 			}
 			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
@@ -284,12 +296,19 @@ public final class BridgeFactory {
 				}
 				( (ParameterizedBridge) instance ).setParameterValues( params );
 			}
+			populateReturnType( appliedOnType, impl, instance );
 		}
 		catch ( Exception e ) {
 			//TODO add classname
-			throw new SearchException( "Unable to instantiate FieldBridge for " + memberName, e );
+			throw new SearchException( "Unable to instantiate FieldBridge for " + appliedOnName, e );
 		}
 		return bridge;
+	}
+
+	private static void populateReturnType(Class<?> appliedOnType, Class<?> bridgeType, Object bridgeInstance) {
+		if ( AppliedOnTypeAwareBridge.class.isAssignableFrom( bridgeType ) ) {
+			( ( AppliedOnTypeAwareBridge ) bridgeInstance ).setAppliedOnType( appliedOnType );
+		}
 	}
 
 	public static FieldBridge getDateField(Resolution resolution) {
@@ -339,14 +358,18 @@ public final class BridgeFactory {
 	 * Takes in a fieldBridge and will return you a TwoWayFieldBridge instance.
 	 *
 	 * @param fieldBridge the field bridge annotation
+	 * @param appliedOnType the type the bridge is applied on
+	 * @param reflectionManager The reflection manager instance
 	 *
 	 * @return a TwoWayFieldBridge instance if the Field Bridge is an instance of a TwoWayFieldBridge.
 	 *
 	 * @throws SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge.
 	 */
 
-	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge) {
-		FieldBridge fb = extractType( fieldBridge );
+	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge,
+													  XClass appliedOnType,
+													  ReflectionManager reflectionManager) {
+		FieldBridge fb = extractType( fieldBridge, appliedOnType, reflectionManager );
 		if ( fb instanceof TwoWayFieldBridge ) {
 			return (TwoWayFieldBridge) fb;
 		}
@@ -360,14 +383,18 @@ public final class BridgeFactory {
 	 * annotation.
 	 *
 	 * @param fieldBridgeAnnotation the FieldBridge annotation
+	 * @param appliedOnType the type the bridge is applied on
+	 * @param reflectionManager The reflection manager instance
 	 *
 	 * @return FieldBridge
 	 */
-	public static FieldBridge extractType(org.hibernate.search.annotations.FieldBridge fieldBridgeAnnotation) {
+	public static FieldBridge extractType(org.hibernate.search.annotations.FieldBridge fieldBridgeAnnotation,
+										  XClass appliedOnType,
+										  ReflectionManager reflectionManager) {
 		FieldBridge bridge = null;
 
 		if ( fieldBridgeAnnotation != null ) {
-			bridge = doExtractType( fieldBridgeAnnotation, null );
+			bridge = doExtractType( fieldBridgeAnnotation, appliedOnType.getName(), reflectionManager.toClass( appliedOnType ) );
 		}
 
 		if ( bridge == null ) {

@@ -162,7 +162,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// special case @ProvidedId
 		ProvidedId provided = findProvidedId( clazz, reflectionManager );
 		if ( provided != null ) {
-			idBridge = BridgeFactory.extractTwoWayType( provided.bridge() );
+			idBridge = BridgeFactory.extractTwoWayType( provided.bridge(), clazz, reflectionManager );
 			idKeywordName = provided.name();
 		}
 

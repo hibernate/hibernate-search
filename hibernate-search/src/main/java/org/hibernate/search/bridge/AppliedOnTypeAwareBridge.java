@@ -21,36 +21,20 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.bridge.builtin;
-
-import org.hibernate.annotations.common.util.StringHelper;
-import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
-import org.hibernate.search.bridge.TwoWayStringBridge;
-
+package org.hibernate.search.bridge;
 
 /**
- * Map an Enum field
- *
- * @author Sylvain Vieujot
+ * For bridges implementing this interface, provide the type of the
+ * object the bridge is applied on:
+ *  - the return type for a property
+ *  - the class itself for a class-level bridge
  */
-public class EnumBridge implements TwoWayStringBridge, AppliedOnTypeAwareBridge {
+public interface AppliedOnTypeAwareBridge {
 
-	private Class<? extends Enum> clazz = null;
-
-	public Enum<? extends Enum> stringToObject(String stringValue) {
-		if ( StringHelper.isEmpty( stringValue ) ) return null;
-		return Enum.valueOf( clazz, stringValue );
-	}
-
-	public String objectToString(Object object) {
-		Enum e = (Enum) object;
-		return e != null ? e.name() : null;
-	}
-
-	public void setAppliedOnType(Class<?> returnType) {
-		@SuppressWarnings("unchecked") //only called for an enum
-		Class<? extends Enum> enumReturnType = (Class<? extends Enum>) returnType;
-		this.clazz = enumReturnType;
-	}
+	/**
+	 * Set the return type of the bridge (the type of the field linked to the bridge).
+	 *
+	 * @param returnType return type
+	 */
+	void setAppliedOnType(Class<?> returnType);
 }
-
