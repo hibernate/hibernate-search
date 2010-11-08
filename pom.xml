@@ -403,7 +403,6 @@
                         <preparationGoals>clean install</preparationGoals>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
-                        <remoteTagging>true</remoteTagging>
                     </configuration>
                 </plugin>
                 <plugin>
