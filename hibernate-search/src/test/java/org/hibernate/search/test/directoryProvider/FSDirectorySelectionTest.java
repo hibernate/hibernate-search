@@ -87,6 +87,7 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 	private SessionFactory createSessionFactoryUsingDirectoryType(String directoryType) {
 		Configuration config = new AnnotationConfiguration();
 		config.addAnnotatedClass( SnowStorm.class );
+		config.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		config.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
 		config.setProperty( "hibernate.search.default.fs_directory_type", directoryType );
 		return config.buildSessionFactory();
