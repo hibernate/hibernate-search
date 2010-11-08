@@ -35,14 +35,16 @@
 
     <para>Apache Lucene has a notion of <literal>Directory</literal> to store
     the index files. The <classname>Directory</classname> implementation can
-    be customized, but Lucene comes bundled with a file system
-    (<literal>FSDirectoryProvider</literal>) and an in memory
-    (<literal>RAMDirectoryProvider</literal>) implementation.
-    <literal>DirectoryProvider</literal>s are the Hibernate Search abstraction
-    around a Lucene <classname>Directory</classname> and handle the
-    configuration and the initialization of the underlying Lucene resources.
-    <xref linkend="directory-provider-table" /> shows the list of the
-    directory providers bundled with Hibernate Search.</para>
+    be customized, but Lucene comes bundled with a file system and an
+    in-memory implementation. <literal>DirectoryProvider</literal>s are the
+    Hibernate Search abstraction around a Lucene
+    <classname>Directory</classname> and handle the configuration and the
+    initialization of the underlying Lucene resources. <xref
+    linkend="directory-provider-table" /> shows the list of the directory
+    providers bundled with Hibernate Search.</para>
+
+    <para>For the most common DirectoryProviders, Hibernate Search offers
+    shortcut names to make things easier.</para>
 
     <table id="directory-provider-table">
       <title>List of built-in Directory Providers</title>
@@ -50,7 +52,7 @@
       <tgroup cols="3">
         <thead>
           <row>
-            <entry align="center">Class</entry>
+            <entry align="center">Class or shortcut name</entry>
 
             <entry align="center">Description</entry>
 
@@ -60,7 +62,7 @@
 
         <tbody>
           <row>
-            <entry>org.hibernate.search.store.RAMDirectoryProvider</entry>
+            <entry>ram</entry>
 
             <entry>Memory based directory, the directory will be uniquely
             identified (in the same deployment unit) by the
@@ -70,7 +72,7 @@
           </row>
 
           <row>
-            <entry>org.hibernate.search.store.FSDirectoryProvider</entry>
+            <entry>filesystem</entry>
 
             <entry>File system based directory. The directory used will be
             &lt;indexBase&gt;/&lt; indexName &gt;</entry>
@@ -84,11 +86,11 @@
           </row>
 
           <row>
-            <entry>org.hibernate.search.store.FSMasterDirectoryProvider</entry>
+            <entry>filesystem-master</entry>
 
             <entry><para>File system based directory. Like
-            FSDirectoryProvider. It also copies the index to a source
-            directory (aka copy directory) on a regular basis.
+            <literal>filesystem</literal>. It also copies the index to a
+            source directory (aka copy directory) on a regular basis.
             </para><para>The recommended value for the refresh period is (at
             least) 50% higher that the time to copy the information (default
             3600 seconds - 60 minutes).</para><para>Note that the copy is
@@ -118,20 +120,21 @@
           </row>
 
           <row>
-            <entry>org.hibernate.search.store.FSSlaveDirectoryProvider</entry>
+            <entry>filesystem-slave</entry>
 
             <entry><para>File system based directory. Like
-            FSDirectoryProvider, but retrieves a master version (source) on a
-            regular basis. To avoid locking and inconsistent search results, 2
-            local copies are kept. </para><para>The recommended value for the
-            refresh period is (at least) 50% higher that the time to copy the
-            information (default 3600 seconds - 60 minutes).</para><para>Note
-            that the copy is based on an incremental copy mechanism reducing
-            the average copy time.</para><para>DirectoryProvider typically
-            used on slave nodes using a JMS back end.</para><para>The
-            <literal> buffer_size_on_copy</literal> optimum depends on your
-            operating system and available RAM; most people reported good
-            results using values between 16 and 64MB.</para></entry>
+            <literal>filesystem</literal>, but retrieves a master version
+            (source) on a regular basis. To avoid locking and inconsistent
+            search results, 2 local copies are kept. </para><para>The
+            recommended value for the refresh period is (at least) 50% higher
+            that the time to copy the information (default 3600 seconds - 60
+            minutes).</para><para>Note that the copy is based on an
+            incremental copy mechanism reducing the average copy
+            time.</para><para>DirectoryProvider typically used on slave nodes
+            using a JMS back end.</para><para>The <literal>
+            buffer_size_on_copy</literal> optimum depends on your operating
+            system and available RAM; most people reported good results using
+            values between 16 and 64MB.</para></entry>
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
@@ -159,8 +162,9 @@
 
     <para>If the built-in directory providers do not fit your needs, you can
     write your own directory provider by implementing the
-    <classname>org.hibernate.store.DirectoryProvider</classname>
-    interface.</para>
+    <classname>org.hibernate.store.DirectoryProvider</classname> interface. In
+    this case, pass the fully qualified class name of your provider into the
+    <literal>directory_provider</literal> property (see below).</para>
 
     <para>Each indexed entity is associated to a Lucene index (an index can be
     shared by several entities but this is not usually the case). You can
@@ -176,9 +180,10 @@
     <example>
       <title>Configuring directory providers</title>
 
-      <programlisting>hibernate.search.default.directory_provider org.hibernate.search.store.FSDirectoryProvider
+      <programlisting>hibernate.search.default.directory_provider filesystem
 hibernate.search.default.indexBase=/usr/lucene/indexes
-hibernate.search.Rules.directory_provider org.hibernate.search.store.RAMDirectoryProvider</programlisting>
+hibernate.search.Rules.directory_provider ram
+hibernate.search.Actions.directory_provider com.acme.hibernate.provider.CustomDirectoryProvider</programlisting>
     </example>
 
     <para>applied on</para>
@@ -196,8 +201,10 @@ public class Rule { ... }</programlisting>
 
     <para>will create a file system directory in
     <filename>/usr/lucene/indexes/Status</filename> where the Status entities
-    will be indexed, and use an in memory directory named
-    <literal>Rules</literal> where Rule entities will be indexed.</para>
+    will be indexed, use an in-memory directory named <literal>Rules</literal>
+    where Rule entities will be indexed and finally use the
+    <classname>CustomDirectoryProvider</classname> where Actions are
+    indexed.</para>
 
     <para>You can easily define common rules like the directory provider and
     base directory, and override those defaults later on on a per index
@@ -285,16 +292,16 @@ public class Rule { ... }</programlisting>
       <programlisting>hibernate.search.default.indexBase /usr/lucene/indexes
 
 hibernate.search.Animal.sharding_strategy.nbr_of_shards 5
-hibernate.search.Animal.directory_provider org.hibernate.search.store.FSDirectoryProvider
+hibernate.search.Animal.directory_provider filesystem
 hibernate.search.Animal.0.indexName Animal00
 hibernate.search.Animal.3.indexBase /usr/lucene/sharded
 hibernate.search.Animal.3.indexName Animal03</programlisting>
     </example>
 
     <para>This configuration uses the default id string hashing strategy and
-    shards the Animal index into 5 subindexes. All subindexes are
-    <classname>FSDirectoryProvider</classname> instances and the directory
-    where each subindex is stored is as followed:</para>
+    shards the Animal index into 5 subindexes. All subindexes are filesystem
+    instances and the directory where each subindex is stored is as
+    followed:</para>
 
     <itemizedlist>
       <listitem>
@@ -659,7 +666,7 @@ hibernate.search.default.indexBase = /Users/prod/lucenedirs
 hibernate.search.default.refresh = 1800
 
 # appropriate directory provider
-hibernate.search.default.directory_provider = org.hibernate.search.store.FSSlaveDirectoryProvider
+hibernate.search.default.directory_provider = filesystem-slave
 
 ## Backend configuration
 hibernate.search.worker.backend = jms
@@ -702,7 +709,7 @@ hibernate.search.default.indexBase = /Users/prod/lucenedirs
 hibernate.search.default.refresh = 1800
 
 # appropriate directory provider
-hibernate.search.default.directory_provider = org.hibernate.search.store.FSMasterDirectoryProvider
+hibernate.search.default.directory_provider = filesystem-master
 
 ## Backend configuration
 #Backend is the default lucene one</programlisting>
@@ -1213,9 +1220,11 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             marks the usage of the index by creating a marker file.</para>
             <para>If for some reason you had to kill your application, you
             will need to remove this file before restarting it.</para>
-            <para>This is the default implementation for
-            <literal>FSDirectoryProvider</literal>,<literal>FSMasterDirectoryProvider</literal>
-            and <literal>FSSlaveDirectoryProvider</literal>.</para></entry>
+            <para>This is the default implementation for the
+            <literal>filesystem</literal>,
+            <literal>filesystem-master</literal> and
+            <literal>filesystem-slave</literal> directory
+            providers.</para></entry>
           </row>
 
           <row>
@@ -1239,7 +1248,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             Java object lock held in memory; therefore it's possible to use it
             only when you are sure the index is not going to be shared by any
             other process.</para> <para>This is the default implementation for
-            <literal>RAMDirectoryProvider</literal>.</para></entry>
+            the <literal>ram</literal> directory provider.</para></entry>
           </row>
 
           <row>

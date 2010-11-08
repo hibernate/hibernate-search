@@ -21,7 +21,7 @@
 			
             <!-- optional -->
             <property name="hibernate.search.default.directory_provider"
-                      value="org.hibernate.search.store.FSDirectoryProvider"/>
+                      value="filesystem"/>
         </properties>
     </persistence-unit>
 </persistence>
