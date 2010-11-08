@@ -61,7 +61,7 @@ public final class DirectoryProviderHelper {
 	private static final String RELATIVE_INDEX_PROP_NAME = "source";
 	private static final String COPY_BUFFER_SIZE_PROP_NAME = "buffer_size_on_copy";
 	private static final String LOCKING_STRATEGY_PROP_NAME = "locking_strategy";
-	private static final String FS_DIRECTORY_TYPE_PROP_NAME = "fs_directory_type";
+	private static final String FS_DIRECTORY_TYPE_PROP_NAME = "filesystem_access_type";
 	private static final String INDEX_BASE_PROP_NAME = "indexBase";
 	private static final String INDEX_NAME_PROP_NAME = "indexName";
 	private static final String REFRESH_PROP_NAME = "refresh";

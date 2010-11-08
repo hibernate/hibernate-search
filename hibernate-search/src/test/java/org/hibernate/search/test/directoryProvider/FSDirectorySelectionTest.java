@@ -64,7 +64,7 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 	public void testInvalidDirectoryType() throws Exception {
 		try {
 			createSessionFactoryUsingDirectoryType( "foobar" );
-			fail( "Factory creation should fail with invalid 'hibernate.search.default.fs_directory_type' parameter " );
+			fail( "Factory creation should fail with invalid 'hibernate.search.default.filesystem_access_type' parameter " );
 		}
 		catch ( HibernateException e ) {
 			assertTrue( e.getCause() instanceof SearchException );
@@ -87,7 +87,7 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		config.addAnnotatedClass( SnowStorm.class );
 		config.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		config.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
-		config.setProperty( "hibernate.search.default.fs_directory_type", directoryType );
+		config.setProperty( "hibernate.search.default.filesystem_access_type", directoryType );
 		return config.buildSessionFactory();
 	}
 
