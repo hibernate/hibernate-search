@@ -36,6 +36,7 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
@@ -66,10 +67,7 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 			fail( "Factory creation should fail with invalid 'hibernate.search.default.fs_directory_type' parameter " );
 		}
 		catch ( HibernateException e ) {
-			assertEquals(
-					"Invalid option value for fs_directory_type: foobar",
-					e.getCause().getMessage()
-			);
+			assertTrue( e.getCause() instanceof SearchException );
 		}
 	}
 

@@ -34,15 +34,14 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
-import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -75,13 +74,13 @@ public class DirectoryProviderFactory {
 	private static final Map<String, Class<? extends DirectoryProvider<?>>> defaultProviderClasses;
 
 	static {
-		defaultProviderClasses = new HashMap<String,  Class<? extends DirectoryProvider<?>>>(5);
+		defaultProviderClasses = new HashMap<String, Class<? extends DirectoryProvider<?>>>( 5 );
 		defaultProviderClasses.put( "", FSDirectoryProvider.class );
 		defaultProviderClasses.put( "filesystem", FSDirectoryProvider.class );
 		defaultProviderClasses.put( "filesystem-master", FSMasterDirectoryProvider.class );
 		defaultProviderClasses.put( "filesystem-slave", FSSlaveDirectoryProvider.class );
 		defaultProviderClasses.put( "ram", RAMDirectoryProvider.class );
-		
+
 	}
 
 	public DirectoryProviders createDirectoryProviders(XClass entity, SearchConfiguration cfg,
@@ -94,14 +93,15 @@ public class DirectoryProviderFactory {
 		//set up the directories
 		int nbrOfProviders = indexProps.length;
 		DirectoryProvider[] providers = new DirectoryProvider[nbrOfProviders];
-		for (int index = 0; index < nbrOfProviders; index++) {
+		for ( int index = 0; index < nbrOfProviders; index++ ) {
 			String providerName = nbrOfProviders > 1 ?
 					directoryProviderName + "." + index :
 					directoryProviderName;
-			providers[index] = createDirectoryProvider( 
+			providers[index] = createDirectoryProvider(
 					providerName, indexProps[index],
 					reflectionManager.toClass( entity ),
-					context );
+					context
+			);
 		}
 
 		//define sharding strategy
@@ -117,11 +117,14 @@ public class DirectoryProviderFactory {
 			}
 		}
 		else {
-			shardingStrategy = ClassLoaderHelper.instanceFromName( IndexShardingStrategy.class,
-					shardingStrategyName, DirectoryProviderFactory.class, "IndexShardingStrategy" );
+			shardingStrategy = ClassLoaderHelper.instanceFromName(
+					IndexShardingStrategy.class,
+					shardingStrategyName, DirectoryProviderFactory.class, "IndexShardingStrategy"
+			);
 		}
 		shardingStrategy.initialize(
-				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers );
+				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers
+		);
 		final String similarityClassName = indexProps[0].getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
 		Similarity similarityInstance = null;
 		if ( similarityClassName != null ) {
@@ -129,13 +132,14 @@ public class DirectoryProviderFactory {
 					Similarity.class,
 					similarityClassName,
 					DirectoryProviderFactory.class,
-					"Similarity class for index " + directoryProviderName  );
+					"Similarity class for index " + directoryProviderName
+			);
 		}
 		return new DirectoryProviders( shardingStrategy, providers, similarityInstance );
 	}
 
 	public void startDirectoryProviders() {
-		for (DirectoryProvider provider : providers) {
+		for ( DirectoryProvider provider : providers ) {
 			provider.start();
 		}
 	}
@@ -152,16 +156,15 @@ public class DirectoryProviderFactory {
 			provider = ClassLoaderHelper.instanceFromClass( DirectoryProvider.class, dpClass, "directory provider" );
 		}
 		else {
-			provider = ClassLoaderHelper.instanceFromName( DirectoryProvider.class, className,
-					DirectoryProviderFactory.class, "directory provider" );
+			provider = ClassLoaderHelper.instanceFromName(
+					DirectoryProvider.class, className,
+					DirectoryProviderFactory.class, "directory provider"
+			);
 		}
 		try {
 			provider.initialize( directoryProviderName, indexProps, context );
 		}
-		catch ( SearchException e ) {
-			throw e;
-		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
 		}
 		int index = providers.indexOf( provider );
@@ -169,7 +172,7 @@ public class DirectoryProviderFactory {
 		if ( index != -1 ) {
 			//share the same Directory provider for the same underlying store
 			final DirectoryProvider<?> directoryProvider = providers.get( index );
-			context.addClassToDirectoryProvider( entity, directoryProvider, exclusiveIndexUsage);
+			context.addClassToDirectoryProvider( entity, directoryProvider, exclusiveIndexUsage );
 			return directoryProvider;
 		}
 		else {
@@ -208,8 +211,8 @@ public class DirectoryProviderFactory {
 	 * </p>
 	 *
 	 * @param context the build context.
-	 * @param directoryProperties	  The properties extracted from the configuration.
-	 * @param provider				 The directory provider for which to configure the indexing parameters.
+	 * @param directoryProperties The properties extracted from the configuration.
+	 * @param provider The directory provider for which to configure the indexing parameters.
 	 */
 	private void configureIndexingParameters(WritableBuildContext context,
 											 Properties directoryProperties, DirectoryProvider<?> provider) {
@@ -235,12 +238,15 @@ public class DirectoryProviderFactory {
 		}
 		else {
 			// count shards
-			int shardsCount = ConfigurationParseHelper.parseInt( shardsCountValue, shardsCountValue + " is not a number" );
+			int shardsCount = ConfigurationParseHelper.parseInt(
+					shardsCountValue, shardsCountValue + " is not a number"
+			);
 			// create shard-specific Props
 			Properties[] shardLocalProperties = new Properties[shardsCount];
-			for (int i = 0; i < shardsCount; i++) {
+			for ( int i = 0; i < shardsCount; i++ ) {
 				shardLocalProperties[i] = new MaskedProperty(
-						directoryLocalProperties, Integer.toString( i ), directoryLocalProperties );
+						directoryLocalProperties, Integer.toString( i ), directoryLocalProperties
+				);
 			}
 			return shardLocalProperties;
 		}
@@ -276,7 +282,8 @@ public class DirectoryProviderFactory {
 		}
 		else {
 			throw new SearchException(
-					"Trying to extract the index name from a non @Indexed class: " + clazz.getName() );
+					"Trying to extract the index name from a non @Indexed class: " + clazz.getName()
+			);
 		}
 	}
 
@@ -303,11 +310,13 @@ public class DirectoryProviderFactory {
 			return similarity;
 		}
 	}
-	
+
 	private static boolean isExclusiveIndexUsageEnabled(String directoryProviderName, Properties indexProps) {
 		String exclusiveIndexUsageProperty = indexProps.getProperty( Environment.EXCLUSIVE_INDEX_USE, "false" );
-		boolean exclusiveIndexUsage = ConfigurationParseHelper.parseBoolean( exclusiveIndexUsageProperty,
-			"Illegal value for property " + Environment.EXCLUSIVE_INDEX_USE + " on index " + directoryProviderName );
+		boolean exclusiveIndexUsage = ConfigurationParseHelper.parseBoolean(
+				exclusiveIndexUsageProperty,
+				"Illegal value for property " + Environment.EXCLUSIVE_INDEX_USE + " on index " + directoryProviderName
+		);
 		return exclusiveIndexUsage;
 	}
 
