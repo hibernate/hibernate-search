@@ -44,81 +44,202 @@
     <section id="basic-mapping">
       <title>Basic mapping</title>
 
-      <para>First, we must declare a persistent class as indexable. This is
-      done by annotating the class with <literal>@Indexed</literal> (all
-      entities not annotated with <literal>@Indexed</literal> will be ignored
-      by the indexing process):</para>
+      <para>Lets start with the most commonly used annotations for mapping an
+      entity.</para>
 
-      <example>
-        <title>Making a class indexable using the
-        <classname>@Indexed</classname> annotation</title>
+      <section id="indexed-annotation">
+        <title>@Indexed</title>
 
-        <programlisting>@Entity
+        <para>First, we must declare a persistent class as indexable. This is
+        done by annotating the class with <literal>@Indexed</literal> (all
+        entities not annotated with <literal>@Indexed</literal> will be
+        ignored by the indexing process):</para>
+
+        <example>
+          <title>Making a class indexable using the
+          <classname>@Indexed</classname> annotation</title>
+
+          <programlisting>@Entity
 <emphasis role="bold">@Indexed(index="indexes/essays")</emphasis>
 public class Essay {
     ...
 }</programlisting>
-      </example>
+        </example>
 
-      <para>The <literal>index</literal> attribute tells Hibernate what the
-      Lucene directory name is (usually a directory on your file system). It
-      is recommended to define a base directory for all Lucene indexes using
-      the <literal>hibernate.search.default.indexBase</literal> property in
-      your configuration file. Alternatively you can specify a base directory
-      per indexed entity by specifying
-      <literal>hibernate.search.&lt;index&gt;.indexBase, </literal>where
-      <literal>&lt;index&gt;</literal> is the fully qualified classname of the
-      indexed entity. Each entity instance will be represented by a Lucene
-      <classname>Document</classname> inside the given index (aka
-      Directory).</para>
+        <para>The <literal>index</literal> attribute tells Hibernate what the
+        Lucene directory name is (usually a directory on your file system). It
+        is recommended to define a base directory for all Lucene indexes using
+        the <literal>hibernate.search.default.indexBase</literal> property in
+        your configuration file. Alternatively you can specify a base
+        directory per indexed entity by specifying
+        <literal>hibernate.search.&lt;index&gt;.indexBase, </literal>where
+        <literal>&lt;index&gt;</literal> is the fully qualified classname of
+        the indexed entity. Each entity instance will be represented by a
+        Lucene <classname>Document</classname> inside the given index (aka
+        Directory).</para>
+      </section>
 
-      <para>For each property (or attribute) of your entity, you have the
-      ability to describe how it will be indexed. The default (no annotation
-      present) means that the property is ignored by the indexing process.
-      <literal>@Field</literal> does declare a property as indexed. When
-      indexing an element to a Lucene document you can specify how it is
-      indexed:</para>
+      <section id="field-annotation">
+        <title>@Field</title>
 
-      <itemizedlist>
-        <listitem>
-          <para><literal>name</literal> : describe under which name, the
-          property should be stored in the Lucene Document. The default value
-          is the property name (following the JavaBeans convention)</para>
-        </listitem>
+        <para>For each property (or attribute) of your entity, you have the
+        ability to describe how it will be indexed. The default (no annotation
+        present) means that the property is ignored by the indexing process.
+        <literal>@Field</literal> does declare a property as indexed. When
+        indexing an element to a Lucene document you can specify how it is
+        indexed:</para>
 
-        <listitem>
-          <para><literal>store</literal> : describe whether or not the
-          property is stored in the Lucene index. You can store the value
-          <literal>Store.YES</literal> (consuming more space in the index but
-          allowing projection, see <xref linkend="projections" /> for more
-          information), store it in a compressed way
-          <literal>Store.COMPRESS</literal> (this does consume more CPU), or
-          avoid any storage <literal>Store.NO</literal> (this is the default
-          value). When a property is stored, you can retrieve its original
-          value from the Lucene Document. This is not related to whether the
-          element is indexed or not.</para>
-        </listitem>
+        <itemizedlist>
+          <listitem>
+            <para><literal>name</literal> : describe under which name, the
+            property should be stored in the Lucene Document. The default
+            value is the property name (following the JavaBeans
+            convention)</para>
+          </listitem>
 
-        <listitem>
-          <para>index: describe how the element is indexed and the type of
-          information store. The different values are
-          <literal>Index.NO</literal> (no indexing, ie cannot be found by a
-          query), <literal>Index.TOKENIZED</literal> (use an analyzer to
-          process the property), <literal>Index.UN_TOKENIZED</literal> (no
-          analyzer pre-processing), <literal>Index.NO_NORMS</literal> (do not
-          store the normalization data). The default value is
-          <literal>TOKENIZED</literal>.</para>
-        </listitem>
+          <listitem>
+            <para><literal>store</literal> : describe whether or not the
+            property is stored in the Lucene index. You can store the value
+            <literal>Store.YES</literal> (consuming more space in the index
+            but allowing projection, see <xref linkend="projections" /> for
+            more information), store it in a compressed way
+            <literal>Store.COMPRESS</literal> (this does consume more CPU), or
+            avoid any storage <literal>Store.NO</literal> (this is the default
+            value). When a property is stored, you can retrieve its original
+            value from the Lucene Document. This is not related to whether the
+            element is indexed or not.</para>
+          </listitem>
 
-        <listitem>
-          <para>termVector: describes collections of term-frequency pairs.
-          This attribute enables term vectors being stored during indexing so
-          they are available within documents. The default value is
-          TermVector.NO.</para>
+          <listitem>
+            <para>index: describe how the element is indexed and the type of
+            information store. The different values are
+            <literal>Index.NO</literal> (no indexing, ie cannot be found by a
+            query), <literal>Index.TOKENIZED</literal> (use an analyzer to
+            process the property), <literal>Index.UN_TOKENIZED</literal> (no
+            analyzer pre-processing), <literal>Index.NO_NORMS</literal> (do
+            not store the normalization data). The default value is
+            <literal>TOKENIZED</literal>.<tip>
+                <para>Whether or not you want to tokenize a property depends
+                on whether you wish to search the element as is, or by the
+                words it contains. It make sense to tokenize a text field, but
+                probably not a date field.</para>
+              </tip><tip>
+                <para>Fields used for sorting must not be tokenized.</para>
+              </tip></para>
+          </listitem>
 
-          <para>The different values of this attribute are:</para>
+          <listitem>
+            <para>termVector: describes collections of term-frequency pairs.
+            This attribute enables term vectors being stored during indexing
+            so they are available within documents. The default value is
+            TermVector.NO.</para>
 
-          <informaltable align="left" width="">
+            <para>The different values of this attribute are:</para>
+
+            <informaltable align="left" width="">
+              <tgroup cols="2">
+                <thead>
+                  <row>
+                    <entry align="center">Value</entry>
+
+                    <entry align="center">Definition</entry>
+                  </row>
+                </thead>
+
+                <tbody>
+                  <row>
+                    <entry align="left">TermVector.YES</entry>
+
+                    <entry>Store the term vectors of each document. This
+                    produces two synchronized arrays, one contains document
+                    terms and the other contains the term's frequency.</entry>
+                  </row>
+
+                  <row>
+                    <entry align="left">TermVector.NO</entry>
+
+                    <entry>Do not store term vectors.</entry>
+                  </row>
+
+                  <row>
+                    <entry align="left">TermVector.WITH_OFFSETS</entry>
+
+                    <entry>Store the term vector and token offset information.
+                    This is the same as TermVector.YES plus it contains the
+                    starting and ending offset position information for the
+                    terms.</entry>
+                  </row>
+
+                  <row>
+                    <entry align="left">TermVector.WITH_POSITIONS</entry>
+
+                    <entry>Store the term vector and token position
+                    information. This is the same as TermVector.YES plus it
+                    contains the ordinal positions of each occurrence of a
+                    term in a document.</entry>
+                  </row>
+
+                  <row>
+                    <entry
+                    align="left">TermVector.WITH_POSITION_OFFSETS</entry>
+
+                    <entry>Store the term vector, token position and offset
+                    information. This is a combination of the YES,
+                    WITH_OFFSETS and WITH_POSITIONS.</entry>
+                  </row>
+                </tbody>
+              </tgroup>
+            </informaltable>
+          </listitem>
+
+          <listitem>
+            <para><literal>indexNullAs</literal> : Per default null values are
+            ignored and not indexed. However, using
+            <parameter>indexNullAs</parameter> you can specify a string which
+            will be inserted as token for the <constant>null</constant> value.
+            Per default this value is set to
+            <constant>Field.DO_NOT_INDEX_NULL</constant> indicating that
+            <constant>null</constant> values should not be indexed. You can
+            set this value to <constant>Field.DEFAULT_NULL_TOKEN </constant>to
+            indicate that a default <constant>null</constant> token should be
+            used. This default <constant>null</constant> token can be
+            specified in the configuration using
+            <literal>hibernate.search.default_null_token</literal>. If this
+            property is not set and you specify
+            <constant>Field.DEFAULT_NULL_TOKEN</constant> the string "_null_"
+            will be used as default. <note>
+                <para>When the <parameter>indexNullAs</parameter> parameter is
+                used it is important to use the same token in the search query
+                (see <xref linkend="search-query" />) to search for
+                <constant>null</constant> values.</para>
+              </note><warning>
+                <para>When implementing a custom
+                <classname>FieldBridge</classname> or
+                <classname>TwoWayFieldBridge</classname> it is up to the
+                developer to handle the indexing of null values (see JavaDocs
+                of
+                <methodname>LuceneOptions.indexNullAs()</methodname>).</para>
+              </warning></para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section id="numeric-field-annotation">
+        <title>@NumericField</title>
+
+        <para>There's a companion annotation called
+        <classname>@NumericField</classname> that can be specified in the same
+        scope as <classname>@Field</classname> or
+        <classname>@DocumentId</classname>.
+        <classname>@NumericField</classname> can be specified for Integer,
+        Long, Float and Double properties and at index time the value will be
+        indexed using a <ulink url="http://en.wikipedia.org/wiki/Trie">Trie
+        structure</ulink>. When a property is indexed as numeric field, it
+        enables efficient range query and sorting, orders of magnitude faster
+        than doing the same query on standard <classname>@Field
+        </classname>properties. The <classname>@NumericField</classname>
+        annotation accept the following parameters: <informaltable
+            align="left" width="">
             <tgroup cols="2">
               <thead>
                 <row>
@@ -130,144 +251,46 @@ public class Essay {
 
               <tbody>
                 <row>
-                  <entry align="left">TermVector.YES</entry>
+                  <entry align="left">forField</entry>
 
-                  <entry>Store the term vectors of each document. This
-                  produces two synchronized arrays, one contains document
-                  terms and the other contains the term's frequency.</entry>
+                  <entry>(Optional) Specify the name of of the related @Field
+                  that will be indexed as numeric. It's only mandatory when
+                  the property contains more than a @Field declaration</entry>
                 </row>
 
                 <row>
-                  <entry align="left">TermVector.NO</entry>
+                  <entry align="left">precisionStep</entry>
 
-                  <entry>Do not store term vectors.</entry>
-                </row>
-
-                <row>
-                  <entry align="left">TermVector.WITH_OFFSETS</entry>
-
-                  <entry>Store the term vector and token offset information.
-                  This is the same as TermVector.YES plus it contains the
-                  starting and ending offset position information for the
-                  terms.</entry>
-                </row>
-
-                <row>
-                  <entry align="left">TermVector.WITH_POSITIONS</entry>
-
-                  <entry>Store the term vector and token position information.
-                  This is the same as TermVector.YES plus it contains the
-                  ordinal positions of each occurrence of a term in a
-                  document.</entry>
-                </row>
-
-                <row>
-                  <entry align="left">TermVector.WITH_POSITION_OFFSETS</entry>
-
-                  <entry>Store the term vector, token position and offset
-                  information. This is a combination of the YES, WITH_OFFSETS
-                  and WITH_POSITIONS.</entry>
+                  <entry>(Optional) Change the way that the Trie structure is
+                  stored in the index. Smaller precisionSteps lead to more
+                  disk space usage and faster range and sort queries. Larger
+                  values lead to less space used and range query performance
+                  more close to the range query in normal @Fields. Default
+                  value is 4.</entry>
                 </row>
               </tbody>
             </tgroup>
-          </informaltable>
-        </listitem>
+          </informaltable></para>
+      </section>
 
-        <listitem>
-          <para><literal>indexNullAs</literal> : Per default null values are
-          ignored and not indexed. However, using
-          <parameter>indexNullAs</parameter> you can specify a string which
-          will be inserted as token for the <constant>null</constant> value.
-          Per default this value is set to
-          <constant>Field.DO_NOT_INDEX_NULL</constant> indicating that
-          <constant>null</constant> values should not be indexed. You can set
-          this value to <constant>Field.DEFAULT_NULL_TOKEN </constant>to
-          indicate that a default <constant>null</constant> token should be
-          used. This default <constant>null</constant> token can be specified
-          in the configuration using
-          <literal>hibernate.search.default_null_token</literal>. If this
-          property is not set and you specify
-          <constant>Field.DEFAULT_NULL_TOKEN</constant> the string "_null_"
-          will be used as default. <note>
-              <para>When the <parameter>indexNullAs</parameter> parameter is
-              used it is important to use the same token in the search query
-              (see <xref linkend="search-query" />) to search for
-              <constant>null</constant> values.</para>
-            </note></para>
-        </listitem>
-      </itemizedlist>
+      <section id="id-annotation">
+        <title>@Id</title>
 
-      <para>There's a companion annotation called
-      <classname>@NumericField</classname> that can be specified in the same
-      scope as <classname>@Field</classname> or
-      <classname>@DocumentId</classname>. <classname>@NumericField</classname>
-      can be specified for Integer, Long, Float and Double properties and at
-      index time the value will be indexed using a <ulink
-      url="http://en.wikipedia.org/wiki/Trie">Trie structure</ulink>. When a
-      property is indexed as numeric field, it enables efficient range query
-      and sorting, orders of magnitude faster than doing the same query on
-      standard <classname>@Field </classname>properties. The
-      <classname>@NumericField</classname> annotation accept the following
-      parameters: <informaltable align="left" width="">
-          <tgroup cols="2">
-            <thead>
-              <row>
-                <entry align="center">Value</entry>
+        <para>Finally, the id property of an entity is a special property used
+        by Hibernate Search to ensure index unicity of a given entity. By
+        design, an id has to be stored and must not be tokenized. To mark a
+        property as index id, use the <literal>@DocumentId</literal>
+        annotation. If you are using Hibernate Annotations and you have
+        specified <classname>@Id</classname> you can omit
+        <classname>@DocumentId</classname>. The chosen entity id will also be
+        used as document id.</para>
 
-                <entry align="center">Definition</entry>
-              </row>
-            </thead>
+        <example id="example-annotated-entity">
+          <title>Adding <classname>@DocumentId</classname> and
+          <classname>@Field</classname> annotations to an indexed
+          entity</title>
 
-            <tbody>
-              <row>
-                <entry align="left">forField</entry>
-
-                <entry>(Optional) Specify the name of of the related @Field
-                that will be indexed as numeric. It's only mandatory when the
-                property contains more than a @Field declaration</entry>
-              </row>
-
-              <row>
-                <entry align="left">precisionStep</entry>
-
-                <entry>(Optional) Change the way that the Trie structure is
-                stored in the index. Smaller precisionSteps lead to more disk
-                space usage and faster range and sort queries. Larger values
-                lead to less space used and range query performance more close
-                to the range query in normal @Fields. Default value is
-                4.</entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable></para>
-
-      <para>Whether or not you want to store the original data in the index
-      depends on how you wish to use the index query result. For a regular
-      Hibernate Search usage storing is not necessary. However you might want
-      to store some fields to subsequently project them (see <xref
-      linkend="projections" /> for more information).</para>
-
-      <para>Whether or not you want to tokenize a property depends on whether
-      you wish to search the element as is, or by the words it contains. It
-      make sense to tokenize a text field, but probably not a date field.
-      <note>
-          <para>Fields used for sorting must not be tokenized.</para>
-        </note></para>
-
-      <para>Finally, the id property of an entity is a special property used
-      by Hibernate Search to ensure index unicity of a given entity. By
-      design, an id has to be stored and must not be tokenized. To mark a
-      property as index id, use the <literal>@DocumentId</literal> annotation.
-      If you are using Hibernate Annotations and you have specified
-      <classname>@Id</classname> you can omit
-      <classname>@DocumentId</classname>. The chosen entity id will also be
-      used as document id.</para>
-
-      <example id="example-annotated-entity">
-        <title>Adding <classname>@DocumentId</classname> and
-        <classname>@Field</classname> annotations to an indexed entity</title>
-
-        <programlisting>@Entity
+          <programlisting>@Entity
 @Indexed(index="indexes/essays")
 public class Essay {
     ...
@@ -286,14 +309,15 @@ public class Essay {
     <emphasis role="bold">@Field @NumericField( precisionStep = 6)</emphasis>
     public float getGrade() { return grade; }
 }</programlisting>
-      </example>
+        </example>
 
-      <para><xref linkend="example-annotated-entity" /> define an index with
-      four fields: <literal>id</literal> , <literal>Abstract</literal>,
-      <literal>text</literal> and <literal>grade</literal> . Note that by
-      default the field name is decapitalized, following the JavaBean
-      specification. The <literal>grade</literal> field is annotated as
-      Numeric with a slightly larger precisionStep than the default/</para>
+        <para><xref linkend="example-annotated-entity" /> define an index with
+        four fields: <literal>id</literal> , <literal>Abstract</literal>,
+        <literal>text</literal> and <literal>grade</literal> . Note that by
+        default the field name is decapitalized, following the JavaBean
+        specification. The <literal>grade</literal> field is annotated as
+        Numeric with a slightly larger precisionStep than the default/</para>
+      </section>
     </section>
 
     <section>
@@ -870,7 +894,7 @@ public class Team {
         the VM default, you can explicitly specify it by adding a
         <literal>resource_charset</literal> parameter.</para>
 
-        <example id="example-analyzer-def">
+        <example id="example-analyzer-def-charset">
           <title>Use a specific charset to load the property file</title>
 
           <programlisting>@AnalyzerDef(name="customanalyzer",
