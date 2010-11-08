@@ -79,10 +79,26 @@
 
             <entry><para><literal>indexBase</literal> : Base
             directory</para><para><literal>indexName</literal>: override
-            @Indexed.index (useful for sharded indexes)</para><para><literal>
-            locking_strategy</literal> : optional, see <xref
+            @Indexed.index (useful for sharded
+            indexes)</para><para><literal>locking_strategy</literal> :
+            optional, see <xref
             linkend="search-configuration-directory-lockfactories" />
-            </para></entry>
+            </para><para><literal>filesystem_access_type</literal>: allows to
+            determine the exact type of <classname>FSDirectory</classname>
+            implementation used by this
+            <classname>DirectoryProvider</classname>. Allowed values are
+            <literal>auto</literal> (the default value, selects
+            <classname>NIOFSDirectory</classname> on non Windows systems,
+            <classname>SimpleFSDirectory</classname> on Windows),
+            <literal>simple</literal>
+            (<classname>SimpleFSDirectory</classname>), <literal>nio</literal>
+            (<classname>NIOFSDirectory</classname>), <literal>mmap</literal>
+            (<classname>MMapDirectory</classname>). Make sure to refer to
+            Javadocs of these <classname>Directory</classname> implementations
+            before changing this setting. Even though
+            <classname>NIOFSDirectory</classname> or
+            <classname>MMapDirectory</classname> can bring substantial
+            performace boosts they also have their issues.</para></entry>
           </row>
 
           <row>
@@ -110,13 +126,29 @@
             The actual source directory name being
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
             </para><para><literal>refresh</literal>: refresh period in second
-            (the copy will take place every refresh seconds).</para><para>
-            <literal>buffer_size_on_copy</literal>: The amount of MegaBytes to
-            move in a single low level copy instruction; defaults to
-            16MB.</para><para><literal> locking_strategy</literal> : optional,
+            (the copy will take place every refresh
+            seconds).</para><para><literal>buffer_size_on_copy</literal>: The
+            amount of MegaBytes to move in a single low level copy
+            instruction; defaults to
+            16MB.</para><para><literal>locking_strategy</literal> : optional,
             see <xref
             linkend="search-configuration-directory-lockfactories" />
-            </para></entry>
+            </para><para><literal>filesystem_access_type</literal>: allows to
+            determine the exact type of <classname>FSDirectory</classname>
+            implementation used by this
+            <classname>DirectoryProvider</classname>. Allowed values are
+            <literal>auto</literal> (the default value, selects
+            <classname>NIOFSDirectory</classname> on non Windows systems,
+            <classname>SimpleFSDirectory</classname> on Windows),
+            <literal>simple</literal>
+            (<classname>SimpleFSDirectory</classname>), <literal>nio</literal>
+            (<classname>NIOFSDirectory</classname>), <literal>mmap</literal>
+            (<classname>MMapDirectory</classname>). Make sure to refer to
+            Javadocs of these <classname>Directory</classname> implementations
+            before changing this setting. Even though
+            <classname>NIOFSDirectory</classname> or
+            <classname>MMapDirectory</classname> can bring substantial
+            performace boosts they also have their issues.</para></entry>
           </row>
 
           <row>
@@ -145,16 +177,32 @@
             The actual source directory name being
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
             </para><para><literal>refresh</literal>: refresh period in second
-            (the copy will take place every refresh seconds).</para><para>
-            <literal>buffer_size_on_copy</literal>: The amount of MegaBytes to
-            move in a single low level copy instruction; defaults to
-            16MB.</para><para><literal> locking_strategy</literal> : optional,
+            (the copy will take place every refresh
+            seconds).</para><para><literal>buffer_size_on_copy</literal>: The
+            amount of MegaBytes to move in a single low level copy
+            instruction; defaults to
+            16MB.</para><para><literal>locking_strategy</literal> : optional,
             see <xref
             linkend="search-configuration-directory-lockfactories" />
-            </para><para><literal> retry_marker_lookup</literal> : optional,
+            </para><para><literal>retry_marker_lookup</literal> : optional,
             default to 0. Defines how many times, we look for the marker files
             in the source directory before failing. Waiting 5 seconds between
-            each try. </para></entry>
+            each try. </para><para><literal>filesystem_access_type</literal>:
+            allows to determine the exact type of
+            <classname>FSDirectory</classname> implementation used by this
+            <classname>DirectoryProvider</classname>. Allowed values are
+            <literal>auto</literal> (the default value, selects
+            <classname>NIOFSDirectory</classname> on non Windows systems,
+            <classname>SimpleFSDirectory</classname> on Windows),
+            <literal>simple</literal>
+            (<classname>SimpleFSDirectory</classname>), <literal>nio</literal>
+            (<classname>NIOFSDirectory</classname>), <literal>mmap</literal>
+            (<classname>MMapDirectory</classname>). Make sure to refer to
+            Javadocs of these <classname>Directory</classname> implementations
+            before changing this setting. Even though
+            <classname>NIOFSDirectory</classname> or
+            <classname>MMapDirectory</classname> can bring substantial
+            performace boosts they also have their issues.</para></entry>
           </row>
         </tbody>
       </tgroup>
