@@ -1542,6 +1542,26 @@ private Integer length;                </programlisting>
         are set during initialization and no special care is required at this
         stage.</para>
 
+        <para>It is sometimes useful to get the type the bridge is applied
+        on:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>the return type of the property for field/getter-level
+            bridges</para>
+          </listitem>
+
+          <listitem>
+            <para>the class type for class-level bridges</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>An example is a bridge that deals with enums in a custom fashion
+        but needs to access the actual enum type. Any bridge implementing
+        <classname>AppliedOnTypeAwareBridge</classname> will get the type the
+        bridge is applied on injected. Like parameters, the type injected
+        needs no particular care with regard to thread-safety.</para>
+
         <para>If you expect to use your bridge implementation on an id
         property (ie annotated with <literal>@DocumentId</literal> ), you need
         to use a slightly extended version of <literal>StringBridge</literal>
