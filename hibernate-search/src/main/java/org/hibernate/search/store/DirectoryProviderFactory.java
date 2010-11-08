@@ -24,7 +24,9 @@
 package org.hibernate.search.store;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.lucene.search.Similarity;
@@ -70,6 +72,18 @@ public class DirectoryProviderFactory {
 
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
+
+	private static final Map<String, Class<? extends DirectoryProvider<?>>> defaultProviderClasses;
+
+	static {
+		defaultProviderClasses = new HashMap<String,  Class<? extends DirectoryProvider<?>>>(5);
+		defaultProviderClasses.put( "", FSDirectoryProvider.class );
+		defaultProviderClasses.put( "filesystem", FSDirectoryProvider.class );
+		defaultProviderClasses.put( "filesystem-master", FSMasterDirectoryProvider.class );
+		defaultProviderClasses.put( "filesystem-slave", FSSlaveDirectoryProvider.class );
+		defaultProviderClasses.put( "ram", RAMDirectoryProvider.class );
+		
+	}
 
 	public DirectoryProviders createDirectoryProviders(XClass entity, SearchConfiguration cfg,
 													   WritableBuildContext context,
@@ -129,10 +143,14 @@ public class DirectoryProviderFactory {
 
 	private DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps,
 														 Class<?> entity, WritableBuildContext context) {
-		String className = indexProps.getProperty( "directory_provider" );
+		String className = indexProps.getProperty( "directory_provider", "" );
+		String maybeShortCut = className.toLowerCase();
+
 		DirectoryProvider<?> provider;
-		if ( StringHelper.isEmpty( className ) ) {
-			provider = new FSDirectoryProvider();
+		//try and use the built-in shortcuts before loading the provider as a fully qualified class name 
+		if ( defaultProviderClasses.containsKey( maybeShortCut ) ) {
+			final Class<? extends DirectoryProvider<?>> dpClass = defaultProviderClasses.get( maybeShortCut );
+			provider = ClassLoaderHelper.instanceFromClass( DirectoryProvider.class, dpClass, "directory provider" );
 		}
 		else {
 			provider = ClassLoaderHelper.instanceFromName( DirectoryProvider.class, className,
