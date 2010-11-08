@@ -1,6 +1,35 @@
 Hibernate Search Changelog
 ==========================
 
+3.3.0.CR1 (08-11-2010)
+-----------------------
+
+** Bug
+    * [HSEARCH-513] - Experiencing long delays when indexing entities saved in different transactions
+    * [HSEARCH-532] - FSSlaveDirectoryProvider could retry several times when the current marker file is not found
+    * [HSEARCH-573] - PerDPQueueProcessor forces release of lock even if not held - causes corrupt index
+    * [HSEARCH-610] - AndDocIdSet makeDocIdSetOnAgreedBits() returns wrong values
+    * [HSEARCH-621] - Some dependencies have the wrong scope
+    * [HSEARCH-624] - NumericField is not working properly with id fields
+
+
+** Improvement
+    * [HSEARCH-115] - Add a default value for indexing null value
+    * [HSEARCH-275] - support NIOFSDirectory and others as optimized FSDirectory extensions
+    * [HSEARCH-618] - BridgeFactory should pass along the field type to the field bridge constructor (if an appropriate constructor exists)
+    * [HSEARCH-627] - Use System.nanoTime() instead of currentTimeMillis() when measuring elapsed time (better precision)
+    * [HSEARCH-628] - Provide shortcut names for the major DirectoryProviders
+
+** New Feature
+    * [HSEARCH-390] - Allow customization of the charset used by analyzer components
+    * [HSEARCH-434] - Make use of NumericField
+    * [HSEARCH-615] - Support for queries limited in time: return the first nth elements within a given time
+
+
+** Task
+    * [HSEARCH-622] - Remove <remoteTagging>true</remoteTagging> in the maven-release-plugin configuration (no longer needed)
+
+
 3.3.0.Beta3 (1-11-2010)
 -----------------------
 
