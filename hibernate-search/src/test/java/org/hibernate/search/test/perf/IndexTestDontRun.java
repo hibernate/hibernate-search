@@ -115,7 +115,7 @@ public class IndexTestDontRun extends SearchTestCase {
 
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 //		cfg.setProperty( "hibernate.search.reader.strategy", DumbSharedReaderProvider.class.getName() );
 	}
 }

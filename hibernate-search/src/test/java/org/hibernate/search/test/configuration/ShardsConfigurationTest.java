@@ -46,8 +46,8 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		super.configure( cfg );
 
 		cfg.setProperty( "hibernate.search.default.sharding_strategy.nbr_of_shards", "2" );// permit this?
-		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getCanonicalName() );
-		cfg.setProperty( "hibernate.search.default.2.directory_provider", RAMDirectoryProvider.class.getCanonicalName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.setProperty( "hibernate.search.default.2.directory_provider", "ram" );
 		cfg.setProperty( "hibernate.search.Documents.batch.max_buffered_docs", "4" );
 		cfg.setProperty( "hibernate.search.Documents.batch.max_merge_docs", "5" );
 		cfg.setProperty( "hibernate.search.Documents.transaction.max_buffered_docs", "6" );
@@ -56,6 +56,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		cfg.setProperty( "hibernate.search.Documents.sharding_strategy.test.system.default", "45" );
 		cfg.setProperty( "hibernate.search.Documents.sharding_strategy.test.output", "70" );
 		cfg.setProperty( "hibernate.search.Documents.0.batch.max_merge_docs", "57" );
+		//use fqcn to make sure it still works even after the introduction of the shortcuts
 		cfg.setProperty( "hibernate.search.Documents.0.directory_provider", RAMDirectoryProvider.class.getCanonicalName() );
 		cfg.setProperty( "hibernate.search.Documents.0.transaction.max_buffered_docs", "58" );
 		cfg.setProperty( "hibernate.search.Documents.1.batch.max_merge_docs", "11" );

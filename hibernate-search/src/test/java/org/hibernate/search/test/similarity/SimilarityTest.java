@@ -47,7 +47,7 @@ public class SimilarityTest extends SearchTestCase {
 		Configuration config = new Configuration();
 		config.addAnnotatedClass( Can.class );
 		config.addAnnotatedClass( Trash.class );
-		config.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		config.setProperty( "hibernate.search.default.similarity", DummySimilarity.class.getName() );
 		try {
 			config.buildSessionFactory();

@@ -224,7 +224,7 @@ public class WorkerTestCase extends SearchTestCase {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
-		cfg.setProperty( "hibernate.search.Clock.directory_provider", FSDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.Clock.directory_provider", "filesystem" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.show_sql", "false" );
 		cfg.setProperty( "hibernate.format_sql", "false" );

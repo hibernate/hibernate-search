@@ -193,7 +193,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 
-		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 

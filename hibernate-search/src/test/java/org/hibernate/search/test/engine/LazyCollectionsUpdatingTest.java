@@ -140,7 +140,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
-		cfg.setProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 

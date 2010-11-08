@@ -237,7 +237,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cfg.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave );
 		cfg.setProperty( "hibernate.search.default.refresh", "1" ); //every second
 		cfg.setProperty(
-				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSSlaveDirectoryProvider"
+				"hibernate.search.default.directory_provider", "filesystem-slave"
 		);
 		cfg.setProperty(
 				"hibernate.search.default.retry_marker_lookup", new Integer(retries).toString()
@@ -260,13 +260,14 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cfg[0].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + masterMain );
 		cfg[0].setProperty( "hibernate.search.default.refresh", "1" ); //every second
 		cfg[0].setProperty(
-				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSMasterDirectoryProvider"
+				"hibernate.search.default.directory_provider", "filesystem-master"
 		);
 
 		//slave(s)
 		cfg[1].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy );
 		cfg[1].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave );
 		cfg[1].setProperty( "hibernate.search.default.refresh", "1" ); //every second
+		//keep the fqcn to make sure non short cut solutions still work
 		cfg[1].setProperty(
 				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSSlaveDirectoryProvider"
 		);

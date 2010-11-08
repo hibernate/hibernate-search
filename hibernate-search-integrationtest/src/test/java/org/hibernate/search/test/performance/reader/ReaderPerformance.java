@@ -102,7 +102,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		cfg.setProperty(
 				"hibernate.search.default.optimizer.transaction_limit.max", "10"

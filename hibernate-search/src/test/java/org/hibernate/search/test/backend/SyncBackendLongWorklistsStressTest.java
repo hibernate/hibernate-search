@@ -85,7 +85,7 @@ public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 		File sub = getBaseIndexDir();
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 		//needs FSDirectory to have the index contents survive the SessionFactory close
-		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.show_sql", "false" );
 		cfg.setProperty( "hibernate.format_sql", "false" );

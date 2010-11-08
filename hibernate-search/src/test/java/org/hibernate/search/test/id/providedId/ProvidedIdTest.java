@@ -49,7 +49,7 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		final ManualConfiguration configuration = new ManualConfiguration()
 				.addClass( ProvidedIdPerson.class )
 				.addClass( ProvidedIdPersonSub.class )
-				.addProperty( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() )
+				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addProperty(  Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() )
 				.addProperty( "hibernate.search.default.transaction.merge_factor", "100" )
 				.addProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );

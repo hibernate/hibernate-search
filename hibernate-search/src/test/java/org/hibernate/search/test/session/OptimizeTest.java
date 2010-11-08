@@ -77,7 +77,7 @@ public class OptimizeTest extends SearchTestCase {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
-		cfg.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 

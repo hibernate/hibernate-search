@@ -123,7 +123,7 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 		}
 
 		//Search config
-		config.put( "hibernate.search.default.directory_provider", RAMDirectoryProvider.class.getName() );
+		config.put( "hibernate.search.default.directory_provider", "ram" );
 		config.put( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 
 		return config;

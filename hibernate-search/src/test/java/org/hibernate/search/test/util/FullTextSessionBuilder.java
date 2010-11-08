@@ -87,13 +87,11 @@ public class FullTextSessionBuilder {
 	 */
 	public FullTextSessionBuilder useRAMDirectoryProvider(boolean use) {
 		 if ( use ) {
-			 cfg.setProperty( "hibernate.search.default.directory_provider",
-						RAMDirectoryProvider.class.getName() );
+			 cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 			 usingFileSystem = false;
 		 }
 		 else {
-			 cfg.setProperty( "hibernate.search.default.directory_provider",
-						FSDirectoryProvider.class.getName() );
+			 cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 			 usingFileSystem = true;
 		 }
 		return this;
