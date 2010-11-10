@@ -38,7 +38,7 @@ public final class Search {
 	}
 
 	public static FullTextSession getFullTextSession(Session session) {
-		if ( session instanceof FullTextSessionImpl ) {
+		if ( session instanceof FullTextSession ) {
 			return ( FullTextSession ) session;
 		}
 		else {

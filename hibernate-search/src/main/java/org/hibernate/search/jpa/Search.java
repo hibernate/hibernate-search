@@ -43,7 +43,7 @@ public final class Search {
 	 * The underlying EM implementation has to be Hibernate EntityManager
 	 */
 	public static FullTextEntityManager getFullTextEntityManager(EntityManager em) {
-		if ( em instanceof FullTextEntityManagerImpl ) {
+		if ( em instanceof FullTextEntityManager ) {
 			return (FullTextEntityManager) em;
 		}
 		else {
