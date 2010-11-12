@@ -40,6 +40,7 @@
         <module>hibernate-search-analyzers</module>
         <module>hibernate-search</module>
         <module>hibernate-search-testing</module>
+        <module>hibernate-search-infinispan</module>
         <module>hibernate-search-archetype</module>
         <module>hibernate-search-integrationtest</module>
     </modules>
