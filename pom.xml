@@ -287,7 +287,27 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
-            </plugin>
+                <executions>
+                    <execution>
+                        <id>build-test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                            </archive>
+                            <excludes>
+                                <exclude>**/hibernate.properties</exclude>
+                                <exclude>**/log4j.properties</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
