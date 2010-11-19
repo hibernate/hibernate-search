@@ -29,6 +29,7 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -42,13 +43,14 @@ public class Value {
 	@GeneratedValue
 	private int id;
 
-	@Field(store = Store.YES, indexNullAs = "_null_")
+	@Field(index = Index.UN_TOKENIZED, store = Store.YES, indexNullAs = "_custom_token_")
 	private String value;
 
-	@Field(store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+	@Field(index = Index.UN_TOKENIZED, store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 	private String fallback;
 
-	@Field(store = Store.YES,
+	@Field(index = Index.UN_TOKENIZED,
+			store = Store.YES,
 			indexNullAs = "_dummy_",
 			bridge = @FieldBridge(impl = DummyStringBridge.class))
 	private String dummy;

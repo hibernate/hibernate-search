@@ -28,20 +28,24 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
 
 /**
- * Tests for indexing and querying {@code null} values. See HSEARCh-115
+ * Tests for indexing and querying {@code null} values. See HSEARCH-115
  *
  * @author Hardy Ferentschik
  */
@@ -61,7 +65,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		tx = fullTextSession.beginTransaction();
 
 		searchKeywordWithExpectedNumberOfResults( fullTextSession, "foo", 1 );
-		searchKeywordWithExpectedNumberOfResults( fullTextSession, "_null_", 1 );
+		searchKeywordWithExpectedNumberOfResults( fullTextSession, "_custom_token_", 1 );
 
 		tx.commit();
 		fullTextSession.close();
@@ -78,13 +82,47 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
-		Document document = getSingleIndexedDocument( fullTextSession );
+		Document document = getSingleIndexedDocument( fullTextSession, QueryType.USE_LUCENE_QUERY );
 
 		String indexedNullString = document.get( "value" );
-		assertEquals( "The null value should be indexed as _null_", "_null_", indexedNullString );
+		String expectedString = "_custom_token_";
+		assertEquals( "The null value should be indexed as " + expectedString, expectedString, indexedNullString );
 
 		tx.commit();
 		fullTextSession.close();
+	}
+
+	public void testNullIndexingWithDSLQuery() throws Exception {
+		Value nullValue = new Value( null );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		session.save( nullValue );
+		tx.commit();
+
+		fullTextSession.clear();
+		tx = fullTextSession.beginTransaction();
+
+		Document document = getSingleIndexedDocument( fullTextSession, QueryType.USE_DSL_QUERY );
+
+		String indexedNullString = document.get( "value" );
+		
+		String expectedString = "_custom_token_";
+		assertEquals( "The null value should be indexed as " + expectedString, expectedString, indexedNullString );
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	public void testNullIndexingWithDSLQueryIgnoringFieldBridge() throws Exception {
+		try {
+			QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
+			queryBuilder.keyword().onField( "value" ).ignoreFieldBridge().matching( null ).createQuery();
+			fail();
+		}
+		catch ( SearchException e ) {
+			// success
+		}
 	}
 
 	public void testProjectedValueGetsConvertedToNull() throws Exception {
@@ -98,9 +136,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
-		parser.setAllowLeadingWildcard( true );
-		Query query = parser.parse( "*" );
+		Query query = createLuceneQuery();
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
 		fullTextQuery.setProjection(
 				"id",
@@ -133,10 +169,12 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
-		Document document = getSingleIndexedDocument( fullTextSession );
+		Document document = getSingleIndexedDocument( fullTextSession, QueryType.USE_LUCENE_QUERY );
 
 		String indexedNullString = document.get( "fallback" );
-		assertEquals( "The null value should be indexed as 'fubar'", "fubar", indexedNullString );
+
+		String expectedString = "fubar";
+		assertEquals( "The null value should be indexed as " + expectedString, expectedString, indexedNullString );
 
 		tx.commit();
 		fullTextSession.close();
@@ -153,19 +191,26 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
-		Document document = getSingleIndexedDocument( fullTextSession );
+		Document document = getSingleIndexedDocument( fullTextSession, QueryType.USE_LUCENE_QUERY );
 
 		String indexedNullString = document.get( "dummy" );
-		assertEquals( "The null value should be indexed as '_dummy_'", "_dummy_", indexedNullString );
+
+		String expectedString = "_dummy_";
+		assertEquals( "The null value should be indexed as " + expectedString, expectedString, indexedNullString );
 
 		tx.commit();
 		fullTextSession.close();
 	}
 
-	private Document getSingleIndexedDocument(FullTextSession fullTextSession) throws ParseException {
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
-		parser.setAllowLeadingWildcard( true );
-		Query query = parser.parse( "*" );
+	private Document getSingleIndexedDocument(FullTextSession fullTextSession, QueryType type) throws ParseException {
+		Query query;
+		if ( QueryType.USE_LUCENE_QUERY.equals( type ) ) {
+			query = createLuceneQuery();
+		}
+		else {
+			query = createDSLQuery();
+		}
+
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
 		fullTextQuery.setProjection(
 				FullTextQuery.DOCUMENT
@@ -180,11 +225,20 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		return document;
 	}
 
+	private Query createLuceneQuery() throws ParseException {
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		parser.setAllowLeadingWildcard( true );
+		return parser.parse( "*" );
+	}
+
+	private Query createDSLQuery() throws ParseException {
+		QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
+		return queryBuilder.keyword().onField( "value" ).matching( null ).createQuery();
+	}
 
 	private void searchKeywordWithExpectedNumberOfResults(FullTextSession fullTextSession, String queryString, int expectedNumberOfResults)
 			throws Exception {
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "value", SearchTestCase.standardAnalyzer );
-		Query query = parser.parse( queryString );
+		TermQuery query = new TermQuery( new Term( "value", queryString ) );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Value.class );
 		@SuppressWarnings("unchecked")
 		List<Value> valueList = fullTextQuery.list();
@@ -200,5 +254,10 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		return new Class[] {
 				Value.class,
 		};
+	}
+
+	enum QueryType {
+		USE_LUCENE_QUERY,
+		USE_DSL_QUERY
 	}
 }
