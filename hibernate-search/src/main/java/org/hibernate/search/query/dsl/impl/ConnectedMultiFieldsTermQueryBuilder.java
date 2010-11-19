@@ -46,8 +46,8 @@ import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.TermTermination;
 
 /**
-* @author Emmanuel Bernard
-*/
+ * @author Emmanuel Bernard
+ */
 public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private final Object value;
 	private final QueryCustomizer queryCustomizer;
@@ -73,52 +73,66 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ) ) ).createQuery();
 		}
 		else {
-			BooleanQuery aggregatedFieldsQuery = new BooleanQuery( );
+			BooleanQuery aggregatedFieldsQuery = new BooleanQuery();
 			for ( FieldContext fieldContext : fieldContexts ) {
 				aggregatedFieldsQuery.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
 			}
-			return  queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
+			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
 		}
 	}
 
 	public Query createQuery(FieldContext fieldContext) {
 		final Query perFieldQuery;
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
-		FieldBridge fieldBridge = documentBuilder.getBridge(fieldContext.getField());
-		if(fieldBridge instanceof NumericFieldBridge) {
-			return NumericFieldUtils.createExactMatchQuery(fieldContext.getField(), value);
+		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
+		if ( fieldBridge instanceof NumericFieldBridge ) {
+			return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
 		}
 
-		String text = fieldContext.isIgnoreFieldBridge() ?
-					value.toString() :
-					documentBuilder.objectToString( fieldContext.getField(), value );
+		String searchTerm = buildSearchTerm( fieldContext, documentBuilder );
+
 		if ( fieldContext.isIgnoreAnalyzer() ) {
-			perFieldQuery = createTermQuery( fieldContext, text );
+			perFieldQuery = createTermQuery( fieldContext, searchTerm );
 		}
 		else {
-			List<String> terms;
-			try {
-				terms = getAllTermsFromText( fieldContext.getField(), text, queryContext.getQueryAnalyzer() );
-			}
-			catch ( IOException e ) {
-				throw new AssertionFailure("IO exception while reading String stream??", e);
-			}
+			List<String> terms = getAllTermsFromText(
+					fieldContext.getField(), searchTerm, queryContext.getQueryAnalyzer()
+			);
+
 			if ( terms.size() == 0 ) {
-				throw new SearchException( "try to search with an empty string: " + fieldContext.getField() );
+				throw new SearchException( "Try to search with an empty string: " + fieldContext.getField() );
 			}
-			else if (terms.size() == 1 ) {
+			else if ( terms.size() == 1 ) {
 				perFieldQuery = createTermQuery( fieldContext, terms.get( 0 ) );
 			}
 			else {
 				BooleanQuery booleanQuery = new BooleanQuery();
-				for (String localTerm : terms) {
-					Query termQuery = createTermQuery(fieldContext, localTerm);
+				for ( String localTerm : terms ) {
+					Query termQuery = createTermQuery( fieldContext, localTerm );
 					booleanQuery.add( termQuery, BooleanClause.Occur.SHOULD );
 				}
 				perFieldQuery = booleanQuery;
 			}
 		}
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
+	}
+
+	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity<?> documentBuilder) {
+		String text;
+		if ( fieldContext.isIgnoreFieldBridge() ) {
+			if ( value == null ) {
+				throw new SearchException(
+						"Unable to search for null token on field "
+								+ fieldContext.getField() + " if field bridge is ignored."
+				);
+			}
+			text = value.toString();
+		}
+		else {
+			// need to go via the appropriate bridge, because value is an object, eg boolean, and must be converted to a string first
+			text = documentBuilder.objectToString( fieldContext.getField(), value );
+		}
+		return text;
 	}
 
 	private Query createTermQuery(FieldContext fieldContext, String term) {
@@ -135,7 +149,8 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				query = new FuzzyQuery(
 						new Term( fieldName, term ),
 						termContext.getThreshold(),
-						termContext.getPrefixLength() );
+						termContext.getPrefixLength()
+				);
 				break;
 			default:
 				throw new AssertionFailure( "Unknown approximation: " + termContext.getApproximation() );
@@ -143,16 +158,20 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		return query;
 	}
 
-	private List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) throws IOException {
+	private List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) {
 		//it's better not to apply the analyzer with wildcard as * and ? can be mistakenly removed
 		List<String> terms = new ArrayList<String>();
 		if ( termContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {
 			terms.add( localText );
 		}
 		else {
-			terms = Helper.getAllTermsFromText( fieldName, localText, analyzer );
+			try {
+				terms = Helper.getAllTermsFromText( fieldName, localText, analyzer );
+			}
+			catch ( IOException e ) {
+				throw new AssertionFailure( "IO exception while reading String stream??", e );
+			}
 		}
 		return terms;
 	}
-
 }
