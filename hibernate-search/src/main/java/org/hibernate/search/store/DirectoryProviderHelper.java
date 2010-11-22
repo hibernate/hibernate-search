@@ -30,10 +30,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.NativeFSLockFactory;
@@ -133,13 +136,27 @@ public final class DirectoryProviderHelper {
 		// must use the setter (instead of using the constructor) to set the lockFactory, or Lucene will
 		// throw an exception if it's different than a previous setting.
 		fsDirectory.setLockFactory( lockFactory );
-		if ( !IndexReader.indexExists( fsDirectory ) ) {
-			log.debug( "Initialize index: '{}'", indexDir.getAbsolutePath() );
-			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
-			IndexWriter iw = new IndexWriter( fsDirectory, new SimpleAnalyzer(), true, fieldLength );
-			iw.close();
-		}
+		log.debug( "Initialize index: '{}'", indexDir.getAbsolutePath() );
+		initializeIndexIfNeeded( fsDirectory );
 		return fsDirectory;
+	}
+
+	/**
+	 * Initialize the Lucene Directory if it isn't already.
+	 * @param directory the Directory to initialize
+	 * @throws SearchException in case of lock acquisition timeouts, IOException, or if a corrupt index is found
+	 */
+	public static void initializeIndexIfNeeded(Directory directory) {
+		try {
+			if ( ! IndexReader.indexExists( directory ) ) {
+				IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
+				IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
+				iw.close();
+			}
+		}
+		catch (IOException e) {
+			throw new SearchException( "Could not initialize index", e );
+		}
 	}
 
 	/**

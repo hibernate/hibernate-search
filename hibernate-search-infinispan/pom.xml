@@ -44,26 +44,28 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>jgroups</groupId>
-            <artifactId>jgroups</artifactId>
-            <version>2.9.0.GA</version>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-lucene-directory</artifactId>
+            <version>${infinispanVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <scope>test</scope>
-        </dependency> 
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-testing</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search</artifactId>
             <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
-        </dependency>       
+       </dependency>
+       <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.12.0.GA</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
     </dependencies>
 
     <build>

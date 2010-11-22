@@ -616,7 +616,8 @@ public class Book {
     analyzer configuration (<xref linkend="analyzer" />) and field bridges
     (<xref linkend="search-mapping-bridge" />), both important features
     required for more fine-grained indexing. More advanced topics cover
-    clustering (<xref linkend="jms-backend" />) and large indexes handling
+    clustering (<xref linkend="jms-backend" />, <xref linkend="infinispan-directories" />)
+    and large indexes handling
     (<xref linkend="search-configuration-directory-sharding" />).</para>
   </section>
 </chapter>

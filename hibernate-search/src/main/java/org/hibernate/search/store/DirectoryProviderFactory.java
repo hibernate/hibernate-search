@@ -71,16 +71,16 @@ public class DirectoryProviderFactory {
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 
-	private static final Map<String, Class<? extends DirectoryProvider<?>>> defaultProviderClasses;
+	private static final Map<String, String> defaultProviderClasses;
 
 	static {
-		defaultProviderClasses = new HashMap<String, Class<? extends DirectoryProvider<?>>>( 5 );
-		defaultProviderClasses.put( "", FSDirectoryProvider.class );
-		defaultProviderClasses.put( "filesystem", FSDirectoryProvider.class );
-		defaultProviderClasses.put( "filesystem-master", FSMasterDirectoryProvider.class );
-		defaultProviderClasses.put( "filesystem-slave", FSSlaveDirectoryProvider.class );
-		defaultProviderClasses.put( "ram", RAMDirectoryProvider.class );
-
+		defaultProviderClasses = new HashMap<String, String>( 6 );
+		defaultProviderClasses.put( "", FSDirectoryProvider.class.getName() );
+		defaultProviderClasses.put( "filesystem", FSDirectoryProvider.class.getName() );
+		defaultProviderClasses.put( "filesystem-master", FSMasterDirectoryProvider.class.getName() );
+		defaultProviderClasses.put( "filesystem-slave", FSSlaveDirectoryProvider.class.getName() );
+		defaultProviderClasses.put( "ram", RAMDirectoryProvider.class.getName() );
+		defaultProviderClasses.put( "infinispan", "org.hibernate.search.infinispan.InfinispanDirectoryProvider" );
 	}
 
 	public DirectoryProviders createDirectoryProviders(XClass entity, SearchConfiguration cfg,
@@ -152,8 +152,9 @@ public class DirectoryProviderFactory {
 		DirectoryProvider<?> provider;
 		//try and use the built-in shortcuts before loading the provider as a fully qualified class name 
 		if ( defaultProviderClasses.containsKey( maybeShortCut ) ) {
-			final Class<? extends DirectoryProvider<?>> dpClass = defaultProviderClasses.get( maybeShortCut );
-			provider = ClassLoaderHelper.instanceFromClass( DirectoryProvider.class, dpClass, "directory provider" );
+			String fullClassName = defaultProviderClasses.get( maybeShortCut );
+			provider = ClassLoaderHelper.instanceFromName( DirectoryProvider.class,
+					fullClassName, DirectoryProviderFactory.class, "directory provider" );
 		}
 		else {
 			provider = ClassLoaderHelper.instanceFromName(
