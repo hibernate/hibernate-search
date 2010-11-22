@@ -28,10 +28,11 @@ import java.io.File;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.util.FileHelper;
 import org.slf4j.Logger;
 
@@ -49,7 +50,7 @@ public class FullTextSessionBuilder {
 
 	private static final File indexDir;
 
-	private AnnotationConfiguration cfg;
+	private Configuration cfg;
 	private SessionFactory sessionFactory;
 	private boolean usingFileSystem = false;
 	
@@ -64,7 +65,7 @@ public class FullTextSessionBuilder {
 	}
 	
 	public FullTextSessionBuilder() {
-		cfg = new AnnotationConfiguration();
+		cfg = new Configuration();
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
 		
 		//cache:
@@ -148,6 +149,19 @@ public class FullTextSessionBuilder {
 	public FullTextSessionBuilder build() {
 		sessionFactory = cfg.buildSessionFactory();
 		return this;
+	}
+
+	/**
+	 * @return the SearchFactory
+	 */
+	public SearchFactory getSearchFactory() {
+		FullTextSession fullTextSession = openFullTextSession();
+		try {
+			return fullTextSession.getSearchFactory();
+		}
+		finally {
+			fullTextSession.close();
+		}
 	}
 	
 }

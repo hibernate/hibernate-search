@@ -204,6 +204,31 @@
             <classname>MMapDirectory</classname> can bring substantial
             performace boosts they also have their issues.</para></entry>
           </row>
+          
+          <row>
+            <entry>infinispan</entry>
+
+            <entry><para>Infinispan based directory. Use it to store the index
+            in a distributed grid, making index changes visible to all elements
+            of the cluster very quickly. Also see
+            <xref linkend="infinispan-directories" /> for additional
+            requirements and configuration settings. Infinispan needs a global
+            configuration and additional dependencies; the settings defined here
+            apply to each different index.</para></entry>
+
+            <entry><para><literal>locking_cachename</literal>: name of the Infinispan
+            cache to use to store locks.</para><para><literal>data_cachename</literal>
+            : name of the Infinispan cache to use to store the largest data chunks; this
+            area will contain the largest objects, use replication if you have enough memory
+            or switch to distribution.</para>
+            <para><literal>metadata_cachename</literal>: name of the Infinispan cache
+            to use to store the metadata relating to the index; this data is rather small
+            and read very often, it's recommended to have this cache setup using
+            replication.</para>
+            <para><literal>chunk_size</literal>: large files of the index are split in smaller
+            chunks, you might want to set the highest value efficiently handled by your network.
+            Networking tuning might be useful.</para></entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
@@ -918,6 +943,95 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true)
 hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
                 </programlisting>
       </example>
+    </section>
+  </section>
+  
+  <section id="infinispan-directories" revision="1">
+    <title>Infinispan Directory configuration</title>
+    
+    <para>Infinispan is a distributed scalable, highly available data grid platform which
+    supports autodiscovery of peer nodes; it's possible to store the
+    index in Infinispan, making it easy to setup a clustering configuration
+    with Hibernate Search and having updates to the index available on
+    other nodes very quickly.</para>
+
+    <para>This section describes in greater detail how to configure Hibernate Search
+    to use an Infinispan Lucene Directory.</para>
+    
+    <para>Using an Infinispan Directory the index is shared across multiple nodes,
+    being stored in memory. It is considered a single directory across all participating
+    nodes, so when a node updates the index this affects the other nodes;
+    what is updated on one node can be immediately searched fore in the whole cluster.</para>
+    
+    <para>The default configuration replicates all data defining the index across all nodes,
+    thus consuming a significant amount of memory. For large indexes it's suggested to enable
+    data distribution, so that each piece of information is replicated to a subset of all
+    cluster members. Also it's possible to offload part or most information to a single centralized
+    <literal>CacheStore</literal>, such as plain filesystem, Amazon S3, Cassandra, Berkley DB,
+    JDBC standard databases, or have a <literal>CacheStore</literal> on each node, chain cachestores.
+    See the <ulink url="http://www.jboss.org/infinispan/" >
+    Infinispan documentation</ulink> for all options and configuration details.</para>
+    
+    <section>
+      <title>Requirements</title>
+      <para>Infinispan requires Java6 and an updated version of JGroups. To use it via maven,
+      add the following dependencies:</para>
+      <example>
+      <title>Maven dependencies for Hibernate Search</title>
+
+      <programlisting language="XML" role="XML">&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search-infinispan&lt;/artifactId&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+    </example>
+    <para>For the non-maven users, add <literal>hibernate-search-infinispan.jar</literal>,
+    <literal>infinispan-lucene-directory.jar</literal>, <literal>infinispan-core.jar</literal>
+    to your application classpath. These last two jars are distributed by 
+    <ulink url="http://sourceforge.net/projects/infinispan/files/" >Infinispan</ulink>;
+    Also make sure to update JGroups to a version matching the Infinispan package, the version
+    normally distributed with Hibernate Search is older to maintain Java5 compatibility.</para>
+    </section>
+    
+    <section>
+    <title>Architecture</title>
+    <para>Even when using an Infinispan directory it's still recommended to use the
+    JMS Master/Slave backend or the JGroups backend: as via Infinispan all nodes will share 
+    the same index, it's likely that <classname>IndexWriter</classname>s being active on different
+    nodes will try to acquire the lock on the same index. So instead of sending updates directly
+    to the index, it's still better to send it to a JMS queue or JGroups channel and have a single
+    node apply all changes on behalf of all other nodes.</para>
+    <para>To configure a JMS slave only the backend must be replaced, the directory provider must be set
+    to <literal>infinispan</literal>; set the same directory provider on the master, they will connect
+    without the need to setup the copy job across nodes. Using the JGroups backend is very similar,
+    just combine the backend configuration with the <literal>infinispan</literal> directory provider.</para>
+    </section>
+    
+    <section>
+    <title>Infinispan Configuration</title>
+    <para>To use Infinispan a <classname>CacheManager</classname> must be started from an Infinispan
+    configuration file. Hibernate Search can take and reuse and existing <classname>CacheManager</classname>
+    looking it up via JNDI, or start a new one. In the latter case Hibernate Search will start it
+    and stop it at <classname>SessionFactory</classname> close.
+    </para>
+    <para>To use and existing <classname>CacheManager</classname> from JNDI (optional parameter):</para>
+    <programlisting>hibernate.search.infinispan.cachemanager_jndiname = [jndiname]</programlisting>
+    <para>To start a new <classname>CacheManager</classname> from a configuration file (optional parameter):</para>
+    <programlisting>hibernate.search.infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
+    <para>If both parameters are defined, JNDI will have priority. If none of these is defined, Hibernate
+    Search will use the example Infinispan configuration provided in the <literal>hibernate-search-infinispan.jar</literal></para>
+    
+    <para>As mentioned in the <xref linkend="search-configuration-directory" />, each index actually
+    makes use of three caches, so three different caches should be configured as shown in the <literal>
+    default-hibernatesearch-infinispan.xml</literal> provided in the  <literal>hibernate-search-infinispan.jar</literal>.
+    </para>
+    <para>Several indexes can share the same caches, they are differentiated by using the index name as
+    it is the case with the other Directory implementations.</para>
     </section>
   </section>
 
