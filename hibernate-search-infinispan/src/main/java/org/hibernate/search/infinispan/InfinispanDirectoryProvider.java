@@ -37,6 +37,9 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.slf4j.Logger;
 
 /**
+ * A DirectoryProvider using Infinispan to store the Index. This depends on the
+ * CacheManagerServiceProvider to get a reference to the Infinispan {@link EmbeddedCacheManager}.
+ * 
  * @author Sanne Grinovero
  */
 public class InfinispanDirectoryProvider implements org.hibernate.search.store.DirectoryProvider<InfinispanDirectory> {
