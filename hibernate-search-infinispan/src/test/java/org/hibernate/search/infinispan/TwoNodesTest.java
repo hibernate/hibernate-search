@@ -28,8 +28,10 @@ import java.util.List;
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-
 import org.apache.lucene.search.Query;
+import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.remoting.transport.Address;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
@@ -37,22 +39,20 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.JGroupsEnvironment;
-import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.remoting.transport.Address;
 
 /**
  * We start two different Hibernate Search instances, both using
  * an InfinispanDirectoryProvider as the default DirectoryProvider
  * for all entities.
  * Set -Djava.net.preferIPv4Stack=true as this is required by JGroups.
- *  
+ *
  * @author Sanne Grinovero
  */
 public class TwoNodesTest extends TestCase {
-	
+
 	final FullTextSessionBuilder nodea = new FullTextSessionBuilder();
 	final FullTextSessionBuilder nodeb = new FullTextSessionBuilder();
-	
+
 	public void testSomething() {
 		final String to = "spam@hibernate.org";
 		final String messageText = "to get started as a real spam expert, search for 'getting an iphone' on Hibernate forums";
@@ -68,8 +68,14 @@ public class TwoNodesTest extends TestCase {
 		{
 			FullTextSession fullTextSession = nodeb.openFullTextSession();
 			Transaction transaction = fullTextSession.beginTransaction();
-			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( SimpleEmail.class ).get();
-			Query query = queryBuilder.keyword().onField( "message" ).matching( "Hibernate Getting Started" ).createQuery();
+			QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
+					.buildQueryBuilder()
+					.forEntity( SimpleEmail.class )
+					.get();
+			Query query = queryBuilder.keyword()
+					.onField( "message" )
+					.matching( "Hibernate Getting Started" )
+					.createQuery();
 			List list = fullTextSession.createFullTextQuery( query ).setProjection( "message" ).list();
 			Assert.assertEquals( 1, list.size() );
 			Object[] result = (Object[]) list.get( 0 );
@@ -77,34 +83,38 @@ public class TwoNodesTest extends TestCase {
 			transaction.commit();
 		}
 	}
-	
+
 	@Override
 	protected void setUp() throws Exception {
 		JGroupsEnvironment.initJGroupsProperties();
-		prepareCommonConfiguration(nodea);
+		prepareCommonConfiguration( nodea );
 		nodea.build();
-		prepareCommonConfiguration(nodeb);
+		prepareCommonConfiguration( nodeb );
 		nodeb.build();
-		
-		InfinispanDirectoryProvider directoryProviderA = extractInfinispanDirectoryProvider(nodea);
+
+		InfinispanDirectoryProvider directoryProviderA = extractInfinispanDirectoryProvider( nodea );
 		EmbeddedCacheManager cacheManager = directoryProviderA.getCacheManager();
-		waitMembersCount(cacheManager, 2);
+		waitMembersCount( cacheManager, 2 );
 	}
 
 	/**
 	 * Wait some time for the cluster to form
+	 *
 	 * @param cacheManager
-	 * @param i
-	 * @throws InterruptedException 
+	 * @param expectedSize
+	 *
+	 * @throws InterruptedException
 	 */
 	private void waitMembersCount(EmbeddedCacheManager cacheManager, int expectedSize) throws InterruptedException {
 		int currentSize = 0;
 		int loopCounter = 0;
-		while (currentSize < expectedSize) {
+		while ( currentSize < expectedSize ) {
 			Thread.sleep( 10 );
 			List<Address> members = cacheManager.getMembers();
 			currentSize = members.size();
-			if (loopCounter > 200) throw new AssertionFailedError( "timeout while waiting for all nodes to join in cluster" );
+			if ( loopCounter > 200 ) {
+				throw new AssertionFailedError( "timeout while waiting for all nodes to join in cluster" );
+			}
 		}
 	}
 
@@ -116,7 +126,10 @@ public class TwoNodesTest extends TestCase {
 
 	private void prepareCommonConfiguration(FullTextSessionBuilder cfg) {
 		cfg.setProperty( "hibernate.search.default.directory_provider", "infinispan" );
-		cfg.setProperty( CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME, "testing-hibernatesearch-infinispan.xml" );
+		cfg.setProperty(
+				CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME,
+				"testing-hibernatesearch-infinispan.xml"
+		);
 		cfg.addAnnotatedClass( SimpleEmail.class );
 	}
 
@@ -125,5 +138,4 @@ public class TwoNodesTest extends TestCase {
 		nodea.close();
 		nodeb.close();
 	}
-
 }

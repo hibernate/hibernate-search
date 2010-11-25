@@ -35,16 +35,17 @@ import org.hibernate.search.annotations.Store;
 /**
  * @author Sanne Grinovero
  */
-@Entity @Indexed(index="emails")
+@Entity
+@Indexed(index = "emails")
 public class SimpleEmail {
-	
-	@Id @GeneratedValue
-	public Long id;
-	
-	@Field(index=Index.UN_TOKENIZED)
-	public String to = "";
-	
-	@Field(store=Store.COMPRESS)
-	public String message = "";
 
+	@Id
+	@GeneratedValue
+	public Long id;
+
+	@Field(index = Index.UN_TOKENIZED)
+	public String to = "";
+
+	@Field(store = Store.COMPRESS)
+	public String message = "";
 }

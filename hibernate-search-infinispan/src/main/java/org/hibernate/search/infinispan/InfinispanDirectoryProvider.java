@@ -26,24 +26,25 @@ package org.hibernate.search.infinispan;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.DirectoryProviderHelper;
-import org.hibernate.search.util.LoggerFactory;
 import org.infinispan.Cache;
 import org.infinispan.lucene.InfinispanDirectory;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.slf4j.Logger;
 
+import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
+import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.store.DirectoryProviderHelper;
+import org.hibernate.search.util.LoggerFactory;
+
 /**
  * A DirectoryProvider using Infinispan to store the Index. This depends on the
  * CacheManagerServiceProvider to get a reference to the Infinispan {@link EmbeddedCacheManager}.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class InfinispanDirectoryProvider implements org.hibernate.search.store.DirectoryProvider<InfinispanDirectory> {
-	
+
 	private static final Logger log = LoggerFactory.make();
 
 	public static final String DEFAULT_LOCKING_CACHENAME = "LuceneIndexesLocking";
@@ -51,7 +52,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	public static final String DEFAULT_INDEXESDATA_CACHENAME = "LuceneIndexesData";
 
 	public static final String DEFAULT_INDEXESMETADATA_CACHENAME = "LuceneIndexesMetadata";
-	
+
 	private BuildContext context;
 	private String directoryProviderName;
 
@@ -68,10 +69,12 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.directoryProviderName = directoryProviderName;
 		this.context = context;
-		metadataCacheName = properties.getProperty( "metadata_cachename" , DEFAULT_INDEXESMETADATA_CACHENAME );
-		dataCacheName = properties.getProperty( "data_cachename" , DEFAULT_INDEXESDATA_CACHENAME );
-		lockingCacheName = properties.getProperty( "locking_cachename" , DEFAULT_LOCKING_CACHENAME );
-		chunkSize = ConfigurationParseHelper.getIntValue( properties, "chunk_size", InfinispanDirectory.DEFAULT_BUFFER_SIZE );
+		metadataCacheName = properties.getProperty( "metadata_cachename", DEFAULT_INDEXESMETADATA_CACHENAME );
+		dataCacheName = properties.getProperty( "data_cachename", DEFAULT_INDEXESDATA_CACHENAME );
+		lockingCacheName = properties.getProperty( "locking_cachename", DEFAULT_LOCKING_CACHENAME );
+		chunkSize = ConfigurationParseHelper.getIntValue(
+				properties, "chunk_size", InfinispanDirectory.DEFAULT_BUFFER_SIZE
+		);
 	}
 
 	@Override
@@ -91,7 +94,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		try {
 			directory.close();
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			// should never happen, #close() had a wrong signature
 			throw new SearchException( e );
 		}
