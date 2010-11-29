@@ -72,7 +72,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	protected Session session;
 
 	private static File targetDir;
-	private static File indexDir;
+	protected static final File indexDir;
 
 	private SearchFactoryImplementor searchFactory;
 
