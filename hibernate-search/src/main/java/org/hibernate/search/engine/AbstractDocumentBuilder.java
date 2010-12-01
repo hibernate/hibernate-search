@@ -63,7 +63,6 @@ import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -71,7 +70,6 @@ import org.hibernate.search.bridge.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PassThroughAnalyzer;
 import org.hibernate.search.util.ReflectionHelper;
@@ -126,11 +124,13 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	abstract public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor);
+	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue);
 
 	abstract protected void subClassSpecificCheck(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
 
 	abstract protected void initSubClass(XClass clazz, ConfigContext context);
+
+	abstract public Serializable getIndexingId(T entity);
 
 	public boolean isRoot() {
 		return isRoot;
@@ -275,16 +275,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				throw new AssertionFailure( "Unexpected Index: " + index );
 		}
 	}
-
+	
 	/**
 	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
-	 *
-	 * @param instance The instance to be indexed
-	 * @param queue the current work queue
-	 * @param metadata metadata
-	 * @param searchFactoryImplementor the current session
-	 */
-	protected <T> void processContainedInInstances(Object instance, List<LuceneWork> queue, PropertiesMetadata metadata, SearchFactoryImplementor searchFactoryImplementor) {
+	 **/
+	public void processContainedInInstances(Class entityClass, Object instance, WorkPlan workplan, SearchFactoryImplementor searchFactoryImplementor) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
 			Object value = ReflectionHelper.getMemberValue( instance, member );
@@ -297,7 +292,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				@SuppressWarnings("unchecked")
 				T[] array = (T[]) value;
 				for ( T arrayValue : array ) {
-					processSingleContainedInInstance( queue, searchFactoryImplementor, arrayValue );
+					processSingleContainedInInstance( workplan, searchFactoryImplementor, arrayValue );
 				}
 			}
 			else if ( member.isCollection() ) {
@@ -309,7 +304,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				catch ( Exception e ) {
 					if ( e.getClass().getName().contains( "org.hibernate.LazyInitializationException" ) ) {
 						/* A deleted entity not having its collection initialized
-						 * leads to a LIE because the colleciton is no longer attached to the session
+						 * leads to a LIE because the collection is no longer attached to the session
 						 *
 						 * But that's ok as the collection update event has been processed before
 						 * or the fk would have been cleared and thus triggering the cleaning
@@ -319,12 +314,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				}
 				if ( collection != null ) {
 					for ( T collectionValue : collection ) {
-						processSingleContainedInInstance( queue, searchFactoryImplementor, collectionValue );
+						processSingleContainedInInstance( workplan, searchFactoryImplementor, collectionValue );
 					}
 				}
 			}
 			else {
-				processSingleContainedInInstance( queue, searchFactoryImplementor, value );
+				processSingleContainedInInstance( workplan, searchFactoryImplementor, value );
 			}
 		}
 	}
@@ -774,46 +769,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		return collection;
 	}
 
-	private <T> void processSingleContainedInInstance(List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor, T value) {
-		Class<T> valueClass = HibernateHelper.getClass( value );
-		DocumentBuilderIndexedEntity<T> builderIndexedEntity =
-				searchFactoryImplementor.getDocumentBuilderIndexedEntity( valueClass );
-
-		// it could be we have a nested @IndexedEmbedded chain in which case we have to find the top level @Indexed entities
-		if ( builderIndexedEntity == null ) {
-			DocumentBuilderContainedEntity<T> builderContainedEntity =
-					searchFactoryImplementor.getDocumentBuilderContainedEntity( valueClass );
-			if ( builderContainedEntity != null ) {
-				processContainedInInstances( value, queue, builderContainedEntity.getMetadata(), searchFactoryImplementor );
-			}
-		}
-		else {
-			addWorkForEmbeddedValue( value, queue, valueClass, builderIndexedEntity, searchFactoryImplementor );
-		}
-	}
-
-	/**
-	 * Create a {@code LuceneWork} instance of the entity which needs updating due to the embedded instance change.
-	 *
-	 * @param value The value to index
-	 * @param queue The current (Lucene) work queue
-	 * @param valueClass The class of the value
-	 * @param builderIndexedEntity the document builder for the entity which needs updating due to a update event of the embedded instance
-	 * @param searchFactoryImplementor the search factory.
-	 */
-	private <T> void addWorkForEmbeddedValue(T value, List<LuceneWork> queue, Class<T> valueClass,
-											 DocumentBuilderIndexedEntity<T> builderIndexedEntity, SearchFactoryImplementor searchFactoryImplementor) {
-		Serializable id = (Serializable) ReflectionHelper.getMemberValue( value, builderIndexedEntity.getIdGetter() );
-		if ( id != null ) {
-			builderIndexedEntity.addWorkToQueue(
-					valueClass, value, id, WorkType.UPDATE, queue, searchFactoryImplementor
-			);
-		}
-		else {
-			//this is an indexed entity that is not yet persisted but should be reached by cascade
-			// and thus raise an Hibernate Core event leading to its indexing by Hibernate Search
-			// => no need to do anything here
-		}
+	private <T> void processSingleContainedInInstance(WorkPlan workplan, SearchFactoryImplementor searchFactoryImplementor, T value) {
+			workplan.recurseContainedIn( searchFactoryImplementor, value );
 	}
 
 	/**

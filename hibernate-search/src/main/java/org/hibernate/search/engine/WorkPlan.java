@@ -37,26 +37,34 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.util.HibernateHelper;
 
+/**
+ * Represents the set of changes going to be applied to the index for the entities. A stream of Work is feed as input, a
+ * list of LuceneWork is output, and in the process we try to reduce the number of output operations to the minimum
+ * needed to reach the same final state.
+ * 
+ * @since 3.3
+ * @author Sanne Grinovero
+ */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class WorkPlan {
 	
-	private HashMap<Class<?>,PerClassWork<?>> byClass = new HashMap<Class<?>,PerClassWork<?>>();
+	private HashMap<Class<?>, PerClassWork<?>> byClass = new HashMap<Class<?>, PerClassWork<?>>();
 	
 	public <T> void addWork(Work<T> work) {
 		Class<T> entityClass = HibernateHelper.getClassFromWork( work );
 		PerClassWork classWork = getClassWork( entityClass );
 		classWork.addWork( work );
 	}
-
-	public <T> PerClassWork getClassWork(Class<T> entityClass) {
+	
+	private <T> PerClassWork getClassWork(Class<T> entityClass) {
 		PerClassWork classWork = byClass.get( entityClass );
-		if (classWork == null) {
+		if ( classWork == null ) {
 			classWork = new PerClassWork( entityClass );
 			byClass.put( entityClass, classWork );
 		}
 		return classWork;
 	}
-
+	
 	public void processContainedIn(SearchFactoryImplementor searchFactoryImplementor) {
 		for ( PerClassWork perClassWork : byClass.values() ) {
 			perClassWork.processContainedIn( searchFactoryImplementor );
@@ -66,11 +74,11 @@ public class WorkPlan {
 	<T> void recurseContainedIn(SearchFactoryImplementor searchFactoryImplementor, T value) {
 		Class<T> entityClass = HibernateHelper.getClass( value );
 		PerClassWork classWork = getClassWork( entityClass );
-		classWork.recurseContainedIn(searchFactoryImplementor, value);
+		classWork.recurseContainedIn( searchFactoryImplementor, value );
 	}
-
+	
 	/**
-	 * @param searchFactoryImplementor 
+	 * @param searchFactoryImplementor
 	 * @return
 	 */
 	public List<LuceneWork> getPlannedLuceneWork(SearchFactoryImplementor searchFactoryImplementor) {
@@ -88,7 +96,7 @@ public class WorkPlan {
 		private final Class<T> entityClass;
 		private AbstractDocumentBuilder<T> entityBuilder;
 		
-		PerClassWork(Class<T> clazz){
+		PerClassWork(Class<T> clazz) {
 			this.entityClass = clazz;
 		}
 		
@@ -139,7 +147,7 @@ public class WorkPlan {
 				if ( entityWork == null ) {
 					entityWork = new PerEntityWork( value );
 					byEntityId.put( indexingId, entityWork );
-					//recursion starts:
+					// recursion starts:
 					documentBuilder.processContainedInInstances( entityClass, value, WorkPlan.this, searchFactoryImplementor );
 				}
 				// else nothing to do as it's being processed already
@@ -174,7 +182,7 @@ public class WorkPlan {
 		private boolean containedInProcessed = false;
 		
 		public PerEntityWork(T entity) {
-			//for updates only
+			// for updates only
 			this.entity = entity;
 			this.delete = true;
 			this.add = true;
@@ -256,14 +264,16 @@ public class WorkPlan {
 			}
 		}
 		
-		public void enqueueLuceneWork(Class<T> entityClass, Serializable id, AbstractDocumentBuilder<T> entityBuilder, List<LuceneWork> luceneQueue, SearchFactoryImplementor searchFactoryImplementor) {
+		public void enqueueLuceneWork(Class<T> entityClass, Serializable id, AbstractDocumentBuilder<T> entityBuilder, List<LuceneWork> luceneQueue,
+				SearchFactoryImplementor searchFactoryImplementor) {
 			if ( add || delete ) {
 				entityBuilder.addWorkToQueue( entityClass, entity, id, delete, add, batch, luceneQueue );
 			}
 		}
 		
-		public void processContainedIn(Class<T> entityClass, Serializable id, AbstractDocumentBuilder<T> entityBuilder, WorkPlan workplan, SearchFactoryImplementor searchFactoryImplementor){
-			if ( ! containedInProcessed ) {
+		public void processContainedIn(Class<T> entityClass, Serializable id, AbstractDocumentBuilder<T> entityBuilder, WorkPlan workplan,
+				SearchFactoryImplementor searchFactoryImplementor) {
+			if ( !containedInProcessed ) {
 				containedInProcessed = true;
 				entityBuilder.processContainedInInstances( entityClass, entity, workplan, searchFactoryImplementor );
 			}

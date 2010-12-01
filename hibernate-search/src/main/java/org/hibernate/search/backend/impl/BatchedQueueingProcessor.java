@@ -24,11 +24,14 @@
 package org.hibernate.search.backend.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -43,6 +46,7 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
@@ -54,11 +58,12 @@ import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcess
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.Executors;
+import org.hibernate.search.engine.AbstractDocumentBuilder;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.WorkPlan;
 import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -66,6 +71,7 @@ import org.hibernate.search.util.LoggerFactory;
  * The work is then executed synchronously or asynchronously.
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class BatchedQueueingProcessor implements QueueingProcessor {
 
@@ -137,144 +143,14 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	public void prepareWorks(WorkQueue workQueue) {
 		final boolean alreadyProcessedAndUnchanged = workQueue.isSealedAndUnchanged();
 		if ( !alreadyProcessedAndUnchanged ) { 
-			List<Work> queue = workQueue.getQueue();
-			int initialSize = queue.size();
-			List<LuceneWork> luceneQueue = new ArrayList<LuceneWork>( initialSize ); //TODO load factor for containedIn
-			/**
-			 * Collection work type are process second, so if the owner entity has already been processed for whatever reason
-			 * the work will be ignored.
-			 * However if the owner entity has not been processed, an "UPDATE" work is executed
-			 *
-			 * Processing collection works last is mandatory to avoid reindexing a object to be deleted
-			 */
-			processWorkByLayer( queue, initialSize, luceneQueue, Layer.FIRST );
-			processWorkByLayer( queue, initialSize, luceneQueue, Layer.SECOND );
-			workQueue.setSealedQueue( optimize( luceneQueue ) );
+			WorkPlan plan = new WorkPlan();
+			for (Work work : workQueue.getQueue()){
+				plan.addWork( work );
+			}
+			plan.processContainedIn( searchFactoryImplementor );
+			List<LuceneWork> luceneWorkPlan = plan.getPlannedLuceneWork( searchFactoryImplementor );
+			workQueue.setSealedQueue( luceneWorkPlan );
 		}
-	}
-
-	private List<LuceneWork> optimize(List<LuceneWork> luceneQueue) {
-		/*
-		 * for a given entity id and entity type,
-		 * keep the latest AddLuceneWork and the first DeleteLuceneWork
-		 * in the queue.
-		 *
-		 * To do that, keep a list of indexes that need to be removed from the list
-		 */
-		final int size = luceneQueue.size();
-		List<Integer> toDelete = new ArrayList<Integer>( size );
-		Map<DuplicatableWork, Integer> workByPosition = new HashMap<DuplicatableWork, Integer>( size );
-		for ( int index = 0 ; index < size; index++ ) {
-			LuceneWork work = luceneQueue.get( index );
-			if ( work instanceof AddLuceneWork ) {
-				DuplicatableWork dupWork = new DuplicatableWork( work );
-				final Integer oldIndex = workByPosition.get( dupWork );
-				if ( oldIndex != null ) {
-					toDelete.add(oldIndex);
-					workByPosition.put( dupWork, index );
-				}
-				workByPosition.put( dupWork, index );
-			}
-			else if ( work instanceof DeleteLuceneWork ) {
-				DuplicatableWork dupWork = new DuplicatableWork( work );
-				final Integer oldIndex = workByPosition.get( dupWork );
-				if ( oldIndex != null ) {
-					toDelete.add(index);
-				}
-				else {
-					workByPosition.put( dupWork, index );
-				}
-			}
-		}
-		List<LuceneWork> result = new ArrayList<LuceneWork>( size - toDelete.size() );
-		for ( int index = 0 ; index < size; index++ ) {
-			if ( ! toDelete.contains( index ) ) {
-				result.add( luceneQueue.get( index ) );
-			}
-		}
-		return result;
-	}
-
-	private static class DuplicatableWork {
-		private final Class<? extends LuceneWork> workType;
-		private final Serializable id;
-		private final Class<?> entityType;
-
-		public DuplicatableWork(LuceneWork work) {
-			workType = work.getClass();
-			if ( ! ( AddLuceneWork.class.isAssignableFrom( workType ) || DeleteLuceneWork.class.isAssignableFrom( workType ) ) ) {
-				throw new AssertionFailure( "Should not be used for lucene work type: " + workType );
-			}
-			id = work.getId();
-			entityType = work.getEntityClass();
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if ( this == o ) {
-				return true;
-			}
-			if ( o == null || getClass() != o.getClass() ) {
-				return false;
-			}
-
-			DuplicatableWork that = ( DuplicatableWork ) o;
-
-			if ( !entityType.equals( that.entityType ) ) {
-				return false;
-			}
-			if ( !id.equals( that.id ) ) {
-				return false;
-			}
-			if ( !workType.equals( that.workType ) ) {
-				return false;
-			}
-
-			return true;
-		}
-
-		@Override
-		public int hashCode() {
-			int result = workType.hashCode();
-			result = 31 * result + id.hashCode();
-			result = 31 * result + entityType.hashCode();
-			return result;
-		}
-	}
-
-	private <T> void processWorkByLayer(List<Work> queue, int initialSize, List<LuceneWork> luceneQueue, Layer layer) {
-		for ( int i = 0; i < initialSize; i++ ) {
-			@SuppressWarnings("unchecked")
-			Work<T> work = queue.get( i );
-			if ( work != null ) {
-				if ( layer.isRightLayer( work.getType() ) ) {
-					queue.set( i, null ); // help GC and avoid 2 loaded queues in memory
-					addWorkToBuilderQueue( luceneQueue, work );
-				}
-			}
-		}
-	}
-
-	private <T> void addWorkToBuilderQueue(List<LuceneWork> luceneQueue, Work<T> work) {
-		Class<T> entityClass = HibernateHelper.getClassFromWork( work );
-		DocumentBuilderIndexedEntity<T> entityBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
-		if ( entityBuilder != null ) {
-			entityBuilder.addWorkToQueue(
-					entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor
-			);
-			return;
-		}
-
-		//might be a entity contained in
-		DocumentBuilderContainedEntity<T> containedInBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity( entityClass );
-		if ( containedInBuilder != null ) {
-			containedInBuilder.addWorkToQueue(
-					entityClass, work.getEntity(), work.getId(), work.getType(), luceneQueue, searchFactoryImplementor
-			);
-			return;
-		}
-		//should never happen but better be safe than sorry
-		throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass);
 	}
 
 	public void performWorks(WorkQueue workQueue) {
@@ -319,24 +195,12 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		backendQueueProcessorFactory.close();
 	}
 
-	private static enum Layer {
-		FIRST,
-		SECOND;
-
-		public boolean isRightLayer(WorkType type) {
-			if ( this == FIRST && type != WorkType.COLLECTION ) {
-				return true;
-			}
-			return this == SECOND && type == WorkType.COLLECTION;
-		}
-	}
-	
 	/**
 	 * @param properties the configuration to parse
 	 * @return true if the configuration uses sync indexing
 	 */
-	public static boolean isConfiguredAsSync(Properties properties){
-		//default to sync if none defined
+	public static boolean isConfiguredAsSync(Properties properties) {
+		// default to sync if none defined
 		return !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
 	}
 

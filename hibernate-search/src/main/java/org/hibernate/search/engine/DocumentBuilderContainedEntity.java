@@ -30,7 +30,6 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.impl.ConfigContext;
 
 /**
@@ -61,14 +60,15 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	protected void subClassSpecificCheck(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
 	}
 
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
-		/**
-		 * When references are changed, either null or another one, we expect dirty checking to be triggered (both sides
-		 * have to be updated)
-		 * When the internal object is changed, we apply the {Add|Update}Work on containedIns
-		 */
-		if ( workType.searchForContainers() ) {
-			processContainedInInstances( entity, queue, getMetadata(), searchFactoryImplementor );
-		}
+	@Override
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue) {
+		// nothing to do
 	}
+
+	@Override
+	public Serializable getIndexingId(T entity) {
+		//this is not an indexed entity
+		return null;
+	}
+
 }

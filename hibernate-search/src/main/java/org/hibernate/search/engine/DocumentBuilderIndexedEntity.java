@@ -26,7 +26,6 @@ package org.hibernate.search.engine;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -287,87 +286,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 		return id;
 	}
-
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, WorkType workType, List<LuceneWork> queue, SearchFactoryImplementor searchFactoryImplementor) {
-		//TODO with the caller loop we are in a n^2: optimize it using a HashMap for work recognition
-
-		boolean sameIdWasSetToBeDeleted = false;
-		List<LuceneWork> toDelete = new ArrayList<LuceneWork>();
-		boolean duplicateDelete = false;
-		for ( LuceneWork luceneWork : queue ) {
-			if ( luceneWork.getEntityClass() == entityClass ) {
-				Serializable currentId = luceneWork.getId();
-				if ( currentId != null && currentId.equals( id ) ) { //find a way to use Type.equals(x,y)
-					if ( luceneWork instanceof DeleteLuceneWork ) {
-						//flag this work as related to a to-be-deleted entity
-						sameIdWasSetToBeDeleted = true;
-					}
-					else if ( luceneWork instanceof AddLuceneWork ) {
-						//if a later work in the queue is adding it back, undo deletion flag:
-						sameIdWasSetToBeDeleted = false;
-					}
-					if ( workType == WorkType.DELETE ) { //TODO add PURGE?
-						//DELETE should have precedence over any update before (HSEARCH-257)
-						//if an Add work is here, remove it
-						//if an other delete is here remember but still search for Add
-						if ( luceneWork instanceof AddLuceneWork ) {
-							toDelete.add( luceneWork );
-						}
-						else if ( luceneWork instanceof DeleteLuceneWork ) {
-							duplicateDelete = true;
-						}
-					}
-					if ( workType == WorkType.ADD ) {
-						if ( luceneWork instanceof AddLuceneWork ) {
-							//embedded objects may issue an "UPDATE" right before the "ADD",
-							//leading to double insertions in the index
-							toDelete.add( luceneWork );
-						}
-					}
-					//TODO do something to avoid multiple PURGE ALL and OPTIMIZE
-				}
-			}
-		}
-
-		if ( sameIdWasSetToBeDeleted && workType == WorkType.COLLECTION ) {
-			//avoid updating (and thus adding) objects which are going to be deleted
-			return;
-		}
-
-		for ( LuceneWork luceneWork : toDelete ) {
-			queue.remove( luceneWork );
-		}
-		if ( duplicateDelete ) {
-			return;
-		}
-
-		if ( workType == WorkType.ADD ) {
-			String idInString = objectToString( idBridge, idKeywordName, id );
-			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
-		}
-		else if ( workType == WorkType.DELETE || workType == WorkType.PURGE ) {
-			String idInString = objectToString( idBridge, idKeywordName, id );
+	
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue) {
+		String idInString = objectToString( idBridge, idKeywordName, id );
+		if (delete) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
-		else if ( workType == WorkType.PURGE_ALL ) {
-			queue.add( new PurgeAllLuceneWork( entityClass ) );
-		}
-		else if ( workType == WorkType.UPDATE || workType == WorkType.COLLECTION ) {
-			String idInString = objectToString( idBridge, idKeywordName, id );
-			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-			queue.add( createAddWork( entityClass, entity, id, idInString, false ) );
-		}
-		else if ( workType == WorkType.INDEX ) {
-			String idInString = objectToString( idBridge, idKeywordName, id );
-			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
-			queue.add( createAddWork( entityClass, entity, id, idInString, true ) );
-		}
-		else {
-			throw new AssertionFailure( "Unknown WorkType: " + workType );
-		}
-
-		if ( workType.searchForContainers() ) {
-			processContainedInInstances( entity, queue, getMetadata(), searchFactoryImplementor );
+		if (add) {
+			queue.add( createAddWork( entityClass, entity, id, idInString, batch ) );
 		}
 	}
 
@@ -766,5 +692,12 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		return ReflectionHelper.getAttributeName( member, name );
+	}
+
+	@Override
+	public Serializable getIndexingId(T entity) {
+		Object unproxiedEntity = HibernateHelper.unproxy( entity );
+		Serializable id = (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, getIdGetter() );
+		return id;
 	}
 }
