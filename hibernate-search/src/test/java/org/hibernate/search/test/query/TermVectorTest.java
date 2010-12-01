@@ -56,7 +56,7 @@ public class TermVectorTest extends SearchTestCase {
        * Since there are so many combinations of results here, we are only going
        * to assert a few. - J.G.
        */
-      int x = 0;
+      int x = 0; //only Document zero is tested: asserts rely on natural document order
       TermPositionVector vector = (TermPositionVector) reader.getTermFreqVector(x, "content");
       assertNotNull(vector);
       String[] terms = vector.getTerms();
@@ -107,17 +107,19 @@ public class TermVectorTest extends SearchTestCase {
       s.close();
    }
 
-   private void createIndex(FullTextSession s) {
-      Transaction tx = s.beginTransaction();
-      ElectricalProperties e1 = new ElectricalProperties(1000, "Electrical Engineers measure Electrical Properties");
-      s.save(e1);
-      ElectricalProperties e2 = new ElectricalProperties(1001, "Electrical Properties are interesting");
-      s.save(e2);
-      ElectricalProperties e3 = new ElectricalProperties(1002, "Electrical Properties are measurable properties");
-      s.save(e3);
+	private void createIndex(FullTextSession s) {
+		storeSeparately( s, new ElectricalProperties( 1000, "Electrical Engineers measure Electrical Properties" ) );
+		storeSeparately( s, new ElectricalProperties( 1001, "Electrical Properties are interesting" ) );
+		storeSeparately( s, new ElectricalProperties( 1002, "Electrical Properties are measurable properties" ) );
+	}
 
-      tx.commit();
-   }
+	// test relies on the order in which Lucene Documents are written, so we commit
+	// the transaction after each entity is saved to make sure the backend doesn't reorder work.
+	private void storeSeparately(FullTextSession s, ElectricalProperties ep) {
+		Transaction tx = s.beginTransaction();
+		s.save( ep );
+		tx.commit();
+	}
 
    protected Class<?>[] getAnnotatedClasses() {
       return new Class[]{
