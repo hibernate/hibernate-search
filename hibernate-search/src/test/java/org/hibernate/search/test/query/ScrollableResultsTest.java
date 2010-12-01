@@ -79,7 +79,7 @@ public class ScrollableResultsTest extends TestCase {
 	public void testScrollingForward() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "summary", SortField.STRING ) );
+		Sort sort = new Sort( new SortField( "id", SortField.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -114,7 +114,7 @@ public class ScrollableResultsTest extends TestCase {
 	public void testScrollingBackwards() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "summary", SortField.STRING ) );
+		Sort sort = new Sort( new SortField( "id", SortField.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -144,7 +144,7 @@ public class ScrollableResultsTest extends TestCase {
 	public void testResultsAreManaged() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "summary", SortField.STRING ) );
+		Sort sort = new Sort( new SortField( "id", SortField.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -189,6 +189,8 @@ public class ScrollableResultsTest extends TestCase {
 	public void testScrollProjectionAndManaged() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "dept", "num") );
+		//the tests relies on the results being returned sorted by id:
+		Sort sort = new Sort( new SortField( "id", SortField.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, Employee.class )
 			.setProjection(
@@ -199,6 +201,7 @@ public class ScrollableResultsTest extends TestCase {
 					FullTextQuery.THIS
 					)
 			.setFetchSize( 10 )
+			.setSort( sort )
 			.scroll();
 		scrollableResults.last();
 		assertEquals( 132, scrollableResults.getRowNumber() );

@@ -29,12 +29,14 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
 /**
  * @author John Grffin
@@ -69,6 +71,7 @@ public class Employee {
 
 	@Id
 	@DocumentId
+	@FieldBridge(impl = PaddedIntegerBridge.class) // test needs to sort on the id
 	public Integer getId() {
 		return id;
 	}
