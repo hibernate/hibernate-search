@@ -64,7 +64,6 @@ public class ProxyTest extends SearchTestCase {
 		session.close();
 	}
 
-	@FailureExpected(jiraKey = "HSEARCH-577")
 	public void testDeteleProxy() throws Exception {
 		createTestData();
 
