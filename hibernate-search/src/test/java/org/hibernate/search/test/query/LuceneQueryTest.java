@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 import org.hibernate.FetchMode;
 import org.hibernate.ScrollableResults;
@@ -373,6 +375,7 @@ public class LuceneQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
 
@@ -415,6 +418,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		hibQuery.setFetchSize( 3 );
 		hibQuery.setFirstResult( 1 );
 		hibQuery.setMaxResults( 3 );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
 
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();
@@ -757,20 +761,13 @@ public class LuceneQueryTest extends SearchTestCase {
 
 	private void prepEmployeeIndex(FullTextSession s) {
 		Transaction tx = s.beginTransaction();
-		Employee e1 = new Employee( 1000, "Griffin", "ITech" );
-		s.save( e1 );
-		Employee e2 = new Employee( 1001, "Jackson", "Accounting" );
-		s.save( e2 );
-		Employee e3 = new Employee( 1002, "Jimenez", "ITech" );
-		s.save( e3 );
-		Employee e4 = new Employee( 1003, "Stejskal", "ITech" );
-		s.save( e4 );
-		Employee e5 = new Employee( 1004, "Whetbrook", "ITech" );
-		s.save( e5 );
-
+		s.save( new Employee( 1000, "Griffin", "ITech" ) );
+		s.save( new Employee( 1001, "Jackson", "Accounting" ) );
+		s.save( new Employee( 1002, "Jimenez", "ITech" ) );
+		s.save( new Employee( 1003, "Stejskal", "ITech" ) );
+		s.save( new Employee( 1004, "Whetbrook", "ITech" ) );
 		tx.commit();
 	}
-
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {

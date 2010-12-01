@@ -158,6 +158,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 				FullTextQuery.DOCUMENT,
 				FullTextQuery.ID
 		);
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
 
 		ScrollableResults projections = hibQuery.scroll();
 
@@ -216,6 +217,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.ID );
 		hibQuery.setResultTransformer( new ProjectionToDelimStringResultTransformer() );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
 
 		@SuppressWarnings("unchecked")
 		List<String> result = hibQuery.list();
@@ -250,6 +252,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 				FullTextQuery.DOCUMENT,
 				FullTextQuery.ID
 		);
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
 
 		hibQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
 
@@ -259,7 +262,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "incorrect transformation", 1002, map.get( "id" ) );
 		assertTrue( "incorrect transformation", map.get( FullTextQuery.DOCUMENT ) instanceof Document );
 		assertEquals(
-				"incorrect transformation", "1002", ( ( Document ) map.get( FullTextQuery.DOCUMENT ) ).get( "id" )
+				"incorrect transformation", "01002", ( ( Document ) map.get( FullTextQuery.DOCUMENT ) ).get( "id" )
 		);
 
 		//cleanup
