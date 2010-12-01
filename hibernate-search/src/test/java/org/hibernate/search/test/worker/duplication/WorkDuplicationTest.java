@@ -113,13 +113,11 @@ public class WorkDuplicationTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-
 	/**
 	 * Tests that adding and deleting the same entity only results into a single delete in the work queue.
 	 * See HSEARCH-293.
 	 *
 	 * @throws Exception in case the test fails.
-	 */
 	@SuppressWarnings( "unchecked" )
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
@@ -150,8 +148,8 @@ public class WorkDuplicationTest extends SearchTestCase {
 
 		fullTextSession.close();
 	}	
-
-
+*/
+	
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
 	}
