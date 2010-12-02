@@ -74,8 +74,8 @@ public class RecursiveGraphTest extends SearchTestCase {
 		assertEquals( 0, countWorksDoneOnPerson( 17L ) );
 		assertEquals( 2, countWorksDoneOnPerson( 8L ) );
 		assertEquals( 2, countWorksDoneOnPerson( 4L ) );
-//		assertEquals( 0, countWorksDoneOnPerson( 2L ) ); //FIXME
-//		assertEquals( 0, countWorksDoneOnPerson( 1L ) ); //FIXME
+//		assertEquals( 0, countWorksDoneOnPerson( 2L ) ); //FIXME see HSEARCH-638
+//		assertEquals( 0, countWorksDoneOnPerson( 1L ) ); //FIXME see HSEARCH-638
 	}
 	
 	/**
