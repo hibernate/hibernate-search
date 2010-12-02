@@ -132,7 +132,9 @@ public class WorkPlan {
 		public void processContainedIn(SearchFactoryImplementor searchFactoryImplementor) {
 			AbstractDocumentBuilder<T> builder = getEntityBuilder( searchFactoryImplementor );
 			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = byEntityId.entrySet();
-			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstances ) {
+			Entry<Serializable, PerEntityWork<T>>[] entityInstancesFrozenView = new Entry[entityInstances.size()];
+			entityInstancesFrozenView = entityInstances.toArray( entityInstancesFrozenView );
+			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstancesFrozenView ) {
 				Serializable id = entry.getKey();
 				PerEntityWork<T> perEntityWork = entry.getValue();
 				perEntityWork.processContainedIn( entityClass, id, builder, WorkPlan.this, searchFactoryImplementor );
