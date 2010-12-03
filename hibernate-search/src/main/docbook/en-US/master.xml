@@ -22,7 +22,8 @@
   ~  51 Franklin Street, Fifth Floor
   ~  Boston, MA  02110-1301  USA
   -->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY % BOOK_ENTITIES SYSTEM "hsearch.ent">
 %BOOK_ENTITIES;
 ]>
@@ -36,17 +37,15 @@
 
     <releaseinfo>&version;</releaseinfo>
 
+    <mediaobject>
+      <imageobject role="fo">
+        <imagedata align="center" fileref="hibernate_logo_a.png" />
+      </imageobject>
 
-              <mediaobject>
-                          <imageobject role="fo">
-                                      <imagedata align="center" fileref="hibernate_logo_a.png" />
-                          </imageobject>
-                          
-                          <imageobject role="html">
-                                      <imagedata depth="3cm" fileref="hibernate_logo_a.png" />
-                          </imageobject>
-              </mediaobject>
-              
+      <imageobject role="html">
+        <imagedata depth="3cm" fileref="hibernate_logo_a.png" />
+      </imageobject>
+    </mediaobject>
   </bookinfo>
 
   <toc></toc>
@@ -57,7 +56,7 @@
     <para>Full text search engines like Apache Lucene are very powerful
     technologies to add efficient free text search capabilities to
     applications. However, Lucene suffers several mismatches when dealing with
-    object domain model. Amongst other things indexes have to be kept up to
+    object domain models. Amongst other things indexes have to be kept up to
     date and mismatches between index structure and domain model as well as
     query mismatches have to be avoided.</para>
 
@@ -92,7 +91,7 @@
 
   <xi:include href="modules/monitoring.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
-              
+
   <xi:include href="modules/advanced-features.xml"
               xmlns:xi="http://www.w3.org/2001/XInclude" />
 </book>

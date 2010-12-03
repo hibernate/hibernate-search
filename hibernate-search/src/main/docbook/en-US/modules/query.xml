@@ -159,8 +159,8 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
     <classname>org.hibernate.Query</classname> as your primary query
     manipulation API.</para>
 
-    <section>
-      <title>Building a Lucene query from scratch</title>
+    <section id="search-query-lucene-api">
+      <title>Building a Lucene query using the Lucene API</title>
 
       <para>You have several options: use the query parser (fine for simple
       queries) or the Lucene programmatic API (for more complex use cases).
@@ -174,7 +174,8 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
     </section>
 
     <section id="search-query-querydsl">
-      <title>Building a Lucene query with Hibernate Search query DSL</title>
+      <title>Building a Lucene query with the Hibernate Search query
+      DSL</title>
 
       <para>Writing full-text queries with the Lucene programmatic API is
       quite complex. It's even more complex to understand the code once
