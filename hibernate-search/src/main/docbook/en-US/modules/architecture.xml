@@ -28,14 +28,13 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="search-architecture">
-
   <title>Architecture</title>
 
   <section>
     <title>Overview</title>
 
-    <para>Hibernate Search consists of an indexing component and an index
-    search component. Both are backed by Apache Lucene.</para>
+    <para>Hibernate Search consists of an indexing and an index search
+    component. Both are backed by Apache Lucene.</para>
 
     <para>Each time an entity is inserted, updated or removed in/from the
     database, Hibernate Search keeps track of this event (through the
@@ -54,21 +53,19 @@
     document mapping. The same persistence context is shared between Hibernate
     and Hibernate Search. As a matter of fact, the
     <classname>FullTextSession</classname> is built on top of the Hibernate
-    Session. so that the application code can use the unified
+    Session so that the application code can use the unified
     <classname>org.hibernate.Query</classname> or
-    <classname>javax.persistence.Query</classname> APIs exactly the way a HQL,
-    JPA-QL or native queries would do.</para>
+    <classname>javax.persistence.Query</classname> APIs exactly the same way a
+    HQL, JPA-QL or native query would do.</para>
 
-    <para>To be more efficient, Hibernate Search batches the write
-    interactions with the Lucene index. There is currently two types of
-    batching depending on the expected scope. Outside a transaction, the index
-    update operation is executed right after the actual database operation.
-    This scope is really a no scoping setup and no batching is performed.
-    However, it is recommended - for both your database and Hibernate Search -
-    to execute your operation in a transaction be it JDBC or JTA. When in a
-    transaction, the index update operation is scheduled for the transaction
-    commit phase and discarded in case of transaction rollback. The batching
-    scope is the transaction. There are two immediate benefits:</para>
+    <para>To be more efficient Hibernate Search batches the write interactions
+    with the Lucene index. There are currently two types of batching. Outside
+    a transaction, the index update operation is executed right after the
+    actual database operation. This is really a no batching setup. In the case
+    of an ongoing transaction, the index update operation is scheduled for the
+    transaction commit phase and discarded in case of transaction rollback.
+    The batching scope is the transaction. There are two immediate
+    benefits:</para>
 
     <itemizedlist>
       <listitem>
@@ -85,11 +82,15 @@
       </listitem>
     </itemizedlist>
 
-    <para>You can think of those two scopes (no scope vs transactional) as the
-    equivalent of the (infamous) autocommit vs transactional behavior. From a
-    performance perspective, the <emphasis>in transaction</emphasis> mode is
-    recommended. The scoping choice is made transparently. Hibernate Search
-    detects the presence of a transaction and adjust the scoping.</para>
+    <para>You can think of those two batch modes (no scope vs transactional)
+    as the equivalent of the (infamous) autocommit vs transactional behavior.
+    From a performance perspective, the <emphasis>in transaction</emphasis>
+    mode is recommended. The scoping choice is made transparently. Hibernate
+    Search detects the presence of a transaction and adjust the scoping.<tip>
+        <para>It is recommended - for both your database and Hibernate Search
+        - to execute your operations in a transaction, be it JDBC or JTA.
+        </para>
+      </tip></para>
 
     <note>
        Hibernate Search works perfectly fine in the Hibernate / EntityManager long conversation pattern aka. atomic conversation. 
@@ -103,9 +104,9 @@
   <section>
     <title>Back end</title>
 
-    <para>Hibernate Search offers the ability to let the scoped work being
-    processed by different back ends. Two back ends are provided out of the
-    box for two different scenarios.</para>
+    <para>Hibernate Search offers the ability to let the batched work being
+    processed by different back ends. Three back ends are provided out of the
+    box and you have the option to plugin in your own implementation.</para>
 
     <section>
       <title>Back end types</title>
@@ -177,17 +178,18 @@
       </section>
 
       <section>
-       <title>JGroups</title>
+        <title>JGroups</title>
 
-       <para>The JGroups based back end works similarly as the JMS one. Designed on the same
-       master/slave pattern, instead of JMS the JGroups toolkit is used as a replication mechanism.
-       This back end can be used as an alternative to JMS one when response time is still critical,
-       but i.e. JNDI service is not available.</para>
+        <para>The JGroups based back end works similar to the JMS one and is
+        designed after the same master/slave pattern. However, instead of JMS
+        the JGroups toolkit is used as a replication mechanism. This back end
+        can be used as an alternative to JMS when response time is critical,
+        but i.e. JNDI service is not available.</para>
       </section>
 
       <note>Hibernate Search is an extensible architecture. Feel free to drop
-      ideas for other third party back ends to
-      <literal>hibernate-dev@lists.jboss.org</literal>.</note>
+      ideas for other third party back ends to<literal>
+      hibernate-dev@lists.jboss.org</literal>.</note>
     </section>
 
     <section>
@@ -220,8 +222,7 @@
 
         <para>It is recommended to use synchronous execution first and
         evaluate asynchronous execution if performance problems occur and
-        after having set up a proper benchmark (ie not a lonely cowboy hitting
-        the system in a completely unrealistic way).</para>
+        after having set up a proper benchmark.</para>
       </section>
     </section>
   </section>
