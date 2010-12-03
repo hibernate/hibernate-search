@@ -389,7 +389,7 @@ public class WorkPlan {
 				break;
 			case DELETE:
 			case PURGE:
-				if ( add & !delete ) {
+				if ( add && !delete ) {
 					// the entity was was newly created in this same unit of
 					// work so works counter each other
 					add = false;
@@ -398,6 +398,7 @@ public class WorkPlan {
 					add = false;
 					delete = true;
 				}
+				break;
 			case COLLECTION:
 				if ( !add && !delete ) {
 					add = true;
