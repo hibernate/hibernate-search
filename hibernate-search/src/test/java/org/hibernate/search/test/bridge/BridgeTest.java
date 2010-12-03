@@ -277,15 +277,11 @@ public class BridgeTest extends SearchTestCase {
 		incorrect.setSubIncorrect(new IncorrectSet.SubIncorrect());
 		incorrect.getSubIncorrect().setName("This is a name not a class");
 
-		org.hibernate.Session s = openSession();
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		try {
 			s.persist( incorrect );
-			s.flush();
-			s.clear();
-			s.delete( incorrect );
-			s.flush();
-			tx.commit();
+			s.flushToIndexes();
 			fail("Incorrect bridge should fail");
 		}
 		catch (BridgeException e) {
@@ -362,15 +358,11 @@ public class BridgeTest extends SearchTestCase {
 		IncorrectObjectToString incorrect = new IncorrectObjectToString();
 		incorrect.setName("test");
 
-		org.hibernate.Session s = openSession();
+		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		try {
 			s.persist( incorrect );
-			s.flush();
-			s.clear();
-			s.delete( incorrect );
-			s.flush();
-			tx.commit();
+			s.flushToIndexes();
 			fail("Incorrect bridge should fail");
 		}
 		catch (BridgeException e) {
