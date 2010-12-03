@@ -73,7 +73,7 @@ public class TransactionalWorker implements Worker {
 					synchronizationPerTransaction.get( transactionIdentifier );
 			if ( txSync == null || txSync.isConsumed() ) {
 				txSync = new PostTransactionWorkQueueSynchronization(
-						queueingProcessor, synchronizationPerTransaction
+						queueingProcessor, synchronizationPerTransaction, factory
 				);
 				transactionContext.registerSynchronization( txSync );
 				synchronizationPerTransaction.put( transactionIdentifier, txSync );
@@ -87,7 +87,7 @@ public class TransactionalWorker implements Worker {
 					"It appears changes are being pushed to the index out of a transaction. " +
 							"Register the IndexWorkFlushEventListener listener on flush to correctly manage Collections!"
 			);
-			WorkQueue queue = new WorkQueue( 2 ); //one work can be split
+			WorkQueue queue = new WorkQueue( factory );
 			queueingProcessor.add( work, queue );
 			queueingProcessor.prepareWorks( queue );
 			queueingProcessor.performWorks( queue );

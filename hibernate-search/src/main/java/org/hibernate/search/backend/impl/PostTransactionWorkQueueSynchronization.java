@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.WeakIdentityHashMap;
 
@@ -53,14 +54,16 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	private boolean consumed;
 	private boolean prepared;
 	private final WeakIdentityHashMap queuePerTransaction;
-	private WorkQueue queue = new WorkQueue();
+	private final WorkQueue queue;
 
 	/**
 	 * in transaction work
 	 */
-	public PostTransactionWorkQueueSynchronization(QueueingProcessor queueingProcessor, WeakIdentityHashMap queuePerTransaction) {
+	public PostTransactionWorkQueueSynchronization(QueueingProcessor queueingProcessor, WeakIdentityHashMap queuePerTransaction,
+			SearchFactoryImplementor searchFactoryImplementor) {
 		this.queueingProcessor = queueingProcessor;
 		this.queuePerTransaction = queuePerTransaction;
+		queue = new WorkQueue( searchFactoryImplementor );
 	}
 
 	public void add(Work work) {

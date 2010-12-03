@@ -23,43 +23,45 @@
  */
 package org.hibernate.search.backend;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.WorkPlan;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class WorkQueue {
 
 	private static final Logger log = LoggerFactory.make();
 
-	private List<Work> queue;
+	private WorkPlan plan;
 
 	private List<LuceneWork> sealedQueue;
-	//flag indicating if the sealed data has be provided meaning that it should no longer be modified
+	//flag indicating if the sealed data has been provided meaning that it should no longer be modified
 	private boolean usedSealedData;
 	//flag indicating if data has been sealed and not modified since
 	private boolean sealedAndUnchanged;
 
-	public WorkQueue(int size) {
-		queue = new ArrayList<Work>(size);
-	}
-
-	private WorkQueue(List<Work> queue) {
-		this.queue = queue;
-	}
+	private final SearchFactoryImplementor searchFactoryImplementor;
 
 	public boolean isSealedAndUnchanged() {
 		return sealedAndUnchanged;
 	}
 
-	public WorkQueue() {
-		this(10);
+	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor) {
+		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.plan = new WorkPlan( searchFactoryImplementor );
+	}
+	
+	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor, WorkPlan plan) {
+		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.plan = plan;
 	}
 
 	public void add(Work work) {
@@ -68,27 +70,26 @@ public class WorkQueue {
 			throw new AssertionFailure( "Attempting to add a work in a used sealed queue" );
 		}
 		this.sealedAndUnchanged = false;
-		queue.add(work);
-	}
-
-	public List<Work> getQueue() {
-		return queue;
+		plan.addWork( work );
 	}
 
 	public WorkQueue splitQueue() {
-		WorkQueue subQueue = new WorkQueue( queue );
-		this.queue = new ArrayList<Work>( queue.size() );
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Splitting workqueue with {} works", plan.size() );
+		}
+		WorkQueue subQueue = new WorkQueue( searchFactoryImplementor, plan );
+		this.plan = new WorkPlan( searchFactoryImplementor );
 		this.sealedAndUnchanged = false;
 		return subQueue;
 	}
 
 	public List<LuceneWork> getSealedQueue() {
-		if (sealedQueue == null) throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
+		if ( sealedQueue == null ) throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
 		this.sealedAndUnchanged = false;
 		return sealedQueue;
 	}
 
-	public void setSealedQueue(List<LuceneWork> sealedQueue) {
+	private void setSealedQueue(List<LuceneWork> sealedQueue) {
 		//invalidate the working queue for serializability
 		/*
 		 * FIXME workaround for flush phase done later
@@ -105,12 +106,34 @@ public class WorkQueue {
 	}
 
 	public void clear() {
-		queue.clear();
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Clearing current workqueue" );
+		}
+		plan.clear();
 		this.sealedAndUnchanged = false;
-		if (sealedQueue != null) sealedQueue.clear();
+		if ( sealedQueue != null )
+			sealedQueue.clear();
 	}
 
+	/**
+	 * Returns an estimate of the to be performed operations
+	 * @see WorkPlan#size()
+	 * @return the approximate size
+	 */
 	public int size() {
-		return queue.size();
+		return plan.size();
 	}
+
+	/**
+	 * Compiles the work collected so far in an optimal execution plan,
+	 * storing the list of lucene operations to be performed in the sealedQueue.
+	 */
+	public void prepareWorkPlan() {
+		if ( ! sealedAndUnchanged ) {
+			plan.processContainedIn();
+			List<LuceneWork> luceneWorkPlan = plan.getPlannedLuceneWork();
+			setSealedQueue( luceneWorkPlan );
+		}
+	}
+	
 }

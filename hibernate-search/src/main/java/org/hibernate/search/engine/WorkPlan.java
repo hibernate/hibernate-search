@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
@@ -48,14 +49,55 @@ import org.hibernate.search.util.HibernateHelper;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class WorkPlan {
 	
-	private HashMap<Class<?>, PerClassWork<?>> byClass = new HashMap<Class<?>, PerClassWork<?>>();
+	private final HashMap<Class<?>, PerClassWork<?>> byClass = new HashMap<Class<?>, PerClassWork<?>>();
 	
+	private final SearchFactoryImplementor searchFactoryImplementor;
+	
+	public WorkPlan(SearchFactoryImplementor searchFactoryImplementor) {
+		this.searchFactoryImplementor = searchFactoryImplementor;
+	}
+	
+	/**
+	 * most work is split in two, some other might cancel one or more existing works,
+	 * we don't track the number accurately as that's not needed.
+	 */
+	private int approximateWorkQueueSize = 0;
+	
+	/**
+	 * Adds a work to be performed as part of the final plan.
+	 * @param <T> the type of the work, or of the affected entity
+	 * @param work
+	 */
 	public <T> void addWork(Work<T> work) {
+		approximateWorkQueueSize++;
 		Class<T> entityClass = HibernateHelper.getClassFromWork( work );
 		PerClassWork classWork = getClassWork( entityClass );
 		classWork.addWork( work );
 	}
 	
+	/**
+	 * Removes all scheduled work
+	 */
+	public void clear() {
+		byClass.clear();
+		approximateWorkQueueSize = 0;
+	}
+	
+	/**
+	 * Returns an approximation of the amount of work that
+	 * {@link #getPlannedLuceneWork(SearchFactoryImplementor)} would return.
+	 * This is meant for resource control for auto flushing of large pending batches.
+	 * 
+	 * @see Environment#WORKER_BATCHSIZE
+	 * @return the approximation
+	 */
+	public int size() {
+		return approximateWorkQueueSize;
+	}
+	
+	/**
+	 * Retrieves (and creates if needed) the PerClassWork from the byClass map.
+	 */
 	private <T> PerClassWork getClassWork(Class<T> entityClass) {
 		PerClassWork classWork = byClass.get( entityClass );
 		if ( classWork == null ) {
@@ -65,41 +107,80 @@ public class WorkPlan {
 		return classWork;
 	}
 	
-	public void processContainedIn(SearchFactoryImplementor searchFactoryImplementor) {
+	/**
+	 * Makes sure that all additional work needed because of containedIn
+	 * is added to the work plan. 
+	 */
+	public void processContainedIn() {
 		for ( PerClassWork perClassWork : byClass.values() ) {
-			perClassWork.processContainedIn( searchFactoryImplementor );
+			perClassWork.processContainedIn();
 		}
 	}
 	
-	<T> void recurseContainedIn(SearchFactoryImplementor searchFactoryImplementor, T value) {
+	/**
+	 * Used for recursive processing of containedIn
+	 * @param value the entity to be processed
+	 */
+	<T> void recurseContainedIn(T value) {
 		Class<T> entityClass = HibernateHelper.getClass( value );
 		PerClassWork classWork = getClassWork( entityClass );
-		classWork.recurseContainedIn( searchFactoryImplementor, value );
+		classWork.recurseContainedIn( value );
 	}
 	
 	/**
-	 * @param searchFactoryImplementor
+	 * Converts the current plan into a list of LuceneWork,
+	 * something that the backends can actually perform to execute
+	 * the plan.
 	 * @return
 	 */
-	public List<LuceneWork> getPlannedLuceneWork(SearchFactoryImplementor searchFactoryImplementor) {
+	public List<LuceneWork> getPlannedLuceneWork() {
 		List<LuceneWork> luceneQueue = new ArrayList<LuceneWork>();
 		for ( PerClassWork perClassWork : byClass.values() ) {
-			perClassWork.enqueueLuceneWork( searchFactoryImplementor, luceneQueue );
+			perClassWork.enqueueLuceneWork( luceneQueue );
 		}
 		return luceneQueue;
 	}
 	
+	/**
+	 * the workPlan organizes work per entity types
+	 */
 	class PerClassWork<T> {
 		
-		private HashMap<Serializable, PerEntityWork<T>> byEntityId = new HashMap<Serializable, PerEntityWork<T>>();
-		private boolean purgeAll = false;
-		private final Class<T> entityClass;
-		private AbstractDocumentBuilder<T> entityBuilder;
-		
+		/**
+		 * The type of entities being managed by this instance.
+		 * @param clazz
+		 */
 		PerClassWork(Class<T> clazz) {
 			this.entityClass = clazz;
 		}
 		
+		/**
+		 * We further organize work per entity identifier so that we can cancel or adapt work being done
+		 * on the same entities
+		 */
+		private HashMap<Serializable, PerEntityWork<T>> byEntityId = new HashMap<Serializable, PerEntityWork<T>>();
+		
+		/**
+		 * When a PurgeAll operation is send on the type, we can remove all previously scheduled work
+		 * and remember that the first operation on the index is going to be a purge all.
+		 */
+		private boolean purgeAll = false;
+		
+		/**
+		 * The type of all classes being managed
+		 */
+		private final Class<T> entityClass;
+		
+		/**
+		 * The ducomentBuilder relative to the type being managed
+		 */
+		private AbstractDocumentBuilder<T> entityBuilder;
+		
+		/**
+		 * Adds a work to the current plan. The entityClass of the work must be of the
+		 * type managed by this.
+		 * @param work
+		 */
 		public void addWork(Work<T> work) {
 			if ( work.getType() == WorkType.PURGE_ALL ) {
 				byEntityId.clear();
@@ -116,8 +197,13 @@ public class WorkPlan {
 			}
 		}
 		
-		public void enqueueLuceneWork(SearchFactoryImplementor searchFactoryImplementor, List<LuceneWork> luceneQueue) {
-			final AbstractDocumentBuilder<T> builder = getEntityBuilder( searchFactoryImplementor );
+		/**
+		 * Enqueues all work needed to be performed according to current state into
+		 * the LuceneWork queue.
+		 * @param luceneQueue work will be appended to this list
+		 */
+		public void enqueueLuceneWork(List<LuceneWork> luceneQueue) {
+			final AbstractDocumentBuilder<T> builder = getEntityBuilder();
 			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = byEntityId.entrySet();
 			if ( purgeAll ) {
 				luceneQueue.add( new PurgeAllLuceneWork( entityClass ) );
@@ -125,24 +211,34 @@ public class WorkPlan {
 			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstances ) {
 				Serializable id = entry.getKey();
 				PerEntityWork<T> perEntityWork = entry.getValue();
-				perEntityWork.enqueueLuceneWork( entityClass, id, builder, luceneQueue, searchFactoryImplementor );
+				perEntityWork.enqueueLuceneWork( entityClass, id, builder, luceneQueue );
 			}
 		}
 		
-		public void processContainedIn(SearchFactoryImplementor searchFactoryImplementor) {
-			AbstractDocumentBuilder<T> builder = getEntityBuilder( searchFactoryImplementor );
+		/**
+		 * Starts processing the ContainedIn annotation for all instances stored in
+		 * byEntityId. Must be performed when no more work is being collected by the event
+		 * system, though this same process might recursively add more work to the plan.
+		 */
+		public void processContainedIn() {
+			AbstractDocumentBuilder<T> builder = getEntityBuilder();
 			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = byEntityId.entrySet();
 			Entry<Serializable, PerEntityWork<T>>[] entityInstancesFrozenView = new Entry[entityInstances.size()];
 			entityInstancesFrozenView = entityInstances.toArray( entityInstancesFrozenView );
 			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstancesFrozenView ) {
 				Serializable id = entry.getKey();
 				PerEntityWork<T> perEntityWork = entry.getValue();
-				perEntityWork.processContainedIn( entityClass, id, builder, WorkPlan.this, searchFactoryImplementor );
+				perEntityWork.processContainedIn( id, builder, WorkPlan.this );
 			}
 		}
 		
-		void recurseContainedIn(SearchFactoryImplementor searchFactoryImplementor, T value) {
-			AbstractDocumentBuilder<T> documentBuilder = getEntityBuilder( searchFactoryImplementor );
+		/**
+		 * Method to continue the recursion for ContainedIn processing, as started by {@link #processContainedIn()}
+		 * Additional work that needs to be processed will be added to this same WorkPlan.
+		 * @param value the instance to be processed
+		 */
+		void recurseContainedIn(T value) {
+			AbstractDocumentBuilder<T> documentBuilder = getEntityBuilder();
 			Serializable indexingId = documentBuilder.getIndexingId( value );
 			if ( indexingId != null ) {
 				PerEntityWork<T> entityWork = byEntityId.get( indexingId );
@@ -150,16 +246,21 @@ public class WorkPlan {
 					entityWork = new PerEntityWork( value );
 					byEntityId.put( indexingId, entityWork );
 					// recursion starts:
-					documentBuilder.processContainedInInstances( entityClass, value, WorkPlan.this, searchFactoryImplementor );
+					documentBuilder.processContainedInInstances( value, WorkPlan.this );
 				}
 				// else nothing to do as it's being processed already
 			}
 			else {
-				documentBuilder.processContainedInInstances( entityClass, value, WorkPlan.this, searchFactoryImplementor );
+				documentBuilder.processContainedInInstances( value, WorkPlan.this );
 			}
 		}
 		
-		private AbstractDocumentBuilder<T> getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor) {
+		/**
+		 * Get and cache the DocumentBuilder for this type. Being this a perClassWork
+		 * we can fetch it once.
+		 * @return the DocumentBuilder for this type
+		 */
+		private AbstractDocumentBuilder<T> getEntityBuilder() {
 			if ( entityBuilder != null ) {
 				return entityBuilder;
 			}
@@ -175,15 +276,46 @@ public class WorkPlan {
 		}
 	}
 	
+	/**
+	 * Keeps track of what needs to be done Lucene wise for each entity.
+	 * Each entity might need to be deleted from the index, added to the index,
+	 * or both; in this case delete will be performed first.
+	 */
 	private static class PerEntityWork<T> {
 		
 		private T entity;
+		
+		/**
+		 * When true, the Lucene Document representing this entity will be deleted
+		 * from the issue.
+		 */
 		private boolean delete = false; // needs to generate a Lucene delete work
+		
+		/**
+		 * When true, the entity will be converted to a Lucene Document and added
+		 * to the index.
+		 */
 		private boolean add = false; // needs to generate a Lucene add work
+		
+		/**
+		 * Any work of type {@link WorkType#INDEX} triggers batch=true for the whole unit of work,
+		 * so if any work enables it it stays enabled for everyone.
+		 * Having batch=true currently only affects the IndexWriter performance tuning options.
+		 */
 		private boolean batch = false;
+		
+		/**
+		 * Needed to stop recursion for processing ContainedIn
+		 * of already processed instances.
+		 */
 		private boolean containedInProcessed = false;
 		
-		public PerEntityWork(T entity) {
+		/**
+		 * Constructor to force an update of the entity even without
+		 * having a specific Work instance for it.
+		 * @param entity the instance which needs to be updated in the index
+		 */
+		private PerEntityWork(T entity) {
 			// for updates only
 			this.entity = entity;
 			this.delete = true;
@@ -191,7 +323,12 @@ public class WorkPlan {
 			this.containedInProcessed = true;
 		}
 		
-		public PerEntityWork(Work<T> work) {
+		/**
+		 * Prepares the initial state of planned changes according
+		 * to the type of work being fired.
+		 * @param work
+		 */
+		private PerEntityWork(Work<T> work) {
 			entity = work.getEntity();
 			WorkType type = work.getType();
 			// sets the initial state:
@@ -221,6 +358,14 @@ public class WorkPlan {
 			}
 		}
 		
+		/**
+		 * Has different effects depending on the new type of work needed
+		 * and the previous scheduled work.
+		 * This way we never store more than a plan for each entity and order
+		 * of final execution is irrelevant, what matters is the order in which the
+		 * work is added to the plan.
+		 * @param work
+		 */
 		public void addWork(Work<T> work) {
 			entity = work.getEntity();
 			WorkType type = work.getType();
@@ -229,7 +374,7 @@ public class WorkPlan {
 				batch = true;
 				// not breaking intentionally
 			case UPDATE:
-				if ( add & !delete ) {
+				if ( add && !delete ) {
 					// noop: the entity was newly created in this same unit of work
 					// so it needs to be added no need to delete
 				}
@@ -266,20 +411,35 @@ public class WorkPlan {
 			}
 		}
 		
-		public void enqueueLuceneWork(Class<T> entityClass, Serializable id, AbstractDocumentBuilder<T> entityBuilder, List<LuceneWork> luceneQueue,
-				SearchFactoryImplementor searchFactoryImplementor) {
+		/**
+		 * Adds the needed LuceneWork to the queue for this entity instance
+		 * @param entityClass the type
+		 * @param id identifier of the instance
+		 * @param entityBuilder the DocumentBuilder for this type
+		 * @param luceneQueue the queue collecting all changes
+		 */
+		public void enqueueLuceneWork(Class<T> entityClass, Serializable id, AbstractDocumentBuilder<T> entityBuilder, List<LuceneWork> luceneQueue) {
 			if ( add || delete ) {
 				entityBuilder.addWorkToQueue( entityClass, entity, id, delete, add, batch, luceneQueue );
 			}
 		}
 		
-		public void processContainedIn(Class<T> entityClass, Serializable id, AbstractDocumentBuilder<T> entityBuilder, WorkPlan workplan,
-				SearchFactoryImplementor searchFactoryImplementor) {
-			if ( !containedInProcessed ) {
+		/**
+		 * Works via recursion passing the WorkPlan over, so that additional work can be planned
+		 * according to the needs of ContainedIn processing.
+		 * @see org.hibernate.search.annotations.ContainedIn
+		 * @param id entity identifier
+		 * @param entityBuilder the DocumentBuilder for this type
+		 * @param workplan the current WorkPlan, used for recursion
+		 */
+		public void processContainedIn(Serializable id, AbstractDocumentBuilder<T> entityBuilder, WorkPlan workplan) {
+			if ( ! containedInProcessed ) {
 				containedInProcessed = true;
-				entityBuilder.processContainedInInstances( entityClass, entity, workplan, searchFactoryImplementor );
+				if ( add || delete ) {
+					entityBuilder.processContainedInInstances( entity, workplan );
+				}
 			}
 		}
 	}
-	
+
 }

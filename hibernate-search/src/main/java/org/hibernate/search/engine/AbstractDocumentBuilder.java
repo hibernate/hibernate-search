@@ -130,6 +130,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	abstract protected void initSubClass(XClass clazz, ConfigContext context);
 
+	/**
+	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId
+	 * @param entity
+	 * @return the value, or null if it's not an indexed entity
+	 */
 	abstract public Serializable getIndexingId(T entity);
 
 	public boolean isRoot() {
@@ -279,7 +284,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	/**
 	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
 	 **/
-	public void processContainedInInstances(Class entityClass, Object instance, WorkPlan workplan, SearchFactoryImplementor searchFactoryImplementor) {
+	public void processContainedInInstances(Object instance, WorkPlan workplan) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
 			Object value = ReflectionHelper.getMemberValue( instance, member );
@@ -292,7 +297,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				@SuppressWarnings("unchecked")
 				T[] array = (T[]) value;
 				for ( T arrayValue : array ) {
-					processSingleContainedInInstance( workplan, searchFactoryImplementor, arrayValue );
+					processSingleContainedInInstance( workplan, arrayValue );
 				}
 			}
 			else if ( member.isCollection() ) {
@@ -314,12 +319,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				}
 				if ( collection != null ) {
 					for ( T collectionValue : collection ) {
-						processSingleContainedInInstance( workplan, searchFactoryImplementor, collectionValue );
+						processSingleContainedInInstance( workplan, collectionValue );
 					}
 				}
 			}
 			else {
-				processSingleContainedInInstance( workplan, searchFactoryImplementor, value );
+				processSingleContainedInInstance( workplan, value );
 			}
 		}
 	}
@@ -769,8 +774,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		return collection;
 	}
 
-	private <T> void processSingleContainedInInstance(WorkPlan workplan, SearchFactoryImplementor searchFactoryImplementor, T value) {
-			workplan.recurseContainedIn( searchFactoryImplementor, value );
+	private <T> void processSingleContainedInInstance(WorkPlan workplan, T value) {
+			workplan.recurseContainedIn( value );
 	}
 
 	/**
