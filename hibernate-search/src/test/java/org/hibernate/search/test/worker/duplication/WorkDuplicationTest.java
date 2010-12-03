@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.worker.duplication;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
@@ -38,6 +37,8 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.Work;
+import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -113,16 +114,16 @@ public class WorkDuplicationTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
+
 	/**
 	 * Tests that adding and deleting the same entity only results into a single delete in the work queue.
 	 * See HSEARCH-293.
 	 *
 	 * @throws Exception in case the test fails.
-	@SuppressWarnings( "unchecked" )
+	 */
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
 		SearchFactoryImplementor searchFactory = ( SearchFactoryImplementor ) fullTextSession.getSearchFactory();
-		DocumentBuilderIndexedEntity builder = searchFactory.getDocumentBuilderIndexedEntity( SpecialPerson.class );
 
 		// create test entity
 		SpecialPerson person = new SpecialPerson();
@@ -134,21 +135,24 @@ public class WorkDuplicationTest extends SearchTestCase {
 
 		person.addEmailAddress( emailAddress );
 
-		List<LuceneWork> queue = new ArrayList<LuceneWork>();
+		WorkQueue plannerEngine = new WorkQueue( searchFactory );
+		
+		plannerEngine.add( new Work<SpecialPerson>( person, 1, WorkType.ADD ) );
+		
+		plannerEngine.prepareWorkPlan();
+		List<LuceneWork> sealedQueue = plannerEngine.getSealedQueue();
 
-		builder.addWorkToQueue( SpecialPerson.class, person, 1, WorkType.ADD, queue, searchFactory );
+		assertEquals("There should only be one job in the queue", 1, sealedQueue.size());
+		assertTrue("Wrong job type", sealedQueue.get(0) instanceof AddLuceneWork );
 
-		assertEquals("There should only be one job in the queue", 1, queue.size());
-		assertTrue("Wrong job type", queue.get(0) instanceof AddLuceneWork );
+		plannerEngine.add( new Work<SpecialPerson>( person, 1, WorkType.DELETE ) );
+		plannerEngine.prepareWorkPlan();
+		sealedQueue = plannerEngine.getSealedQueue();
 
-		builder.addWorkToQueue( SpecialPerson.class, person, 1, WorkType.DELETE, queue, searchFactory );
-
-		assertEquals("There should only be one job in the queue", 1, queue.size());
-		assertTrue("Wrong job type. Add job should have been replaced by delete.", queue.get(0) instanceof DeleteLuceneWork );
+		assertEquals("Jobs should have countered each other", 0, sealedQueue.size());
 
 		fullTextSession.close();
 	}	
-*/
 	
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
