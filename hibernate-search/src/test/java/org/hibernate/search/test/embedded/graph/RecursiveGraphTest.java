@@ -28,49 +28,46 @@ import org.hibernate.Session;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
- * TestCase to verify proper management of saving of complex relations and collections.
- * See HSEARCH-476
+ * TestCase to verify proper management of saving of complex relations and collections. See HSEARCH-476
  */
 public class RecursiveGraphTest extends SearchTestCase {
-
+	
 	public void testCreateParentAndChild() throws Exception {
-        Person[] people = new Person[2];
-        Person parent = new Person();
-        parent.setName( "parent" );
-        Person child = new Person();
-        child.setName( "child" );
-        connectChildToParent(child, parent);
-        people[0] = parent;
-        people[1] = child;
-        savePeople( people );
-        assertEquals( 2, getDocumentNbr( Person.class ) );
-    }
+		Person[] people = new Person[2];
+		Person parent = new Person();
+		parent.setName( "parent" );
+		Person child = new Person();
+		child.setName( "child" );
+		connectChildToParent( child, parent );
+		people[0] = parent;
+		people[1] = child;
+		savePeople( people );
+		assertEquals( 2, getDocumentNbr( Person.class ) );
+	}
 	
 	private void connectChildToParent(Person child, Person parent) {
-        Event birthEvent = child.getBirthEvent();
-        child.setBirthEvent(birthEvent);
-        ParentOfBirthEvent parentOfBirthEvent = new ParentOfBirthEvent(parent, child.getBirthEvent());
-        parent.getParentOfBirthEvents().add(parentOfBirthEvent);
-    }
+		Event birthEvent = child.getBirthEvent();
+		child.setBirthEvent( birthEvent );
+		ParentOfBirthEvent parentOfBirthEvent = new ParentOfBirthEvent( parent, child.getBirthEvent() );
+		parent.getParentOfBirthEvents().add( parentOfBirthEvent );
+	}
 	
 	public void savePeople(Person... people) {
-        for (Person person : people) {
-        	if (person==null) continue;
-        	Session s = getSessions().openSession();
-    		s.getTransaction().begin();
-    		s.save( person );
-    		s.getTransaction().commit();
-    		s.close();
-        }
-    }
-
+		for ( Person person : people ) {
+			if ( person == null ) {
+				continue;
+			}
+			Session s = getSessions().openSession();
+			s.getTransaction().begin();
+			s.save( person );
+			s.getTransaction().commit();
+			s.close();
+		}
+	}
+	
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[]{
-				Event.class,
-				Person.class,
-				ParentOfBirthEvent.class
-		};
+		return new Class[] { Event.class, Person.class, ParentOfBirthEvent.class };
 	}
 	
 	private int getDocumentNbr(Class type) throws Exception {
