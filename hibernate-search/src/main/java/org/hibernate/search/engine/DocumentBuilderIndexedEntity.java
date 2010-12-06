@@ -56,8 +56,6 @@ import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.PurgeAllLuceneWork;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.bridge.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -133,7 +131,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * Flag indicating whether there is an explicit id (@DocumentId or @Id) or not. When Search is used as make
 	 * for example using JBoss Cache Searchable the <code>idKeywordName</code> will be provided.
 	 */
-	private boolean idProvided = false;
+	private boolean idProvided;
 
 	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
@@ -163,6 +161,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( provided != null ) {
 			idBridge = BridgeFactory.extractTwoWayType( provided.bridge(), clazz, reflectionManager );
 			idKeywordName = provided.name();
+			idProvided = true;
 		}
 
 		if ( idKeywordName == null ) {
@@ -552,10 +551,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public Term getTerm(Serializable id) {
-		if ( idProvided ) {
-			return new Term( idKeywordName, (String) id );
-		}
-
 		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id ) );
 	}
 
