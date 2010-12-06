@@ -33,21 +33,83 @@
   <section id="search-configuration-directory" revision="1">
     <title>Directory configuration</title>
 
-    <para>Apache Lucene has a notion of <literal>Directory</literal> to store
-    the index files. The <classname>Directory</classname> implementation can
-    be customized, but Lucene comes bundled with a file system and an
-    in-memory implementation. <literal>DirectoryProvider</literal>s are the
+    <para>Apache Lucene has a notion of a <classname>Directory</classname> to
+    store the index files. The <classname>Directory</classname> implementation
+    can be customized and Lucene comes bundled with a file system and an
+    in-memory implementation. <classname>DirectoryProvider</classname> is the
     Hibernate Search abstraction around a Lucene
-    <classname>Directory</classname> and handle the configuration and the
+    <classname>Directory</classname> and handles the configuration and the
     initialization of the underlying Lucene resources. <xref
     linkend="directory-provider-table" /> shows the list of the directory
-    providers bundled with Hibernate Search.</para>
+    providers available in Hibernate Search together with their corresponding
+    options. </para>
 
-    <para>For the most common DirectoryProviders, Hibernate Search offers
-    shortcut names to make things easier.</para>
+    <para>To configure your <classname>DirectoryProvider</classname> you have
+    to understand that each indexed entity is associated to a Lucene index
+    (except of the case where multiple entities share the same index - <xref
+    linkend="section-sharing-indexes" />). The name of the index is given by
+    the <constant>index</constant> property of the
+    <classname>@Indexed</classname> annotation. If the
+    <constant>index</constant> property is not specified the fully qualified
+    name of the indexed class will be used as name. </para>
+
+    <para>Knowing the index name, you can configure the directory provider and
+    any additional options by using the prefix
+    <constant>hibernate.search.</constant><replaceable>&lt;indexname&gt;</replaceable>.
+    The name <constant>default</constant>
+    (<constant>hibernate.search.default</constant>) is reserved and can be
+    used to define properties which apply to all indexes. <xref
+    linkend="example-configuring-directory-providers" /> shows how
+    <constant>hibernate.search.default.directory_provider</constant> is used
+    to set the default directory provider to be the filesystem one.
+    <constant>hibernate.search.default.indexBase</constant> sets then the
+    default base directory for the indexes. As a result the index for the
+    entity <classname>Status</classname> is created in
+    <filename>/usr/lucene/indexes/org.hibernate.example.Status</filename>.</para>
+
+    <para>The index for the <classname>Rule</classname> entity, however, is
+    using an in-memory directory, because the default directory provider for
+    this entity is overriden by the property
+    <constant>hibernate.search.Rules.directory_provider</constant>.</para>
+
+    <para>Finally the <classname>Action</classname> entity uses a custom
+    directory provider <classname>CustomDirectoryProvider</classname>
+    specified via
+    <constant>hibernate.search.Actions.directory_provider</constant>.</para>
+
+    <example>
+      <title>Specifying the index name</title>
+
+      <programlisting>package org.hibernate.example;
+
+@Indexed
+public class Status { ... }
+
+@Indexed(index="Rules")
+public class Rule { ... }
+
+@Indexed(index="Actions")
+public class Action { ... }</programlisting>
+    </example>
+
+    <example id="example-configuring-directory-providers">
+      <title>Configuring directory providers</title>
+
+      <programlisting>hibernate.search.default.directory_provider filesystem
+hibernate.search.default.indexBase=/usr/lucene/indexes
+hibernate.search.Rules.directory_provider ram
+hibernate.search.Actions.directory_provider com.acme.hibernate.provider.CustomDirectoryProvider</programlisting>
+    </example>
+
+    <tip>
+      <para>Using the described configuration scheme you can easily define
+      common rules like the directory provider and base directory, and
+      override those defaults later on on a per index basis.</para>
+    </tip>
 
     <table id="directory-provider-table">
-      <title>List of built-in Directory Providers</title>
+      <title>List of built-in
+      <classname>DirectoryProvider</classname>s</title>
 
       <tgroup cols="3">
         <thead>
@@ -204,99 +266,58 @@
             <classname>MMapDirectory</classname> can bring substantial
             performace boosts they also have their issues.</para></entry>
           </row>
-          
+
           <row>
             <entry>infinispan</entry>
 
             <entry><para>Infinispan based directory. Use it to store the index
-            in a distributed grid, making index changes visible to all elements
-            of the cluster very quickly. Also see
-            <xref linkend="infinispan-directories" /> for additional
-            requirements and configuration settings. Infinispan needs a global
-            configuration and additional dependencies; the settings defined here
-            apply to each different index.</para></entry>
+            in a distributed grid, making index changes visible to all
+            elements of the cluster very quickly. Also see <xref
+            linkend="infinispan-directories" /> for additional requirements
+            and configuration settings. Infinispan needs a global
+            configuration and additional dependencies; the settings defined
+            here apply to each different index.</para></entry>
 
-            <entry><para><literal>locking_cachename</literal>: name of the Infinispan
-            cache to use to store locks.</para><para><literal>data_cachename</literal>
-            : name of the Infinispan cache to use to store the largest data chunks; this
-            area will contain the largest objects, use replication if you have enough memory
-            or switch to distribution.</para>
-            <para><literal>metadata_cachename</literal>: name of the Infinispan cache
-            to use to store the metadata relating to the index; this data is rather small
-            and read very often, it's recommended to have this cache setup using
-            replication.</para>
-            <para><literal>chunk_size</literal>: large files of the index are split in smaller
-            chunks, you might want to set the highest value efficiently handled by your network.
-            Networking tuning might be useful.</para></entry>
+            <entry><para><literal>locking_cachename</literal>: name of the
+            Infinispan cache to use to store
+            locks.</para><para><literal>data_cachename</literal> : name of the
+            Infinispan cache to use to store the largest data chunks; this
+            area will contain the largest objects, use replication if you have
+            enough memory or switch to distribution.</para>
+            <para><literal>metadata_cachename</literal>: name of the
+            Infinispan cache to use to store the metadata relating to the
+            index; this data is rather small and read very often, it's
+            recommended to have this cache setup using replication.</para>
+            <para><literal>chunk_size</literal>: large files of the index are
+            split in smaller chunks, you might want to set the highest value
+            efficiently handled by your network. Networking tuning might be
+            useful.</para></entry>
           </row>
         </tbody>
       </tgroup>
     </table>
 
-    <para>If the built-in directory providers do not fit your needs, you can
-    write your own directory provider by implementing the
-    <classname>org.hibernate.store.DirectoryProvider</classname> interface. In
-    this case, pass the fully qualified class name of your provider into the
-    <literal>directory_provider</literal> property (see below).</para>
-
-    <para>Each indexed entity is associated to a Lucene index (an index can be
-    shared by several entities but this is not usually the case). You can
-    configure the index through properties prefixed by
-    <constant>hibernate.search.</constant><replaceable>indexname</replaceable>
-    . Default properties inherited to all indexes can be defined using the
-    prefix <constant>hibernate.search.default.</constant></para>
-
-    <para>To define the directory provider of a given index, you use the
-    <constant>hibernate.search.<replaceable>indexname</replaceable>.directory_provider
-    </constant></para>
-
-    <example>
-      <title>Configuring directory providers</title>
-
-      <programlisting>hibernate.search.default.directory_provider filesystem
-hibernate.search.default.indexBase=/usr/lucene/indexes
-hibernate.search.Rules.directory_provider ram
-hibernate.search.Actions.directory_provider com.acme.hibernate.provider.CustomDirectoryProvider</programlisting>
-    </example>
-
-    <para>applied on</para>
-
-    <example>
-      <title>Specifying the index name using the <literal>index</literal>
-      parameter of <classname>@Indexed</classname></title>
-
-      <programlisting>@Indexed(index="Status")
-public class Status { ... }
-
-@Indexed(index="Rules")
-public class Rule { ... }</programlisting>
-    </example>
-
-    <para>will create a file system directory in
-    <filename>/usr/lucene/indexes/Status</filename> where the Status entities
-    will be indexed, use an in-memory directory named <literal>Rules</literal>
-    where Rule entities will be indexed and finally use the
-    <classname>CustomDirectoryProvider</classname> where Actions are
-    indexed.</para>
-
-    <para>You can easily define common rules like the directory provider and
-    base directory, and override those defaults later on on a per index
-    basis.</para>
-
-    <para>Writing your own <classname>DirectoryProvider</classname>, you can
-    utilize this configuration mechanism as well.</para>
+    <tip>
+      <para>If the built-in directory providers do not fit your needs, you can
+      write your own directory provider by implementing the
+      <classname>org.hibernate.store.DirectoryProvider</classname> interface.
+      In this case, pass the fully qualified class name of your provider into
+      the <literal>directory_provider</literal> property. You can pass any
+      additional properties using the prefix
+      <constant>hibernate.search.</constant><replaceable>&lt;indexname&gt;</replaceable>.</para>
+    </tip>
   </section>
 
   <section id="search-configuration-directory-sharding" revision="1">
     <title>Sharding indexes</title>
 
-    <para>In some cases, it is necessary to split (shard) the indexing data of
+    <para>In some cases it can be useful to split (shard) the indexing data of
     a given entity type into several Lucene indexes. This solution is not
-    recommended unless there is a pressing need because by default, searches
-    will be slower as all shards have to be opened for a single search. In
-    other words don't do it until you have problems :)</para>
+    recommended unless there is a pressing need. searches will be slower as
+    all shards have to be opened for a single search. In other words don't do
+    it until you have problems!</para>
 
-    <para>For example, sharding may be desirable if:</para>
+    <para>Use cases for sharding are:</para>
 
     <itemizedlist>
       <listitem>
@@ -404,8 +425,8 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
     </itemizedlist>
   </section>
 
-  <section>
-    <title>Sharing indexes (two entities into the same directory)</title>
+  <section id="section-sharing-indexes">
+    <title>Sharing indexes</title>
 
     <note>
       <para>This is only presented here so that you know the option is
@@ -945,41 +966,46 @@ hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
       </example>
     </section>
   </section>
-  
+
   <section id="infinispan-directories" revision="1">
     <title>Infinispan Directory configuration</title>
-    
-    <para>Infinispan is a distributed scalable, highly available data grid platform which
-    supports autodiscovery of peer nodes; it's possible to store the
-    index in Infinispan, making it easy to setup a clustering configuration
-    with Hibernate Search and having updates to the index available on
-    other nodes very quickly.</para>
 
-    <para>This section describes in greater detail how to configure Hibernate Search
-    to use an Infinispan Lucene Directory.</para>
-    
-    <para>Using an Infinispan Directory the index is shared across multiple nodes,
-    being stored in memory. It is considered a single directory across all participating
-    nodes, so when a node updates the index this affects the other nodes;
-    what is updated on one node can be immediately searched fore in the whole cluster.</para>
-    
-    <para>The default configuration replicates all data defining the index across all nodes,
-    thus consuming a significant amount of memory. For large indexes it's suggested to enable
-    data distribution, so that each piece of information is replicated to a subset of all
-    cluster members. Also it's possible to offload part or most information to a single centralized
-    <literal>CacheStore</literal>, such as plain filesystem, Amazon S3, Cassandra, Berkley DB,
-    JDBC standard databases, or have a <literal>CacheStore</literal> on each node, chain cachestores.
-    See the <ulink url="http://www.jboss.org/infinispan/" >
-    Infinispan documentation</ulink> for all options and configuration details.</para>
-    
+    <para>Infinispan is a distributed scalable, highly available data grid
+    platform which supports autodiscovery of peer nodes; it's possible to
+    store the index in Infinispan, making it easy to setup a clustering
+    configuration with Hibernate Search and having updates to the index
+    available on other nodes very quickly.</para>
+
+    <para>This section describes in greater detail how to configure Hibernate
+    Search to use an Infinispan Lucene Directory.</para>
+
+    <para>Using an Infinispan Directory the index is shared across multiple
+    nodes, being stored in memory. It is considered a single directory across
+    all participating nodes, so when a node updates the index this affects the
+    other nodes; what is updated on one node can be immediately searched fore
+    in the whole cluster.</para>
+
+    <para>The default configuration replicates all data defining the index
+    across all nodes, thus consuming a significant amount of memory. For large
+    indexes it's suggested to enable data distribution, so that each piece of
+    information is replicated to a subset of all cluster members. Also it's
+    possible to offload part or most information to a single centralized
+    <literal>CacheStore</literal>, such as plain filesystem, Amazon S3,
+    Cassandra, Berkley DB, JDBC standard databases, or have a
+    <literal>CacheStore</literal> on each node, chain cachestores. See the
+    <ulink url="http://www.jboss.org/infinispan/"> Infinispan
+    documentation</ulink> for all options and configuration details.</para>
+
     <section>
       <title>Requirements</title>
-      <para>Infinispan requires Java6 and an updated version of JGroups. To use it via maven,
-      add the following dependencies:</para>
-      <example>
-      <title>Maven dependencies for Hibernate Search</title>
 
-      <programlisting language="XML" role="XML">&lt;dependency&gt;
+      <para>Infinispan requires Java6 and an updated version of JGroups. To
+      use it via maven, add the following dependencies:</para>
+
+      <example>
+        <title>Maven dependencies for Hibernate Search</title>
+
+        <programlisting language="XML" role="XML">&lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
    &lt;version&gt;&version;&lt;/version&gt;
@@ -989,49 +1015,74 @@ hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
    &lt;artifactId&gt;hibernate-search-infinispan&lt;/artifactId&gt;
    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
-    </example>
-    <para>For the non-maven users, add <literal>hibernate-search-infinispan.jar</literal>,
-    <literal>infinispan-lucene-directory.jar</literal>, <literal>infinispan-core.jar</literal>
-    to your application classpath. These last two jars are distributed by 
-    <ulink url="http://sourceforge.net/projects/infinispan/files/" >Infinispan</ulink>;
-    Also make sure to update JGroups to a version matching the Infinispan package, the version
-    normally distributed with Hibernate Search is older to maintain Java5 compatibility.</para>
+      </example>
+
+      <para>For the non-maven users, add
+      <literal>hibernate-search-infinispan.jar</literal>,
+      <literal>infinispan-lucene-directory.jar</literal>,
+      <literal>infinispan-core.jar</literal> to your application classpath.
+      These last two jars are distributed by <ulink
+      url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>;
+      Also make sure to update JGroups to a version matching the Infinispan
+      package, the version normally distributed with Hibernate Search is older
+      to maintain Java5 compatibility.</para>
     </section>
-    
+
     <section>
-    <title>Architecture</title>
-    <para>Even when using an Infinispan directory it's still recommended to use the
-    JMS Master/Slave backend or the JGroups backend: as via Infinispan all nodes will share 
-    the same index, it's likely that <classname>IndexWriter</classname>s being active on different
-    nodes will try to acquire the lock on the same index. So instead of sending updates directly
-    to the index, it's still better to send it to a JMS queue or JGroups channel and have a single
-    node apply all changes on behalf of all other nodes.</para>
-    <para>To configure a JMS slave only the backend must be replaced, the directory provider must be set
-    to <literal>infinispan</literal>; set the same directory provider on the master, they will connect
-    without the need to setup the copy job across nodes. Using the JGroups backend is very similar,
-    just combine the backend configuration with the <literal>infinispan</literal> directory provider.</para>
+      <title>Architecture</title>
+
+      <para>Even when using an Infinispan directory it's still recommended to
+      use the JMS Master/Slave backend or the JGroups backend: as via
+      Infinispan all nodes will share the same index, it's likely that
+      <classname>IndexWriter</classname>s being active on different nodes will
+      try to acquire the lock on the same index. So instead of sending updates
+      directly to the index, it's still better to send it to a JMS queue or
+      JGroups channel and have a single node apply all changes on behalf of
+      all other nodes.</para>
+
+      <para>To configure a JMS slave only the backend must be replaced, the
+      directory provider must be set to <literal>infinispan</literal>; set the
+      same directory provider on the master, they will connect without the
+      need to setup the copy job across nodes. Using the JGroups backend is
+      very similar, just combine the backend configuration with the
+      <literal>infinispan</literal> directory provider.</para>
     </section>
-    
+
     <section>
-    <title>Infinispan Configuration</title>
-    <para>To use Infinispan a <classname>CacheManager</classname> must be started from an Infinispan
-    configuration file. Hibernate Search can take and reuse and existing <classname>CacheManager</classname>
-    looking it up via JNDI, or start a new one. In the latter case Hibernate Search will start it
-    and stop it at <classname>SessionFactory</classname> close.
-    </para>
-    <para>To use and existing <classname>CacheManager</classname> from JNDI (optional parameter):</para>
-    <programlisting>hibernate.search.infinispan.cachemanager_jndiname = [jndiname]</programlisting>
-    <para>To start a new <classname>CacheManager</classname> from a configuration file (optional parameter):</para>
-    <programlisting>hibernate.search.infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
-    <para>If both parameters are defined, JNDI will have priority. If none of these is defined, Hibernate
-    Search will use the example Infinispan configuration provided in the <literal>hibernate-search-infinispan.jar</literal></para>
-    
-    <para>As mentioned in the <xref linkend="search-configuration-directory" />, each index actually
-    makes use of three caches, so three different caches should be configured as shown in the <literal>
-    default-hibernatesearch-infinispan.xml</literal> provided in the  <literal>hibernate-search-infinispan.jar</literal>.
-    </para>
-    <para>Several indexes can share the same caches, they are differentiated by using the index name as
-    it is the case with the other Directory implementations.</para>
+      <title>Infinispan Configuration</title>
+
+      <para>To use Infinispan a <classname>CacheManager</classname> must be
+      started from an Infinispan configuration file. Hibernate Search can take
+      and reuse and existing <classname>CacheManager</classname> looking it up
+      via JNDI, or start a new one. In the latter case Hibernate Search will
+      start it and stop it at <classname>SessionFactory</classname>
+      close.</para>
+
+      <para>To use and existing <classname>CacheManager</classname> from JNDI
+      (optional parameter):</para>
+
+      <programlisting>hibernate.search.infinispan.cachemanager_jndiname = [jndiname]</programlisting>
+
+      <para>To start a new <classname>CacheManager</classname> from a
+      configuration file (optional parameter):</para>
+
+      <programlisting>hibernate.search.infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
+
+      <para>If both parameters are defined, JNDI will have priority. If none
+      of these is defined, Hibernate Search will use the example Infinispan
+      configuration provided in the
+      <literal>hibernate-search-infinispan.jar</literal></para>
+
+      <para>As mentioned in the <xref
+      linkend="search-configuration-directory" />, each index actually makes
+      use of three caches, so three different caches should be configured as
+      shown in the <literal> default-hibernatesearch-infinispan.xml</literal>
+      provided in the
+      <literal>hibernate-search-infinispan.jar</literal>.</para>
+
+      <para>Several indexes can share the same caches, they are differentiated
+      by using the index name as it is the case with the other Directory
+      implementations.</para>
     </section>
   </section>
 
