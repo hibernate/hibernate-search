@@ -652,16 +652,16 @@ fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
 
           <programlisting language="JAVA" role="JAVA">
 org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
-org.apache.lucene.search.Sort sort = new Sort(new SortField("title"));
+org.apache.lucene.search.Sort sort = new Sort(new SortField("title"), SortField.STRING);
 <emphasis role="bold">query.setSort(sort);</emphasis>
 List results = query.list();
 </programlisting>
         </example>
 
-        <para>One can notice the <classname>FullTextQuery</classname>
-        interface which is a sub interface of
-        <classname>org.hibernate.Query</classname>. Be aware that fields used
-        for sorting must not be tokenized.</para>
+        <tip>
+          <para>Be aware that fields used for sorting must not be
+          tokenized.</para>
+        </tip>
       </section>
 
       <section>
