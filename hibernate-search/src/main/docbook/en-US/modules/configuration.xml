@@ -30,6 +30,45 @@
 <chapter id="search-configuration">
   <title>Configuration</title>
 
+  <section id="search-configuration-event" revision="2">
+    <title>Enabling Hibernate Search and automatic indexing</title>
+
+    <para>Let's start with the most basic configuration question - how to
+    enable Hibernate Search in your system.</para>
+
+    <section>
+      <title>Enabling Hibernate Search</title>
+
+      <para>The good news is that Hibernate Search is enabled out of the box
+      when detected on the classpath by Hibernate Core. If, for some reason
+      you need to disable it, set
+      <literal>hibernate.search.autoregister_listeners</literal> to false.
+      Note that there is no performance penalty when the listeners are enabled
+      but no entities are annotated as indexed.</para>
+    </section>
+
+    <section>
+      <title>Automatic indexing</title>
+
+      <para>By default, every time an object is inserted, updated or deleted
+      through Hibernate, Hibernate Search updates the according Lucene index.
+      It is sometimes desirable to disable that features if either your index
+      is read-only or if index updates are done in a batch way (see <xref
+      linkend="search-batchindex" />).</para>
+
+      <para>To disable event based indexing, set</para>
+
+      <programlisting>hibernate.search.indexing_strategy = manual</programlisting>
+
+      <note>
+        <para>In most case, the JMS backend provides the best of both world, a
+        lightweight event based system keeps track of all changes in the
+        system, and the heavyweight indexing process is done by a separate
+        process or machine.</para>
+      </note>
+    </section>
+  </section>
+
   <section id="search-configuration-directory" revision="1">
     <title>Directory configuration</title>
 
@@ -983,36 +1022,38 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     <title>Infinispan Directory configuration</title>
 
     <para>Infinispan is a distributed scalable, highly available data grid
-    platform which supports autodiscovery of peer nodes; it's possible to
-    store the index in Infinispan, making it easy to setup a clustering
+    platform which supports autodiscovery of peer nodes. It is possible to
+    store the Lucene index in Infinispan, making it easy to setup a clustering
     configuration with Hibernate Search and having updates to the index
     available on other nodes very quickly.</para>
 
     <para>This section describes in greater detail how to configure Hibernate
     Search to use an Infinispan Lucene Directory.</para>
 
-    <para>Using an Infinispan Directory the index is shared across multiple
-    nodes, being stored in memory. It is considered a single directory across
-    all participating nodes, so when a node updates the index this affects the
-    other nodes; what is updated on one node can be immediately searched fore
-    in the whole cluster.</para>
+    <para>Using an Infinispan Directory the index is stored in memory and
+    shared across multiple nodes. It is considered a single directory across
+    all participating nodes. If a node updates the index, all other nodes are
+    affected as well. Updates on one node can be immediately searched for in
+    the whole cluster.</para>
 
     <para>The default configuration replicates all data defining the index
     across all nodes, thus consuming a significant amount of memory. For large
     indexes it's suggested to enable data distribution, so that each piece of
-    information is replicated to a subset of all cluster members. Also it's
-    possible to offload part or most information to a single centralized
-    <literal>CacheStore</literal>, such as plain filesystem, Amazon S3,
-    Cassandra, Berkley DB, JDBC standard databases, or have a
-    <literal>CacheStore</literal> on each node, chain cachestores. See the
-    <ulink url="http://www.jboss.org/infinispan/"> Infinispan
+    information is replicated to a subset of all cluster members. </para>
+
+    <para>It is also possible to offload part or most information to a single
+    centralized <literal>CacheStore</literal>, such as plain filesystem,
+    Amazon S3, Cassandra, Berkley DB, JDBC standard databases. You can also
+    have a <literal>CacheStore</literal> on each node or chain cachestores.
+    See the <ulink url="http://www.jboss.org/infinispan/"> Infinispan
     documentation</ulink> for all options and configuration details.</para>
 
     <section>
       <title>Requirements</title>
 
-      <para>Infinispan requires Java6 and an updated version of JGroups. To
-      use it via maven, add the following dependencies:</para>
+      <para>Infinispan requires Java 6 and an updated version of JGroups. To
+      use the Infinispan directory via maven, add the following
+      dependencies:</para>
 
       <example>
         <title>Maven dependencies for Hibernate Search</title>
@@ -1031,24 +1072,24 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
 
       <para>For the non-maven users, add
       <literal>hibernate-search-infinispan.jar</literal>,
-      <literal>infinispan-lucene-directory.jar</literal>,
+      <literal>infinispan-lucene-directory.jar</literal> and
       <literal>infinispan-core.jar</literal> to your application classpath.
       These last two jars are distributed by <ulink
-      url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>;
+      url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>.
       Also make sure to update JGroups to a version matching the Infinispan
-      package, the version normally distributed with Hibernate Search is older
-      to maintain Java5 compatibility.</para>
+      package. The version normally distributed with Hibernate Search is older
+      to maintain Java 5 compatibility.</para>
     </section>
 
     <section>
       <title>Architecture</title>
 
       <para>Even when using an Infinispan directory it's still recommended to
-      use the JMS Master/Slave backend or the JGroups backend: as via
-      Infinispan all nodes will share the same index, it's likely that
+      use the JMS Master/Slave or JGroups backend, because in Infinispan all
+      nodes will share the same index and it is likely that
       <classname>IndexWriter</classname>s being active on different nodes will
       try to acquire the lock on the same index. So instead of sending updates
-      directly to the index, it's still better to send it to a JMS queue or
+      directly to the index, it is recommended to send it to a JMS queue or
       JGroups channel and have a single node apply all changes on behalf of
       all other nodes.</para>
 
@@ -1065,10 +1106,10 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
 
       <para>To use Infinispan a <classname>CacheManager</classname> must be
       started from an Infinispan configuration file. Hibernate Search can take
-      and reuse and existing <classname>CacheManager</classname> looking it up
+      and reuse an existing <classname>CacheManager,</classname> look it up
       via JNDI, or start a new one. In the latter case Hibernate Search will
-      start it and stop it at <classname>SessionFactory</classname>
-      close.</para>
+      start and stop it ( closing occurs at
+      <classname>SessionFactory</classname> close).</para>
 
       <para>To use and existing <classname>CacheManager</classname> from JNDI
       (optional parameter):</para>
@@ -1085,15 +1126,13 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       configuration provided in the
       <literal>hibernate-search-infinispan.jar</literal></para>
 
-      <para>As mentioned in the <xref
-      linkend="search-configuration-directory" />, each index actually makes
-      use of three caches, so three different caches should be configured as
-      shown in the <literal> default-hibernatesearch-infinispan.xml</literal>
-      provided in the
-      <literal>hibernate-search-infinispan.jar</literal>.</para>
-
-      <para>Several indexes can share the same caches, they are differentiated
-      by using the index name as it is the case with the other Directory
+      <para>As mentioned in infinispan configuration in <xref
+      linkend="directory-provider-table" />, each index actually makes use of
+      three caches, so three different caches should be configured as shown in
+      the <literal> default-hibernatesearch-infinispan.xml</literal> provided
+      in the <literal>hibernate-search-infinispan.jar</literal>. Several
+      indexes can share the same caches, they are differentiated by using the
+      index name as it is the case with the other Directory
       implementations.</para>
     </section>
   </section>
@@ -1133,43 +1172,6 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     the custom strategy implementation.</para>
   </section>
 
-  <section id="search-configuration-event" revision="2">
-    <title>Enabling Hibernate Search and automatic indexing</title>
-
-    <para>Let's discover how to enable Hibernate Search in your system.</para>
-
-    <section>
-      <title>Enabling Hibernate Search</title>
-
-      <para>Hibernate Search is enabled out of the box when detected on the
-      classpath by Hibernate Core. If, for some reason you need to disable it,
-      set <literal>hibernate.search.autoregister_listeners</literal> to false.
-      Note that there is no performance penalty when the listeners are enabled
-      but no entities are annotated as indexed.</para>
-    </section>
-
-    <section>
-      <title>Automatic indexing</title>
-
-      <para>By default, every time an object is inserted, updated or deleted
-      through Hibernate, Hibernate Search updates the according Lucene index.
-      It is sometimes desirable to disable that features if either your index
-      is read-only or if index updates are done in a batch way (see <xref
-      linkend="search-batchindex" />).</para>
-
-      <para>To disable event based indexing, set</para>
-
-      <programlisting>hibernate.search.indexing_strategy = manual</programlisting>
-
-      <note>
-        <para>In most case, the JMS backend provides the best of both world, a
-        lightweight event based system keeps track of all changes in the
-        system, and the heavyweight indexing process is done by a separate
-        process or machine.</para>
-      </note>
-    </section>
-  </section>
-
   <section id="lucene-indexing-performance" revision="3">
     <title>Tuning Lucene indexing performance</title>
 
@@ -1190,13 +1192,19 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     linkend="search-batchindex" />), the used properties are those grouped
     under the <literal>batch</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting></para>
 
-    <para>If no value is set for a <literal>.batch</literal> value in a
+    <para>If no value is set for a <literal>batch</literal> value in a
     specific shard configuration, Hibernate Search will look at the index
-    section, then at the default section: <programlisting>hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
+    section, then at the default section.<example
+        id="example-performamce-option-configuration">
+        <title>Example performance option configuration</title>
+
+        <programlisting>hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
 hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
 hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
-    This configuration will result in these settings applied to the second
-    shard of Animals index:</para>
+      </example> The configuration in <xref
+    linkend="example-performamce-option-configuration" /> will result in these
+    settings applied on the second shard of the <classname>Animal</classname>
+    index:</para>
 
     <itemizedlist>
       <listitem>
@@ -1218,11 +1226,12 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
 
     <para>All other values will use the defaults defined in Lucene.</para>
 
-    <para>The default for all values is to leave them at Lucene's own default,
-    so the listed values in the following table actually depend on the version
-    of Lucene you are using; values shown are relative to version
-    <literal>2.4</literal>. For more information about Lucene indexing
-    performances, please refer to the Lucene documentation.</para>
+    <para>The default for all values is to leave them at Lucene's own default.
+    The values listed in <xref linkend="table-performance-parameters" />
+    depend for this reason on the version of Lucene you are using. The values
+    shown are relative to version <literal>2.4</literal>. For more information
+    about Lucene indexing performance, please refer to the Lucene
+    documentation.</para>
 
     <warning>
       <para>Previous versions had the <literal>batch</literal> parameters
@@ -1230,7 +1239,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
       to be explicitly set.</para>
     </warning>
 
-    <table>
+    <table id="table-performance-parameters">
       <title>List of indexing performance and behavior properties</title>
 
       <tgroup cols="3">
@@ -1249,9 +1258,9 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].exclusive_index_use</literal></entry>
 
             <entry><para>Set to <literal>true</literal> when no other process
-            will need to write to the same index: this will enable Hibernate
+            will need to write to the same index. This will enable Hibernate
             Search to work in exlusive mode on the index and improve
-            performance in writing changes to the index.</para></entry>
+            performance when writing changes to the index.</para></entry>
 
             <entry><literal>false</literal> (releases locks as soon as
             possible)</entry>
@@ -1362,10 +1371,9 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             takes more time and temporary disk space. You can set this
             parameter to <literal>false</literal> in an attempt to improve the
             indexing time, but you could run out of file descriptors if
-            <literal>mergeFactor</literal> is also
-            large.<para></para><para>Boolean parameter, use
-            "<literal>true</literal>" or "<literal>false</literal>". The
-            default value for this option is
+            <literal>mergeFactor</literal> is also large.<para>Boolean
+            parameter, use "<literal>true</literal>" or
+            "<literal>false</literal>". The default value for this option is
             <literal>true</literal>.</para></entry>
 
             <entry>true</entry>
@@ -1380,33 +1388,38 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
       it greatly improves efficiency in index writing.</para>
     </tip>
 
-    <para>To tune the indexing speed it might be useful to time the object
-    loading from database in isolation from the writes to the index. To
-    achieve this set the <literal>blackhole</literal> as worker backend and
-    start you indexing routines. This backend does not disable Hibernate
-    Search: it will still generate the needed changesets to the index, but
-    will discard them instead of flushing them to the index. As opposite to
-    setting the <literal>hibernate.search.indexing_strategy</literal> to
-    <literal>manual</literal> when using <literal>blackhole</literal> it will
-    possibly load more data to rebuild the index from associated
-    entities.</para>
+    <tip>
+      <para>To tune the indexing speed it might be useful to time the object
+      loading from database in isolation from the writes to the index. To
+      achieve this set the <literal>blackhole</literal> as worker backend and
+      start you indexing routines. This backend does not disable Hibernate
+      Search: it will still generate the needed changesets to the index, but
+      will discard them instead of flushing them to the index. In contrast to
+      setting the <literal>hibernate.search.indexing_strategy</literal> to
+      <literal>manual</literal>, using <literal>blackhole</literal> will
+      possibly load more data from the database. because associated entities
+      are re-indexed as well.</para>
 
-    <programlisting>hibernate.search.worker.backend blackhole</programlisting>
+      <programlisting>hibernate.search.worker.backend blackhole</programlisting>
 
-    <para>The recommended approach is to focus first on optimizing the object
-    loading, and then use the timings you achieve as a baseline to tune the
-    indexing process.</para>
+      <para>The recommended approach is to focus first on optimizing the
+      object loading, and then use the timings you achieve as a baseline to
+      tune the indexing process.</para>
+    </tip>
 
-    <para>The <literal>blackhole</literal> backend is not meant to be used in
-    production, only as a tool to identify indexing bottlenecks.</para>
+    <warning>
+      <para>The <literal>blackhole</literal> backend is not meant to be used
+      in production, only as a tool to identify indexing bottlenecks.</para>
+    </warning>
   </section>
 
   <section id="search-configuration-directory-lockfactories" revision="1">
     <title>LockFactory configuration</title>
 
-    <para>Lucene Directories have default locking strategies which work well
-    for most cases, but it's possible to specify for each index managed by
-    Hibernate Search which LockingFactory you want to use.</para>
+    <para>Lucene <classname>Directory</classname>s have default locking
+    strategies which work well for most cases, but it's possible to specify
+    for each index managed by Hibernate Search which
+    <classname>LockingFactory</classname> you want to use.</para>
 
     <para>Some of these locking strategies require a filesystem level lock and
     may be used even on RAM based indexes, but this is not recommended and of
@@ -1415,11 +1428,9 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     <para>To select a locking factory, set the
     <literal>hibernate.search.&lt;index&gt;.locking_strategy</literal> option
     to one of <literal>simple</literal>, <literal>native</literal>,
-    <literal>single</literal> or <literal>none</literal>, or set it to the
-    fully qualified name of an implementation of
-    <literal>org.hibernate.search.store.LockFactoryFactory</literal>;
-    Implementing this interface you can provide a custom
-    <literal>org.apache.lucene.store.LockFactory</literal>.</para>
+    <literal>single</literal> or <literal>none</literal>. Alternatively set it
+    to the fully qualified name of an implementation of
+    <literal>org.hibernate.search.store.LockFactoryFactory</literal>.</para>
 
     <table id="search-configuration-directory-lockfactories-table">
       <title>List of available LockFactory implementations</title>
@@ -1504,17 +1515,18 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
     exceptions are logged to the log output by default. It is possible to
     explicitly declare the exception logging mechanism as seen below:</para>
 
-    <para><programlisting>hibernate.search.error_handler log</programlisting>
-    The default exception handling occurs for both synchronous and
-    asynchronous indexing. Hibernate Search provides an easy mechanism to
-    override the default error handling implementation.</para>
+    <para><programlisting>hibernate.search.error_handler log</programlisting>The
+    default exception handling occurs for both synchronous and asynchronous
+    indexing. Hibernate Search provides an easy mechanism to override the
+    default error handling implementation.</para>
 
     <para>In order to provide your own implementation you must implement the
-    <code>ErrorHandler</code> interface, which provides <code>handle (
-    ErrorContext context )</code> method. The <code>ErrorContext</code>
-    provides a reference to the primary <code>LuceneWork</code> that failed,
-    the underlying exception and any subsequent <code>LuceneWork</code> that
-    could not be processed due to the primary exception.</para>
+    <classname>ErrorHandler</classname> interface, which provides the
+    <code>handle(ErrorContext context)</code> method.
+    <code>ErrorContext</code> provides a reference to the primary
+    <code>LuceneWork</code> instance, the underlying exception and any
+    subsequent <code>LuceneWork</code> instances that could not be processed
+    due to the primary exception.</para>
 
     <para><programlisting>public interface ErrorContext  {
    List&lt;LuceneWork&gt; getFailingOperations();
@@ -1523,18 +1535,10 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
    boolean hasErrors();
 }</programlisting></para>
 
-    <para>The following provides an example implementation of
-    <code>ErrorHandler</code>:</para>
-
-    <para><programlisting>public class CustomErrorHandler implements ErrorHandler {
-   public void handle ( ErrorContext context ) {
-      ...
-      //publish error context to some internal error handling system
-      ...
-   }
-}</programlisting> To register this error handler with Hibernate Search you
-    must declare the <code>CustomErrorHandler</code> fully qualified classname
-    in the configuration properties:</para>
+    <para> To register this error handler with Hibernate Search you must
+    declare the fully qualified classname of your
+    <classname>ErrorHandler</classname> implementation in the configuration
+    properties:</para>
 
     <para><programlisting>hibernate.search.error_handler CustomerErrorHandler</programlisting></para>
   </section>
