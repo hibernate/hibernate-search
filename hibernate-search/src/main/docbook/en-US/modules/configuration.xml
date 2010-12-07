@@ -370,13 +370,13 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.provider.CustomDi
     (<classname>IndexShardingStrategy.getDirectoryProvidersForQuery</classname>)
     and thus speed up the query execution.</para>
 
-    <para>Each shard has an independent directory provider configuration as
-    described in <xref linkend="search-configuration-directory" />. The
+    <para>Each shard has an independent directory provider configuration. The
     <classname>DirectoryProvider</classname> index names for the Animal entity
     in <xref linkend="example-sharding-configuration" /> are
     <literal>Animal.0</literal> to <literal>Animal.4</literal>. In other
     words, each shard has the name of it's owning index followed by
-    <constant>.</constant> (dot) and its index number.</para>
+    <constant>.</constant> (dot) and its index number (see also <xref
+    linkend="search-configuration-directory" />).</para>
 
     <example id="example-sharding-configuration">
       <title>Sharding configuration for entity
@@ -391,7 +391,7 @@ hibernate.search.Animal.3.indexBase /usr/lucene/sharded
 hibernate.search.Animal.3.indexName Animal03</programlisting>
     </example>
 
-    <para>In<xref linkend="example-sharding-configuration" /> the
+    <para>In <xref linkend="example-sharding-configuration" /> the
     configuration uses the default id string hashing strategy and shards the
     <classname>Animal</classname> index into 5 sub-indexes. All sub-indexes
     are filesystem instances and the directory where each sub-index is stored
@@ -726,8 +726,8 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
   <section id="jms-backend">
     <title>JMS Master/Slave configuration</title>
 
-    <para>This section describes in greater detail how to configure the Master
-    / Slaves Hibernate Search architecture.</para>
+    <para>This section describes in greater detail how to configure the
+    Master/Slave Hibernate Search architecture.</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -778,11 +778,15 @@ hibernate.search.worker.jms.queue = queue/hibernatesearch
 # hibernate.search.worker.buffer_queue.max = 50</programlisting>
       </example>
 
-      <para>A file system local copy is recommended for faster search
-      results.</para>
+      <tip>
+        <para>A file system local copy is recommended for faster search
+        results.</para>
+      </tip>
 
-      <para>The refresh period should be higher that the expected time
-      copy.</para>
+      <tip>
+        <para>The refresh period should be higher that the expected copy
+        time.</para>
+      </tip>
     </section>
 
     <section>
@@ -813,11 +817,13 @@ hibernate.search.default.directory_provider = filesystem-master
 #Backend is the default lucene one</programlisting>
       </example>
 
-      <para>The refresh period should be higher that the expected time
-      copy.</para>
+      <tip>
+        <para>The refresh period should be higher that the expected time
+        copy.</para>
+      </tip>
 
       <para>In addition to the Hibernate Search framework configuration, a
-      Message Driven Bean should be written and set up to process the index
+      Message Driven Bean has to be written and set up to process the index
       works queue through JMS.</para>
 
       <example>
@@ -847,10 +853,9 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
 
       <para>This example inherits from the abstract JMS controller class
       available in the Hibernate Search source code and implements a JavaEE 5
-      MDB. This implementation is given as an example and, while most likely
-      be more complex, can be adjusted to make use of non Java EE Message
-      Driven Beans. For more information about the
-      <methodname>getSession()</methodname> and
+      MDB. This implementation is given as an example and can be adjusted to
+      make use of non Java EE Message Driven Beans. For more information about
+      the <methodname>getSession()</methodname> and
       <methodname>cleanSessionIfNeeded()</methodname>, please check
       <classname>AbstractJMSHibernateSearchController</classname>'s
       javadoc.</para>
@@ -860,10 +865,12 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
   <section id="jgroups-backend">
     <title>JGroups Master/Slave configuration</title>
 
-    <para>Describes how to configure JGroups Master/Slave back end.
-    Configuration examples illustrated in JMS Master/Slave configuration
-    section (<xref linkend="jms-backend" />) also apply here, only a different
-    backend needs to be set.</para>
+    <para>This section describes how to configure the JGroups Master/Slave
+    back end. The configuration examples illustrated in the JMS Master/Slave
+    configuration section (<xref linkend="jms-backend" />) also apply here,
+    only a different backend
+    (<constant>hibernate.search.worker.backend</constant>) needs to be
+    set.</para>
 
     <section>
       <title>Slave nodes</title>
@@ -875,11 +882,8 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
       <example>
         <title>JGroups Slave configuration</title>
 
-        <programlisting>
-### slave configuration
-## Backend configuration
-hibernate.search.worker.backend = jgroupsSlave
-       </programlisting>
+        <programlisting>### slave configuration
+hibernate.search.worker.backend = jgroupsSlave     </programlisting>
       </example>
     </section>
 
@@ -892,32 +896,42 @@ hibernate.search.worker.backend = jgroupsSlave
       <example>
         <title>JGroups Master configuration</title>
 
-        <programlisting>
-### master configuration
-## Backend configuration
-hibernate.search.worker.backend = jgroupsMaster
-     </programlisting>
+        <programlisting>### master configuration
+hibernate.search.worker.backend = jgroupsMaster   </programlisting>
       </example>
     </section>
 
     <section>
       <title>JGroups channel configuration</title>
 
-      <para>Optionally configuration for JGroups transport protocols (UDP,
-      TCP) and channel name can be defined. It can be applied to both master
-      and slave nodes. There are several ways to configure JGroups transport
-      details. If it is not defined explicity, configuration found in the
-      <literal> flush-udp.xml</literal> file is used.</para>
+      <para>Optionally the configuration for the JGroups transport protocols
+      (UDP, TCP) and channel name can be defined and applied to master and
+      slave nodes. There are several ways to configure the JGroups transport
+      details. You can set the
+      <constant>hibernate.search.worker.backend.jgroups.configurationFile</constant>
+      property and specify a file containing the JGRoups configuration or you
+      can use the property
+      <constant>hibernate.search.worker.backend.jgroups.configurationXml</constant>
+      or
+      <constant>hibernate.search.worker.backend.jgroups.configurationString</constant>
+      to directly embed either the xml or string JGroups configuration into
+      your Hibernate configuration file. All three options are shown in <xref
+      linkend="example-jgroup-xml-configuration" />.</para>
 
-      <example>
-        <title>JGroups transport protocols configuration</title>
+      <tip>
+        <para>If no property is explicitly specified it is assumed that the
+        JGroups default configuration file <literal>flush-udp.xml</literal> is
+        used. </para>
+      </tip>
 
-        <programlisting language="XML">
-## configuration
-#udp.xml file needs to be located in the classpath
+      <example id="example-jgroup-xml-configuration">
+        <title>JGroups transport protocol configuration</title>
+
+        <programlisting language="XML">## JGroups configuration options
+# OPTION 1 - udp.xml file needs to be located in the classpath
 hibernate.search.worker.backend.jgroups.configurationFile = udp.xml
 
-#protocol stack configuration provided in XML format
+# OPTION 2 - protocol stack configuration provided in XML format
 hibernate.search.worker.backend.jgroups.configurationXml =
 
 &lt;config xmlns="urn:org:jgroups"
@@ -944,29 +958,24 @@ thread_pool.rejection_policy="Run"/&gt;
 &lt;pbcast.FLUSH timeout="0"/&gt;
 &lt;/config&gt;
 
-#protocol stack configuration provided in "old style" jgroups format
+# OPTION 3 - protocol stack configuration provided in "old style" jgroups format
 hibernate.search.worker.backend.jgroups.configurationString =
 
 UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):PING(timeout=3000;
 num_initial_members=6):FD(timeout=5000):VERIFY_SUSPECT(timeout=1500):
 pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):UNICAST(timeout=5000):
-FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true)
-
-    </programlisting>
+FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlisting>
       </example>
 
-      <para>Master and slave nodes communicate over JGroups channel that is
-      identified by this same name. Name of the channel can be defined
-      explicity, if not default <literal>HSearchCluster</literal> is
-      used.</para>
+      <para>In this master/slave configuration nodes communicate over a
+      JGroups channel. The default channel name is
+      <literal>HSearchCluster</literal> which can be configured as seen in
+      <xref linkend="example-jgroups-channel-name" />.</para>
 
-      <example>
+      <example id="example-jgroups-channel-name">
         <title>JGroups channel name configuration</title>
 
-        <programlisting>
-## Backend configuration
-hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster
-                </programlisting>
+        <programlisting>hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster       </programlisting>
       </example>
     </section>
   </section>
