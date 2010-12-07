@@ -866,9 +866,8 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
     <title>JGroups Master/Slave configuration</title>
 
     <para>This section describes how to configure the JGroups Master/Slave
-    back end. The configuration examples illustrated in the JMS Master/Slave
-    configuration section (<xref linkend="jms-backend" />) also apply here,
-    only a different backend
+    back end. The configuration examples illustrated in <xref
+    linkend="jms-backend" /> also apply here, only a different backend
     (<constant>hibernate.search.worker.backend</constant>) needs to be
     set.</para>
 
@@ -905,11 +904,11 @@ hibernate.search.worker.backend = jgroupsMaster   </programlisting>
       <title>JGroups channel configuration</title>
 
       <para>Optionally the configuration for the JGroups transport protocols
-      (UDP, TCP) and channel name can be defined and applied to master and
-      slave nodes. There are several ways to configure the JGroups transport
-      details. You can set the
+      and channel name can be defined and applied to master and slave nodes.
+      There are several ways to configure the JGroups transport details. You
+      can either set the
       <constant>hibernate.search.worker.backend.jgroups.configurationFile</constant>
-      property and specify a file containing the JGRoups configuration or you
+      property and specify a file containing the JGroups configuration or you
       can use the property
       <constant>hibernate.search.worker.backend.jgroups.configurationXml</constant>
       or
@@ -967,8 +966,8 @@ pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):UNICAST(timeout=5000):
 FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlisting>
       </example>
 
-      <para>In this master/slave configuration nodes communicate over a
-      JGroups channel. The default channel name is
+      <para>In this JGroups master/slave configuration nodes communicate over
+      a JGroups channel. The default channel name is
       <literal>HSearchCluster</literal> which can be configured as seen in
       <xref linkend="example-jgroups-channel-name" />.</para>
 
