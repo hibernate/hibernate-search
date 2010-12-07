@@ -66,7 +66,7 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	}
 
 	@Override
-	public Serializable getIndexingId(T entity) {
+	public Serializable getId(Object entity) {
 		//this is not an indexed entity
 		return null;
 	}

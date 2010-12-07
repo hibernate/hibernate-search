@@ -131,12 +131,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	abstract protected void initSubClass(XClass clazz, ConfigContext context);
 
 	/**
-	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId
+	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId;
+	 * in case the entity uses @ProvidedId, it's illegal to call this method.
 	 * @param entity
 	 * @return the value, or null if it's not an indexed entity
+	 * @throws IllegalStateException when used with a @ProvidedId annotated entity
 	 */
-	abstract public Serializable getIndexingId(T entity);
-
+	abstract public Serializable getId(Object entity);
+	
 	public boolean isRoot() {
 		return isRoot;
 	}
@@ -284,7 +286,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	/**
 	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
 	 **/
-	public void processContainedInInstances(Object instance, WorkPlan workplan) {
+	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
 			Object value = ReflectionHelper.getMemberValue( instance, member );
@@ -846,4 +848,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			return boost * classBoostStrategy.defineBoost( value );
 		}
 	}
+
+	/**
+	 * @return true if a providedId needs to be provided for indexing
+	 */
+	public boolean requiresProvidedId() {
+		return false;
+	}
+	
 }
