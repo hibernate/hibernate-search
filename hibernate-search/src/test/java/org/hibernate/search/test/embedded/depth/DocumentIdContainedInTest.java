@@ -29,6 +29,7 @@ import junit.framework.Assert;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 
 /**
@@ -48,13 +49,11 @@ public class DocumentIdContainedInTest extends RecursiveGraphTest {
 			session.close();
 		}
 		List<LuceneWork> processedQueue = LeakingLuceneBackend.getLastProcessedQueue();
-		Assert.assertEquals( 2, processedQueue.size() ); //FIXME it's ok it works like this for now, but should be just one object
+		// as they resolve to the same Lucene id only one instance will make it to the backend.
+		// (which one is undefined, nobody should use a constant as id)
+		Assert.assertEquals( 1, processedQueue.size() );
 		Assert.assertEquals( "100", processedQueue.get( 0 ).getId() );
-		Assert.assertTrue( processedQueue.get( 0 ) instanceof LuceneWork );
-		Assert.assertEquals( "Mario Rossi", processedQueue.get( 0 ).getDocument().get( "name" ) );
-		Assert.assertEquals( "100", processedQueue.get( 1 ).getId() );
-		Assert.assertTrue( processedQueue.get( 1 ) instanceof LuceneWork );
-		Assert.assertEquals( "Bruno Rossi", processedQueue.get( 1 ).getDocument().get( "name" ) );
+		Assert.assertTrue( processedQueue.get( 0 ) instanceof AddLuceneWork );
 	}
 	
 	@Override

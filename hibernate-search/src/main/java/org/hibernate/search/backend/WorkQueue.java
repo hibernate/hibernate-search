@@ -130,7 +130,7 @@ public class WorkQueue {
 	 */
 	public void prepareWorkPlan() {
 		if ( ! sealedAndUnchanged ) {
-			plan.processContainedIn();
+			plan.processContainedInAndPrepareExecution();
 			List<LuceneWork> luceneWorkPlan = plan.getPlannedLuceneWork();
 			setSealedQueue( luceneWorkPlan );
 		}

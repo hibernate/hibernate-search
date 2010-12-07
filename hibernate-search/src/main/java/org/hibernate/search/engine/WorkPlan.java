@@ -37,6 +37,8 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.util.HibernateHelper;
+import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Represents the set of changes going to be applied to the index for the entities. A stream of Work is feed as input, a
@@ -48,6 +50,8 @@ import org.hibernate.search.util.HibernateHelper;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class WorkPlan {
+	
+	private static final Logger log = LoggerFactory.make();
 	
 	private final HashMap<Class<?>, PerClassWork<?>> byClass = new HashMap<Class<?>, PerClassWork<?>>();
 	
@@ -111,9 +115,9 @@ public class WorkPlan {
 	 * Makes sure that all additional work needed because of containedIn
 	 * is added to the work plan. 
 	 */
-	public void processContainedIn() {
+	public void processContainedInAndPrepareExecution() {
 		for ( PerClassWork perClassWork : byClass.values() ) {
-			perClassWork.processContainedIn();
+			perClassWork.processContainedInAndPrepareExecution();
 		}
 	}
 	
@@ -152,13 +156,17 @@ public class WorkPlan {
 		 */
 		PerClassWork(Class<T> clazz) {
 			this.entityClass = clazz;
+			this.documentBuilder = getEntityBuilder( searchFactoryImplementor, clazz );
 		}
 		
 		/**
 		 * We further organize work per entity identifier so that we can cancel or adapt work being done
-		 * on the same entities
+		 * on the same entities.
+		 * This map uses as key what we originally received as {@link Work#getId()} if the type
+		 * is annotated with @ProvidedId, otherwise it uses the value pointed to by
+		 * {@link org.hibernate.search.annotations.DocumentId} or as last attempt {@link javax.persistence.Id}.
 		 */
-		private HashMap<Serializable, PerEntityWork<T>> byEntityId = new HashMap<Serializable, PerEntityWork<T>>();
+		private final HashMap<Serializable, PerEntityWork<T>> entityById = new HashMap<Serializable, PerEntityWork<T>>();
 		
 		/**
 		 * When a PurgeAll operation is send on the type, we can remove all previously scheduled work
@@ -174,7 +182,7 @@ public class WorkPlan {
 		/**
 		 * The ducomentBuilder relative to the type being managed
 		 */
-		private AbstractDocumentBuilder<T> entityBuilder;
+		private final AbstractDocumentBuilder<T> documentBuilder;
 		
 		/**
 		 * Adds a work to the current plan. The entityClass of the work must be of the
@@ -183,35 +191,52 @@ public class WorkPlan {
 		 */
 		public void addWork(Work<T> work) {
 			if ( work.getType() == WorkType.PURGE_ALL ) {
-				byEntityId.clear();
+				entityById.clear();
 				purgeAll = true;
 			}
 			else {
-				Serializable id = work.getId();
-				PerEntityWork<T> entityWork = byEntityId.get( id );
+				Serializable id = extractProperId( work );
+				PerEntityWork<T> entityWork = entityById.get( id );
 				if ( entityWork == null ) {
 					entityWork = new PerEntityWork<T>( work );
-					byEntityId.put( id, entityWork );
+					entityById.put( id, entityWork );
 				}
 				entityWork.addWork( work );
 			}
 		}
 		
 		/**
+		 * We need to make a difference on which value is used as identifier
+		 * according to use case and mapping options
+		 * @param work
+		 * @return the appropriate id to use for this work
+		 */
+		private Serializable extractProperId(Work<T> work) {
+			T entity = work.getEntity();
+			// entity is null for purge operation, which requires to trust the work id
+			// also types mapped as provided id require to use the work id
+			if ( entity == null || documentBuilder.requiresProvidedId() ) {
+				return work.getId();
+			}
+			else {
+				return documentBuilder.getId( entity );
+			}
+		}
+
+		/**
 		 * Enqueues all work needed to be performed according to current state into
 		 * the LuceneWork queue.
 		 * @param luceneQueue work will be appended to this list
 		 */
 		public void enqueueLuceneWork(List<LuceneWork> luceneQueue) {
-			final AbstractDocumentBuilder<T> builder = getEntityBuilder();
-			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = byEntityId.entrySet();
+			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = entityById.entrySet();
 			if ( purgeAll ) {
 				luceneQueue.add( new PurgeAllLuceneWork( entityClass ) );
 			}
 			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstances ) {
-				Serializable id = entry.getKey();
+				Serializable indexingId = entry.getKey();
 				PerEntityWork<T> perEntityWork = entry.getValue();
-				perEntityWork.enqueueLuceneWork( entityClass, id, builder, luceneQueue );
+				perEntityWork.enqueueLuceneWork( entityClass, indexingId, documentBuilder, luceneQueue );
 			}
 		}
 		
@@ -219,61 +244,50 @@ public class WorkPlan {
 		 * Starts processing the ContainedIn annotation for all instances stored in
 		 * byEntityId. Must be performed when no more work is being collected by the event
 		 * system, though this same process might recursively add more work to the plan.
+		 * Also we switch from a map being keyed by the provided Work Id to a map using as
+		 * key the id we will use as DocumentId (which is the same in case the entity is
+		 * using @ProvidedId, or otherwise what is marked as @DocumentId or if this is missing
+		 * whatever is marked as @Id.
 		 */
-		public void processContainedIn() {
-			AbstractDocumentBuilder<T> builder = getEntityBuilder();
-			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = byEntityId.entrySet();
-			Entry<Serializable, PerEntityWork<T>>[] entityInstancesFrozenView = new Entry[entityInstances.size()];
-			entityInstancesFrozenView = entityInstances.toArray( entityInstancesFrozenView );
-			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstancesFrozenView ) {
-				Serializable id = entry.getKey();
+		public void processContainedInAndPrepareExecution() {
+			Entry<String, PerEntityWork<T>>[] entityInstancesFrozenView = new Entry[entityById.size()];
+			entityInstancesFrozenView = entityById.entrySet().toArray( entityInstancesFrozenView );
+			for ( Entry<String, PerEntityWork<T>> entry : entityInstancesFrozenView ) {
 				PerEntityWork<T> perEntityWork = entry.getValue();
-				perEntityWork.processContainedIn( id, builder, WorkPlan.this );
+				perEntityWork.processContainedIn( documentBuilder, WorkPlan.this );
 			}
 		}
 		
 		/**
-		 * Method to continue the recursion for ContainedIn processing, as started by {@link #processContainedIn()}
+		 * Method to continue the recursion for ContainedIn processing, as started by {@link #processContainedInAndPrepareExecution()}
 		 * Additional work that needs to be processed will be added to this same WorkPlan.
 		 * @param value the instance to be processed
 		 */
 		void recurseContainedIn(T value) {
-			AbstractDocumentBuilder<T> documentBuilder = getEntityBuilder();
-			Serializable indexingId = documentBuilder.getIndexingId( value );
-			if ( indexingId != null ) {
-				PerEntityWork<T> entityWork = byEntityId.get( indexingId );
-				if ( entityWork == null ) {
-					entityWork = new PerEntityWork( value );
-					byEntityId.put( indexingId, entityWork );
-					// recursion starts:
-					documentBuilder.processContainedInInstances( value, WorkPlan.this );
-				}
-				// else nothing to do as it's being processed already
+			if ( documentBuilder.requiresProvidedId() ) {
+				log.warn( "@ContainedIn is pointing to an entity having @ProvidedId. This is not supported, indexing of contained in entities will be skipped."
+						+ "indexed data of the embedded object might become out of date in objects of type " + HibernateHelper.getClass( value ) );
 			}
 			else {
-				documentBuilder.processContainedInInstances( value, WorkPlan.this );
+				Serializable extractedId = documentBuilder.getId( value );
+				if ( extractedId != null ) {
+					PerEntityWork<T> entityWork = entityById.get( extractedId );
+					if ( entityWork == null ) {
+						entityWork = new PerEntityWork( value );
+						entityById.put( extractedId, entityWork );
+						// recursion starts
+						documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this );
+					}
+					// else nothing to do as it's being processed already
+				}
+				else {
+					// this branch for @ContainedIn recursive work of non-indexed entities
+					// as they don't have an indexingId
+					documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this );
+				}
 			}
 		}
 		
-		/**
-		 * Get and cache the DocumentBuilder for this type. Being this a perClassWork
-		 * we can fetch it once.
-		 * @return the DocumentBuilder for this type
-		 */
-		private AbstractDocumentBuilder<T> getEntityBuilder() {
-			if ( entityBuilder != null ) {
-				return entityBuilder;
-			}
-			entityBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
-			if ( entityBuilder == null ) {
-				entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity( entityClass );
-				if ( entityBuilder == null ) {
-					// should never happen but better be safe than sorry
-					throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass );
-				}
-			}
-			return entityBuilder;
-		}
 	}
 	
 	/**
@@ -287,15 +301,15 @@ public class WorkPlan {
 		
 		/**
 		 * When true, the Lucene Document representing this entity will be deleted
-		 * from the issue.
+		 * from the index.
 		 */
-		private boolean delete = false; // needs to generate a Lucene delete work
+		private boolean delete = false;
 		
 		/**
 		 * When true, the entity will be converted to a Lucene Document and added
 		 * to the index.
 		 */
-		private boolean add = false; // needs to generate a Lucene add work
+		private boolean add = false;
 		
 		/**
 		 * Any work of type {@link WorkType#INDEX} triggers batch=true for the whole unit of work,
@@ -415,13 +429,13 @@ public class WorkPlan {
 		/**
 		 * Adds the needed LuceneWork to the queue for this entity instance
 		 * @param entityClass the type
-		 * @param id identifier of the instance
+		 * @param indexingId identifier of the instance
 		 * @param entityBuilder the DocumentBuilder for this type
 		 * @param luceneQueue the queue collecting all changes
 		 */
-		public void enqueueLuceneWork(Class<T> entityClass, Serializable id, AbstractDocumentBuilder<T> entityBuilder, List<LuceneWork> luceneQueue) {
+		public void enqueueLuceneWork(Class<T> entityClass, Serializable indexingId, AbstractDocumentBuilder<T> entityBuilder, List<LuceneWork> luceneQueue) {
 			if ( add || delete ) {
-				entityBuilder.addWorkToQueue( entityClass, entity, id, delete, add, batch, luceneQueue );
+				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, batch, luceneQueue );
 			}
 		}
 		
@@ -429,18 +443,35 @@ public class WorkPlan {
 		 * Works via recursion passing the WorkPlan over, so that additional work can be planned
 		 * according to the needs of ContainedIn processing.
 		 * @see org.hibernate.search.annotations.ContainedIn
-		 * @param id entity identifier
 		 * @param entityBuilder the DocumentBuilder for this type
 		 * @param workplan the current WorkPlan, used for recursion
 		 */
-		public void processContainedIn(Serializable id, AbstractDocumentBuilder<T> entityBuilder, WorkPlan workplan) {
+		public void processContainedIn(AbstractDocumentBuilder<T> entityBuilder, WorkPlan workplan) {
 			if ( ! containedInProcessed ) {
 				containedInProcessed = true;
 				if ( add || delete ) {
-					entityBuilder.processContainedInInstances( entity, workplan );
+					entityBuilder.appendContainedInWorkForInstance( entity, workplan );
 				}
 			}
 		}
 	}
+	
+	/**
+	 * Get and cache the DocumentBuilder for this type. Being this a perClassWork
+	 * we can fetch it once.
+	 * @return the DocumentBuilder for this type
+	 */
+	private static <T> AbstractDocumentBuilder<T> getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor, Class entityClass) {
+		AbstractDocumentBuilder<T> entityBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
+		if ( entityBuilder == null ) {
+			entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity( entityClass );
+			if ( entityBuilder == null ) {
+				// should never happen but better be safe than sorry
+				throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass );
+			}
+		}
+		return entityBuilder;
+	}
 
 }
+

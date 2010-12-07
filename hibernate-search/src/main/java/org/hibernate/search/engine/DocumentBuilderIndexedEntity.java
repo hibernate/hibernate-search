@@ -288,14 +288,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue) {
 		String idInString = objectToString( idBridge, idKeywordName, id );
-		if (delete) {
+		if ( delete ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
-		if (add) {
+		if ( add ) {
 			queue.add( createAddWork( entityClass, entity, id, idInString, batch ) );
 		}
 	}
-
+	
 	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value) {
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
 				.setClass( getBeanClass() )
@@ -563,7 +563,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	/**
-	 * Return the entity id if possible
+	 * Return the id used for indexing if possible
 	 * An IllegalStateException otherwise
 	 * <p/>
 	 * If the id is provided, we can't extract it from the entity
@@ -572,13 +572,15 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 *
 	 * @return entity id
 	 */
+	@Override
 	public Serializable getId(Object entity) {
-		if ( entity == null || idGetter == null ) {
-			throw new IllegalStateException( "Cannot guess id form entity" );
+		if ( entity == null || idGetter == null || idProvided ) {
+			throw new IllegalStateException( "Cannot guess id from entity" );
 		}
-		return (Serializable) ReflectionHelper.getMemberValue( entity, idGetter );
+		Object unproxiedEntity = HibernateHelper.unproxy( entity );
+		return (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, idGetter );
 	}
-
+	
 	public String objectToString(String fieldName, Object value) {
 		if ( fieldName == null ) {
 			throw new AssertionFailure( "Field name should not be null" );
@@ -685,14 +687,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		catch ( Exception e ) {
 			// ignore
 		}
-
 		return ReflectionHelper.getAttributeName( member, name );
 	}
 
 	@Override
-	public Serializable getIndexingId(T entity) {
-		Object unproxiedEntity = HibernateHelper.unproxy( entity );
-		Serializable id = (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, getIdGetter() );
-		return id;
+	public boolean requiresProvidedId() {
+		return this.idProvided;
 	}
 }
