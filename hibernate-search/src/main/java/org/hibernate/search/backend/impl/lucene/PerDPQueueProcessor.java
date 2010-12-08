@@ -100,13 +100,13 @@ class PerDPQueueProcessor implements Runnable {
 		ErrorContextBuilder builder = new ErrorContextBuilder();
 		builder.allWorkToBeDone( workOnWriter );
 		try {
-			IndexWriter indexWriter = workspace.getIndexWriter( batchmode );
+			IndexWriter indexWriter = workspace.getIndexWriter( batchmode, builder );
 			try {
 				for ( LuceneWork lw : workOnWriter ) {
 					lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
 					builder.workCompleted( lw );
 				}
-				workspace.commitIndexWriter();
+				workspace.commitIndexWriter( builder );
 				performOptimizations();
 			}
 			finally {
