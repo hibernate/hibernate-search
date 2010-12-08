@@ -35,11 +35,12 @@ import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -146,10 +147,10 @@ public class Workspace {
 	 * Gets the IndexWriter, opening one if needed.
 	 * @param batchmode when true the indexWriter settings for batch mode will be applied.
 	 * Ignored if IndexWriter is open already.
-	 * @throws SearchException on a IOException during index opening.
+	 * @param builder might contain some context useful to provide when handling IOExceptions
 	 * @return a new IndexWriter or one already open.
 	 */
-	public synchronized IndexWriter getIndexWriter(boolean batchmode) {
+	public synchronized IndexWriter getIndexWriter(boolean batchmode, ErrorContextBuilder builder) {
 		if ( writer != null )
 			return writer;
 		try {
@@ -158,34 +159,45 @@ public class Workspace {
 			writer.setSimilarity( similarity );
 			log.trace( "IndexWriter opened" );
 		}
-		catch ( IOException e ) {
+		catch ( IOException ioe ) {
 			writer = null;
-			throw new SearchException( "Unable to open IndexWriter", e );
+			handleIOException( ioe, builder );
 		}
 		return writer;
+	}
+	
+	/**
+	 * @see #getIndexWriter(boolean, ErrorContextBuilder)
+	 */
+	public IndexWriter getIndexWriter(boolean batchmode) {
+		return getIndexWriter( batchmode, null );
 	}
 
 	/**
 	 * Commits changes to a previously opened IndexWriter.
-	 *
-	 * @throws SearchException on IOException during Lucene close operation,
-	 * or if there is no IndexWriter to close.
+	 * @param builder use it to handle exceptions, as it might contain a reference to the work performed before the commit
 	 */
-	public synchronized void commitIndexWriter() {
+	public synchronized void commitIndexWriter(ErrorContextBuilder builder) {
 		if ( writer != null ) {
 			try {
 				writer.commit();
 				log.trace( "Index changes commited." );
 			}
-			catch ( IOException e ) {
-				throw new SearchException( "Exception while commiting index changes", e );
+			catch ( IOException ioe ) {
+				handleIOException( ioe, builder );
 			}
 		}
+	}
+	
+	/**
+	 * @see #commitIndexWriter(ErrorContextBuilder)
+	 */
+	public synchronized void commitIndexWriter() {
+		commitIndexWriter( null );
 	}
 
 	/**
 	 * Closes a previously opened IndexWriter.
-	 * @throws SearchException on IOException during Lucene close operation
 	 */
 	public synchronized void closeIndexWriter() {
 		IndexWriter toClose = writer;
@@ -195,8 +207,8 @@ public class Workspace {
 				toClose.close();
 				log.trace( "IndexWriter closed" );
 			}
-			catch ( IOException e ) {
-				throw new SearchException( "Exception while closing IndexWriter", e );
+			catch ( IOException ioe ) {
+				handleIOException( ioe, null );
 			}
 		}
 	}
@@ -236,9 +248,26 @@ public class Workspace {
 			}
 		}
 		catch (IOException ioe) {
-			SingleErrorContext error = new SingleErrorContext( ioe );
-			this.errorHandler.handle( error );
+			handleIOException( ioe, null );
 		}
+	}
+	
+	/**
+	 * @param ioe The exception to handle
+	 * @param errorBuilder Might be used to enqueue useful information about the lost operations, or be null
+	 */
+	private void handleIOException(IOException ioe, ErrorContextBuilder errorBuilder) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "going to handle IOException", ioe );
+		}
+		final ErrorContext errorContext;
+		if ( errorBuilder != null ) {
+			errorContext = errorBuilder.errorThatOccurred( ioe ).createErrorContext();
+		}
+		else {
+			 errorContext = new SingleErrorContext( ioe );
+		}
+		this.errorHandler.handle( errorContext );
 	}
 
 }
