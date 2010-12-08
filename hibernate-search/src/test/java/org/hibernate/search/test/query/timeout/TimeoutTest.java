@@ -120,7 +120,7 @@ public class TimeoutTest extends SearchTestCase {
 
 		query = builder.keyword().onField( "brand" ).matching( "Swatch" ).createQuery();
 		hibernateQuery = fts.createFullTextQuery( query, Clock.class );
-		hibernateQuery.limitFetchingTime( 1, TimeUnit.NANOSECONDS );
+		hibernateQuery.limitExecutionTimeTo( 1, TimeUnit.NANOSECONDS );
 		List result = hibernateQuery.list();
 		System.out.println("Result size early: " + result.size() );
 		assertEquals("Test early failure, before the number of results are even fetched", 0, result.size() );
@@ -143,7 +143,7 @@ public class TimeoutTest extends SearchTestCase {
 //		fts.clear();
 
 		hibernateQuery = fts.createFullTextQuery( query, Clock.class );
-		hibernateQuery.limitFetchingTime( 30, TimeUnit.SECONDS );
+		hibernateQuery.limitExecutionTimeTo( 30, TimeUnit.SECONDS );
 		results = hibernateQuery.list();
 		assertEquals("Test below limit termination", 500, results.size() );
 		assertFalse( hibernateQuery.hasPartialResults() );
