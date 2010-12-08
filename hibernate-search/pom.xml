@@ -226,7 +226,7 @@
                     <links>
                         <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
                         <link>http://docs.jboss.org/hibernate/stable/core/javadocs/</link>
-                        <link>http://lucene.apache.org/java/2_9_2/api/all</link>
+                        <link>http://lucene.apache.org/java/3_0_3/api/all</link>
                     </links>
                     <packagesheader>Hibernate Search Packages</packagesheader>
                     <doctitle>Hibernate Search ${project.version}</doctitle>
