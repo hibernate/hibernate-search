@@ -936,7 +936,7 @@ catch (javax.persistence.QueryTimeoutException e) {
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
-query.limitFetchingTime(500, TimeUnit.MILLISECONDS);
+query.limitExecutionTimeTo(500, TimeUnit.MILLISECONDS);
 List results = query.list();</programlisting>
         </example>
 
@@ -957,7 +957,7 @@ List results = query.list();</programlisting>
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
-query.limitFetchingTime(500, TimeUnit.MILLISECONDS);
+query.limitExecutionTimeTo(500, TimeUnit.MILLISECONDS);
 List results = query.list();
 
 if ( query.hasPartialResults() ) {
@@ -966,7 +966,7 @@ if ( query.hasPartialResults() ) {
         </example>
 
         <para>If you use the JPA API,
-        <methodname>limitFetchingTime</methodname> and
+        <methodname>limitExecutionTimeTo</methodname> and
         <methodname>hasPartialResults</methodname> are also available to
         you.</para>
 

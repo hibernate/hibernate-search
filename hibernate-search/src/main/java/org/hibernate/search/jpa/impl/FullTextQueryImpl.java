@@ -332,8 +332,8 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return query.explain( documentId );
 	}
 
-	public FullTextQuery limitFetchingTime(long timeout, TimeUnit timeUnit) {
-		query.limitFetchingTime( timeout, timeUnit );
+	public FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
+		query.limitExecutionTimeTo( timeout, timeUnit );
 		return this;
 	}
 

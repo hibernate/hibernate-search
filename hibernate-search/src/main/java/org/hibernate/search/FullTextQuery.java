@@ -169,12 +169,12 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param timeout time out period
 	 * @param timeUnit time out unit
 	 */
-	FullTextQuery limitFetchingTime(long timeout, TimeUnit timeUnit);
+	FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit);
 
 	/**
 	 * *Experimental* API, subject to change or removal
 	 *
-	 * When using {@link #limitFetchingTime(long, java.util.concurrent.TimeUnit)} }, returns true if partial results are returned (ie if the time limit has been reached
+	 * When using {@link #limitExecutionTimeTo(long, java.util.concurrent.TimeUnit)} }, returns true if partial results are returned (ie if the time limit has been reached
 	 * and the result fetching process has been terminated.
 	 */	
 	boolean hasPartialResults();

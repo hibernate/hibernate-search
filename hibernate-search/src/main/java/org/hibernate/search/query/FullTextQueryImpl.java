@@ -980,7 +980,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
-	public FullTextQuery limitFetchingTime(long timeout, TimeUnit timeUnit) {
+	public FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
 		timeoutManager.setTimeout( timeout, timeUnit );
 		timeoutManager.limitFetchingOnTimeout();
 		return this;
