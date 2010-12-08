@@ -27,17 +27,20 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hsearch.ent">
 %BOOK_ENTITIES;
 ]>
-
 <chapter id="search-lucene-native">
   <title>Advanced features</title>
 
+  <para>In this final chapter we are offering a smorgasbord of tips and tricks
+  which might become useful as you dive deeper and deeper into Hibernate
+  Search.</para>
+
   <section>
-    <title>SearchFactory</title>
+    <title>Accessing the SearchFactory</title>
 
     <para>The <classname>SearchFactory</classname> object keeps track of the
-    underlying Lucene resources for Hibernate Search, it's also a convenient
-    way to access Lucene natively. The <classname>SearchFactory</classname>
-    can be accessed from a<classname>FullTextSession</classname>:</para>
+    underlying Lucene resources for Hibernate Search. It is a convenient way
+    to access Lucene natively. The <classname>SearchFactory</classname> can be
+    accessed from a<classname> FullTextSession</classname>:</para>
 
     <example>
       <title>Accessing the <classname>SearchFactory</classname></title>
@@ -50,16 +53,16 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();           </pr
   <section>
     <title>Accessing a Lucene Directory</title>
 
-    <para>You can always access the Lucene directories through plain Lucene,
-    the Directory structure is in no way different with or without Hibernate
-    Search. However there are some more convenient ways to access a given
-    Directory. The <classname>SearchFactory</classname> keeps track of the
-    <classname>DirectoryProvider</classname>s per indexed class. One directory
-    provider can be shared amongst several indexed classes if the classes
-    share the same underlying index directory. While usually not the case, a
-    given entity can have several<classname>DirectoryProvider</classname>s if
-    the index is sharded (see<xref
-    linkend="search-configuration-directory-sharding" />).</para>
+    <para>You can always access the Lucene directories through plain Lucene.
+    The <classname>Directory</classname> structure is in no way different with
+    or without Hibernate Search. However there are some more convenient ways
+    to access a given Directory. The <classname>SearchFactory</classname>
+    keeps track of the <classname>DirectoryProvider</classname>s per indexed
+    class. One directory provider can be shared amongst several indexed
+    classes, if the classes share the same underlying index directory. While
+    usually not the case, a given entity can have several
+    <classname>DirectoryProvider</classname>s if the index is sharded (see
+    <xref linkend="search-configuration-directory-sharding" />).</para>
 
     <example>
       <title>Accessing the Lucene <classname>Directory</classname></title>
@@ -70,14 +73,14 @@ org.apache.lucene.store.Directory directory = provider[0].getDirectory();       
 
     <para>In this example, directory points to the lucene index storing
     <classname>Order</classname>s information. Note that the obtained Lucene
-    directory must not be closed (this is Hibernate Search
+    directory must not be closed (this is Hibernate Search's
     responsibility).</para>
   </section>
 
   <section>
     <title>Using an IndexReader</title>
 
-    <para>Queries in Lucene are executed on an<literal>IndexReader</literal>.
+    <para>Queries in Lucene are executed on an <literal>IndexReader</literal>.
     Hibernate Search caches all index readers to maximize performance. Your
     code can access this cached resources, but you have to follow some "good
     citizen" rules.</para>
@@ -120,18 +123,19 @@ finally {
       </listitem>
     </itemizedlist>
 
-    <para>Aside from those rules, you can use the IndexReader freely,
-    especially to do native queries. Using the shared
-    <literal>IndexReader</literal>s will make most queries more
-    efficient.</para>
+    <para>Aside from those rules, you can use the
+    <classname>IndexReader</classname> freely, especially to do native
+    queries. Using the shared <literal>IndexReader</literal>s will make most
+    queries more efficient.</para>
   </section>
 
   <section>
     <title>Use external services in Hibernate Search components
     (experimental)</title>
 
-    <para>By components, this section means any of the pluggable
-    contracts:</para>
+    <para>By components, this section means any of the pluggable contracts -
+    <classname>DirectoryProvider</classname> being the most useful use
+    case:</para>
 
     <itemizedlist>
       <listitem>
@@ -155,11 +159,8 @@ finally {
       </listitem>
     </itemizedlist>
 
-    <para><classname>DirectoryProvider</classname> is the most useful use
-    case.</para>
-
-    <para>Some of these compnents need to access a service either available in
-    the environment or whose lifecycle is bound to the
+    <para>Some of these compnents need to access a service which is either
+    available in the environment or whose lifecycle is bound to the
     <classname>SearchFactory</classname>. Sometimes, you even want the same
     service to be shared amongst several instances of these contract. One
     example is the ability the share an Infinispan cache instance between
@@ -172,18 +173,19 @@ finally {
       <para>To expose a service, you need to implement
       <classname>org.hibernate.search.spi.ServiceProvider&lt;T&gt;</classname>.
       <classname>T</classname> is the type of the service you want to use.
-      Services are retrieved in Hibernate Search components via its
+      Services are retrieved by components via their
       <classname>ServiceProvider</classname> class implementation.</para>
 
       <section>
         <title>Managed services</title>
 
         <para>If your service ought to be started when Hibernate Search starts
-        and stopped when Hibernate Search stop, you can use a managed service.
-        Make sure to properly implement the <methodname>start</methodname> and
-        <methodname>stop</methodname> methods of
-        <classname>ServiceProvider</classname>. When the service is requested,
-        the <methodname>getService</methodname> method is called.</para>
+        and stopped when Hibernate Search stops, you can use a managed
+        service. Make sure to properly implement the
+        <methodname>start</methodname> and <methodname>stop</methodname>
+        methods of <classname>ServiceProvider</classname>. When the service is
+        requested, the <methodname>getService</methodname> method is
+        called.</para>
 
         <example>
           <title>Example of ServiceProvider implementation</title>
@@ -233,9 +235,9 @@ finally {
         Hibernate Search as its internal search engine can pass the
         <classname>CacheContainer</classname> to Hibernate Search. In this
         case, the <classname>CacheContainer</classname> instance is not
-        managed by Hibernate Search and the <methodname>start</methodname> /
-        <methodname>stop</methodname> methods of its corresponding service
-        provider will not be used.</para>
+        managed by Hibernate Search and the
+        <methodname>start</methodname>/<methodname>stop</methodname> methods
+        of its corresponding service provider will not be used.</para>
 
         <note>
           <para>Provided services have priority over managed services. If a
@@ -297,7 +299,7 @@ finally {
       </example>
 
       <para>When you request a service, an instance of the service is served
-      to you. Make sure to then release the service. It is fundamental. Note
+      to you. Make sure to then release the service. This is fundamental. Note
       that the service can be released in the
       <methodname>DirectoryProvider.stop</methodname> method if the
       <classname>DirectoryProvider</classname> uses the service during its
