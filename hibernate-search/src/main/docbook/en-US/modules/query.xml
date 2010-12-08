@@ -44,7 +44,7 @@
 
     <listitem>
       <para>Creating a Lucene query either via the Hibernate Search query DSL
-      (recommended) or from scratch</para>
+      (recommended) or by utilizing the Lucene query API</para>
     </listitem>
 
     <listitem>
@@ -59,10 +59,10 @@
     </listitem>
   </itemizedlist>
 
-  <para>To access the querying facilities, you have to use an
+  <para>To access the querying facilities, you have to use a
   <classname>FullTextSession</classname>. This Search specific session wraps a
-  regular <classname>org.hibernate.Session</classname> to provide query and
-  indexing capabilities.</para>
+  regular <classname>org.hibernate.Session</classname> in order to provide
+  query and indexing capabilities.</para>
 
   <example>
     <title>Creating a FullTextSession</title>
@@ -72,8 +72,9 @@
 FullTextSession fullTextSession = Search.getFullTextSession(session);    </programlisting>
   </example>
 
-  <para>You then have two options to build the full-text query: the Hibernate
-  Search query DSL or the native Lucene query.</para>
+  <para>Once you have a <classname>FullTextSession</classname> you have two
+  options to build the full-text query: the Hibernate Search query DSL or the
+  native Lucene query.</para>
 
   <para>If you use the Hibernate Search query DSL, it will look like
   this:</para>
@@ -90,10 +91,8 @@ org.apache.lucene.search.Query luceneQuery =
 org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
 List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
 
-  <para>You can alternatively write your Lucene query by hand either using the
-  query parser or the programmatic API. If you are considering the
-  programmatic API, we highly encourage you to use the Hibernate Search query
-  DSL (or a mix of both).</para>
+  <para>You can alternatively write your Lucene query either using the query
+  parser or the programmatic API.</para>
 
   <example>
     <title>Creating a Lucene query from scratch via the query parser</title>
@@ -937,7 +936,7 @@ catch (javax.persistence.QueryTimeoutException e) {
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
-query.limitFetchingTime(500, TimeUnit.MILLISECONDS);
+query.limitExecutionTimeTo(500, TimeUnit.MILLISECONDS);
 List results = query.list();</programlisting>
         </example>
 
@@ -958,7 +957,7 @@ List results = query.list();</programlisting>
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
-query.limitFetchingTime(500, TimeUnit.MILLISECONDS);
+query.limitExecutionTimeTo(500, TimeUnit.MILLISECONDS);
 List results = query.list();
 
 if ( query.hasPartialResults() ) {
@@ -967,7 +966,7 @@ if ( query.hasPartialResults() ) {
         </example>
 
         <para>If you use the JPA API,
-        <methodname>limitFetchingTime</methodname> and
+        <methodname>limitExecutionTimeTo</methodname> and
         <methodname>hasPartialResults</methodname> are also available to
         you.</para>
 
