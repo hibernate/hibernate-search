@@ -39,6 +39,8 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.LoggerFactory;
@@ -69,6 +71,7 @@ public class Workspace {
 	private final Set<Class<?>> entitiesInDirectory;
 	private final LuceneIndexingParameters indexingParams;
 	private final Similarity similarity;
+	private final ErrorHandler errorHandler;
 
 	// variable state:
 	
@@ -82,7 +85,7 @@ public class Workspace {
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 	
-	public Workspace(WorkerBuildContext context, DirectoryProvider<?> provider) {
+	public Workspace(WorkerBuildContext context, DirectoryProvider<?> provider, ErrorHandler errorHandler) {
 		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
 		this.directoryProvider = provider;
 		this.optimizerStrategy = context.getOptimizerStrategy( directoryProvider );
@@ -90,6 +93,7 @@ public class Workspace {
 		this.indexingParams = context.getIndexingParameters( directoryProvider );
 		this.lock = context.getDirectoryProviderLock( provider );
 		this.similarity = context.getSimilarity( directoryProvider );
+		this.errorHandler = errorHandler;
 	}
 
 	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilder(Class<T> entity) {
@@ -232,7 +236,8 @@ public class Workspace {
 			}
 		}
 		catch (IOException ioe) {
-			throw new SearchException( "IOException while attempting to force release the Directory Lock", ioe );
+			SingleErrorContext error = new SingleErrorContext( ioe );
+			this.errorHandler.handle( error );
 		}
 	}
 

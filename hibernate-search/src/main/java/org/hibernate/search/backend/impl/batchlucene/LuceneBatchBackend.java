@@ -38,6 +38,7 @@ import org.hibernate.search.backend.impl.lucene.PerDirectoryWorkProcessor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -66,8 +67,9 @@ public class LuceneBatchBackend implements BatchBackend {
 		if ( maxThreadsPerIndex < 1 ) {
 			throw new SearchException( "concurrent_writers for batch backend must be at least 1." );
 		}
+		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
 		for ( DirectoryProvider<?> dp : context.getDirectoryProviders() ) {
-			DirectoryProviderWorkspace resources = new DirectoryProviderWorkspace( context, dp, monitor, maxThreadsPerIndex );
+			DirectoryProviderWorkspace resources = new DirectoryProviderWorkspace( context, dp, monitor, maxThreadsPerIndex, errorHandler );
 			resourcesMap.put( dp, resources );
 		}
 	}

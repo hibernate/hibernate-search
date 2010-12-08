@@ -52,11 +52,11 @@ class PerDPResources {
 	private final ErrorHandler errorHandler;
 	
 	PerDPResources(WorkerBuildContext context, DirectoryProvider<?> dp) {
-		workspace = new Workspace( context, dp );
+		errorHandler = context.getErrorHandler();
+		workspace = new Workspace( context, dp, errorHandler );
 		visitor = new LuceneWorkVisitor( workspace, context );
 		executor = Executors.newFixedThreadPool( 1, "Directory writer" );
 		exclusiveIndexUsage = context.isExclusiveIndexUsageEnabled( dp );
-		errorHandler = context.getErrorHandler();
 	}
 
 	public ExecutorService getExecutor() {

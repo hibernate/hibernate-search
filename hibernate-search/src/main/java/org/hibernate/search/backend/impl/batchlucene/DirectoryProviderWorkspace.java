@@ -37,6 +37,7 @@ import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -61,12 +62,12 @@ class DirectoryProviderWorkspace {
 	
 	private final AtomicBoolean closed = new AtomicBoolean( false );
 	
-	DirectoryProviderWorkspace(WorkerBuildContext context, DirectoryProvider<?> dp, MassIndexerProgressMonitor monitor, int maxThreads) {
+	DirectoryProviderWorkspace(WorkerBuildContext context, DirectoryProvider<?> dp, MassIndexerProgressMonitor monitor, int maxThreads, ErrorHandler errorHandler) {
 		if ( maxThreads < 1 ) {
 			throw new IllegalArgumentException( "maxThreads needs to be at least 1" );
 		}
 		this.monitor = monitor;
-		workspace = new Workspace( context, dp );
+		workspace = new Workspace( context, dp, errorHandler );
 		visitor = new LuceneWorkVisitor( workspace, context );
 		executor = Executors.newFixedThreadPool( maxThreads, "indexwriter" );
 	}
