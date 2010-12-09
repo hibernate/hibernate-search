@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.FlushMode;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
@@ -49,7 +51,7 @@ import org.slf4j.Logger;
  * 
  * @author Sanne Grinovero
  */
-public class IdentifierProducer implements Runnable {
+public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	
 	private static final Logger log = LoggerFactory.make();
 
@@ -84,10 +86,10 @@ public class IdentifierProducer implements Runnable {
 				log.trace( "created" );
 	}
 	
-	public void run() {
+	public void run(StatelessSession upperSession) {
 		log.trace( "started" );
 		try {
-			inTransactionWrapper();
+			inTransactionWrapper(upperSession);
 		}
 		catch (Throwable e) {
 			log.error( "error during batch indexing: ", e );
@@ -98,10 +100,12 @@ public class IdentifierProducer implements Runnable {
 		log.trace( "finished" );
 	}
 
-	private void inTransactionWrapper() {
-		StatelessSession session = sessionFactory.openStatelessSession();
+	private void inTransactionWrapper(StatelessSession upperSession) throws Exception {
+		StatelessSession session = upperSession;
+		if (upperSession == null) {
+			session = sessionFactory.openStatelessSession();
+		}
 		try {
-			Transaction transaction = session.beginTransaction();
 			Transaction transaction = Helper.getTransactionAndMarkForJoin( session );
 			transaction.begin();
 			loadAllIdentifiers( session );
@@ -110,7 +114,9 @@ public class IdentifierProducer implements Runnable {
 			// just quit
 		}
 		finally {
-			session.close();
+			if (upperSession == null) {
+				session.close();
+			}
 		}
 	}
 

@@ -42,6 +42,7 @@ import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
+
 import org.slf4j.Logger;
 
 /**
@@ -51,7 +52,7 @@ import org.slf4j.Logger;
  * 
  * @author Sanne Grinovero
  */
-public class EntityConsumerLuceneworkProducer implements Runnable {
+public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 	
 	private static final Logger log = LoggerFactory.make();
 	
@@ -81,13 +82,15 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 		this.documentBuilders = searchFactory.getDocumentBuildersIndexedEntities();
 	}
 
-	public void run() {
-		Session session = sessionFactory.openSession();
+	public void run(Session upperSession) {
+		Session session = upperSession;
+		if ( upperSession == null ) {
+			session = sessionFactory.openSession();
+		}
 		session.setFlushMode( FlushMode.MANUAL );
 		session.setCacheMode( cacheMode );
 		session.setDefaultReadOnly( true );
 		try {
-			Transaction transaction = session.beginTransaction();
 			Transaction transaction = Helper.getTransactionAndMarkForJoin( session );
 			transaction.begin();
 			indexAllQueue( session );
@@ -98,7 +101,9 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 		}
 		finally {
 			producerEndSignal.countDown();
-			session.close();
+			if ( upperSession == null ) {
+				session.close();
+			}
 		}
 		log.debug( "finished" );
 	}

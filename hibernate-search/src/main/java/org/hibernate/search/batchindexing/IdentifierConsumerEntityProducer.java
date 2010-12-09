@@ -46,7 +46,7 @@ import org.slf4j.Logger;
  * 
  * @author Sanne Grinovero
  */
-public class IdentifierConsumerEntityProducer implements Runnable {
+public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 	
 	private static final Logger log = LoggerFactory.make();
 
@@ -72,9 +72,12 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 				log.trace( "created" );
 	}
 
-	public void run() {
+	public void run(Session upperSession) {
 		log.trace( "started" );
-		Session session = sessionFactory.openSession();
+		Session session = upperSession;
+		if ( upperSession == null ) {
+			session = sessionFactory.openSession();
+		}
 		session.setFlushMode( FlushMode.MANUAL );
 		session.setCacheMode( cacheMode );
 		session.setDefaultReadOnly( true );
@@ -88,7 +91,9 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 			log.error( "error during batch indexing: ", e );
 		}
 		finally {
+			if (upperSession == null) {
 				session.close();
+			}
 		}
 		log.trace( "finished" );
 	}
