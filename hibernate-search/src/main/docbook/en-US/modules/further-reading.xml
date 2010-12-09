@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  ~  indicated by the @author tags or express copyright attribution
+  ~  statements applied by the authors.  All third-party contributions are
+  ~  distributed under license by Red Hat, Inc.
+  ~
+  ~  This copyrighted material is made available to anyone wishing to use, modify,
+  ~  copy, or redistribute it subject to the terms and conditions of the GNU
+  ~  Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~  for more details.
+  ~
+  ~  You should have received a copy of the GNU Lesser General Public License
+  ~  along with this distribution; if not, write to:
+  ~  Free Software Foundation, Inc.
+  ~  51 Franklin Street, Fifth Floor
+  ~  Boston, MA  02110-1301  USA
+  -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../hsearch.ent">
+%BOOK_ENTITIES;
+]>
+<chapter>
+  <title id="chapter-further-reading">Further reading</title>
+
+  <para>Last but not least, a few pointers to further information. He highly
+  recommend you to get a copy <ulink
+  url="http://www.manning.com/bernard/">Hibernate Search in Action</ulink>.
+  This excellent book covers Hibernate Search in much more depth than this
+  online documentation can and has a great range of additional examples. If
+  you want to increase your knowledge in Lucene we recommend <ulink
+  url="http://www.manning.com/hatcher3/">Lucene in Action (Second
+  Edition)</ulink>. Because Hibernate Search's functionality is tightly
+  coupled to Hibernate Core is it a good idea to understand Hibernate in more
+  detail. Start with the <ulink url="http://www.hibernate.org/docs">online
+  documentation</ulink> or get hold of a copy of <ulink
+  url="http://www.manning.com/bauer2/">Java Persistence with
+  Hibernate</ulink>.</para>
+
+  <para>If you have any further questions regarding Hibernate Search or want
+  to share some of your use cases have a look at the <ulink
+  url="http://community.jboss.org/en/hibernate/search">Hibernate Search
+  Wiki</ulink> and the <ulink
+  url="https://forum.hibernate.org/viewforum.php?f=9">Hibernate Search
+  Forum</ulink>. We are looking forward hearing from you.</para>
+
+  <para>In case you would like to report a bug use the <ulink
+  url="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH">Hibernate
+  Search Jira</ulink> instance. Feedback is always welcome!</para>
+</chapter>
