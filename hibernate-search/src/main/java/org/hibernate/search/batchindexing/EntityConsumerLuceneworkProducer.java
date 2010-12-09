@@ -88,6 +88,8 @@ public class EntityConsumerLuceneworkProducer implements Runnable {
 		session.setDefaultReadOnly( true );
 		try {
 			Transaction transaction = session.beginTransaction();
+			Transaction transaction = Helper.getTransactionAndMarkForJoin( session );
+			transaction.begin();
 			indexAllQueue( session );
 			transaction.commit();
 		}

@@ -79,12 +79,16 @@ public class IdentifierConsumerEntityProducer implements Runnable {
 		session.setCacheMode( cacheMode );
 		session.setDefaultReadOnly( true );
 		try {
-			Transaction transaction = session.beginTransaction();
+			Transaction transaction = Helper.getTransactionAndMarkForJoin( session );
+			transaction.begin();
 			loadAllFromQueue( session );
 			transaction.commit();
 		}
+		catch (Throwable e) {
+			log.error( "error during batch indexing: ", e );
+		}
 		finally {
-			session.close();
+				session.close();
 		}
 		log.trace( "finished" );
 	}
