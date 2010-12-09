@@ -2,13 +2,14 @@ Hibernate Search Changelog
 ==========================
 
 3.3.0.CR2 (09-12-2010)
------------------------
+----------------------
 
 ** Bug
     * [HSEARCH-513] - Experiencing long delays when indexing entities saved in different transactions
     * [HSEARCH-577] - IllegalArgumentException when using @Proxy and trying to delete a loaded but proxied class
     * [HSEARCH-625] - Some errors triggered by Lucene are not catched by the ErrorHandler
     * [HSEARCH-635] - Remove build cycle and duplicate classes from hibernate-search-testing module
+    * [HSEARCH-640] - MassIndexer/JBoss 6: Could not register synchronization for container transaction
     * [HSEARCH-641] - idProvided flag in DocumentBuilderIndexedEntity is always false
 
 
@@ -33,7 +34,7 @@ Hibernate Search Changelog
 
 
 3.3.0.CR1 (08-11-2010)
------------------------
+----------------------
 
 ** Bug
     * [HSEARCH-513] - Experiencing long delays when indexing entities saved in different transactions
