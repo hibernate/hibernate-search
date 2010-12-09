@@ -270,12 +270,6 @@ public class Essay {
               </tbody>
             </tgroup>
           </informaltable></para>
-
-        <warning>
-          <para>The numeric field feature is still marked experimental in
-          Lucene and might change in incompatible ways in following
-          releases.</para>
-        </warning>
       </section>
 
       <section id="id-annotation">
@@ -858,7 +852,7 @@ public class MyEntity {
         url="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-593">HSEARCH-593</ulink>):<programlisting>&lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt; 
    &lt;artifactId&gt;hibernate-search-analyzers&lt;/artifactId&gt;
-  &lt;version&gt;&version;&lt;/version&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
 &lt;dependency&gt;</programlisting></para>
       </warning>
 
@@ -890,19 +884,19 @@ public class MyEntity {
         framework</title>
 
         <programlisting>@AnalyzerDef(name="customanalyzer",
-        charFilters = {
-                @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
-                    @Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
-                })
-        },
-        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-        filters = {
-                @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
-                @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-                @TokenFilterDef(factory = StopFilterFactory.class, params = {
-                    @Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
-                    @Parameter(name="ignoreCase", value="true")
-                })
+  charFilters = {
+    @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
+      @Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+    })
+  },
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = StopFilterFactory.class, params = {
+      @Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
+      @Parameter(name="ignoreCase", value="true")
+    })
 })
 public class Team {
     ...
@@ -925,20 +919,20 @@ public class Team {
         <title>Use a specific charset to load the property file</title>
 
         <programlisting>@AnalyzerDef(name="customanalyzer",
-        charFilters = {
-                @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
-                    @Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
-                })
-        },
-        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-        filters = {
-                @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
-                @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-                @TokenFilterDef(factory = StopFilterFactory.class, params = {
-                    @Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
-                    @Parameter(name="resource_charset", value = "UTF-16BE"),
-                    @Parameter(name="ignoreCase", value="true")
-                })
+  charFilters = {
+    @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
+      @Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+    })
+  },
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = StopFilterFactory.class, params = {
+      @Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
+      @Parameter(name="resource_charset", value = "UTF-16BE"),
+      @Parameter(name="ignoreCase", value="true")
+  })
 })
 public class Team {
     ...
@@ -1960,28 +1954,28 @@ mapping.entity(Address.class)
                .indexName("Address_Index"); //optional
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+        </example></para>
 
-          <para>As you can see you must first create a
-          <classname>SearchMapping</classname> object which is the root object
-          that is then passed to the <classname>Configuration</classname>
-          object as property. You must declare an entity and if you wish to
-          make that entity as indexable then you must call the
-          <methodname>indexed()</methodname> method. The <methodname>indexed()
-          </methodname>method has an optional <methodname>indexName(String
-          indexName)</methodname> which can be used to change the default
-          index name that is created by Hibernate Search. Using the annotation
-          model the above can be achieved as:</para>
+      <para>As you can see you must first create a
+      <classname>SearchMapping</classname> object which is the root object
+      that is then passed to the <classname>Configuration</classname> object
+      as property. You must declare an entity and if you wish to make that
+      entity as indexable then you must call the
+      <methodname>indexed()</methodname> method. The <methodname>indexed()
+      </methodname>method has an optional <methodname>indexName(String
+      indexName)</methodname> which can be used to change the default index
+      name that is created by Hibernate Search. Using the annotation model the
+      above can be achieved as:</para>
 
-          <para><example>
-              <title>Annotation example of indexing entity</title>
+      <example>
+        <title>Annotation example of indexing entity</title>
 
-              <programlisting>@Entity
+        <programlisting>@Entity
 @Indexed(index="Address_Index")
 public class Address {
 ....
 }</programlisting>
-            </example></para>
-        </example></para>
+      </example>
     </section>
 
     <section>
@@ -2000,15 +1994,16 @@ mapping.entity(Address.class).indexed()
                    .name("id");
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping);</programlisting>
+        </example></para>
 
-          <para>The above is equivalent to annotating a property in the entity
-          as <classname>@DocumentId</classname> as seen in the following
-          example:</para>
+      <para>The above is equivalent to annotating a property in the entity as
+      <classname>@DocumentId</classname> as seen in the following
+      example:</para>
 
-          <para><example>
-              <title>DocumentId annotation definition</title>
+      <para><example>
+          <title>DocumentId annotation definition</title>
 
-              <programlisting>@Entity
+          <programlisting>@Entity
 @Indexed
 public class Address {
  @Id
@@ -2018,9 +2013,10 @@ public class Address {
 
  ....
 }</programlisting>
-            </example></para>
-        </example> The next section demonstrates how to programmatically
-      define analyzers.</para>
+
+          <para> The next section demonstrates how to programmatically define
+          analyzers.</para>
+        </example></para>
     </section>
 
     <section>
@@ -2056,14 +2052,16 @@ mapping
                 .name("id");
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+        </example></para>
 
-          <para>The analyzer mapping defined above is equivalent to the
-          annotation model using <classname>@AnalyzerDef</classname> in
-          conjunction with <classname>@AnalyzerDefs</classname>:</para>
-        </example><example>
-          <title>Analyzer definition using annotation</title>
+      <para>The analyzer mapping defined above is equivalent to the annotation
+      model using <classname>@AnalyzerDef</classname> in conjunction with
+      <classname>@AnalyzerDefs</classname>:</para>
 
-          <programlisting>@Indexed
+      <example>
+        <title>Analyzer definition using annotation</title>
+
+        <programlisting>@Indexed
 @Entity
 @AnalyzerDefs({
   @AnalyzerDef(name = "ngram",
@@ -2094,7 +2092,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
 public class Address {
 ...
 }</programlisting>
-        </example></para>
+      </example>
     </section>
 
     <section>
@@ -2134,15 +2132,15 @@ mapping
                 .store(Store.NO);
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+        </example></para>
 
-          <para>The previous example can effectively been seen as annotating
-          your entity with <classname>@FullTextFilterDef</classname> like
-          below:</para>
-        </example><example>
-          <title>Using annotation to define full text filter
-          definition</title>
+      <para>The previous example can effectively been seen as annotating your
+      entity with <classname>@FullTextFilterDef</classname> like below:</para>
 
-          <programlisting>@Entity
+      <example>
+        <title>Using annotation to define full text filter definition</title>
+
+        <programlisting>@Entity
 @Indexed
 @AnalyzerDefs({
   @AnalyzerDef(name = "en",
@@ -2172,7 +2170,7 @@ public class Address {
  ......
  
 }</programlisting>
-        </example></para>
+      </example>
     </section>
 
     <section>
@@ -2209,14 +2207,16 @@ mapping
                 .analyzer("en");</emphasis>
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+        </example></para>
 
-          <para>The above example of marking fields as indexable is equivalent
-          to defining fields using <classname>@Field</classname> as seen
-          below:</para>
-        </example><example>
-          <title>Indexing fields using annotation</title>
+      <para>The above example of marking fields as indexable is equivalent to
+      defining fields using <classname>@Field</classname> as seen
+      below:</para>
 
-          <programlisting>@Entity
+      <example>
+        <title>Indexing fields using annotation</title>
+
+        <programlisting>@Entity
 @Indexed
 @AnalyzerDefs({
   @AnalyzerDef(name = "en",
@@ -2242,7 +2242,7 @@ public class Address {
 
  ......
 }</programlisting>
-        </example></para>
+      </example>
     </section>
 
     <section>
@@ -2280,13 +2280,15 @@ mappping
                 .prefix("catalog.items"); //optional</emphasis>
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+        </example></para>
 
-          <para>The next example shows the same definition using annotation
-          (<classname>@IndexEmbedded</classname>):</para>
-        </example><example>
-          <title>Using @IndexEmbedded</title>
+      <para>The next example shows the same definition using annotation
+      (<classname>@IndexEmbedded</classname>):</para>
 
-          <programlisting>@Entity
+      <example>
+        <title>Using @IndexEmbedded</title>
+
+        <programlisting>@Entity
 @Indexed
 public class ProductCatalog {
  @Id
@@ -2309,17 +2311,19 @@ public class ProductCatalog {
  ...
 
 }</programlisting>
-        </example></para>
+      </example>
     </section>
 
     <section>
       <title>Contained In definition</title>
 
       <para><classname>@ContainedIn</classname> can be define as seen in the
-      example below:<example>
-          <title>Programmatically defining ContainedIn</title>
+      example below:</para>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+      <example>
+        <title>Programmatically defining ContainedIn</title>
+
+        <programlisting>SearchMapping mapping = new SearchMapping();
 
 mappping
     .entity(ProductCatalog.class)
@@ -2340,14 +2344,15 @@ mappping
             <emphasis role="bold">.containedIn()</emphasis>;
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+      </example>
 
-          <para>This is equivalent to defining
-          <classname>@ContainedIn</classname> in your entity:</para>
+      <para>This is equivalent to defining <classname>@ContainedIn</classname>
+      in your entity:</para>
 
-          <para><example>
-              <title>Annotation approach for ContainedIn</title>
+      <para><example>
+          <title>Annotation approach for ContainedIn</title>
 
-              <programlisting>@Entity
+          <programlisting>@Entity
 @Indexed
 public class ProductCatalog {
  
@@ -2389,7 +2394,6 @@ public class Item {
 
  ...
 }</programlisting>
-            </example></para>
         </example></para>
     </section>
 
@@ -2421,14 +2425,16 @@ mapping
         <emphasis role="bold">.calendarBridge(Resolution.DAY)</emphasis>;
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+        </example></para>
 
-          <para>See below for defining the above using
-          <classname>@CalendarBridge</classname> and
-          <classname>@DateBridge</classname>:</para>
-        </example><example>
-          <title>@CalendarBridge and @DateBridge definition</title>
+      <para>See below for defining the above using
+      <classname>@CalendarBridge</classname> and
+      <classname>@DateBridge</classname>:</para>
 
-          <programlisting>@Entity
+      <example>
+        <title>@CalendarBridge and @DateBridge definition</title>
+
+        <programlisting>@Entity
 @Indexed
 public class Address {
  
@@ -2449,7 +2455,7 @@ public class Address {
 
  ...
 }</programlisting>
-        </example></para>
+      </example>
     </section>
 
     <section>
@@ -2482,14 +2488,15 @@ mapping
                     .param( "size", "4" )</emphasis>;
  
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+        </example></para>
 
-          <para>The above can equally be defined using annotations, as seen in
-          the next example.</para>
+      <para>The above can equally be defined using annotations, as seen in the
+      next example.</para>
 
-          <para><example>
-              <title>Defining field bridges using annotation</title>
+      <para><example>
+          <title>Defining field bridges using annotation</title>
 
-              <programlisting>@Entity
+          <programlisting>@Entity
 @Indexed
 
 public class Address {
@@ -2509,7 +2516,6 @@ public class Address {
 
  ...
 }</programlisting>
-            </example></para>
         </example></para>
     </section>
 
@@ -2544,12 +2550,15 @@ mapping
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 
 </programlisting>
+      </example>
 
-        <para>The above is similar to using <classname>@ClassBridge
-        </classname>as seen in the next example:<example>
-            <title>Using @ClassBridge</title>
+      <para>The above is similar to using <classname>@ClassBridge
+      </classname>as seen in the next example:</para>
 
-            <programlisting>@Entity
+      <example>
+        <title>Using @ClassBridge</title>
+
+        <programlisting>@Entity
 @Indexed
 @ClassBridges ( {
   @ClassBridge(name="branchnetwork",
@@ -2572,7 +2581,6 @@ public class Departments {
 ....
 
 }</programlisting>
-          </example></para>
       </example>
     </section>
 
@@ -2599,12 +2607,15 @@ mapping
       .store(Store.YES)
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
+      </example>
 
-        <para>The next example shows the equivalent mapping using the
-        <classname>@DynamicBoost</classname> annotation: <example>
-            <title>Using the @DynamicBoost</title>
+      <para>The next example shows the equivalent mapping using the
+      <classname>@DynamicBoost</classname> annotation:</para>
 
-            <programlisting>@Entity
+      <example>
+        <title>Using the @DynamicBoost</title>
+
+        <programlisting>@Entity
 @Indexed
 @DynamicBoost(impl = CustomBoostStrategy.class)
 public class DynamicBoostedDescriptionLibrary {
@@ -2627,7 +2638,6 @@ public class DynamicBoostedDescriptionLibrary {
  .......
 
 }</programlisting>
-          </example></para>
       </example>
     </section>
   </section>
