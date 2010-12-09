@@ -120,16 +120,20 @@ public class BatchIndexingWorkspace implements Runnable {
 			//first start the consumers, then the producers (reverse order):
 			for ( int i=0; i < luceneworkerBuildingThreadNum; i++ ) {
 			//from entity to LuceneWork:
-				execDocBuilding.execute( new EntityConsumerLuceneworkProducer(
+				final EntityConsumerLuceneworkProducer producer = new EntityConsumerLuceneworkProducer(
 						fromEntityToAddwork, monitor,
 						sessionFactory, producerEndSignal, searchFactory,
-						cacheMode, backend) );
+						cacheMode, backend
+				);
+				execDocBuilding.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
 			}
 			for ( int i=0; i < objectLoadingThreadNum; i++ ) {
 			//from primary key to loaded entity:
-				execFirstLoader.execute( new IdentifierConsumerEntityProducer(
+				final IdentifierConsumerEntityProducer producer = new IdentifierConsumerEntityProducer(
 						fromIdentifierListToEntities, fromEntityToAddwork, monitor,
-						sessionFactory, cacheMode, indexedType) );
+						sessionFactory, cacheMode, indexedType
+				);
+				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
 			}
 			//from class definition to all primary keys:
 			execIdentifiersLoader.execute( new IdentifierProducer(
