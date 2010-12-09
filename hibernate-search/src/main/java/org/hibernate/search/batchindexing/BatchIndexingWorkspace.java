@@ -136,10 +136,12 @@ public class BatchIndexingWorkspace implements Runnable {
 				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
 			}
 			//from class definition to all primary keys:
-			execIdentifiersLoader.execute( new IdentifierProducer(
+			final IdentifierProducer producer = new IdentifierProducer(
 					fromIdentifierListToEntities, sessionFactory,
 					objectLoadingBatchSize, indexedType, monitor,
-					objectsLimit ) );
+					objectsLimit
+			);
+			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
 			
 			//shutdown all executors:
 			execIdentifiersLoader.shutdown();

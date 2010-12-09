@@ -89,6 +89,9 @@ public class IdentifierProducer implements Runnable {
 		try {
 			inTransactionWrapper();
 		}
+		catch (Throwable e) {
+			log.error( "error during batch indexing: ", e );
+		}
 		finally{
 			destination.producerStopping();
 		}
@@ -99,6 +102,8 @@ public class IdentifierProducer implements Runnable {
 		StatelessSession session = sessionFactory.openStatelessSession();
 		try {
 			Transaction transaction = session.beginTransaction();
+			Transaction transaction = Helper.getTransactionAndMarkForJoin( session );
+			transaction.begin();
 			loadAllIdentifiers( session );
 			transaction.commit();
 		} catch (InterruptedException e) {
