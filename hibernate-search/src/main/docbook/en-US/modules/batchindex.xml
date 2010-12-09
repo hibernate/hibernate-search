@@ -219,12 +219,12 @@ transaction.commit();</programlisting>
         <title>Index rebuilding using a MassIndexer</title>
 
         <programlisting>fullTextSession.createIndexer().startAndWait();</programlisting>
-
-        <para>This will rebuild the index, deleting it and then reloading all
-        entities from the database. Although it's simple to use, some tweaking
-        is recommended to speed up the process: there are several parameters
-        configurable.</para>
       </example>
+
+      <para>This will rebuild the index, deleting it and then reloading all
+      entities from the database. Although it's simple to use, some tweaking
+      is recommended to speed up the process: there are several parameters
+      configurable.</para>
 
       <warning>
         <para>During the progress of a MassIndexer the content of the index is
@@ -237,27 +237,26 @@ transaction.commit();</programlisting>
         <title>Using a tuned MassIndexer</title>
 
         <programlisting>fullTextSession
-	.createIndexer( User.class )
-	.batchSizeToLoadObjects( 25 )
-	.cacheMode( CacheMode.NORMAL )
-	.threadsToLoadObjects( 5 )
-	.threadsForSubsequentFetching( 20 )
-	.startAndWait();</programlisting>
-
-        <para>This will rebuild the index of all User instances (and
-        subtypes), and will create 5 parallel threads to load the User
-        instances using batches of 25 objects per query; these loaded User
-        instances are then pipelined to 20 parallel threads to load the
-        attached lazy collections of User containing some information needed
-        for the index.</para>
-
-        <para>It is recommended to leave cacheMode to
-        <literal>CacheMode.IGNORE</literal> (the default), as in most
-        reindexing situations the cache will be a useless additional overhead;
-        it might be useful to enable some other <literal>CacheMode</literal>
-        depending on your data: it might increase performance if the main
-        entity is relating to enum-like data included in the index.</para>
+ .createIndexer( User.class )
+ .batchSizeToLoadObjects( 25 )
+ .cacheMode( CacheMode.NORMAL )
+ .threadsToLoadObjects( 5 )
+ .threadsForSubsequentFetching( 20 )
+ .startAndWait();</programlisting>
       </example>
+
+      <para>This will rebuild the index of all User instances (and subtypes),
+      and will create 5 parallel threads to load the User instances using
+      batches of 25 objects per query; these loaded User instances are then
+      pipelined to 20 parallel threads to load the attached lazy collections
+      of User containing some information needed for the index.</para>
+
+      <para>It is recommended to leave cacheMode to
+      <literal>CacheMode.IGNORE</literal> (the default), as in most reindexing
+      situations the cache will be a useless additional overhead; it might be
+      useful to enable some other <literal>CacheMode</literal> depending on
+      your data: it might increase performance if the main entity is relating
+      to enum-like data included in the index.</para>
 
       <tip>
         <para>The "sweet spot" of number of threads to achieve best
