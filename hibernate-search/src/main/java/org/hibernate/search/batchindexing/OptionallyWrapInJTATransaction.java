@@ -1,8 +1,10 @@
 package org.hibernate.search.batchindexing;
 
+import javax.naming.InitialContext;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.slf4j.Logger;
 
@@ -42,17 +44,22 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 	public void run() {
 		final boolean wrapInTransaction = wrapInTransaction();
 		if (wrapInTransaction) {
-			final TransactionManager transactionManager = factory.getTransactionManager();
+			UserTransaction transaction = null;
 			try {
-				transactionManager.begin();
+				//nasty as we don't pass properties to the InitialContext construction
+				transaction = (UserTransaction) new InitialContext().lookup(
+						factory.getSettings().getTransactionManagerLookup().getUserTransactionName()
+				);
+				//transactionManager.begin() does not seem to work in JBoss AS
+				transaction.begin();
 				delegate.run();
-				transactionManager.commit();
+				transaction.commit();
 			}
 			catch (Throwable e) {
 				//TODO exception handling seems messy-ish
 				log.error( "Error while executing runnable wrapped in a JTA transaction", e );
 				try {
-					transactionManager.rollback();
+					if ( transaction != null ) transaction.rollback();
 				}
 				catch ( SystemException e1 ) {
 					// we already have an exception, don't propagate this one
@@ -69,7 +76,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 		final TransactionFactory transactionFactory = factory.getSettings().getTransactionFactory();
 		if ( !transactionFactory.isTransactionManagerRequired() ) {
 			//Today we only require a TransactionManager on JTA based transaction factories
-			log.trace( "TransactionFactory does nto require a TransactionManager: don't wrap in a JTA transaction" );
+			log.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );
 			return false;
 		}
 		final TransactionManager transactionManager = factory.getTransactionManager();
