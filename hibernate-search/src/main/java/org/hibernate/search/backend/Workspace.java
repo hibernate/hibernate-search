@@ -149,10 +149,10 @@ public class Workspace {
 	 * Gets the IndexWriter, opening one if needed.
 	 * @param batchmode when true the indexWriter settings for batch mode will be applied.
 	 * Ignored if IndexWriter is open already.
-	 * @param builder might contain some context useful to provide when handling IOExceptions
+	 * @param errorContextBuilder might contain some context useful to provide when handling IOExceptions
 	 * @return a new IndexWriter or one already open.
 	 */
-	public synchronized IndexWriter getIndexWriter(boolean batchmode, ErrorContextBuilder builder) {
+	public synchronized IndexWriter getIndexWriter(boolean batchmode, ErrorContextBuilder errorContextBuilder) {
 		if ( writer != null )
 			return writer;
 		try {
@@ -165,7 +165,7 @@ public class Workspace {
 		}
 		catch ( IOException ioe ) {
 			writer = null;
-			handleIOException( ioe, builder );
+			handleIOException( ioe, errorContextBuilder );
 		}
 		return writer;
 	}
@@ -179,16 +179,16 @@ public class Workspace {
 
 	/**
 	 * Commits changes to a previously opened IndexWriter.
-	 * @param builder use it to handle exceptions, as it might contain a reference to the work performed before the commit
+	 * @param errorContextBuilder use it to handle exceptions, as it might contain a reference to the work performed before the commit
 	 */
-	public synchronized void commitIndexWriter(ErrorContextBuilder builder) {
+	public synchronized void commitIndexWriter(ErrorContextBuilder errorContextBuilder) {
 		if ( writer != null ) {
 			try {
 				writer.commit();
 				log.trace( "Index changes commited." );
 			}
 			catch ( IOException ioe ) {
-				handleIOException( ioe, builder );
+				handleIOException( ioe, errorContextBuilder );
 			}
 		}
 	}
@@ -258,15 +258,15 @@ public class Workspace {
 	
 	/**
 	 * @param ioe The exception to handle
-	 * @param errorBuilder Might be used to enqueue useful information about the lost operations, or be null
+	 * @param errorContextBuilder Might be used to enqueue useful information about the lost operations, or be null
 	 */
-	private void handleIOException(IOException ioe, ErrorContextBuilder errorBuilder) {
+	private void handleIOException(IOException ioe, ErrorContextBuilder errorContextBuilder) {
 		if ( log.isTraceEnabled() ) {
 			log.trace( "going to handle IOException", ioe );
 		}
 		final ErrorContext errorContext;
-		if ( errorBuilder != null ) {
-			errorContext = errorBuilder.errorThatOccurred( ioe ).createErrorContext();
+		if ( errorContextBuilder != null ) {
+			errorContext = errorContextBuilder.errorThatOccurred( ioe ).createErrorContext();
 		}
 		else {
 			 errorContext = new SingleErrorContext( ioe );

@@ -97,16 +97,16 @@ class PerDPQueueProcessor implements Runnable {
 			return;
 		}
 		log.debug( "Opening an IndexWriter for update" );
-		ErrorContextBuilder builder = new ErrorContextBuilder();
-		builder.allWorkToBeDone( workOnWriter );
+		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
+		errorContextBuilder.allWorkToBeDone( workOnWriter );
 		try {
-			IndexWriter indexWriter = workspace.getIndexWriter( batchmode, builder );
+			IndexWriter indexWriter = workspace.getIndexWriter( batchmode, errorContextBuilder );
 			try {
 				for ( LuceneWork lw : workOnWriter ) {
 					lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
-					builder.workCompleted( lw );
+					errorContextBuilder.workCompleted( lw );
 				}
-				workspace.commitIndexWriter( builder );
+				workspace.commitIndexWriter( errorContextBuilder );
 				performOptimizations();
 			}
 			finally {
@@ -117,7 +117,7 @@ class PerDPQueueProcessor implements Runnable {
 			//needs to be attempted even for out of memory errors, therefore we catch Throwable
 			log.error( "Unexpected error in Lucene Backend: ", tw );
 			try {
-				handler.handle( builder.errorThatOccurred( tw ).createErrorContext() );
+				handler.handle( errorContextBuilder.errorThatOccurred( tw ).createErrorContext() );
 				workspace.closeIndexWriter();
 			}
 			finally {
