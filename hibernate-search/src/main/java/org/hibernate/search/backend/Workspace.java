@@ -31,11 +31,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.Similarity;
 import org.slf4j.Logger;
 
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorContext;
@@ -157,6 +159,8 @@ public class Workspace {
 			writer = new IndexWriter( directoryProvider.getDirectory(), SIMPLE_ANALYZER, false, maxFieldLength ); // has been created at init time
 			indexingParams.applyToWriter( writer, batchmode );
 			writer.setSimilarity( similarity );
+			MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler );
+			writer.setMergeScheduler( mergeScheduler );
 			log.trace( "IndexWriter opened" );
 		}
 		catch ( IOException ioe ) {
