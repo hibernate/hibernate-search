@@ -31,11 +31,12 @@
   <title>Querying</title>
 
   <para>The second most important capability of Hibernate Search is the
-  ability to execute a Lucene query and retrieve entities managed by an
-  Hibernate session, providing the power of Lucene without leaving the
-  Hibernate paradigm, and giving another dimension to the Hibernate classic
-  search mechanisms (HQL, Criteria query, native SQL query). Preparing and
-  executing a query consists of four simple steps:</para>
+  ability to execute Lucene queries and retrieve entities managed by a
+  Hibernate session. The search provides the power of Lucene without leaving
+  the Hibernate paradigm, giving another dimension to the Hibernate classic
+  search mechanisms (HQL, Criteria query, native SQL query).</para>
+
+  <para>Preparing and executing a query consists of four simple steps:</para>
 
   <itemizedlist>
     <listitem>
@@ -48,7 +49,7 @@
     </listitem>
 
     <listitem>
-      <para>Wrapping the Lucene query using a
+      <para>Wrapping the Lucene query using an
       <classname>org.hibernate.Query</classname></para>
     </listitem>
 
@@ -91,11 +92,12 @@ org.apache.lucene.search.Query luceneQuery =
 org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
 List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
 
-  <para>You can alternatively write your Lucene query either using the query
-  parser or the programmatic API.</para>
+  <para>You can alternatively write your Lucene query either using the Lucene
+  query parser or Lucene programmatic API.</para>
 
   <example>
-    <title>Creating a Lucene query from scratch via the query parser</title>
+    <title>Creating a Lucene query via the
+    <classname>QueryParser</classname></title>
 
     <programlisting language="JAVA" role="JAVA"><emphasis role="bold">SearchFactory searchFactory = fullTextSession.getSearchFactory();
 org.apache.lucene.queryParser.QueryParser parser = 
@@ -111,12 +113,14 @@ org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery(luceneQu
 List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
   </example>
 
-  <para>The Hibernate query built on top of the Lucene query is a regular
-  <literal>org.hibernate.Query</literal>, which means you are in the same
-  paradigm as the other Hibernate query facilities (HQL, Native or Criteria).
-  The regular <literal>list()</literal> , <literal>uniqueResult()</literal>,
-  <literal>iterate()</literal> and <literal>scroll()</literal> methods can be
-  used.</para>
+  <note>
+    <para>The Hibernate query built on top of the Lucene query is a regular
+    <literal>org.hibernate.Query</literal>, which means you are in the same
+    paradigm as the other Hibernate query facilities (HQL, Native or
+    Criteria). The regular <literal>list()</literal> ,
+    <literal>uniqueResult()</literal>, <literal>iterate()</literal> and
+    <literal>scroll()</literal> methods can be used.</para>
+  </note>
 
   <para>In case you are using the Java Persistence APIs of Hibernate, the same
   extensions exist:</para>
@@ -144,12 +148,14 @@ org.apache.lucene.search.Query luceneQuery =
 List result = fullTextQuery.getResultList(); //return a list of managed objects  </programlisting>
   </example>
 
-  <para>The following examples we will use the Hibernate APIs but the same
-  example can be easily rewritten with the Java Persistence API by just
-  adjusting the way the <classname>FullTextQuery</classname> is
-  retrieved.</para>
+  <note>
+    <para>The following examples we will use the Hibernate APIs but the same
+    example can be easily rewritten with the Java Persistence API by just
+    adjusting the way the <classname>FullTextQuery</classname> is
+    retrieved.</para>
+  </note>
 
-  <section>
+  <section id="section-building-lucene-queries">
     <title>Building queries</title>
 
     <para>Hibernate Search queries are built on top of Lucene queries which
@@ -161,15 +167,12 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
     <section id="search-query-lucene-api">
       <title>Building a Lucene query using the Lucene API</title>
 
-      <para>You have several options: use the query parser (fine for simple
-      queries) or the Lucene programmatic API (for more complex use cases).
-      Particularly if you plan on using the programmatic API, we highly
-      recommend you have a look at the Hibernate Search query DSL.</para>
-
-      <para>It is out of the scope of this documentation on how to exactly
-      build a Lucene query. Please refer to the online Lucene documentation or
-      get hold of a copy of either Lucene In Action or Hibernate Search in
-      Action.</para>
+      <para>Using the Lucene API, you have several options. You can use the
+      query parser (fine for simple queries) or the Lucene programmatic API
+      (for more complex use cases). It is out of the scope of this
+      documentation on how to exactly build a Lucene query. Please refer to
+      the online Lucene documentation or get hold of a copy of Lucene In
+      Action or Hibernate Search in Action.</para>
     </section>
 
     <section id="search-query-querydsl">
@@ -184,9 +187,8 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       for example use several ngrams as the tokens for a given word and should
       be searched as such).</para>
 
-      <para>Hibernate Search query DSL make use of a style of API called a
-      fluent API. This is a fancy name for an API that has a few key
-      characteristics:</para>
+      <para>The Hibernate Search query DSL makes use of a style of API called
+      a fluent API. This API has a few key characteristics:</para>
 
       <itemizedlist>
         <listitem>
@@ -204,11 +206,7 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
         </listitem>
 
         <listitem>
-          <para>it's easy to use</para>
-        </listitem>
-
-        <listitem>
-          <para>it's even easier to read</para>
+          <para>it's easy to use and even easier to read</para>
         </listitem>
       </itemizedlist>
 
@@ -217,95 +215,101 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
       <classname>QueryBuilder</classname> will know what analyzer to use and
       what field bridge to apply. You can create several
       <classname>QueryBuilder</classname>s (one for each entity type involved
-      in the root of your query. You get the
+      in the root of your query). You get the
       <classname>QueryBuilder</classname> from the
       <classname>SearchFactory</classname>.</para>
 
-      <programlisting language="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory
-    .buildQueryBuilder().forEntity( Myth.class ).get();</programlisting>
+      <programlisting language="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory.buildQueryBuilder().forEntity( Myth.class ).get();</programlisting>
 
       <para>You can also override the analyzer used for a given field or
       fields. This is rarely needed and should be avoided unless you know what
-      you are doing (like many things :)).</para>
+      you are doing.</para>
 
       <programlisting language="JAVA" role="JAVA">QueryBuilder mythQB = searchFactory.buildQueryBuilder()
     .forEntity( Myth.class )
         .overridesForField("history","stem_analyzer_definition")
     .get();</programlisting>
 
-      <para>From the query builder, you are then ready to... build queries.
-      What's interesting is that we build Lucene queries: you can easily mix
-      and match Lucene's query parser generated <classname>Query</classname>
-      objects or a <classname>Query</classname> object you have assembled with
-      the Lucene programmatic API and use them with the Hibernate Search DSL
-      should the DSL be missing some queries.</para>
+      <para>Using the query builder, you can then build queries. It is
+      important to realize that the end result of a
+      <classname>QueryBuilder</classname> is a Lucene query. For this reason
+      you can easily mix and match queries generated via Lucene's query parser
+      or <classname>Query</classname> objects you have assembled with the
+      Lucene programmatic API and use them with the Hibernate Search DSL. Just
+      in case the DSL is missing some features.</para>
 
-      <para>Here is how you search for a specific word:</para>
+      <section>
+        <title>Keyword queries</title>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = 
-    mythQB.keyword().onField("history").matching("storm").createQuery();</programlisting>
+        <para>Let's start with the most basic use case - searching for a
+        specific word:</para>
 
-      <para><methodname>keyword()</methodname> means that you are trying to
-      find a specific word. <methodname>onField()</methodname> tells in which
-      Lucene field to look. <methodname>matching()</methodname> tells what to
-      look for. And finally <methodname>createQuery()</methodname> does create
-      the Lucene query object. A lot is going on with this line of
-      code.</para>
+        <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB.keyword().onField("history").matching("storm").createQuery();</programlisting>
 
-      <itemizedlist>
-        <listitem>
-          <para>The value storm is passed through the
-          <literal>history</literal> <classname>FieldBridge</classname>: it
-          does not matter here but you will see that it's quite handy when
-          dealing with numbers or dates.</para>
-        </listitem>
+        <para><methodname>keyword()</methodname> means that you are trying to
+        find a specific word. <methodname>onField()</methodname> specifies in
+        which Lucene field to look. <methodname>matching()</methodname> tells
+        what to look for. And finally <methodname>createQuery()</methodname>
+        creates the Lucene query object. A lot is going on with this line of
+        code.</para>
 
-        <listitem>
-          <para>The field bridge value is then passed to the analyzer used to
-          index <literal>history</literal>. This ensures that the query uses
-          the same term transformation than the indexing (lower case, n-gram,
-          stemming and so on). If the analyzing process generates several
-          terms for a given word, a boolean query is used with the
-          <literal>SHOULD</literal> logic (roughly an <literal>OR</literal>
-          logic).</para>
-        </listitem>
-      </itemizedlist>
+        <itemizedlist>
+          <listitem>
+            <para>The value storm is passed through the
+            <literal>history</literal> <classname>FieldBridge</classname>: it
+            does not matter here but you will see that it's quite handy when
+            dealing with numbers or dates.</para>
+          </listitem>
 
-      <para>Let's see how you can search a property that is not of type
-      string.</para>
+          <listitem>
+            <para>The field bridge value is then passed to the analyzer used
+            to index the field <literal>history</literal>. This ensures that
+            the query uses the same term transformation than the indexing
+            (lower case, n-gram, stemming and so on). If the analyzing process
+            generates several terms for a given word, a boolean query is used
+            with the <literal>SHOULD</literal> logic (roughly an
+            <literal>OR</literal> logic).</para>
+          </listitem>
+        </itemizedlist>
 
-      <programlisting language="JAVA" role="JAVA">@Entity @Indexed 
+        <para>Let's see how you can search a property that is not of type
+        string.</para>
+
+        <programlisting language="JAVA" role="JAVA">@Entity 
+@Indexed 
 public class Myth {
-  @Field(index = Index.UN_TOKENIZED) @DateBridge(resolution = Resolution.YEAR)
+  @Field(index = Index.UN_TOKENIZED) 
+  @DateBridge(resolution = Resolution.YEAR)
   public Date getCreationDate() { return creationDate; }
   public Date setCreationDate(Date creationDate) { this.creationDate = creationDate; }
   private Date creationDate;
   
-  [...]
+  ...
 }
 
 Date birthdate = ...;
-Query luceneQuery = 
-    mythQb.keywork().onField("creationDate").matching(birthdate).createQuery();
+Query luceneQuery = mythQb.keywork().onField("creationDate").matching(birthdate).createQuery();
 </programlisting>
 
-      <note>
-        <para>In plain Lucene, you would have had to convert the
-        <classname>Date</classname> object to its string representation (in
-        this case the year).</para>
-      </note>
+        <note>
+          <para>In plain Lucene, you would have had to convert the
+          <classname>Date</classname> object to its string representation (in
+          this case the year).</para>
+        </note>
 
-      <para>This works for any object, not just <classname>Date</classname>,
-      provided that the <classname>FieldBridge</classname> has an
-      <methodname>objectToString</methodname> method (all built-in
-      <classname>FieldBridge</classname> implementations do).</para>
+        <para>This conversion works for any object, not just
+        <classname>Date</classname>, provided that the
+        <classname>FieldBridge</classname> has an
+        <methodname>objectToString</methodname> method (and all built-in
+        <classname>FieldBridge</classname> implementations do).</para>
 
-      <para>Let's now have a look at how to search a field that uses ngram
-      analyzers. ngram analyzers do index the succession of ngrams of your
-      words which helps to recover from user typos. For example the 3-grams of
-      the word hibernate are hib, ibe, ber, rna, nat, ate.</para>
+        <para>We make the example a little more advanced now and have a look
+        at how to search a field that uses ngram analyzers. ngram analyzers
+        index succession of ngrams of your words which helps to recover from
+        user typos. For example the 3-grams of the word hibernate are hib,
+        ibe, ber, rna, nat, ate.</para>
 
-      <programlisting language="JAVA" role="JAVA">@AnalyzerDef(name = "ngram",
+        <programlisting language="JAVA" role="JAVA">@AnalyzerDef(name = "ngram",
   tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class ),
   filters = {
     @TokenFilterDef(factory = StandardFilterFactory.class),
@@ -317,7 +321,8 @@ Query luceneQuery =
         @Parameter(name = "maxGramSize", value = "3") } )
   }
 )
-@Entity @Indexed 
+@Entity 
+@Indexed 
 public class Myth {
   @Field(analyzer=@Analyzer(definition="ngram") 
   @DateBridge(resolution = Resolution.YEAR)
@@ -325,46 +330,47 @@ public class Myth {
   public String setName(Date name) { this.name = name; }
   private String name;
   
-  [...]
+  ...
 }
 
 Date birthdate = ...;
 Query luceneQuery = mythQb.keyword().onField("name").matching("Sisiphus").createQuery();
 </programlisting>
 
-      <para>The matching word "Sisiphus" will be lower-cased and then split
-      into 3-grams: sis, isi, sip, phu, hus. Each of these n-gram will be part
-      of the query. We will then be able to find the Sysiphus myth (with a
-      <literal>y</literal>). All that is transparently done for you.</para>
+        <para>The matching word "Sisiphus" will be lower-cased and then split
+        into 3-grams: sis, isi, sip, phu, hus. Each of these n-gram will be
+        part of the query. We will then be able to find the Sysiphus myth
+        (with a <literal>y</literal>). All that is transparently done for
+        you.</para>
 
-      <note>
-        <para>If for some reason you do not want a specific field to use the
-        field bridge or the analyzer you can call the
-        <methodname>ignoreAnalyzer()</methodname> or
-        <methodname>ignoreFieldBridge()</methodname> functions</para>
-      </note>
+        <note>
+          <para>If for some reason you do not want a specific field to use the
+          field bridge or the analyzer you can call the
+          <methodname>ignoreAnalyzer()</methodname> or
+          <methodname>ignoreFieldBridge()</methodname> functions</para>
+        </note>
 
-      <para>To search for multiple possible words in the same field, simply
-      add them all in the matching clause.</para>
+        <para>To search for multiple possible words in the same field, simply
+        add them all in the matching clause.</para>
 
-      <programlisting language="JAVA" role="JAVA">//search document with storm or lightning in their history
+        <programlisting language="JAVA" role="JAVA">//search document with storm or lightning in their history
 Query luceneQuery = 
     mythQB.keyword().onField("history").matching("storm lightning").createQuery();</programlisting>
 
-      <para>To search the same word on multiple fields, use the
-      <methodname>onFields</methodname> method.</para>
+        <para>To search the same word on multiple fields, use the
+        <methodname>onFields</methodname> method.</para>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+        <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .keyword()
     .onFields("history","description","name")
     .matching("storm")
     .createQuery();</programlisting>
 
-      <para>Sometimes, one field should be treated differently from another
-      field even if searching the same term, you can use the
-      <methodname>andField()</methodname> method for that.</para>
+        <para>Sometimes, one field should be treated differently from another
+        field even if searching the same term, you can use the
+        <methodname>andField()</methodname> method for that.</para>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB.keyword()
+        <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB.keyword()
     .onField("history")
     .andField("name")
       .boostedTo(5)
@@ -372,12 +378,17 @@ Query luceneQuery =
     .matching("storm")
     .createQuery();</programlisting>
 
-      <para>In the previous example, only field name is boosted to 5.</para>
+        <para>In the previous example, only field name is boosted to 5.</para>
+      </section>
 
-      <para>To do a fuzzy query (using the Levenshtein distance), start as a
-      <literal>keyword</literal> query and add the fuzzy flag.</para>
+      <section>
+        <title>Fuzzy queries</title>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+        <para>To execute a fuzzy query (based on the Levenshtein distance
+        algorithm), start like a <literal>keyword</literal> query and add the
+        fuzzy flag.</para>
+
+        <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .keyword()
       .fuzzy()
         .withThreshold( .8f )
@@ -386,59 +397,73 @@ Query luceneQuery =
     .matching("starm")
     .createQuery();</programlisting>
 
-      <para><literal>threshold</literal> is the limit above which two terms
-      are considering matching. It's a decimal between 0 and 1 and defaults to
-      0.5. <literal>prefixLength</literal> is the length of the prefix ignored
-      by the "fuzzyness": while it defaults to 0, a non zero value is
-      recommended for indexes containing a huge amount of distinct
-      terms.</para>
+        <para><literal>threshold</literal> is the limit above which two terms
+        are considering matching. It's a decimal between 0 and 1 and defaults
+        to 0.5. <literal>prefixLength</literal> is the length of the prefix
+        ignored by the "fuzzyness": while it defaults to 0, a non zero value
+        is recommended for indexes containing a huge amount of distinct
+        terms.</para>
+      </section>
 
-      <para>You can also do wildcard queries (queries where some of parts of
-      the word are unknown. <literal>?</literal> represents a single character
-      and <literal>*</literal> represents any character sequence. Note that
-      for performance purposes, it is recommended that the query does not
-      start with either <literal>?</literal> or <literal>*</literal>.</para>
+      <section>
+        <title>Wildcard queries</title>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+        <para>You can also execute wildcard queries (queries where some of
+        parts of the word are unknown). <literal>?</literal> represents a
+        single character and <literal>*</literal> represents any character
+        sequence. Note that for performance purposes, it is recommended that
+        the query does not start with either <literal>?</literal> or
+        <literal>*</literal>.</para>
+
+        <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .keyword()
       .wildcard()
     .onField("history")
     .matching("sto*")
     .createQuery();</programlisting>
 
-      <note>
-        <para>Wildcard queries do not apply the analyzer on the matching
-        terms. Otherwise the risk of <literal>*</literal> or
-        <literal>?</literal> being mangled is too high.</para>
-      </note>
+        <note>
+          <para>Wildcard queries do not apply the analyzer on the matching
+          terms. Otherwise the risk of <literal>*</literal> or
+          <literal>?</literal> being mangled is too high.</para>
+        </note>
+      </section>
 
-      <para>So far we have been looking for words or sets of words, you can
-      also search exact or approximate sentences. Use the
-      <methodname>phrase()</methodname> query.</para>
+      <section>
+        <title>Phrase queries</title>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+        <para>So far we have been looking for words or sets of words, you can
+        also search exact or approximate sentences. Use
+        <methodname>phrase()</methodname> to do so.</para>
+
+        <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .phrase()
     .onField("history")
     .matching("Thou shalt not kill")
     .createQuery();</programlisting>
 
-      <para>You can search approximate sentences by adding a slop factor. The
-      slop factor represents the number of other words permitted in the
-      sentence: this works like a within or near operator</para>
+        <para>You can search approximate sentences by adding a slop factor.
+        The slop factor represents the number of other words permitted in the
+        sentence: this works like a within or near operator</para>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+        <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .phrase()
       .withSlop(3)
     .onField("history")
     .matching("Thou kill")
     .createQuery();</programlisting>
+      </section>
 
-      <para>We are done with queries related to a given word. You can also do
-      range queries (on numbers, dates, strings etc). You can look for a value
-      in between boundaries (included or not) and for a value below or above a
-      given boundary (included or not).</para>
+      <section>
+        <title>Range queries</title>
 
-      <programlisting language="JAVA" role="JAVA">//look for 0 &lt;= starred &lt; 3
+        <para>After looking at all these query examples for searching for to a
+        given word, it is time to introduce range queries (on numbers, dates,
+        strings etc). A range query searches for a value in between given
+        boundaries (included or not) or for a value below or above a given
+        boundary (included or not).</para>
+
+        <programlisting language="JAVA" role="JAVA">//look for 0 &lt;= starred &lt; 3
 Query luceneQuery = mythQB
     .range()
     .onField("starred")
@@ -452,30 +477,34 @@ Query luceneQuery = mythQB
     .onField("creationDate")
     .below(beforeChrist).excludeLimit()
     .createQuery();</programlisting>
+      </section>
 
-      <para>Finally, you can aggregate queries together to create more complex
-      queries. These aggregation operators are known as boolean queries where
-      the operators are:</para>
+      <section>
+        <title>Combining queries</title>
 
-      <itemizedlist>
-        <listitem>
-          <para><literal>SHOULD</literal>: the query query should contain the
-          matching elements of the subquery</para>
-        </listitem>
+        <para>Finally, you can aggregate (combine) queries to create more
+        complex queries. The following aggregation operators are
+        available:</para>
 
-        <listitem>
-          <para><literal>MUST</literal>: the query must contain the matching
-          elements of the subquery</para>
-        </listitem>
+        <itemizedlist>
+          <listitem>
+            <para><literal>SHOULD</literal>: the query query should contain
+            the matching elements of the subquery</para>
+          </listitem>
 
-        <listitem>
-          <para><literal>MUST NOT</literal>: the query must not contain the
-          matching elements of the subquery</para>
-        </listitem>
-      </itemizedlist>
+          <listitem>
+            <para><literal>MUST</literal>: the query must contain the matching
+            elements of the subquery</para>
+          </listitem>
 
-      <para>The subqueries can be any Lucene query including a boolean query
-      itself. Let's look at a few examples:<programlisting><!--TODO role JAVA fails here. needs to investigate-->//look for popular modern myths that are not urban
+          <listitem>
+            <para><literal>MUST NOT</literal>: the query must not contain the
+            matching elements of the subquery</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>The subqueries can be any Lucene query including a boolean query
+        itself. Let's look at a few examples:<programlisting><!--TODO role JAVA fails here. needs to investigate-->//look for popular modern myths that are not urban
 Date twentiethCentury = ...;
 Query luceneQuery = mythQB
     .bool()
@@ -506,42 +535,48 @@ Query luceneQuery = mythQB
         .createQuery() 
       )
     .createQuery();</programlisting></para>
+      </section>
 
-      <para>You can apply some options to query types and fields:</para>
+      <section>
+        <title>Query options</title>
 
-      <itemizedlist>
-        <listitem>
-          <para><methodname>boostedTo</methodname> (on query type and on
-          field): boost the whole query or the specific field to a given
-          factor</para>
-        </listitem>
+        <para>We already have seen several query options in the previous
+        example, but lets summarize again the options for query types and
+        fields:</para>
 
-        <listitem>
-          <para><methodname>withConstantScore</methodname> (on query): all
-          results matching the query have a constant score equals to the
-          boost</para>
-        </listitem>
+        <itemizedlist>
+          <listitem>
+            <para><methodname>boostedTo</methodname> (on query type and on
+            field): boost the whole query or the specific field to a given
+            factor</para>
+          </listitem>
 
-        <listitem>
-          <para><methodname>filteredBy(Filter) </methodname>(on query): filter
-          query results using the <classname>Filter</classname>
-          instance</para>
-        </listitem>
+          <listitem>
+            <para><methodname>withConstantScore</methodname> (on query): all
+            results matching the query have a constant score equals to the
+            boost</para>
+          </listitem>
 
-        <listitem>
-          <para><methodname>ignoreAnalyzer</methodname> (on field): ignore the
-          analyzer when processing this field</para>
-        </listitem>
+          <listitem>
+            <para><methodname>filteredBy(Filter) </methodname>(on query):
+            filter query results using the <classname>Filter</classname>
+            instance</para>
+          </listitem>
 
-        <listitem>
-          <para><methodname>ignoreFieldBridge</methodname> (on field): ignore
-          field bridge when processing this field</para>
-        </listitem>
-      </itemizedlist>
+          <listitem>
+            <para><methodname>ignoreAnalyzer</methodname> (on field): ignore
+            the analyzer when processing this field</para>
+          </listitem>
 
-      <para>Let's check out an example using some of these options</para>
+          <listitem>
+            <para><methodname>ignoreFieldBridge</methodname> (on field):
+            ignore field bridge when processing this field</para>
+          </listitem>
+        </itemizedlist>
 
-      <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
+        <para>Let's check out an example using some of these options</para>
+
+        <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .bool()
       .should( mythQB.keyword().onField("description").matching("urban").createQuery() )
       .should( mythQB
@@ -557,58 +592,58 @@ Query luceneQuery = mythQB
     .createQuery();
 </programlisting>
 
-      <para>As you can see, Hibernate Search query DSL is a fairly high and
-      easy to read query API. By accepting and producing Lucene queries, you
-      can easily incorporate query types not (yet) supported by the DSL.
-      Please give us feedback!</para>
+        <para>As you can see, the Hibernate Search query DSL is an easy to use
+        and easy to read query API and by accepting and producing Lucene
+        queries, you can easily incorporate query types not (yet) supported by
+        the DSL. Please give us feedback!</para>
+      </section>
     </section>
 
     <section>
       <title>Building a Hibernate Search query</title>
 
-      <para>Let's now see how to build the Hibernate Search query from the
-      Lucene one.</para>
+      <para>So far we only covered the process of how to create your Lucene
+      query (see <xref linkend="section-building-lucene-queries" />). However,
+      this is only the first step in the chain of actions. Let's now see how
+      to build the Hibernate Search query from the Lucene query.</para>
 
       <section>
         <title>Generality</title>
 
         <para>Once the Lucene query is built, it needs to be wrapped into an
-        Hibernate Query.</para>
+        Hibernate Query. If not specified otherwise, the query will be
+        executed against all indexed entities, potentially returning all types
+        of indexed classes.</para>
 
         <example>
           <title>Wrapping a Lucene query into a Hibernate Query</title>
 
           <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession( session );
-org.hibernate.Query fullTextQuery = 
-    fullTextSession.createFullTextQuery( luceneQuery );</programlisting>
+org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );</programlisting>
         </example>
 
-        <para>If not specified otherwise, the query will be executed against
-        all indexed entities, potentially returning all types of indexed
-        classes. It is advised, from a performance point of view, to restrict
+        <para> It is advised, from a performance point of view, to restrict
         the returned types:</para>
 
-        <example>
+        <example id="example-filtering-by-entity-type">
           <title>Filtering the search result by entity type</title>
 
-          <programlisting language="JAVA" role="JAVA">org.hibernate.Query fullTextQuery = 
-    fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+          <programlisting language="JAVA" role="JAVA">fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
 
 // or
 
-fullTextQuery = 
-    fullTextSession.createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
+fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
         </example>
 
-        <para>The first example returns only matching
-        <classname>Customer</classname>s, the second returns matching
-        <classname>Actor</classname>s and <classname>Item</classname>s. The
-        type restriction is fully polymorphic which means that if there are
-        two indexed subclasses <classname>Salesman</classname> and
-        <classname>Customer</classname> of the baseclass
-        <classname>Person</classname>, it is possible to just specify
-        <classname>Person.class</classname> in order to filter on result
-        types.</para>
+        <para>In <xref linkend="example-filtering-by-entity-type" /> the first
+        example returns only matching <classname>Customer</classname>s, the
+        second returns matching <classname>Actor</classname>s and
+        <classname>Item</classname>s. The type restriction is fully
+        polymorphic which means that if there are two indexed subclasses
+        <classname>Salesman</classname> and <classname>Customer</classname> of
+        the baseclass <classname>Person</classname>, it is possible to just
+        specify <classname>Person.class</classname> in order to filter on
+        result types.</para>
       </section>
 
       <section>
@@ -629,11 +664,11 @@ fullTextQuery.setFirstResult(15); //start from the 15th element
 fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
         </example>
 
-        <note>
+        <tip>
           <para>It is still possible to get the total number of matching
           elements regardless of the pagination via
           <methodname>fulltextQuery.</methodname><methodname>getResultSize()</methodname></para>
-        </note>
+        </tip>
       </section>
 
       <section>
@@ -658,8 +693,8 @@ List results = query.list();
         </example>
 
         <tip>
-          <para>Be aware that fields used for sorting must not be
-          tokenized.</para>
+          <para>Be aware that fields used for sorting must not be tokenized
+          (see <xref linkend="field-annotation" />).</para>
         </tip>
       </section>
 
@@ -686,22 +721,29 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
         luceneQuery. The authors collection will be loaded from the same query
         using an SQL outer join.</para>
 
-        <para>When defining a criteria query, it is not needed to restrict the
-        entity types returned while creating the Hibernate Search query from
-        the full text session: the type is guessed from the criteria query
-        itself. Only fetch mode can be adjusted, refrain from applying any
-        other restriction.</para>
+        <para>When defining a criteria query, it is not necessary to restrict
+        the returned entity types when creating the Hibernate Search query
+        from the full text session: the type is guessed from the criteria
+        query itself. </para>
 
-        <para>One cannot use <methodname>setCriteriaQuery</methodname> if more
-        than one entity type is expected to be returned.</para>
+        <important>
+          <para>Only fetch mode can be adjusted, refrain from applying any
+          other restriction.</para>
+        </important>
+
+        <important>
+          <para>One cannot use <methodname>setCriteriaQuery</methodname> if
+          more than one entity type is expected to be returned.</para>
+        </important>
       </section>
 
       <section id="projections">
         <title>Projection</title>
 
-        <para>For some use cases, returning the domain object (graph) is
-        overkill. Only a small subset of the properties is necessary.
-        Hibernate Search allows you to return a subset of properties:</para>
+        <para>For some use cases, returning the domain object (including its
+        associations) is overkill. Only a small subset of the properties is
+        necessary. Hibernate Search allows you to return a subset of
+        properties:</para>
 
         <example>
           <title>Using projection instead of returning the full domain
@@ -721,13 +763,13 @@ String authorName = firstResult[3];</programlisting>
         <para>Hibernate Search extracts the properties from the Lucene index
         and convert them back to their object representation, returning a list
         of <classname>Object[]</classname>. Projections avoid a potential
-        database round trip (useful if the query response time is critical),
-        but has some constraints:</para>
+        database round trip (useful if the query response time is critical).
+        However, it also has several constraints:</para>
 
         <itemizedlist>
           <listitem>
             <para>the properties projected must be stored in the index
-            (<literal>@Field(store=Store.YES)</literal>), which increase the
+            (<literal>@Field(store=Store.YES)</literal>), which increases the
             index size</para>
           </listitem>
 
@@ -737,8 +779,11 @@ String authorName = firstResult[3];</programlisting>
             <classname>org.hibernate.search.bridge.TwoWayFieldBridge</classname>
             or
             <literal>org.hibernate.search.bridge.TwoWayStringBridge</literal>,
-            the latter being the simpler version. All Hibernate Search
-            built-in types are two-way.</para>
+            the latter being the simpler version. </para>
+
+            <note>
+              <para>All Hibernate Search built-in types are two-way.</para>
+            </note>
           </listitem>
 
           <listitem>
@@ -753,10 +798,10 @@ String authorName = firstResult[3];</programlisting>
           </listitem>
         </itemizedlist>
 
-        <para>Projection is useful for another kind of use cases. Lucene
-        provides some metadata information to the user about the results. By
-        using some special placeholders, the projection mechanism can retrieve
-        them:</para>
+        <para>Projection is also useful for another kind of use case. Lucene
+        can provide metadata information about the results. By using some
+        special projection constants, the projection mechanism can retrieve
+        this metadata:</para>
 
         <example>
           <title>Using projection in order to retrieve meta data</title>
@@ -774,8 +819,8 @@ Book book = firstResult[1];
 String authorName = firstResult[2];</programlisting>
         </example>
 
-        <para>You can mix and match regular fields and special placeholders.
-        Here is the list of available placeholders:</para>
+        <para>You can mix and match regular fields and projection constants.
+        Here is the list of the available constants:</para>
 
         <itemizedlist>
           <listitem>
@@ -885,7 +930,7 @@ catch (org.hibernate.QueryTimeoutException e) {
           <note>
             <para><methodname>explain()</methodname> does not honor the
             timeout: this method is used for debug purposes and in particular
-            to find out why a query is slow ;)</para>
+            to find out why a query is slow</para>
           </note>
 
           <para>When using JPA, simply use the standard way of limiting query
@@ -908,8 +953,10 @@ catch (javax.persistence.QueryTimeoutException e) {
 }</programlisting>
           </example>
 
-          <para>Remember, this is a best effort basis and not a guarantee to
-          stop passed a certain time.</para>
+          <important>
+            <para>Remember, this is a best effort approach and does not
+            guarantee to stop exactly on the specified timeout.</para>
+          </important>
         </section>
       </section>
 
@@ -917,15 +964,16 @@ catch (javax.persistence.QueryTimeoutException e) {
         <title>Limit the number of results when the time limit is reached
         (EXPERIMENTAL)</title>
 
-        <para>Alternatively, you can return the number of results fetched when
-        the time limit is reached. Note that only the Lucene part of the query
-        is influenced by this limit. It is possible that, if you retrieve
-        managed object, it takes longer to fetch these objects.</para>
+        <para>Alternatively, you can return the number of results which have
+        already been fetched by the time the limit is reached. Note that only
+        the Lucene part of the query is influenced by this limit. It is
+        possible that, if you retrieve managed object, it takes longer to
+        fetch these objects.</para>
 
-        <note>
+        <warning>
           <para>This approach is not compatible with the
           <classname>setTimeout</classname> approach.</para>
-        </note>
+        </warning>
 
         <para>To define this soft limit, use the following approach</para>
 
@@ -1010,7 +1058,9 @@ if ( query.hasPartialResults() ) {
       accessed, and if not already loaded, Hibernate Search will load the next
       <literal>fetchSize</literal> objects in one pass.</para>
 
-      <para>Pagination is a preferred method over scrolling though.</para>
+      <important>
+        <para>Pagination is a preferred over scrolling.</para>
+      </important>
     </section>
 
     <section>
@@ -1021,7 +1071,7 @@ if ( query.hasPartialResults() ) {
 
       <itemizedlist>
         <listitem>
-          <para>for the Google-like feature 1-10 of about 888,000,000</para>
+          <para>for the Google-like feature "1-10 of about 888,000,000"</para>
         </listitem>
 
         <listitem>
@@ -1066,11 +1116,11 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; </program
     <section>
       <title>ResultTransformer</title>
 
-      <para>Especially when using projection, the data structure returned by a
-      query (an object array in this case), is not always matching the
-      application needs. It is possible to apply a
-      <classname>ResultTransformer</classname> operation post query to match
-      the targeted data structure:</para>
+      <para>As seen in <xref linkend="projections" /> projection results are
+      returns as <classname>Object</classname> arrays. This data structure is
+      not always matching the application needs. In this cases It is possible
+      to apply a <classname>ResultTransformer</classname> which post query
+      execution can build the needed data structure:</para>
 
       <example>
         <title>Using ResultTransformer in conjunction with projections</title>
@@ -1264,9 +1314,7 @@ public class BestDriversFilterFactory {
 
     <para>Hibernate Search will look for a <literal>@Factory</literal>
     annotated method and use it to build the filter instance. The factory must
-    have a no-arg constructor. For people familiar with JBoss Seam, this is
-    similar to the component factory pattern, but the annotation is
-    different!</para>
+    have a no-arg constructor.</para>
 
     <para>Named filters come in handy where parameters have to be passed to
     the filter. For example a security filter might want to know which
@@ -1466,48 +1514,47 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
       <programlisting>public class CustomerShardingStrategy implements IndexShardingStrategy {
 
-	// stored DirectoryProviders in a array indexed by customerID
-	private DirectoryProvider&lt;?&gt;[] providers;
-	
-	public void initialize(Properties properties, DirectoryProvider&lt;?&gt;[] providers) {
-		this.providers = providers;
-	}
+ // stored DirectoryProviders in a array indexed by customerID
+ private DirectoryProvider&lt;?&gt;[] providers;
+ 
+ public void initialize(Properties properties, DirectoryProvider&lt;?&gt;[] providers) {
+  this.providers = providers;
+ }
 
-	public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForAllShards() {
-		return providers;
-	}
+ public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForAllShards() {
+  return providers;
+ }
 
-	public DirectoryProvider&lt;?&gt; getDirectoryProviderForAddition(Class&lt;?&gt; entity, Serializable id, String idInString, Document document) {
-		Integer customerID = Integer.parseInt(document.getField("customerID").stringValue());
-		return providers[customerID];
-	}
+ public DirectoryProvider&lt;?&gt; getDirectoryProviderForAddition(Class&lt;?&gt; entity, Serializable id, String idInString, Document document) {
+  Integer customerID = Integer.parseInt(document.getField("customerID").stringValue());
+  return providers[customerID];
+ }
 
-	public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForDeletion(Class&lt;?&gt; entity, Serializable id, String idInString) {
-		return getDirectoryProvidersForAllShards();
-	}
+ public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForDeletion(Class&lt;?&gt; entity, Serializable id, String idInString) {
+  return getDirectoryProvidersForAllShards();
+ }
 
-<emphasis role="bold">	/**
-	 * Optimization; don't search ALL shards and union the results; in this case, we 
-	 * can be certain that all the data for a particular customer Filter is in a single
-	 * shard; simply return that shard by customerID.
-	 */
-	public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
-		FFullTextFilter filter = getCustomerFilter(filters, "customer");
-		if (filter == null) {
-			return getDirectoryProvidersForAllShards();
-		}
-		else {
-			return new DirectoryProvider[] { providers[Integer.parseInt(filter.getParameter("customerID").toString())] };
-		}
-	}
+<emphasis role="bold"> /**
+  * Optimization; don't search ALL shards and union the results; in this case, we 
+  * can be certain that all the data for a particular customer Filter is in a single
+  * shard; simply return that shard by customerID.
+  */
+ public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
+  FFullTextFilter filter = getCustomerFilter(filters, "customer");
+  if (filter == null) {
+   return getDirectoryProvidersForAllShards();
+  }
+  else {
+   return new DirectoryProvider[] { providers[Integer.parseInt(filter.getParameter("customerID").toString())] };
+  }
+ }
 
-	private FullTextFilter getFilter(FullTextFilterImplementor[] filters, String name) {
-		for (FullTextFilterImplementor filter: filters) {
-			if (filter.getName().equals(name)) return filter;
-		}
-		return null;
-	}</emphasis>
-
+ private FullTextFilter getFilter(FullTextFilterImplementor[] filters, String name) {
+  for (FullTextFilterImplementor filter: filters) {
+   if (filter.getName().equals(name)) return filter;
+  }
+  return null;
+ }</emphasis>
 }</programlisting>
 
       <para>In this example, if the filter named <literal>customer</literal>
@@ -1565,13 +1612,5 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
         linkend="search-architecture-readerstrategy" />.</para>
       </listitem>
     </itemizedlist>
-  </section>
-
-  <section>
-    <title>Native Lucene Queries</title>
-
-    <para>If you wish to use some specific features of Lucene, you can always
-    run Lucene specific queries. Check <xref linkend="search-lucene-native" />
-    for more information.</para>
   </section>
 </chapter>
