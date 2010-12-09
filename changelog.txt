@@ -1,6 +1,37 @@
 Hibernate Search Changelog
 ==========================
 
+3.3.0.CR2 (09-12-2010)
+-----------------------
+
+** Bug
+    * [HSEARCH-513] - Experiencing long delays when indexing entities saved in different transactions
+    * [HSEARCH-577] - IllegalArgumentException when using @Proxy and trying to delete a loaded but proxied class
+    * [HSEARCH-625] - Some errors triggered by Lucene are not catched by the ErrorHandler
+    * [HSEARCH-635] - Remove build cycle and duplicate classes from hibernate-search-testing module
+    * [HSEARCH-641] - idProvided flag in DocumentBuilderIndexedEntity is always false
+
+
+** Improvement
+    * [HSEARCH-511] - Clean up orphaned lock files on startup
+    * [HSEARCH-570] - Optimize the o^2 loop in DocumentBuilderIndexedEntity.addWorkToQueue
+    * [HSEARCH-630] - Rename limitFetchTime() to query.limitTimeAllowedTo() or limitExecutionTimeTo() in Query API
+    * [HSEARCH-631] - Protect against excessive proxying (in particular in Seam)
+    * [HSEARCH-632] - Make sure indexAsNull and Query DSL work like a charm together
+    * [HSEARCH-639] - Update dependency to Lucene 3.0.3
+
+** New Feature
+    * [HSEARCH-307] - Implement clustering with Infinispan
+    * [HSEARCH-416] - Analyze Payload and how this could be used to store id and class in the index and not the document
+    * [HSEARCH-644] - Enable Byteman for unit tests
+
+
+** Task
+    * [HSEARCH-579] - Ensure compatibility with latest Hibernate Core 3.6
+    * [HSEARCH-602] - Create new hibernate-search-infinispan skeleton module
+    * [HSEARCH-637] - Review documentation
+
+
 3.3.0.CR1 (08-11-2010)
 -----------------------
 
