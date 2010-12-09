@@ -1,8 +1,5 @@
 package org.hibernate.search.test.batchindexing;
 
-import java.io.File;
-
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.slf4j.Logger;
 
@@ -15,7 +12,6 @@ import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
