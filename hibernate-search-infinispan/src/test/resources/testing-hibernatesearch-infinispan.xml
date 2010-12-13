@@ -10,7 +10,7 @@
 
     <global>
 
-        <!-- duplicate domains are allowed so that multiple deployments with default configuration 
+        <!-- Duplicate domains are allowed so that multiple deployments with default configuration 
             of Hibernate Search applications work - if possible it would be better to use JNDI to share 
             the CacheManager across applications -->
         <globalJmxStatistics
@@ -31,7 +31,8 @@
         </transport>
             
         <!-- Note that the JGroups transport uses sensible defaults if no configuration property 
-            is defined. See the JGroupsTransport javadocs for more flags -->
+            is defined. See the Infinispan wiki for more JGroups settings:
+            http://community.jboss.org/wiki/ClusteredConfigurationQuickStart -->
 
         <serialization
             marshallerClass="org.infinispan.marshall.VersionAwareMarshaller"
