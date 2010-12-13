@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.infinispan;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -44,6 +45,7 @@ public class SimpleEmail {
 	public Long id;
 
 	@Field(index = Index.UN_TOKENIZED)
+	@Column(name="recipient")
 	public String to = "";
 
 	@Field(store = Store.COMPRESS)

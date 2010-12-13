@@ -44,7 +44,7 @@ import org.hibernate.search.test.util.JGroupsEnvironment;
  * We start two different Hibernate Search instances, both using
  * an InfinispanDirectoryProvider as the default DirectoryProvider
  * for all entities.
- * Set -Djava.net.preferIPv4Stack=true as this is required by JGroups.
+ * Set <code>-Djava.net.preferIPv4Stack=true</code> as this is required by JGroups.
  *
  * @author Sanne Grinovero
  */
