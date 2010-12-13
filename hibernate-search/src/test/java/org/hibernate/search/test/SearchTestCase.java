@@ -137,7 +137,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 		try {
 			if ( sessions != null ) {
 				sessions.close();
-				sessions = null;
+				buildConfiguration();
 			}
 		}
 		catch ( Exception ignore ) {
