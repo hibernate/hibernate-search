@@ -281,6 +281,7 @@ public class BridgeTest extends SearchTestCase {
 		Transaction tx = s.beginTransaction();
 		try {
 			s.persist( incorrect );
+			s.flush();
 			s.flushToIndexes();
 			fail("Incorrect bridge should fail");
 		}
@@ -323,7 +324,7 @@ public class BridgeTest extends SearchTestCase {
 
 		try {
 			final FullTextQuery textQuery = s.createFullTextQuery(query, IncorrectGet.class).setProjection("subIncorrect.name");
-			final List results = textQuery.list();
+			textQuery.list();
 			fail("Incorrect bridge should fail");
 		}
 		catch (BridgeException e) {
@@ -362,6 +363,7 @@ public class BridgeTest extends SearchTestCase {
 		Transaction tx = s.beginTransaction();
 		try {
 			s.persist( incorrect );
+			s.flush();
 			s.flushToIndexes();
 			fail("Incorrect bridge should fail");
 		}
