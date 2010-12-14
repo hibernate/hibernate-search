@@ -125,7 +125,7 @@
         <clustering
             mode="replication">
             <stateRetrieval
-                fetchInMemoryState="false"
+                fetchInMemoryState="true"
                 logFlushTimeout="30000" />
             <sync
                 replTimeout="25000" />
