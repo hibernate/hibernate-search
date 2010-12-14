@@ -36,7 +36,38 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Emmanuel Bernard
  */
 public class DoubleInsertEmbeddedTest extends SearchTestCase {
+
 	public void testDoubleInsert() throws Exception {
+		PersonalContact contact = createTestData();
+		FullTextSession s = Search.getFullTextSession( openSession( ) );
+		s.getTransaction().begin();
+		Term term = new Term( "county", "county" );
+		TermQuery termQuery = new TermQuery( term );
+		Query query = s.createFullTextQuery( termQuery );
+		assertEquals( 1, query.list().size() );
+		contact = (PersonalContact) s.get( PersonalContact.class, contact.getId() );
+		contact.getPhoneNumbers().clear();
+		contact.getAddresses().clear();
+		s.flush();
+		s.clear();
+		s.createQuery( "delete " + Address.class.getName() ).executeUpdate();
+		s.createQuery( "delete " + Phone.class.getName() ).executeUpdate();
+		s.createQuery( "delete " + Contact.class.getName() ).executeUpdate();
+		s.getTransaction().commit();
+		s.close();
+	}
+
+	public void testMultipleUpdatesTriggeredByContainedIn() {
+		PersonalContact contact = createTestData();
+		FullTextSession s = Search.getFullTextSession( openSession( ) );
+		s.getTransaction().begin();
+		contact = (PersonalContact) s.load( PersonalContact.class, contact.getId() );
+		contact.setEmail( "spam@hibernate.org" );
+		s.getTransaction().commit();
+		s.close();
+	}
+	
+	public PersonalContact createTestData() {
 		Address address = new Address();
 		address.setAddress1( "TEST1" );
 		address.setAddress2( "N/A" );
@@ -72,33 +103,16 @@ public class DoubleInsertEmbeddedTest extends SearchTestCase {
 		s.getTransaction().commit();
 
 		s.close();
-
-		s = Search.getFullTextSession( openSession( ) );
-		s.getTransaction().begin();
-		Term term = new Term("county", "county");
-		TermQuery termQuery = new TermQuery( term );
-		Query query = s.createFullTextQuery( termQuery );
-		assertEquals( 1, query.list().size() );
-		contact = (PersonalContact) s.get( PersonalContact.class, contact.getId() );
-		contact.getPhoneNumbers().clear();
-		contact.getAddresses().clear();
-		s.flush();
-		s.clear();
-		s.createQuery( "delete " + Address.class.getName() ).executeUpdate();
-		s.createQuery( "delete " + Phone.class.getName() ).executeUpdate();
-		s.createQuery( "delete " + Contact.class.getName() ).executeUpdate();
-		s.getTransaction().commit();
-
-		s.close();
+		return contact;
 	}
-
+	
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Address.class,
+				Phone.class,
 				Contact.class,
 				PersonalContact.class,
+				Address.class,
 				BusinessContact.class,
-				Phone.class
 		};
 	}
 }

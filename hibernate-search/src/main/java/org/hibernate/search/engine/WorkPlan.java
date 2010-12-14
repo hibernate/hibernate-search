@@ -116,7 +116,14 @@ public class WorkPlan {
 	 * is added to the work plan. 
 	 */
 	public void processContainedInAndPrepareExecution() {
-		for ( PerClassWork perClassWork : byClass.values() ) {
+		PerClassWork[] worksFromEvents = new PerClassWork[byClass.size()];
+		worksFromEvents = byClass.values().toArray( worksFromEvents );
+		// We need to iterate on a "frozen snapshot" of the byClass values
+		// because of HSEARCH-647. This method is not recursive, invoked
+		// only after the current unit of work is complete, and all additional
+		// work we add through recursion is already complete, so we don't need
+		// to process again new classes we add during the process.
+		for ( PerClassWork perClassWork : worksFromEvents ) {
 			perClassWork.processContainedInAndPrepareExecution();
 		}
 	}
