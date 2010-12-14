@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+3.3.0.Final (15-12-2010)
+------------------------
+
+** Bug
+    * [HSEARCH-629] - Mark the NumericField feature as experimental (Lucene mark it as such)
+    * [HSEARCH-646] - Unable to run tests against non in memory db
+    * [HSEARCH-647] - WorkPlan causes ConcurrentModificationException on finding new entity types during processContainedInAndPrepareExecution
+    * [HSEARCH-649] - Fix assembly not containing Infinispan dependencies
+
+
+** Improvement
+    * [HSEARCH-648] - Apply suggestions from Infinispan team to Infinispan default configuration
+
+
 3.3.0.CR2 (09-12-2010)
 ----------------------
 
