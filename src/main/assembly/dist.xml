@@ -35,6 +35,8 @@
         <moduleSet>
             <includes>
                 <include>org.hibernate:hibernate-search</include>
+                <include>org.hibernate:hibernate-search-infinispan</include>
+                <include>org.hibernate:hibernate-search-testing</include>
             </includes>
             <sources>
                 <includeModuleDirectory>false</includeModuleDirectory>
