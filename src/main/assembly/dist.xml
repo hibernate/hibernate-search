@@ -35,8 +35,6 @@
         <moduleSet>
             <includes>
                 <include>org.hibernate:hibernate-search</include>
-                <include>org.hibernate:hibernate-search-infinispan</include>
-                <include>org.hibernate:hibernate-search-testing</include>
             </includes>
             <sources>
                 <includeModuleDirectory>false</includeModuleDirectory>
@@ -52,7 +50,7 @@
                 </fileSets>
             </sources>
             <binaries>
-                <outputDirectory>.</outputDirectory>
+                <outputDirectory>dist</outputDirectory>
                 <unpack>false</unpack>
                 <dependencySets>
                     <dependencySet>
@@ -83,7 +81,7 @@
                         <outputDirectory>/dist/lib/optional</outputDirectory>
                         <scope>test</scope>
                         <includes>
-	                        <include>org.apache.lucene:lucene-analyzers</include>
+                            <include>org.apache.lucene:lucene-analyzers</include>
                             <include>org.apache.lucene:lucene-snowball</include>
                             <include>org.apache.lucene:lucene-collation</include>
                             <include>commons-codec:commons-codec</include>
@@ -96,6 +94,31 @@
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>/dist/lib/provided</outputDirectory>
                         <scope>provided</scope>
+                    </dependencySet>
+                </dependencySets>
+            </binaries>
+        </moduleSet>
+        <moduleSet>
+            <includes>
+                <include>org.hibernate:hibernate-search-infinispan</include>
+            </includes>
+            <binaries>
+                <outputDirectory>dist</outputDirectory>
+                <unpack>false</unpack>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>/dist/lib/optional</outputDirectory>
+                        <scope>runtime</scope>
+                        <excludes>
+                            <exclude>org.hibernate:*</exclude>
+                            <exclude>org.apache.lucene:*</exclude>
+                            <exclude>antlr:antlr</exclude>
+                            <exclude>commons-collections:commons-collections</exclude>
+                            <exclude>org.slf4j:slf4j-api</exclude>
+                            <exclude>dom4j:dom4j</exclude>
+                            <exclude>javax.transaction:jta</exclude>
+                        </excludes>
                     </dependencySet>
                 </dependencySets>
             </binaries>
@@ -121,7 +144,7 @@
             <outputDirectory>/</outputDirectory>
         </file>
     </files>
-
+    
     <fileSets>
         <!-- Include all sources -->
         <fileSet>
@@ -133,7 +156,11 @@
                 <exclude>lgpl.txt</exclude>
                 <exclude>changelog.txt</exclude>
                 <exclude>.git</exclude>
-                <exclude>.gitignore</exclude>
+                <exclude>**/.gitignore</exclude>
+                <exclude>**/.settings/**</exclude>
+                <exclude>**/.project</exclude>
+                <exclude>**/.classpath</exclude>
+                <exclude>**/.externalToolBuilders/**</exclude>
                 <exclude>**/target/**</exclude>
                 <exclude>**/.idea/**</exclude>
                 <exclude>**/*.iml</exclude>
