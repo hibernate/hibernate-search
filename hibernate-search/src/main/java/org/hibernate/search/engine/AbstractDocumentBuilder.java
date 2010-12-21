@@ -850,16 +850,18 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	/**
+	 * To be removed, see org.hibernate.search.engine.DocumentBuilderIndexedEntity.isIdMatchingJpaId()
 	 * @return true if a providedId needs to be provided for indexing
 	 */
-	public boolean requiresProvidedId() {
+	boolean requiresProvidedId() {
 		return false;
 	}
 
 	/**
+	 * To be removed, see org.hibernate.search.engine.DocumentBuilderIndexedEntity.isIdMatchingJpaId()
 	 * @return true if @DocumentId and @Id are found on the same property
 	 */
-	public boolean isIdMatchingJpaId() {
+	boolean isIdMatchingJpaId() {
 		return true;
 	}
 	
