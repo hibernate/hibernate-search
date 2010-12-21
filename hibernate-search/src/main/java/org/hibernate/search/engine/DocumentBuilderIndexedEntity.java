@@ -136,12 +136,12 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	/**
 	 * The member - if any - annotated with @DocumentId
 	 */
-	private XProperty documentIdAnnotatedMember;
+	private XProperty documentIdAnnotatedMember; //FIXME: to remove, needed only for isIdMatchingJpaId()
 
 	/**
 	 * The member - if any - annotated with @Id
 	 */
-	private XProperty jpaIdAnnotatedMember;
+	private XProperty jpaIdAnnotatedMember; //FIXME: to remove, needed only for isIdMatchingJpaId()
 
 	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
@@ -704,13 +704,21 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return ReflectionHelper.getAttributeName( member, name );
 	}
 
+	/**
+	 * To be removed, see org.hibernate.search.engine.DocumentBuilderIndexedEntity.isIdMatchingJpaId()
+	 */
 	@Override
-	public boolean requiresProvidedId() {
+	boolean requiresProvidedId() {
 		return this.idProvided;
 	}
 	
+	/**
+	 * FIXME remove the need for such a method, we should always be able to rely on Work.id,
+	 * but to respect @DocumentId which is being processed in the DocumentBuilder currently
+	 * finding out which id we need is tricky, and requires helpers method like this one.
+	 */
 	@Override
-	public boolean isIdMatchingJpaId() {
+	boolean isIdMatchingJpaId() {
 		return ( ! idProvided &&
 				( documentIdAnnotatedMember == null || documentIdAnnotatedMember.equals( jpaIdAnnotatedMember ) )
 								);
