@@ -220,9 +220,13 @@ public class WorkPlan {
 		 */
 		private Serializable extractProperId(Work<T> work) {
 			T entity = work.getEntity();
-			// entity is null for purge operation, which requires to trust the work id
-			// also types mapped as provided id require to use the work id
-			if ( entity == null || documentBuilder.requiresProvidedId() ) {
+			// 1) entity is null for purge operation, which requires to trust the work id
+			// 2) types mapped as provided id require to use the work id
+			// 3) when Hibernate identifier rollback is used && this identifier is our same id source, we need to get the value from work id
+			if ( entity == null ||
+					documentBuilder.requiresProvidedId() ||
+					( work.isIdentifierWasRolledBack() && documentBuilder.isIdMatchingJpaId() )
+					) {
 				return work.getId();
 			}
 			else {

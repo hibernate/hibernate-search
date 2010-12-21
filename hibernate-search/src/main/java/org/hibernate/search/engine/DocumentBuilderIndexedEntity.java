@@ -134,6 +134,16 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	private boolean idProvided;
 
 	/**
+	 * The member - if any - annotated with @DocumentId
+	 */
+	private XProperty documentIdAnnotatedMember;
+
+	/**
+	 * The member - if any - annotated with @Id
+	 */
+	private XProperty jpaIdAnnotatedMember;
+
+	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
 	 *
 	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>
@@ -254,9 +264,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		DocumentId documentIdAnn = member.getAnnotation( DocumentId.class );
 		if ( documentIdAnn != null ) {
 			idAnnotation = documentIdAnn;
+			documentIdAnnotatedMember = member;
 		}
 		// check for JPA @Id
-		else if ( context.isJpaPresent() ) {
+		if ( context.isJpaPresent() ) {
 			Annotation jpaId;
 			try {
 				@SuppressWarnings("unchecked")
@@ -269,8 +280,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				throw new SearchException( "Unable to load @Id.class even though it should be present ?!" );
 			}
 			if ( jpaId != null ) {
-				log.debug( "Found JPA id and using it as document id" );
-				idAnnotation = jpaId;
+				jpaIdAnnotatedMember = member;
+				if ( documentIdAnn == null ) {
+					log.debug( "Found JPA id and using it as document id" );
+					idAnnotation = jpaId;
+				}
 			}
 		}
 		return idAnnotation;
@@ -693,5 +707,12 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	@Override
 	public boolean requiresProvidedId() {
 		return this.idProvided;
+	}
+	
+	@Override
+	public boolean isIdMatchingJpaId() {
+		return ( ! idProvided &&
+				( documentIdAnnotatedMember == null || documentIdAnnotatedMember.equals( jpaIdAnnotatedMember ) )
+								);
 	}
 }

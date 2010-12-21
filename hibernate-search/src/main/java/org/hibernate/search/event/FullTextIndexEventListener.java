@@ -159,7 +159,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			final Class<?> entityType = event.getEntity().getClass();
 			if ( searchFactoryImplementor.getDocumentBuildersIndexedEntities().containsKey( entityType )
 					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entityType ) != null ) {
-				processWork( event.getEntity(), event.getId(), WorkType.DELETE, event );
+				boolean identifierRollbackEnabled = event.getSession().getFactory().getSettings().isIdentifierRollbackEnabled();
+				processWork( event.getEntity(), event.getId(), WorkType.DELETE, event, identifierRollbackEnabled );
 			}
 		}
 	}
@@ -170,7 +171,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity.getClass() ) != null
 					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entity.getClass() ) != null ) {
 				Serializable id = event.getId();
-				processWork( entity, id, WorkType.ADD, event );
+				processWork( entity, id, WorkType.ADD, event, false );
 			}
 		}
 	}
@@ -181,13 +182,13 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity.getClass() ) != null
 					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entity.getClass() ) != null ) {
 				Serializable id = event.getId();
-				processWork( entity, id, WorkType.UPDATE, event );
+				processWork( entity, id, WorkType.UPDATE, event, false );
 			}
 		}
 	}
 
-	protected <T> void processWork(T entity, Serializable id, WorkType workType, AbstractEvent event) {
-		Work<T> work = new Work<T>( entity, id, workType );
+	protected <T> void processWork(T entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {
+		Work<T> work = new Work<T>( entity, id, workType, identifierRollbackEnabled );
 		final EventSourceTransactionContext transactionContext = new EventSourceTransactionContext( event.getSession() );
 		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 	}
@@ -227,7 +228,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 					);
 					return;
 				}
-				processWork( entity, id, WorkType.COLLECTION, event );
+				processWork( entity, id, WorkType.COLLECTION, event, false );
 			}
 		}
 	}

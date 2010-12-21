@@ -38,26 +38,32 @@ public class Work<T> {
 	private final Serializable id;
 	private final XMember idGetter;
 	private final WorkType type;
-
+	private final boolean identifierWasRolledBack;
+	
 	public Work(T entity, Serializable id, WorkType type) {
-		this( entity, null, id, null, type );
+		this( entity, null, id, null, type, false );
+	}
+
+	public Work(T entity, Serializable id, WorkType type, boolean identifierRollbackEnabled) {
+		this( entity, null, id, null, type, identifierRollbackEnabled );
 	}
 
 	public Work(Class<T> entityType, Serializable id, WorkType type) {
-		this( null, entityType, id, null, type );
+		this( null, entityType, id, null, type, false );
 	}
 
 	public Work(T entity, XMember idGetter, WorkType type) {
-		this( entity, null, null, idGetter, type );
+		this( entity, null, null, idGetter, type, false );
 	}
 
 	private Work(T entity, Class<T> entityClass, Serializable id,
-				 XMember idGetter, WorkType type) {
+				 XMember idGetter, WorkType type, boolean identifierWasRolledBack) {
 		this.entity = entity;
 		this.entityClass = entityClass;
 		this.id = id;
 		this.idGetter = idGetter;
 		this.type = type;
+		this.identifierWasRolledBack = identifierWasRolledBack;
 	}
 
 	public Class<T> getEntityClass() {
@@ -78,5 +84,9 @@ public class Work<T> {
 
 	public WorkType getType() {
 		return type;
+	}
+
+	public boolean isIdentifierWasRolledBack() {
+		return identifierWasRolledBack;
 	}
 }

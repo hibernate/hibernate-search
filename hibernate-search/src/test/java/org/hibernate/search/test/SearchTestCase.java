@@ -265,6 +265,13 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	public static Version getTargetLuceneVersion() {
 		return Version.LUCENE_29;
 	}
+	
+	protected SearchFactoryImplementor getSearchFactoryImpl() {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		s.close();
+		SearchFactory searchFactory = s.getSearchFactory();
+		return (SearchFactoryImplementor) searchFactory;
+	}
 
 	/**
 	 * Returns the target directory of the build.
