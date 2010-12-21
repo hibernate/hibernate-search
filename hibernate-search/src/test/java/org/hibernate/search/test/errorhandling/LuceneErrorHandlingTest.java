@@ -31,10 +31,7 @@ import junit.framework.Assert;
 import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -111,13 +108,6 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
-	}
-	
-	protected SearchFactoryImplementor getSearchFactoryImpl() {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		s.close();
-		SearchFactory searchFactory = s.getSearchFactory();
-		return (SearchFactoryImplementor) searchFactory;
 	}
 	
 	/**

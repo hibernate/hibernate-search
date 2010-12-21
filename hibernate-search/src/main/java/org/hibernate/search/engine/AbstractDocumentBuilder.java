@@ -855,5 +855,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	public boolean requiresProvidedId() {
 		return false;
 	}
+
+	/**
+	 * @return true if @DocumentId and @Id are found on the same property
+	 */
+	public boolean isIdMatchingJpaId() {
+		return true;
+	}
 	
 }
