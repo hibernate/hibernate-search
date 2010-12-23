@@ -613,7 +613,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 					return objectToString( (StringBridge) bridge, fieldName, value );
 				}
 				throw new SearchException(
-						"FieldBridge " + bridgeClass + "does not have a objectToString method: field "
+						"FieldBridge " + bridgeClass + " does not have a objectToString method: field "
 								+ fieldName + " in " + getBeanXClass()
 				);
 			}
