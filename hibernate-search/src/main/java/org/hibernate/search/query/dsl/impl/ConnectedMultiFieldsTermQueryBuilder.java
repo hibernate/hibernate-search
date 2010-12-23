@@ -118,7 +118,6 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	}
 
 	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity<?> documentBuilder) {
-		String text;
 		if ( fieldContext.isIgnoreFieldBridge() ) {
 			if ( value == null ) {
 				throw new SearchException(
@@ -126,13 +125,18 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 								+ fieldContext.getField() + " if field bridge is ignored."
 				);
 			}
-			text = value.toString();
+			String stringform = value.toString();
+			if ( stringform == null ) {
+				throw new SearchException(
+						"When ignoreFieldBridge() is enabled, toString() on the value is used: the returned string must not be null: " +
+						"on field " + fieldContext.getField() );
+			}
+			return stringform;
 		}
 		else {
 			// need to go via the appropriate bridge, because value is an object, eg boolean, and must be converted to a string first
-			text = documentBuilder.objectToString( fieldContext.getField(), value );
+			return documentBuilder.objectToString( fieldContext.getField(), value );
 		}
-		return text;
 	}
 
 	private Query createTermQuery(FieldContext fieldContext, String term) {
