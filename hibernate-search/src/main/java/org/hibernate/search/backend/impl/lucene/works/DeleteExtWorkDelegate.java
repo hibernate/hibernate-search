@@ -27,13 +27,10 @@ import java.io.Serializable;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
-import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -41,10 +38,9 @@ import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 
 /**
- * Stateless extension of <code>DeleteLuceneWork</code>,
- * performing the same LuceneWork in an optimal way in case
- * the index is NOT shared across different entities
- * (which is the default).
+ * Extension of <code>DeleteLuceneWork</code> bound to a single entity.
+ * This allows to perform the delete LuceneWork in an optimal way in case
+ * the index is NOT shared across different entities (which is the default).
  *
  * @author Sanne Grinovero
  * @see DeleteWorkDelegate
@@ -54,11 +50,13 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 	private final Class<?> managedType;
 	private final DocumentBuilderIndexedEntity<?> builder;
 	private final Logger log = LoggerFactory.make();
+	private final boolean idIsNumeric;
 
 	DeleteExtWorkDelegate(Workspace workspace, WorkerBuildContext context) {
 		super( workspace );
 		managedType = workspace.getEntitiesInDirectory().iterator().next();
 		builder = context.getDocumentBuilderIndexedEntity( managedType );
+		idIsNumeric = isIdNumeric( managedType, builder );
 	}
 
 	@Override
@@ -67,7 +65,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 		Serializable id = work.getId();
 		log.trace( "Removing {}#{} by id using an IndexWriter.", managedType, id );
 		try {
-			if( isIdNumeric( work.getEntityClass() ) ) {
+			if( idIsNumeric ) {
 				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdentifierName(), id ) );
 			} else {
 				Term idTerm = builder.getTerm( id );
