@@ -72,7 +72,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
 		Query idQueryTerm;
-		if ( isIdNumeric( entityType ) ) {
+		if ( isIdNumeric( entityType, builder ) ) {
 			idQueryTerm = NumericFieldUtils.createExactMatchQuery( builder.getIdentifierName(), id );
 		} else {
 			idQueryTerm = new TermQuery( builder.getTerm( id ) );
@@ -92,8 +92,8 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		}
 	}
 
-	protected boolean isIdNumeric(Class<?> entityType) {
-		TwoWayFieldBridge idBridge = workspace.getDocumentBuilder(entityType).getIdBridge();
+	protected static boolean isIdNumeric(Class<?> entityType, DocumentBuilderIndexedEntity<?> documentBuilder) {
+		TwoWayFieldBridge idBridge = documentBuilder.getIdBridge();
 		return idBridge instanceof NumericFieldBridge;
 	}
 
