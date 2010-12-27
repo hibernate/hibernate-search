@@ -24,7 +24,7 @@
 package org.hibernate.search.test.configuration;
 
 import org.hibernate.HibernateException;
-import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
@@ -112,7 +112,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 		FileHelper.delete( getBaseIndexDir() );
 	}
 	
-	public static void assertCfgIsInvalid(AnnotationConfiguration configuration, Class[] mapping) {
+	public static void assertCfgIsInvalid(Configuration configuration, Class[] mapping) {
 		try {
 			for ( Class annotated : mapping ) {
 				( configuration ).addAnnotatedClass( annotated );

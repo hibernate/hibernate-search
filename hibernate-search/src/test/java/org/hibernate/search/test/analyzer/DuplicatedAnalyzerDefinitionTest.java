@@ -33,7 +33,6 @@ import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.SearchMapping;
@@ -54,7 +53,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 	}
 
 	public void testDuplicatedAnalyzerDefinitionThrowsException() throws Exception {
-		Configuration config = new AnnotationConfiguration();
+		Configuration config = new Configuration();
 		config.addAnnotatedClass( Entity1.class );
 		config.addAnnotatedClass( Entity2.class );
 		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
@@ -72,7 +71,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 	}
 
 	public void testDuplicatedProgrammaticAnalyzerDefinitionThrowsException() throws Exception {
-		Configuration config = new AnnotationConfiguration();
+		Configuration config = new Configuration();
 		config.getProperties().put( Environment.MODEL_MAPPING, createSearchMapping() );
 		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		try {

@@ -26,7 +26,6 @@ package org.hibernate.search.test.jgroups.common;
 import java.io.InputStream;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.classic.Session;
 import org.hibernate.search.test.SearchTestCase;
@@ -110,16 +109,16 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 			getSlaveSessionFactory().close();
 		}
 
-		setCommonCfg( new AnnotationConfiguration() );
+		setCommonCfg( new Configuration() );
 		commonConfigure( commonCfg );
 		if ( recreateSchema() ) {
 			commonCfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 		}
 		for ( String aPackage : getCommonAnnotatedPackages() ) {
-			( ( AnnotationConfiguration ) getCommonConfiguration() ).addPackage( aPackage );
+			( ( Configuration ) getCommonConfiguration() ).addPackage( aPackage );
 		}
 		for ( Class<?> aClass : getCommonAnnotatedClasses() ) {
-			( ( AnnotationConfiguration ) getCommonConfiguration() ).addAnnotatedClass( aClass );
+			( ( Configuration ) getCommonConfiguration() ).addAnnotatedClass( aClass );
 		}
 		for ( String xmlFile : getCommonXmlFiles() ) {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );

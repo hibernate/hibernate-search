@@ -29,7 +29,6 @@ import junit.framework.TestCase;
 
 import org.apache.lucene.util.Version;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
@@ -44,7 +43,7 @@ import org.hibernate.search.test.SearchTestCase;
 public abstract class MultipleSFTestCase extends TestCase {
 
 	private static SessionFactory[] sessionFactories;
-	private static AnnotationConfiguration[] cfgs;
+	private static Configuration[] cfgs;
 	private static Dialect dialect;
 	private static Class lastTestClass;
 
@@ -55,7 +54,7 @@ public abstract class MultipleSFTestCase extends TestCase {
 			sessionFactories = new SessionFactory[getSFNbrs()];
 		}
 		if ( cfgs == null ) {
-			cfgs = new AnnotationConfiguration[getSFNbrs()];
+			cfgs = new Configuration[getSFNbrs()];
 		}
 		for ( SessionFactory sf : sessionFactories ) {
 			if ( sf != null ) {
@@ -63,7 +62,7 @@ public abstract class MultipleSFTestCase extends TestCase {
 			}
 		}
 		for ( int sfIndex = 0; sfIndex < getSFNbrs(); sfIndex++ ) {
-			cfgs[sfIndex] = new AnnotationConfiguration();
+			cfgs[sfIndex] = new Configuration();
 		}
 		configure( cfgs );
 		for ( int sfIndex = 0; sfIndex < getSFNbrs(); sfIndex++ ) {
