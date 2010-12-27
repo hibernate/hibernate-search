@@ -23,8 +23,8 @@
  */
 package org.hibernate.search.test.bridge;
 
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.SearchException;
-import org.hibernate.cfg.AnnotationConfiguration;
 import junit.framework.TestCase;
 
 /**
@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  */
 public class UnresolvedBridgeTest extends TestCase {
 	public void testSerializableType() throws Exception {
-		AnnotationConfiguration cfg = new AnnotationConfiguration();
+		Configuration cfg = new Configuration();
 
 		for (int i = 0; i < getAnnotatedClasses().length; i++) {
 			cfg.addAnnotatedClass( getAnnotatedClasses()[i] );

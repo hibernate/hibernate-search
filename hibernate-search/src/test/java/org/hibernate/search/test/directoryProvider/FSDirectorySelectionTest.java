@@ -32,7 +32,6 @@ import org.apache.lucene.store.SimpleFSDirectory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -83,7 +82,7 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 	}
 
 	private SessionFactory createSessionFactoryUsingDirectoryType(String directoryType) {
-		Configuration config = new AnnotationConfiguration();
+		Configuration config = new Configuration();
 		config.addAnnotatedClass( SnowStorm.class );
 		config.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		config.setProperty( "hibernate.search.default.directory_provider", FSDirectoryProvider.class.getName() );
