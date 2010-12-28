@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -671,6 +672,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		propertiesMetadata.fieldGetters.add( member );
 		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
 		propertiesMetadata.fieldNames.add( fieldName );
+		propertiesMetadata.fieldNameToPositionMap.put( member.getName(), Integer.valueOf( propertiesMetadata.fieldNames.size() ) );
 		propertiesMetadata.fieldStore.add( fieldAnn.store() );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
 		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
@@ -781,11 +783,51 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	/**
-	 * 
+	 * Hibernate entities might be considered dirty, but still have only changes that
+	 * don't affect indexing. So this isDirty() implementation will return true only
+	 * if the proposed change is possibly affecting the index.
 	 */
 	public boolean isDirty(String[] propertyNames, Object[] oldState, Object[] state) {
-		// TODO Auto-generated method stub
-		return true;
+		if ( oldState == null ) {
+			return true; // it appears some collection work has no oldState -> reindex
+		}
+		if ( metadata.classBridges.size() > 0 ) {
+			return true; // can't know what a classBridge is going to look at -> reindex //TODO nice new feature to have?
+		}
+		if ( ! ( metadata.classBoostStrategy instanceof DefaultBoostStrategy ) ) {
+			return true; // as with classbridge: might be affected by any field //TODO nice new feature to have?
+		}
+
+		for ( int arrayIdx = 0; arrayIdx < propertyNames.length; arrayIdx++ ) {
+			// Hibernate core will do an in-depth comparison of collections, taking care of creating new values,
+			// so it looks like we can rely on reference equality comparisons, or at least that seems a safe way:
+			if ( oldState[arrayIdx] != state[arrayIdx] ) {
+				Integer propertyIndexInteger = metadata.fieldNameToPositionMap.get( propertyNames[arrayIdx] );
+				if ( propertyIndexInteger != null ) {
+					int propertyIndex = propertyIndexInteger.intValue() - 1;
+					
+					//take care of indexed fields:
+					if ( metadata.fieldIndex.get( propertyIndex ).isIndexed() ) {
+						return true;
+					}
+					
+					//take care of stored fields:
+					Store store = metadata.fieldStore.get( propertyIndex );
+					if ( store.equals( Store.YES ) || store.equals( Store.COMPRESS ) ) {
+						// if Store.NO it doesn't affect the index
+						return true;
+					}
+				}
+				
+				//consider IndexedEmbedded:
+				for ( XMember embeddedMember : metadata.embeddedGetters ) {
+					String name = embeddedMember.getName();
+					if ( name.equals( propertyNames[arrayIdx] ) )
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -799,6 +841,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		public Discriminator discriminator;
 		public XMember discriminatorGetter;
 		public BoostStrategy classBoostStrategy;
+		public final Map<String,Integer> fieldNameToPositionMap = new HashMap<String,Integer>();
 
 		public final List<String> fieldNames = new ArrayList<String>();
 		public final List<XMember> fieldGetters = new ArrayList<XMember>();
