@@ -63,10 +63,12 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
+import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;
+import org.hibernate.tuple.StandardProperty;
 
 import static org.hibernate.search.event.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
 
@@ -156,13 +158,12 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	public void onPostDelete(PostDeleteEvent event) {
 		if ( used ) {
-			final Class<?> entityType = event.getEntity().getClass();
-			if ( searchFactoryImplementor.getDocumentBuildersIndexedEntities().containsKey( entityType )
-					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entityType ) != null ) {
+			final Object entity = event.getEntity();
+			if ( getDocumentBuilder( entity ) != null ) {
 				// FIXME The engine currently needs to know about details such as identifierRollbackEnabled
 				// but we should not move the responsibility to figure out the proper id to the engine  
 				boolean identifierRollbackEnabled = event.getSession().getFactory().getSettings().isIdentifierRollbackEnabled();
-				processWork( event.getEntity(), event.getId(), WorkType.DELETE, event, identifierRollbackEnabled );
+				processWork( entity, event.getId(), WorkType.DELETE, event, identifierRollbackEnabled );
 			}
 		}
 	}
@@ -170,8 +171,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onPostInsert(PostInsertEvent event) {
 		if ( used ) {
 			final Object entity = event.getEntity();
-			if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity.getClass() ) != null
-					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entity.getClass() ) != null ) {
+			if ( getDocumentBuilder( entity ) != null ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.ADD, event, false );
 			}
@@ -181,12 +181,21 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onPostUpdate(PostUpdateEvent event) {
 		if ( used ) {
 			final Object entity = event.getEntity();
-			if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity.getClass() ) != null
-					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entity.getClass() ) != null ) {
+			final DocumentBuilder docBuilder = getDocumentBuilder( entity );
+			if ( docBuilder != null && docBuilder.isDirty( getPropertyNames( event ), event.getOldState(), event.getState() ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
 			}
 		}
+	}
+
+	private static String[] getPropertyNames(PostUpdateEvent event) {
+		StandardProperty[] properties = event.getPersister().getEntityMetamodel().getProperties();
+		String[] propertyNames = new String[properties.length];
+		for ( int i = 0; i < propertyNames.length; i++ ) {
+			propertyNames[i] = properties[i].getName();
+		}
+		return propertyNames;
 	}
 
 	protected <T> void processWork(T entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {
@@ -220,8 +229,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			return;
 		}
 		if ( used ) {
-			if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity.getClass() ) != null
-					|| searchFactoryImplementor.getDocumentBuilderContainedEntity( entity.getClass() ) != null ) {
+			if ( getDocumentBuilder( entity ) != null ) {
 				Serializable id = getId( entity, event );
 				if ( id == null ) {
 					log.warn(
@@ -293,6 +301,17 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>( 0 );
 		// setting a final field by reflection during a readObject is considered as safe as in a constructor:
 		f.set( this, flushSynch );
+	}
+	
+	private DocumentBuilder getDocumentBuilder(final Object entity) {
+		Class<?> clazz = entity.getClass();
+		DocumentBuilder documentBuilderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
+		if ( documentBuilderIndexedEntity != null ) {
+			return documentBuilderIndexedEntity;
+		}
+		else {
+			return searchFactoryImplementor.getDocumentBuilderContainedEntity( clazz );
+		}
 	}
 
 	public static enum Installation {
