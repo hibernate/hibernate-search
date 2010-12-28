@@ -61,6 +61,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		tx = fullTextSession.beginTransaction();
 		line1 = (BusLine) fullTextSession.load( BusLine.class, line1.getId() );
 		line1.setBusLineCode( Integer.valueOf( 2 ) );
+		line1.getStops().iterator().next().setServiceComments( "please clean the garbage after the football match" );
 		tx.commit();
 		Assert.assertEquals( 0, LeakingLuceneBackend.getLastProcessedQueue().size() );
 		
