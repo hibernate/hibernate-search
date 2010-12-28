@@ -45,6 +45,7 @@ public class BusStop {
 	private Long id;
 	private String roadName;
 	private Set<BusLine> busses = new HashSet<BusLine>();
+	private String serviceComments = "nothing";
 
 	@Id
 	@GeneratedValue
@@ -73,6 +74,14 @@ public class BusStop {
 
 	public void setBusses(Set<BusLine> busses) {
 		this.busses = busses;
+	}
+	
+	public String getServiceComments() {
+		return serviceComments;
+	}
+
+	public void setServiceComments(String serviceComments) {
+		this.serviceComments = serviceComments;
 	}
 
 	@Override
