@@ -61,11 +61,21 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		tx = fullTextSession.beginTransaction();
 		line1 = (BusLine) fullTextSession.load( BusLine.class, line1.getId() );
 		line1.setBusLineCode( Integer.valueOf( 2 ) );
-		line1.getStops().iterator().next().setServiceComments( "please clean the garbage after the football match" );
+		BusStop busStop = line1.getStops().iterator().next();
+		busStop.setServiceComments( "please clean the garbage after the football match" );
 		tx.commit();
 		Assert.assertEquals( 0, LeakingLuceneBackend.getLastProcessedQueue().size() );
 		
+		// now we make an indexing affecting change in the embedded object only,
+		// parent should still be updated
 		LeakingLuceneBackend.reset();
+		fullTextSession.clear();
+		tx = fullTextSession.beginTransaction();
+		busStop = (BusStop) fullTextSession.load( BusStop.class, busStop.getId() );
+		busStop.setRoadName( "Mill Road" );
+		tx.commit();
+		Assert.assertEquals( 2, LeakingLuceneBackend.getLastProcessedQueue().size() ); //2 = delete+add
+		
 		fullTextSession.close();
 	}
 	
