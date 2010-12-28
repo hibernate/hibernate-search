@@ -50,6 +50,7 @@ public class BusLine {
 	private Long id;
 	private String busLineName;
 	private Set<BusStop> stops = new HashSet<BusStop>();
+	private Integer busLineCode = Integer.valueOf( 0 );
 
 	@Id
 	@GeneratedValue
@@ -78,6 +79,14 @@ public class BusLine {
 
 	public void setStops(Set<BusStop> stops) {
 		this.stops = stops;
+	}
+	
+	public Integer getBusLineCode() {
+		return busLineCode;
+	}
+
+	public void setBusLineCode(Integer busLineCode) {
+		this.busLineCode = busLineCode;
 	}
 
 	@Override

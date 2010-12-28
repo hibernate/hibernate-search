@@ -1,0 +1,86 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ *
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+ */
+package org.hibernate.search.test.engine;
+
+import junit.framework.Assert;
+
+import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.hibernate.Transaction;
+import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.embedded.depth.LeakingLuceneBackend;
+
+/**
+ * See HSEARCH-361 and HSEARCH-5 : avoid reindexing objects for which
+ * changes where made in hibernate but not affecting the index state.
+ * 
+ * @author Sanne Grinovero
+ */
+public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
+	
+	public void testUnindexedFieldsDontTriggerEngine() {
+		// first, normal storage of new indexed graph:
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		BusLine line1 = new BusLine();
+		line1.setBusLineCode( Integer.valueOf( 1 ) );
+		line1.setBusLineName( "Line Uno" );
+		LazyCollectionsUpdatingTest.addBusStop( line1, "Gateshead" );
+		LazyCollectionsUpdatingTest.addBusStop( line1, "The Sage" );
+		session.persist( line1 );
+		tx.commit();
+		
+		Assert.assertEquals( 1, LeakingLuceneBackend.getLastProcessedQueue().size() );
+		LeakingLuceneBackend.reset();
+		fullTextSession.clear();
+		
+		// now change the BusLine in some way which does not affect the index:
+		tx = fullTextSession.beginTransaction();
+		line1 = (BusLine) fullTextSession.load( BusLine.class, line1.getId() );
+		line1.setBusLineCode( Integer.valueOf( 2 ) );
+		tx.commit();
+		Assert.assertEquals( 0, LeakingLuceneBackend.getLastProcessedQueue().size() );
+		
+		LeakingLuceneBackend.reset();
+		fullTextSession.close();
+	}
+	
+	// Test setup options - Entities
+	@Override
+	protected Class<?>[] getAnnotatedClasses() {
+		return new Class[] { BusLine.class, BusStop.class };
+	}
+	
+	// Test setup options - SessionFactory Properties
+	@Override
+	protected void configure(org.hibernate.cfg.Configuration configuration) {
+		super.configure( configuration );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
+		cfg.setProperty( "hibernate.search.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
+	}
+	
+}

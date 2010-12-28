@@ -122,7 +122,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		}
 	}
 	
-	private void addBusStop(BusLine bus, String roadName) {
+	static void addBusStop(BusLine bus, String roadName) {
 		BusStop stop = new BusStop();
 		stop.setRoadName( roadName );
 		bus.getStops().add( stop );
