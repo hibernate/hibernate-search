@@ -781,6 +781,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	/**
+	 * 
+	 */
+	public boolean isDirty(String[] propertyNames, Object[] oldState, Object[] state) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	/**
 	 * Wrapper class containing all the meta data extracted out of a single entity.
 	 * All field/property related properties are kept in lists. Retrieving all metadata for a given
 	 * property/field means accessing all the lists with the same index.
