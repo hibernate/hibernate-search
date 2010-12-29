@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.slf4j.Logger;
 
@@ -68,7 +69,6 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;
-import org.hibernate.tuple.StandardProperty;
 
 import static org.hibernate.search.event.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
 
@@ -182,20 +182,33 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Object entity = event.getEntity();
 			final DocumentBuilder docBuilder = getDocumentBuilder( entity );
-			if ( docBuilder != null && docBuilder.isDirty( getPropertyNames( event ), event.getOldState(), event.getState() ) ) {
+			if ( docBuilder != null && docBuilder.isDirty( getDirtyPropertyNames( event ) ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
 			}
 		}
 	}
 
-	private static String[] getPropertyNames(PostUpdateEvent event) {
-		StandardProperty[] properties = event.getPersister().getEntityMetamodel().getProperties();
-		String[] propertyNames = new String[properties.length];
-		for ( int i = 0; i < propertyNames.length; i++ ) {
-			propertyNames[i] = properties[i].getName();
+	/**
+	 * Returns the names of properties which where updated according to Hibernate Core
+	 * dirty checks.
+	 */
+	private String[] getDirtyPropertyNames(PostUpdateEvent event) {
+		EntityPersister persister = event.getPersister();
+		Object[] oldState = event.getOldState();
+		if ( oldState != null ) {
+			int[] dirtyProperties = persister.findDirty( event.getState(), oldState, event.getEntity(), event.getSession() );
+			String[] propertyNames = persister.getPropertyNames();
+			int length = dirtyProperties.length;
+			String[] dirtyPropertyNames = new String[length];
+			for ( int i = 0; i < length; i++ ) {
+				dirtyPropertyNames[i] = propertyNames[dirtyProperties[i]];
+			}
+			return dirtyPropertyNames;
 		}
-		return propertyNames;
+		else {
+			return null;
+		}
 	}
 
 	protected <T> void processWork(T entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {

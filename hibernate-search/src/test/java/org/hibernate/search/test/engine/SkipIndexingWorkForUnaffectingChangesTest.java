@@ -61,6 +61,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		tx = fullTextSession.beginTransaction();
 		line1 = (BusLine) fullTextSession.load( BusLine.class, line1.getId() );
 		line1.setBusLineCode( Integer.valueOf( 2 ) );
+		line1.setOperating( true ); // boolean set to same value: might receive a different instance of Boolean
 		BusStop busStop = line1.getStops().iterator().next();
 		busStop.setServiceComments( "please clean the garbage after the football match" );
 		tx.commit();
