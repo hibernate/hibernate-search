@@ -51,6 +51,7 @@ public class BusLine {
 	private String busLineName;
 	private Set<BusStop> stops = new HashSet<BusStop>();
 	private Integer busLineCode = Integer.valueOf( 0 );
+	private boolean operating = true;
 
 	@Id
 	@GeneratedValue
@@ -87,6 +88,15 @@ public class BusLine {
 
 	public void setBusLineCode(Integer busLineCode) {
 		this.busLineCode = busLineCode;
+	}
+	
+	@Field
+	public boolean isOperating() {
+		return operating;
+	}
+
+	public void setOperating(boolean operating) {
+		this.operating = operating;
 	}
 
 	@Override

@@ -42,10 +42,8 @@ public interface DocumentBuilder {
 	 * The DocumentBuilder might be able to tell if an object state update is going to affect index state,
 	 * so that if this function returns false we can skip updating the Lucene index.
 	 * @since 3.4
-	 * @param propertyNames The three arrays have the same length; this one contains the property name of each value
-	 * @param oldState
-	 * @param state
+	 * @param dirtyPropertyNames Contains the property name of each value which changed, or null for everything.
 	 * @return true if it can't make sure the index doesn't need an update
 	 */
-	boolean isDirty(String[] propertyNames, Object[] oldState, Object[] state);
+	boolean isDirty(String[] dirtyPropertyNames);
 }

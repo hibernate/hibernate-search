@@ -787,8 +787,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 * don't affect indexing. So this isDirty() implementation will return true only
 	 * if the proposed change is possibly affecting the index.
 	 */
-	public boolean isDirty(String[] propertyNames, Object[] oldState, Object[] state) {
-		if ( oldState == null ) {
+	public boolean isDirty(String[] dirtyPropertyNames) {
+		if ( dirtyPropertyNames == null || dirtyPropertyNames.length == 0 ) {
 			return true; // it appears some collection work has no oldState -> reindex
 		}
 		if ( metadata.classBridges.size() > 0 ) {
@@ -798,33 +798,31 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			return true; // as with classbridge: might be affected by any field //TODO nice new feature to have?
 		}
 
-		for ( int arrayIdx = 0; arrayIdx < propertyNames.length; arrayIdx++ ) {
+		for ( String dirtyPropertyName : dirtyPropertyNames ) {
 			// Hibernate core will do an in-depth comparison of collections, taking care of creating new values,
 			// so it looks like we can rely on reference equality comparisons, or at least that seems a safe way:
-			if ( oldState[arrayIdx] != state[arrayIdx] ) {
-				Integer propertyIndexInteger = metadata.fieldNameToPositionMap.get( propertyNames[arrayIdx] );
-				if ( propertyIndexInteger != null ) {
-					int propertyIndex = propertyIndexInteger.intValue() - 1;
-					
-					//take care of indexed fields:
-					if ( metadata.fieldIndex.get( propertyIndex ).isIndexed() ) {
-						return true;
-					}
-					
-					//take care of stored fields:
-					Store store = metadata.fieldStore.get( propertyIndex );
-					if ( store.equals( Store.YES ) || store.equals( Store.COMPRESS ) ) {
-						// if Store.NO it doesn't affect the index
-						return true;
-					}
+			Integer propertyIndexInteger = metadata.fieldNameToPositionMap.get( dirtyPropertyName );
+			if ( propertyIndexInteger != null ) {
+				int propertyIndex = propertyIndexInteger.intValue() - 1;
+				
+				// take care of indexed fields:
+				if ( metadata.fieldIndex.get( propertyIndex ).isIndexed() ) {
+					return true;
 				}
 				
-				//consider IndexedEmbedded:
-				for ( XMember embeddedMember : metadata.embeddedGetters ) {
-					String name = embeddedMember.getName();
-					if ( name.equals( propertyNames[arrayIdx] ) )
-						return true;
+				// take care of stored fields:
+				Store store = metadata.fieldStore.get( propertyIndex );
+				if ( store.equals( Store.YES ) || store.equals( Store.COMPRESS ) ) {
+					// unless Store.NO, which doesn't affect the index
+					return true;
 				}
+			}
+			
+			// consider IndexedEmbedded:
+			for ( XMember embeddedMember : metadata.embeddedGetters ) {
+				String name = embeddedMember.getName();
+				if ( name.equals( dirtyPropertyName ) )
+					return true;
 			}
 		}
 		return false;
