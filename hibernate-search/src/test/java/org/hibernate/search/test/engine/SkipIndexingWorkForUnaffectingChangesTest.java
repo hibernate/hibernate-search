@@ -65,7 +65,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		BusStop busStop = line1.getStops().iterator().next();
 		busStop.setServiceComments( "please clean the garbage after the football match" );
 		tx.commit();
-		if (isDirtyCheckEnabled()) {
+		if ( isDirtyCheckEnabled() ) {
 			Assert.assertEquals( 0, LeakingLuceneBackend.getLastProcessedQueue().size() );
 		}
 		else {
