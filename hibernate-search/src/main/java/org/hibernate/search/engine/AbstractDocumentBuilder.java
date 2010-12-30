@@ -786,6 +786,9 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 * Hibernate entities might be considered dirty, but still have only changes that
 	 * don't affect indexing. So this isDirty() implementation will return true only
 	 * if the proposed change is possibly affecting the index.
+	 * @since 3.4
+	 * @param dirtyPropertyNames Contains the property name of each value which changed, or null for everything.
+	 * @return true if it can't make sure the index doesn't need an update
 	 */
 	public boolean isDirty(String[] dirtyPropertyNames) {
 		if ( dirtyPropertyNames == null || dirtyPropertyNames.length == 0 ) {

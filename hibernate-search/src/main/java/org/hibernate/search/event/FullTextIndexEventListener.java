@@ -64,7 +64,7 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
-import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.AbstractDocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
@@ -181,7 +181,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	public void onPostUpdate(PostUpdateEvent event) {
 		if ( used ) {
 			final Object entity = event.getEntity();
-			final DocumentBuilder docBuilder = getDocumentBuilder( entity );
+			final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
 			if ( docBuilder != null && docBuilder.isDirty( getDirtyPropertyNames( event ) ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
@@ -316,9 +316,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		f.set( this, flushSynch );
 	}
 	
-	private DocumentBuilder getDocumentBuilder(final Object entity) {
+	private AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
 		Class<?> clazz = entity.getClass();
-		DocumentBuilder documentBuilderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
+		AbstractDocumentBuilder documentBuilderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
 		if ( documentBuilderIndexedEntity != null ) {
 			return documentBuilderIndexedEntity;
 		}
