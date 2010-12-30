@@ -1378,6 +1378,25 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
 
             <entry>true</entry>
           </row>
+          
+          <row>
+            <entry><literal>hibernate.search.enable_dirty_check</literal></entry>
+
+            <entry>When updating an Hibernate entity changing only non-indexed
+            fields it should be possible to skip entity indexing and to avoid
+            costly writes to the index. Hibernate Search will figure out if all dirty (updated
+            properties) are ignored by the indexing engine and skip unneded work.
+            Disable this option if you use custom <literal>FieldBridge</literal>s whose
+            output is affected by fields which are not indexed nor stored and you need them to
+            be invoked at each update event.
+            <para>This optimization will not be applied on classes using a
+            <literal>@ClassBridge</literal> or a <literal>@DynamicBoost</literal>.</para>
+            <para>Boolean parameter, use "<literal>true</literal>" or
+            "<literal>false</literal>". The default value for this option is
+            <literal>true</literal>.</para></entry>
+
+            <entry>true</entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
@@ -1392,7 +1411,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
       <para>To tune the indexing speed it might be useful to time the object
       loading from database in isolation from the writes to the index. To
       achieve this set the <literal>blackhole</literal> as worker backend and
-      start you indexing routines. This backend does not disable Hibernate
+      start your indexing routines. This backend does not disable Hibernate
       Search: it will still generate the needed changesets to the index, but
       will discard them instead of flushing them to the index. In contrast to
       setting the <literal>hibernate.search.indexing_strategy</literal> to
