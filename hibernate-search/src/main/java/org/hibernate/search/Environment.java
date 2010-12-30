@@ -164,4 +164,12 @@ public final class Environment {
 	 * Tokenizer or filter parameter describing the charset used to load associated resources if needed.
 	 */
 	public static final String RESOURCE_CHARSET = "resource_charset";
+
+	/**
+	 * When enabled reindexing of an entity is skipped if the updates affect only non-indexed fields.
+	 * Enabled by default as it should be safe and should improve performance, disable it to force updates
+	 * skipping value checks.
+	 * Affect semantics of entity updates only.
+	 */
+	public static final String ENABLE_DIRTY_CHECK = "hibernate.search.enable_dirty_check";
 }

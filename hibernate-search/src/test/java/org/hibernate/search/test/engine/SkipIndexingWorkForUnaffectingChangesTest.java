@@ -65,7 +65,12 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		BusStop busStop = line1.getStops().iterator().next();
 		busStop.setServiceComments( "please clean the garbage after the football match" );
 		tx.commit();
-		Assert.assertEquals( 0, LeakingLuceneBackend.getLastProcessedQueue().size() );
+		if (isDirtyCheckEnabled()) {
+			Assert.assertEquals( 0, LeakingLuceneBackend.getLastProcessedQueue().size() );
+		}
+		else {
+			Assert.assertEquals( 2, LeakingLuceneBackend.getLastProcessedQueue().size() );
+		}
 		
 		// now we make an indexing affecting change in the embedded object only,
 		// parent should still be updated
@@ -93,6 +98,10 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.search.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
+	}
+	
+	protected boolean isDirtyCheckEnabled() {
+		return true;
 	}
 	
 }

@@ -94,6 +94,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	private final Installation installation;
 
 	protected boolean used;
+	protected boolean skipDirtyChecks = true;
 	protected SearchFactoryImplementor searchFactoryImplementor;
 
 	static {
@@ -150,6 +151,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		}
 
 		log.debug( "Hibernate Search event listeners " + (used ? "activated" : "deactivated") );
+		
+		skipDirtyChecks = ! searchFactoryImplementor.isDirtyChecksEnabled();
+		log.debug( "Hibernate Search dirty checks " + (skipDirtyChecks ? "disabled" : "enabled") );
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
@@ -182,7 +186,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Object entity = event.getEntity();
 			final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
-			if ( docBuilder != null && docBuilder.isDirty( getDirtyPropertyNames( event ) ) ) {
+			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( getDirtyPropertyNames( event ) ) ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
 			}

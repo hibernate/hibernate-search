@@ -112,4 +112,21 @@ public abstract class ConfigurationParseHelper {
 		}
 	}
 
+	/**
+	 * Extracts a boolean value from configuration properties
+	 * @param cfg configuration Properties
+	 * @param key the property key
+	 * @param defaultValue
+	 * @return the defaultValue if the property was not defined
+	 * @throws SearchException for invalid format or values.
+	 */
+	public static final boolean getBooleanValue(Properties cfg, String key, boolean defaultValue) {
+		String propValue = cfg.getProperty( key );
+		if ( propValue == null ) {
+			return defaultValue;
+		}
+		else {
+			return parseBoolean( propValue, "Property '" + key + "' needs to be either literal 'true' or 'false'" );
+		}
+	}
 }

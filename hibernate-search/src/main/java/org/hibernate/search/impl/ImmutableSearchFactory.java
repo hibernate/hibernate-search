@@ -51,6 +51,7 @@ import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.Worker;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
@@ -114,6 +115,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams;
 	private final String indexingStrategy;
 	private final ServiceManager serviceManager;
+	private final boolean enableDirtyChecks;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -132,11 +134,14 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.readerProvider = state.getReaderProvider();
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
+		
 		this.statistics = new StatisticsImpl( this );
-		String enableStats = configurationProperties.getProperty( Environment.GENERATE_STATS );
-		if ( "true".equalsIgnoreCase( enableStats ) ) {
-			statistics.setStatisticsEnabled( true );
-		}
+		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
+				configurationProperties, Environment.GENERATE_STATS, false );
+		statistics.setStatisticsEnabled( statsEnabled );
+		
+		this.enableDirtyChecks = ConfigurationParseHelper.getBooleanValue(
+				configurationProperties, Environment.ENABLE_DIRTY_CHECK, true );
 
 		if ( isJMXEnabled() ) {
 			// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
@@ -162,7 +167,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public void close() {
-		if ( stopped.compareAndSet( false, true ) ) {  //make sure we only sop once
+		if ( stopped.compareAndSet( false, true ) ) {  //make sure we only stop once
 			try {
 				worker.close();
 			}
@@ -395,5 +400,9 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	public boolean isJMXEnabled() {
 		String enableJMX = getConfigurationProperties().getProperty( Environment.JMX_ENABLED );
 		return "true".equalsIgnoreCase( enableJMX );
+	}
+
+	public boolean isDirtyChecksEnabled() {
+		return enableDirtyChecks;
 	}
 }

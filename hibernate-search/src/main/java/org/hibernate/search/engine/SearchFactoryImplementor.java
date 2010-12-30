@@ -91,4 +91,11 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * @return The statistics implementor.
 	 */
 	public StatisticsImplementor getStatisticsImplementor();
+
+	/**
+	 * @return true if we are allowed to inspect entity state to
+	 * potentially skip some indexing operations.
+	 * Can be disabled to get pre-3.4 behavior (always rebuild document)
+	 */
+	boolean isDirtyChecksEnabled();
 }

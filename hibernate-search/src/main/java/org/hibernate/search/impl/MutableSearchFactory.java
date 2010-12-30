@@ -249,4 +249,8 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 			mutating.unlock();
 		}
 	}
+
+	public boolean isDirtyChecksEnabled() {
+		return delegate.isDirtyChecksEnabled();
+	}
 }
