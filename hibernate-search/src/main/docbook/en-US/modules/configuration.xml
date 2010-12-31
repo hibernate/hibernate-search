@@ -81,7 +81,7 @@
     initialization of the underlying Lucene resources. <xref
     linkend="directory-provider-table" /> shows the list of the directory
     providers available in Hibernate Search together with their corresponding
-    options. </para>
+    options.</para>
 
     <para>To configure your <classname>DirectoryProvider</classname> you have
     to understand that each indexed entity is associated to a Lucene index
@@ -90,7 +90,7 @@
     the <constant>index</constant> property of the
     <classname>@Indexed</classname> annotation. If the
     <constant>index</constant> property is not specified the fully qualified
-    name of the indexed class will be used as name. </para>
+    name of the indexed class will be used as name.</para>
 
     <para>Knowing the index name, you can configure the directory provider and
     any additional options by using the prefix
@@ -354,7 +354,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.provider.CustomDi
     a given entity into several Lucene indexes.</para>
 
     <warning>
-      <para> This solution is not recommended unless there is a pressing need.
+      <para>This solution is not recommended unless there is a pressing need.
       Searches will be slower as all shards have to be opened for a single
       search. Don't do it until you have a real use case!</para>
     </warning>
@@ -959,7 +959,7 @@ hibernate.search.worker.backend = jgroupsMaster   </programlisting>
       <tip>
         <para>If no property is explicitly specified it is assumed that the
         JGroups default configuration file <literal>flush-udp.xml</literal> is
-        used. </para>
+        used.</para>
       </tip>
 
       <example id="example-jgroup-xml-configuration">
@@ -1039,7 +1039,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     <para>The default configuration replicates all data defining the index
     across all nodes, thus consuming a significant amount of memory. For large
     indexes it's suggested to enable data distribution, so that each piece of
-    information is replicated to a subset of all cluster members. </para>
+    information is replicated to a subset of all cluster members.</para>
 
     <para>It is also possible to offload part or most information to a single
     centralized <literal>CacheStore</literal>, such as plain filesystem,
@@ -1378,21 +1378,22 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
 
             <entry>true</entry>
           </row>
-          
+
           <row>
             <entry><literal>hibernate.search.enable_dirty_check</literal></entry>
 
-            <entry>When updating an Hibernate entity changing only non-indexed
-            fields it should be possible to skip entity indexing and to avoid
-            costly writes to the index. Hibernate Search will figure out if all dirty (updated
-            properties) are ignored by the indexing engine and skip unneded work.
-            Disable this option if you use custom <literal>FieldBridge</literal>s whose
-            output is affected by fields which are not indexed nor stored and you need them to
-            be invoked at each update event.
-            <para>This optimization will not be applied on classes using a
-            <literal>@ClassBridge</literal> or a <literal>@DynamicBoost</literal>.</para>
-            <para>Boolean parameter, use "<literal>true</literal>" or
-            "<literal>false</literal>". The default value for this option is
+            <entry><para>Not all entity changes require an update of the
+            Lucene index. If all of the updated entity properties (dirty
+            properties) are not indexed Hibernate Search will skip the
+            re-indexing work.</para><para>Disable this option if you use
+            custom <literal>FieldBridge</literal>s which need to be invoked at
+            each update event (even though the property for which the field
+            bridge is configured has not changed).</para><para>This
+            optimization will not be applied on classes using a
+            <literal>@ClassBridge</literal> or a
+            <literal>@DynamicBoost</literal>.</para><para>Boolean parameter,
+            use "<literal>true</literal>" or "<literal>false</literal>". The
+            default value for this option is
             <literal>true</literal>.</para></entry>
 
             <entry>true</entry>
@@ -1554,7 +1555,7 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
    boolean hasErrors();
 }</programlisting></para>
 
-    <para> To register this error handler with Hibernate Search you must
+    <para>To register this error handler with Hibernate Search you must
     declare the fully qualified classname of your
     <classname>ErrorHandler</classname> implementation in the configuration
     properties:</para>
