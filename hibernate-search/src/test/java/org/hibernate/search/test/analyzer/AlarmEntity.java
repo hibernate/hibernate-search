@@ -30,6 +30,7 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 
@@ -45,6 +46,11 @@ public class AlarmEntity {
 
 	@Field(index = Index.TOKENIZED)
 	private String property;
+	
+	@Fields({
+		@Field(name = "description_analyzer2", index = Index.TOKENIZED, analyzer = @Analyzer(impl = Test2Analyzer.class)),
+		@Field(name = "description_analyzer3", index = Index.TOKENIZED, analyzer = @Analyzer(impl = Test3Analyzer.class)) })
+	private String alarmDescription;
 
 	public Integer getId() {
 		return id;
@@ -59,6 +65,12 @@ public class AlarmEntity {
 	}
 	public void setProperty(String property) {
 		this.property = property;
+	}
+	public String getAlarmDescription() {
+		return alarmDescription;
+	}
+	public void setAlarmDescription(String alarmDescription) {
+		this.alarmDescription = alarmDescription;
 	}
 
 }

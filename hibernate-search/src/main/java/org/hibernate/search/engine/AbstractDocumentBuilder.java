@@ -455,7 +455,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			}
 			catch ( ClassCastException e ) {
 				throw new SearchException(
-						"Lucene analyzer does not implement " + Analyzer.class.getName() + ": " + analyzerClass.getName(),
+						"Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(),
 						e
 				);
 			}

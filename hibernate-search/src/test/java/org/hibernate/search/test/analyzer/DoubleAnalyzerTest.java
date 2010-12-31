@@ -53,6 +53,7 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 		en.setEntity( "anyNotNull" );
 		AlarmEntity alarmEn = new AlarmEntity();
 		alarmEn.setProperty( "notNullAgain" );
+		alarmEn.setAlarmDescription( "description" );
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		s.persist( en );
@@ -75,6 +76,16 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 			Query luceneQuery = parser.parse( "property:sound" );
 			FullTextQuery query = s.createFullTextQuery( luceneQuery, AlarmEntity.class );
 			assertEquals( 0, query.getResultSize() );
+		}
+		{
+			Query luceneQuery = parser.parse( "description_analyzer2:sound" );
+			FullTextQuery query = s.createFullTextQuery( luceneQuery, AlarmEntity.class );
+			assertEquals( 1, query.getResultSize() );
+		}
+		{
+			Query luceneQuery = parser.parse( "description_analyzer3:music" );
+			FullTextQuery query = s.createFullTextQuery( luceneQuery, AlarmEntity.class );
+			assertEquals( 1, query.getResultSize() );
 		}
 		
 		tx.commit();
