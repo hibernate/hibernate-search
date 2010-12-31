@@ -32,8 +32,6 @@ import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
-import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.slf4j.Logger;
 
 import org.hibernate.Session;
@@ -58,6 +56,7 @@ import org.hibernate.event.PostInsertEvent;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.Work;
@@ -66,6 +65,7 @@ import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.cfg.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.AbstractDocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;
@@ -132,10 +132,10 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	 */
 
 	public void initialize(Configuration cfg) {
-		if(installation != SINGLE_INSTANCE) {
+		if ( installation != SINGLE_INSTANCE ) {
 			throw new SearchException( "Only Installation.SINGLE_INSTANCE is supported" );
 		}
-		
+
 		if ( searchFactoryImplementor == null ) {
 			searchFactoryImplementor = new SearchFactoryBuilder()
 					.configuration( new SearchConfigurationFromHibernateCore( cfg ) )
@@ -150,10 +150,10 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			used = false;
 		}
 
-		log.debug( "Hibernate Search event listeners " + (used ? "activated" : "deactivated") );
-		
-		skipDirtyChecks = ! searchFactoryImplementor.isDirtyChecksEnabled();
-		log.debug( "Hibernate Search dirty checks " + (skipDirtyChecks ? "disabled" : "enabled") );
+		log.debug( "Hibernate Search event listeners " + ( used ? "activated" : "deactivated" ) );
+
+		skipDirtyChecks = !searchFactoryImplementor.isDirtyChecksEnabled();
+		log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
@@ -166,7 +166,10 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			if ( getDocumentBuilder( entity ) != null ) {
 				// FIXME The engine currently needs to know about details such as identifierRollbackEnabled
 				// but we should not move the responsibility to figure out the proper id to the engine  
-				boolean identifierRollbackEnabled = event.getSession().getFactory().getSettings().isIdentifierRollbackEnabled();
+				boolean identifierRollbackEnabled = event.getSession()
+						.getFactory()
+						.getSettings()
+						.isIdentifierRollbackEnabled();
 				processWork( entity, event.getId(), WorkType.DELETE, event, identifierRollbackEnabled );
 			}
 		}
@@ -201,7 +204,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		EntityPersister persister = event.getPersister();
 		Object[] oldState = event.getOldState();
 		if ( oldState != null ) {
-			int[] dirtyProperties = persister.findDirty( event.getState(), oldState, event.getEntity(), event.getSession() );
+			int[] dirtyProperties = persister.findDirty(
+					event.getState(), oldState, event.getEntity(), event.getSession()
+			);
 			String[] propertyNames = persister.getPropertyNames();
 			int length = dirtyProperties.length;
 			String[] dirtyPropertyNames = new String[length];
@@ -263,7 +268,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	private Serializable getId(Object entity, AbstractCollectionEvent event) {
 		Serializable id = event.getAffectedOwnerIdOrNull();
 		if ( id == null ) {
-			//most likely this recovery is unnecessary since Hibernate Core probably try that
+			// most likely this recovery is unnecessary since Hibernate Core probably try that
 			EntityEntry entityEntry = event.getSession().getPersistenceContext().getEntry( entity );
 			id = entityEntry == null ? null : entityEntry.getId();
 		}
@@ -319,10 +324,12 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		// setting a final field by reflection during a readObject is considered as safe as in a constructor:
 		f.set( this, flushSynch );
 	}
-	
+
 	private AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
 		Class<?> clazz = entity.getClass();
-		AbstractDocumentBuilder documentBuilderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
+		AbstractDocumentBuilder documentBuilderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
+				clazz
+		);
 		if ( documentBuilderIndexedEntity != null ) {
 			return documentBuilderIndexedEntity;
 		}
@@ -335,8 +342,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		SINGLE_INSTANCE,
 
 		/**
-		 * @deprecated As of Hibernate Search 3.3.
 		 * @see #FullTextIndexEventListener()
+		 * @deprecated As of Hibernate Search 3.3.
 		 */
 		MULTIPLE_INSTANCE
 	}

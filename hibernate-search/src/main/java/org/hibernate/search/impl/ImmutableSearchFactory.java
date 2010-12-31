@@ -34,11 +34,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
-
-import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.spi.ServiceProvider;
-import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
-import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -60,6 +55,7 @@ import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.jmx.JMXRegistrar;
@@ -68,9 +64,12 @@ import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
+import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.StatisticsImpl;
 import org.hibernate.search.stat.StatisticsImplementor;
@@ -134,14 +133,16 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.readerProvider = state.getReaderProvider();
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
-		
+
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
-				configurationProperties, Environment.GENERATE_STATS, false );
+				configurationProperties, Environment.GENERATE_STATS, false
+		);
 		statistics.setStatisticsEnabled( statsEnabled );
-		
+
 		this.enableDirtyChecks = ConfigurationParseHelper.getBooleanValue(
-				configurationProperties, Environment.ENABLE_DIRTY_CHECK, true );
+				configurationProperties, Environment.ENABLE_DIRTY_CHECK, true
+		);
 
 		if ( isJMXEnabled() ) {
 			// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
@@ -214,12 +215,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@SuppressWarnings("unchecked")
 	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-		return ( DocumentBuilderIndexedEntity<T> ) documentBuildersIndexedEntities.get( entityType );
+		return (DocumentBuilderIndexedEntity<T>) documentBuildersIndexedEntities.get( entityType );
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {
-		return ( DocumentBuilderContainedEntity<T> ) documentBuildersContainedEntities.get( entityType );
+		return (DocumentBuilderContainedEntity<T>) documentBuildersContainedEntities.get( entityType );
 	}
 
 	public Set<DirectoryProvider<?>> getDirectoryProviders() {

@@ -21,26 +21,27 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.search.test.engine;
 
 import org.hibernate.search.Environment;
 
 /**
  * Verify functionality of Environment.ENABLE_DIRTY_CHECK
- * @since 3.4
+ *
  * @author Sanne Grinovero
+ * @since 3.4
  */
 public class DirtyChecksDisabledTest extends SkipIndexingWorkForUnaffectingChangesTest {
-	
+
 	@Override
 	protected boolean isDirtyCheckEnabled() {
 		return false;
 	}
-	
+
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
 		cfg.setProperty( Environment.ENABLE_DIRTY_CHECK, " false" ); //intentional space in the value
 	}
-	
 }

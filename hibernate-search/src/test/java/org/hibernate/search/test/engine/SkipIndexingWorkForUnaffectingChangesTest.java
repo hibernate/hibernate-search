@@ -24,8 +24,8 @@
 package org.hibernate.search.test.engine;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.analysis.SimpleAnalyzer;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -36,31 +36,31 @@ import org.hibernate.search.test.embedded.depth.LeakingLuceneBackend;
 /**
  * See HSEARCH-361 and HSEARCH-5 : avoid reindexing objects for which
  * changes where made in hibernate but not affecting the index state.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
-	
+
 	public void testUnindexedFieldsDontTriggerEngine() {
 		// first, normal storage of new indexed graph:
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		BusLine line1 = new BusLine();
-		line1.setBusLineCode( Integer.valueOf( 1 ) );
+		line1.setBusLineCode( 1 );
 		line1.setBusLineName( "Line Uno" );
 		LazyCollectionsUpdatingTest.addBusStop( line1, "Gateshead" );
 		LazyCollectionsUpdatingTest.addBusStop( line1, "The Sage" );
 		session.persist( line1 );
 		tx.commit();
-		
+
 		Assert.assertEquals( 1, LeakingLuceneBackend.getLastProcessedQueue().size() );
 		LeakingLuceneBackend.reset();
 		fullTextSession.clear();
-		
+
 		// now change the BusLine in some way which does not affect the index:
 		tx = fullTextSession.beginTransaction();
 		line1 = (BusLine) fullTextSession.load( BusLine.class, line1.getId() );
-		line1.setBusLineCode( Integer.valueOf( 2 ) );
+		line1.setBusLineCode( 2 );
 		line1.setOperating( true ); // boolean set to same value: might receive a different instance of Boolean
 		BusStop busStop = line1.getStops().iterator().next();
 		busStop.setServiceComments( "please clean the garbage after the football match" );
@@ -71,7 +71,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		else {
 			Assert.assertEquals( 2, LeakingLuceneBackend.getLastProcessedQueue().size() );
 		}
-		
+
 		// now we make an indexing affecting change in the embedded object only,
 		// parent should still be updated
 		LeakingLuceneBackend.reset();
@@ -81,27 +81,28 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		busStop.setRoadName( "Mill Road" );
 		tx.commit();
 		Assert.assertEquals( 2, LeakingLuceneBackend.getLastProcessedQueue().size() ); //2 = delete+add
-		
+
 		fullTextSession.close();
 	}
-	
+
 	// Test setup options - Entities
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { BusLine.class, BusStop.class };
 	}
-	
+
 	// Test setup options - SessionFactory Properties
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
-		cfg.setProperty( "hibernate.search.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
+		cfg.setProperty(
+				"hibernate.search.worker.backend",
+				org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName()
+		);
 	}
-	
+
 	protected boolean isDirtyCheckEnabled() {
 		return true;
 	}
-	
 }
