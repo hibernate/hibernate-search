@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.engine;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -46,6 +47,7 @@ public class BusStop {
 	private String roadName;
 	private Set<BusLine> busses = new HashSet<BusLine>();
 	private String serviceComments = "nothing";
+	private Date startingDate = new Date();
 
 	@Id
 	@GeneratedValue
@@ -82,6 +84,15 @@ public class BusStop {
 
 	public void setServiceComments(String serviceComments) {
 		this.serviceComments = serviceComments;
+	}
+	
+	@Field
+	public Date getStartingDate() {
+		return startingDate;
+	}
+
+	public void setStartingDate(Date startingDate) {
+		this.startingDate = startingDate;
 	}
 
 	@Override
