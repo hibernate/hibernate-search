@@ -1,12 +1,15 @@
 package org.hibernate.search.event;
 
+import java.io.Serializable;
+
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.persister.entity.EntityPersister;
 
 /**
  * @author Emmanuel Bernard
  */
-class HSearchComputedDirtyStrategy implements DirtyStrategy {
+class HSearchComputedDirtyStrategy implements DirtyStrategy, Serializable {
+	
 	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
 		EntityPersister persister = event.getPersister();
 		Object[] oldState = event.getOldState();
@@ -26,4 +29,5 @@ class HSearchComputedDirtyStrategy implements DirtyStrategy {
 			return null;
 		}
 	}
+	
 }
