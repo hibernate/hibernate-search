@@ -56,7 +56,6 @@ import org.hibernate.event.PostInsertEvent;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
-import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.Work;
@@ -96,6 +95,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	protected boolean used;
 	protected boolean skipDirtyChecks = true;
 	protected SearchFactoryImplementor searchFactoryImplementor;
+	private final DirtyStrategy dirtyStrategy;
 
 	static {
 		Version.touch();
@@ -125,6 +125,16 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	public FullTextIndexEventListener(Installation installation) {
 		this.installation = installation;
+		//TODO remove this code when moving to Core 4 (HSEARCH-660)
+		DirtyStrategy dirtyStrategy;
+		try {
+			PostUpdateEvent.class.getMethod( "getDirtyProperties" );
+			dirtyStrategy = new CoreComputedDirtyStrategy();
+		}
+		catch ( NoSuchMethodException e ) {
+			dirtyStrategy = new HSearchComputedDirtyStrategy();
+		}
+		this.dirtyStrategy = dirtyStrategy;
 	}
 
 	/**
@@ -189,34 +199,12 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Object entity = event.getEntity();
 			final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
-			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( getDirtyPropertyNames( event ) ) ) ) {
+			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( dirtyStrategy.getDirtyPropertyNames(
+					event
+			) ) ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
 			}
-		}
-	}
-
-	/**
-	 * Returns the names of properties which where updated according to Hibernate Core
-	 * dirty checks.
-	 */
-	private String[] getDirtyPropertyNames(PostUpdateEvent event) {
-		EntityPersister persister = event.getPersister();
-		Object[] oldState = event.getOldState();
-		if ( oldState != null ) {
-			int[] dirtyProperties = persister.findDirty(
-					event.getState(), oldState, event.getEntity(), event.getSession()
-			);
-			String[] propertyNames = persister.getPropertyNames();
-			int length = dirtyProperties.length;
-			String[] dirtyPropertyNames = new String[length];
-			for ( int i = 0; i < length; i++ ) {
-				dirtyPropertyNames[i] = propertyNames[dirtyProperties[i]];
-			}
-			return dirtyPropertyNames;
-		}
-		else {
-			return null;
 		}
 	}
 
