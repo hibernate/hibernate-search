@@ -90,6 +90,13 @@ public final class Environment {
 	public static final String READER_STRATEGY = READER_PREFIX + "strategy";
 
 	/**
+	 * define the facet field names
+	 */
+	// todo - this is only required for bobo browser. Need a better approach for passing the facet names to
+    // the reader
+	public static final String READER_FACETS = READER_PREFIX + "facets";
+
+	/**
 	 * filter caching strategy class (must have a no-arg constructor and implement FilterCachingStrategy)
 	 */
 	public static final String FILTER_CACHING_STRATEGY = "hibernate.search.filter.cache_strategy";
@@ -123,7 +130,7 @@ public final class Environment {
 	 *
 	 * Default to 0 (ie no retry).
 	 */
-	public static final String RETRY_MARKER_LOOKUP = "retry_marker_lookup"; 
+	public static final String RETRY_MARKER_LOOKUP = "retry_marker_lookup";
 
 	/**
 	 * Define the similarity class name for a given index

@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  * @author Hardy Ferentschik
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.FIELD })
+@Target( { ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface Field {
 	/**
@@ -88,6 +88,11 @@ public @interface Field {
 	 * @return Returns the field bridge used for this field. Default is autowired.
 	 */
 	FieldBridge bridge() default @FieldBridge;
+
+	/**
+	 * @return Returns the facet definition mapped to this field.
+	 */
+	boolean isFacetable() default false;
 
 	/**
 	 * @return Returns the value to be used for indexing {@code null}. Per default {@code Field.NO_NULL_INDEXING} is returned indicating that

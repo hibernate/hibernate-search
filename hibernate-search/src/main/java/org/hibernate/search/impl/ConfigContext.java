@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -24,8 +24,10 @@
 package org.hibernate.search.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -59,22 +61,42 @@ import org.hibernate.search.util.LoggerFactory;
 public final class ConfigContext {
 
 	private static final Logger log = LoggerFactory.make();
-	private static final Version DEFAULT_LUCENE_MATCH_VERSION = Version.LUCENE_30;
-	private static final String  DEFAULT_NULL_INDEX_TOKEN = "_null_";
 
 	/**
-	 * Constant used as definition point it is a global (programmatic) definition and there is no annotated element
-	 * connected to it
+	 * If nothing else is specified we use {@code Version.LUCENE_30} as the default Lucene version. This version
+	 * parameter was introduced by Lucene to achieve some sort of backward compatibility.
+	 */
+	private static final Version DEFAULT_LUCENE_MATCH_VERSION = Version.LUCENE_30;
+
+	/**
+	 * The default token for indexing null values. See {@link org.hibernate.search.annotations.Field#indexNullAs()}
+	 */
+	private static final String DEFAULT_NULL_INDEX_TOKEN = "_null_";
+
+	/**
+	 * Constant used as definition point for a global (programmatic) analyzer definition. In this case no annotated
+	 * element is available to be used as definition point.
 	 */
 	private static final String PROGRAMMATIC_ANALYZER_DEFINITION = "PROGRAMMATIC_ANALYZER_DEFINITION";
 
+	/**
+	 * Used to keep track of duplicated analyzer definitions. The key of the map is the analyzer definition
+	 * name and the value is a string defining the location of the definition. In most cases the fully specified class
+	 * name together with the annotated element name is used. See also {@link #PROGRAMMATIC_ANALYZER_DEFINITION}.
+	 */
+	private final Map<String, String> analyzerDefinitionPoints = new HashMap<String, String>();
+
+	/**
+	 * Map of discovered analyzer definitions. The key of the map is the analyzer def name and the value is the
+	 * {@code AnalyzerDef} annotation.
+	 */
 	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
 
 	/**
-	 * Used to keep track of duplicated analyzer definitions. The key of the map is the analyzer definition
-	 * name and the value is a string defining the location of the definition.
+	 * Set of field names used for faceting
 	 */
-	private final Map<String, String> analyzerDefinitionPoints = new HashMap<String, String>();
+	// todo - Check whether I have to take care about which class defines the name
+	private final Collection<String> facetFieldNames = new HashSet<String>();
 
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
@@ -90,7 +112,7 @@ public final class ConfigContext {
 		defaultSimilarity = initSimilarity( cfg );
 		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
 		jpaPresent = isPresent( "javax.persistence.Id" );
-		nullToken = initNullToken(cfg);
+		nullToken = initNullToken( cfg );
 	}
 
 	/**
@@ -104,6 +126,19 @@ public final class ConfigContext {
 			return;
 		}
 		addAnalyzerDef( analyzerDef, buildAnnotationDefinitionPoint( annotatedElement ) );
+	}
+
+	/**
+	 * Add a facet field name.
+	 *
+	 * @param facetFieldName the name of the faceted field
+	 */
+	public void addFacetFieldName(String facetFieldName) {
+		facetFieldNames.add( facetFieldName );
+	}
+
+	public Collection<String> getFacetFieldNames() {
+		return facetFieldNames;
 	}
 
 	public void addGlobalAnalyzerDef(AnalyzerDef analyzerDef) {
@@ -182,7 +217,7 @@ public final class ConfigContext {
 
 	private String initNullToken(SearchConfiguration cfg) {
 		String defaultNullIndexToken = cfg.getProperty( Environment.DEFAULT_NULL_TOKEN );
-		if(StringHelper.isEmpty( defaultNullIndexToken )) {
+		if ( StringHelper.isEmpty( defaultNullIndexToken ) ) {
 			defaultNullIndexToken = DEFAULT_NULL_INDEX_TOKEN;
 		}
 		return defaultNullIndexToken;

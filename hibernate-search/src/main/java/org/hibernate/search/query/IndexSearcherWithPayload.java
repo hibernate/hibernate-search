@@ -1,18 +1,40 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ *
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+ */
+
 package org.hibernate.search.query;
 
 import org.apache.lucene.search.IndexSearcher;
 
 /**
-* @author Emmanuel Bernard
-*/
-//meant to be package-private, was opened up for Infinispan temporarily. Don't use outside of Hibernate Search codebase!
-@Deprecated//(warning to other frameworks only: this class is not part of public API)
-public class IndexSearcherWithPayload {
+ * @author Emmanuel Bernard
+ */
+class IndexSearcherWithPayload {
 	private final IndexSearcher searcher;
 	private boolean fieldSortDoTrackScores;
 	private boolean fieldSortDoMaxScore;
 
-	public IndexSearcherWithPayload(IndexSearcher searcher, boolean fieldSortDoTrackScores, boolean fieldSortDoMaxScore) {
+	IndexSearcherWithPayload(IndexSearcher searcher, boolean fieldSortDoTrackScores, boolean fieldSortDoMaxScore) {
 		this.searcher = searcher;
 		this.fieldSortDoTrackScores = fieldSortDoTrackScores;
 		this.fieldSortDoMaxScore = fieldSortDoMaxScore;

@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -27,8 +27,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.event.PostInsertEventListener;
-import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.event.FullTextIndexEventListener;
 
 /**
  * @author Emmanuel Bernard
@@ -40,7 +40,6 @@ public abstract class ContextHelper {
 		return getSearchFactoryBySFI( (SessionImplementor) session );
 	}
 
-	
 	public static SearchFactoryImplementor getSearchFactoryBySFI(SessionImplementor session) {
 		PostInsertEventListener[] listeners = session.getListeners().getPostInsertEventListeners();
 		FullTextIndexEventListener listener = null;
@@ -51,9 +50,12 @@ public abstract class ContextHelper {
 				break;
 			}
 		}
-		if ( listener == null ) throw new HibernateException(
-				"Hibernate Search Event listeners not configured, please check the reference documentation and the " +
-						"application's hibernate.cfg.xml" );
+		if ( listener == null ) {
+			throw new HibernateException(
+					"Hibernate Search Event listeners not configured, please check the reference documentation and the " +
+							"application's hibernate.cfg.xml"
+			);
+		}
 		return listener.getSearchFactoryImplementor();
 	}
 }
