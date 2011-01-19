@@ -465,7 +465,22 @@ public class DSLTest extends SearchTestCase {
 
 		transaction.commit();
 	}
-
+	
+	public void testFieldBridge() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+		Query query = monthQb.keyword()
+			.onField( "monthRomanNumber" )
+			.matching( 2 )
+			.createQuery();
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		List results = fullTextQuery.list();
+		assertEquals( 1, results.size() );
+		Month february = (Month) results.get( 0 );
+		assertEquals( 2, february.getMonthValue() );
+		transaction.commit();
+	}
 
 //	public void testTermQueryOnAnalyzer() throws Exception {
 //		FullTextSession fullTextSession = indexTestData();

@@ -73,6 +73,12 @@ class Helper {
 	static List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) throws IOException {
 		List<String> terms = new ArrayList<String>();
 
+		// Can't deal with null at this point. Likely returned by some FieldBridge not recognizing the type.
+		if ( localText == null ) {
+			throw new SearchException( "Search parameter on field " + fieldName + " could not be converted. " +
+					"Likely using wrong parameter type (in object world), or apply the ignoreFieldBridge() option to " +
+					"pass String parameters" );
+		}
 		Reader reader = new StringReader(localText);
 		TokenStream stream = analyzer.reusableTokenStream( fieldName, reader);
 		TermAttribute attribute = (TermAttribute) stream.addAttribute( TermAttribute.class );
