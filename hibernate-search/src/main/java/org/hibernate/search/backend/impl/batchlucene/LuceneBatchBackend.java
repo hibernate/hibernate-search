@@ -63,10 +63,7 @@ public class LuceneBatchBackend implements BatchBackend {
 
 	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, WorkerBuildContext context) {
 		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
-		int maxThreadsPerIndex = ConfigurationParseHelper.getIntValue( cfg, "concurrent_writers", 2 );
-		if ( maxThreadsPerIndex < 1 ) {
-			throw new SearchException( "concurrent_writers for batch backend must be at least 1." );
-		}
+		final int maxThreadsPerIndex = definedIndexWriters( cfg );
 		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
 		for ( DirectoryProvider<?> dp : context.getDirectoryProviders() ) {
 			DirectoryProviderWorkspace resources = new DirectoryProviderWorkspace( context, dp, monitor, maxThreadsPerIndex, errorHandler );
@@ -142,6 +139,18 @@ public class LuceneBatchBackend implements BatchBackend {
 			resourcesMap.get( dp ).doWorkInSync( work );
 		}
 		
+	}
+	
+	/**
+	 * @param cfg Configuration properties
+	 * @return the number of threads to be writing on the shared IndexWriter
+	 */
+	private static int definedIndexWriters(Properties cfg) {
+		final int indexWriters = ConfigurationParseHelper.getIntValue( cfg, "concurrent_writers", 2 );
+		if ( indexWriters < 1 ) {
+			throw new SearchException( "concurrent_writers for batch backend must be at least 1." );
+		}
+		return indexWriters;
 	}
 
 }

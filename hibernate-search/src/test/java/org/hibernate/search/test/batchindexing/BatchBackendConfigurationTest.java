@@ -61,6 +61,25 @@ public class BatchBackendConfigurationTest extends TestCase {
 		fullTextSession.close();
 		fsBuilder.close();
 	}
+	
+	public void testConfigurationIsOverriden() throws InterruptedException {
+		FullTextSessionBuilder fsBuilder = new FullTextSessionBuilder()
+			.addAnnotatedClass( Book.class )
+			.addAnnotatedClass( Nation.class )
+		// illegal option:
+			.setProperty( LuceneBatchBackend.CONCURRENT_WRITERS, "0" ).build();
+		try {
+			FullTextSession fullTextSession = fsBuilder.openFullTextSession();
+			MassIndexer massIndexer = fullTextSession.createIndexer();
+			// "fixes" illegal option by override:
+			massIndexer.threadsForIndexWriter( 2 );
+			massIndexer.startAndWait();
+			fullTextSession.close();
+		}
+		finally {
+			fsBuilder.close();
+		}
+	}
 
 }
 

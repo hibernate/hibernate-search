@@ -347,8 +347,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return indexHierarchy.getIndexedClasses( classes );
 	}
 
-	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
-		BatchBackend batchBackend;
+	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer forceToNumWriterThreads) {
+		final BatchBackend batchBackend;
 		String impl = configurationProperties.getProperty( Environment.BATCH_BACKEND );
 		if ( StringHelper.isEmpty( impl ) || "LuceneBatch".equalsIgnoreCase( impl ) ) {
 			batchBackend = new LuceneBatchBackend();
@@ -359,8 +359,13 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 					"batchbackend"
 			);
 		}
+		Properties cfg = this.configurationProperties;
+		if ( forceToNumWriterThreads != null ) {
+			cfg = new Properties( cfg );
+			cfg.put( LuceneBatchBackend.CONCURRENT_WRITERS, forceToNumWriterThreads.toString() );
+		}
 		Properties batchBackendConfiguration = new MaskedProperty(
-				this.configurationProperties, Environment.BATCH_BACKEND
+				cfg, Environment.BATCH_BACKEND
 		);
 		batchBackend.initialize( batchBackendConfiguration, progressMonitor, this );
 		return batchBackend;

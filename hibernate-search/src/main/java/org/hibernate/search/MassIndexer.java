@@ -61,14 +61,16 @@ public interface MassIndexer {
 	MassIndexer threadsForSubsequentFetching(int numberOfThreads);
 	
 	/**
-	 * Sets the number of threads to be used to analyze the documents
-	 * and write to the index.
+	 * <p>Sets the number of threads to be used to analyze the documents
+	 * and write to the index.</p><p>This overrides the global property
+	 * <tt>hibernate.search.batchbackend.concurrent_writers</tt>.</p><p>
+	 * Might be ignored by <code>BatchBackend</code> implementations other
+	 * than <code>org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend</code></p>
+	 * @see org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend.
 	 * @param numberOfThreads
-	 * @return
+	 * @return <tt>this</tt> for method chaining
 	 */
-	//TODO implement? performance improvement was found to be
-	//interesting in unusual setups only.
-	//MassIndexer threadsForIndexWriter(int numberOfThreads);
+	MassIndexer threadsForIndexWriter(int numberOfThreads);
 	
 	/**
 	 * Sets the cache interaction mode for the data loading tasks.

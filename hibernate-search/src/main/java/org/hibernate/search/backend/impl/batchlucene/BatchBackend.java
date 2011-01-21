@@ -45,7 +45,7 @@ public interface BatchBackend {
 	 *
 	 * @param props all configuration properties
 	 * @param monitor the indexing progress monitor
-	 * @param context the build context for the workers.
+	 * @param context the build context for the workers
 	 */
 	void initialize(Properties props, MassIndexerProgressMonitor monitor, WorkerBuildContext context);
 

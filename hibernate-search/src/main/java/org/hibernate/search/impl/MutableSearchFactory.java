@@ -159,8 +159,8 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getIndexedTypesPolymorphic( classes );
 	}
 
-	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
-		return delegate.makeBatchBackend( progressMonitor );
+	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer writerThreads) {
+		return delegate.makeBatchBackend( progressMonitor, writerThreads );
 	}
 
 	public Similarity getSimilarity(DirectoryProvider<?> directoryProvider) {

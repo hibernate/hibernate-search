@@ -75,7 +75,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
 
-	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
+	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer writerThreads);
 
 	Similarity getSimilarity(DirectoryProvider<?> directoryProvider);
 
@@ -98,4 +98,5 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * Can be disabled to get pre-3.4 behavior (always rebuild document)
 	 */
 	boolean isDirtyChecksEnabled();
+
 }
