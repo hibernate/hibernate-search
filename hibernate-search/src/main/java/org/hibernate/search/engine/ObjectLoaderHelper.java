@@ -121,6 +121,8 @@ public class ObjectLoaderHelper {
 		//mandatory to keep the same ordering
 		List result = new ArrayList( entityInfos.length );
 		for ( EntityInfo entityInfo : entityInfos ) {
+			//FIXME This call is very inefficient when @Entity's id property is different
+			//FIXME from Document stored id as we need to do the actual query again
 			Object element = executeLoad( entityInfo, session );
 			if ( HibernateHelper.isInitialized( element ) ) {
 				//all existing elements should have been loaded by the query,
@@ -156,6 +158,8 @@ public class ObjectLoaderHelper {
 				maybeProxy = criteria.uniqueResult();
 			}
 			catch ( HibernateException e ) {
+				//FIXME should not raise an exception but return something like null
+				//FIXME this happens when the index is out of sync with the db)
 				throw new SearchException(
 						"Loading entity of type " + entityInfo.clazz.getName() + " using '"
 								+ entityInfo.idName
