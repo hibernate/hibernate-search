@@ -62,6 +62,8 @@ import org.hibernate.hql.QueryExecutionRequestException;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.query.DatabaseRetrievalMethod;
+import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -339,6 +341,11 @@ public class FullTextQueryImpl implements FullTextQuery {
 
 	public boolean hasPartialResults() {
 		return query.hasPartialResults();
+	}
+
+	public FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
+		query.initializeObjectsWith( lookupMethod, retrievalMethod );
+		return this;
 	}
 
 	public int executeUpdate() {

@@ -70,53 +70,6 @@ public class ObjectLoaderHelper {
 		return maybeProxy;
 	}
 
-	public static void initializeObjects(EntityInfo[] entityInfos,
-										 Criteria criteria, Class<?> entityType,
-										 SearchFactoryImplementor searchFactoryImplementor,
-										 TimeoutManager timeoutManager) {
-		//Do not call isTimeOut here as the caller might be the last biggie on the list.
-		final int maxResults = entityInfos.length;
-		if ( maxResults == 0 ) {
-			return;
-		}
-
-		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
-		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				indexedEntities.iterator().next()
-		);
-		String idName = builder.getIdentifierName();
-		Disjunction disjunction = Restrictions.disjunction();
-
-		int loop = maxResults / MAX_IN_CLAUSE;
-		boolean exact = maxResults % MAX_IN_CLAUSE == 0;
-		if ( !exact ) {
-			loop++;
-		}
-		for ( int index = 0; index < loop; index++ ) {
-			int max = index * MAX_IN_CLAUSE + MAX_IN_CLAUSE <= maxResults ?
-					index * MAX_IN_CLAUSE + MAX_IN_CLAUSE :
-					maxResults;
-			List<Serializable> ids = new ArrayList<Serializable>( max - index * MAX_IN_CLAUSE );
-			for ( int entityInfoIndex = index * MAX_IN_CLAUSE; entityInfoIndex < max; entityInfoIndex++ ) {
-				ids.add( entityInfos[entityInfoIndex].id );
-			}
-			disjunction.add( Restrictions.in( idName, ids ) );
-		}
-		criteria.add( disjunction );
-		//not best effort so fail fast
-		if ( timeoutManager.getType() != TimeoutManager.Type.LIMIT ) {
-			Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
-			if ( timeLeftInSecond != null ) {
-				if (timeLeftInSecond == 0) {
-					timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting(null);
-				}
-				criteria.setTimeout( timeLeftInSecond.intValue() );
-			}
-		}
-		criteria.list(); //load all objects
-	}
-
-
 	public static List returnAlreadyLoadedObjectsInCorrectOrder(EntityInfo[] entityInfos, Session session) {
 		//mandatory to keep the same ordering
 		List result = new ArrayList( entityInfos.length );

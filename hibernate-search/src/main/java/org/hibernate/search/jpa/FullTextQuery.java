@@ -30,6 +30,8 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Explanation;
 import org.hibernate.Criteria;
+import org.hibernate.search.query.DatabaseRetrievalMethod;
+import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.FullTextFilter;
@@ -148,4 +150,16 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * and the result fetching process has been terminated.
 	 */
 	boolean hasPartialResults();
+
+	/**
+	 * Refine the strategies used to load entities.
+	 *
+	 * The lookup method defines whether or not to lookup first in the second level cache or the persistence context
+	 * before trying to initialize objects from the database. Defaults to SKIP.
+	 *
+	 * The database retrieval method defines how objects are loaded from the database. Defaults to QUERY.
+	 *
+	 * Note that Hibernate Search can deviate from these choices when it makes sense.
+	 */
+	FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod);
 }

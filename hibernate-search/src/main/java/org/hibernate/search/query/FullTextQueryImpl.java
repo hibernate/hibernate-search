@@ -78,6 +78,7 @@ import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
+import org.hibernate.search.query.impl.ObjectsInitializer;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -120,7 +121,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private int fetchSize = 1;
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 	private final TimeoutManager timeoutManager;
-
+	private ObjectLookupMethod lookupMethod = ObjectLookupMethod.SKIP; //default
+	private DatabaseRetrievalMethod retrievalMethod = DatabaseRetrievalMethod.QUERY; //default
 
 	/**
 	 * Constructs a  <code>FullTextQueryImpl</code> instance.
@@ -234,7 +236,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				.indexedTargetedEntities(indexedTargetedEntities)
 				.session(session)
 				.searchFactory(searchFactoryImplementor)
-				.timeoutManager(timeoutManager);
+				.timeoutManager(timeoutManager)
+				.lookupMethod(lookupMethod)
+				.retrievalMethod( retrievalMethod );
 		if ( indexProjection != null ) {
 			return getProjectionLoader( loaderBuilder );
 		}
@@ -990,6 +994,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return timeoutManager.hasPartialResults();
 	}
 
+	public FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
+		this.lookupMethod = lookupMethod;
+		this.retrievalMethod = retrievalMethod;
+		return this;
+	}
+
 	private SearchFactoryImplementor getSearchFactoryImplementor() {
 		if ( searchFactoryImplementor == null ) {
 			searchFactoryImplementor = ContextHelper.getSearchFactoryBySFI( session );
@@ -998,7 +1008,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private static Loader noLoader = new Loader() {
-		public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, TimeoutManager timeoutManager) {
+		public void init(Session session,
+					 SearchFactoryImplementor searchFactoryImplementor,
+					 ObjectsInitializer objectsInitializer,
+					 TimeoutManager timeoutManager) {
 		}
 
 		public Object load(EntityInfo entityInfo) {
