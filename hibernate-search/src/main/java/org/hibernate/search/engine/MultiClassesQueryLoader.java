@@ -34,6 +34,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.TimeoutManager;
+import org.hibernate.search.query.impl.ObjectsInitializer;
 
 /**
  * A loader which loads objects of multiple types.
@@ -45,12 +46,17 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private List<RootEntityMetadata> entityMatadata;
 	private TimeoutManager timeoutManager;
+	private ObjectsInitializer objectsInitializer;
 
-	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, TimeoutManager timeoutManager) {
+	public void init(Session session,
+					 SearchFactoryImplementor searchFactoryImplementor,
+					 ObjectsInitializer objectsInitializer,
+					 TimeoutManager timeoutManager) {
 		super.init( session, searchFactoryImplementor );
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.timeoutManager = timeoutManager;
+		this.objectsInitializer = objectsInitializer;
 	}
 
 	public void setEntityTypes(Set<Class<?>> entityTypes) {
@@ -99,6 +105,8 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		Map<RootEntityMetadata, List<EntityInfo>> entityinfoBuckets =
 				new HashMap<RootEntityMetadata, List<EntityInfo>>( entityMatadata.size());
 		for (EntityInfo entityInfo : entityInfos) {
+
+
 			boolean found = false;
 			for (RootEntityMetadata rootEntityInfo : entityMatadata) {
 				if ( rootEntityInfo.rootEntity == entityInfo.clazz || rootEntityInfo.mappedSubclasses.contains( entityInfo.clazz ) ) {
@@ -121,8 +129,13 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			final List<EntityInfo> value = entry.getValue();
 			final EntityInfo[] bucketEntityInfos = value.toArray( new EntityInfo[value.size()] );
 
-			ObjectLoaderHelper.initializeObjects( bucketEntityInfos,
-					key.criteria, key.rootEntity, searchFactoryImplementor, timeoutManager);
+			objectsInitializer.initializeObjects(
+					bucketEntityInfos,
+					key.criteria,
+					key.rootEntity,
+					searchFactoryImplementor,
+					timeoutManager,
+					session);
 			timeoutManager.isTimedOut();
 
 		}

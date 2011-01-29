@@ -30,6 +30,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.TimeoutManager;
+import org.hibernate.search.query.impl.ObjectsInitializer;
 
 /**
  * @author Emmanuel Bernard
@@ -43,13 +44,18 @@ public class QueryLoader extends AbstractLoader {
 	private Criteria criteria;
 	private boolean isExplicitCriteria;
 	private TimeoutManager timeoutManager;
+	private ObjectsInitializer objectsInitializer;
 
 
-	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, TimeoutManager timeoutManager) {
+	public void init(Session session,
+					 SearchFactoryImplementor searchFactoryImplementor,
+					 ObjectsInitializer objectsInitializer,
+					 TimeoutManager timeoutManager) {
 		super.init( session, searchFactoryImplementor );
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.timeoutManager = timeoutManager;
+		this.objectsInitializer = objectsInitializer;
 	}
 
 	public void setEntityType(Class entityType) {
@@ -77,7 +83,13 @@ public class QueryLoader extends AbstractLoader {
 			criteria = session.createCriteria( entityType );
 		}
 
-		ObjectLoaderHelper.initializeObjects( entityInfos, criteria, entityType, searchFactoryImplementor, timeoutManager );
+		objectsInitializer.initializeObjects(
+				entityInfos,
+				criteria,
+				entityType,
+				searchFactoryImplementor,
+				timeoutManager,
+				session);
 		return ObjectLoaderHelper.returnAlreadyLoadedObjectsInCorrectOrder( entityInfos, session );
 	}
 

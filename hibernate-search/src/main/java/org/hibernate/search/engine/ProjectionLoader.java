@@ -30,6 +30,7 @@ import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.ObjectLoaderBuilder;
 import org.hibernate.search.query.TimeoutManager;
+import org.hibernate.search.query.impl.ObjectsInitializer;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -46,11 +47,19 @@ public class ProjectionLoader implements Loader {
 	private String[] aliases;
 	private ObjectLoaderBuilder loaderBuilder;
 
-	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, TimeoutManager timeoutManager) {
+	public void init(Session session,
+					 SearchFactoryImplementor searchFactoryImplementor,
+					 ObjectsInitializer objectsInitializer,
+					 TimeoutManager timeoutManager) {
 	}
 
-	public void init(Session session, SearchFactoryImplementor searchFactoryImplementor, ResultTransformer transformer, ObjectLoaderBuilder loaderBuilder, String[] aliases, TimeoutManager timeoutManager) {
-		init(session, searchFactoryImplementor, timeoutManager);
+	public void init(Session session,
+					 SearchFactoryImplementor searchFactoryImplementor,
+					 ResultTransformer transformer,
+					 ObjectLoaderBuilder loaderBuilder,
+					 String[] aliases,
+					 TimeoutManager timeoutManager) {
+		init(session, searchFactoryImplementor, null, timeoutManager); //TODO why do we call this method?
 		this.transformer = transformer;
 		this.aliases = aliases;
 		this.loaderBuilder = loaderBuilder;

@@ -26,6 +26,7 @@ package org.hibernate.search.query;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.impl.CriteriaImpl;
@@ -34,6 +35,11 @@ import org.hibernate.search.engine.Loader;
 import org.hibernate.search.engine.MultiClassesQueryLoader;
 import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.query.impl.CriteriaObjectsInitializer;
+import org.hibernate.search.query.impl.LookupObjectsInitializer;
+import org.hibernate.search.query.impl.ObjectsInitializer;
+import org.hibernate.search.query.impl.PersistenceContextObjectsInitializer;
+import org.hibernate.search.query.impl.SecondLevelCacheObjectsInitializer;
 
 import java.util.List;
 import java.util.Set;
@@ -48,6 +54,8 @@ public class ObjectLoaderBuilder {
 	private SearchFactoryImplementor searchFactoryImplementor;
 	private Set<Class<?>> indexedTargetedEntities;
 	private TimeoutManager timeoutManager;
+	private ObjectLookupMethod lookupMethod;
+	private DatabaseRetrievalMethod retrievalMethod;
 
 	public ObjectLoaderBuilder criteria(Criteria criteria) {
 		this.criteria = criteria;
@@ -56,6 +64,16 @@ public class ObjectLoaderBuilder {
 
 	public ObjectLoaderBuilder targetedEntities(List<Class<?>> targetedEntities) {
 		this.targetedEntities = targetedEntities;
+		return this;
+	}
+
+	public ObjectLoaderBuilder lookupMethod(ObjectLookupMethod lookupMethod) {
+		this.lookupMethod = lookupMethod;
+		return this;
+	}
+
+	public ObjectLoaderBuilder retrievalMethod(DatabaseRetrievalMethod retrievalMethod) {
+		this.retrievalMethod = retrievalMethod;
 		return this;
 	}
 
@@ -73,14 +91,14 @@ public class ObjectLoaderBuilder {
 
 	private Loader getMultipleEntitiesLoader() {
 		final MultiClassesQueryLoader multiClassesLoader = new MultiClassesQueryLoader();
-		multiClassesLoader.init( (Session) session, searchFactoryImplementor, timeoutManager );
+		multiClassesLoader.init( (Session) session, searchFactoryImplementor, getObjectInitializer(), timeoutManager );
 		multiClassesLoader.setEntityTypes( indexedTargetedEntities );
 		return multiClassesLoader;
 	}
 
 	private Loader getSingleEntityLoader() {
 		final QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( ( Session ) session, searchFactoryImplementor, timeoutManager );
+		queryLoader.init( ( Session ) session, searchFactoryImplementor, getObjectInitializer(), timeoutManager );
 		queryLoader.setEntityType( targetedEntities.iterator().next() );
 		return queryLoader;
 	}
@@ -105,7 +123,7 @@ public class ObjectLoaderBuilder {
 			}
 		}
 		QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( ( Session ) session, searchFactoryImplementor, timeoutManager );
+		queryLoader.init( ( Session ) session, searchFactoryImplementor, getObjectInitializer(), timeoutManager );
 		queryLoader.setEntityType( entityType );
 		queryLoader.setCriteria( criteria );
 		return queryLoader;
@@ -129,5 +147,40 @@ public class ObjectLoaderBuilder {
 	public ObjectLoaderBuilder timeoutManager(TimeoutManager timeoutManager) {
 		this.timeoutManager = timeoutManager;
 		return this;
+	}
+
+	private ObjectsInitializer getObjectInitializer() {
+		if (criteria != null && retrievalMethod != DatabaseRetrievalMethod.QUERY) {
+			throw new SearchException( "Cannot mix custom criteria query and " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
+		}
+		//TODO should we cache these ObjectInitializer instances?
+		ObjectsInitializer initializer;
+		if ( retrievalMethod == DatabaseRetrievalMethod.FIND_BY_ID) {
+			//return early as this method does naturally 2lc + session lookup
+			return new LookupObjectsInitializer();
+		}
+		else if ( retrievalMethod == DatabaseRetrievalMethod.QUERY) {
+			initializer = new CriteriaObjectsInitializer();
+		}
+		else {
+			throw new AssertionFailure( "Unknown " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
+		}
+		if (lookupMethod == ObjectLookupMethod.SKIP) {
+			return initializer;
+		}
+		else if (lookupMethod == ObjectLookupMethod.SECOND_LEVEL_CACHE) {
+			return new SecondLevelCacheObjectsInitializer( initializer );
+		}
+		else if (lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT) {
+			return new PersistenceContextObjectsInitializer( initializer );
+		}
+		else if (lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT_AND_SECOND_LEVEL_CACHE ) {
+			//we want to check the PC first, that's cheaper
+			return new PersistenceContextObjectsInitializer( new SecondLevelCacheObjectsInitializer(initializer) );
+		}
+		else {
+			throw new AssertionFailure( "Unknown " + ObjectLookupMethod.class.getSimpleName() + "." + lookupMethod );
+		}
+		//unreachable statement
 	}
 }
