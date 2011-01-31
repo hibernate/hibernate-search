@@ -622,8 +622,8 @@ Query luceneQuery = mythQB
 org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );</programlisting>
         </example>
 
-        <para> It is advised, from a performance point of view, to restrict
-        the returned types:</para>
+        <para>It is advised, from a performance point of view, to restrict the
+        returned types:</para>
 
         <example id="example-filtering-by-entity-type">
           <title>Filtering the search result by entity type</title>
@@ -724,7 +724,7 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
         <para>When defining a criteria query, it is not necessary to restrict
         the returned entity types when creating the Hibernate Search query
         from the full text session: the type is guessed from the criteria
-        query itself. </para>
+        query itself.</para>
 
         <important>
           <para>Only fetch mode can be adjusted, refrain from applying any
@@ -779,7 +779,7 @@ String authorName = firstResult[3];</programlisting>
             <classname>org.hibernate.search.bridge.TwoWayFieldBridge</classname>
             or
             <literal>org.hibernate.search.bridge.TwoWayStringBridge</literal>,
-            the latter being the simpler version. </para>
+            the latter being the simpler version.</para>
 
             <note>
               <para>All Hibernate Search built-in types are two-way.</para>
@@ -958,50 +958,50 @@ catch (javax.persistence.QueryTimeoutException e) {
             guarantee to stop exactly on the specified timeout.</para>
           </important>
         </section>
-      </section>
 
-      <section>
-        <title>Limit the number of results when the time limit is reached
-        (EXPERIMENTAL)</title>
+        <section>
+          <title>Limit the number of results when the time limit is reached
+          (EXPERIMENTAL)</title>
 
-        <para>Alternatively, you can return the number of results which have
-        already been fetched by the time the limit is reached. Note that only
-        the Lucene part of the query is influenced by this limit. It is
-        possible that, if you retrieve managed object, it takes longer to
-        fetch these objects.</para>
+          <para>Alternatively, you can return the number of results which have
+          already been fetched by the time the limit is reached. Note that
+          only the Lucene part of the query is influenced by this limit. It is
+          possible that, if you retrieve managed object, it takes longer to
+          fetch these objects.</para>
 
-        <warning>
-          <para>This approach is not compatible with the
-          <classname>setTimeout</classname> approach.</para>
-        </warning>
+          <warning>
+            <para>This approach is not compatible with the
+            <classname>setTimeout</classname> approach.</para>
+          </warning>
 
-        <para>To define this soft limit, use the following approach</para>
+          <para>To define this soft limit, use the following approach</para>
 
-        <example>
-          <title>Defining a time limit in query execution</title>
+          <example>
+            <title>Defining a time limit in query execution</title>
 
-          <programlisting>Query luceneQuery = ...;
+            <programlisting>Query luceneQuery = ...;
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
 query.limitExecutionTimeTo(500, TimeUnit.MILLISECONDS);
 List results = query.list();</programlisting>
-        </example>
+          </example>
 
-        <para>Likewise <literal>getResultSize()</literal>,
-        <methodname>iterate()</methodname> and
-        <methodname>scroll()</methodname> honor the time limit but only until
-        the end of the method call. That simply means that the methods of
-        <classname>Iterable</classname> or the
-        <classname>ScrollableResults</classname> ignore the timeout.</para>
+          <para>Likewise <literal>getResultSize()</literal>,
+          <methodname>iterate()</methodname> and
+          <methodname>scroll()</methodname> honor the time limit but only
+          until the end of the method call. That simply means that the methods
+          of <classname>Iterable</classname> or the
+          <classname>ScrollableResults</classname> ignore the timeout.</para>
 
-        <para>You can determine if the results have been partially loaded by
-        invoking the <methodname>hasPartialResults</methodname> method.</para>
+          <para>You can determine if the results have been partially loaded by
+          invoking the <methodname>hasPartialResults</methodname>
+          method.</para>
 
-        <example>
-          <title>Determines when a query returns partial results</title>
+          <example>
+            <title>Determines when a query returns partial results</title>
 
-          <programlisting>Query luceneQuery = ...;
+            <programlisting>Query luceneQuery = ...;
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
@@ -1011,16 +1011,17 @@ List results = query.list();
 if ( query.hasPartialResults() ) {
     displayWarningToUser();
 }</programlisting>
-        </example>
+          </example>
 
-        <para>If you use the JPA API,
-        <methodname>limitExecutionTimeTo</methodname> and
-        <methodname>hasPartialResults</methodname> are also available to
-        you.</para>
+          <para>If you use the JPA API,
+          <methodname>limitExecutionTimeTo</methodname> and
+          <methodname>hasPartialResults</methodname> are also available to
+          you.</para>
 
-        <warning>
-          <para>This approach is considered experimental</para>
-        </warning>
+          <warning>
+            <para>This approach is considered experimental</para>
+          </warning>
+        </section>
       </section>
     </section>
   </section>
