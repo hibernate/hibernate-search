@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.search.engine.EntityInfo;
+import org.hibernate.search.engine.ObjectLoaderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.search.util.HibernateHelper;
@@ -59,12 +60,18 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		//check the persistence context
 		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( entityInfos.length );
 		for ( EntityInfo entityInfo : entityInfos ) {
-			final boolean isInitialized = HibernateHelper.isInitialized(
-					session.load(
-							entityInfo.clazz, entityInfo.id
-					)
-			);
-			if ( !isInitialized ) {
+			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
+				final boolean isInitialized = HibernateHelper.isInitialized(
+						session.load(
+								entityInfo.clazz, entityInfo.id
+						)
+				);
+				if ( !isInitialized ) {
+					remainingEntityInfos.add( entityInfo );
+				}
+			}
+			else {
+				//if document id !=  entity id we can't use PC lookup
 				remainingEntityInfos.add( entityInfo );
 			}
 		}

@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.search.engine.EntityInfo;
+import org.hibernate.search.engine.ObjectLoaderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.search.util.LoggerFactory;
@@ -61,12 +62,18 @@ public class SecondLevelCacheObjectsInitializer implements ObjectsInitializer {
 		//check the second-level cache
 		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( entityInfos.length );
 		for ( EntityInfo entityInfo : entityInfos ) {
-			final boolean isIn2LCache = session.getSessionFactory().getCache().containsEntity( entityInfo.clazz, entityInfo.id );
-			if ( isIn2LCache ) {
-				//load the object from the second level cache
-				session.get(entityInfo.clazz, entityInfo.id);
+			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
+				final boolean isIn2LCache = session.getSessionFactory().getCache().containsEntity( entityInfo.clazz, entityInfo.id );
+				if ( isIn2LCache ) {
+					//load the object from the second level cache
+					session.get(entityInfo.clazz, entityInfo.id);
+				}
+				else {
+					remainingEntityInfos.add( entityInfo );
+				}
 			}
 			else {
+				//if document id !=  entity id we can't use 2LC
 				remainingEntityInfos.add( entityInfo );
 			}
 
