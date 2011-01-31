@@ -23,21 +23,16 @@
  */
 package org.hibernate.search.engine;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.QueryTimeoutException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -47,7 +42,6 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class ObjectLoaderHelper {
 
-	private static final int MAX_IN_CLAUSE = 500;
 	private static final Logger log = LoggerFactory.make();
 
 	public static Object load(EntityInfo entityInfo, Session session) {
@@ -96,11 +90,7 @@ public class ObjectLoaderHelper {
 
 	private static Object executeLoad(EntityInfo entityInfo, Session session) {
 		Object maybeProxy;
-		String hibernateIdentifierProperty = session.getSessionFactory()
-				.getClassMetadata( entityInfo.clazz )
-				.getIdentifierPropertyName();
-
-		if ( entityInfo.idName.equals( hibernateIdentifierProperty ) ) {
+		if ( areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
 			//be sure to get an initialized object but save from ONFE and ENFE
 			maybeProxy = session.load( entityInfo.clazz, entityInfo.id );
 		}
@@ -123,5 +113,13 @@ public class ObjectLoaderHelper {
 			}
 		}
 		return maybeProxy;
+	}
+
+	//TODO should we cache that result?
+	public static boolean areDocIdAndEntityIdIdentical(EntityInfo entityInfo, Session session) {
+		String hibernateIdentifierProperty = session.getSessionFactory()
+				.getClassMetadata( entityInfo.clazz )
+				.getIdentifierPropertyName();
+		return entityInfo.idName.equals( hibernateIdentifierProperty );
 	}
 }
