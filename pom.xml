@@ -281,6 +281,11 @@
                 <artifactId>byteman</artifactId>
                 <version>${bytemanVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.easytesting</groupId>
+                <artifactId>fest-assert</artifactId>
+                <version>1.3</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
