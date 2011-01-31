@@ -869,6 +869,99 @@ String authorName = firstResult[2];</programlisting>
       </section>
 
       <section>
+        <title>Customizing object initialization strategies</title>
+
+        <para>By default, Hibernate Search uses the most appropriate strategy
+        to initialize entities matching your full text query. It executes one
+        (or several) queries to retrieve the required entities. This is the
+        best approach to minimize database round trips in a scenario where
+        none / few of the retrieved entities are present in the persistence
+        context (ie the session) or the second level cache.</para>
+
+        <para>If most of your entities are present in the second level cache,
+        you can force Hibernate Search to look into the cache before
+        retrieving an object from the database.</para>
+
+        <example>
+          <title>Check the second-level cache before using a query</title>
+
+          <programlisting>FullTextQuery query = session.createFullTextQuery(luceneQuery, User.class);
+query.initializeObjectWith(
+    ObjectLookupMethod.SECOND_LEVEL_CACHE,
+    DatabaseRetrievalMethod.QUERY
+);</programlisting>
+        </example>
+
+        <para><classname>ObjectLookupMethod</classname> defines the strategy
+        used to check if an object is easily accessible (without database
+        round trip). Other options are:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><literal>ObjectLookupMethod.PERSISTENCE_CONTEXT</literal>:
+            useful if most of the matching entities are already in the
+            persistence context (ie loaded in the
+            <classname>Session</classname> or
+            <classname>EntityManager</classname>)</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>ObjectLookupMethod.PERSISTENCE_CONTEXT_AND_SECOND_LEVEL_CACHE</literal>:
+            check first the persistence context and then the second-level
+            cache.</para>
+          </listitem>
+        </itemizedlist>
+
+        <note>
+          <para>Note that to search in the second-level cache, several
+          settings must be in place:</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>the second level cache must be properly configured and
+              active</para>
+            </listitem>
+
+            <listitem>
+              <para>the entity must have enabled second-level cache (eg via
+              <classname>@Cacheable</classname>)</para>
+            </listitem>
+
+            <listitem>
+              <para>the <classname>Session</classname>,
+              <classname>EntityManager</classname> or
+              <classname>Query</classname> must allow access to the
+              second-level cache for read access (ie
+              <literal>CacheMode.NORMAL</literal> in Hibernate native APIs or
+              <literal>CacheRetrieveMode.USE</literal> in JPA 2 APIs).</para>
+            </listitem>
+          </itemizedlist>
+        </note>
+
+        <para>You can also customize how objects are loaded from the database
+        (if not found before). Use
+        <classname>DatabaseRetrievalMethod</classname> for that:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><classname>QUERY</classname> (default): use a (set of)
+            queries to load several objects in batch. This is usually the best
+            approach.</para>
+          </listitem>
+
+          <listitem>
+            <para><classname>FIND_BY_ID</classname>: load objects one by one
+            using the <classname>Session.get</classname> or
+            <classname>EntityManager.find</classname> semantic. This might be
+            useful if batch-size is set on the entity (in which case, entities
+            will be loaded in batch by Hibernate Core).
+            <classname>QUERY</classname> should be preferred almost all the
+            time.</para>
+          </listitem>
+        </itemizedlist>
+      </section>
+
+      <section>
         <title>Limiting the time of a query</title>
 
         <para>You can limit the time a query takes in Hibernate Search in two
