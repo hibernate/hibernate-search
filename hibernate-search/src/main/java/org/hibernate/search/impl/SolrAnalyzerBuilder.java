@@ -37,13 +37,14 @@ import org.apache.solr.common.ResourceLoader;
 import org.apache.solr.util.plugin.ResourceLoaderAware;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.util.HibernateSearchResourceLoader;
+
+import static org.hibernate.search.util.ClassLoaderHelper.instanceFromClass;
 
 /**
  * Instances of this class are used to build Lucene analyzers which are defined using the solr <code>TokenFilterFactory</code>.
@@ -70,7 +71,7 @@ final class SolrAnalyzerBuilder {
 	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) {
 		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader();
 		TokenizerDef token = analyzerDef.tokenizer();
-		TokenizerFactory tokenFactory = ( TokenizerFactory ) instantiate( token.factory() );
+		TokenizerFactory tokenFactory = instanceFromClass( TokenizerFactory.class, token.factory(), "Tokenizer factory" );
 		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( token.params(), luceneMatchVersion );
 		tokenFactory.init( tokenMapsOfParameters );
 		injectResourceLoader( tokenFactory, defaultResourceLoader, tokenMapsOfParameters );
@@ -81,14 +82,14 @@ final class SolrAnalyzerBuilder {
 		CharFilterFactory[] charFilters = new CharFilterFactory[charLength];
 		for ( int index = 0; index < length; index++ ) {
 			TokenFilterDef filterDef = analyzerDef.filters()[index];
-			filters[index] = ( TokenFilterFactory ) instantiate( filterDef.factory() );
+			filters[index] = instanceFromClass( TokenFilterFactory.class, filterDef.factory(), "Token filter factory" );
 			final Map<String, String> mapOfParameters = getMapOfParameters( filterDef.params(), luceneMatchVersion );
 			filters[index].init( mapOfParameters );
 			injectResourceLoader( filters[index], defaultResourceLoader, mapOfParameters );
 		}
 		for ( int index = 0; index < charFilters.length; index++ ) {
 			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
-			charFilters[index] = ( CharFilterFactory ) instantiate( charFilterDef.factory() );
+			charFilters[index] = instanceFromClass( CharFilterFactory.class, charFilterDef.factory(), "Character filter factory" );
 			final Map<String, String> mapOfParameters = getMapOfParameters(
 					charFilterDef.params(), luceneMatchVersion
 			);
@@ -109,18 +110,6 @@ final class SolrAnalyzerBuilder {
 				localResourceLoader = defaultResourceLoader;
 			}
 			( ( ResourceLoaderAware ) processor ).inform( localResourceLoader );
-		}
-	}
-
-	private static Object instantiate(Class clazz) {
-		try {
-			return clazz.newInstance();
-		}
-		catch ( IllegalAccessException e ) {
-			throw new SearchException( "Unable to instantiate class: " + clazz, e );
-		}
-		catch ( InstantiationException e ) {
-			throw new SearchException( "Unable to instantiate class: " + clazz, e );
 		}
 	}
 
