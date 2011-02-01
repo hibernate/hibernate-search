@@ -77,7 +77,7 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		}
 		//update entityInfos to only contains the remaining ones
 		final int remainingSize = remainingEntityInfos.size();
-		log.trace( "Initialized {} objects out of {} in the persistence contedt", maxResults - remainingSize, maxResults );
+		log.trace( "Initialized {} objects out of {} in the persistence context", maxResults - remainingSize, maxResults );
 		if (remainingSize > 0) {
 			delegate.initializeObjects(
 					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
