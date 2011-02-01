@@ -36,23 +36,25 @@ import org.hibernate.search.annotations.Indexed;
  */
 @Entity
 @Cacheable(true)
-@Cache( usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@Cache( usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE )
 @Indexed
 public class Kernel {
+
 	@Id
 	@GeneratedValue
 	@DocumentId
 	public String getId() { return id; }
-	public void setId(String id) {  this.id = id; }
+	public void setId(String id) { this.id = id; }
 	private String id;
 
 	@Field
 	public String getCodeName() { return codeName; }
-	public void setCodeName(String codeName) {  this.codeName = codeName; }
+	public void setCodeName(String codeName) { this.codeName = codeName; }
 	private String codeName;
 
 	@Field
 	public String getProduct() { return product; }
-	public void setProduct(String product) {  this.product = product; }
+	public void setProduct(String product) { this.product = product; }
 	private String product;
+
 }
