@@ -150,7 +150,7 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 					.threadsForSubsequentFetching( 8 )
 					.threadsToLoadObjects( 4 )
 					.batchSizeToLoadObjects( 30 )
-					.customProgressMonitor( progressMonitor )
+					.progressMonitor( progressMonitor )
 					.startAndWait();
 		}
 		finally {

@@ -166,7 +166,7 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
-    public MassIndexer customProgressMonitor(MassIndexerProgressMonitor monitor) {
+    public MassIndexer progressMonitor(MassIndexerProgressMonitor monitor) {
         this.monitor = monitor;
         return this;
     }

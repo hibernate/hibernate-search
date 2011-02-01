@@ -78,7 +78,7 @@ public interface MassIndexer {
      * @param monitor this instance will receive updates about the massindexing progress.
      * @return <tt>this</tt> for method chaining
      */
-    MassIndexer customProgressMonitor(MassIndexerProgressMonitor monitor);
+    MassIndexer progressMonitor(MassIndexerProgressMonitor monitor);
 	
 	/**
 	 * Sets the cache interaction mode for the data loading tasks.
