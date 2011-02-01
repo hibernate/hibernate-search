@@ -67,7 +67,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private boolean optimizeAtEnd = true;
 	private boolean purgeAtStart = true;
 	private boolean optimizeAfterPurge = true;
-	private MassIndexerProgressMonitor monitor = new SimpleIndexingProgressMonitor();
+	private MassIndexerProgressMonitor monitor;
 
 	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory, Class<?>... entities) {
 		this.searchFactoryImplementor = searchFactory;
@@ -76,6 +76,9 @@ public class MassIndexerImpl implements MassIndexer {
 		if ( searchFactoryImplementor.isJMXEnabled() ) {
 			monitor = new IndexingProgressMonitor();
 		}
+        else {
+            monitor = new SimpleIndexingProgressMonitor();
+        }
 	}
 
 	/**
@@ -163,7 +166,12 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
-	public MassIndexer optimizeOnFinish(boolean optimize) {
+    public MassIndexer progressMonitor(MassIndexerProgressMonitor monitor) {
+        this.monitor = monitor;
+        return this;
+    }
+
+    public MassIndexer optimizeOnFinish(boolean optimize) {
 		this.optimizeAtEnd = optimize;
 		return this;
 	}

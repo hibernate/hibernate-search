@@ -26,6 +26,7 @@ package org.hibernate.search;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 
 /**
  * A MassIndexer is useful to rebuild the indexes from the
@@ -66,11 +67,18 @@ public interface MassIndexer {
 	 * <tt>hibernate.search.batchbackend.concurrent_writers</tt>.</p><p>
 	 * Might be ignored by <code>BatchBackend</code> implementations other
 	 * than <code>org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend</code></p>
-	 * @see org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend.
+	 * @see org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend
 	 * @param numberOfThreads
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer threadsForIndexWriter(int numberOfThreads);
+
+    /**
+     * Override the default <code>MassIndexerProgressMonitor</code>.
+     * @param monitor this instance will receive updates about the massindexing progress.
+     * @return <tt>this</tt> for method chaining
+     */
+    MassIndexer progressMonitor(MassIndexerProgressMonitor monitor);
 	
 	/**
 	 * Sets the cache interaction mode for the data loading tasks.

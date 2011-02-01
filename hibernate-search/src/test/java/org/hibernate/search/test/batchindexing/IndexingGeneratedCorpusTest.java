@@ -24,7 +24,9 @@
 package org.hibernate.search.test.batchindexing;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -35,6 +37,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.textbuilder.SentenceInventor;
 
@@ -140,16 +143,20 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 
 	private void reindexAll() throws InterruptedException {
 		FullTextSession fullTextSession = builder.openFullTextSession();
+		SilentProgressMonitor progressMonitor = new SilentProgressMonitor();
+		Assert.assertFalse( progressMonitor.finished );
 		try {
 			fullTextSession.createIndexer( Object.class )
 					.threadsForSubsequentFetching( 8 )
 					.threadsToLoadObjects( 4 )
 					.batchSizeToLoadObjects( 30 )
+					.progressMonitor( progressMonitor )
 					.startAndWait();
 		}
 		finally {
 			fullTextSession.close();
 		}
+		Assert.assertTrue( progressMonitor.finished );
 	}
 
 	private void purgeAll() {
@@ -235,6 +242,37 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		finally {
 			session.close();
 		}
+	}
+	
+	private static class SilentProgressMonitor implements MassIndexerProgressMonitor {
+		
+		final AtomicLong objectsCounter = new AtomicLong();
+		
+		volatile boolean finished = false;
+
+		@Override
+		public void documentsAdded(long increment) {
+		}
+
+		@Override
+		public void documentsBuilt(int number) {
+		}
+
+		@Override
+		public void entitiesLoaded(int size) {
+		}
+
+		@Override
+		public void addToTotalCount(long count) {
+			objectsCounter.addAndGet( count );
+		}
+
+		@Override
+		public void indexingCompleted() {
+			finished = true;
+			System.out.println( "Finished indexing " + objectsCounter.get() + " entities" );
+		}
+		
 	}
 
 }
