@@ -906,7 +906,7 @@ query.initializeObjectWith(
           </listitem>
 
           <listitem>
-            <para><literal>ObjectLookupMethod.PERSISTENCE_CONTEXT_AND_SECOND_LEVEL_CACHE</literal>:
+            <para><literal>ObjectLookupMethod.SECOND_LEVEL_CACHE</literal>:
             check first the persistence context and then the second-level
             cache.</para>
           </listitem>
@@ -937,6 +937,13 @@ query.initializeObjectWith(
             </listitem>
           </itemizedlist>
         </note>
+        
+        <warning>
+            <para>Avoid using <literal>ObjectLookupMethod.SECOND_LEVEL_CACHE</literal>
+            unless your second level cache implementation is either EHCache or
+            Infinispan; other second level cache providers don't currently implement
+            this operation efficiently.</para>
+        </warning>
 
         <para>You can also customize how objects are loaded from the database
         (if not found before). Use
@@ -951,10 +958,10 @@ query.initializeObjectWith(
 
           <listitem>
             <para><classname>FIND_BY_ID</classname>: load objects one by one
-            using the <classname>Session.get</classname> or
-            <classname>EntityManager.find</classname> semantic. This might be
-            useful if batch-size is set on the entity (in which case, entities
-            will be loaded in batch by Hibernate Core).
+            using the <classname>Session</classname>.<methodname>get</methodname>
+            or <classname>EntityManager</classname>.<methodname>find</methodname>
+            semantic. This might be useful if batch-size is set on the entity
+            (in which case, entities will be loaded in batch by Hibernate Core).
             <classname>QUERY</classname> should be preferred almost all the
             time.</para>
           </listitem>
