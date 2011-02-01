@@ -40,7 +40,14 @@ import org.hibernate.search.util.LoggerFactory;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class LookupObjectsInitializer implements ObjectsInitializer {
+	
 	private static final Logger log = LoggerFactory.make();
+	
+	public static final LookupObjectsInitializer INSTANCE = new LookupObjectsInitializer();
+	
+	private LookupObjectsInitializer() {
+		// use INSTANCE instead of constructor
+	}
 
 	public void initializeObjects(EntityInfo[] entityInfos,
 										 Criteria criteria, Class<?> entityType,

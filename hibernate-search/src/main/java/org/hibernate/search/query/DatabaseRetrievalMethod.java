@@ -27,7 +27,7 @@ package org.hibernate.search.query;
  */
 public enum DatabaseRetrievalMethod {
 	/**
-	 * Use a criterla query to load the objects.
+	 * Use a criteria query to load the objects.
 	 * This is done in batch to minimize the number of queries
 	 *
 	 * Default approach
