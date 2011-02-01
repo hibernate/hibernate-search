@@ -172,13 +172,10 @@ public class ObjectLoaderBuilder {
 		if ( lookupMethod == ObjectLookupMethod.SKIP ) {
 			return initializer;
 		}
-		else if ( lookupMethod == ObjectLookupMethod.SECOND_LEVEL_CACHE ) {
-			return new SecondLevelCacheObjectsInitializer( initializer );
-		}
 		else if ( lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT ) {
 			return new PersistenceContextObjectsInitializer( initializer );
 		}
-		else if ( lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT_AND_SECOND_LEVEL_CACHE ) {
+		else if ( lookupMethod == ObjectLookupMethod.SECOND_LEVEL_CACHE ) {
 			//we want to check the PC first, that's cheaper
 			return new PersistenceContextObjectsInitializer( new SecondLevelCacheObjectsInitializer( initializer ) );
 		}

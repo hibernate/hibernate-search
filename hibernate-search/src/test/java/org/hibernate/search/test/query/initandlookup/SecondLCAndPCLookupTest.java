@@ -161,7 +161,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 				.get();
 		final Query luceneQuery = queryBuilder.keyword().onField( "product" ).matching( "Polgeiser" ).createQuery();
 		final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Kernel.class );
-		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.PERSISTENCE_CONTEXT_AND_SECOND_LEVEL_CACHE, DatabaseRetrievalMethod.QUERY );
+		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.SECOND_LEVEL_CACHE, DatabaseRetrievalMethod.QUERY );
 		List list = fullTextQuery.list();
 		assertThat( list.size() ).isEqualTo( 2 );
 		assertThat( statistics.getSecondLevelCacheHitCount() )
