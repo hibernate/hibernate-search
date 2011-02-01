@@ -32,7 +32,8 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
- * A very simple implementation of {@code MassIndexerProgressMonitor}.
+ * A very simple implementation of {@code MassIndexerProgressMonitor} which
+ * uses the logger at INFO level to output indexing speed statistics.
  *
  * @author Sanne Grinovero
  */
@@ -42,6 +43,23 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final AtomicLong totalCounter = new AtomicLong();
 	private volatile long startTime;
+	private final int loggingPeriod;
+	
+	/**
+	 * Logs progress of indexing job every 50 documents written.
+	 */
+	public SimpleIndexingProgressMonitor() {
+		this( 50 );
+	}
+
+	/**
+	 * Logs progress of indexing job every <code>loggingPeriod</code>
+	 * documents written.
+	 * @param loggingPeriod the logging period
+	 */
+	public SimpleIndexingProgressMonitor(int loggingPeriod) {
+		this.loggingPeriod = loggingPeriod;
+	}
 
 	public void entitiesLoaded(int size) {
 		//not used
@@ -71,7 +89,7 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	}
 
 	protected int getStatusMessagePeriod() {
-		return 50;
+		return loggingPeriod;
 	}
 
 	protected void printStatusMessage(long starttime, long totalTodoCount, long doneCount) {
