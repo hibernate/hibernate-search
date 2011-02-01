@@ -42,7 +42,7 @@ public interface MassIndexerProgressMonitor {
 
 	/**
 	 * The number of documents sent to the backend;
-	 * This is called several times during
+	 * This is invoked several times during
 	 * the indexing process.
 	 *
 	 * @param increment number of documents sent to backend
@@ -51,7 +51,7 @@ public interface MassIndexerProgressMonitor {
 
 	/**
 	 * The number of Documents built;
-	 * This is called several times and concurrently during
+	 * This is invoked several times and concurrently during
 	 * the indexing process.
 	 *
 	 * @param number number of {@code Document}s built
@@ -60,7 +60,7 @@ public interface MassIndexerProgressMonitor {
 
 	/**
 	 * The number of entities loaded from database;
-	 * This is called several times and concurrently during
+	 * This is invoked several times and concurrently during
 	 * the indexing process.
 	 *
 	 * @param size number of entities loaded from database
@@ -71,16 +71,16 @@ public interface MassIndexerProgressMonitor {
 	 * The total count of entities to be indexed is
 	 * added here; It could be called more than once,
 	 * the implementation should add them up.
-	 * This is called several times and concurrently during
+	 * This is invoked several times and concurrently during
 	 * the indexing process.
 	 *
 	 * @param count number of newly indexed entities which has to
-	 * ber added to total count
+	 * be added to total count
 	 */
 	void addToTotalCount(long count);
 
 	/**
-	 * Called when the indexing is completed.
+	 * Invoked when the indexing is completed.
 	 */
 	void indexingCompleted();
 }

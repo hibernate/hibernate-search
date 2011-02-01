@@ -243,6 +243,7 @@ transaction.commit();</programlisting>
  .threadsToLoadObjects( 5 )
  .threadsForIndexWriter( 3 )
  .threadsForSubsequentFetching( 20 )
+ .customProgressMonitor( monitor ) //a MassIndexerProgressMonitor implementation
  .startAndWait();</programlisting>
       </example>
 
