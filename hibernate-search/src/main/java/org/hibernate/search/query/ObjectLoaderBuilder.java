@@ -155,33 +155,32 @@ public class ObjectLoaderBuilder {
 
 	private ObjectsInitializer getObjectInitializer() {
 		log.trace( "ObjectsInitializer: Use lookup method {} and database retrieval method {}", lookupMethod, retrievalMethod );
-		if (criteria != null && retrievalMethod != DatabaseRetrievalMethod.QUERY) {
+		if ( criteria != null && retrievalMethod != DatabaseRetrievalMethod.QUERY ) {
 			throw new SearchException( "Cannot mix custom criteria query and " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
 		}
-		//TODO should we cache these ObjectInitializer instances?
-		ObjectsInitializer initializer;
-		if ( retrievalMethod == DatabaseRetrievalMethod.FIND_BY_ID) {
+		final ObjectsInitializer initializer;
+		if ( retrievalMethod == DatabaseRetrievalMethod.FIND_BY_ID ) {
 			//return early as this method does naturally 2lc + session lookup
-			return new LookupObjectsInitializer();
+			return LookupObjectsInitializer.INSTANCE;
 		}
-		else if ( retrievalMethod == DatabaseRetrievalMethod.QUERY) {
-			initializer = new CriteriaObjectsInitializer();
+		else if ( retrievalMethod == DatabaseRetrievalMethod.QUERY ) {
+			initializer = CriteriaObjectsInitializer.INSTANCE;
 		}
 		else {
 			throw new AssertionFailure( "Unknown " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
 		}
-		if (lookupMethod == ObjectLookupMethod.SKIP) {
+		if ( lookupMethod == ObjectLookupMethod.SKIP ) {
 			return initializer;
 		}
-		else if (lookupMethod == ObjectLookupMethod.SECOND_LEVEL_CACHE) {
+		else if ( lookupMethod == ObjectLookupMethod.SECOND_LEVEL_CACHE ) {
 			return new SecondLevelCacheObjectsInitializer( initializer );
 		}
-		else if (lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT) {
+		else if ( lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT ) {
 			return new PersistenceContextObjectsInitializer( initializer );
 		}
-		else if (lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT_AND_SECOND_LEVEL_CACHE ) {
+		else if ( lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT_AND_SECOND_LEVEL_CACHE ) {
 			//we want to check the PC first, that's cheaper
-			return new PersistenceContextObjectsInitializer( new SecondLevelCacheObjectsInitializer(initializer) );
+			return new PersistenceContextObjectsInitializer( new SecondLevelCacheObjectsInitializer( initializer ) );
 		}
 		else {
 			throw new AssertionFailure( "Unknown " + ObjectLookupMethod.class.getSimpleName() + "." + lookupMethod );

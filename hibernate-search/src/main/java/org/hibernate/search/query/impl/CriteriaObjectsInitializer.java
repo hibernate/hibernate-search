@@ -46,6 +46,12 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 
 	private static final Logger log = LoggerFactory.make();
 	private static final int MAX_IN_CLAUSE = 500;
+	
+	public static final CriteriaObjectsInitializer INSTANCE = new CriteriaObjectsInitializer();
+	
+	private CriteriaObjectsInitializer() {
+		// use INSTANCE instead of constructor
+	}
 
 	public void initializeObjects(EntityInfo[] entityInfos,
 										 Criteria criteria, Class<?> entityType,
