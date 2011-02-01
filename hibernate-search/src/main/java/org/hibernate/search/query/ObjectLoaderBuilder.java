@@ -40,9 +40,12 @@ import org.hibernate.search.query.impl.LookupObjectsInitializer;
 import org.hibernate.search.query.impl.ObjectsInitializer;
 import org.hibernate.search.query.impl.PersistenceContextObjectsInitializer;
 import org.hibernate.search.query.impl.SecondLevelCacheObjectsInitializer;
+import org.hibernate.search.util.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
+
+import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Bernard
@@ -56,6 +59,7 @@ public class ObjectLoaderBuilder {
 	private TimeoutManager timeoutManager;
 	private ObjectLookupMethod lookupMethod;
 	private DatabaseRetrievalMethod retrievalMethod;
+	private static final Logger log = LoggerFactory.make();
 
 	public ObjectLoaderBuilder criteria(Criteria criteria) {
 		this.criteria = criteria;
@@ -150,6 +154,7 @@ public class ObjectLoaderBuilder {
 	}
 
 	private ObjectsInitializer getObjectInitializer() {
+		log.trace( "ObjectsInitializer: Use lookup method {} and database retrieval method {}", lookupMethod, retrievalMethod );
 		if (criteria != null && retrievalMethod != DatabaseRetrievalMethod.QUERY) {
 			throw new SearchException( "Cannot mix custom criteria query and " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
 		}
