@@ -55,7 +55,7 @@
       <title>Indexing an entity via <methodname>FullTextSession.index(T
       entity)</methodname></title>
 
-      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 Object customer = fullTextSession.load( Customer.class, 8 );
 <emphasis role="bold">fullTextSession.index(customer);</emphasis>
@@ -79,7 +79,7 @@ tx.commit(); //index only updated at commit time</programlisting>
     <example>
       <title>Purging a specific instance of an entity from the index</title>
 
-      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 for (Customer customer : customers) {
     <emphasis role="bold">fullTextSession.purge( Customer.class, customer.getId() );</emphasis>
@@ -98,7 +98,7 @@ tx.commit(); //index is updated at commit time</programlisting>
     <example>
       <title>Purging all instances of an entity from the index</title>
 
-      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 <emphasis role="bold">fullTextSession.purgeAll( Customer.class );</emphasis>
 //optionally optimize the index
@@ -175,7 +175,7 @@ tx.commit(); //index changes are applied at commit time    </programlisting>
       <example>
         <title>Index rebuilding using index() and flushToIndexes()</title>
 
-        <programlisting>fullTextSession.setFlushMode(FlushMode.MANUAL);
+        <programlisting language="JAVA" role="JAVA">fullTextSession.setFlushMode(FlushMode.MANUAL);
 fullTextSession.setCacheMode(CacheMode.IGNORE);
 transaction = fullTextSession.beginTransaction();
 //Scrollable results will avoid loading too many objects in memory
@@ -218,7 +218,7 @@ transaction.commit();</programlisting>
       <example>
         <title>Index rebuilding using a MassIndexer</title>
 
-        <programlisting>fullTextSession.createIndexer().startAndWait();</programlisting>
+        <programlisting language="JAVA" role="JAVA">fullTextSession.createIndexer().startAndWait();</programlisting>
       </example>
 
       <para>This will rebuild the index, deleting it and then reloading all
@@ -236,7 +236,7 @@ transaction.commit();</programlisting>
       <example>
         <title>Using a tuned MassIndexer</title>
 
-        <programlisting>fullTextSession
+        <programlisting language="JAVA" role="JAVA">fullTextSession
  .createIndexer( User.class )
  .batchSizeToLoadObjects( 25 )
  .cacheMode( CacheMode.NORMAL )
@@ -261,6 +261,29 @@ transaction.commit();</programlisting>
       useful to enable some other <literal>CacheMode</literal> depending on
       your data: it might increase performance if the main entity is relating
       to enum-like data included in the index.</para>
+      
+      <example>
+        <title>MassIndexer restricted on a specific range</title>
+        
+      <programlisting language="JAVA" role="JAVA">fullTextSession
+ .createIndexer( AncientBook.class )
+ .countQuery( "select count (*) from AncientBook a where a.id &lt;= :num" )
+ .primaryKeySelectingQuery( "select a.id from AncientBook a where a.id &lt;= :num" )
+ .queryParameter( "num", 20L )
+ .startAndWait();</programlisting>
+      </example>
+      
+      <para>This example will use the provided queries to restrict the entities
+      going to be added to the index. The <methodname>countQuery</methodname> and
+      <methodname>primaryKeySelectingQuery</methodname> must be both defined, or none,
+      and written in such a way that the first will count the number of elements
+      returned by the second one. <methodname>queryParameter</methodname> can be used
+      to pass parameters to the defined queries.</para>
+      
+      <para>As an alternative to writing custom <literal>HQL</literal> queries,
+      the method <classname>MassIndexer</classname>.<methodname>idLoadingStrategy</methodname>
+      makes it possible to use a custom implementation of <classname>IdentifierLoadingStrategy</classname>.
+      </para>
 
       <tip>
         <para>The "sweet spot" of number of threads to achieve best

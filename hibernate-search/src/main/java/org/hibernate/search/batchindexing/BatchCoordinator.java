@@ -63,6 +63,7 @@ public class BatchCoordinator implements Runnable {
 	private final CountDownLatch endAllSignal;
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
+	private final IdentifierLoadingStrategy customIdLoadingStrategy;
 
 	private BatchBackend backend;
 
@@ -73,7 +74,8 @@ public class BatchCoordinator implements Runnable {
 							int objectLoadingBatchSize, long objectsLimit,
 							boolean optimizeAtEnd,
 							boolean purgeAtStart, boolean optimizeAfterPurge,
-							MassIndexerProgressMonitor monitor, Integer writerThreads) {
+							MassIndexerProgressMonitor monitor, Integer writerThreads,
+							IdentifierLoadingStrategy customIdLoadingStrategy) {
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.sessionFactory = sessionFactory;
@@ -87,6 +89,7 @@ public class BatchCoordinator implements Runnable {
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 		this.writerThreads = writerThreads;
+		this.customIdLoadingStrategy = customIdLoadingStrategy;
 		this.endAllSignal = new CountDownLatch( rootEntities.size() );
 	}
 
@@ -123,7 +126,8 @@ public class BatchCoordinator implements Runnable {
 							searchFactoryImplementor, sessionFactory, type,
 							objectLoadingThreads, collectionLoadingThreads,
 							cacheMode, objectLoadingBatchSize,
-							endAllSignal, monitor, backend, objectsLimit
+							endAllSignal, monitor, backend, objectsLimit,
+							customIdLoadingStrategy
 					)
 			);
 		}

@@ -25,6 +25,7 @@ package org.hibernate.search.batchindexing;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -75,13 +76,15 @@ public class BatchIndexingWorkspace implements Runnable {
 	
 	private final long objectsLimit;
 
+	private final IdentifierLoadingStrategy customIdLoadingStrategy;
+
 	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor, SessionFactory sessionFactory,
 			Class<?> entityType,
 			int objectLoadingThreads, int collectionLoadingThreads,
 			CacheMode cacheMode, int objectLoadingBatchSize,
 			CountDownLatch endAllSignal,
 			MassIndexerProgressMonitor monitor, BatchBackend backend,
-			long objectsLimit) {
+			long objectsLimit, IdentifierLoadingStrategy customIdLoadingStrategy) {
 		
 		this.indexedType = entityType;
 		this.searchFactory = searchFactoryImplementor;
@@ -95,6 +98,7 @@ public class BatchIndexingWorkspace implements Runnable {
 		this.cacheMode = cacheMode;
 		this.objectLoadingBatchSize = objectLoadingBatchSize;
 		this.backend = backend;
+		this.customIdLoadingStrategy = customIdLoadingStrategy;
 		
 		//executors: (quite expensive constructor)
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
@@ -139,7 +143,7 @@ public class BatchIndexingWorkspace implements Runnable {
 			final IdentifierProducer producer = new IdentifierProducer(
 					fromIdentifierListToEntities, sessionFactory,
 					objectLoadingBatchSize, indexedType, monitor,
-					objectsLimit
+					objectsLimit, customIdLoadingStrategy
 			);
 			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
 			

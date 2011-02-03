@@ -23,7 +23,9 @@
  */
 package org.hibernate.search.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -32,9 +34,12 @@ import org.slf4j.Logger;
 
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.BatchCoordinator;
+import org.hibernate.search.batchindexing.CustomHQLLoadingStrategy;
 import org.hibernate.search.batchindexing.Executors;
+import org.hibernate.search.batchindexing.IdentifierLoadingStrategy;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.jmx.IndexingProgressMonitor;
@@ -68,6 +73,10 @@ public class MassIndexerImpl implements MassIndexer {
 	private boolean purgeAtStart = true;
 	private boolean optimizeAfterPurge = true;
 	private MassIndexerProgressMonitor monitor;
+	private IdentifierLoadingStrategy customIdLoadingStrategy = null;
+	private String countQueryHQL = null;
+	private String idLoadingHQL = null;
+	private Map<String,Object> customQueryParameters = new HashMap<String,Object>();
 
 	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory, Class<?>... entities) {
 		this.searchFactoryImplementor = searchFactory;
@@ -150,6 +159,37 @@ public class MassIndexerImpl implements MassIndexer {
 		this.objectLoadingBatchSize = batchSize;
 		return this;
 	}
+	
+	public MassIndexer countQuery(String hqlCountingEntities) {
+		if ( StringHelper.isEmpty( hqlCountingEntities ) ) {
+			// TODO Verify at this time HQL validity and return type
+			throw new IllegalArgumentException( "hqlCountingEntities must not be empty" );
+		}
+		this.countQueryHQL = hqlCountingEntities;
+		return this;
+	}
+	
+	public MassIndexer primaryKeySelectingQuery(String hqlLoadingPrimaryKeys) {
+		if ( StringHelper.isEmpty( hqlLoadingPrimaryKeys ) ) {
+			// TODO Verify at this time HQL validity
+			throw new IllegalArgumentException( "hqlLoadingPrimaryKeys must not be empty" );
+		}
+		this.idLoadingHQL = hqlLoadingPrimaryKeys;
+		return this;
+	}
+	
+	public MassIndexer queryParameter(String name, Object value) {
+		Object previous = this.customQueryParameters.put( name, value );
+		if ( previous != null ) {
+			log.warn( "duplicate parameter named '{}', previous value is being ignored" );
+		}
+		return this;
+	}
+	
+	public MassIndexer idLoadingStrategy(IdentifierLoadingStrategy customIdLoadingStrategy) {
+		this.customIdLoadingStrategy = customIdLoadingStrategy;
+		return this;
+	}
 
 	public MassIndexer threadsForSubsequentFetching(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
@@ -207,12 +247,22 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	protected BatchCoordinator createCoordinator() {
+		if ( this.countQueryHQL != null || this.idLoadingHQL != null ) {
+			if ( StringHelper.isEmpty( countQueryHQL ) ||
+					StringHelper.isEmpty( idLoadingHQL ) ) {
+				throw new IllegalArgumentException( "When using custom HQL queries to load identifiers, both countQuery and primaryKeySelectingQuery must be defined" );
+			}
+			if ( customIdLoadingStrategy != null ) {
+				throw new IllegalArgumentException( "can't use a custom IdLoadingStrategy when HQL queries are provided" );
+			}
+			customIdLoadingStrategy = new CustomHQLLoadingStrategy( this.countQueryHQL, this.idLoadingHQL, this.customQueryParameters );
+		}
 		return new BatchCoordinator(
 				rootEntities, searchFactoryImplementor, sessionFactory,
 				objectLoadingThreads, collectionLoadingThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor, writerThreads
+				monitor, writerThreads, customIdLoadingStrategy
 		);
 	}
 
@@ -220,4 +270,5 @@ public class MassIndexerImpl implements MassIndexer {
 		this.objectsLimit = maximum;
 		return this;
 	}
+
 }

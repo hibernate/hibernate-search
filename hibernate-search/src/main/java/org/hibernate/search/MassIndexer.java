@@ -26,6 +26,7 @@ package org.hibernate.search;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
+import org.hibernate.search.batchindexing.IdentifierLoadingStrategy;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 
 /**
@@ -117,15 +118,56 @@ public interface MassIndexer {
 	MassIndexer purgeAllOnStart(boolean purgeAll);
 	
 	/**
-	 * EXPERIMENTAL method: will probably change
-	 * 
 	 * Will stop indexing after having indexed a set amount of objects.
 	 * As a results the index will not be consistent
 	 * with the database: use only for testing on an (undefined) subset of database data.
 	 * @param maximum
-	 * @return
+	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer limitIndexedObjectsTo(long maximum);
+	
+	/**
+	 * Define a custom HQL query which will be used to count the entities to be indexed.
+	 * If using this option, defining {@link #primaryKeySelectingQuery(String)} too is mandatory and it won't be possible
+	 * to choose a custom <tt>IdentifierLoadingStrategy</tt>.
+	 * You can pass values for named parameters by using {@link #queryParameter(String, Object)}
+	 * @see #primaryKeySelectingQuery(String)
+	 * @see #idLoadingStrategy(IdentifierLoadingStrategy)
+	 * @param entitiesCountHQL the HQL counting the entities to be indexed.
+	 * @return <tt>this</tt> for method chaining
+	 */
+	MassIndexer countQuery(String entitiesCountHQL);
+	
+	/**
+	 * Define a custom HQL query to select all primary keys of entities to be indexed.
+	 * The number of selected entities must match the value returned by {@link #countQuery(String)}.
+	 * If using this option, defining {@link #countQuery(String)} is mandatory and it won't be possible
+	 * to choose a custom IdentifierLoadingStrategy using {@link #idLoadingStrategy(IdentifierLoadingStrategy)}.
+	 * You can pass values for named parameters by using {@link #queryParameter(String, Object)}
+	 * @param primaryKeysSelectingHQL the HQL selecting all primary keys of objects to be indexed 
+	 * @return <tt>this</tt> for method chaining
+	 */
+	MassIndexer primaryKeySelectingQuery(String primaryKeysSelectingHQL);
+	
+	/**
+	 * When defining a custom entitiesCountHQL and primaryKeysSelectingHQL via {@link #countQuery(String)}
+	 * and {@link #primaryKeySelectingQuery(String)} doesn't suffice, you can implement a custom {@link #idLoadingStrategy(IdentifierLoadingStrategy)}
+	 * to use instead. When overriding the <tt>primaryKeysSelectingHQL</tt> you can't also define custom queries.
+	 * @param customIdLoadingStrategy
+	 * @return <tt>this</tt> for method chaining
+	 */
+	MassIndexer idLoadingStrategy(IdentifierLoadingStrategy customIdLoadingStrategy);
+	
+	/**
+	 * Define named parameters to be used on queries defined via {@link #countQuery(String)}
+	 * and/or {@link #primaryKeySelectingQuery(String)}.
+	 * It's allowed to reuse the same parameter names across the two queries, the same object instance
+	 * will be passed as parameter to both queries.
+	 * @param name query parameter name
+	 * @param value
+	 * @return <tt>this</tt> for method chaining
+	 */
+	MassIndexer queryParameter(String name, Object value);
 
 	/**
 	 * Starts the indexing process in background (asynchronous).
@@ -143,5 +185,5 @@ public interface MassIndexer {
 	 * while waiting.
 	 */
 	void startAndWait() throws InterruptedException;
-
+	
 }

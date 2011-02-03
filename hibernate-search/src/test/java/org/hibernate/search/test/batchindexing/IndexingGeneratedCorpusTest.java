@@ -71,9 +71,9 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 				.setProperty( "hibernate.show_sql", "false" ) // too verbose for this test
 				.setProperty( LuceneBatchBackend.CONCURRENT_WRITERS, "4" )
 				.build();
-		createMany( Book.class, BOOK_NUM );
-		createMany( Dvd.class, DVD_NUM );
-		createMany( AncientBook.class, ANCIENTBOOK_NUM );
+        createMany( AncientBook.class, ANCIENTBOOK_NUM );
+        createMany( Book.class, BOOK_NUM );
+        createMany( Dvd.class, DVD_NUM );
 		createMany( SecretBook.class, SECRETBOOK_NUM );
 		storeAllBooksInNation();
 	}
@@ -139,6 +139,42 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		verifyResultNumbers(); // verify the count match again
 		reindexAll(); //tests that purgeAll is automatic:
 		verifyResultNumbers(); //..same numbers again
+	}
+
+	/**
+	 * Will create a partial index using custom HQL queries to define the subset of
+	 * data to be indexed.
+	 */
+	public void testSelectedBatchIndexing() throws InterruptedException {
+		verifyResultNumbers(); //initial count of entities should match expectations
+		purgeAll(); // empty indexes
+		verifyIsEmpty();
+		FullTextSession fullTextSession = builder.openFullTextSession();
+		SilentProgressMonitor progressMonitor = new SilentProgressMonitor();
+		Assert.assertEquals( 0l, progressMonitor.documentBuiltCounter.get() );
+		Assert.assertFalse( progressMonitor.finished );
+		long artificialLimit = 20l;
+		try {
+			fullTextSession.createIndexer( AncientBook.class )
+					.countQuery( "select count (*) from AncientBook a where a.id <= :num" )
+					.primaryKeySelectingQuery( "select a.id from AncientBook a where a.id <= :num" )
+					.queryParameter( "num", artificialLimit )
+					.threadsToLoadObjects( 1 )
+					.batchSizeToLoadObjects( 5 )
+					.progressMonitor( progressMonitor )
+					.startAndWait();
+		}
+		finally {
+			fullTextSession.close();
+		}
+		Assert.assertTrue( progressMonitor.finished );
+		Assert.assertEquals( artificialLimit, progressMonitor.documentBuiltCounter.get() );
+		Assert.assertEquals( artificialLimit, progressMonitor.objectsCounter.get() );
+		assertEquals(
+				artificialLimit,
+				countByFT( AncientBook.class )
+		);
+		reindexAll(); // rebuild the indexes
 	}
 
 	private void reindexAll() throws InterruptedException {
@@ -247,27 +283,24 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 	private static class SilentProgressMonitor implements MassIndexerProgressMonitor {
 		
 		final AtomicLong objectsCounter = new AtomicLong();
+		final AtomicLong documentBuiltCounter = new AtomicLong();
 		
 		volatile boolean finished = false;
 
-		@Override
 		public void documentsAdded(long increment) {
 		}
 
-		@Override
 		public void documentsBuilt(int number) {
+			documentBuiltCounter.addAndGet( number );
 		}
 
-		@Override
 		public void entitiesLoaded(int size) {
 		}
 
-		@Override
 		public void addToTotalCount(long count) {
 			objectsCounter.addAndGet( count );
 		}
 
-		@Override
 		public void indexingCompleted() {
 			finished = true;
 			System.out.println( "Finished indexing " + objectsCounter.get() + " entities" );
