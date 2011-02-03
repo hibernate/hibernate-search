@@ -72,13 +72,14 @@ public interface MassIndexer {
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer threadsForIndexWriter(int numberOfThreads);
-
-    /**
-     * Override the default <code>MassIndexerProgressMonitor</code>.
-     * @param monitor this instance will receive updates about the massindexing progress.
-     * @return <tt>this</tt> for method chaining
-     */
-    MassIndexer progressMonitor(MassIndexerProgressMonitor monitor);
+	
+	/**
+	 * Override the default <code>MassIndexerProgressMonitor</code>.
+	 * 
+	 * @param monitor this instance will receive updates about the massindexing progress.
+	 * @return <tt>this</tt> for method chaining
+	 */
+	MassIndexer progressMonitor(MassIndexerProgressMonitor monitor);
 	
 	/**
 	 * Sets the cache interaction mode for the data loading tasks.
@@ -139,7 +140,7 @@ public interface MassIndexer {
 	 * Starts the indexing process, and then block until it's finished.
 	 * Can be called only once.
 	 * @throws InterruptedException if the current thread is interrupted
-     * while waiting.
+	 * while waiting.
 	 */
 	void startAndWait() throws InterruptedException;
 
