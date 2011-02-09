@@ -90,11 +90,6 @@ public @interface Field {
 	FieldBridge bridge() default @FieldBridge;
 
 	/**
-	 * @return Returns the facet definition mapped to this field.
-	 */
-	boolean isFacetable() default false;
-
-	/**
 	 * @return Returns the value to be used for indexing {@code null}. Per default {@code Field.NO_NULL_INDEXING} is returned indicating that
 	 *         null values are not indexed.
 	 */

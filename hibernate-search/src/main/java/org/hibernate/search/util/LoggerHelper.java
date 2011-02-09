@@ -21,37 +21,29 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+package org.hibernate.search.util;
 
-package org.hibernate.search.query;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 
-import org.apache.lucene.search.IndexSearcher;
+import org.slf4j.Logger;
 
 /**
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-//meant to be package-private, was opened up for Infinispan temporarily. Don't use outside of Hibernate Search codebase!
-@Deprecated//(warning to other frameworks only: this class is not part of public API)
-public class IndexSearcherWithPayload {
-	private final IndexSearcher searcher;
-	private boolean fieldSortDoTrackScores;
-	private boolean fieldSortDoMaxScore;
+public class LoggerHelper {
+	private static final Logger log = LoggerFactory.make();
 
-	public IndexSearcherWithPayload(IndexSearcher searcher, boolean fieldSortDoTrackScores, boolean fieldSortDoMaxScore) {
-		this.searcher = searcher;
-		this.fieldSortDoTrackScores = fieldSortDoTrackScores;
-		this.fieldSortDoMaxScore = fieldSortDoMaxScore;
-		searcher.setDefaultFieldSortScoring( fieldSortDoTrackScores, fieldSortDoMaxScore );
+	public static PrintStream getLoggingPrintStream() {
+		return new PrintStream( new CustomByteArrayOutputStream(), true );
 	}
 
-	public IndexSearcher getSearcher() {
-		return searcher;
-	}
-
-	public boolean isFieldSortDoTrackScores() {
-		return fieldSortDoTrackScores;
-	}
-
-	public boolean isFieldSortDoMaxScore() {
-		return fieldSortDoMaxScore;
+	static class CustomByteArrayOutputStream extends ByteArrayOutputStream {
+		public void flush() throws IOException {
+			log.debug( this.toString() );
+			super.flush();
+		}
 	}
 }
+

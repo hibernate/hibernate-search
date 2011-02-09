@@ -22,36 +22,60 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query;
+package org.hibernate.search.test.query.facet;
 
-import org.apache.lucene.search.IndexSearcher;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-//meant to be package-private, was opened up for Infinispan temporarily. Don't use outside of Hibernate Search codebase!
-@Deprecated//(warning to other frameworks only: this class is not part of public API)
-public class IndexSearcherWithPayload {
-	private final IndexSearcher searcher;
-	private boolean fieldSortDoTrackScores;
-	private boolean fieldSortDoMaxScore;
+@Entity
+@Indexed
+public class Car {
+	@Id
+	@GeneratedValue
+	private int id;
 
-	public IndexSearcherWithPayload(IndexSearcher searcher, boolean fieldSortDoTrackScores, boolean fieldSortDoMaxScore) {
-		this.searcher = searcher;
-		this.fieldSortDoTrackScores = fieldSortDoTrackScores;
-		this.fieldSortDoMaxScore = fieldSortDoMaxScore;
-		searcher.setDefaultFieldSortScoring( fieldSortDoTrackScores, fieldSortDoMaxScore );
+	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	private String color;
+
+	@Field(store = Store.YES)
+	private String make;
+
+	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	private int cubicCapacity;
+
+	private Car() {
 	}
 
-	public IndexSearcher getSearcher() {
-		return searcher;
+	public Car(String make, String color, int cubicCapacity) {
+		this.color = color;
+		this.cubicCapacity = cubicCapacity;
+		this.make = make;
 	}
 
-	public boolean isFieldSortDoTrackScores() {
-		return fieldSortDoTrackScores;
+	public String getColor() {
+		return color;
 	}
 
-	public boolean isFieldSortDoMaxScore() {
-		return fieldSortDoMaxScore;
+	public int getCubicCapacity() {
+		return cubicCapacity;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getMake() {
+		return make;
 	}
 }
+
+

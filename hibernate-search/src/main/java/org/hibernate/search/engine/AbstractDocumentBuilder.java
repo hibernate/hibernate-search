@@ -84,7 +84,6 @@ import org.hibernate.search.util.ScopedAnalyzer;
 public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private static final Logger log = LoggerFactory.make();
 
-	private final PropertiesMetadata metadata = new PropertiesMetadata();
 	private final XClass beanXClass;
 	private final Class<?> beanClass;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
@@ -93,9 +92,10 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
 	private Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	private boolean isRoot;
-	private EntityState entityState;
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
 
+	protected final PropertiesMetadata metadata = new PropertiesMetadata();
+	protected EntityState entityState;
 	protected ReflectionManager reflectionManager; //available only during initialization and post-initialization
 
 	/**
@@ -118,24 +118,31 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		this.beanClass = reflectionManager.toClass( xClass );
 		this.similarity = similarity; //set the index similarity before the class level one to detect conflict
 
-		init( xClass, context );
+		metadata.boost = getBoost( xClass );
+		metadata.classBoostStrategy = getDynamicBoost( xClass );
+		metadata.analyzer = context.getDefaultAnalyzer();
 
-		if ( metadata.containedInGetters.size() == 0 ) {
-			this.entityState = EntityState.NON_INDEXABLE;
+		Set<XClass> processedClasses = new HashSet<XClass>();
+		processedClasses.add( xClass );
+		initializeClass( xClass, metadata, true, "", processedClasses, context );
+
+		this.analyzer.setGlobalAnalyzer( metadata.analyzer );
+
+		// set the default similarity in case that after processing all classes there is still no similarity set
+		if ( this.similarity == null ) {
+			this.similarity = context.getDefaultSimilarity();
 		}
 	}
 
 	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue);
 
-	abstract protected void subClassSpecificCheck(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
-
-	abstract protected void initSubClass(XClass clazz, ConfigContext context);
+	abstract protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
 
 	/**
 	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId;
 	 * in case the entity uses @ProvidedId, it's illegal to call this method.
 	 *
-	 * @param entity The entity for which to retrieve the id
+	 * @param entity the instance for which to retrieve the id
 	 *
 	 * @return the value, or null if it's not an indexed entity
 	 *
@@ -169,10 +176,6 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	public EntityState getEntityState() {
 		return entityState;
-	}
-
-	public void setEntityState(EntityState entityState) {
-		this.entityState = entityState;
 	}
 
 	public Set<Class<?>> getMappedSubclasses() {
@@ -335,25 +338,6 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void init(XClass clazz, ConfigContext context) {
-		metadata.boost = getBoost( clazz );
-		metadata.classBoostStrategy = getDynamicBoost( clazz );
-		metadata.analyzer = context.getDefaultAnalyzer();
-
-		Set<XClass> processedClasses = new HashSet<XClass>();
-		processedClasses.add( clazz );
-		initializeClass( clazz, metadata, true, "", processedClasses, context );
-
-		this.analyzer.setGlobalAnalyzer( metadata.analyzer );
-
-		// set the default similarity in case that after processing all classes there is still no similarity set
-		if ( this.similarity == null ) {
-			this.similarity = context.getDefaultSimilarity();
-		}
-
-		initSubClass( clazz, context );
-	}
-
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
 								 Set<XClass> processedClasses, ConfigContext context) {
 		List<XClass> hierarchy = new ArrayList<XClass>();
@@ -439,7 +423,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
 		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context );
 		checkForContainedIn( member, propertiesMetadata );
-		subClassSpecificCheck( member, propertiesMetadata, isRoot, prefix, context );
+		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context );
 	}
 
 	private Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext context) {
@@ -670,17 +654,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		addToScopedAnalyzer( fieldName, analyzer, ann.index() );
 	}
 
-	private void bindFieldAnnotation(XProperty member,
-									 PropertiesMetadata propertiesMetadata,
-									 String prefix,
-									 org.hibernate.search.annotations.Field fieldAnn,
-									 NumericField numericFieldAnn,
-									 ConfigContext context) {
+	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, NumericField numericFieldAnn, ConfigContext context) {
 		ReflectionHelper.setAccessible( member );
 		propertiesMetadata.fieldGetters.add( member );
 		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
 		propertiesMetadata.fieldNames.add( fieldName );
-		propertiesMetadata.fieldNameToPositionMap.put( member.getName(), propertiesMetadata.fieldNames.size() );
+		propertiesMetadata.fieldNameToPositionMap.put(
+				member.getName(), Integer.valueOf( propertiesMetadata.fieldNames.size() )
+		);
 		propertiesMetadata.fieldStore.add( fieldAnn.store() );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
 		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
@@ -710,13 +691,6 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			analyzer = getAnalyzer( member, context );
 		}
 		addToScopedAnalyzer( fieldName, analyzer, fieldAnn.index() );
-
-		// take care of faceting
-		// todo - we need to check or at least log a warning for faceted fields which are analyzed
-		// todo - really we want Index.NOT_ANALYZED_NO_NORMS
-		if ( fieldAnn.isFacetable() ) {
-			context.addFacetFieldName( fieldName );
-		}
 	}
 
 	protected Integer getPrecisionStep(NumericField numericFieldAnn) {
@@ -938,5 +912,4 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	boolean isIdMatchingJpaId() {
 		return true;
 	}
-
 }

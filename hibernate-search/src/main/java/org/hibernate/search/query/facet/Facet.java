@@ -22,36 +22,39 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query;
-
-import org.apache.lucene.search.IndexSearcher;
+package org.hibernate.search.query.facet;
 
 /**
- * @author Emmanuel Bernard
+ * A single facet (field value and count).
+ *
+ * @author Hardy Ferentschik
  */
-//meant to be package-private, was opened up for Infinispan temporarily. Don't use outside of Hibernate Search codebase!
-@Deprecated//(warning to other frameworks only: this class is not part of public API)
-public class IndexSearcherWithPayload {
-	private final IndexSearcher searcher;
-	private boolean fieldSortDoTrackScores;
-	private boolean fieldSortDoMaxScore;
+public class Facet {
+	private final String value;
+	private final int count;
 
-	public IndexSearcherWithPayload(IndexSearcher searcher, boolean fieldSortDoTrackScores, boolean fieldSortDoMaxScore) {
-		this.searcher = searcher;
-		this.fieldSortDoTrackScores = fieldSortDoTrackScores;
-		this.fieldSortDoMaxScore = fieldSortDoMaxScore;
-		searcher.setDefaultFieldSortScoring( fieldSortDoTrackScores, fieldSortDoMaxScore );
+	public Facet(String value, int count) {
+		this.count = count;
+		this.value = value;
 	}
 
-	public IndexSearcher getSearcher() {
-		return searcher;
+	public int getCount() {
+		return count;
 	}
 
-	public boolean isFieldSortDoTrackScores() {
-		return fieldSortDoTrackScores;
+	public String getValue() {
+		return value;
 	}
 
-	public boolean isFieldSortDoMaxScore() {
-		return fieldSortDoMaxScore;
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "Facet" );
+		sb.append( "{value='" ).append( value ).append( '\'' );
+		sb.append( ", count=" ).append( count );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
+
+

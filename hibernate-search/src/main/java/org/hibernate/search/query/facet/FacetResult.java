@@ -22,36 +22,38 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query;
+package org.hibernate.search.query.facet;
 
-import org.apache.lucene.search.IndexSearcher;
+import java.util.List;
 
 /**
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-//meant to be package-private, was opened up for Infinispan temporarily. Don't use outside of Hibernate Search codebase!
-@Deprecated//(warning to other frameworks only: this class is not part of public API)
-public class IndexSearcherWithPayload {
-	private final IndexSearcher searcher;
-	private boolean fieldSortDoTrackScores;
-	private boolean fieldSortDoMaxScore;
+public class FacetResult {
+	private final String fieldName;
+	private final List<Facet> facets;
 
-	public IndexSearcherWithPayload(IndexSearcher searcher, boolean fieldSortDoTrackScores, boolean fieldSortDoMaxScore) {
-		this.searcher = searcher;
-		this.fieldSortDoTrackScores = fieldSortDoTrackScores;
-		this.fieldSortDoMaxScore = fieldSortDoMaxScore;
-		searcher.setDefaultFieldSortScoring( fieldSortDoTrackScores, fieldSortDoMaxScore );
+	public FacetResult(String fieldName, List<Facet> facets) {
+		this.fieldName = fieldName;
+		this.facets = facets;
 	}
 
-	public IndexSearcher getSearcher() {
-		return searcher;
+	public List<Facet> getFacets() {
+		return facets;
 	}
 
-	public boolean isFieldSortDoTrackScores() {
-		return fieldSortDoTrackScores;
+	public String getFieldName() {
+		return fieldName;
 	}
 
-	public boolean isFieldSortDoMaxScore() {
-		return fieldSortDoMaxScore;
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "FacetResult" );
+		sb.append( "{facets=" ).append( facets );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
+
+

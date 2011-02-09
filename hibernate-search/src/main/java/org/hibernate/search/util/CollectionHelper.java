@@ -22,36 +22,43 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query;
+package org.hibernate.search.util;
 
-import org.apache.lucene.search.IndexSearcher;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
- * @author Emmanuel Bernard
+ * Provides some methods for simplified collection instantiation.
+ *
+ * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
-//meant to be package-private, was opened up for Infinispan temporarily. Don't use outside of Hibernate Search codebase!
-@Deprecated//(warning to other frameworks only: this class is not part of public API)
-public class IndexSearcherWithPayload {
-	private final IndexSearcher searcher;
-	private boolean fieldSortDoTrackScores;
-	private boolean fieldSortDoMaxScore;
+public class CollectionHelper {
 
-	public IndexSearcherWithPayload(IndexSearcher searcher, boolean fieldSortDoTrackScores, boolean fieldSortDoMaxScore) {
-		this.searcher = searcher;
-		this.fieldSortDoTrackScores = fieldSortDoTrackScores;
-		this.fieldSortDoMaxScore = fieldSortDoMaxScore;
-		searcher.setDefaultFieldSortScoring( fieldSortDoTrackScores, fieldSortDoMaxScore );
+	public static <K, V> HashMap<K, V> newHashMap() {
+		return new HashMap<K, V>();
 	}
 
-	public IndexSearcher getSearcher() {
-		return searcher;
+	public static <K, V> SortedMap<K, V> newSortedMap() {
+		return new TreeMap<K, V>();
 	}
 
-	public boolean isFieldSortDoTrackScores() {
-		return fieldSortDoTrackScores;
+	public static <T> HashSet<T> newHashSet() {
+		return new HashSet<T>();
 	}
 
-	public boolean isFieldSortDoMaxScore() {
-		return fieldSortDoMaxScore;
+	public static <T> ArrayList<T> newArrayList() {
+		return new ArrayList<T>();
+	}
+
+	public static <T> Set<T> asSet(T... ts) {
+		return new HashSet<T>( Arrays.asList( ts ) );
 	}
 }
+
+
