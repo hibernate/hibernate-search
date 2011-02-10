@@ -541,7 +541,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public String getIdentifierName() {
-		return idGetter.getName();
+		if ( idProvided ) {
+			return null;
+		}
+		return idGetter.getName(); //TODO cache this, it's invoking reflection each time. Needs safe initialization.
 	}
 
 	public DirectoryProvider[] getDirectoryProviders() {
