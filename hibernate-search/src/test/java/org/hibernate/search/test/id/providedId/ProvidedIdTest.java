@@ -23,6 +23,9 @@
  */
 package org.hibernate.search.test.id.providedId;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -32,7 +35,11 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
+import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.query.IndexSearcherWithPayload;
+import org.hibernate.search.query.QueryHits;
+import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
@@ -41,6 +48,7 @@ import org.hibernate.search.test.util.ManualConfiguration;
 
 /**
  * @author Navin Surtani
+ * @author Sanne Grinovero
  */
 public class ProvidedIdTest extends junit.framework.TestCase {
 
@@ -80,7 +88,7 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Goat" );
 
-		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
+		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Search Query extension
 		//needs it. So we use plain Lucene
 
 		//we know there is only one DP
@@ -89,6 +97,31 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 3, hits.totalHits );
+
+		//follows an example of what Infinispan Query actually needs to resolve a search request:
+		IndexSearcherWithPayload lowLevelSearcher = new IndexSearcherWithPayload( searcher, false, false );
+		QueryHits queryHits = new QueryHits( lowLevelSearcher, luceneQuery, null, null, new TimeoutManager() );
+		Set<String> identifiers = new HashSet<String>();
+		identifiers.add( "providedId" );
+		DocumentExtractor extractor = new DocumentExtractor( queryHits, sf, new String[] { "name" }, identifiers, false );
+		for ( int id = 0; id < hits.totalHits; id++ ) {
+			Long documentId = (Long) extractor.extract( id ).id;
+			String projectedTitle = (String) extractor.extract( id ).projection[0];
+			assert documentId != null;
+			assert projectedTitle != null;
+			if ( documentId.intValue() == 3 ) {
+				assert "Regular goat".equals( projectedTitle );
+			}
+			else if ( documentId.intValue() == 2 ) {
+				assert "Mini Goat".equals( projectedTitle );
+			}
+			else if ( documentId.intValue() == 1 ) {
+				assert "Big Goat".equals( projectedTitle );
+			}
+			else {
+				assert false : "each result should match a goat";
+			}
+		}
 		searcher.close();
 	}
 

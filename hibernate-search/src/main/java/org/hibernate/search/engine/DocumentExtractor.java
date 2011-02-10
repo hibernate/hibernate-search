@@ -66,7 +66,7 @@ public class DocumentExtractor {
 
 	private void initFieldSelection(String[] projection, Set<String> idFieldNames) {
 		// if we need to project DOCUMENT do not use fieldSelector as the user might want anything
-		int projectionSize = projection != null && projection.length != 0 ? projection.length : 0;
+		final int projectionSize = projection != null ? projection.length : 0;
 		if ( projectionSize != 0 ) {
 			for ( String property : projection ) {
 				if ( ProjectionConstants.DOCUMENT.equals( property ) ) {
