@@ -37,13 +37,11 @@ import java.io.Serializable;
 /**
  * @author Navin Surtani
  */
-//@Entity
 @ProvidedId(bridge = @FieldBridge(impl = LongBridge.class) )
 @Indexed
 public class ProvidedIdPerson implements Serializable {
 
-//	@Id
-//	@GeneratedValue
+	// No annotations: this entity uses a ProvidedId
 	private long id;
 	
 	@Field(index = Index.TOKENIZED, store = Store.YES)
