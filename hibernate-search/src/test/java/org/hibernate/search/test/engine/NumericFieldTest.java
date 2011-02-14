@@ -5,14 +5,15 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.test.SearchTestCase;
 
 import java.io.IOException;
 import java.util.List;
-
 
 public class NumericFieldTest extends SearchTestCase {
 
@@ -35,15 +36,15 @@ public class NumericFieldTest extends SearchTestCase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// Range Queries including lower and upper bounds
-		assertEquals("Query id ", 3, numericQueryFor("id", 1, 3).size());
+		assertEquals("Query id ", 3, numericQueryFor("overridenFieldName", 1, 3).size());
 		assertEquals("Query by double range", 3, numericQueryFor( "latitude", -10d, 10d ).size() );
 		assertEquals("Query by integer range", 4, numericQueryFor( "ranking", 1 ,2 ).size() );
 		assertEquals("Query by long range", 3, numericQueryFor( "myCounter", 1L, 3L ).size() );
 		assertEquals("Query by multifields", 2, numericQueryFor( "strMultiple", 0.7d, 0.9d).size() );
 
 		// Range Queries different bounds
-		assertEquals("Query by id excluding upper", 2, numericQueryFor("id", 1, 3, true, false).size() );
-		assertEquals("Query by id excluding upper and lower", 1, numericQueryFor("id", 1, 3, false, false).size() );
+		assertEquals("Query by id excluding upper", 2, numericQueryFor("overridenFieldName", 1, 3, true, false).size() );
+		assertEquals("Query by id excluding upper and lower", 1, numericQueryFor("overridenFieldName", 1, 3, false, false).size() );
 
 		// Range Query for embedded entities
 		assertEquals("Range Query for indexed embedded", 2, numericQueryFor("country.idh", 0.9, 1d).size() );
@@ -52,15 +53,34 @@ public class NumericFieldTest extends SearchTestCase {
 		assertEquals("Range Query across entities", 1, numericQueryFor("pinPoints.stars", 4, 5).size() );
 
 		// Exact Matching Queries
-		assertEquals("Query id exact", 1, doExactQuery("id", 1).getId());
+		assertEquals("Query id exact", 1, doExactQuery("overridenFieldName", 1).getId());
 		assertEquals("Query double exact", 2, doExactQuery( "latitude", -10d).getId() );
 		assertEquals("Query integer exact", 3, doExactQuery("longitude", -20d).getId() );
 		assertEquals("Query long exact", 4, doExactQuery("myCounter",4L).getId() );
 		assertEquals("Query multifield exact", 5, doExactQuery("strMultiple",0.1d).getId() );
-
+		
 		tx.commit();
 		fullTextSession.clear();
-
+		
+		// Delete operation on Numeric Id with overriden field name:
+		tx = fullTextSession.beginTransaction();
+		List allLocations = fullTextSession.createCriteria( Location.class ).list();
+		for (Object location : allLocations) {
+			fullTextSession.delete( location );
+		}
+		tx.commit();
+		fullTextSession.clear();
+		tx = fullTextSession.beginTransaction();
+		
+		assertEquals("Check for deletion on Query", 0, numericQueryFor("overridenFieldName", 1, 6).size());
+		// and now check also for the real index contents:
+		Query query = NumericFieldUtils.createNumericRangeQuery("overridenFieldName", 1, 6, true, true);
+		FullTextQuery fullTextQuery = fullTextSession
+			.createFullTextQuery( query, Location.class )
+			.setProjection( ProjectionConstants.DOCUMENT );
+		assertEquals("Check for deletion on index projection", 0, fullTextQuery.list().size() );
+		
+		tx.commit();
 	}
 
 	private boolean indexIsEmpty() {
@@ -79,7 +99,7 @@ public class NumericFieldTest extends SearchTestCase {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[]{PinPoint.class, Location.class};
+		return new Class<?>[] { PinPoint.class, Location.class };
 	}
 
 	private Location doExactQuery(String fieldName, Object value) {

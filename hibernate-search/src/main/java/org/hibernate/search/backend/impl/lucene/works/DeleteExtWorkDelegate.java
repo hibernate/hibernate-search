@@ -66,7 +66,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 		log.trace( "Removing {}#{} by id using an IndexWriter.", managedType, id );
 		try {
 			if( idIsNumeric ) {
-				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdentifierName(), id ) );
+				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
 			} else {
 				Term idTerm = builder.getTerm( id );
 				writer.deleteDocuments( idTerm );

@@ -1,7 +1,5 @@
 package org.hibernate.search.test.engine;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
@@ -17,9 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
-import static org.hibernate.annotations.CascadeType.REMOVE;
 
 /**
  * @author: Gustavo Fernandes
@@ -29,7 +24,7 @@ import static org.hibernate.annotations.CascadeType.REMOVE;
 public class Location {
 
 	@Id
-	@DocumentId
+	@DocumentId(name="overridenFieldName")
 	@NumericField
 	private int id;
 
