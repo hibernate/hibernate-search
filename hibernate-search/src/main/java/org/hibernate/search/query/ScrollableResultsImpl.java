@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -48,6 +48,7 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.Loader;
+import org.hibernate.search.query.engine.HSQuery;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.type.Type;
 
@@ -96,17 +97,17 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	
 	private int current;
 
-	public ScrollableResultsImpl( IndexSearcher searcher, int first, int max, int fetchSize, DocumentExtractor extractor,
-			Loader loader, SearchFactory searchFactory, SessionImplementor sessionImplementor
+	public ScrollableResultsImpl( HSQuery hSearchQuery, int fetchSize, DocumentExtractor extractor,
+			Loader loader, SessionImplementor sessionImplementor
 	) {
-		this.searchFactory = searchFactory;
-		this.searcher = searcher;
-		this.first = first;
-		this.max = max;
+		this.searchFactory = hSearchQuery.getSearchFactoryImplementor();
+		this.searcher = extractor.getSearcher();
 		this.loader = loader;
 		this.documentExtractor = extractor;
 		this.fetchSize = fetchSize;
 		this.session = sessionImplementor;
+		this.first = extractor.getFirst();
+		this.max = extractor.getMax();
 		int size = Math.max( max - first + 1, 0 );
 		this.resultsContext = new LoadedObject[size];
 		beforeFirst();

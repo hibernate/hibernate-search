@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -38,7 +38,7 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.query.IndexSearcherWithPayload;
+import org.hibernate.search.query.engine.internal.IndexSearcherWithPayload;
 import org.hibernate.search.query.QueryHits;
 import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
@@ -101,13 +101,17 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 
 		//follows an example of what Infinispan Query actually needs to resolve a search request:
 		IndexSearcherWithPayload lowLevelSearcher = new IndexSearcherWithPayload( searcher, false, false );
-		QueryHits queryHits = new QueryHits( lowLevelSearcher, luceneQuery, null, null, new TimeoutManager() );
+		QueryHits queryHits = new QueryHits( lowLevelSearcher, luceneQuery, null, null, new TimeoutManager(luceneQuery) );
 		Set<String> identifiers = new HashSet<String>();
 		identifiers.add( "providedId" );
 		Set<Class<?>> targetedClasses = new HashSet<Class<?>>();
 		targetedClasses.add( ProvidedIdPerson.class );
 		targetedClasses.add( ProvidedIdPersonSub.class );
-		DocumentExtractor extractor = new DocumentExtractor( queryHits, sf, new String[] { "name" }, identifiers, false, targetedClasses );
+		DocumentExtractor extractor = new DocumentExtractor(
+				queryHits, sf, new String[] { "name" },
+				identifiers, false,
+				searcher, 0, 0, //not used in this case
+				targetedClasses );
 		HashSet<String> titles = new HashSet<String>(3);
 		for ( int id = 0; id < hits.totalHits; id++ ) {
 			Long documentId = (Long) extractor.extract( id ).id;

@@ -33,6 +33,7 @@ import java.util.List;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
+//FIXME encapsulate
 public class EntityInfo {
 	/**
 	 * The entity class.

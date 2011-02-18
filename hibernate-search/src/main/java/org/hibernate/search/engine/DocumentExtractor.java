@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -34,6 +34,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Searcher;
 
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.query.QueryHits;
@@ -50,18 +52,33 @@ public class DocumentExtractor {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
 	private final QueryHits queryHits;
+	private final IndexSearcher searcher;
 	private FieldSelector fieldSelector;
 	private boolean allowFieldSelection;
 	private boolean needId;
 	private final Map<String,Class> targetedClasses;
 	private final Class singleClassIfPossible;
+	private int first;
+	private int max;
 	
 	@Deprecated
-	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection) {
-		this(queryHits, searchFactoryImplementor, projection, idFieldNames, allowFieldSelection, Collections.EMPTY_SET);
+	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection,
+							 IndexSearcher searcher,
+							int first,
+							int max) {
+		this(queryHits, searchFactoryImplementor, projection, idFieldNames, allowFieldSelection, searcher, first, max, Collections.EMPTY_SET);
 	}
-
-	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection, Set<Class<?>> classesAndSubclasses) {
+	public DocumentExtractor(
+			QueryHits queryHits,
+			SearchFactoryImplementor searchFactoryImplementor,
+			String[] projection,
+			Set<String> idFieldNames,
+			boolean allowFieldSelection,
+			IndexSearcher searcher,
+			int first,
+			int max,
+			Set<Class<?>> classesAndSubclasses
+		) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		if ( projection != null ) {
 			this.projection = projection.clone();
@@ -82,6 +99,9 @@ public class DocumentExtractor {
 		else {
 			singleClassIfPossible = null;
 		}
+		this.searcher = searcher;
+		this.first = first;
+		this.max = max;
 		initFieldSelection( projection, idFieldNames );
 	}
 
@@ -221,5 +241,16 @@ public class DocumentExtractor {
 		}
 		return entityInfo;
 	}
-	
+
+	public int getFirst() {
+		return first;
+	}
+
+	public int getMax() {
+		return max;
+	}
+
+	public IndexSearcher getSearcher() {
+		return searcher;
+	}
 }

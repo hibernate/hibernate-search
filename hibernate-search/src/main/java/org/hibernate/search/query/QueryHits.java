@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -42,6 +42,7 @@ import org.apache.lucene.search.Weight;
 
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.query.engine.internal.IndexSearcherWithPayload;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
