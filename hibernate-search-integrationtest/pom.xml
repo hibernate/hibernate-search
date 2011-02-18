@@ -56,6 +56,12 @@
             <groupId>org.jboss.jbossts</groupId>
             <artifactId>jbossjta</artifactId>
             <version>4.11.0.Final</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.ws.native</groupId>
+                    <artifactId>jbossws-native-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Hibernate -->
