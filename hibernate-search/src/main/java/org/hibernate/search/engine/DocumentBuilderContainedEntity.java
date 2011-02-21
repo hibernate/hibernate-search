@@ -52,9 +52,10 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	 */
 	public DocumentBuilderContainedEntity(XClass xClass, ConfigContext context, ReflectionManager reflectionManager) {
 		super( xClass, context, null, reflectionManager );
-	}
-
-	protected void initSubClass(XClass clazz, ConfigContext context) {	
+		//done after init:
+		if ( metadata.containedInGetters.size() == 0 ) {
+			this.entityState = EntityState.NON_INDEXABLE;
+		}
 	}
 
 	protected void subClassSpecificCheck(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {

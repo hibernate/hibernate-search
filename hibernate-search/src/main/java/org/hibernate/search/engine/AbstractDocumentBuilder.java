@@ -84,7 +84,7 @@ import org.hibernate.search.util.ScopedAnalyzer;
 public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private static final Logger log = LoggerFactory.make();
 
-	private final PropertiesMetadata metadata = new PropertiesMetadata();
+	protected final PropertiesMetadata metadata = new PropertiesMetadata();
 	private final XClass beanXClass;
 	private final Class<?> beanClass;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
@@ -93,7 +93,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
 	private Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	private boolean isRoot;
-	private EntityState entityState;
+	protected EntityState entityState;
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
 
 	protected ReflectionManager reflectionManager; //available only during initialization and post-initialization
@@ -118,18 +118,25 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		this.beanClass = reflectionManager.toClass( xClass );
 		this.similarity = similarity; //set the index similarity before the class level one to detect conflict
 
-		init( xClass, context );
+		metadata.boost = getBoost( xClass );
+		metadata.classBoostStrategy = getDynamicBoost( xClass );
+		metadata.analyzer = context.getDefaultAnalyzer();
 
-		if ( metadata.containedInGetters.size() == 0 ) {
-			this.entityState = EntityState.NON_INDEXABLE;
+		Set<XClass> processedClasses = new HashSet<XClass>();
+		processedClasses.add( xClass );
+		initializeClass( xClass, metadata, true, "", processedClasses, context );
+
+		this.analyzer.setGlobalAnalyzer( metadata.analyzer );
+
+		// set the default similarity in case that after processing all classes there is still no similarity set
+		if ( this.similarity == null ) {
+			this.similarity = context.getDefaultSimilarity();
 		}
 	}
 
 	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue);
 
 	abstract protected void subClassSpecificCheck(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
-
-	abstract protected void initSubClass(XClass clazz, ConfigContext context);
 
 	/**
 	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId;
@@ -330,25 +337,6 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				processSingleContainedInInstance( workplan, value );
 			}
 		}
-	}
-
-	private void init(XClass clazz, ConfigContext context) {
-		metadata.boost = getBoost( clazz );
-		metadata.classBoostStrategy = getDynamicBoost( clazz );
-		metadata.analyzer = context.getDefaultAnalyzer();
-
-		Set<XClass> processedClasses = new HashSet<XClass>();
-		processedClasses.add( clazz );
-		initializeClass( clazz, metadata, true, "", processedClasses, context );
-
-		this.analyzer.setGlobalAnalyzer( metadata.analyzer );
-
-		// set the default similarity in case that after processing all classes there is still no similarity set
-		if ( this.similarity == null ) {
-			this.similarity = context.getDefaultSimilarity();
-		}
-
-		initSubClass( clazz, context );
 	}
 
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,

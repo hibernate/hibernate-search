@@ -155,7 +155,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			XClass clazz, ConfigContext context, DirectoryProviderFactory.DirectoryProviders providerWrapper, ReflectionManager reflectionManager) {
 
 		super( clazz, context, providerWrapper.getSimilarity(), reflectionManager );
-
+		initSubClass( clazz, context );
 		setEntityState( EntityState.INDEXED );
 		this.directoryProviders = providerWrapper.getProviders();
 		this.shardingStrategy = providerWrapper.getSelectionStrategy();
