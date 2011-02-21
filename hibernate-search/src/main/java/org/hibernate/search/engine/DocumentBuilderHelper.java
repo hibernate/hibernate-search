@@ -92,7 +92,7 @@ public final class DocumentBuilderHelper {
 				clazz
 		);
 		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
+			throw new SearchException( "No Lucene configuration set up for: " + clazz );
 		}
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];

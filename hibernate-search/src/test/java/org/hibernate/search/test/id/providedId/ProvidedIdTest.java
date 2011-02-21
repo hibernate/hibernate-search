@@ -33,6 +33,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentExtractor;
@@ -103,25 +104,20 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		QueryHits queryHits = new QueryHits( lowLevelSearcher, luceneQuery, null, null, new TimeoutManager() );
 		Set<String> identifiers = new HashSet<String>();
 		identifiers.add( "providedId" );
-		DocumentExtractor extractor = new DocumentExtractor( queryHits, sf, new String[] { "name" }, identifiers, false );
+		Set<Class<?>> targetedClasses = new HashSet<Class<?>>();
+		targetedClasses.add( ProvidedIdPerson.class );
+		targetedClasses.add( ProvidedIdPersonSub.class );
+		DocumentExtractor extractor = new DocumentExtractor( queryHits, sf, new String[] { "name" }, identifiers, false, targetedClasses );
+		HashSet<String> titles = new HashSet<String>(3);
 		for ( int id = 0; id < hits.totalHits; id++ ) {
 			Long documentId = (Long) extractor.extract( id ).id;
 			String projectedTitle = (String) extractor.extract( id ).projection[0];
-			assert documentId != null;
-			assert projectedTitle != null;
-			if ( documentId.intValue() == 3 ) {
-				assert "Regular goat".equals( projectedTitle );
-			}
-			else if ( documentId.intValue() == 2 ) {
-				assert "Mini Goat".equals( projectedTitle );
-			}
-			else if ( documentId.intValue() == 1 ) {
-				assert "Big Goat".equals( projectedTitle );
-			}
-			else {
-				assert false : "each result should match a goat";
-			}
+			assertNotNull( projectedTitle );
+			titles.add( projectedTitle );
 		}
+		assertTrue( titles.contains( "Regular goat" ) );
+		assertTrue( titles.contains( "Mini Goat" ) );
+		assertTrue( titles.contains( "Big Goat" ) );
 		searcher.close();
 	}
 

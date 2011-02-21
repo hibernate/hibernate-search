@@ -20,11 +20,14 @@
 package org.hibernate.search.test.util;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.document.FieldSelectorResult;
+import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexReader;
@@ -37,12 +40,13 @@ import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.reader.NotSharedReaderProvider;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.ReflectionHelper;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.*;
 
 /**
  * ReaderProvider to inspect the type of FieldSelector being applied.
@@ -57,8 +61,31 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		fieldSelector = null;
 	}
 	
-	public static void assertFieldSelectorEnabled() {
+	/**
+	 * Verifies the FieldSelector being used contains the listed fieldnames (and no more).
+	 * Note that DocumentBuilder.CLASS_FIELDNAME is always used.
+	 * @param expectedFieldNames
+	 */
+	public static void assertFieldSelectorEnabled(String... expectedFieldNames) {
 		assertNotNull( FieldSelectorLeakingReaderProvider.fieldSelector );
+		MapFieldSelector selector = (MapFieldSelector) fieldSelector;
+		Map<String, FieldSelectorResult> fieldSelections;
+		try {
+			Field field = MapFieldSelector.class.getDeclaredField( "fieldSelections" );
+			ReflectionHelper.setAccessible( field );
+			fieldSelections = (Map<String, FieldSelectorResult>) field.get( selector );
+		}
+		catch (NoSuchFieldException e) {
+			throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
+		}
+		catch (IllegalArgumentException e) {
+			throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
+		}
+		catch (IllegalAccessException e) {
+			throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
+		}
+		assertNotNull( fieldSelections );
+		assertEquals( expectedFieldNames.length, fieldSelections.size() );
 	}
 	
 	public static void assertFieldSelectorDisabled() {

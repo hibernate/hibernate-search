@@ -186,9 +186,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
-			DocumentExtractor extractor = new DocumentExtractor(
-					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
-			);
+			DocumentExtractor extractor = buildDocumentExtractor( queryHits );
 			try {
 				for ( int index = first; index <= max; index++ ) {
 					infos.add( extractor.extract( index ) );
@@ -215,6 +213,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
 			}
 		}
+	}
+
+	private DocumentExtractor buildDocumentExtractor(QueryHits queryHits) {
+		return new DocumentExtractor(
+				queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection, classesAndSubclasses
+		);
 	}
 
 	private void reactOnQueryTimeoutExceptionWhileExtracting(QueryTimeoutException e) {
@@ -263,9 +267,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
 			int first = first();
 			int max = max( first, queryHits.totalHits );
-			DocumentExtractor extractor = new DocumentExtractor(
-					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
-			);
+			DocumentExtractor extractor = buildDocumentExtractor( queryHits );
 			Loader loader = getLoader();
 			//stop timeout manager, the iterator pace is in the user's hands
 			timeoutManager.stop();
@@ -304,9 +306,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
-			DocumentExtractor extractor = new DocumentExtractor(
-					queryHits, searchFactoryImplementor, indexProjection, idFieldNames, allowFieldSelectionInProjection
-			);
+			DocumentExtractor extractor = buildDocumentExtractor( queryHits );
 			try {
 				for ( int index = first; index <= max; index++ ) {
 					infos.add( extractor.extract( index ) );
@@ -698,7 +698,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		Similarity searcherSimilarity = null;
 		//TODO check if caching this work for the last n list of indexedTargetedEntities makes a perf boost
 		if ( indexedTargetedEntities.size() == 0 ) {
-			// empty indexedTargetedEntities array means search over all indexed enities,
+			// empty indexedTargetedEntities array means search over all indexed entities,
 			// but we have to make sure there is at least one
 			if ( builders.isEmpty() ) {
 				throw new HibernateException(
@@ -764,6 +764,15 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 					break;
 				}
 			}
+		}
+		else {
+			Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+			this.classesAndSubclasses = documentBuildersIndexedEntities.keySet();
+		}
+			for ( DirectoryProvider dp : targetedDirectories ) {
+				final Set<Class<?>> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider(
+						dp
+				);
 		}
 
 		//set up the searcher

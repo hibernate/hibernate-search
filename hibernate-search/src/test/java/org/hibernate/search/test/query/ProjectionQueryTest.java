@@ -40,13 +40,19 @@ import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
+
+import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
+import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
+import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.resetFieldSelector;
 
 /**
  * Tests several aspects of projection queries.
@@ -83,8 +89,10 @@ public class ProjectionQueryTest extends SearchTestCase {
 		fetchingStrategy.setFetchMode("spouse", FetchMode.JOIN);
 		hibQuery.setCriteriaQuery(fetchingStrategy);
 
+		resetFieldSelector();
 		List result = hibQuery.list();
 		assertNotNull( result );
+		assertFieldSelectorEnabled( ProjectionConstants.ID );
 
 		Object[] projection = ( Object[] ) result.get( 0 );
 		assertNotNull( projection );
@@ -118,9 +126,11 @@ public class ProjectionQueryTest extends SearchTestCase {
 		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "dept", SearchTestCase.standardAnalyzer );
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		resetFieldSelector();
 		hibQuery.setProjection( FullTextQuery.OBJECT_CLASS );
 
 		List result = hibQuery.list();
+		assertFieldSelectorEnabled( ); // empty!
 		assertNotNull( result );
 
 		Object[] projection = ( Object[] ) result.get( 0 );
@@ -159,7 +169,9 @@ public class ProjectionQueryTest extends SearchTestCase {
 		);
 		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
 
+		resetFieldSelector();
 		ScrollableResults projections = hibQuery.scroll();
+		assertFieldSelectorDisabled(); //because of DOCUMENT being projected
 
 		// There are a lot of methods to check in ScrollableResultsImpl
 		// so, we'll use methods to check each projection as needed.
@@ -218,8 +230,10 @@ public class ProjectionQueryTest extends SearchTestCase {
 		hibQuery.setResultTransformer( new ProjectionToDelimStringResultTransformer() );
 		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
 
+		resetFieldSelector();
 		@SuppressWarnings("unchecked")
 		List<String> result = hibQuery.list();
+		assertFieldSelectorEnabled( "lastname", "dept", ProjectionConstants.ID );
 		assertTrue( "incorrect transformation", result.get( 0 ).startsWith( "1000, Griffin, ITech" ) );
 		assertTrue( "incorrect transformation", result.get( 1 ).startsWith( "1002, Jimenez, ITech" ) );
 
@@ -489,6 +503,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		hibQuery.setProjection("nrTitles", "name", "debtInMillions");
 
 		List result = hibQuery.list();
+		assertFieldSelectorEnabled( "nrTitles", "name", "debtInMillions" );
 		assertEquals(1, result.size());
 
 		Object[] projection = ( Object[] ) result.get( 0 );
@@ -552,6 +567,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		hibQuery.setProjection( "id", "summary", "mainAuthor.name" );
 
 		List result = hibQuery.list();
+		assertFieldSelectorEnabled( "id", "summary", "mainAuthor.name" );
 		assertNotNull( result );
 		assertEquals( "Query with no explicit criteria", 1, result.size() );
 		Object[] projection = ( Object[] ) result.get( 0 );
@@ -584,11 +600,13 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( 1, result.size() );
 		assertTrue( "Should not trigger projection", result.get( 0 ) instanceof Book );
+		assertFieldSelectorEnabled( ProjectionConstants.ID );
 
 		query = parser.parse( "summary:fleurs" );
 		hibQuery = s.createFullTextQuery( query, Book.class );
 		hibQuery.setProjection( "id", "summary", "mainAuthor.name" );
 		result = hibQuery.list();
+		hibQuery.setProjection( "id", "summary", "mainAuthor.name" );
 		assertEquals( 1, result.size() );
 		projection = ( Object[] ) result.get( 0 );
 		assertEquals( "mainAuthor.name", null, projection[2] );
@@ -614,4 +632,12 @@ public class ProjectionQueryTest extends SearchTestCase {
 				FootballTeam.class
 		};
 	}
+	
+	@Override
+	protected void configure(org.hibernate.cfg.Configuration configuration) {
+		super.configure( configuration );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		cfg.setProperty( Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
+	}
+	
 }

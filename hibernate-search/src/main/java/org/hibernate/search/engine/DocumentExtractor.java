@@ -43,6 +43,7 @@ import org.hibernate.search.query.QueryHits;
  * @author Emmanuel Bernard
  * @author John Griffin
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class DocumentExtractor {
 	private final SearchFactoryImplementor searchFactoryImplementor;
@@ -50,8 +51,11 @@ public class DocumentExtractor {
 	private final QueryHits queryHits;
 	private FieldSelector fieldSelector;
 	private boolean allowFieldSelection;
+	private boolean needId;
+	private final Map<String,Class> targetedClasses;
+	private final Class singleClassIfPossible;
 
-	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection) {
+	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection, Set<Class<?>> classesAndSubclasses) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		if ( projection != null ) {
 			this.projection = projection.clone();
@@ -61,39 +65,86 @@ public class DocumentExtractor {
 		}
 		this.queryHits = queryHits;
 		this.allowFieldSelection = allowFieldSelection;
+		this.targetedClasses = new HashMap<String,Class>( classesAndSubclasses.size() );
+		for ( Class<?> clazz : classesAndSubclasses ) {
+			//useful to reload classes from index without using reflection
+			targetedClasses.put( clazz.getName(), clazz );
+		}
+		if ( classesAndSubclasses.size() == 1 ) {
+			singleClassIfPossible = classesAndSubclasses.iterator().next();
+		}
+		else {
+			singleClassIfPossible = null;
+		}
 		initFieldSelection( projection, idFieldNames );
 	}
 
 	private void initFieldSelection(String[] projection, Set<String> idFieldNames) {
-		// if we need to project DOCUMENT do not use fieldSelector as the user might want anything
-		final int projectionSize = projection != null ? projection.length : 0;
-		if ( projectionSize != 0 ) {
-			for ( String property : projection ) {
-				if ( ProjectionConstants.DOCUMENT.equals( property ) ) {
+		Map<String, FieldSelectorResult> fields;
+		if ( projection == null ) {
+			// we're going to load hibernate entities
+			needId = true;
+			fields = new HashMap<String, FieldSelectorResult>( 2 ); // id + class
+		}
+		else {
+			fields = new HashMap<String, FieldSelectorResult>( projection.length + 2 ); // we actually have no clue
+			for ( String projectionName : projection ) {
+				if ( projectionName == null ) {
+					continue;
+				}
+				else if ( ProjectionConstants.THIS.equals( projectionName ) ) {
+					needId = true;
+				}
+				else if ( ProjectionConstants.DOCUMENT.equals( projectionName ) ) {
+					// if we need to project DOCUMENT do not use fieldSelector as the user might want anything
 					allowFieldSelection = false;
+					needId = true;
 					return;
+				}
+				else if ( ProjectionConstants.SCORE.equals( projectionName ) ) {
+					continue;
+				}
+				else if ( ProjectionConstants.BOOST.equals( projectionName ) ) {
+					continue;
+				}
+				else if ( ProjectionConstants.ID.equals( projectionName ) ) {
+					needId = true;
+				}
+				else if ( ProjectionConstants.DOCUMENT_ID.equals( projectionName ) ) {
+					continue;
+				}
+				else if ( ProjectionConstants.EXPLANATION.equals( projectionName ) ) {
+					continue;
+				}
+				else if ( ProjectionConstants.OBJECT_CLASS.equals( projectionName ) ) {
+					continue;
+				}
+				else {
+					fields.put( projectionName, FieldSelectorResult.LOAD );
 				}
 			}
 		}
-
-		// set up the field selector. CLASS_FIELDNAME and id fields are needed on top of any projected fields
-		Map<String, FieldSelectorResult> fields = new HashMap<String, FieldSelectorResult>( 1 + idFieldNames.size() + projectionSize );
-		fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
-		for ( String idFieldName : idFieldNames ) {
-			fields.put( idFieldName, FieldSelectorResult.LOAD );
+		if ( singleClassIfPossible == null ) {
+			fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
 		}
-		if ( projectionSize != 0 ) {
-			for ( String projectedField : projection ) {
-				fields.put( projectedField, FieldSelectorResult.LOAD );
+		if ( needId ) {
+			for ( String idFieldName : idFieldNames ) {
+				fields.put( idFieldName, FieldSelectorResult.LOAD );
 			}
+		}
+		if ( fields.size() == 1 ) {
+			// surprised: from unit tests it seems this case is possible quite often
+			// so apply an additional optimization using LOAD_AND_BREAK instead:
+			String key = fields.keySet().iterator().next();
+			fields.put( key, FieldSelectorResult.LOAD_AND_BREAK );
 		}
 		this.fieldSelector = new MapFieldSelector( fields );
 	}
 
 	private EntityInfo extract(Document document) {
-		Class clazz = DocumentBuilderHelper.getDocumentClass( document );
-		String idName =  DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
-		Serializable id = DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document );
+		Class clazz = singleClassIfPossible != null ? singleClassIfPossible : DocumentBuilderHelper.getDocumentClass( document );
+		String idName = DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
+		Serializable id = needId ? DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document ) : null;
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
 			projected = DocumentBuilderHelper.getDocumentFields(
@@ -148,4 +199,5 @@ public class DocumentExtractor {
 		}
 		return entityInfo;
 	}
+	
 }

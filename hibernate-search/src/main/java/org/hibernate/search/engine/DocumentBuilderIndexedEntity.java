@@ -63,6 +63,7 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.ContextualExceptionBridge;
 import org.hibernate.search.impl.ConfigContext;
@@ -668,18 +669,24 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 */
 	private void checkAllowFieldSelection() {
 		allowFieldSelectionInProjection = true;
-		if ( !( idBridge instanceof TwoWayStringBridge || idBridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
+		if ( !( idBridge instanceof TwoWayStringBridge
+				|| idBridge instanceof TwoWayString2FieldBridgeAdaptor
+				|| idBridge instanceof NumericFieldBridge ) ) {
 			allowFieldSelectionInProjection = false;
 			return;
 		}
 		for ( FieldBridge bridge : getMetadata().fieldBridges ) {
-			if ( !( bridge instanceof TwoWayStringBridge || bridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
+			if ( !( bridge instanceof TwoWayStringBridge
+					|| bridge instanceof TwoWayString2FieldBridgeAdaptor
+					|| bridge instanceof NumericFieldBridge ) ) {
 				allowFieldSelectionInProjection = false;
 				return;
 			}
 		}
 		for ( FieldBridge bridge : getMetadata().classBridges ) {
-			if ( !( bridge instanceof TwoWayStringBridge || bridge instanceof TwoWayString2FieldBridgeAdaptor ) ) {
+			if ( !( bridge instanceof TwoWayStringBridge
+					|| bridge instanceof TwoWayString2FieldBridgeAdaptor
+					|| bridge instanceof NumericFieldBridge ) ) {
 				allowFieldSelectionInProjection = false;
 				return;
 			}
