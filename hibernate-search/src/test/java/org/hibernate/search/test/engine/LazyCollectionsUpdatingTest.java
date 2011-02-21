@@ -35,10 +35,17 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 
+import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
+import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
+import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.resetFieldSelector;
+
 /**
  * TestCase for HSEARCH-178 (Search hitting HHH-2763)
  * Verifies that it's possible to index lazy loaded collections from
  * indexed entities even when no transactions are used.
+ * 
+ * Additionally, it uses projection and verifies an optimal FieldSelector
+ * is being applied (HSEARCH-690).
  *
  * @author Sanne Grinovero
  */
@@ -49,7 +56,9 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
+			resetFieldSelector();
 			List list = fullTextSession.createCriteria( BusStop.class ).list();
+			assertFieldSelectorDisabled();
 			assertNotNull( list );
 			assertEquals( 4, list.size() );
 			BusStop busStop = (BusStop) list.get( 1 );
@@ -87,12 +96,14 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	
 	public void assertFindsByRoadName(String analyzedRoadname) {
 		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
+		resetFieldSelector();
 		Transaction tx = fullTextSession.beginTransaction();
 		TermQuery ftQuery = new TermQuery( new Term( "stops.roadName", analyzedRoadname ) );
 		FullTextQuery query = fullTextSession.createFullTextQuery( ftQuery, BusLine.class );
 		query.setProjection( "busLineName" );
 		assertEquals( 1, query.list().size() );
 		List results = query.list();
+		assertFieldSelectorEnabled();
 		String resultName = (String) ((Object[])results.get(0))[0];
 		assertEquals( "Linea 64", resultName );
 		tx.commit();
@@ -140,6 +151,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		cfg.setProperty( Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 
