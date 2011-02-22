@@ -20,16 +20,9 @@ public class TimeoutTest extends SearchTestCase {
 
 	public void testTimeout() {
 		FullTextSession fts = Search.getFullTextSession( openSession(  ) );
+		storeClocks( fts );
+
 		Transaction tx = fts.beginTransaction();
-		for ( int i = 0 ; i < 1000 ; i++ ) {
-			Clock clock  = new Clock("Model cat A" + i, (i % 2 == 0) ? "Seiko" : "Swatch", new Long (2000 + i) ) ;
-			fts.persist( clock );
-		}
-		tx.commit();
-
-		fts.clear();
-
-		tx = fts.beginTransaction();
 		final QueryBuilder builder = fts.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
 		Query query = builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery();
 		FullTextQuery hibernateQuery = fts.createFullTextQuery( query, Clock.class );
@@ -98,16 +91,9 @@ public class TimeoutTest extends SearchTestCase {
 
 	public void testLimitFetchingTime() {
 		FullTextSession fts = Search.getFullTextSession( openSession(  ) );
+		storeClocks( fts );
+
 		Transaction tx = fts.beginTransaction();
-		for ( int i = 0 ; i < 1000 ; i++ ) {
-			Clock clock  = new Clock("Model cat A" + i, (i % 2 == 0) ? "Seiko" : "Swatch", new Long (3000 + i) ) ;
-			fts.persist( clock );
-		}
-		tx.commit();
-
-		fts.clear();
-
-		tx = fts.beginTransaction();
 
 		final QueryBuilder builder = fts.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
 		Query query = builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery();
@@ -158,6 +144,37 @@ public class TimeoutTest extends SearchTestCase {
 
 		fts.close();
 
+	}
+	
+	public void testEnoughTime() {
+		FullTextSession fts = Search.getFullTextSession( openSession(  ) );
+		storeClocks( fts );
+
+		Transaction tx = fts.beginTransaction();
+
+		final QueryBuilder builder = fts.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
+		Query query = builder.all().createQuery();
+		FullTextQuery hibernateQuery = fts.createFullTextQuery( query, Clock.class );
+		hibernateQuery.setTimeout( 5, TimeUnit.MINUTES );
+		List results = hibernateQuery.list();
+		assertFalse( hibernateQuery.hasPartialResults() );
+		assertEquals( 1000, results.size() );
+		
+		tx.commit();
+		fts.close();
+	}
+	
+	/**
+	 * Use to add some initial data
+	 */
+	private void storeClocks(FullTextSession fts) {
+		Transaction tx = fts.beginTransaction();
+		for ( int i = 0 ; i < 1000 ; i++ ) {
+			Clock clock  = new Clock("Model cat A" + i, (i % 2 == 0) ? "Seiko" : "Swatch", new Long (2000 + i) ) ;
+			fts.persist( clock );
+		}
+		tx.commit();
+		fts.clear();
 	}
 
 	@Override
