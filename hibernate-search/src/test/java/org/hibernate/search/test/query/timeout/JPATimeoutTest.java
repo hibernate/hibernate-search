@@ -18,7 +18,7 @@ import org.hibernate.search.test.jpa.JPATestCase;
  */
 public class JPATimeoutTest extends JPATestCase {
 
-	public void testQuerTimeoutException() throws Exception {
+	public void testQueryTimeoutException() throws Exception {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
 		for ( int i = 0 ; i < 1000 ; i++ ) {
