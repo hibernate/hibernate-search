@@ -25,6 +25,7 @@ package org.hibernate.search.engine;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
@@ -54,6 +55,11 @@ public class DocumentExtractor {
 	private boolean needId;
 	private final Map<String,Class> targetedClasses;
 	private final Class singleClassIfPossible;
+	
+	@Deprecated
+	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection) {
+		this(queryHits, searchFactoryImplementor, projection, idFieldNames, allowFieldSelection, Collections.EMPTY_SET);
+	}
 
 	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection, Set<Class<?>> classesAndSubclasses) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
