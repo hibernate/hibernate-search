@@ -45,7 +45,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.slf4j.Logger;
 
-import org.hibernate.HibernateException;
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.FullTextFilter;
@@ -178,9 +177,9 @@ public class HSQuery implements ProjectionConstants {
 	}
 
 	public TimeoutManager getTimeoutManager() {
-		if (timeoutManager == null) {
-			if ( luceneQuery == null) {
-				throw new AssertionFailure("Requesting TimeoutManager before setting luceneQuery()");
+		if ( timeoutManager == null ) {
+			if ( luceneQuery == null ) {
+				throw new AssertionFailure( "Requesting TimeoutManager before setting luceneQuery()" );
 			}
 			timeoutManager = new TimeoutManager( luceneQuery );
 		}
@@ -194,7 +193,7 @@ public class HSQuery implements ProjectionConstants {
 	public List<EntityInfo> getEntityInfos() {
 		IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor );
 		if ( searcher == null ) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 		try {
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize()  );
@@ -217,7 +216,7 @@ public class HSQuery implements ProjectionConstants {
 			return infos;
 		}
 		catch ( IOException e ) {
-			throw new HibernateException( "Unable to query Lucene index", e );
+			throw new SearchException( "Unable to query Lucene index", e );
 		}
 		finally {
 			try {
@@ -263,7 +262,7 @@ public class HSQuery implements ProjectionConstants {
 			catch ( SearchException ee ) {
 				//we have the initial issue already
 			}
-			throw new HibernateException( "Unable to query Lucene index", e );
+			throw new SearchException( "Unable to query Lucene index", e );
 		}
 	}
 
@@ -285,7 +284,7 @@ public class HSQuery implements ProjectionConstants {
 					resultSize = hits.totalHits;
 				}
 				catch ( IOException e ) {
-					throw new HibernateException( "Unable to query Lucene index", e );
+					throw new SearchException( "Unable to query Lucene index", e );
 				}
 				finally {
 					//searcher cannot be null
@@ -318,7 +317,7 @@ public class HSQuery implements ProjectionConstants {
 			explanation = searcher.getSearcher().explain( filteredQuery, documentId );
 		}
 		catch ( IOException e ) {
-			throw new HibernateException( "Unable to query Lucene index and build explanation", e );
+			throw new SearchException( "Unable to query Lucene index and build explanation", e );
 		}
 		finally {
 			//searcher cannot be null
@@ -416,7 +415,7 @@ public class HSQuery implements ProjectionConstants {
 				// don't return just Integer.MAX_VALUE due to a bug in Lucene - see HSEARCH-330
 				return Integer.MAX_VALUE - 1;
 			}
-			if (tmpMaxResult == 0) {
+			if ( tmpMaxResult == 0 ) {
 				return 1; // Lucene enforces that at least one top doc will be retrieved. See also HSEARCH-604
 			}
 			else {
@@ -443,7 +442,7 @@ public class HSQuery implements ProjectionConstants {
 	}
 
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
-		return buildSearcher(searchFactoryImplementor, null);
+		return buildSearcher( searchFactoryImplementor, null );
 	}
 
 	/**
@@ -466,7 +465,7 @@ public class HSQuery implements ProjectionConstants {
 			// empty indexedTargetedEntities array means search over all indexed enities,
 			// but we have to make sure there is at least one
 			if ( builders.isEmpty() ) {
-				throw new HibernateException(
+				throw new SearchException(
 						"There are no mapped entities. Don't forget to add @Indexed to at least one class."
 				);
 			}
@@ -495,7 +494,7 @@ public class HSQuery implements ProjectionConstants {
 				DocumentBuilderIndexedEntity builder = builders.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
 				if ( builder == null ) {
-					throw new HibernateException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
+					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
 				}
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
@@ -519,7 +518,7 @@ public class HSQuery implements ProjectionConstants {
 				if ( classesInDirectoryProvider.size() > 1 ) {
 					//risk of needClassFilterClause
 					for ( Class clazz : classesInDirectoryProvider ) {
-						if ( !classesAndSubclasses.contains( clazz ) ) {
+						if ( ! classesAndSubclasses.contains( clazz ) ) {
 							this.needClassFilterClause = true;
 							break;
 						}
@@ -556,13 +555,13 @@ public class HSQuery implements ProjectionConstants {
 		}
 		else if ( this.sort != null && projection != null ) {
 			boolean activate = false;
-			for(String field : projection) {
-				if ( SCORE.equals(field) ) {
+			for ( String field : projection ) {
+				if ( SCORE.equals( field ) ) {
 					activate = true;
 					break;
 				}
 			}
-			if (activate) {
+			if ( activate ) {
 				return new IndexSearcherWithPayload( is, true, false );
 			}
 		}
@@ -574,8 +573,8 @@ public class HSQuery implements ProjectionConstants {
 		if ( similarity == null ) {
 			similarity = builder.getSimilarity();
 		}
-		else if ( !similarity.getClass().equals( builder.getSimilarity().getClass() ) ) {
-			throw new HibernateException(
+		else if ( ! similarity.getClass().equals( builder.getSimilarity().getClass() ) ) {
+			throw new SearchException(
 					"Cannot perform search on two entities with differing Similarity implementations (" + similarity.getClass()
 							.getName() + " & " + builder.getSimilarity().getClass().getName() + ")"
 			);

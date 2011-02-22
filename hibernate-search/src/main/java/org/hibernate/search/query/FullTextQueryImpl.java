@@ -23,39 +23,20 @@
  */
 package org.hibernate.search.query;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
-import org.slf4j.Logger;
-
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
-import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -64,33 +45,15 @@ import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.impl.AbstractQueryImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.DocumentBuilder;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
-import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.Loader;
 import org.hibernate.search.engine.ProjectionLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.filter.ChainedFilter;
-import org.hibernate.search.filter.FilterKey;
-import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
-import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.query.engine.HSQuery;
-import org.hibernate.search.query.engine.internal.IndexSearcherWithPayload;
 import org.hibernate.search.query.impl.ObjectsInitializer;
-import org.hibernate.search.reader.ReaderProvider;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.ContextHelper;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
-
-import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
 
 /**
  * Implementation of {@link org.hibernate.search.FullTextQuery}.
@@ -100,7 +63,7 @@ import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
  * @todo Implements setParameter()
  */
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
-	private static final Logger log = LoggerFactory.make();
+
 	private Criteria criteria;
 	private ResultTransformer resultTransformer;
 	private int fetchSize = 1;
@@ -182,10 +145,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				.criteria(criteria)
 				.targetedEntities( hSearchQuery.getTargetedEntities() )
 				.indexedTargetedEntities( hSearchQuery.getIndexedTargetedEntities() )
-				.session(session)
-				.searchFactory(hSearchQuery.getSearchFactoryImplementor())
+				.session( session )
+				.searchFactory( hSearchQuery.getSearchFactoryImplementor() )
 				.timeoutManager( hSearchQuery.getTimeoutManager() )
-				.lookupMethod(lookupMethod)
+				.lookupMethod( lookupMethod )
 				.retrievalMethod( retrievalMethod );
 		if ( hSearchQuery.getProjectedFields() != null ) {
 			return getProjectionLoader( loaderBuilder );
@@ -355,7 +318,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return ContextHelper.getSearchFactoryBySFI( session );
 	}
 
-	private static Loader noLoader = new Loader() {
+	private static final Loader noLoader = new Loader() {
 		public void init(Session session,
 					 SearchFactoryImplementor searchFactoryImplementor,
 					 ObjectsInitializer objectsInitializer,

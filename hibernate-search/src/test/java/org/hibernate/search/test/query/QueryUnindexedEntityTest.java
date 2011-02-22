@@ -30,6 +30,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -57,7 +58,7 @@ public class QueryUnindexedEntityTest extends SearchTestCase {
 			hibQuery.list();
 			fail();
 		}
-		catch ( HibernateException e ) {
+		catch ( SearchException e ) {
 			assertTrue( "Wrong message", e.getMessage().startsWith( "There are no mapped entities" ) );
 		}
 
