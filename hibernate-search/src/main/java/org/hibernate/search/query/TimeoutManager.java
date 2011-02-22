@@ -84,7 +84,7 @@ public class TimeoutManager {
 		else {
 			final long elapsedTime = currentTime - start;
 			timedOut = elapsedTime > timeout;
-			if ( this.type != Type.LIMIT  ) {
+			if ( this.type != Type.LIMIT && timedOut ) {
 				throw new QueryTimeoutException(
 						"Full-text query took longer than expected (in microsecond): " + TimeUnit.NANOSECONDS.toMicros( elapsedTime ),
 						( SQLException) null,
