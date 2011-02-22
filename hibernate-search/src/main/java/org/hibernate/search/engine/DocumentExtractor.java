@@ -142,7 +142,7 @@ public class DocumentExtractor {
 	}
 
 	private EntityInfo extract(Document document) {
-		Class clazz = singleClassIfPossible != null ? singleClassIfPossible : DocumentBuilderHelper.getDocumentClass( document );
+		Class clazz = extractClass( document );
 		String idName = DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
 		Serializable id = needId ? DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document ) : null;
 		Object[] projected = null;
@@ -152,6 +152,22 @@ public class DocumentExtractor {
 			);
 		}
 		return new EntityInfo( clazz, idName, id, projected );
+	}
+
+	private Class extractClass(Document document) {
+		//maybe we can avoid document extraction:
+		if ( singleClassIfPossible != null ) {
+			return singleClassIfPossible;
+		}
+		String className = document.get( DocumentBuilder.CLASS_FIELDNAME );
+		Class clazz = targetedClasses.get( className );
+		//and maybe we can avoid the Reflect helper:
+		if ( clazz != null ) {
+			return clazz;
+		}
+		else {
+			return DocumentBuilderHelper.getDocumentClass( className );
+		}
 	}
 
 	public EntityInfo extract(int index) throws IOException {

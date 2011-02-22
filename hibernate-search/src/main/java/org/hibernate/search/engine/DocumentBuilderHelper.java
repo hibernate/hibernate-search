@@ -47,8 +47,7 @@ public final class DocumentBuilderHelper {
 	private DocumentBuilderHelper() {
 	}
 
-	public static Class getDocumentClass(Document document) {
-		String className = document.get( DocumentBuilder.CLASS_FIELDNAME );
+	public static Class getDocumentClass(String className) {
 		try {
 			return ReflectHelper.classForName( className );
 		}
