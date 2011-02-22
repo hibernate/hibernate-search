@@ -33,8 +33,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.impl.ConfigContext;
 
 /**
- * Set up and provide a manager for classes which are indexed via <code>@IndexedEmbedded</code>, but themselves do not
- * contain the <code>@Indexed</code> annotation.
+ * Set up and provide a manager for classes which are indexed via {@code @IndexedEmbedded}, but themselves do not
+ * contain the {@code @Indexed} annotation.
  *
  * @author Gavin King
  * @author Emmanuel Bernard
@@ -44,9 +44,9 @@ import org.hibernate.search.impl.ConfigContext;
  */
 public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T> implements DocumentBuilder {
 	/**
-	 * Constructor used on contained entities not annotated with <code>@Indexed</code> themselves.
+	 * Constructor used on contained entities not annotated with {@code @Indexed} themselves.
 	 *
-	 * @param xClass The class for which to build a <code>DocumentBuilderContainedEntity</code>.
+	 * @param xClass The class for which to build a {@code DocumentBuilderContainedEntity}.
 	 * @param context Handle to default configuration settings.
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */

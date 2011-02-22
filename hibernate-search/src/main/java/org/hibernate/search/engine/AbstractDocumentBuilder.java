@@ -84,7 +84,6 @@ import org.hibernate.search.util.ScopedAnalyzer;
 public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private static final Logger log = LoggerFactory.make();
 
-	protected final PropertiesMetadata metadata = new PropertiesMetadata();
 	private final XClass beanXClass;
 	private final Class<?> beanClass;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
@@ -93,9 +92,10 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
 	private Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	private boolean isRoot;
-	protected EntityState entityState;
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
 
+	protected final PropertiesMetadata metadata = new PropertiesMetadata();
+	protected EntityState entityState;
 	protected ReflectionManager reflectionManager; //available only during initialization and post-initialization
 
 	/**
@@ -141,12 +141,15 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	/**
 	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId;
 	 * in case the entity uses @ProvidedId, it's illegal to call this method.
-	 * @param entity
+	 *
+	 * @param entity the instance for which to retrieve the id
+	 *
 	 * @return the value, or null if it's not an indexed entity
+	 *
 	 * @throws IllegalStateException when used with a @ProvidedId annotated entity
 	 */
 	abstract public Serializable getId(Object entity);
-	
+
 	public boolean isRoot() {
 		return isRoot;
 	}
@@ -173,10 +176,6 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	public EntityState getEntityState() {
 		return entityState;
-	}
-
-	public void setEntityState(EntityState entityState) {
-		this.entityState = entityState;
 	}
 
 	public Set<Class<?>> getMappedSubclasses() {
@@ -290,10 +289,10 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				throw new AssertionFailure( "Unexpected Index: " + index );
 		}
 	}
-	
+
 	/**
 	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
-	 **/
+	 */
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
@@ -660,7 +659,9 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		propertiesMetadata.fieldGetters.add( member );
 		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
 		propertiesMetadata.fieldNames.add( fieldName );
-		propertiesMetadata.fieldNameToPositionMap.put( member.getName(), Integer.valueOf( propertiesMetadata.fieldNames.size() ) );
+		propertiesMetadata.fieldNameToPositionMap.put(
+				member.getName(), Integer.valueOf( propertiesMetadata.fieldNames.size() )
+		);
 		propertiesMetadata.fieldStore.add( fieldAnn.store() );
 		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
 		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
@@ -672,7 +673,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		String indexNullAs = fieldAnn.indexNullAs();
 		if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL ) ) {
 			indexNullAs = null;
-		} else if(indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN )) {
+		}
+		else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
 			indexNullAs = context.getDefaultNullToken();
 		}
 		propertiesMetadata.fieldNullTokens.add( indexNullAs );
@@ -767,16 +769,19 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	private <T> void processSingleContainedInInstance(WorkPlan workplan, T value) {
-			workplan.recurseContainedIn( value );
+		workplan.recurseContainedIn( value );
 	}
 
 	/**
 	 * Hibernate entities might be considered dirty, but still have only changes that
 	 * don't affect indexing. So this isDirty() implementation will return true only
 	 * if the proposed change is possibly affecting the index.
-	 * @since 3.4
+	 *
 	 * @param dirtyPropertyNames Contains the property name of each value which changed, or null for everything.
+	 *
 	 * @return true if it can't make sure the index doesn't need an update
+	 *
+	 * @since 3.4
 	 */
 	public boolean isDirty(String[] dirtyPropertyNames) {
 		if ( dirtyPropertyNames == null || dirtyPropertyNames.length == 0 ) {
@@ -785,7 +790,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( metadata.classBridges.size() > 0 ) {
 			return true; // can't know what a classBridge is going to look at -> reindex //TODO nice new feature to have?
 		}
-		if ( ! ( metadata.classBoostStrategy instanceof DefaultBoostStrategy ) ) {
+		if ( !( metadata.classBoostStrategy instanceof DefaultBoostStrategy ) ) {
 			return true; // as with classbridge: might be affected by any field //TODO nice new feature to have?
 		}
 
@@ -795,12 +800,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			Integer propertyIndexInteger = metadata.fieldNameToPositionMap.get( dirtyPropertyName );
 			if ( propertyIndexInteger != null ) {
 				int propertyIndex = propertyIndexInteger.intValue() - 1;
-				
+
 				// take care of indexed fields:
 				if ( metadata.fieldIndex.get( propertyIndex ).isIndexed() ) {
 					return true;
 				}
-				
+
 				// take care of stored fields:
 				Store store = metadata.fieldStore.get( propertyIndex );
 				if ( store.equals( Store.YES ) || store.equals( Store.COMPRESS ) ) {
@@ -808,12 +813,13 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 					return true;
 				}
 			}
-			
+
 			// consider IndexedEmbedded:
 			for ( XMember embeddedMember : metadata.embeddedGetters ) {
 				String name = embeddedMember.getName();
-				if ( name.equals( dirtyPropertyName ) )
+				if ( name.equals( dirtyPropertyName ) ) {
 					return true;
+				}
 			}
 		}
 		return false;
@@ -830,7 +836,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		public Discriminator discriminator;
 		public XMember discriminatorGetter;
 		public BoostStrategy classBoostStrategy;
-		public final Map<String,Integer> fieldNameToPositionMap = new HashMap<String,Integer>();
+		public final Map<String, Integer> fieldNameToPositionMap = new HashMap<String, Integer>();
 
 		public final List<String> fieldNames = new ArrayList<String>();
 		public final List<XMember> fieldGetters = new ArrayList<XMember>();
@@ -891,6 +897,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	/**
 	 * To be removed, see org.hibernate.search.engine.DocumentBuilderIndexedEntity.isIdMatchingJpaId()
+	 *
 	 * @return true if a providedId needs to be provided for indexing
 	 */
 	boolean requiresProvidedId() {
@@ -899,10 +906,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	/**
 	 * To be removed, see org.hibernate.search.engine.DocumentBuilderIndexedEntity.isIdMatchingJpaId()
+	 *
 	 * @return true if @DocumentId and @Id are found on the same property
 	 */
 	boolean isIdMatchingJpaId() {
 		return true;
 	}
-	
+
 }
