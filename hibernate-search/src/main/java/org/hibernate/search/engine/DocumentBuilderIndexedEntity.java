@@ -156,8 +156,25 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			XClass clazz, ConfigContext context, DirectoryProviderFactory.DirectoryProviders providerWrapper, ReflectionManager reflectionManager) {
 
 		super( clazz, context, providerWrapper.getSimilarity(), reflectionManager );
-		initSubClass( clazz, context );
-		setEntityState( EntityState.INDEXED );
+		// special case @ProvidedId
+		ProvidedId provided = findProvidedId( clazz, reflectionManager );
+		if ( provided != null ) {
+			idBridge = BridgeFactory.extractTwoWayType( provided.bridge(), clazz, reflectionManager );
+			idKeywordName = provided.name();
+			idProvided = true;
+		}
+		if ( idKeywordName == null ) {
+			throw new SearchException( "No document id in: " + clazz );
+		}
+		checkAllowFieldSelection();
+		if ( log.isDebugEnabled() ) {
+			log.debug(
+					"Field selection in projections is set to {} for entity {}.",
+					allowFieldSelectionInProjection,
+					clazz
+			);
+		}
+		this.entityState = EntityState.INDEXED;
 		this.directoryProviders = providerWrapper.getProviders();
 		this.shardingStrategy = providerWrapper.getSelectionStrategy();
 	}
@@ -166,30 +183,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return idGetter;
 	}
 
-	protected void initSubClass(XClass clazz, ConfigContext context) {
-		// special case @ProvidedId
-		ProvidedId provided = findProvidedId( clazz, reflectionManager );
-		if ( provided != null ) {
-			idBridge = BridgeFactory.extractTwoWayType( provided.bridge(), clazz, reflectionManager );
-			idKeywordName = provided.name();
-			idProvided = true;
-		}
-
-		if ( idKeywordName == null ) {
-			throw new SearchException( "No document id in: " + clazz.getName() );
-		}
-
-		checkAllowFieldSelection();
-		if ( log.isDebugEnabled() ) {
-			log.debug(
-					"Field selection in projections is set to {} for entity {}.",
-					allowFieldSelectionInProjection,
-					clazz.getName()
-			);
-		}
-	}
-
-	protected void subClassSpecificCheck(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
+	protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
 		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context );
 	}
 

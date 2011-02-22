@@ -61,7 +61,7 @@ public final class DocumentBuilderHelper {
 				clazz
 		);
 		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
+			throw new SearchException( "No Lucene configuration set up for: " + clazz );
 		}
 
 
@@ -81,7 +81,7 @@ public final class DocumentBuilderHelper {
 				clazz
 		);
 		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz.getName() );
+			throw new SearchException( "No Lucene configuration set up for: " + clazz );
 		}
 		return builderIndexedEntity.getIdentifierName();
 	}

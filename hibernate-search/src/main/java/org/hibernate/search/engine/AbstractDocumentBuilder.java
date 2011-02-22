@@ -136,7 +136,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue);
 
-	abstract protected void subClassSpecificCheck(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
+	abstract protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
 
 	/**
 	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId;
@@ -424,7 +424,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
 		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context );
 		checkForContainedIn( member, propertiesMetadata );
-		subClassSpecificCheck( member, propertiesMetadata, isRoot, prefix, context );
+		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context );
 	}
 
 	private Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext context) {
