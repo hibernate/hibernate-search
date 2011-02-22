@@ -535,12 +535,6 @@ public class HSQuery implements ProjectionConstants {
 			this.classesAndSubclasses = documentBuildersIndexedEntities.keySet();
 		}
 
-		for ( DirectoryProvider dp : targetedDirectories ) {
-			final Set<Class<?>> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider(
-					dp
-			);
-		}
-
 		//set up the searcher
 		final DirectoryProvider[] directoryProviders = targetedDirectories.toArray(
 				new DirectoryProvider[targetedDirectories.size()]
