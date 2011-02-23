@@ -133,7 +133,7 @@
         <hibernateVersion>3.6.1-SNAPSHOT</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Final</hibernateCommonsAnnotationVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bytemanVersion>1.4.1</bytemanVersion>
+        <bytemanVersion>1.5.1</bytemanVersion>
     </properties>
 
     <dependencies>
