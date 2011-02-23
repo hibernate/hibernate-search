@@ -1,6 +1,6 @@
 ########################################################################
 # JBoss, Home of Professional Open Source
-# Copyright 2009-2010, Red Hat and individual contributors
+# Copyright 2009-2011, Red Hat and individual contributors
 # by the @authors tag. See the copyright.txt in the distribution for a
 # full listing of individual contributors.
 #
@@ -19,7 +19,7 @@
 # Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 #
-# @authors Sanne Grinovero
+# @authors Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
 #
 # ConcurrentMergeErrorTest
 #
@@ -45,4 +45,29 @@ IF TRUE
 	DO
 		traceln( "\n *** Byteman rules deployed! Next IndexWriter.checkpoint invocation will fail. ***\n" );
 		flag("createIndexWriterIOException")
+ENDRULE
+
+#
+# JPATimeoutTest needs the document collection to take at least a second
+#
+
+RULE Enable QueryHits slow down
+CLASS org.hibernate.search.test.query.timeout.JPATimeoutTest
+METHOD testQueryTimeoutException
+IF TRUE
+	DO
+		traceln( "\n *** Byteman rules deployed! Next Hits collection will be slow. ***\n" );
+		flag("slowDownDocumentCollection")
+ENDRULE
+
+RULE QueryHits-updateTopDocs-slowsDown
+CLASS org.hibernate.search.query.QueryHits
+METHOD updateTopDocs
+HELPER org.hibernate.search.test.util.BytemanHelper
+AT ENTRY
+IF flagged("slowDownDocumentCollection")
+	DO
+		clear("slowDownDocumentCollection");
+		sleepASecond();
+		traceln("slept a second");
 ENDRULE
