@@ -22,26 +22,51 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query.facet;
+package org.hibernate.search.test.query.facet;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Hardy Ferentschik
  */
-public class SimpleFacetRequest extends FacetRequest {
-	public SimpleFacetRequest(String fieldName) {
-		super( fieldName );
+@Entity
+@Indexed
+public class Cd {
+	@Id
+	@GeneratedValue
+	private int id;
+
+	@Field
+	private String name;
+
+	@Field(index = Index.UN_TOKENIZED)
+	private int price;
+
+	private Cd() {
 	}
 
-	public SimpleFacetRequest(String fieldName, FacetSortOrder sort) {
-		super( fieldName, sort );
+	public Cd(String name, int price) {
+		this.name = name;
+		this.price = price;
 	}
 
-	public SimpleFacetRequest(String fieldName, FacetSortOrder sort, boolean includeZeroCounts) {
-		super( fieldName, sort, includeZeroCounts );
+	public int getId() {
+		return id;
 	}
 
-	@Override
-	public Class<?> getFieldCacheType() {
-		return String.class;
+	public String getName() {
+		return name;
+	}
+
+	public int getPrice() {
+		return price;
 	}
 }
+
+

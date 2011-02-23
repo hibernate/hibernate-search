@@ -29,7 +29,6 @@ import java.util.Map;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
-import org.slf4j.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -42,14 +41,12 @@ import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.SimpleFacetRequest;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.LoggerFactory;
 
 
 /**
  * @author Hardy Ferentschik
  */
-public class FacetingTest extends SearchTestCase {
-	private static final Logger log = LoggerFactory.make();
+public class SimpleFacetingTest extends SearchTestCase {
 
 	private static final String[] colors = { "red", "black", "white", "blue" };
 	private static final String[] makes = { "Honda", "Toyota", "BMW", "Mercedes" };
@@ -150,6 +147,53 @@ public class FacetingTest extends SearchTestCase {
 		assertTrue( "A unknown field name should not create any facets", facetResult.getFacets().size() == 0 );
 	}
 
+	public void testEnableDisableFacets() {
+		FacetRequest request = new SimpleFacetRequest( indexFieldName );
+		FullTextQuery query = queryHondaWithFacet( facetName, request );
+		Map<String, FacetResult> results = query.getFacetResults();
+		assertNotNull( results );
+		assertTrue( "We should have one facet result", results.size() == 1 );
+
+		query.disableQueryFacet( facetName );
+		query.list();
+		results = query.getFacetResults();
+		assertNotNull( results );
+		assertTrue( "We should have no facets", results.size() == 0 );
+	}
+
+	public void testMultipleFacets() {
+		final String descendingOrderedFacet = "desc";
+		FacetRequest requestDesc = new SimpleFacetRequest( indexFieldName );
+
+		final String ascendingOrderedFacet = "asc";
+		FacetRequest requestAsc = new SimpleFacetRequest( indexFieldName, FacetSortOrder.COUNT_ASC );
+
+		TermQuery term = new TermQuery( new Term( "make", "honda" ) );
+		FullTextQuery query = fullTextSession.createFullTextQuery( term, Car.class );
+
+		query.enableQueryFacet( descendingOrderedFacet, requestDesc );
+		query.enableQueryFacet( ascendingOrderedFacet, requestAsc );
+
+		Map<String, FacetResult> results = query.getFacetResults();
+		assertTrue( "We should have two facet result", results.size() == 2 );
+		FacetResult facetResult = results.get( descendingOrderedFacet );
+		assertCounts( facetResult.getFacets(), new int[] { 5, 4, 4, 0 } );
+
+		facetResult = results.get( ascendingOrderedFacet );
+		assertCounts( facetResult.getFacets(), new int[] { 0, 4, 4, 5 } );
+
+		query.disableQueryFacet( descendingOrderedFacet );
+		results = query.getFacetResults();
+		assertTrue( "We should have only one result", results.size() == 1 );
+		facetResult = results.get( ascendingOrderedFacet );
+		assertCounts( facetResult.getFacets(), new int[] { 0, 4, 4, 5 } );
+
+		query.disableQueryFacet( ascendingOrderedFacet );
+		results = query.getFacetResults();
+		assertTrue( "We should have no facets", results.size() == 0 );
+	}
+
+
 	private void assertCounts(List<Facet> facetList, int[] counts) {
 		assertTrue( "Wrong number of facets", facetList.size() == counts.length );
 		for ( int i = 0; i < facetList.size(); i++ ) {
@@ -172,7 +216,7 @@ public class FacetingTest extends SearchTestCase {
 		TermQuery term = new TermQuery( new Term( "make", "honda" ) );
 		FullTextQuery query = fullTextSession.createFullTextQuery( term, Car.class );
 		query.enableQueryFacet( facetName, request );
-		assertEquals( "Wrong number of query matches", 13, query.list().size() );
+		assertEquals( "Wrong number of query matches", 13, query.getResultSize() );
 		return query;
 	}
 

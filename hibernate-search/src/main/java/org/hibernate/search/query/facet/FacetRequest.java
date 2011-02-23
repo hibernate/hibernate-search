@@ -29,7 +29,7 @@ package org.hibernate.search.query.facet;
  *
  * @author Hardy Ferentschik
  */
-public class FacetRequest {
+public abstract class FacetRequest {
 	/**
 	 * The document field name to facet on
 	 */
@@ -73,6 +73,8 @@ public class FacetRequest {
 	public FacetSortOrder getSort() {
 		return sort;
 	}
+
+	public abstract Class<?> getFieldCacheType();
 
 	@Override
 	public String toString() {

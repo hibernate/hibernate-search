@@ -43,13 +43,13 @@ public class Car {
 	@GeneratedValue
 	private int id;
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	@Field(index = Index.UN_TOKENIZED)
 	private String color;
 
 	@Field(store = Store.YES)
 	private String make;
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	@Field(index = Index.UN_TOKENIZED)
 	private int cubicCapacity;
 
 	private Car() {

@@ -1036,9 +1036,20 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public void disableQueryFacet(String name) {
 		facetRequests.remove( name );
+		if ( facetResults != null ) {
+			facetResults.remove( name );
+		}
 	}
 
 	public Map<String, FacetResult> getFacetResults() {
+		// if there are no facet requests we don't have to do anything
+		if ( facetRequests.isEmpty() ) {
+			return Collections.emptyMap();
+		}
+		// we have facet request, but the query hasn't executed yet. trigger the query via getting the result size
+		if ( !facetRequests.isEmpty() && facetResults == null ) {
+			getResultSize();
+		}
 		return facetResults;
 	}
 

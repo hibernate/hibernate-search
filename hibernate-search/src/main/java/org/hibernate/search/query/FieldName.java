@@ -22,26 +22,55 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query.facet;
+package org.hibernate.search.query;
 
 /**
  * @author Hardy Ferentschik
  */
-public class SimpleFacetRequest extends FacetRequest {
-	public SimpleFacetRequest(String fieldName) {
-		super( fieldName );
+class FieldName {
+	private final Class<?> type;
+	private final String name;
+
+	FieldName(String name, Class<?> type) {
+		this.type = type;
+		this.name = name;
 	}
 
-	public SimpleFacetRequest(String fieldName, FacetSortOrder sort) {
-		super( fieldName, sort );
+	Class<?> getType() {
+		return type;
 	}
 
-	public SimpleFacetRequest(String fieldName, FacetSortOrder sort, boolean includeZeroCounts) {
-		super( fieldName, sort, includeZeroCounts );
+	String getName() {
+		return name;
 	}
 
 	@Override
-	public Class<?> getFieldCacheType() {
-		return String.class;
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		FieldName mapKey = (FieldName) o;
+
+		if ( type != null ? !type.equals( mapKey.type ) : mapKey.type != null ) {
+			return false;
+		}
+		if ( name != null ? !name.equals( mapKey.name ) : mapKey.name != null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = type != null ? type.hashCode() : 0;
+		result = 31 * result + ( name != null ? name.hashCode() : 0 );
+		return result;
 	}
 }
+
+

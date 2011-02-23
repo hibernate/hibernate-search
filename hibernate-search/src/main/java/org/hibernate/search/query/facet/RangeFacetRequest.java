@@ -24,11 +24,41 @@
 
 package org.hibernate.search.query.facet;
 
+import java.util.List;
+
 /**
  * @author Hardy Ferentschik
  */
-public class RangeFacetRequest extends FacetRequest {
-	public RangeFacetRequest( String field) {
-		super( field );
+// todo have some helper method or constructors to create range requests using a start and increment
+public class RangeFacetRequest<N extends Number> extends FacetRequest {
+	private final List<FacetRange<N>> facetRangeList;
+
+	public RangeFacetRequest(String field, List<FacetRange<N>> facetRanges) {
+		this( field, FacetSortOrder.COUNT_DESC, facetRanges );
+	}
+
+	public RangeFacetRequest(String fieldName, FacetSortOrder sort, List<FacetRange<N>> facetRanges) {
+		this( fieldName, sort, true, facetRanges );
+	}
+
+	public RangeFacetRequest(String fieldName, FacetSortOrder sort, boolean includeZeroCounts, List<FacetRange<N>> facetRanges) {
+		super( fieldName, sort, includeZeroCounts );
+		this.facetRangeList = facetRanges;
+	}
+
+	public List<FacetRange<N>> getFacetRangeList() {
+		return facetRangeList;
+	}
+
+	@Override
+	public Class<?> getFieldCacheType() {
+		return facetRangeList.get(0).getMin().getClass();
+	}
+
+	@Override
+	public String toString() {
+		return "RangeFacetRequest{" +
+				"facetRangeList=" + facetRangeList +
+				"} " + super.toString();
 	}
 }
