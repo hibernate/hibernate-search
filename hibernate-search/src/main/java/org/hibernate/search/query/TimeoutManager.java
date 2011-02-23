@@ -20,13 +20,12 @@
  */
 package org.hibernate.search.query;
 
-import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Query;
 
-import org.hibernate.QueryTimeoutException;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.query.engine.TimeoutExceptionFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -36,13 +35,14 @@ public class TimeoutManager {
 	private Long timeout;
 	private long start;
 	boolean timedOut = false;
-	private Query luceneQuery;
+	private final Query luceneQuery;
 	private Type type;
 	private boolean partialResults;
+	private final TimeoutExceptionFactory timeoutExceptionFactory;
 
-
-	public TimeoutManager(Query query) {
+	public TimeoutManager(Query query, TimeoutExceptionFactory timeoutExceptionFactory) {
 		this.luceneQuery = query;
+		this.timeoutExceptionFactory = timeoutExceptionFactory;
 	}
 
 	/** we start counting from this method call (if needed) */
@@ -105,10 +105,9 @@ public class TimeoutManager {
 			final long elapsedTime = currentTime - start;
 			timedOut = elapsedTime > timeout;
 			if ( this.type != Type.LIMIT && timedOut ) {
-				throw new QueryTimeoutException(
+				throw timeoutExceptionFactory.createTimeoutException(
 						"Full-text query took longer than expected (in microsecond): " + TimeUnit.NANOSECONDS.toMicros( elapsedTime ),
-						( SQLException) null,
-						luceneQuery.toString()
+						luceneQuery
 				);
 			}
 			return timedOut;
@@ -152,14 +151,16 @@ public class TimeoutManager {
 		this.type = Type.LIMIT;
 	}
 
-	public void reactOnQueryTimeoutExceptionWhileExtracting(QueryTimeoutException e) {
+	public void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e) {
 		if ( type == Type.LIMIT) {
 			//we stop where we are return what we have
 			this.partialResults = true;
 		}
 		else {
 			if ( e == null) {
-				e = new QueryTimeoutException( "Timeout period exceeded", (SQLException) null, luceneQuery.toString() );
+				e = timeoutExceptionFactory.createTimeoutException(
+						"Timeout period exceeded",
+						luceneQuery );
 			}
 			throw e;
 		}

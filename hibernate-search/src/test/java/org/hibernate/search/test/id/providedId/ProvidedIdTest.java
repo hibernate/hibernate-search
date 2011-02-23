@@ -38,6 +38,7 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.query.engine.SearchTimeoutException;
 import org.hibernate.search.query.engine.internal.IndexSearcherWithPayload;
 import org.hibernate.search.query.QueryHits;
 import org.hibernate.search.query.TimeoutManager;
@@ -101,7 +102,8 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 
 		//follows an example of what Infinispan Query actually needs to resolve a search request:
 		IndexSearcherWithPayload lowLevelSearcher = new IndexSearcherWithPayload( searcher, false, false );
-		QueryHits queryHits = new QueryHits( lowLevelSearcher, luceneQuery, null, null, new TimeoutManager(luceneQuery) );
+		QueryHits queryHits = new QueryHits( lowLevelSearcher, luceneQuery, null, null,
+				new TimeoutManager( luceneQuery, SearchTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY ) );
 		Set<String> identifiers = new HashSet<String>();
 		identifiers.add( "providedId" );
 		Set<Class<?>> targetedClasses = new HashSet<Class<?>>();

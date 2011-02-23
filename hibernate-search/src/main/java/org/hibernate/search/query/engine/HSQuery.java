@@ -45,7 +45,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.slf4j.Logger;
 
-import org.hibernate.QueryTimeoutException;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
@@ -87,7 +86,6 @@ public class HSQuery implements ProjectionConstants {
 	private List<Class<?>> targetedEntities;
 	private TimeoutManager timeoutManager;
 	private Set<Class<?>> indexedTargetedEntities;
-	private IndexSearcherWithPayload searcher;
 	private boolean allowFieldSelectionInProjection = true;
 	private final Map<String, FullTextFilterImpl> filterDefinitions = new HashMap<String, FullTextFilterImpl>();
 	private Filter filter;
@@ -101,6 +99,7 @@ public class HSQuery implements ProjectionConstants {
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
+	private TimeoutExceptionFactory timeoutExceptionFactory = SearchTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
 
 	public HSQuery(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
@@ -129,6 +128,11 @@ public class HSQuery implements ProjectionConstants {
 
 	public HSQuery filter(Filter filter) {
 		this.userFilter = filter;
+		return this;
+	}
+	
+	public HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory) {
+		this.timeoutExceptionFactory = exceptionFactory;
 		return this;
 	}
 
@@ -181,7 +185,7 @@ public class HSQuery implements ProjectionConstants {
 			if ( luceneQuery == null ) {
 				throw new AssertionFailure( "Requesting TimeoutManager before setting luceneQuery()" );
 			}
-			timeoutManager = new TimeoutManager( luceneQuery );
+			timeoutManager = new TimeoutManager( luceneQuery, timeoutExceptionFactory );
 		}
 		return timeoutManager;
 	}
@@ -203,15 +207,10 @@ public class HSQuery implements ProjectionConstants {
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
 			DocumentExtractor extractor = buildDocumentExtractor( searcher, queryHits, first, max );
-			try {
-				for ( int index = first; index <= max; index++ ) {
-					infos.add( extractor.extract( index ) );
-					//TODO should we measure on each extractor?
-					if ( index % 10 == 0 ) getTimeoutManager().isTimedOut();
-				}
-			}
-			catch ( QueryTimeoutException e ) {
-				getTimeoutManager().reactOnQueryTimeoutExceptionWhileExtracting( e );
+			for ( int index = first; index <= max; index++ ) {
+				infos.add( extractor.extract( index ) );
+				//TODO should we measure on each extractor?
+				if ( index % 10 == 0 ) getTimeoutManager().isTimedOut();
 			}
 			return infos;
 		}
@@ -357,11 +356,6 @@ public class HSQuery implements ProjectionConstants {
 		for ( IndexReader indexReader : indexReaders ) {
 			readerProvider.closeReader( indexReader );
 		}
-	}
-
-	@Deprecated
-	private void reactOnQueryTimeoutExceptionWhileExtracting(QueryTimeoutException e) {
-		timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting(e);
 	}
 
 	/**
@@ -839,4 +833,5 @@ public class HSQuery implements ProjectionConstants {
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
 		return searchFactoryImplementor;
 	}
+
 }

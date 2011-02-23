@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.query;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
@@ -51,6 +53,7 @@ import org.hibernate.search.engine.Loader;
 import org.hibernate.search.engine.ProjectionLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.HSQuery;
+import org.hibernate.search.query.engine.TimeoutExceptionFactory;
 import org.hibernate.search.query.impl.ObjectsInitializer;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.transform.ResultTransformer;
@@ -63,7 +66,7 @@ import org.hibernate.transform.ResultTransformer;
  * @todo Implements setParameter()
  */
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
-
+	
 	private Criteria criteria;
 	private ResultTransformer resultTransformer;
 	private int fetchSize = 1;
@@ -87,6 +90,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		hSearchQuery = new HSQuery( getSearchFactoryImplementor() );
 		hSearchQuery
 				.luceneQuery( query )
+				.timeoutExceptionFactory( exceptionFactory )
 				.targetedEntities( Arrays.asList( classes ) );
 	}
 
@@ -120,7 +124,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		final List<EntityInfo> entityInfos = hSearchQuery.getEntityInfos();
 		//stop timeout manager, the iterator pace is in the user's hands
 		hSearchQuery.getTimeoutManager().stop();
-		//TODO is this nooader optimization really needed?
+		//TODO is this noloader optimization really needed?
 		if ( entityInfos.size() == 0 ) {
 			return new IteratorImpl( entityInfos, noLoader );
 		}
@@ -142,7 +146,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 */
 	private Loader getLoader() {
 		ObjectLoaderBuilder loaderBuilder = new ObjectLoaderBuilder()
-				.criteria(criteria)
+				.criteria( criteria )
 				.targetedEntities( hSearchQuery.getTargetedEntities() )
 				.indexedTargetedEntities( hSearchQuery.getIndexedTargetedEntities() )
 				.session( session )
@@ -337,4 +341,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
 	};
+	
+	private static final TimeoutExceptionFactory exceptionFactory = new TimeoutExceptionFactory() {
+
+		public RuntimeException createTimeoutException(String message, org.apache.lucene.search.Query luceneQuery) {
+			return new QueryTimeoutException( message, ( SQLException) null, luceneQuery.toString() );
+		}
+		
+	};
+	
 }
