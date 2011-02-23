@@ -43,9 +43,9 @@ public class Kernel {
 	@Id
 	@GeneratedValue
 	@DocumentId
-	public String getId() { return id; }
-	public void setId(String id) { this.id = id; }
-	private String id;
+	public Integer getId() { return id; }
+	public void setId(Integer id) { this.id = id; }
+	private Integer id;
 
 	@Field
 	public String getCodeName() { return codeName; }
