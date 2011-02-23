@@ -68,12 +68,11 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer();
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
+	protected static final File indexDir;
 	protected static SessionFactory sessions;
 	protected Session session;
 
 	private static File targetDir;
-	protected static final File indexDir;
-
 	private SearchFactoryImplementor searchFactory;
 
 	static {
@@ -115,7 +114,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 			}
 			session.close();
 			session = null;
-			fail( "unclosed session" );
+			log.warn("Closing open session. Make sure to close sessions explicitly in your tests!");
 		}
 		else {
 			session = null;
@@ -124,24 +123,6 @@ public abstract class SearchTestCase extends HibernateTestCase {
 
 	@Override
 	protected void closeResources() {
-		try {
-			if ( session != null && session.isOpen() ) {
-				if ( session.isConnected() ) {
-					session.doWork( new RollbackWork() );
-				}
-				session.close();
-			}
-		}
-		catch ( Exception ignore ) {
-		}
-		try {
-			if ( sessions != null ) {
-				sessions.close();
-				buildConfiguration();
-			}
-		}
-		catch ( Exception ignore ) {
-		}
 	}
 
 	public Session openSession() throws HibernateException {
