@@ -32,12 +32,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.HibernateException;
+import org.hibernate.search.SearchException;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
@@ -196,7 +195,7 @@ public final class BridgeFactory {
 				catch ( Exception e ) {
 					final String msg = "Unable to instantiate ClassBridge of type " + impl.getName() + " defined on "
 							+ clazz.getName();
-					throw new HibernateException( msg, e );
+					throw new SearchException( msg, e );
 				}
 			}
 		}

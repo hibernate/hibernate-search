@@ -34,7 +34,7 @@ import javax.jms.QueueSession;
 
 import org.slf4j.Logger;
 
-import org.hibernate.HibernateException;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.util.LoggerFactory;
@@ -81,7 +81,7 @@ public class JMSBackendQueueProcessor implements Runnable {
 			session.close();
 		}
 		catch (JMSException e) {
-			throw new HibernateException( "Unable to send Search work to JMS queue: " + factory.getJmsQueueName(), e );
+			throw new SearchException( "Unable to send Search work to JMS queue: " + factory.getJmsQueueName(), e );
 		}
 		finally {
 			try {

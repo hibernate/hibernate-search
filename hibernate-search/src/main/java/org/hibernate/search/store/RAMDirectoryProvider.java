@@ -29,7 +29,7 @@ import java.util.Properties;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.RAMDirectory;
-import org.hibernate.HibernateException;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.BuildContext;
 
 /**
@@ -55,7 +55,7 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 			iw.close();
 		}
 		catch (IOException e) {
-			throw new HibernateException( "Unable to initialize index: " + indexName, e );
+			throw new SearchException( "Unable to initialize index: " + indexName, e );
 		}
 	}
 
