@@ -92,7 +92,7 @@ public class HSQuery implements ProjectionConstants {
 	private Filter userFilter;
 	private Sort sort;
 	private String[] projectedFields;
-	private Integer firstResult;
+	private int firstResult;
 	private Integer maxResults;
 	private Integer resultSize;
 	private Set<Class<?>> classesAndSubclasses;
@@ -146,8 +146,8 @@ public class HSQuery implements ProjectionConstants {
 		return this;
 	}
 
-	public HSQuery firstResult(Integer firstResult) {
-		if ( firstResult != null && firstResult < 0 ) {
+	public HSQuery firstResult(int firstResult) {
+		if ( firstResult < 0 ) {
 			throw new IllegalArgumentException( "'first' pagination parameter less than 0" );
 		}
 		this.firstResult = firstResult;
@@ -201,7 +201,7 @@ public class HSQuery implements ProjectionConstants {
 		}
 		try {
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize()  );
-			int first = first();
+			int first = getFirstResultIndex();
 			int max = max( first, queryHits.totalHits );
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
@@ -248,7 +248,7 @@ public class HSQuery implements ProjectionConstants {
 		//FIXME: handle null searcher
 		try {
 			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
-			int first = first();
+			int first = getFirstResultIndex();
 			int max = max( first, queryHits.totalHits );
 			DocumentExtractor extractor = buildDocumentExtractor( searcher, queryHits, first, max );
 			return extractor;
@@ -404,7 +404,7 @@ public class HSQuery implements ProjectionConstants {
 			return null;
 		}
 		else {
-			long tmpMaxResult = ( long ) first() + maxResults;
+			long tmpMaxResult = ( long ) getFirstResultIndex() + maxResults;
 			if ( tmpMaxResult >= Integer.MAX_VALUE ) {
 				// don't return just Integer.MAX_VALUE due to a bug in Lucene - see HSEARCH-330
 				return Integer.MAX_VALUE - 1;
@@ -429,10 +429,8 @@ public class HSQuery implements ProjectionConstants {
 		}
 	}
 
-	private int first() {
-		return firstResult != null ?
-				firstResult :
-				0;
+	public int getFirstResultIndex() {
+		return 	firstResult;
 	}
 
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
@@ -456,7 +454,7 @@ public class HSQuery implements ProjectionConstants {
 		Similarity searcherSimilarity = null;
 		//TODO check if caching this work for the last n list of indexedTargetedEntities makes a perf boost
 		if ( indexedTargetedEntities.size() == 0 ) {
-			// empty indexedTargetedEntities array means search over all indexed enities,
+			// empty indexedTargetedEntities array means search over all indexed entities,
 			// but we have to make sure there is at least one
 			if ( builders.isEmpty() ) {
 				throw new SearchException(

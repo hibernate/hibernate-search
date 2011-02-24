@@ -33,7 +33,7 @@ public class SearchTimeoutException extends RuntimeException {
 	public static final TimeoutExceptionFactory DEFAULT_TIMEOUT_EXCEPTION_FACTORY = new DefaultSearchTimeoutException();
 	
 	private SearchTimeoutException(String message, Query query) {
-		super( message + '\"' + query + '\"' );
+		super( message + " \"" + query + '\"' );
 	}
 	
 	private static class DefaultSearchTimeoutException implements TimeoutExceptionFactory {
