@@ -65,7 +65,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 			busStop.setRoadName( "new road" );
 			tx.commit();
 		}
-		catch (org.hibernate.AssertionFailure ass) {
+		catch (org.hibernate.annotations.common.AssertionFailure ass) {
 			fail( ass.getMessage() );
 		}
 		finally {
@@ -85,7 +85,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 			busStop.setRoadName( "new road" );
 			fullTextSession.flush();
 		}
-		catch (org.hibernate.AssertionFailure ass) {
+		catch (org.hibernate.annotations.common.AssertionFailure ass) {
 			fail( ass.getMessage() );
 		}
 		finally {

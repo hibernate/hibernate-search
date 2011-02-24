@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 
-import org.hibernate.AssertionFailure;
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
