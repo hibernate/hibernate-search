@@ -28,8 +28,6 @@ import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 
-import org.hibernate.util.LRUMap;
-
 /**
  * Cache following a "Most Recently Used" (MRU) algorithm for maintaining a
  * bounded in-memory size; the "Least Recently Used" (LRU) entry is the first
