@@ -100,6 +100,7 @@ public class HSQuery implements ProjectionConstants {
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
 	private TimeoutExceptionFactory timeoutExceptionFactory = SearchTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
+	private IndexSearcherWithPayload openSearcher = null;
 
 	public HSQuery(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
@@ -195,7 +196,7 @@ public class HSQuery implements ProjectionConstants {
 	}
 
 	public List<EntityInfo> getEntityInfos() {
-		IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor );
+		IndexSearcherWithPayload searcher = buildSearcher();
 		if ( searcher == null ) {
 			return Collections.emptyList();
 		}
@@ -218,12 +219,7 @@ public class HSQuery implements ProjectionConstants {
 			throw new SearchException( "Unable to query Lucene index", e );
 		}
 		finally {
-			try {
-				closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
-			}
-			catch ( SearchException e ) {
-				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
-			}
+			closeSearcher( searcher );
 		}
 	}
 
@@ -244,23 +240,17 @@ public class HSQuery implements ProjectionConstants {
 	public DocumentExtractor getDocumentExtractor() {
 		//keep the searcher open until the resultset is closed
 		//find the directories
-		IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor );
+		openSearcher = buildSearcher();
 		//FIXME: handle null searcher
 		try {
-			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
+			QueryHits queryHits = getQueryHits( openSearcher, calculateTopDocsRetrievalSize() );
 			int first = getFirstResultIndex();
 			int max = max( first, queryHits.totalHits );
-			DocumentExtractor extractor = buildDocumentExtractor( searcher, queryHits, first, max );
+			DocumentExtractor extractor = buildDocumentExtractor( openSearcher, queryHits, first, max );
 			return extractor;
 		}
 		catch ( IOException e ) {
-			//close only in case of exception
-			try {
-				closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
-			}
-			catch ( SearchException ee ) {
-				//we have the initial issue already
-			}
+			closeSearcher( openSearcher );
 			throw new SearchException( "Unable to query Lucene index", e );
 		}
 	}
@@ -286,14 +276,7 @@ public class HSQuery implements ProjectionConstants {
 					throw new SearchException( "Unable to query Lucene index", e );
 				}
 				finally {
-					//searcher cannot be null
-					try {
-						closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
-						//searchFactoryImplementor.getReaderProvider().closeReader( searcher.getIndexReader() );
-					}
-					catch ( SearchException e ) {
-						log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
-					}
+					closeSearcher( searcher );
 				}
 			}
 		}
@@ -319,13 +302,7 @@ public class HSQuery implements ProjectionConstants {
 			throw new SearchException( "Unable to query Lucene index and build explanation", e );
 		}
 		finally {
-			//searcher cannot be null
-			try {
-				closeSearcher( searcher.getSearcher(), searchFactoryImplementor.getReaderProvider() );
-			}
-			catch ( SearchException e ) {
-				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
-			}
+			closeSearcher( searcher );
 		}
 		return explanation;
 	}
@@ -349,12 +326,25 @@ public class HSQuery implements ProjectionConstants {
 	public void disableFullTextFilter(String name) {
 		filterDefinitions.remove( name );
 	}
-
-	private void closeSearcher(Searcher searcher, ReaderProvider readerProvider) {
-		Set<IndexReader> indexReaders = getIndexReaders( searcher );
-
+	
+	public void close() {
+		closeSearcher( openSearcher );
+	}
+	
+	private void closeSearcher(IndexSearcherWithPayload searcherWithPayload) {
+		if ( searcherWithPayload == null ) {
+			return;
+		}
+		Set<IndexReader> indexReaders = getIndexReaders( searcherWithPayload.getSearcher() );
+		ReaderProvider readerProvider = searchFactoryImplementor.getReaderProvider();
 		for ( IndexReader indexReader : indexReaders ) {
-			readerProvider.closeReader( indexReader );
+			try {
+				readerProvider.closeReader( indexReader );
+			}
+			catch (SearchException e) {
+				//catch is inside the for loop to make sure we try to close all of them
+				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
+			}
 		}
 	}
 
@@ -433,7 +423,7 @@ public class HSQuery implements ProjectionConstants {
 		return 	firstResult;
 	}
 
-	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor) {
+	public IndexSearcherWithPayload buildSearcher() {
 		return buildSearcher( searchFactoryImplementor, null );
 	}
 
