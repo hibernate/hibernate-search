@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.util;
 
+import java.io.Closeable;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,13 +35,17 @@ import java.util.Collections;
 import org.apache.solr.common.ResourceLoader;
 import org.apache.solr.util.plugin.ResourceLoaderAware;
 
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
+import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
+	
+	private static final Logger log = LoggerFactory.make();
+	
 	private final String charset;
 
 	public HibernateSearchResourceLoader() {
@@ -56,56 +61,61 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 	}
 
 	public List<String> getLines(String resource) throws IOException {
-		BufferedReader reader = null;
+		final InputStream stream = openResource( resource );
+		if ( stream == null ) {
+			throw new SearchException( "Resource not found: " + resource );
+		}
 		try {
 			final InputStreamReader charsetAwareReader;
-			final InputStream stream = openResource( resource );
 			charsetAwareReader = charset == null ? new InputStreamReader( stream ) : new InputStreamReader( stream, charset );
-			reader = new BufferedReader( charsetAwareReader );
-			List<String> results = new ArrayList<String>();
-			String line = reader.readLine();
-			while ( line != null ) {
-				//comment or empty line
-				if ( line.length() != 0 && !line.startsWith( "#" ) ) {
-					results.add( line );
+			final List<String> results = new ArrayList<String>();
+			final BufferedReader reader = new BufferedReader( charsetAwareReader );
+			try {
+				String line = reader.readLine();
+				while ( line != null ) {
+					// comment or empty line
+					if ( line.length() != 0 && !line.startsWith( "#" ) ) {
+						results.add( line );
+					}
+					line = reader.readLine();
 				}
-				line = reader.readLine();
+			}
+			finally {
+				closeResource( reader );
 			}
 			return Collections.unmodifiableList( results );
 		}
 		finally {
-			try {
-				if (reader != null) reader.close();
-			}
-			catch ( Exception e ) {
-				//we don't really care if we can't close
-			}
+			closeResource( stream );
 		}
 	}
 
 	public Object newInstance(String cname, String... subpackages) {
-		if (subpackages != null && subpackages.length > 0)
+		if ( subpackages != null && subpackages.length > 0 )
 			throw new UnsupportedOperationException( "newInstance(classname, packages) not implemented" );
 
-		final Class<?> clazz;
-		try {
-			clazz = ReflectHelper.classForName( cname );
+		final Object instance = ClassLoaderHelper.instanceFromName(
+				Object.class, cname, this.getClass(), "Solr resource" );
+		if ( instance instanceof ResourceLoaderAware ) {
+			( ( ResourceLoaderAware) instance ).inform( this );
 		}
-		catch ( ClassNotFoundException e ) {
-			throw new SearchException("Unable to find class " + cname, e);
-		}
-		try {
-			final Object instance = clazz.newInstance();
-			if (instance instanceof ResourceLoaderAware) {
-				( ( ResourceLoaderAware) instance ).inform( this );
+		return instance;
+	}
+	
+	/**
+	 * Closes a resource without throwing IOExceptions
+	 * @param resource
+	 */
+	private void closeResource(Closeable resource) {
+		if ( resource != null ) {
+			try {
+				resource.close();
 			}
-			return instance;
-		}
-		catch ( InstantiationException e ) {
-			throw new SearchException("Unable to instanciate class with no-arg constructor: " + cname, e);
-		}
-		catch ( IllegalAccessException e ) {
-			throw new SearchException("Unable to instanciate class with no-arg constructor: " + cname, e);
+			catch (IOException e) {
+				//we don't really care if we can't close
+				log.warn( "could not close resource: {}", e );
+			}
 		}
 	}
+	
 }
