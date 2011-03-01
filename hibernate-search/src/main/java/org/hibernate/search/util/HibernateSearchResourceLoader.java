@@ -23,29 +23,29 @@
  */
 package org.hibernate.search.util;
 
-import java.io.Closeable;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.BufferedReader;
-import java.util.List;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.solr.common.ResourceLoader;
 import org.apache.solr.util.plugin.ResourceLoaderAware;
+import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
-import org.slf4j.Logger;
 
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
-	
+
 	private static final Logger log = LoggerFactory.make();
-	
+
 	private final String charset;
 
 	public HibernateSearchResourceLoader() {
@@ -67,7 +67,9 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 		}
 		try {
 			final InputStreamReader charsetAwareReader;
-			charsetAwareReader = charset == null ? new InputStreamReader( stream ) : new InputStreamReader( stream, charset );
+			charsetAwareReader = charset == null ?
+					new InputStreamReader( stream ) :
+					new InputStreamReader( stream, charset );
 			final List<String> results = new ArrayList<String>();
 			final BufferedReader reader = new BufferedReader( charsetAwareReader );
 			try {
@@ -91,31 +93,33 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 	}
 
 	public Object newInstance(String cname, String... subpackages) {
-		if ( subpackages != null && subpackages.length > 0 )
+		if ( subpackages != null && subpackages.length > 0 ) {
 			throw new UnsupportedOperationException( "newInstance(classname, packages) not implemented" );
+		}
 
 		final Object instance = ClassLoaderHelper.instanceFromName(
-				Object.class, cname, this.getClass(), "Solr resource" );
+				Object.class, cname, this.getClass(), "Solr resource"
+		);
 		if ( instance instanceof ResourceLoaderAware ) {
-			( ( ResourceLoaderAware) instance ).inform( this );
+			( (ResourceLoaderAware) instance ).inform( this );
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * Closes a resource without throwing IOExceptions
-	 * @param resource
+	 *
+	 * @param resource the resource to close
 	 */
 	private void closeResource(Closeable resource) {
 		if ( resource != null ) {
 			try {
 				resource.close();
 			}
-			catch (IOException e) {
+			catch ( IOException e ) {
 				//we don't really care if we can't close
 				log.warn( "could not close resource: {}", e );
 			}
 		}
 	}
-	
 }
