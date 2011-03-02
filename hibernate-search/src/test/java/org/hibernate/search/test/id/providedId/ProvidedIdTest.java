@@ -112,7 +112,9 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		DocumentExtractor extractor = new DocumentExtractor(
 				queryHits, sf, new String[] { "name" },
 				identifiers, false,
-				searcher, 0, 0, //not used in this case
+				lowLevelSearcher,
+				luceneQuery,
+				0, 0, //not used in this case
 				targetedClasses );
 		HashSet<String> titles = new HashSet<String>(3);
 		for ( int id = 0; id < hits.totalHits; id++ ) {

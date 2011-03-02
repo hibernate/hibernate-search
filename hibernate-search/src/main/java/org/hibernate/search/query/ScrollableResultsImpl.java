@@ -79,9 +79,7 @@ import org.hibernate.type.Type;
 public class ScrollableResultsImpl implements ScrollableResults {
 	
 	private static final Logger log = LoggerFactory.make();
-	
-	private final SearchFactory searchFactory;
-	private final IndexSearcher searcher;
+
 	private final int first;
 	private final int max;
 	private final int fetchSize;
@@ -97,17 +95,15 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	
 	private int current;
 
-	public ScrollableResultsImpl( HSQuery hSearchQuery, int fetchSize, DocumentExtractor extractor,
+	public ScrollableResultsImpl(int fetchSize, DocumentExtractor extractor,
 			Loader loader, SessionImplementor sessionImplementor
 	) {
-		this.searchFactory = hSearchQuery.getSearchFactoryImplementor();
-		this.searcher = extractor.getSearcher();
 		this.loader = loader;
 		this.documentExtractor = extractor;
 		this.fetchSize = fetchSize;
 		this.session = sessionImplementor;
-		this.first = extractor.getFirst();
-		this.max = extractor.getMax();
+		this.first = extractor.getFirstIndex();
+		this.max = extractor.getMaxIndex();
 		int size = Math.max( max - first + 1, 0 );
 		this.resultsContext = new LoadedObject[size];
 		beforeFirst();
@@ -224,7 +220,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 
 	public void close() {
 		try {
-			searchFactory.getReaderProvider().closeReader( searcher.getIndexReader() );
+			documentExtractor.close();
 		}
 		catch (SearchException e) {
 			log.warn( "Unable to properly close searcher in ScrollableResults", e );

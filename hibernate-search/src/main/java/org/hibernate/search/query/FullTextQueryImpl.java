@@ -187,7 +187,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		hSearchQuery.getTimeoutManager().stop();
 		Loader loader = getLoader();
 		return new ScrollableResultsImpl(
-				hSearchQuery,
 				fetchSize,
 				documentExtractor,
 				loader,

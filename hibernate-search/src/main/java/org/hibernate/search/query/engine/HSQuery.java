@@ -100,7 +100,6 @@ public class HSQuery implements ProjectionConstants {
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
 	private TimeoutExceptionFactory timeoutExceptionFactory = SearchTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
-	private IndexSearcherWithPayload openSearcher = null;
 
 	public HSQuery(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
@@ -230,17 +229,26 @@ public class HSQuery implements ProjectionConstants {
 						projectedFields,
 						idFieldNames,
 						allowFieldSelectionInProjection,
-						searcher.getSearcher(),
+						searcher,
+						luceneQuery,
 						first,
 						max,
 						classesAndSubclasses
 				);
 	}
 
+	/**
+	 * DocumentExtractor returns a traverser over the full-text results (EntityInfo)
+	 * This operation is lazy bound:
+	 *  - the query is executed
+	 *  -  results are not retrieved until actually requested
+	 *
+	 * DocumentExtractor objects *must* be closed when the results are no longer traversed.
+	 */
 	public DocumentExtractor getDocumentExtractor() {
 		//keep the searcher open until the resultset is closed
 		//find the directories
-		openSearcher = buildSearcher();
+		IndexSearcherWithPayload openSearcher = buildSearcher();
 		//FIXME: handle null searcher
 		try {
 			QueryHits queryHits = getQueryHits( openSearcher, calculateTopDocsRetrievalSize() );
@@ -326,26 +334,12 @@ public class HSQuery implements ProjectionConstants {
 	public void disableFullTextFilter(String name) {
 		filterDefinitions.remove( name );
 	}
-	
-	public void close() {
-		closeSearcher( openSearcher );
-	}
-	
+
 	private void closeSearcher(IndexSearcherWithPayload searcherWithPayload) {
 		if ( searcherWithPayload == null ) {
 			return;
 		}
-		Set<IndexReader> indexReaders = getIndexReaders( searcherWithPayload.getSearcher() );
-		ReaderProvider readerProvider = searchFactoryImplementor.getReaderProvider();
-		for ( IndexReader indexReader : indexReaders ) {
-			try {
-				readerProvider.closeReader( indexReader );
-			}
-			catch (SearchException e) {
-				//catch is inside the for loop to make sure we try to close all of them
-				log.warn( "Unable to properly close searcher during lucene query: " + getQueryString(), e );
-			}
-		}
+		searcherWithPayload.closeSearcher( luceneQuery, searchFactoryImplementor );
 	}
 
 	/**
@@ -419,11 +413,11 @@ public class HSQuery implements ProjectionConstants {
 		}
 	}
 
-	public int getFirstResultIndex() {
+	private int getFirstResultIndex() {
 		return 	firstResult;
 	}
 
-	public IndexSearcherWithPayload buildSearcher() {
+	private IndexSearcherWithPayload buildSearcher() {
 		return buildSearcher( searchFactoryImplementor, null );
 	}
 

@@ -25,7 +25,6 @@ package org.hibernate.search.engine;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
@@ -34,13 +33,22 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.search.IndexSearcher;
 
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.query.QueryHits;
+import org.hibernate.search.query.engine.internal.IndexSearcherWithPayload;
 
 /**
- * Helper class to extract <code>EntityInfo</code>s out of the <code>QueryHits</code>.
+ * DocumentExtractor is a traverser over the full-text results (EntityInfo)
+ *
+ * This operation is as lazy as possible:
+ *  - the query is executed eagerly
+ *  - results are not retrieved until actually requested
+ *
+ *  #getFirstIndex and #getMaxIndex define the boundaries available to #extract.
+ *
+ * DocumentExtractor objects *must* be closed when the results are no longer traversed.
+ * #close
  *
  * @author Emmanuel Bernard
  * @author John Griffin
@@ -51,33 +59,26 @@ public class DocumentExtractor {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
 	private final QueryHits queryHits;
-	private final IndexSearcher searcher;
+	private final IndexSearcherWithPayload searcher;
 	private FieldSelector fieldSelector;
 	private boolean allowFieldSelection;
 	private boolean needId;
 	private final Map<String,Class> targetedClasses;
 	private final Class singleClassIfPossible;
-	private int first;
-	private int max;
-	
-	@Deprecated
-	public DocumentExtractor(QueryHits queryHits, SearchFactoryImplementor searchFactoryImplementor, String[] projection, Set<String> idFieldNames, boolean allowFieldSelection,
-							 IndexSearcher searcher,
-							int first,
-							int max) {
-		this(queryHits, searchFactoryImplementor, projection, idFieldNames, allowFieldSelection, searcher, first, max, Collections.EMPTY_SET);
-	}
-	public DocumentExtractor(
-			QueryHits queryHits,
+	private int firstIndex;
+	private int maxIndex;
+	private Object query;
+
+	public DocumentExtractor(QueryHits queryHits,
 			SearchFactoryImplementor searchFactoryImplementor,
 			String[] projection,
 			Set<String> idFieldNames,
 			boolean allowFieldSelection,
-			IndexSearcher searcher,
-			int first,
-			int max,
-			Set<Class<?>> classesAndSubclasses
-		) {
+			IndexSearcherWithPayload searcher,
+			Object query,
+			int firstIndex,
+			int maxIndex,
+			Set<Class<?>> classesAndSubclasses) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		if ( projection != null ) {
 			this.projection = projection.clone();
@@ -99,8 +100,9 @@ public class DocumentExtractor {
 			singleClassIfPossible = null;
 		}
 		this.searcher = searcher;
-		this.first = first;
-		this.max = max;
+		this.query = query;
+		this.firstIndex = firstIndex;
+		this.maxIndex = maxIndex;
 		initFieldSelection( projection, idFieldNames );
 	}
 
@@ -241,15 +243,15 @@ public class DocumentExtractor {
 		return entityInfo;
 	}
 
-	public int getFirst() {
-		return first;
+	public int getFirstIndex() {
+		return firstIndex;
 	}
 
-	public int getMax() {
-		return max;
+	public int getMaxIndex() {
+		return maxIndex;
 	}
 
-	public IndexSearcher getSearcher() {
-		return searcher;
+	public void close() {
+		searcher.closeSearcher( query, searchFactoryImplementor );
 	}
 }
