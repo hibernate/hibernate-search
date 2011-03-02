@@ -144,6 +144,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 */
 	private XProperty jpaIdAnnotatedMember; //FIXME: to remove, needed only for isIdMatchingJpaId()
 
+	private final String identifierName;
+
 	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
 	 *
@@ -177,6 +179,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		this.entityState = EntityState.INDEXED;
 		this.directoryProviders = providerWrapper.getProviders();
 		this.shardingStrategy = providerWrapper.getSelectionStrategy();
+		this.identifierName = idProvided ? null : idGetter.getName();
 	}
 
 	public XMember getIdGetter() {
@@ -536,12 +539,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public String getIdentifierName() {
-		if ( idProvided ) {
-			return null;
-		}
-		return idGetter.getName(); //TODO cache this, it's invoking reflection each time. Needs safe initialization.
+		return identifierName;
 	}
-
+	
 	public DirectoryProvider[] getDirectoryProviders() {
 		if ( getEntityState() != EntityState.INDEXED ) {
 			throw new AssertionFailure( "Contained in only entity: getDirectoryProvider should not have been called." );
