@@ -125,13 +125,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//stop timeout manager, the iterator pace is in the user's hands
 		hSearchQuery.getTimeoutManager().stop();
 		//TODO is this noloader optimization really needed?
+		final Iterator<Object> iterator;
 		if ( entityInfos.size() == 0 ) {
-			return new IteratorImpl( entityInfos, noLoader );
+			iterator = new IteratorImpl( entityInfos, noLoader );
+			return iterator;
 		}
 		else {
 			Loader loader = getLoader();
-			return new IteratorImpl( entityInfos, loader );
+			iterator = new IteratorImpl( entityInfos, loader );
 		}
+		hSearchQuery.getTimeoutManager().stop();
+		return iterator;
 	}
 
 
@@ -204,11 +208,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//no need to timeoutManager.isTimedOut from this point, we don't do anything intensive
 		if ( resultTransformer == null || loader instanceof ProjectionLoader ) {
 			//stay consistent with transformTuple which can only be executed during a projection
-			return list;
+			//nothing to do
 		}
 		else {
-			return resultTransformer.transformList( list );
+			list = resultTransformer.transformList( list );
 		}
+		hSearchQuery.getTimeoutManager().stop();
+		return list;
 	}
 
 	public Explanation explain(int documentId) {
