@@ -35,7 +35,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.engine.DocumentExtractor;
+import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;

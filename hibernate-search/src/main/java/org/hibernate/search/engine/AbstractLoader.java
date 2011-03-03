@@ -26,6 +26,7 @@ package org.hibernate.search.engine;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.stat.StatisticsImplementor;
 
 

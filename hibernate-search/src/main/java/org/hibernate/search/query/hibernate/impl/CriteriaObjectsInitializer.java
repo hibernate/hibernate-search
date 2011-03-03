@@ -32,7 +32,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.EntityInfo;
+import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.util.LoggerFactory;

@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.query.engine.spi;
 
 import java.io.Serializable;
 import java.util.LinkedList;

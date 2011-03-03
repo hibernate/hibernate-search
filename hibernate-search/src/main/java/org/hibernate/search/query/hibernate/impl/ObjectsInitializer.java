@@ -22,7 +22,7 @@ package org.hibernate.search.query.hibernate.impl;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.search.engine.EntityInfo;
+import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 

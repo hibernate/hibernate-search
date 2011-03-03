@@ -30,8 +30,6 @@ import org.apache.lucene.search.Sort;
 
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
-import org.hibernate.search.engine.DocumentExtractor;
-import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**

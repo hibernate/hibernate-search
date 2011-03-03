@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.query.engine.spi;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -35,6 +35,9 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.document.FieldSelector;
 
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderHelper;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 

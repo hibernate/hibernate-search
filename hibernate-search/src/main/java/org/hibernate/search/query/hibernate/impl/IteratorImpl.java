@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.hibernate.search.engine.Loader;
-import org.hibernate.search.engine.EntityInfo;
+import org.hibernate.search.query.engine.spi.EntityInfo;
 
 /**
  * @author Emmanuel Bernard
