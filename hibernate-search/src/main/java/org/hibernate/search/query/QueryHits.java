@@ -42,7 +42,7 @@ import org.apache.lucene.search.Weight;
 
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.query.engine.internal.IndexSearcherWithPayload;
+import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically

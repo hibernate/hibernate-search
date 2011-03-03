@@ -33,13 +33,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.SearchTimeoutException;
-import org.hibernate.search.query.engine.internal.IndexSearcherWithPayload;
+import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 import org.hibernate.search.query.QueryHits;
 import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;

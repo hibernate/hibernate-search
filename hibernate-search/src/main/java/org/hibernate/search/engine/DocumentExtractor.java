@@ -36,7 +36,7 @@ import org.apache.lucene.document.FieldSelector;
 
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.query.QueryHits;
-import org.hibernate.search.query.engine.internal.IndexSearcherWithPayload;
+import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 
 /**
  * DocumentExtractor is a traverser over the full-text results (EntityInfo)
