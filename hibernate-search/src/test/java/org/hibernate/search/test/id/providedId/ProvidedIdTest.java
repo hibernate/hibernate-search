@@ -39,7 +39,7 @@ import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
-import org.hibernate.search.query.QueryHits;
+import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.store.DirectoryProvider;

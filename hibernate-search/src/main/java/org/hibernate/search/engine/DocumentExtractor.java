@@ -35,7 +35,7 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.document.FieldSelector;
 
 import org.hibernate.search.ProjectionConstants;
-import org.hibernate.search.query.QueryHits;
+import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 
 /**
