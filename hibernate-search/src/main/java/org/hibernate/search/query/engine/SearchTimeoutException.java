@@ -1,4 +1,6 @@
-/* 
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -21,14 +23,18 @@ package org.hibernate.search.query.engine;
 
 import org.apache.lucene.search.Query;
 
+import org.hibernate.search.SearchException;
+
 /**
  * Represent a timeout during a Fulltext search in the HSQuery.
- * The Hibernate integration should catch this and throw an
- * {@link org.hibernate.QueryTimeoutException} instead.
+ * The object source integration should catch this and throw a
+ * relevent exception for the object source. For example in Hibernate Core, an
+ * {@link org.hibernate.QueryTimeoutException}.
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SearchTimeoutException extends RuntimeException {
+public class SearchTimeoutException extends SearchException {
 	
 	public static final TimeoutExceptionFactory DEFAULT_TIMEOUT_EXCEPTION_FACTORY = new DefaultSearchTimeoutException();
 	
