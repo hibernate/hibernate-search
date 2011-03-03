@@ -34,19 +34,19 @@ import org.hibernate.search.SearchException;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SearchTimeoutException extends SearchException {
+public class QueryTimeoutException extends SearchException {
 	
 	public static final TimeoutExceptionFactory DEFAULT_TIMEOUT_EXCEPTION_FACTORY = new DefaultSearchTimeoutException();
 	
-	private SearchTimeoutException(String message, Query query) {
+	private QueryTimeoutException(String message, Query query) {
 		super( message + " \"" + query + '\"' );
 	}
 	
 	private static class DefaultSearchTimeoutException implements TimeoutExceptionFactory {
 
 		@Override
-		public SearchTimeoutException createTimeoutException(String message, Query query) {
-			return new SearchTimeoutException( message, query );
+		public QueryTimeoutException createTimeoutException(String message, Query query) {
+			return new QueryTimeoutException( message, query );
 		}
 		
 	}

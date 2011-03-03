@@ -96,7 +96,7 @@ public class HSQuery implements ProjectionConstants {
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
-	private TimeoutExceptionFactory timeoutExceptionFactory = SearchTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
+	private TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
 
 	public HSQuery(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
