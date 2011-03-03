@@ -121,7 +121,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//scrollable is better in this area
 
 		hSearchQuery.getTimeoutManager().start();
-		final List<EntityInfo> entityInfos = hSearchQuery.getEntityInfos();
+		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
 		//stop timeout manager, the iterator pace is in the user's hands
 		hSearchQuery.getTimeoutManager().stop();
 		//TODO is this noloader optimization really needed?
@@ -182,7 +182,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//keep the searcher open until the resultset is closed
 
 		hSearchQuery.getTimeoutManager().start();
-		final DocumentExtractor documentExtractor = hSearchQuery.getDocumentExtractor();
+		final DocumentExtractor documentExtractor = hSearchQuery.queryDocumentExtractor();
 		//stop timeout manager, the iterator pace is in the user's hands
 		hSearchQuery.getTimeoutManager().stop();
 		Loader loader = getLoader();
@@ -201,7 +201,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public List list() throws HibernateException {
 		hSearchQuery.getTimeoutManager().start();
-		final List<EntityInfo> entityInfos = hSearchQuery.getEntityInfos();
+		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
 		Loader loader = getLoader();
 		List list = loader.load( entityInfos.toArray( new EntityInfo[entityInfos.size()] ) );
 		//no need to timeoutManager.isTimedOut from this point, we don't do anything intensive
@@ -221,7 +221,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public int getResultSize() {
-		return hSearchQuery.getResultSize();
+		return hSearchQuery.queryResultSize();
 	}
 
 	public FullTextQuery setCriteriaQuery(Criteria criteria) {

@@ -160,7 +160,7 @@ public interface HSQuery extends ProjectionConstants {
 	 * THIS if projected is *not* populated:
 	 * it is the responsibility of the object source integration
 	 */
-	List<EntityInfo> getEntityInfos();
+	List<EntityInfo> queryEntityInfos();
 
 	/**
 	 * Execute the Lucene query and return a traversable object over the results.
@@ -169,7 +169,7 @@ public interface HSQuery extends ProjectionConstants {
 	 * it is the responsibility of the object source integration
 	 * DocumentExtractor *must* be closed by the caller to release Lucene resources.
 	 */
-	DocumentExtractor getDocumentExtractor();
+	DocumentExtractor queryDocumentExtractor();
 
 	/**
 	 * Returns the number of hits for this search
@@ -179,7 +179,7 @@ public interface HSQuery extends ProjectionConstants {
 	 * what the object source retuns if the index is
 	 * not in sync with the store at the time of query.
 	 */
-	int getResultSize();
+	int queryResultSize();
 
 	/**
 	 * Return the Lucene {@link org.apache.lucene.search.Explanation}

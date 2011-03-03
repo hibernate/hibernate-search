@@ -204,7 +204,7 @@ public class HSQueryImpl implements HSQuery {
 	}
 
 	@Override
-	public List<EntityInfo> getEntityInfos() {
+	public List<EntityInfo> queryEntityInfos() {
 		IndexSearcherWithPayload searcher = buildSearcher();
 		if ( searcher == null ) {
 			return Collections.emptyList();
@@ -256,7 +256,7 @@ public class HSQueryImpl implements HSQuery {
 	 * DocumentExtractor objects *must* be closed when the results are no longer traversed.
 	 */
 	@Override
-	public DocumentExtractor getDocumentExtractor() {
+	public DocumentExtractor queryDocumentExtractor() {
 		//keep the searcher open until the resultset is closed
 		//find the directories
 		IndexSearcherWithPayload openSearcher = buildSearcher();
@@ -275,7 +275,7 @@ public class HSQueryImpl implements HSQuery {
 	}
 
 	@Override
-	public int getResultSize() {
+	public int queryResultSize() {
 		if ( resultSize == null ) {
 			//the timeoutManager does not need to be stopped nor reset as a start does indeed reset
 			getTimeoutManager().start();
