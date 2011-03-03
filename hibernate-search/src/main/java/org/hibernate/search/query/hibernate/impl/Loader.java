@@ -29,7 +29,6 @@ import org.hibernate.Session;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.hibernate.impl.ObjectsInitializer;
 
 /**
  * Interface defining a set of operations in order to load entities which matched a query. Depending on the type of
@@ -48,6 +47,7 @@ public interface Loader {
 	Object load(EntityInfo entityInfo);
 
 	Object loadWithoutTiming(EntityInfo entityInfo);
+
 
 	List load(EntityInfo... entityInfos);
 }

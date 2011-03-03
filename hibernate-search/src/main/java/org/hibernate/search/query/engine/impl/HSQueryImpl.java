@@ -66,7 +66,6 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.LoggerFactory;
 
-import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
 
@@ -81,7 +80,7 @@ public class HSQueryImpl implements HSQuery {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private Query luceneQuery;
 	private List<Class<?>> targetedEntities;
-	private TimeoutManager timeoutManager;
+	private TimeoutManagerImpl timeoutManager;
 	private Set<Class<?>> indexedTargetedEntities;
 	private boolean allowFieldSelectionInProjection = true;
 	private final Map<String, FullTextFilterImpl> filterDefinitions = new HashMap<String, FullTextFilterImpl>();
@@ -194,7 +193,7 @@ public class HSQueryImpl implements HSQuery {
 			if ( luceneQuery == null ) {
 				throw new AssertionFailure( "Requesting TimeoutManager before setting luceneQuery()" );
 			}
-			timeoutManager = new TimeoutManager( luceneQuery, timeoutExceptionFactory );
+			timeoutManager = new TimeoutManagerImpl( luceneQuery, timeoutExceptionFactory );
 		}
 		return timeoutManager;
 	}

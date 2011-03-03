@@ -42,7 +42,6 @@ import org.apache.lucene.search.Weight;
 
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 
 /**
@@ -61,13 +60,13 @@ public class QueryHits {
 	public final Sort sort;
 	public int totalHits;
 	public TopDocs topDocs;
-	private TimeoutManager timeoutManager;
+	private TimeoutManagerImpl timeoutManager;
 
 	public QueryHits(IndexSearcherWithPayload searcher,
 					 org.apache.lucene.search.Query preparedQuery,
 					 Filter filter,
 					 Sort sort,
-					 TimeoutManager timeoutManager)
+					 TimeoutManagerImpl timeoutManager)
 			throws IOException {
 		this( searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager );
 	}
@@ -77,7 +76,7 @@ public class QueryHits {
 					 Filter filter,
 					 Sort sort,
 					 Integer n,
-					 TimeoutManager timeoutManager )
+					 TimeoutManagerImpl timeoutManager )
 			throws IOException {
 		this.timeoutManager = timeoutManager;
 		this.preparedQuery = preparedQuery;

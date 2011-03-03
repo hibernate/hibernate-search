@@ -2,7 +2,7 @@
  * Hibernate, Relational Persistence for Idiomatic Java
  *
  * JBoss, Home of Professional Open Source
- * Copyright 2010-2011 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -22,156 +22,31 @@ package org.hibernate.search.query.engine.spi;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.lucene.search.Query;
-
-import org.hibernate.search.SearchException;
-
 /**
- * @author Emmanuel Bernard
+ * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class TimeoutManager {
-	// timeout in nanoseconds
-	private Long timeout;
-	private long start;
-	boolean timedOut = false;
-	private final Query luceneQuery;
-	private Type type;
-	private boolean partialResults;
-	private final TimeoutExceptionFactory timeoutExceptionFactory;
+public interface TimeoutManager {
+	void start();
 
-	public TimeoutManager(Query query, TimeoutExceptionFactory timeoutExceptionFactory) {
-		this.luceneQuery = query;
-		this.timeoutExceptionFactory = timeoutExceptionFactory;
-	}
+	Long getTimeoutLeftInMilliseconds();
 
-	/** we start counting from this method call (if needed) */
-	public void start() {
-		if ( timeout == null ) return;
-		this.start = System.nanoTime();
-		this.partialResults = false;
-	}
+	Long getTimeoutLeftInSeconds();
 
-	public Long getTimeoutLeftInMilliseconds() {
-		return getTimeoutLeft( 1000000 );
-	}
+	boolean isTimedOut();
 
-	public Long getTimeoutLeftInSeconds() {
-		return getTimeoutLeft(1000000000);
-	}
+	void stop();
 
-	private Long getTimeoutLeft(long factor) {
-		if (timeout == null) {
-			return null;
-		}
-		else {
-			final long currentTime = System.nanoTime();
-			if ( isTimedOut( currentTime ) ) {
-				//0 means no limit so we return the lowest possible value
-				return 0l;
-			}
-			long left = timeout - ( currentTime - start);
-			long result;
-			if ( left % factor == 0 ) {
-				result = left / factor;
-			}
-			else {
-				result = (left / factor) + 1;
-			}
-			if ( result <= 0 ) {
-				//0 means no limit so we return the lowest possible value
-				return 0l;
-			}
-			else {
-				return result;
-			}
-		}
-	}
+	void setTimeout(long timeout, TimeUnit timeUnit);
 
-	public boolean isTimedOut() {
-		if ( timeout == null ) return false;
-		if ( timedOut ) {
-			return true;
-		}
-		return isTimedOut( System.nanoTime() );
-	}
+	void raiseExceptionOnTimeout();
 
-	private boolean isTimedOut(long currentTime) {
-		if ( timeout == null ) return false;
-		if ( timedOut ) {
-			return true;
-		}
-		else {
-			final long elapsedTime = currentTime - start;
-			timedOut = elapsedTime > timeout;
-			if ( this.type != Type.LIMIT && timedOut ) {
-				throw timeoutExceptionFactory.createTimeoutException(
-						"Full-text query took longer than expected (in microsecond): " + TimeUnit.NANOSECONDS.toMicros( elapsedTime ),
-						luceneQuery
-				);
-			}
-			return timedOut;
-		}
-	}
+	void limitFetchingOnTimeout();
 
-	public void stop() {
-		this.timeout = null;
-		this.type = Type.NONE;
-		//don't reset, we need it for the query API even when the manager is stopped.
-		//this.partialResults = false;
-	}
+	void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e);
 
-	public void setTimeout(long timeout, TimeUnit timeUnit) {
-		this.timeout = timeUnit.toNanos( timeout );
-		//timeout of 0 means no more timeout
-		if ( timeout == 0 ) {
-			stop();
-		}
-	}
+	boolean hasPartialResults();
 
-	public void forceTimedOut() {
-		this.timedOut = Boolean.TRUE;
-		if ( type == Type.LIMIT) {
-			//we stop where we are return what we have
-			this.partialResults = true;
-		}
-	}
-
-	public void raiseExceptionOnTimeout() {
-		if ( this.type == Type.LIMIT ) {
-			throw new SearchException("Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team");
-		}
-		this.type = Type.EXCEPTION;
-	}
-
-	public void limitFetchingOnTimeout() {
-		if ( this.type == Type.EXCEPTION ) {
-			throw new SearchException("Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team");
-		}
-		this.type = Type.LIMIT;
-	}
-
-	public void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e) {
-		if ( type == Type.LIMIT) {
-			//we stop where we are return what we have
-			this.partialResults = true;
-		}
-		else {
-			if ( e == null) {
-				e = timeoutExceptionFactory.createTimeoutException(
-						"Timeout period exceeded",
-						luceneQuery );
-			}
-			throw e;
-		}
-	}
-
-	public boolean hasPartialResults() {
-		return partialResults;
-	}
-
-	public Type getType() {
-		return type;
-	}
+	Type getType();
 
 	public static enum Type {
 		NONE,
