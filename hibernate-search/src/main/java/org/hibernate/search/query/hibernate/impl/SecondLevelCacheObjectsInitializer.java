@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.query.impl;
+package org.hibernate.search.query.hibernate.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +31,19 @@ import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.ObjectLoaderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
+ * Check if the entity is available in the second level cache and load it if there
+ * before falling back to the delegate method.
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class PersistenceContextObjectsInitializer implements ObjectsInitializer {
+public class SecondLevelCacheObjectsInitializer implements ObjectsInitializer {
 	private static final Logger log = LoggerFactory.make();
 	private final ObjectsInitializer delegate;
 
-	public PersistenceContextObjectsInitializer(ObjectsInitializer delegate) {
+	public SecondLevelCacheObjectsInitializer(ObjectsInitializer delegate) {
 		this.delegate = delegate;
 	}
 
@@ -57,28 +59,30 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 			return;
 		}
 
-		//check the persistence context
+		//check the second-level cache
 		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( entityInfos.length );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
-				final boolean isInitialized = HibernateHelper.isInitialized(
-						session.load(
-								entityInfo.clazz, entityInfo.id
-						)
-				);
-				if ( !isInitialized ) {
+				final boolean isIn2LCache = session.getSessionFactory().getCache().containsEntity( entityInfo.clazz, entityInfo.id );
+				if ( isIn2LCache ) {
+					//load the object from the second level cache
+					session.get(entityInfo.clazz, entityInfo.id);
+				}
+				else {
 					remainingEntityInfos.add( entityInfo );
 				}
 			}
 			else {
-				//if document id !=  entity id we can't use PC lookup
+				//if document id !=  entity id we can't use 2LC
 				remainingEntityInfos.add( entityInfo );
 			}
+
 		}
 		//update entityInfos to only contains the remaining ones
 		final int remainingSize = remainingEntityInfos.size();
-		log.trace( "Initialized {} objects out of {} in the persistence context", maxResults - remainingSize, maxResults );
-		if (remainingSize > 0) {
+
+		log.trace( "Initialized {} objects out of {} in the second level cache", maxResults - remainingSize, maxResults );
+		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(
 					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
 					criteria,

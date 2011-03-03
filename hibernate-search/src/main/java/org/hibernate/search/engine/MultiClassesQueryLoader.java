@@ -34,7 +34,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.impl.ObjectsInitializer;
+import org.hibernate.search.query.hibernate.impl.ObjectsInitializer;
 
 /**
  * A loader which loads objects of multiple types.

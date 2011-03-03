@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.impl.ObjectsInitializer;
+import org.hibernate.search.query.hibernate.impl.ObjectsInitializer;
 
 /**
  * Interface defining a set of operations in order to load entities which matched a query. Depending on the type of

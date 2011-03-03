@@ -38,7 +38,7 @@ import junit.framework.TestCase;
 /**
  * Test for org.hibernate.search.query.ScrollableResultsImpl
  * 
- * @see org.hibernate.search.query.ScrollableResultsImpl
+ * @see org.hibernate.search.query.hibernate.impl.ScrollableResultsImpl
  * @author Sanne Grinovero
  */
 public class ScrollableResultsTest extends TestCase {

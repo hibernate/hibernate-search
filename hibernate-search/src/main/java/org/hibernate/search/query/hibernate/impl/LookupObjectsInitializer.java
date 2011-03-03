@@ -18,23 +18,53 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.query.impl;
+package org.hibernate.search.query.hibernate.impl;
+
+import org.slf4j.Logger;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.search.engine.EntityInfo;
+import org.hibernate.search.engine.ObjectLoaderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.util.LoggerFactory;
 
 /**
- * Initializes a set of objects from EntityInfos
+ * Initializes objects using lookup by it.
+ * This approach is useful is a batch size has been set on the entity.
+ * Hibernate Session will load objects by batch reducing the number of database roundtrip.
+ *
+ * Note that the second level cache is naturally first checked in this approach.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface ObjectsInitializer {
-	void initializeObjects(EntityInfo[] entityInfos,
+public class LookupObjectsInitializer implements ObjectsInitializer {
+	
+	private static final Logger log = LoggerFactory.make();
+	
+	public static final LookupObjectsInitializer INSTANCE = new LookupObjectsInitializer();
+	
+	private LookupObjectsInitializer() {
+		// use INSTANCE instead of constructor
+	}
+
+	public void initializeObjects(EntityInfo[] entityInfos,
 										 Criteria criteria, Class<?> entityType,
 										 SearchFactoryImplementor searchFactoryImplementor,
 										 TimeoutManager timeoutManager,
-										 Session session);
+										 Session session) {
+		//Do not call isTimeOut here as the caller might be the last biggie on the list.
+		final int maxResults = entityInfos.length;
+		if ( maxResults == 0 ) {
+			log.trace( "No object to initialize", maxResults );
+			return;
+		}
+
+		//TODO should we do time out check between each object call?
+		for ( EntityInfo entityInfo : entityInfos ) {
+			ObjectLoaderHelper.load( entityInfo, session );
+		}
+		log.trace( "Initialized {} objects by lookup method.", maxResults );
+	}
 }

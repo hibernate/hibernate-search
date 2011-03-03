@@ -18,7 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.query.impl;
+package org.hibernate.search.query.hibernate.impl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 
@@ -28,25 +31,18 @@ import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.ObjectLoaderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
- * Initializes objects using lookup by it.
- * This approach is useful is a batch size has been set on the entity.
- * Hibernate Session will load objects by batch reducing the number of database roundtrip.
- *
- * Note that the second level cache is naturally first checked in this approach.
- *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class LookupObjectsInitializer implements ObjectsInitializer {
-	
+public class PersistenceContextObjectsInitializer implements ObjectsInitializer {
 	private static final Logger log = LoggerFactory.make();
-	
-	public static final LookupObjectsInitializer INSTANCE = new LookupObjectsInitializer();
-	
-	private LookupObjectsInitializer() {
-		// use INSTANCE instead of constructor
+	private final ObjectsInitializer delegate;
+
+	public PersistenceContextObjectsInitializer(ObjectsInitializer delegate) {
+		this.delegate = delegate;
 	}
 
 	public void initializeObjects(EntityInfo[] entityInfos,
@@ -61,10 +57,36 @@ public class LookupObjectsInitializer implements ObjectsInitializer {
 			return;
 		}
 
-		//TODO should we do time out check between each object call?
+		//check the persistence context
+		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( entityInfos.length );
 		for ( EntityInfo entityInfo : entityInfos ) {
-			ObjectLoaderHelper.load( entityInfo, session );
+			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
+				final boolean isInitialized = HibernateHelper.isInitialized(
+						session.load(
+								entityInfo.clazz, entityInfo.id
+						)
+				);
+				if ( !isInitialized ) {
+					remainingEntityInfos.add( entityInfo );
+				}
+			}
+			else {
+				//if document id !=  entity id we can't use PC lookup
+				remainingEntityInfos.add( entityInfo );
+			}
 		}
-		log.trace( "Initialized {} objects by lookup method.", maxResults );
+		//update entityInfos to only contains the remaining ones
+		final int remainingSize = remainingEntityInfos.size();
+		log.trace( "Initialized {} objects out of {} in the persistence context", maxResults - remainingSize, maxResults );
+		if (remainingSize > 0) {
+			delegate.initializeObjects(
+					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
+					criteria,
+					entityType,
+					searchFactoryImplementor,
+					timeoutManager,
+					session
+			);
+		}
 	}
 }

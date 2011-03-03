@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query;
+package org.hibernate.search.query.hibernate.impl;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -35,12 +35,9 @@ import org.hibernate.search.engine.Loader;
 import org.hibernate.search.engine.MultiClassesQueryLoader;
 import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.query.DatabaseRetrievalMethod;
+import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.impl.CriteriaObjectsInitializer;
-import org.hibernate.search.query.impl.LookupObjectsInitializer;
-import org.hibernate.search.query.impl.ObjectsInitializer;
-import org.hibernate.search.query.impl.PersistenceContextObjectsInitializer;
-import org.hibernate.search.query.impl.SecondLevelCacheObjectsInitializer;
 import org.hibernate.search.util.LoggerFactory;
 
 import java.util.List;
