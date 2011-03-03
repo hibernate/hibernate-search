@@ -84,7 +84,7 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 					maxResults;
 			List<Serializable> ids = new ArrayList<Serializable>( max - index * MAX_IN_CLAUSE );
 			for ( int entityInfoIndex = index * MAX_IN_CLAUSE; entityInfoIndex < max; entityInfoIndex++ ) {
-				ids.add( entityInfos[entityInfoIndex].id );
+				ids.add( entityInfos[entityInfoIndex].getId() );
 			}
 			disjunction.add( Restrictions.in( idName, ids ) );
 		}

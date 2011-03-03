@@ -468,9 +468,9 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	private boolean areAllEntitiesManaged(Object[] objects,	EntityInfo entityInfo) {
 		//check if all entities are session-managed and skip the check on projected values
 		org.hibernate.Session hibSession = (org.hibernate.Session) session;
-		if ( entityInfo.projection != null ) {
+		if ( entityInfo.getProjection() != null ) {
 			// using projection: test only for entities
-			for ( int idx : entityInfo.indexesOfThis ) {
+			for ( int idx : entityInfo.getIndexesOfThis() ) {
 				Object o = objects[idx];
 				//TODO improve: is it useful to check for proxies and have them reassociated to persistence context?
 				if ( ! hibSession.contains( o ) )

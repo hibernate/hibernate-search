@@ -110,8 +110,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 
 
 			boolean found = false;
+			final Class<?> clazz = entityInfo.getClazz();
 			for (RootEntityMetadata rootEntityInfo : entityMatadata) {
-				if ( rootEntityInfo.rootEntity == entityInfo.clazz || rootEntityInfo.mappedSubclasses.contains( entityInfo.clazz ) ) {
+				if ( rootEntityInfo.rootEntity == clazz || rootEntityInfo.mappedSubclasses.contains( clazz ) ) {
 					List<EntityInfo> bucket = entityinfoBuckets.get( rootEntityInfo );
 					if ( bucket == null ) {
 						bucket = new ArrayList<EntityInfo>();
@@ -122,7 +123,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 					break; //we stop looping for the right bucket
 				}
 			}
-			if (!found) throw new AssertionFailure( "Could not find root entity for " + entityInfo.clazz );
+			if (!found) throw new AssertionFailure( "Could not find root entity for " + clazz );
 		}
 
 		//initialize objects by bucket

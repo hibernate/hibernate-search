@@ -28,34 +28,63 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Wrapper class for the loading of a single entity.
+ * Wrapper class describing the loading of an element.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-//FIXME encapsulate
 public class EntityInfo {
 	/**
 	 * The entity class.
 	 */
-	public final Class clazz;
+	private final Class<?> clazz;
 
 	/**
 	 * The document id.
 	 */
-	public final Serializable id;
+	private final Serializable id;
 
 	/**
 	 * The name of the document id property.
 	 */
-	public final String idName;
+	private final String idName;
 
 	/**
 	 * Array of projected values. {@code null} in case there are no projections.
 	 */
-	public final Object[] projection;
+	private final Object[] projection;
 
-	public final List<Integer> indexesOfThis = new LinkedList<Integer>();
+	private final List<Integer> indexesOfThis = new LinkedList<Integer>();
+
+	public Class<?> getClazz() {
+		return clazz;
+	}
+
+	public Serializable getId() {
+		return id;
+	}
+
+	public String getIdName() {
+		return idName;
+	}
+
+	public Object[] getProjection() {
+		return projection;
+	}
+
+	public List<Integer> getIndexesOfThis() {
+		return indexesOfThis;
+	}
+
+	public boolean isProjectThis() {
+		return indexesOfThis.size() != 0;
+	}
+
+	public void populateWithEntityInstance(Object entity) {
+		for (int index : indexesOfThis) {
+			projection[index] = entity;
+		}
+	}
 
 	public EntityInfo(Class clazz,  String idName,  Serializable id, Object[] projection) {
 		this.clazz = clazz;

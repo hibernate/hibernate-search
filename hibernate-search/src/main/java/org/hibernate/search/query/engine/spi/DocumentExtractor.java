@@ -210,7 +210,7 @@ public class DocumentExtractor {
 		}
 
 		EntityInfo entityInfo = extract( doc );
-		Object[] eip = entityInfo.projection;
+		Object[] eip = entityInfo.getProjection();
 
 		// TODO - if we are only looking for score (unlikely), avoid accessing doc (lazy load)
 		if ( eip != null && eip.length > 0 ) {
@@ -219,7 +219,7 @@ public class DocumentExtractor {
 					eip[x] = queryHits.score( index );
 				}
 				else if ( ProjectionConstants.ID.equals( projection[x] ) ) {
-					eip[x] = entityInfo.id;
+					eip[x] = entityInfo.getId();
 				}
 				else if ( ProjectionConstants.DOCUMENT.equals( projection[x] ) ) {
 					eip[x] = doc;
@@ -234,12 +234,12 @@ public class DocumentExtractor {
 					eip[x] = queryHits.explain( index );
 				}
 				else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
-						eip[x] = entityInfo.clazz;
+						eip[x] = entityInfo.getClazz();
 				}
 				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 					//THIS could be projected more than once
 					//THIS loading delayed to the Loader phase
-					entityInfo.indexesOfThis.add( x );
+					entityInfo.getIndexesOfThis().add( x );
 				}
 			}
 		}

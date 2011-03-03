@@ -62,7 +62,7 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
 				final boolean isInitialized = HibernateHelper.isInitialized(
 						session.load(
-								entityInfo.clazz, entityInfo.id
+								entityInfo.getClazz(), entityInfo.getId()
 						)
 				);
 				if ( !isInitialized ) {

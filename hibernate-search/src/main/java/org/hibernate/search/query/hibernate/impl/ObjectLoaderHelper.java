@@ -54,7 +54,7 @@ public class ObjectLoaderHelper {
 			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
 				log.debug(
 						"Object found in Search index but not in database: {} with id {}",
-						entityInfo.clazz, entityInfo.id
+						entityInfo.getClazz(), entityInfo.getId()
 				);
 				maybeProxy = null;
 			}
@@ -81,7 +81,7 @@ public class ObjectLoaderHelper {
 				if ( log.isDebugEnabled() ) {
 					log.debug(
 							"Object found in Search index but not in database: {} with {}",
-							entityInfo.clazz, entityInfo.id
+							entityInfo.getClazz(), entityInfo.getId()
 					);
 				}
 			}
@@ -93,11 +93,11 @@ public class ObjectLoaderHelper {
 		Object maybeProxy;
 		if ( areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
 			//be sure to get an initialized object but save from ONFE and ENFE
-			maybeProxy = session.load( entityInfo.clazz, entityInfo.id );
+			maybeProxy = session.load( entityInfo.getClazz(), entityInfo.getId() );
 		}
 		else {
-			Criteria criteria = session.createCriteria( entityInfo.clazz );
-			criteria.add( Restrictions.eq( entityInfo.idName, entityInfo.id ) );
+			Criteria criteria = session.createCriteria( entityInfo.getClazz() );
+			criteria.add( Restrictions.eq( entityInfo.getIdName(), entityInfo.getId() ) );
 			try {
 				maybeProxy = criteria.uniqueResult();
 			}
@@ -105,10 +105,10 @@ public class ObjectLoaderHelper {
 				//FIXME should not raise an exception but return something like null
 				//FIXME this happens when the index is out of sync with the db)
 				throw new SearchException(
-						"Loading entity of type " + entityInfo.clazz.getName() + " using '"
-								+ entityInfo.idName
+						"Loading entity of type " + entityInfo.getClazz().getName() + " using '"
+								+ entityInfo.getIdName()
 								+ "' as document id and '"
-								+ entityInfo.id
+								+ entityInfo.getId()
 								+ "'  as value was not unique"
 				);
 			}
@@ -119,8 +119,8 @@ public class ObjectLoaderHelper {
 	//TODO should we cache that result?
 	public static boolean areDocIdAndEntityIdIdentical(EntityInfo entityInfo, Session session) {
 		String hibernateIdentifierProperty = session.getSessionFactory()
-				.getClassMetadata( entityInfo.clazz )
+				.getClassMetadata( entityInfo.getClazz() )
 				.getIdentifierPropertyName();
-		return entityInfo.idName.equals( hibernateIdentifierProperty );
+		return entityInfo.getIdName().equals( hibernateIdentifierProperty );
 	}
 }

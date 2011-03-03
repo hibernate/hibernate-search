@@ -69,15 +69,14 @@ public class ProjectionLoader implements Loader {
 		//no need to timeouManage here, the underlying loader is the real time consumer
 		initThisProjectionFlag(entityInfo);
 		if (projectThis) {
-			for (int index : entityInfo.indexesOfThis) {
-				entityInfo.projection[index] = objectLoader.load(entityInfo);
-			}
+			final Object entityInstance = objectLoader.load( entityInfo );
+			entityInfo.populateWithEntityInstance( entityInstance );
 		}
 		if (transformer != null) {
-			return transformer.transformTuple(entityInfo.projection, aliases);
+			return transformer.transformTuple(entityInfo.getProjection(), aliases);
 		}
 		else {
-			return entityInfo.projection;
+			return entityInfo.getProjection();
 		}
 	}
 
@@ -87,7 +86,7 @@ public class ProjectionLoader implements Loader {
 
 	private void initThisProjectionFlag(EntityInfo entityInfo) {
 		if (projectThis == null) {
-			projectThis = entityInfo.indexesOfThis.size() != 0;
+			projectThis = entityInfo.isProjectThis();
 			if (projectThis) {
 				objectLoader = loaderBuilder.buildLoader();
 			}
@@ -105,19 +104,16 @@ public class ProjectionLoader implements Loader {
 		if (projectThis) {
 			objectLoader.load(entityInfos); // load by batch
 			for (EntityInfo entityInfo : entityInfos) {
-				for (int index : entityInfo.indexesOfThis) {
-					// set one by one to avoid loosing null objects (skipped in the objectLoader.load( EntityInfo[] ))
-					// use objectLoader.executeLoad to prevent measuring load time again (see AbstractLoader)
-					entityInfo.projection[index] = objectLoader.loadWithoutTiming(entityInfo);
-				}
+				final Object entityInstance = objectLoader.loadWithoutTiming( entityInfo );
+				entityInfo.populateWithEntityInstance( entityInstance );
 			}
 		}
 		for (EntityInfo entityInfo : entityInfos) {
 			if (transformer != null) {
-				results.add(transformer.transformTuple(entityInfo.projection, aliases));
+				results.add( transformer.transformTuple(entityInfo.getProjection(), aliases) );
 			}
 			else {
-				results.add(entityInfo.projection);
+				results.add( entityInfo.getProjection() );
 			}
 		}
 

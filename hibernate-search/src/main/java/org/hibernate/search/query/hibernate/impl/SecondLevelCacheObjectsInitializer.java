@@ -62,10 +62,10 @@ public class SecondLevelCacheObjectsInitializer implements ObjectsInitializer {
 		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( entityInfos.length );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
-				final boolean isIn2LCache = session.getSessionFactory().getCache().containsEntity( entityInfo.clazz, entityInfo.id );
+				final boolean isIn2LCache = session.getSessionFactory().getCache().containsEntity( entityInfo.getClazz(), entityInfo.getId() );
 				if ( isIn2LCache ) {
 					//load the object from the second level cache
-					session.get(entityInfo.clazz, entityInfo.id);
+					session.get( entityInfo.getClazz(), entityInfo.getId() );
 				}
 				else {
 					remainingEntityInfos.add( entityInfo );

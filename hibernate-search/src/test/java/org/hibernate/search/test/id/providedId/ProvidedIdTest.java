@@ -41,7 +41,6 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 import org.hibernate.search.query.engine.impl.QueryHits;
-import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
@@ -118,8 +117,8 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 				targetedClasses );
 		HashSet<String> titles = new HashSet<String>(3);
 		for ( int id = 0; id < hits.totalHits; id++ ) {
-			Long documentId = (Long) extractor.extract( id ).id;
-			String projectedTitle = (String) extractor.extract( id ).projection[0];
+			Long documentId = (Long) extractor.extract( id ).getId();
+			String projectedTitle = (String) extractor.extract( id ).getProjection()[0];
 			assertNotNull( projectedTitle );
 			titles.add( projectedTitle );
 		}
