@@ -25,6 +25,7 @@ package org.hibernate.search.spi;
 
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.Worker;
+import org.hibernate.search.query.engine.HSQuery;
 
 /**
  * This contract is considered experimental.
@@ -52,4 +53,14 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	Worker getWorker();
 
 	void close();
+
+	/**
+	 * Return an Hibernate Search query object.
+	 * This object uses fluent APIs to define the query executed.
+	 * Offers a few execution approaches:
+	 *  - return the list of results eagerly
+	 *  - return the list of results lazily
+	 *  - get the number fo results
+	 */
+	HSQuery createHSQuery();
 }

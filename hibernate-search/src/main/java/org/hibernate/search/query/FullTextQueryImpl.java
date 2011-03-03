@@ -87,7 +87,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//TODO handle flushMode
 		super( query.toString(), null, session, parameterMetadata );
 		//TODO get a factory on searchFactoryImplementor
-		hSearchQuery = new HSQuery( getSearchFactoryImplementor() );
+		hSearchQuery = getSearchFactoryImplementor().createHSQuery();
 		hSearchQuery
 				.luceneQuery( query )
 				.timeoutExceptionFactory( exceptionFactory )
