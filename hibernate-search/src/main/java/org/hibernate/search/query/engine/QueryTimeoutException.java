@@ -24,6 +24,7 @@ package org.hibernate.search.query.engine;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 
 /**
  * Represent a timeout during a Fulltext search in the HSQuery.

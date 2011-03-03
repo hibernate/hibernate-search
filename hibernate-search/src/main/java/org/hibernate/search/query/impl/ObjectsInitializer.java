@@ -24,7 +24,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.query.TimeoutManager;
+import org.hibernate.search.query.engine.spi.TimeoutManager;
 
 /**
  * Initializes a set of objects from EntityInfos

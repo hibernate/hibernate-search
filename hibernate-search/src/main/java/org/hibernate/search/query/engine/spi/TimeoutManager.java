@@ -18,14 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.query;
+package org.hibernate.search.query.engine.spi;
 
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.query.engine.TimeoutExceptionFactory;
 
 /**
  * @author Emmanuel Bernard

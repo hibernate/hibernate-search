@@ -33,8 +33,6 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.query.TimeoutManager;
-import org.hibernate.search.query.engine.TimeoutExceptionFactory;
 
 /**
  * Defines and execute an Hibernate Search query (wrapping a Lucene query).

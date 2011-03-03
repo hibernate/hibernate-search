@@ -29,7 +29,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.ObjectLoaderBuilder;
-import org.hibernate.search.query.TimeoutManager;
+import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.impl.ObjectsInitializer;
 import org.hibernate.transform.ResultTransformer;
 

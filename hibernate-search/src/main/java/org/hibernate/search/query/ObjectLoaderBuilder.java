@@ -35,6 +35,7 @@ import org.hibernate.search.engine.Loader;
 import org.hibernate.search.engine.MultiClassesQueryLoader;
 import org.hibernate.search.engine.QueryLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.impl.CriteriaObjectsInitializer;
 import org.hibernate.search.query.impl.LookupObjectsInitializer;
 import org.hibernate.search.query.impl.ObjectsInitializer;

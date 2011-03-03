@@ -33,7 +33,7 @@ import java.util.Set;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.query.TimeoutManager;
+import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.impl.ObjectsInitializer;
 
 /**

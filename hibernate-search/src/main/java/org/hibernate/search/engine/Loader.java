@@ -26,8 +26,7 @@ package org.hibernate.search.engine;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.search.engine.EntityInfo;
-import org.hibernate.search.query.TimeoutManager;
+import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.impl.ObjectsInitializer;
 
 /**

@@ -30,7 +30,7 @@ import org.hibernate.Session;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.ObjectLoaderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.query.TimeoutManager;
+import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
