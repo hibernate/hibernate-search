@@ -25,7 +25,7 @@ package org.hibernate.search.spi;
 
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.Worker;
-import org.hibernate.search.query.engine.HSQuery;
+import org.hibernate.search.query.engine.spi.HSQuery;
 
 /**
  * This contract is considered experimental.

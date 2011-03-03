@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.query.engine;
+package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -45,7 +45,6 @@ import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.FullTextFilter;
-import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
@@ -60,7 +59,9 @@ import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.query.FullTextFilterImpl;
 import org.hibernate.search.query.QueryHits;
-import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
+import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.QueryTimeoutException;
+import org.hibernate.search.query.engine.TimeoutExceptionFactory;
 import org.hibernate.search.query.TimeoutManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -74,7 +75,7 @@ import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik <hardy@hibernate.org>
  */
-public class HSQuery implements ProjectionConstants {
+public class HSQueryImpl implements HSQuery {
 	private static final Logger log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
@@ -98,15 +99,17 @@ public class HSQuery implements ProjectionConstants {
 	private Set<String> idFieldNames;
 	private TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
 
-	public HSQuery(SearchFactoryImplementor searchFactoryImplementor) {
+	public HSQueryImpl(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
 
+	@Override
 	public HSQuery luceneQuery(Query query) {
 		this.luceneQuery = query;
 		return this;
 	}
 
+	@Override
 	public HSQuery targetedEntities(List<Class<?>> classes) {
 		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>(classes);
 		final Class[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
@@ -118,21 +121,25 @@ public class HSQuery implements ProjectionConstants {
 		return this;
 	}
 
+	@Override
 	public HSQuery sort(Sort sort) {
 		this.sort = sort;
 		return this;
 	}
 
+	@Override
 	public HSQuery filter(Filter filter) {
 		this.userFilter = filter;
 		return this;
 	}
 	
+	@Override
 	public HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory) {
 		this.timeoutExceptionFactory = exceptionFactory;
 		return this;
 	}
 
+	@Override
 	public HSQuery projection(String... fields) {
 		if ( fields == null || fields.length == 0 ) {
 			this.projectedFields = null;
@@ -143,6 +150,7 @@ public class HSQuery implements ProjectionConstants {
 		return this;
 	}
 
+	@Override
 	public HSQuery firstResult(int firstResult) {
 		if ( firstResult < 0 ) {
 			throw new IllegalArgumentException( "'first' pagination parameter less than 0" );
@@ -151,6 +159,7 @@ public class HSQuery implements ProjectionConstants {
 		return this;
 	}
 
+	@Override
 	public HSQuery maxResults(Integer maxResults) {
 		if ( maxResults != null && maxResults < 0 ) {
 			throw new IllegalArgumentException( "'max' pagination parameter less than 0" );
@@ -162,6 +171,7 @@ public class HSQuery implements ProjectionConstants {
 	/**
 	 * List of targeted entities as described by the user
 	 */
+	@Override
 	public List<Class<?>> getTargetedEntities() {
 		return targetedEntities;
 	}
@@ -169,14 +179,17 @@ public class HSQuery implements ProjectionConstants {
 	/**
 	 * Set of indexed entities corresponding to the class hierarchy of the targeted entities
 	 */
+	@Override
 	public Set<Class<?>> getIndexedTargetedEntities() {
 		return indexedTargetedEntities;
 	}
 
+	@Override
 	public String[] getProjectedFields() {
 		return projectedFields;
 	}
 
+	@Override
 	public TimeoutManager getTimeoutManager() {
 		if ( timeoutManager == null ) {
 			if ( luceneQuery == null ) {
@@ -187,10 +200,12 @@ public class HSQuery implements ProjectionConstants {
 		return timeoutManager;
 	}
 
+	@Override
 	public Query getLuceneQuery() {
 		return luceneQuery;
 	}
 
+	@Override
 	public List<EntityInfo> getEntityInfos() {
 		IndexSearcherWithPayload searcher = buildSearcher();
 		if ( searcher == null ) {
@@ -242,6 +257,7 @@ public class HSQuery implements ProjectionConstants {
 	 *
 	 * DocumentExtractor objects *must* be closed when the results are no longer traversed.
 	 */
+	@Override
 	public DocumentExtractor getDocumentExtractor() {
 		//keep the searcher open until the resultset is closed
 		//find the directories
@@ -260,6 +276,7 @@ public class HSQuery implements ProjectionConstants {
 		}
 	}
 
+	@Override
 	public int getResultSize() {
 		if ( resultSize == null ) {
 			//the timeoutManager does not need to be stopped nor reset as a start does indeed reset
@@ -288,6 +305,7 @@ public class HSQuery implements ProjectionConstants {
 		return this.resultSize;
 	}
 
+	@Override
 	public Explanation explain(int documentId) {
 		//don't use TimeoutManager here as explain is a dev tool when things are weird... or slow :)
 		Explanation explanation = null;
@@ -312,6 +330,7 @@ public class HSQuery implements ProjectionConstants {
 		return explanation;
 	}
 
+	@Override
 	public FullTextFilter enableFullTextFilter(String name) {
 		FullTextFilterImpl filterDefinition = filterDefinitions.get( name );
 		if ( filterDefinition != null ) {
@@ -328,6 +347,7 @@ public class HSQuery implements ProjectionConstants {
 		return filterDefinition;
 	}
 
+	@Override
 	public void disableFullTextFilter(String name) {
 		filterDefinitions.remove( name );
 	}
@@ -809,6 +829,7 @@ public class HSQuery implements ProjectionConstants {
 		return luceneQuery.toString();
 	}
 
+	@Override
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
 		return searchFactoryImplementor;
 	}

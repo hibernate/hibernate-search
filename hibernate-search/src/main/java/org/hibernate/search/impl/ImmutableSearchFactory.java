@@ -63,7 +63,8 @@ import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
-import org.hibernate.search.query.engine.HSQuery;
+import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.impl.HSQueryImpl;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -199,7 +200,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public HSQuery createHSQuery() {
-		return new HSQuery( this );
+		return new HSQueryImpl( this );
 	}
 
 	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {

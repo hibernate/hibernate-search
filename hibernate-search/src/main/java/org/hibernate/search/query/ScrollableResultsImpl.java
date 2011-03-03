@@ -37,18 +37,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.lucene.search.IndexSearcher;
 import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.ScrollableResults;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.DocumentExtractor;
 import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.Loader;
-import org.hibernate.search.query.engine.HSQuery;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.type.Type;
 

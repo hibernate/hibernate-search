@@ -52,7 +52,7 @@ import org.hibernate.search.engine.EntityInfo;
 import org.hibernate.search.engine.Loader;
 import org.hibernate.search.engine.ProjectionLoader;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.query.engine.HSQuery;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.TimeoutExceptionFactory;
 import org.hibernate.search.query.impl.ObjectsInitializer;
 import org.hibernate.search.util.ContextHelper;
