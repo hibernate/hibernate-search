@@ -21,32 +21,52 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.query.hibernate.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.hibernate.impl.ObjectsInitializer;
+import org.hibernate.annotations.common.util.ReflectHelper;
+
 
 /**
- * Interface defining a set of operations in order to load entities which matched a query. Depending on the type of
- * indexed entities and the type of query different strategies can be used.
- *
- *
  * @author Emmanuel Bernard
  */
-public interface Loader {
-	void init(
-			Session session,
-			SearchFactoryImplementor searchFactoryImplementor,
-			ObjectsInitializer objectsInitializer,
-			TimeoutManager timeoutManager);
+public class LoaderHelper {
+	private static final List<Class> objectNotFoundExceptions;
 
-	Object load(EntityInfo entityInfo);
+	static {
+		objectNotFoundExceptions = new ArrayList<Class>( 2 );
+		try {
+			objectNotFoundExceptions.add(
+					ReflectHelper.classForName( "org.hibernate.ObjectNotFoundException" )
+			);
+		}
+		catch ( ClassNotFoundException e ) {
+			//leave it alone
+		}
+		try {
+			objectNotFoundExceptions.add(
+					ReflectHelper.classForName( "javax.persistence.EntityNotFoundException" )
+			);
+		}
+		catch ( ClassNotFoundException e ) {
+			//leave it alone
+		}
+	}
 
-	Object loadWithoutTiming(EntityInfo entityInfo);
+	private LoaderHelper() {
+	}
 
-	List load(EntityInfo... entityInfos);
+	public static boolean isObjectNotFoundException(RuntimeException e) {
+		boolean objectNotFound = false;
+		Class exceptionClass = e.getClass();
+		for ( Class clazz : objectNotFoundExceptions ) {
+			if ( clazz.isAssignableFrom( exceptionClass ) ) {
+				objectNotFound = true;
+				break;
+			}
+		}
+		return objectNotFound;
+	}
 }

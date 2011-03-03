@@ -21,11 +21,12 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.query.hibernate.impl;
 
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.stat.StatisticsImplementor;
 

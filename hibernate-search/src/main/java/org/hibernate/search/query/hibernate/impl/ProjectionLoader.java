@@ -21,17 +21,16 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.query.hibernate.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.hibernate.impl.ObjectLoaderBuilder;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.hibernate.impl.ObjectsInitializer;
 import org.hibernate.transform.ResultTransformer;
 
 /**
