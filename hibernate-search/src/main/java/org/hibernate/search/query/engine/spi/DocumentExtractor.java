@@ -38,6 +38,7 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentBuilderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.query.engine.impl.EntityInfoImpl;
 import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 
@@ -181,7 +182,7 @@ public class DocumentExtractor {
 					searchFactoryImplementor, clazz, document, projection
 			);
 		}
-		return new EntityInfo( clazz, idName, id, projected );
+		return new EntityInfoImpl( clazz, idName, id, projected );
 	}
 
 	private Class extractClass(Document document) {

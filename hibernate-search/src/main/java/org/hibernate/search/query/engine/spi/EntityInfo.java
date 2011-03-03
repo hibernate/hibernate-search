@@ -1,100 +1,45 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
+ * JBoss, Home of Professional Open Source
+ * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+ * as indicated by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
 package org.hibernate.search.query.engine.spi;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Wrapper class describing the loading of an element.
  *
- * @author Emmanuel Bernard
- * @author Hardy Ferentschik
+ * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class EntityInfo {
-	/**
-	 * The entity class.
-	 */
-	private final Class<?> clazz;
+public interface EntityInfo {
+	Class<?> getClazz();
 
-	/**
-	 * The document id.
-	 */
-	private final Serializable id;
+	Serializable getId();
 
-	/**
-	 * The name of the document id property.
-	 */
-	private final String idName;
+	String getIdName();
 
-	/**
-	 * Array of projected values. {@code null} in case there are no projections.
-	 */
-	private final Object[] projection;
+	Object[] getProjection();
 
-	private final List<Integer> indexesOfThis = new LinkedList<Integer>();
+	List<Integer> getIndexesOfThis();
 
-	public Class<?> getClazz() {
-		return clazz;
-	}
+	boolean isProjectThis();
 
-	public Serializable getId() {
-		return id;
-	}
-
-	public String getIdName() {
-		return idName;
-	}
-
-	public Object[] getProjection() {
-		return projection;
-	}
-
-	public List<Integer> getIndexesOfThis() {
-		return indexesOfThis;
-	}
-
-	public boolean isProjectThis() {
-		return indexesOfThis.size() != 0;
-	}
-
-	public void populateWithEntityInstance(Object entity) {
-		for (int index : indexesOfThis) {
-			projection[index] = entity;
-		}
-	}
-
-	public EntityInfo(Class clazz,  String idName,  Serializable id, Object[] projection) {
-		this.clazz = clazz;
-		this.idName = idName;
-		this.id = id;
-		if ( projection != null ) {
-			this.projection = projection.clone();
-		}
-		else {
-			this.projection = null;
-		}
-	}
+	void populateWithEntityInstance(Object entity);
 }
