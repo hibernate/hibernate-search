@@ -233,7 +233,7 @@ public class HSQueryImpl implements HSQuery {
 	}
 
 	private DocumentExtractor buildDocumentExtractor(IndexSearcherWithPayload searcher, QueryHits queryHits, int first, int max) {
-		return new DocumentExtractor(
+		return new DocumentExtractorImpl(
 						queryHits,
 						searchFactoryImplementor,
 						projectedFields,

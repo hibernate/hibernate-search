@@ -35,6 +35,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
+import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
 import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -108,7 +109,7 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		Set<Class<?>> targetedClasses = new HashSet<Class<?>>();
 		targetedClasses.add( ProvidedIdPerson.class );
 		targetedClasses.add( ProvidedIdPersonSub.class );
-		DocumentExtractor extractor = new DocumentExtractor(
+		DocumentExtractor extractor = new DocumentExtractorImpl(
 				queryHits, sf, new String[] { "name" },
 				identifiers, false,
 				lowLevelSearcher,
