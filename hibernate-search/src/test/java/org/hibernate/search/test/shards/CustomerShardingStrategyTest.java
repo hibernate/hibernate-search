@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
-import org.hibernate.search.query.FullTextFilterImpl;
+import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.RAMDirectoryProvider;
 

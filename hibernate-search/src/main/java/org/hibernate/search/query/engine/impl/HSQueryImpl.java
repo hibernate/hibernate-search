@@ -57,7 +57,7 @@ import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
-import org.hibernate.search.query.FullTextFilterImpl;
+import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.query.QueryHits;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.QueryTimeoutException;
