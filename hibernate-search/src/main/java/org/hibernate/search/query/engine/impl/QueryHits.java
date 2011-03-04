@@ -60,7 +60,7 @@ public class QueryHits {
 	public final Sort sort;
 	public int totalHits;
 	public TopDocs topDocs;
-	private TimeoutManagerImpl timeoutManager;
+	private final TimeoutManagerImpl timeoutManager;
 
 	public QueryHits(IndexSearcherWithPayload searcher,
 					 org.apache.lucene.search.Query preparedQuery,
@@ -143,7 +143,7 @@ public class QueryHits {
 			topCollector = TopFieldCollector.create(
 					sort, 
 					maxDocs,
-        			fillFields,
+					fillFields,
 					searcher.isFieldSortDoTrackScores(),
 					searcher.isFieldSortDoMaxScore(),
 					!weight.scoresDocsOutOfOrder()

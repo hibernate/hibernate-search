@@ -42,9 +42,9 @@ import org.hibernate.search.query.engine.spi.HSQuery;
  * @author Emmanuel Bernard
  */
 public interface SearchFactoryIntegrator extends SearchFactory {
+
 	/**
 	 * Add the following classes to the SearchFactory
-	 *
 	 */
 	void addClasses(Class<?>... classes);
 
@@ -60,7 +60,7 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	 * Offers a few execution approaches:
 	 *  - return the list of results eagerly
 	 *  - return the list of results lazily
-	 *  - get the number fo results
+	 *  - get the number of results
 	 */
 	HSQuery createHSQuery();
 }

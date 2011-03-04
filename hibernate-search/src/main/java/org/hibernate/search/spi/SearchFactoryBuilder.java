@@ -400,7 +400,7 @@ public class SearchFactoryBuilder {
 				}
 			}
 			bindFilterDefs( mappedXClass );
-			//TODO should analyzer def for classes at tyher sqme level???
+			//TODO should analyzer def for classes at their same level???
 		}
 		factoryState.setAnalyzers( context.initLazyAnalyzers() );
 		factory.startDirectoryProviders();

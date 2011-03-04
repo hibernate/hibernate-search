@@ -33,8 +33,8 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 
 /**
- * Defines and execute an Hibernate Search query (wrapping a Lucene query).
- * Uses fluent APIs to define the query and offer a few alternative
+ * Defines and executes an Hibernate Search query (wrapping a Lucene query).
+ * Uses fluent APIs to define the query and offer a few alternatives
  * on how to execute the query.
  *
  * This object is not meant to be thread safe.
@@ -70,17 +70,17 @@ public interface HSQuery extends ProjectionConstants {
 	HSQuery luceneQuery(Query query);
 
 	/**
-	 * Defines the targeted entities. This helps to reduce indexes targeted.
+	 * Defines the targeted entities. This helps to reduce the number of targeted indexes.
 	 */
 	HSQuery targetedEntities(List<Class<?>> classes);
 
 	/**
-	 * Allows to let lucene sort the results. This is useful when you have
-	 * additional sort requirements on top of the default lucene ranking.
-	 * Without lucene sorting you would have to retrieve the full result set and
-	 * order the hibernate objects.
+	 * Lets Lucene sort the results. This is useful when you have
+	 * different sort requirements than the default Lucene ranking.
+	 * Without Lucene sorting you would have to retrieve the full result set and
+	 * order the Hibernate objects.
 	 *
-	 * @param sort The lucene sort object.
+	 * @param sort The Lucene sort object.
 	 *
 	 * @return this for method chaining
 	 */
@@ -90,7 +90,7 @@ public interface HSQuery extends ProjectionConstants {
 	 * Allows to use lucene filters.
 	 * Semi-deprecated? a preferred way is to use the @FullTextFilterDef approach
 	 *
-	 * @param filter The lucene filter.
+	 * @param filter The Lucene filter.
 	 *
 	 * @return this for method chaining
 	 */

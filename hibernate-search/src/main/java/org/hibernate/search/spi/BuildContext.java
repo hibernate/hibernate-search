@@ -84,7 +84,7 @@ public interface BuildContext {
 	 * Release a service from duty. Each call to (@link #requestService} should be coupled with
 	 * a call to (@link #releaseService} when the service is no longer needed.
 	 * 
-	 * @param provider of thr service
+	 * @param provider of the service
 	 */
 	void releaseService(Class<? extends ServiceProvider<?>> provider);
 }

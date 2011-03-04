@@ -186,9 +186,8 @@ public class HSQueryImpl implements HSQuery {
 	public String[] getProjectedFields() {
 		return projectedFields;
 	}
-
-	@Override
-	public TimeoutManager getTimeoutManager() {
+	
+	private TimeoutManagerImpl getTimeoutManagerImpl() {
 		if ( timeoutManager == null ) {
 			if ( luceneQuery == null ) {
 				throw new AssertionFailure( "Requesting TimeoutManager before setting luceneQuery()" );
@@ -196,6 +195,11 @@ public class HSQueryImpl implements HSQuery {
 			timeoutManager = new TimeoutManagerImpl( luceneQuery, timeoutExceptionFactory );
 		}
 		return timeoutManager;
+	}
+
+	@Override
+	public TimeoutManager getTimeoutManager() {
+		return getTimeoutManagerImpl();
 	}
 
 	@Override
@@ -251,7 +255,7 @@ public class HSQueryImpl implements HSQuery {
 	 * DocumentExtractor returns a traverser over the full-text results (EntityInfo)
 	 * This operation is lazy bound:
 	 *  - the query is executed
-	 *  -  results are not retrieved until actually requested
+	 *  - results are not retrieved until actually requested
 	 *
 	 * DocumentExtractor objects *must* be closed when the results are no longer traversed.
 	 */
@@ -379,10 +383,10 @@ public class HSQueryImpl implements HSQuery {
 		}
 
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
-			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, timeoutManager );
+			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, getTimeoutManagerImpl() );
 		}
 		else {
-			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, n, timeoutManager );
+			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, n, getTimeoutManagerImpl() );
 		}
 		resultSize = queryHits.totalHits;
 
