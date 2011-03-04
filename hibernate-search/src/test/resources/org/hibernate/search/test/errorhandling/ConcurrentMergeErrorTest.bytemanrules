@@ -43,7 +43,7 @@ CLASS org.hibernate.search.test.errorhandling.ConcurrentMergeErrorHandledTest
 METHOD testLuceneMergerErrorHandling
 IF TRUE
 	DO
-		traceln( "\n *** Byteman rules deployed! Next IndexWriter.checkpoint invocation will fail. ***\n" );
+		traceln( "\n *** Byteman rule enabled! Next IndexWriter.checkpoint invocation will fail. ***\n" );
 		flag("createIndexWriterIOException")
 ENDRULE
 
@@ -56,18 +56,18 @@ CLASS org.hibernate.search.test.query.timeout.JPATimeoutTest
 METHOD testQueryTimeoutException
 IF TRUE
 	DO
-		traceln( "\n *** Byteman rules deployed! Next Hits collection will be slow. ***\n" );
+		traceln( "\n *** Byteman rule enabled! Next Hits collection will be slow. ***\n" );
 		flag("slowDownDocumentCollection")
 ENDRULE
 
-RULE QueryHits-updateTopDocs-slowsDown
-CLASS org.hibernate.search.query.QueryHits
+RULE QueryHits updateTopDocs slow down
+CLASS QueryHits
 METHOD updateTopDocs
 HELPER org.hibernate.search.test.util.BytemanHelper
 AT ENTRY
 IF flagged("slowDownDocumentCollection")
 	DO
 		clear("slowDownDocumentCollection");
+		traceln( "\n *** Byteman sleeping a second... ***\n" );
 		sleepASecond();
-		traceln("slept a second");
 ENDRULE
