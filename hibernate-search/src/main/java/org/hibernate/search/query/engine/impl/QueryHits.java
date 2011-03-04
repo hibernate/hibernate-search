@@ -163,7 +163,7 @@ public class QueryHits {
 				maybeTimeLimitingCollector = new TimeLimitingCollector(topCollector, timeoutLeft );
 			}
 			else {
-				if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT && timeoutManager.isTimedOut() ) {
+				if ( timeoutManager.isTimedOut() ) {
 					timeoutManager.forceTimedOut();
 				}
 			}
