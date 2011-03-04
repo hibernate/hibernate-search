@@ -200,7 +200,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 	}
 
-	@Override public EntityInfo extract(int index) throws IOException {
+	public EntityInfo extract(int index) throws IOException {
 		Document doc;
 		if ( allowFieldSelection ) {
 			doc = queryHits.doc( index, fieldSelector );
@@ -246,15 +246,15 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		return entityInfo;
 	}
 
-	@Override public int getFirstIndex() {
+	public int getFirstIndex() {
 		return firstIndex;
 	}
 
-	@Override public int getMaxIndex() {
+	public int getMaxIndex() {
 		return maxIndex;
 	}
 
-	@Override public void close() {
+	public void close() {
 		searcher.closeSearcher( query, searchFactoryImplementor );
 	}
 }

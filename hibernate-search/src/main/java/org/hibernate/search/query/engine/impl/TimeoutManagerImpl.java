@@ -47,17 +47,17 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	}
 
 	/** we start counting from this method call (if needed) */
-	@Override public void start() {
+	public void start() {
 		if ( timeout == null ) return;
 		this.start = System.nanoTime();
 		this.partialResults = false;
 	}
 
-	@Override public Long getTimeoutLeftInMilliseconds() {
+	public Long getTimeoutLeftInMilliseconds() {
 		return getTimeoutLeft( 1000000 );
 	}
 
-	@Override public Long getTimeoutLeftInSeconds() {
+	public Long getTimeoutLeftInSeconds() {
 		return getTimeoutLeft(1000000000);
 	}
 
@@ -89,7 +89,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
-	@Override public boolean isTimedOut() {
+	public boolean isTimedOut() {
 		if ( timeout == null ) return false;
 		if ( timedOut ) {
 			return true;
@@ -115,14 +115,14 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
-	@Override public void stop() {
+	public void stop() {
 		this.timeout = null;
 		this.type = Type.NONE;
 		//don't reset, we need it for the query API even when the manager is stopped.
 		//this.partialResults = false;
 	}
 
-	@Override public void setTimeout(long timeout, TimeUnit timeUnit) {
+	public void setTimeout(long timeout, TimeUnit timeUnit) {
 		this.timeout = timeUnit.toNanos( timeout );
 		//timeout of 0 means no more timeout
 		if ( timeout == 0 ) {
@@ -138,21 +138,21 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
-	@Override public void raiseExceptionOnTimeout() {
+	public void raiseExceptionOnTimeout() {
 		if ( this.type == Type.LIMIT ) {
 			throw new SearchException("Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team");
 		}
 		this.type = Type.EXCEPTION;
 	}
 
-	@Override public void limitFetchingOnTimeout() {
+	public void limitFetchingOnTimeout() {
 		if ( this.type == Type.EXCEPTION ) {
 			throw new SearchException("Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team");
 		}
 		this.type = Type.LIMIT;
 	}
 
-	@Override public void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e) {
+	public void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e) {
 		if ( type == Type.LIMIT) {
 			//we stop where we are return what we have
 			this.partialResults = true;
@@ -167,11 +167,10 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
-	@Override public boolean hasPartialResults() {
+	public boolean hasPartialResults() {
 		return partialResults;
 	}
 
-	@Override
 	public Type getType() {
 		return type;
 	}

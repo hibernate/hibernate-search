@@ -45,7 +45,6 @@ public class QueryTimeoutException extends SearchException {
 	
 	private static class DefaultSearchTimeoutException implements TimeoutExceptionFactory {
 
-		@Override
 		public QueryTimeoutException createTimeoutException(String message, Query query) {
 			return new QueryTimeoutException( message, query );
 		}

@@ -101,13 +101,11 @@ public class HSQueryImpl implements HSQuery {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
 
-	@Override
 	public HSQuery luceneQuery(Query query) {
 		this.luceneQuery = query;
 		return this;
 	}
 
-	@Override
 	public HSQuery targetedEntities(List<Class<?>> classes) {
 		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>(classes);
 		final Class[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
@@ -119,25 +117,21 @@ public class HSQueryImpl implements HSQuery {
 		return this;
 	}
 
-	@Override
 	public HSQuery sort(Sort sort) {
 		this.sort = sort;
 		return this;
 	}
 
-	@Override
 	public HSQuery filter(Filter filter) {
 		this.userFilter = filter;
 		return this;
 	}
 	
-	@Override
 	public HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory) {
 		this.timeoutExceptionFactory = exceptionFactory;
 		return this;
 	}
 
-	@Override
 	public HSQuery projection(String... fields) {
 		if ( fields == null || fields.length == 0 ) {
 			this.projectedFields = null;
@@ -148,7 +142,6 @@ public class HSQueryImpl implements HSQuery {
 		return this;
 	}
 
-	@Override
 	public HSQuery firstResult(int firstResult) {
 		if ( firstResult < 0 ) {
 			throw new IllegalArgumentException( "'first' pagination parameter less than 0" );
@@ -157,7 +150,6 @@ public class HSQueryImpl implements HSQuery {
 		return this;
 	}
 
-	@Override
 	public HSQuery maxResults(Integer maxResults) {
 		if ( maxResults != null && maxResults < 0 ) {
 			throw new IllegalArgumentException( "'max' pagination parameter less than 0" );
@@ -169,7 +161,6 @@ public class HSQueryImpl implements HSQuery {
 	/**
 	 * List of targeted entities as described by the user
 	 */
-	@Override
 	public List<Class<?>> getTargetedEntities() {
 		return targetedEntities;
 	}
@@ -177,12 +168,10 @@ public class HSQueryImpl implements HSQuery {
 	/**
 	 * Set of indexed entities corresponding to the class hierarchy of the targeted entities
 	 */
-	@Override
 	public Set<Class<?>> getIndexedTargetedEntities() {
 		return indexedTargetedEntities;
 	}
 
-	@Override
 	public String[] getProjectedFields() {
 		return projectedFields;
 	}
@@ -197,17 +186,14 @@ public class HSQueryImpl implements HSQuery {
 		return timeoutManager;
 	}
 
-	@Override
 	public TimeoutManager getTimeoutManager() {
 		return getTimeoutManagerImpl();
 	}
 
-	@Override
 	public Query getLuceneQuery() {
 		return luceneQuery;
 	}
 
-	@Override
 	public List<EntityInfo> queryEntityInfos() {
 		IndexSearcherWithPayload searcher = buildSearcher();
 		if ( searcher == null ) {
@@ -259,7 +245,6 @@ public class HSQueryImpl implements HSQuery {
 	 *
 	 * DocumentExtractor objects *must* be closed when the results are no longer traversed.
 	 */
-	@Override
 	public DocumentExtractor queryDocumentExtractor() {
 		//keep the searcher open until the resultset is closed
 		//find the directories
@@ -278,7 +263,6 @@ public class HSQueryImpl implements HSQuery {
 		}
 	}
 
-	@Override
 	public int queryResultSize() {
 		if ( resultSize == null ) {
 			//the timeoutManager does not need to be stopped nor reset as a start does indeed reset
@@ -307,7 +291,6 @@ public class HSQueryImpl implements HSQuery {
 		return this.resultSize;
 	}
 
-	@Override
 	public Explanation explain(int documentId) {
 		//don't use TimeoutManager here as explain is a dev tool when things are weird... or slow :)
 		Explanation explanation = null;
@@ -332,7 +315,6 @@ public class HSQueryImpl implements HSQuery {
 		return explanation;
 	}
 
-	@Override
 	public FullTextFilter enableFullTextFilter(String name) {
 		FullTextFilterImpl filterDefinition = filterDefinitions.get( name );
 		if ( filterDefinition != null ) {
@@ -349,7 +331,6 @@ public class HSQueryImpl implements HSQuery {
 		return filterDefinition;
 	}
 
-	@Override
 	public void disableFullTextFilter(String name) {
 		filterDefinitions.remove( name );
 	}
@@ -831,7 +812,6 @@ public class HSQueryImpl implements HSQuery {
 		return luceneQuery.toString();
 	}
 
-	@Override
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
 		return searchFactoryImplementor;
 	}
