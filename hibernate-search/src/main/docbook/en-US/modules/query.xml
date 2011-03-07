@@ -1712,6 +1712,74 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
         defines the appropriate <xref
         linkend="search-architecture-readerstrategy" />.</para>
       </listitem>
+      
+      <listitem>
+        <para>caching frequently extracted values from the index:
+        see <xref
+        linkend="query-fieldcaches" />.</para>
+      </listitem>
     </itemizedlist>
+    
+      <section id="query-fieldcaches">
+         <title>Caching index values: FieldCache</title>
+         <para>The primary function of a Lucene index is to identify matches to your queries,
+         still after the query is performed the results must be analyzed to extract useful
+         information: typically Hibernate Search might need to extract the Class type
+         and the primary key.</para>
+         <para>Extracting the needed values from the index has a performance cost, which in
+         some cases might be very low and not noticeable, but in some other cases might
+         be a good candidate for caching.</para>
+         <para>What is exactly needed depends on the kind of Projections being used (see
+         <xref linkend="projections" />), and in some cases the Class type is not needed
+         as it can be inferred from the query context or other means.</para>
+         <para>Using the @<classname>CacheFromIndex</classname> annotation you can experiment
+         different kinds of caching of the main metadata fields required by Hibernate Search:</para>
+         <programlisting language="JAVA" role="JAVA">
+@Indexed
+@CacheFromIndex(FieldCacheType.CLASS_AND_ID)
+public class Essay {
+    ...
+         </programlisting>
+         <para>There are currently three possible options for this annotation:</para>
+         <itemizedlist>
+      <listitem>
+        <para><constant>NO</constant>: nor the Class nor the entity Id will be cached: for every
+        hit the values (if at all needed) will be extracted from the Document.</para>
+        </listitem>
+        <listitem>
+        <para><constant>CLASS</constant>: Hibernate Search will use a Lucene FieldCache to improve
+        peformance of the Class type extraction from the index.</para><para>This is the default value,
+        and what Hibernate Search will apply if you don't specify the @<classname>CacheFromIndex</classname>
+        annotation.</para>
+        </listitem>
+        <listitem>
+        <para><constant>CLASS_AND_ID</constant>: both Class and primary identifier will use a cache.
+        This is likely providing the best performing queries, but will consume much more memory which in turn
+        might reduce performance.</para>
+      </listitem>
+      </itemizedlist>
+      <note><para>Measure the performance and memory consumption impact after warmup (executing some queries):
+      enabling Field Caches is likely to improve performance but this is not always the case.</para></note>
+      <para>Using a FieldCache has two downsides to consider:</para>
+      <itemizedlist>
+         <listitem>
+           <para>Memory usage: these caches can be quite memory hungry. Typically the CLASS cache has lower
+           requirements.
+           </para>
+         </listitem>
+         <listitem>
+           <para>Index warmup: when using field caches, the first query on a new index or segment will be
+           slower than when you don't have caching enabled.</para>
+         </listitem>
+      </itemizedlist>
+      <para>With some queries the classtype won't be needed at all, in that case even if you enabled the
+      <constant>CLASS</constant> field cache, this might not be used; for example if you are targeting
+      a single class, obviously all returned values will be of that type (this is evaluated at each Query
+      execution).</para>
+      <para>For the ID FieldCache to be used, the ids of targeted entities must be using a
+      <classname>TwoWayFieldBridge</classname> (as all builting bridges), and all types being loaded in
+      a specific query must use the fieldname for the id, and have ids of the same type (this is evaluated
+      at each Query execution).</para>
+      </section>
   </section>
 </chapter>
