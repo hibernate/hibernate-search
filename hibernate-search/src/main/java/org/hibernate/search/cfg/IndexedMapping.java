@@ -51,7 +51,7 @@ public class IndexedMapping {
 		return this;
 	}
 	
-	public IndexedMapping cacheFromIndex(FieldCacheType type) {
+	public IndexedMapping cacheFromIndex(FieldCacheType... type) {
 		Map<String, Object> cacheInMemory = new HashMap<String, Object>(1);
 		cacheInMemory.put( "value", type );
 		entity.setCacheInMemory(cacheInMemory);

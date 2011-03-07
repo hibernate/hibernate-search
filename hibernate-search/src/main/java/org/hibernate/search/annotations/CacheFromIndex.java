@@ -40,8 +40,8 @@ import java.lang.annotation.Target;
 public @interface CacheFromIndex {
 	
 	/**
-	 * @return Returns a {@code FieldCache} enum type indicating what kind of caching we should use for index stored metadata. Defaults to {@code FieldCache.TYPE}.
+	 * @return Returns a {@code FieldCache} enum type indicating what kind of caching we should use for index stored metadata. Defaults to {@code FieldCache.CLASS}.
 	 */
-	FieldCacheType value() default FieldCacheType.CLASS;
+	FieldCacheType[] value() default { FieldCacheType.CLASS };
 	
 }

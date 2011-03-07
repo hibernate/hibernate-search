@@ -1735,25 +1735,25 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
          <para>Using the @<classname>CacheFromIndex</classname> annotation you can experiment
          different kinds of caching of the main metadata fields required by Hibernate Search:</para>
          <programlisting language="JAVA" role="JAVA">
+import static org.hibernate.search.annotations.FieldCacheType.CLASS;
+import static org.hibernate.search.annotations.FieldCacheType.ID;
+
 @Indexed
-@CacheFromIndex(FieldCacheType.CLASS_AND_ID)
+@CacheFromIndex( { CLASS, ID } )
 public class Essay {
     ...
+
          </programlisting>
-         <para>There are currently three possible options for this annotation:</para>
+         <para>It is currently possible to cache Class types and IDs using this annotation:</para>
          <itemizedlist>
-      <listitem>
-        <para><constant>NO</constant>: nor the Class nor the entity Id will be cached: for every
-        hit the values (if at all needed) will be extracted from the Document.</para>
-        </listitem>
         <listitem>
         <para><constant>CLASS</constant>: Hibernate Search will use a Lucene FieldCache to improve
-        peformance of the Class type extraction from the index.</para><para>This is the default value,
-        and what Hibernate Search will apply if you don't specify the @<classname>CacheFromIndex</classname>
+        peformance of the Class type extraction from the index.</para><para>This value is enabled
+        by default, and is what Hibernate Search will apply if you don't specify the @<classname>CacheFromIndex</classname>
         annotation.</para>
         </listitem>
         <listitem>
-        <para><constant>CLASS_AND_ID</constant>: both Class and primary identifier will use a cache.
+        <para><constant>ID</constant>: Extracting the primary identifier will use a cache.
         This is likely providing the best performing queries, but will consume much more memory which in turn
         might reduce performance.</para>
       </listitem>
@@ -1764,7 +1764,7 @@ public class Essay {
       <itemizedlist>
          <listitem>
            <para>Memory usage: these caches can be quite memory hungry. Typically the CLASS cache has lower
-           requirements.
+           requirements than the ID cache.
            </para>
          </listitem>
          <listitem>

@@ -49,37 +49,42 @@ public class ClasstypeFieldCacheExtractionTest extends TestCase {
 	
 	public void testWithoutFieldCacheOnMixedIds() {
 		// no caches, mixed classes and multiple id fieldnames
-		wrapper( FieldCacheType.NO, true, "id", "addressId", ProjectionConstants.OBJECT_CLASS );
+		Mapping.enableFieldCache = new FieldCacheType[0];
+		wrapper( true, "id", "addressId", ProjectionConstants.OBJECT_CLASS );
 	}
 	
 	public void testWithFieldCacheOnTypOnMixedIds() {
 		// multiple id fieldnames, multiple classes but cached
-		wrapper( FieldCacheType.CLASS, true, "id", "addressId" );
+		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS };
+		wrapper( true, "id", "addressId" );
 	}
 	
 	public void testWithFieldCacheOnTypeAndIdOnMixedIds() {
-		// works the same as TYPE because one of the entities uses a different fieldname
+		// works the same as CLASS because one of the entities uses a different fieldname
 		// which forces us to disable ID caching
-		wrapper( FieldCacheType.CLASS_AND_ID, true, "id", "addressId" );
+		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS, FieldCacheType.ID };
+		wrapper( true, "id", "addressId" );
 	}
 	
 	public void testWithoutFieldCache() {
 		// single type: doesn't need classtype even without caches
-		wrapper( FieldCacheType.NO, false, "id" );
+		Mapping.enableFieldCache = new FieldCacheType[0];
+		wrapper( false, "id" );
 	}
 	
 	public void testWithFieldCacheOnType() {
 		// single type: doesn't need classtype cache
-		wrapper( FieldCacheType.CLASS, false, "id" );
+		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS };
+		wrapper( false, "id" );
 	}
 	
 	public void testWithFieldCacheOnTypeAndId() {
 		// nothing needs to be extracted, full cache
-		wrapper( FieldCacheType.CLASS_AND_ID, false );
+		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS, FieldCacheType.ID };
+		wrapper( false );
 	}
 	
-	public void wrapper(FieldCacheType usingFieldCache, boolean usingMixedIds, String... expectedLoadedFields) {
-		Mapping.enableFieldCache = usingFieldCache;
+	public void wrapper(boolean usingMixedIds, String... expectedLoadedFields) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		if ( usingMixedIds ) {
 			builder
@@ -128,7 +133,7 @@ public class ClasstypeFieldCacheExtractionTest extends TestCase {
 	// trick to perform the same test on three different configurations:
 	public static class Mapping {
 		
-		static FieldCacheType enableFieldCache;
+		static FieldCacheType[] enableFieldCache;
 
 		@Factory
 		public SearchMapping build() {

@@ -3,7 +3,6 @@ package org.hibernate.search.test.engine;
 import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -18,12 +17,16 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static org.hibernate.search.annotations.FieldCacheType.CLASS;
+import static org.hibernate.search.annotations.FieldCacheType.ID;
+
 /**
  * @author: Gustavo Fernandes
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 @Entity
 @Indexed (index = "numeric_field_test")
-@CacheFromIndex(FieldCacheType.CLASS_AND_ID)
+@CacheFromIndex({CLASS,ID})
 public class Location {
 
 	@Id

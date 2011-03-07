@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -152,7 +154,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	/**
 	 * Type of allowed FieldCache usage
 	 */
-	private final FieldCacheType fieldCacheUsage;
+	private final Set<FieldCacheType> fieldCacheUsage;
 
 	private final String identifierName;
 
@@ -185,10 +187,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 		CacheFromIndex fieldCacheOptions = clazz.getAnnotation( CacheFromIndex.class );
 		if ( fieldCacheOptions == null ) {
-			this.fieldCacheUsage = FieldCacheType.CLASS;
+			this.fieldCacheUsage = Collections.unmodifiableSet( EnumSet.of( FieldCacheType.CLASS ) );
 		}
 		else {
-			this.fieldCacheUsage = fieldCacheOptions.value();
+			EnumSet<FieldCacheType> enabledTypes = EnumSet.noneOf( FieldCacheType.class );
+			for (FieldCacheType t : fieldCacheOptions.value() ) {
+				enabledTypes.add( t );
+			}
+			this.fieldCacheUsage = Collections.unmodifiableSet( enabledTypes );
 		}
 		checkAllowFieldSelection();
 		idFieldCacheCollectorFactory = figureIdFieldCacheUsage();
@@ -206,7 +212,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	private FieldCacheCollectorFactory figureIdFieldCacheUsage() {
-		if ( this.fieldCacheUsage.enableOnId() ) {
+		if ( this.fieldCacheUsage.contains( FieldCacheType.ID ) ) {
 			FieldCollectorType collectorTypeForId = ClassLoadingStrategySelector.guessAppropriateCollectorType( idBridge );
 			if ( collectorTypeForId == null ) {
 				log.warn( "FieldCache was enabled on class " + this.beanClass + " but for this type of identifier we can't extract values from the FieldCache: cache disabled" );
@@ -602,7 +608,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return allowFieldSelectionInProjection;
 	}
 	
-	public FieldCacheType getFieldCacheOption() {
+	public Set<FieldCacheType> getFieldCacheOption() {
 		return fieldCacheUsage;
 	}
 

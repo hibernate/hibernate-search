@@ -45,6 +45,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -62,6 +63,7 @@ import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.fieldcache.FieldCacheCollectorFactory;
+import org.hibernate.search.query.fieldcache.FieldCollectorType;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.LoggerFactory;
@@ -99,7 +101,7 @@ public class HSQueryImpl implements HSQuery {
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
 	private TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
-	private boolean useFieldCacheOnTypes = false;
+	private boolean useFieldCacheOnClassTypes = false;
 
 	public HSQueryImpl(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
@@ -445,7 +447,7 @@ public class HSQueryImpl implements HSQuery {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
-				useFieldCacheOnTypes = useFieldCacheOnTypes || builder.getFieldCacheOption().enableOnType();
+				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption().contains( FieldCacheType.CLASS );
 				populateDirectories( targetedDirectories, builder );
 			}
 			classesAndSubclasses = null;
@@ -471,7 +473,7 @@ public class HSQueryImpl implements HSQuery {
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
-				useFieldCacheOnTypes = useFieldCacheOnTypes || builder.getFieldCacheOption().enableOnType();
+				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption().contains( FieldCacheType.CLASS );
 				populateDirectories( targetedDirectories, builder );
 			}
 			this.classesAndSubclasses = involvedClasses;
@@ -825,14 +827,14 @@ public class HSQueryImpl implements HSQuery {
 			return false;
 		}
 		if ( log.isDebugEnabled() ) {
-			if ( useFieldCacheOnTypes ) {
+			if ( useFieldCacheOnClassTypes ) {
 				log.debug( "FieldCache on classes enabled for Query {}", this.luceneQuery );
 			}
 			else {
 				log.debug( "FieldCache on classes disabled for Query {}", this.luceneQuery );
 			}
 		}
-		return useFieldCacheOnTypes;
+		return useFieldCacheOnClassTypes;
 	}
 	
 	/**

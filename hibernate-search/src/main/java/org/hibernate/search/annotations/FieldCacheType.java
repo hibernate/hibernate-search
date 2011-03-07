@@ -32,34 +32,16 @@ package org.hibernate.search.annotations;
 public enum FieldCacheType {
 	
 	/**
-	 * Disable usage of FieldCache for this entity 
-	 **/
-	NO {
-		@Override
-		public boolean enableOnType() {
-			return false;
-		}
-	},
-	
-	/**
-	 * Cache only the entity type. This is a good tradeoff in most cases as
+	 * Cache the entity type. This is a good tradeoff in most cases as
 	 * it enables some optimizations; Depending on the query the type might not be
 	 * needed, in which case the FieldCache won't be used.
 	 **/
 	CLASS,
 
 	/**
-	 * Attempts to cache both the type and the object identifier (@DocumentId).
-	 * Not all identifier types are supported, in case it's not this is equivalent to TYPE.
+	 * Attempts to the object identifier (@DocumentId).
+	 * Not all identifier types are supported.
 	 */
-	CLASS_AND_ID {
-		@Override
-		public boolean enableOnId() {
-			return true;
-		}
-	};
-	
-	public boolean enableOnType() { return true; }
-	public boolean enableOnId() { return false; }
+	ID;
 	
 }
