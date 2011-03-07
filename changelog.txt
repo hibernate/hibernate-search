@@ -1,7 +1,54 @@
 Hibernate Search Changelog
 ==========================
 
-3.3.0.Final (15-12-2010)
+3.4.0.Alpha1 (07-03-2011)
+------------------------
+
+** Bug
+    * [HSEARCH-650] - Regression in 3.3.0: Using hibernate.use_identifier_rollback property causes exceptions on deletes
+    * [HSEARCH-669] - String2FieldBridgeAdaptor does not implement StringBridge causing DocumentBuilderIndexedEntity to not recognize it as a StringBridge
+    * [HSEARCH-672] - Incorrect chapter sections on query's module (Limiting the time of a query)
+    * [HSEARCH-683] - NullPointerException while using DocumentExtract on entities using @ProvidedId
+    * [HSEARCH-685] - Deletion of Document having a NumericField ID might fail when the identifier field name is overriden
+    * [HSEARCH-686] - Failing tests hide the assertion failure message by consequently failing cleanup methods
+    * [HSEARCH-688] - Exclude indirect dependency on JBoss WS Native
+    * [HSEARCH-690] - FieldSelectors are never used
+    * [HSEARCH-696] - QueryTimeoutException thrown even if there's plenty of time left
+    * [HSEARCH-698] - NPE when loading invalid stopwords file
+    * [HSEARCH-699] - SecondLCAndPCLookupTest does not run against MySQL or PostgreSQL
+
+** Improvement
+    * [HSEARCH-531] - Use Lucene fieldcache
+    * [HSEARCH-651] - Improve error reporting on null values in querybuilder DSL
+    * [HSEARCH-652] - Cache NumericField usage in Delete operation for single entity-per-index case
+    * [HSEARCH-657] - Update dependencies for Infinispan module to Infinispan 4.2.0.FINAL and JGroups 2.11.0.GA
+    * [HSEARCH-674] - Improve error messages on incorrectly defined Solr Analyzers
+    * [HSEARCH-691] - Automatically figure out the minimum set of fields needed to be loaded via a FieldSelector
+    * [HSEARCH-693] - Avoid reflection when associating query matches to their DocumentBuilders
+    * [HSEARCH-700] - Cache value of DocumentBuilderIndexedEntity.getIdentifierName
+
+
+** New Feature
+    * [HSEARCH-361] - Only index an entity if an indexed property has changed
+    * [HSEARCH-370] - Monitoring of mass indexer state and progress
+    * [HSEARCH-430] - Use multiple threads for text analysis in MassIndexer
+    * [HSEARCH-645] - Ability to load objects from the second level cache and if unavailable from the database
+    * [HSEARCH-667] - Implement a facenting API and implementation
+    * [HSEARCH-687] - Expose core of query engine as SPI for use by alternative object sources (independent of Hibernate Core)
+
+
+** Task
+    * [HSEARCH-654] - Remove usage of deprecated org.hibernate.cfg.AnnotationConfiguration
+    * [HSEARCH-656] - Add unit tests for different analyzers on @Fields
+    * [HSEARCH-658] - Create test to check dirtyness of mutable properties
+    * [HSEARCH-671] - Add EasyTesting's FEST-Assert as a dependency for nicer test assertions
+    * [HSEARCH-673] - Update Infinispan and JGroups components
+    * [HSEARCH-684] - Upgrade to Infinispan 4.2.1.CR1 and make IndexSearcherWithPayload public
+    * [HSEARCH-694] - Keep legacy constructor of DocumentExtractor for people using Infinispan Query 5.0.0.Alpha3
+    * [HSEARCH-702] - Make sure testsuite of hibernate-search module compiles with Java5
+
+
+ 3.3.0.Final (15-12-2010)
 ------------------------
 
 ** Bug
