@@ -32,6 +32,12 @@ package org.hibernate.search.annotations;
 public enum FieldCacheType {
 	
 	/**
+	 * Doesn't enable any specific cache.
+	 * CacheFromIndex(NOTHING) or CacheFromIndex(value=FieldCacheType[]{}) are equivalent.
+	 */
+	NOTHING,
+	
+	/**
 	 * Cache the entity type. This is a good tradeoff in most cases as
 	 * it enables some optimizations; Depending on the query the type might not be
 	 * needed, in which case the FieldCache won't be used.
