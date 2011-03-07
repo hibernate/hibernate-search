@@ -194,6 +194,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			for (FieldCacheType t : fieldCacheOptions.value() ) {
 				enabledTypes.add( t );
 			}
+			if ( enabledTypes.size() != 1 && enabledTypes.contains( FieldCacheType.NOTHING ) ) {
+				throw new SearchException( "CacheFromIndex configured with conflicting parameters:" +
+						" if FieldCacheType.NOTHING is enabled, no other options can be added" );
+			}
 			this.fieldCacheUsage = Collections.unmodifiableSet( enabledTypes );
 		}
 		checkAllowFieldSelection();

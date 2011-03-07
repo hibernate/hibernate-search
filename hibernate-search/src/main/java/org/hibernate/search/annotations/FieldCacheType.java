@@ -32,7 +32,7 @@ package org.hibernate.search.annotations;
 public enum FieldCacheType {
 	
 	/**
-	 * Doesn't enable any specific cache.
+	 * Disable all caching options. (ie CLASS, ID)
 	 * CacheFromIndex(NOTHING) or CacheFromIndex(value=FieldCacheType[]{}) are equivalent.
 	 */
 	NOTHING,
