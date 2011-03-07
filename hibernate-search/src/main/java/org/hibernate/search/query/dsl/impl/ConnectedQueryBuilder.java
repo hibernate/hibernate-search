@@ -25,15 +25,16 @@
 package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.query.dsl.AllContext;
+import org.hibernate.search.query.dsl.BooleanJunction;
+import org.hibernate.search.query.dsl.FacetContext;
 import org.hibernate.search.query.dsl.PhraseContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.RangeContext;
 import org.hibernate.search.query.dsl.TermContext;
 
 /**
  * Assuming connection with the search factory
- * 
+ *
  * @author Emmanuel Bernard
  */
 public class ConnectedQueryBuilder implements QueryBuilder {
@@ -44,15 +45,15 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 	}
 
 	public TermContext keyword() {
-		return new ConnectedTermContext(context);
+		return new ConnectedTermContext( context );
 	}
 
 	public RangeContext range() {
-		return new ConnectedRangeContext(context);
+		return new ConnectedRangeContext( context );
 	}
 
 	public PhraseContext phrase() {
-		return new ConnectedPhraseContext(context);
+		return new ConnectedPhraseContext( context );
 	}
 
 	//fixme Have to use raw types but would be nice to not have to
@@ -62,5 +63,9 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 
 	public AllContext all() {
 		return new ConnectedAllContext();
+	}
+
+	public FacetContext facet() {
+		return new ConnectedFacetContext( new FacetBuildingContext() );
 	}
 }

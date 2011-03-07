@@ -21,6 +21,7 @@
 package org.hibernate.search.query.engine.spi;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.search.Explanation;
@@ -31,6 +32,8 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetResult;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).
@@ -40,37 +43,45 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
  * This object is not meant to be thread safe.
  * The typical usage is as follow
  * <code>
- *     //get query object
- *     HSQuery query = searchFactoryIngegrator.createHSQuery();
- *     //configure query object
- *     query
- *     	.luceneQuery( luceneQuery )
- *     	.timeoutExceptionFactory( exceptionFactory )
- *     	.targetedEntities( Arrays.asList( classes ) );
+ * //get query object
+ * HSQuery query = searchFactoryIngegrator.createHSQuery();
+ * //configure query object
+ * query
+ * .luceneQuery( luceneQuery )
+ * .timeoutExceptionFactory( exceptionFactory )
+ * .targetedEntities( Arrays.asList( classes ) );
  *
- *     [...]
+ * [...]
  *
- *     //start timeout counting
- *     query.getTimeoutManager().start();
+ * //start timeout counting
+ * query.getTimeoutManager().start();
  *
- *     //query execution and use
- *     List<EntityInfo> entityInfos = query.getEntityInfos();
- *     [...]
+ * //query execution and use
+ * List<EntityInfo> entityInfos = query.getEntityInfos();
+ * [...]
  *
- *     //done with the core of the query
- *     query.getTimeoutManager().stop();
- *  </code>
+ * //done with the core of the query
+ * query.getTimeoutManager().stop();
+ * </code>
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public interface HSQuery extends ProjectionConstants {
 	/**
 	 * Defines the underlying Lucene query
+	 *
+	 * @param query the Lucene query
+	 *
+	 * @return {@code this} to allow method chaining
 	 */
 	HSQuery luceneQuery(Query query);
 
 	/**
 	 * Defines the targeted entities. This helps to reduce the number of targeted indexes.
+	 *
+	 * @param classes the list of classes (indexes) targeted by this query
+	 *
+	 * @return {@code this} to allow for method chaining
 	 */
 	HSQuery targetedEntities(List<Class<?>> classes);
 
@@ -82,7 +93,7 @@ public interface HSQuery extends ProjectionConstants {
 	 *
 	 * @param sort The Lucene sort object.
 	 *
-	 * @return this for method chaining
+	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery sort(Sort sort);
 
@@ -92,13 +103,17 @@ public interface HSQuery extends ProjectionConstants {
 	 *
 	 * @param filter The Lucene filter.
 	 *
-	 * @return this for method chaining
+	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery filter(Filter filter);
 
 	/**
 	 * Define the timeout exception factory to customize the exception returned by the user.
 	 * Defaults to returning {@link org.hibernate.search.query.engine.QueryTimeoutException}
+	 *
+	 * @param exceptionFactory the timeout exception factory to use
+	 *
+	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory);
 
@@ -111,25 +126,34 @@ public interface HSQuery extends ProjectionConstants {
 	 * Unless notified in their JavaDoc, all built-in bridges are two-way. All @DocumentId fields are projectable by design.
 	 * <p/>
 	 * If the projected field is not a projectable field, null is returned in the object[]
+	 *
+	 * @param fields the projected field names
+	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery projection(String... fields);
 
 	/**
 	 * Set the first element to retrieve. If not set, elements will be
 	 * retrieved beginning from element <tt>0</tt>.
+	 *
 	 * @param firstResult a element number, numbered from <tt>0</tt>
+	 *
+	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery firstResult(int firstResult);
 
 	/**
 	 * Set the maximum number of elements to retrieve. If not set,
 	 * there is no limit to the number of elements retrieved.
+	 *
 	 * @param maxResults the maximum number of elements
+	 *
+	 * @return {@code this} in order to allow method chaining
 	 */
 	HSQuery maxResults(Integer maxResults);
 
 	/**
-	 * Return the targeted entity types
+	 * @return the targeted entity types
 	 */
 	List<Class<?>> getTargetedEntities();
 
@@ -139,45 +163,47 @@ public interface HSQuery extends ProjectionConstants {
 	Set<Class<?>> getIndexedTargetedEntities();
 
 	/**
-	 * return the projected fields
+	 * @return the projected field names
 	 */
 	String[] getProjectedFields();
 
 	/**
-	 * Return the timeout manager
-	 * Make sure to wrap your HSQuery usage around a timeoutManager.start() / .stop()
+	 * @return the timeout manager. Make sure to wrap your HSQuery usage around a {@code timeoutManager.start()} and  {@code timeoutManager.stop()}.
 	 */
 	TimeoutManager getTimeoutManager();
 
 	/**
-	 * The underlying Lucene query
+	 * @return the underlying Lucene query
 	 */
 	Query getLuceneQuery();
 
 	/**
-	 * Execute the Lucene query and return the list of EntityInfos populated with
-	 * metadata and projection.
-	 * THIS if projected is *not* populated:
-	 * it is the responsibility of the object source integration
+	 * Execute the Lucene query and return the list of {@code EntityInfo}s populated with
+	 * metadata and projection. {@link org.hibernate.search.ProjectionConstants.THIS} if projected is <br>not</br> populated.
+	 * It is the responsibility of the object source integration.
+	 *
+	 * @return list of {@code EntityInfo}s populated with metadata and projection
 	 */
 	List<EntityInfo> queryEntityInfos();
 
 	/**
 	 * Execute the Lucene query and return a traversable object over the results.
 	 * Results are lazily fetched.
-	 * THIS if projected is *not* populated:
-	 * it is the responsibility of the object source integration
-	 * DocumentExtractor *must* be closed by the caller to release Lucene resources.
+	 * {@link org.hibernate.search.ProjectionConstants.THIS} if projected is <br>not</br> populated. It is the responsibility
+	 * of the object source integration.
+	 * The returned {@code DocumentExtractor} <br>must</br> be closed by the caller to release Lucene resources.
+	 *
+	 * @return the {@code DocumentExtractor} instance
 	 */
 	DocumentExtractor queryDocumentExtractor();
 
 	/**
-	 * Returns the number of hits for this search
-	 * <p/>
-	 * Caution:
-	 * The number of results might be slightly different from
-	 * what the object source retuns if the index is
-	 * not in sync with the store at the time of query.
+	 * @return the number of hits for this search
+	 *         <p/>
+	 *         Caution:
+	 *         The number of results might be slightly different from
+	 *         what the object source returns if the index is
+	 *         not in sync with the store at the time of query.
 	 */
 	int queryResultSize();
 
@@ -193,17 +219,46 @@ public interface HSQuery extends ProjectionConstants {
 	Explanation explain(int documentId);
 
 	/**
-	 * Enable a given filter by its name. Returns a FullTextFilter object that allows filter parameter injection
+	 * Enable a given filter by its name.
+	 *
+	 * @param name the name of the filter to enable
+	 *
+	 * @return Returns a {@code FullTextFilter} object that allows filter parameter injection
 	 */
 	FullTextFilter enableFullTextFilter(String name);
 
 	/**
-	 * Disable a given filter by its name
+	 * Disable a given filter by its name.
+	 *
+	 * @param name the name of the filter to disable.
 	 */
 	void disableFullTextFilter(String name);
 
 	/**
+	 * @return the {@code SearchFactoryImplementor} instance
+	 *
 	 * @deprecated should be at most SearchFactoryIntegrator, preferably removed altogether
 	 */
 	SearchFactoryImplementor getSearchFactoryImplementor();
+
+	/**
+	 * Enable a facet request.
+	 *
+	 * @param facet the facet request
+	 *
+	 * @return {@code this} to allow method chaining
+	 */
+	HSQuery enableFacet(FacetRequest facet);
+
+	/**
+	 * @return returns the faceting results
+	 */
+	Map<String, FacetResult> getFacetResults();
+
+	/**
+	 * Disable a facet with the given name.
+	 *
+	 * @param name the name of the facet to disable.
+	 */
+	void disableFacet(String name);
 }

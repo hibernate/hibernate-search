@@ -29,28 +29,44 @@ package org.hibernate.search.query.dsl;
  */
 public interface QueryBuilder {
 	/**
-	 * build a term query
+	 * Build a term query (see {@link org.apache.lucene.search.TermQuery}).
+	 *
+	 * @return a {@code TermContext} instance for building the term query
 	 */
 	TermContext keyword();
 
 	/**
-	 * find matching elements within a range
+	 * Build a range query (see {@link org.apache.lucene.search.TermRangeQuery}.
+	 *
+	 * @return a {@code RangeContext} instance for building the range query
 	 */
 	RangeContext range();
 
 	/**
-	 * find an sentence (words can be inversed according to the slop factor
+	 * Build a phrase query (see {@link org.apache.lucene.search.PhraseQuery}).
+	 *
+	 * @return a {@code PhraseContext} instance for building the range query
 	 */
 	PhraseContext phrase();
 
 	/**
-	 * Boolean query
+	 * Start for building a boolean query.
+	 *
+	 * @return a {@code BooleanJunction} instance for building the boolean query
 	 */
 	BooleanJunction<BooleanJunction> bool();
 
 	/**
-	 * Query matching all documents
-	 * Typically mixed with a boolean query.
+	 * Query matching all documents (typically mixed with a boolean query).
+	 *
+	 * @return an {@code AllContext}
 	 */
 	AllContext all();
+
+	/**
+	 * Build a facet request
+	 *
+	 * @return the facet context as entry point for building the facet request
+	 */
+	FacetContext facet();
 }
