@@ -297,7 +297,7 @@ public class SearchFactoryBuilder {
 				if ( prevSimilarity != null && !prevSimilarity.getClass().equals( similarity.getClass() ) ) {
 					throw new SearchException(
 							"Multiple entities are sharing the same index but are declaring an " +
-									"inconsistent Similarity. When overrriding default Similarity make sure that all types sharing a same index " +
+									"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
 									"declare the same Similarity implementation."
 					);
 				}
@@ -383,7 +383,7 @@ public class SearchFactoryBuilder {
 								context,
 								providers,
 								reflectionManager
-				);
+						);
 
 				indexingHierarchy.addIndexedClass( mappedClass );
 				documentBuildersIndexedEntities.put( mappedClass, documentBuilder );

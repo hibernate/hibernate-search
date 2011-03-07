@@ -912,5 +912,4 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	boolean isIdMatchingJpaId() {
 		return true;
 	}
-
 }

@@ -23,16 +23,19 @@
  */
 package org.hibernate.search;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.Explanation;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
+import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -41,7 +44,6 @@ import org.hibernate.transform.ResultTransformer;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  */
-//TODO return FullTextQuery rather than Query in useful chain methods
 public interface FullTextQuery extends Query, ProjectionConstants {
 
 	/**
@@ -67,21 +69,27 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery setFilter(Filter filter);
 
 	/**
-	 * Returns the number of hits for this search
-	 * <p/>
-	 * Caution:
-	 * The number of results might be slightly different from
-	 * <code>list().size()</code> because list() if the index is
-	 * not in sync with the database at the time of query.
+	 * @return the number of hits for this search.
+	 *         <p/>
+	 *         Caution:
+	 *         The number of results might be slightly different from
+	 *         <code>list().size()</code> because list() if the index is
+	 *         not in sync with the database at the time of query.
 	 */
 	int getResultSize();
 
 	/**
 	 * Defines the Database Query used to load the Lucene results.
-	 * Useful to load a given object graph by refining the fetch modes
-	 * <p/>
-	 * No projection (criteria.setProjection() ) allowed, the root entity must be the only returned type
-	 * No where restriction can be defined either.
+	 * Useful to load a given object graph by refining the fetch modes.
+	 * <p>
+	 * <ul>
+	 * <li>No projection (criteria.setProjection() ) allowed, the root entity must be the only returned type</li>
+	 * <li>No where restriction can be defined either</li>
+	 * </p>
+	 *
+	 * @param criteria Hibernate criteria query used to load results
+	 *
+	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery setCriteriaQuery(Criteria criteria);
 
@@ -94,18 +102,51 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Unless notified in their JavaDoc, all built-in bridges are two-way. All @DocumentId fields are projectable by design.
 	 * <p/>
 	 * If the projected field is not a projectable field, null is returned in the object[]
+	 *
+	 * @param fields list of field names to project on
+	 *
+	 * @return {@code this} for method chaining
 	 */
 	FullTextQuery setProjection(String... fields);
 
 	/**
-	 * Enable a given filter by its name. Returns a FullTextFilter object that allows filter parameter injection
+	 * Enable a given filter by its name.
+	 *
+	 * @param name the name of the filter to enable
+	 *
+	 * @return Returns a {@code FullTextFilter} object that allows filter parameter injection
+	 *
+	 * @throws SearchException in case the filter with the specified name is not defined
 	 */
 	FullTextFilter enableFullTextFilter(String name);
 
 	/**
-	 * Disable a given filter by its name
+	 * Disable a given filter by its name.
+	 *
+	 * @param name the name of the filter to disable.
 	 */
 	void disableFullTextFilter(String name);
+
+	/**
+	 * Enable a facet request.
+	 *
+	 * @param facet the facet request
+	 *
+	 * @return {@code this} to allow method chaining
+	 */
+	FullTextQuery enableFacet(FacetRequest facet);
+
+	/**
+	 * @return returns the faceting results
+	 */
+	Map<String, FacetResult> getFacetResults();
+
+	/**
+	 * Disable a facet with the given name.
+	 *
+	 * @param name the name of the facet to disable.
+	 */
+	void disableFacet(String name);
 
 	/**
 	 * Return the Lucene {@link org.apache.lucene.search.Explanation}
@@ -114,7 +155,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param documentId Lucene Document id to be explain. This is NOT the object id
 	 *
-	 * @return Lucene Explanation
+	 * @return An Lucene {@code Explanation} instance
 	 */
 	Explanation explain(int documentId);
 
@@ -139,9 +180,13 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
 	/**
-	 * return the underlying type if possible or IllegalArgumentException otherwise
-	 * Supported types are:
-	 *  - org.apache.lucene.search.Query the underlying lucene query
+	 * @param type the type to unwrap
+	 *
+	 * @return the underlying type if possible. If not possible to unwrap to the given type an
+	 *         {@code IllegalArgumentException} is thrown. Supported types are:
+	 *         <ul>
+	 *         <li>org.apache.lucene.search.Query the underlying lucene query</li>
+	 *         </ul>
 	 */
 	<T> T unwrap(Class<T> type);
 
@@ -153,6 +198,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @param timeout time out period
 	 * @param timeUnit time out unit
 	 *
+	 * @return {@code this} to allow method chaining
 	 */
 	FullTextQuery setTimeout(long timeout, TimeUnit timeUnit);
 
@@ -170,15 +216,18 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param timeout time out period
 	 * @param timeUnit time out unit
+	 *
+	 * @return {@code this} to allow method chaining
 	 */
 	FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit);
 
 	/**
-	 * *Experimental* API, subject to change or removal
+	 * <b>Experimental</b> API, subject to change or removal
 	 *
-	 * When using {@link #limitExecutionTimeTo(long, java.util.concurrent.TimeUnit)} }, returns true if partial results are returned (ie if the time limit has been reached
-	 * and the result fetching process has been terminated.
-	 */	
+	 * @return When using {@link #limitExecutionTimeTo(long, java.util.concurrent.TimeUnit)} }, returns {@code true}
+	 *         if partial results are returned (ie if the time limit has been reached
+	 *         and the result fetching process has been terminated.
+	 */
 	boolean hasPartialResults();
 
 	/**

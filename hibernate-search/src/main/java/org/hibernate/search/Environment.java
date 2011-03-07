@@ -123,7 +123,7 @@ public final class Environment {
 	 *
 	 * Default to 0 (ie no retry).
 	 */
-	public static final String RETRY_MARKER_LOOKUP = "retry_marker_lookup"; 
+	public static final String RETRY_MARKER_LOOKUP = "retry_marker_lookup";
 
 	/**
 	 * Define the similarity class name for a given index
