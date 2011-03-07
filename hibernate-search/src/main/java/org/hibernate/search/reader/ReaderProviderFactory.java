@@ -41,9 +41,9 @@ public abstract class ReaderProviderFactory {
 		Properties props = cfg.getProperties();
 		Properties workerProperties = new Properties();
 		for ( Map.Entry entry : props.entrySet() ) {
-			String key = ( String ) entry.getKey();
+			String key = (String) entry.getKey();
 			if ( key.startsWith( Environment.READER_PREFIX ) ) {
-				workerProperties.setProperty( key, ( String ) entry.getValue() );
+				workerProperties.put( key, entry.getValue() );
 			}
 		}
 		return workerProperties;

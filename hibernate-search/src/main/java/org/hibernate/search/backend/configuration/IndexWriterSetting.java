@@ -26,16 +26,17 @@ package org.hibernate.search.backend.configuration;
 import java.io.Serializable;
 
 import org.apache.lucene.index.IndexWriter;
+
 import org.hibernate.search.SearchException;
 
 /**
  * Represents possible options to be applied to an
- * <code>org.apache.lucene.index.IndexWriter</code>
- * 
+ * {@code org.apache.lucene.index.IndexWriter}.
+ *
  * @author Sanne Grinovero
  */
 public enum IndexWriterSetting implements Serializable {
-	
+
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setMaxBufferedDeleteTerms(int)
 	 */
@@ -43,7 +44,7 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setMaxBufferedDeleteTerms( value );
 		}
-	} ,
+	},
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setMaxBufferedDocs(int)
 	 */
@@ -51,7 +52,7 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setMaxBufferedDocs( value );
 		}
-	} ,
+	},
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setMaxFieldLength(int)
 	 */
@@ -59,7 +60,7 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setMaxFieldLength( value );
 		}
-	} ,
+	},
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setMaxMergeDocs(int)
 	 */
@@ -67,7 +68,7 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setMaxMergeDocs( value );
 		}
-	} ,
+	},
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setMergeFactor(int)
 	 */
@@ -75,7 +76,7 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setMergeFactor( value );
 		}
-	} ,
+	},
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setRAMBufferSizeMB(double)
 	 */
@@ -83,7 +84,7 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setRAMBufferSizeMB( value );
 		}
-	} ,
+	},
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setTermIndexInterval(int)
 	 */
@@ -91,7 +92,7 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setTermIndexInterval( value );
 		}
-	} ,
+	},
 	/**
 	 * @see org.apache.lucene.index.IndexWriter#setUseCompoundFile(boolean)
 	 */
@@ -99,21 +100,22 @@ public enum IndexWriterSetting implements Serializable {
 		public void applySetting(IndexWriter writer, int value) {
 			writer.setUseCompoundFile( intToBoolean( value ) );
 		}
+
 		@Override
 		public Integer parseVal(String value) {
 			return USE_COMPOUND_FILE.parseBoolean( value );
 		}
 	};
-	
-	private static final Integer TRUE = Integer.valueOf( 1 );
-	private static final Integer FALSE = Integer.valueOf( 0 );
-	
+
+	private static final Integer TRUE = 1;
+	private static final Integer FALSE = 0;
+
 	private final String cfgKey;
-	
+
 	IndexWriterSetting(String configurationKey) {
 		this.cfgKey = configurationKey;
 	}
-	
+
 	/**
 	 * @throws IllegalArgumentException when user selects an invalid value; should be wrapped.
 	 */
@@ -128,23 +130,29 @@ public enum IndexWriterSetting implements Serializable {
 
 	/**
 	 * Specific parameters may override to provide additional keywords support.
+	 *
 	 * @param value the string value as in configuration file
+	 *
 	 * @return the integer value going to be set as parameter
+	 *
 	 * @throws SearchException for unrecognized values
 	 */
 	public Integer parseVal(String value) {
-		return ConfigurationParseHelper.parseInt( value,
-				"Invalid value for " + cfgKey + ": " + value );
+		return ConfigurationParseHelper.parseInt(
+				value,
+				"Invalid value for " + cfgKey + ": " + value
+		);
 	}
-	
+
 	private Integer parseBoolean(String value) {
-		boolean v = ConfigurationParseHelper.parseBoolean( value,
-				"Invalid value for " + cfgKey + ": " + value );
+		boolean v = ConfigurationParseHelper.parseBoolean(
+				value,
+				"Invalid value for " + cfgKey + ": " + value
+		);
 		return v ? TRUE : FALSE;
 	}
-	
+
 	private static boolean intToBoolean(int value) {
-		return value == TRUE.intValue();
+		return value == TRUE;
 	}
-	
 }

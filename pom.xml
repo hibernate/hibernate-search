@@ -101,7 +101,7 @@
             <archive>http://lists.jboss.org/pipermail/hibernate-dev/</archive>
         </mailingList>
         <mailingList>
-            <name>Hibernate Commit Notificatons</name>
+            <name>Hibernate Commit Notifications</name>
             <post>hibernate-commits@lists.jboss.org</post>
             <subscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</subscribe>
             <unsubscribe>https://lists.jboss.org/mailman/listinfo/hibernate-commits</unsubscribe>

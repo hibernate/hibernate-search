@@ -40,6 +40,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.LobHelper;
 import org.hibernate.LockMode;
+import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.ReplicationMode;
 import org.hibernate.SQLQuery;
@@ -49,16 +50,15 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.TypeHelper;
 import org.hibernate.UnknownProfileException;
-import org.hibernate.LockOptions;
 import org.hibernate.classic.Session;
 import org.hibernate.collection.PersistentCollection;
 import org.hibernate.engine.EntityKey;
+import org.hibernate.engine.LoadQueryInfluencers;
+import org.hibernate.engine.NonFlushedChanges;
 import org.hibernate.engine.PersistenceContext;
 import org.hibernate.engine.QueryParameters;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.LoadQueryInfluencers;
-import org.hibernate.engine.NonFlushedChanges;
 import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.engine.query.sql.NativeSQLQuerySpecification;
 import org.hibernate.event.EventListeners;
@@ -70,8 +70,8 @@ import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.MassIndexer;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
@@ -92,7 +92,6 @@ import org.hibernate.type.Type;
  */
 @SuppressWarnings("deprecation")
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
-
 	private final Session session;
 	private final SessionImplementor sessionImplementor;
 	private transient SearchFactoryImplementor searchFactory;
@@ -100,12 +99,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 
 	public FullTextSessionImpl(org.hibernate.Session session) {
-		if ( session  == null ) {
-			throw new IllegalArgumentException("Unable to create a FullTextSession from an null Session object");
+		if ( session == null ) {
+			throw new IllegalArgumentException( "Unable to create a FullTextSession from an null Session object" );
 		}
-		this.session = ( Session ) session;
-		this.transactionContext = new EventSourceTransactionContext( ( EventSource ) session );
-		this.sessionImplementor = ( SessionImplementor ) session;
+		this.session = (Session) session;
+		this.transactionContext = new EventSourceTransactionContext( (EventSource) session );
+		this.sessionImplementor = (SessionImplementor) session;
 	}
 
 	/**
@@ -115,7 +114,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 * @param entities must be immutable for the lifetime of the query object
 	 */
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class... entities) {
-		return new FullTextQueryImpl( luceneQuery, entities, sessionImplementor, new ParameterMetadata( null, null ) );
+		return new FullTextQueryImpl(
+				luceneQuery,
+				entities,
+				sessionImplementor,
+				new ParameterMetadata( null, null )
+		);
 	}
 
 	/**

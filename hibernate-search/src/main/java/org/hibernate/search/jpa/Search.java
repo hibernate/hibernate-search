@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -34,7 +34,7 @@ import org.hibernate.search.jpa.impl.FullTextEntityManagerImpl;
  * @author Hardy Ferentschik
  */
 public final class Search {
-	
+
 	private Search() {
 	}
 
@@ -47,7 +47,7 @@ public final class Search {
 			return (FullTextEntityManager) em;
 		}
 		else {
-			return new FullTextEntityManagerImpl(em);
+			return new FullTextEntityManagerImpl( em );
 		}
 	}
 
@@ -56,6 +56,6 @@ public final class Search {
 	 */
 	@Deprecated
 	public static FullTextEntityManager createFullTextEntityManager(EntityManager em) {
-		return getFullTextEntityManager(em);
+		return getFullTextEntityManager( em );
 	}
 }

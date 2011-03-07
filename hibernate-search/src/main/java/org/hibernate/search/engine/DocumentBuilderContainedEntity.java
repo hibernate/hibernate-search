@@ -71,5 +71,4 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 		//this is not an indexed entity
 		return null;
 	}
-
 }
