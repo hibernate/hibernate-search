@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -40,12 +40,12 @@ public abstract class ReflectionHelper {
 	}
 
 	/**
-	 * Get attribute name out of member unless overriden by <code>name</code>.
+	 * Get attribute name out of member unless overridden by <code>name</code>.
 	 *
 	 * @param member <code>XMember</code> from which to extract the name.
 	 * @param name Override value which will be returned in case it is not empty.
 	 *
-	 * @return attribute name out of member unless overriden by <code>name</code>.
+	 * @return attribute name out of member unless overridden by <code>name</code>.
 	 */
 	public static String getAttributeName(XMember member, String name) {
 		return StringHelper.isNotEmpty( name ) ?
@@ -58,7 +58,7 @@ public abstract class ReflectionHelper {
 	 */
 	public static void setAccessible(XMember member) {
 		try {
-			//always set accessible to true as it bypass the security model checks
+			// always set accessible to true as it bypass the security model checks
 			// at execution time and is faster.
 			member.setAccessible( true );
 		}
@@ -74,7 +74,7 @@ public abstract class ReflectionHelper {
 	 */
 	public static void setAccessible(AccessibleObject member) {
 		try {
-			//always set accessible to true as it bypass the security model checks
+			// always set accessible to true as it bypass the security model checks
 			// at execution time and is faster.
 			member.setAccessible( true );
 		}
@@ -94,5 +94,20 @@ public abstract class ReflectionHelper {
 			throw new IllegalStateException( "Could not get property value", e );
 		}
 		return value;
+	}
+
+	public static Class<?> loadClass(String fqcn) {
+		try {
+			return org.hibernate.annotations.common.util.ReflectHelper.classForName(
+					fqcn, ReflectionHelper.class
+			);
+		}
+		catch ( ClassNotFoundException e ) {
+			return null;
+		}
+	}
+
+	public static boolean onClasspath(String fqcn) {
+		return loadClass( fqcn ) != null;
 	}
 }

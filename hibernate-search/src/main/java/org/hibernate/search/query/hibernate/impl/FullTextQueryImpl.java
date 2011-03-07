@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -47,14 +48,16 @@ import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.impl.AbstractQueryImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.query.engine.spi.DocumentExtractor;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
+import org.hibernate.search.query.engine.spi.DocumentExtractor;
+import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.transform.ResultTransformer;
 
@@ -66,7 +69,7 @@ import org.hibernate.transform.ResultTransformer;
  * @todo Implements setParameter()
  */
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
-	
+
 	private Criteria criteria;
 	private ResultTransformer resultTransformer;
 	private int fetchSize = 1;
@@ -139,7 +142,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 
-
 	/**
 	 * Decide which object loader to use depending on the targeted entities. If there is only a single entity targeted
 	 * a <code>QueryLoader</code> can be used which will only execute a single query to load the entities. If more than
@@ -169,12 +171,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private Loader getProjectionLoader(ObjectLoaderBuilder loaderBuilder) {
 		ProjectionLoader loader = new ProjectionLoader();
 		loader.init(
-				( Session ) session,
+				(Session) session,
 				hSearchQuery.getSearchFactoryImplementor(),
 				resultTransformer,
 				loaderBuilder,
 				hSearchQuery.getProjectedFields(),
-				hSearchQuery.getTimeoutManager() );
+				hSearchQuery.getTimeoutManager()
+		);
 		return loader;
 	}
 
@@ -266,7 +269,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	public <T> T unwrap(Class<T> type) {
 		if ( type == org.apache.lucene.search.Query.class ) {
-			return ( T ) hSearchQuery.getLuceneQuery();
+			return (T) hSearchQuery.getLuceneQuery();
 		}
 		throw new IllegalArgumentException( "Cannot unwrap " + type.getName() );
 	}
@@ -295,13 +298,26 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		hSearchQuery.disableFullTextFilter( name );
 	}
 
+	public FullTextQuery enableFacet(FacetRequest facet) {
+		hSearchQuery.enableFacet( facet );
+		return this;
+	}
+
+	public Map<String, FacetResult> getFacetResults() {
+		return hSearchQuery.getFacetResults();
+	}
+
+	public void disableFacet(String name) {
+		hSearchQuery.disableFacet( name );
+	}
+
 	@Override
 	public FullTextQuery setTimeout(int timeout) {
 		return setTimeout( timeout, TimeUnit.SECONDS );
 	}
 
 	public FullTextQuery setTimeout(long timeout, TimeUnit timeUnit) {
-		super.setTimeout( (int)timeUnit.toSeconds( timeout ) );
+		super.setTimeout( (int) timeUnit.toSeconds( timeout ) );
 		hSearchQuery.getTimeoutManager().setTimeout( timeout, timeUnit );
 		hSearchQuery.getTimeoutManager().raiseExceptionOnTimeout();
 		return this;
@@ -329,9 +345,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	private static final Loader noLoader = new Loader() {
 		public void init(Session session,
-					 SearchFactoryImplementor searchFactoryImplementor,
-					 ObjectsInitializer objectsInitializer,
-					 TimeoutManager timeoutManager) {
+						 SearchFactoryImplementor searchFactoryImplementor,
+						 ObjectsInitializer objectsInitializer,
+						 TimeoutManager timeoutManager) {
 		}
 
 		public Object load(EntityInfo entityInfo) {
@@ -346,13 +362,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
 	};
-	
+
 	private static final TimeoutExceptionFactory exceptionFactory = new TimeoutExceptionFactory() {
 
 		public RuntimeException createTimeoutException(String message, org.apache.lucene.search.Query luceneQuery) {
-			return new QueryTimeoutException( message, ( SQLException) null, luceneQuery.toString() );
+			return new QueryTimeoutException( message, (SQLException) null, luceneQuery.toString() );
 		}
-		
+
 	};
-	
 }

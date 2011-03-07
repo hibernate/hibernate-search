@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +47,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.query.engine.spi.DocumentExtractor;
-import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.engine.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.filter.ChainedFilter;
@@ -58,28 +55,29 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
-import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.QueryTimeoutException;
+import org.hibernate.search.query.engine.spi.DocumentExtractor;
+import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.search.query.fieldcache.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.FieldCollectorType;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
-import org.hibernate.search.util.LoggerFactory;
-import org.slf4j.Logger;
 
+import static org.hibernate.search.util.CollectionHelper.newHashMap;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik <hardy@hibernate.org>
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class HSQueryImpl implements HSQuery {
-	
-	private static final Logger log = LoggerFactory.make();
+
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
@@ -88,7 +86,10 @@ public class HSQueryImpl implements HSQuery {
 	private TimeoutManagerImpl timeoutManager;
 	private Set<Class<?>> indexedTargetedEntities;
 	private boolean allowFieldSelectionInProjection = true;
-	private final Map<String, FullTextFilterImpl> filterDefinitions = new HashMap<String, FullTextFilterImpl>();
+	/**
+	 * The  map of currently active/enabled filters.
+	 */
+	private final Map<String, FullTextFilterImpl> filterDefinitions = newHashMap();
 	private Filter filter;
 	private Filter userFilter;
 	private Sort sort;
@@ -103,6 +104,15 @@ public class HSQueryImpl implements HSQuery {
 	private TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
 	private boolean useFieldCacheOnClassTypes = false;
 
+	/**
+	 * The map of currently active/enabled facet requests.
+	 */
+	private final Map<String, FacetRequest> facetRequests = newHashMap();
+	/**
+	 * Keeps track of faceting results.
+	 */
+	private Map<String, FacetResult> facetResults;
+
 	public HSQueryImpl(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
@@ -113,7 +123,7 @@ public class HSQueryImpl implements HSQuery {
 	}
 
 	public HSQuery targetedEntities(List<Class<?>> classes) {
-		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>(classes);
+		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>( classes );
 		final Class[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
 		this.indexedTargetedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( classesAsArray );
 		if ( targetedEntities != null && targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
@@ -132,7 +142,7 @@ public class HSQueryImpl implements HSQuery {
 		this.userFilter = filter;
 		return this;
 	}
-	
+
 	public HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory) {
 		this.timeoutExceptionFactory = exceptionFactory;
 		return this;
@@ -181,7 +191,7 @@ public class HSQueryImpl implements HSQuery {
 	public String[] getProjectedFields() {
 		return projectedFields;
 	}
-	
+
 	private TimeoutManagerImpl getTimeoutManagerImpl() {
 		if ( timeoutManager == null ) {
 			if ( luceneQuery == null ) {
@@ -206,9 +216,9 @@ public class HSQueryImpl implements HSQuery {
 			return Collections.emptyList();
 		}
 		try {
-			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize()  );
+			QueryHits queryHits = getQueryHits( searcher, calculateTopDocsRetrievalSize() );
 			int first = getFirstResultIndex();
-			int max = max( first, queryHits.totalHits );
+			int max = max( first, queryHits.getTotalHits() );
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
@@ -216,7 +226,9 @@ public class HSQueryImpl implements HSQuery {
 			for ( int index = first; index <= max; index++ ) {
 				infos.add( extractor.extract( index ) );
 				//TODO should we measure on each extractor?
-				if ( index % 10 == 0 ) getTimeoutManager().isTimedOut();
+				if ( index % 10 == 0 ) {
+					getTimeoutManager().isTimedOut();
+				}
 			}
 			return infos;
 		}
@@ -230,24 +242,24 @@ public class HSQueryImpl implements HSQuery {
 
 	private DocumentExtractor buildDocumentExtractor(IndexSearcherWithPayload searcher, QueryHits queryHits, int first, int max) {
 		return new DocumentExtractorImpl(
-						queryHits,
-						searchFactoryImplementor,
-						projectedFields,
-						idFieldNames,
-						allowFieldSelectionInProjection,
-						searcher,
-						luceneQuery,
-						first,
-						max,
-						classesAndSubclasses
-				);
+				queryHits,
+				searchFactoryImplementor,
+				projectedFields,
+				idFieldNames,
+				allowFieldSelectionInProjection,
+				searcher,
+				luceneQuery,
+				first,
+				max,
+				classesAndSubclasses
+		);
 	}
 
 	/**
 	 * DocumentExtractor returns a traverser over the full-text results (EntityInfo)
 	 * This operation is lazy bound:
-	 *  - the query is executed
-	 *  - results are not retrieved until actually requested
+	 * - the query is executed
+	 * - results are not retrieved until actually requested
 	 *
 	 * DocumentExtractor objects *must* be closed when the results are no longer traversed.
 	 */
@@ -259,9 +271,8 @@ public class HSQueryImpl implements HSQuery {
 		try {
 			QueryHits queryHits = getQueryHits( openSearcher, calculateTopDocsRetrievalSize() );
 			int first = getFirstResultIndex();
-			int max = max( first, queryHits.totalHits );
-			DocumentExtractor extractor = buildDocumentExtractor( openSearcher, queryHits, first, max );
-			return extractor;
+			int max = max( first, queryHits.getTotalHits() );
+			return buildDocumentExtractor( openSearcher, queryHits, first, max );
 		}
 		catch ( IOException e ) {
 			closeSearcher( openSearcher );
@@ -283,7 +294,7 @@ public class HSQueryImpl implements HSQuery {
 				try {
 					hits = getQueryHits(
 							searcher, 1
-					).topDocs; // Lucene enforces that at least one top doc will be retrieved.
+					).getTopDocs(); // Lucene enforces that at least one top doc will be retrieved.
 					resultSize = hits.totalHits;
 				}
 				catch ( IOException e ) {
@@ -341,6 +352,30 @@ public class HSQueryImpl implements HSQuery {
 		filterDefinitions.remove( name );
 	}
 
+	public HSQuery enableFacet(FacetRequest facet) {
+		facetRequests.put( facet.getName(), facet );
+		return this;
+	}
+
+	public void disableFacet(String name) {
+		facetRequests.remove( name );
+		if ( facetResults != null ) {
+			facetResults.remove( name );
+		}
+	}
+
+	public Map<String, FacetResult> getFacetResults() {
+		// if there are no facet requests we don't have to do anything
+		if ( facetRequests.isEmpty() ) {
+			return Collections.emptyMap();
+		}
+		// we have facet request, but the query hasn't executed yet. trigger the query via getting the result size
+		if ( !facetRequests.isEmpty() && facetResults == null ) {
+			queryResultSize();
+		}
+		return facetResults;
+	}
+
 	private void closeSearcher(IndexSearcherWithPayload searcherWithPayload) {
 		if ( searcherWithPayload == null ) {
 			return;
@@ -370,17 +405,37 @@ public class HSQueryImpl implements HSQuery {
 		}
 
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
-			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, getTimeoutManagerImpl(), useFieldCacheOnClasses(), getAppropriateIdFieldCollectorFactory() );
+			queryHits = new QueryHits(
+					searcher,
+					filteredQuery,
+					filter,
+					sort,
+					getTimeoutManagerImpl(),
+					facetRequests,
+					useFieldCacheOnTypes(),
+					getAppropriateIdFieldCollectorFactory()
+			);
 		}
 		else {
-			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, n, getTimeoutManagerImpl(), useFieldCacheOnClasses(), getAppropriateIdFieldCollectorFactory() );
+			queryHits = new QueryHits(
+					searcher,
+					filteredQuery,
+					filter,
+					sort,
+					n,
+					getTimeoutManagerImpl(),
+					facetRequests,
+					useFieldCacheOnTypes(),
+					getAppropriateIdFieldCollectorFactory()
+			);
 		}
-		resultSize = queryHits.totalHits;
+		resultSize = queryHits.getTotalHits();
 
 		if ( stats ) {
-			searchFactoryImplementor.getStatisticsImplementor().searchExecuted( filteredQuery.toString(), System.nanoTime() - startTime );
+			searchFactoryImplementor.getStatisticsImplementor()
+					.searchExecuted( filteredQuery.toString(), System.nanoTime() - startTime );
 		}
-
+		facetResults = queryHits.getFacetResults();
 		return queryHits;
 	}
 
@@ -394,7 +449,7 @@ public class HSQueryImpl implements HSQuery {
 			return null;
 		}
 		else {
-			long tmpMaxResult = ( long ) getFirstResultIndex() + maxResults;
+			long tmpMaxResult = (long) getFirstResultIndex() + maxResults;
 			if ( tmpMaxResult >= Integer.MAX_VALUE ) {
 				// don't return just Integer.MAX_VALUE due to a bug in Lucene - see HSEARCH-330
 				return Integer.MAX_VALUE - 1;
@@ -403,13 +458,13 @@ public class HSQueryImpl implements HSQuery {
 				return 1; // Lucene enforces that at least one top doc will be retrieved. See also HSEARCH-604
 			}
 			else {
-				return ( int ) tmpMaxResult;
+				return (int) tmpMaxResult;
 			}
 		}
 	}
 
 	private int getFirstResultIndex() {
-		return 	firstResult;
+		return firstResult;
 	}
 
 	private IndexSearcherWithPayload buildSearcher() {
@@ -491,7 +546,7 @@ public class HSQueryImpl implements HSQuery {
 				if ( classesInDirectoryProvider.size() > 1 ) {
 					//risk of needClassFilterClause
 					for ( Class clazz : classesInDirectoryProvider ) {
-						if ( ! classesAndSubclasses.contains( clazz ) ) {
+						if ( !classesAndSubclasses.contains( clazz ) ) {
 							this.needClassFilterClause = true;
 							break;
 						}
@@ -546,7 +601,7 @@ public class HSQueryImpl implements HSQuery {
 		if ( similarity == null ) {
 			similarity = builder.getSimilarity();
 		}
-		else if ( ! similarity.getClass().equals( builder.getSimilarity().getClass() ) ) {
+		else if ( !similarity.getClass().equals( builder.getSimilarity().getClass() ) ) {
 			throw new SearchException(
 					"Cannot perform search on two entities with differing Similarity implementations (" + similarity.getClass()
 							.getName() + " & " + builder.getSimilarity().getClass().getName() + ")"
@@ -652,7 +707,7 @@ public class HSQueryImpl implements HSQuery {
 		Filter filter;
 		if ( def.getFactoryMethod() != null ) {
 			try {
-				filter = ( Filter ) def.getFactoryMethod().invoke( instance );
+				filter = (Filter) def.getFactoryMethod().invoke( instance );
 			}
 			catch ( IllegalAccessException e ) {
 				throw new SearchException(
@@ -675,7 +730,7 @@ public class HSQueryImpl implements HSQuery {
 		}
 		else {
 			try {
-				filter = ( Filter ) instance;
+				filter = (Filter) instance;
 			}
 			catch ( ClassCastException e ) {
 				throw new SearchException(
@@ -724,14 +779,14 @@ public class HSQueryImpl implements HSQuery {
 					if ( !( obj instanceof FilterKey ) ) {
 						return false;
 					}
-					FilterKey that = ( FilterKey ) obj;
+					FilterKey that = (FilterKey) obj;
 					return this.getImpl().equals( that.getImpl() );
 				}
 			};
 		}
 		else {
 			try {
-				key = ( FilterKey ) def.getKeyMethod().invoke( instance );
+				key = (FilterKey) def.getKeyMethod().invoke( instance );
 			}
 			catch ( IllegalAccessException e ) {
 				throw new SearchException(
@@ -804,7 +859,7 @@ public class HSQueryImpl implements HSQuery {
 			return filteredQuery;
 		}
 	}
-	
+
 	private int max(int first, int totalHits) {
 		if ( maxResults == null ) {
 			return totalHits - 1;
@@ -819,24 +874,15 @@ public class HSQueryImpl implements HSQuery {
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
 		return searchFactoryImplementor;
 	}
-	
-	private boolean useFieldCacheOnClasses() {
+
+	private boolean useFieldCacheOnTypes() {
 		if ( classesAndSubclasses.size() <= 1 ) {
-			log.debug( "FieldCache on classes disabled as class type extraction from the index is not needed" );
 			// force it to false, as we won't need classes at all
 			return false;
 		}
-		if ( log.isDebugEnabled() ) {
-			if ( useFieldCacheOnClassTypes ) {
-				log.debug( "FieldCache on classes enabled for Query {}", this.luceneQuery );
-			}
-			else {
-				log.debug( "FieldCache on classes disabled for Query {}", this.luceneQuery );
-			}
-		}
 		return useFieldCacheOnClassTypes;
 	}
-	
+
 	/**
 	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
 	 */
@@ -856,7 +902,6 @@ public class HSQueryImpl implements HSQuery {
 			allCollectors.add( fieldCacheCollectionFactory );
 		}
 		if ( allCollectors.size() != 1 ) {
-			log.debug( "Multiple FieldCache Collectors should be applied for ID field: IdFieldCollector disabled" );
 			// some implementations have different requirements
 			return null;
 		}
@@ -865,5 +910,4 @@ public class HSQueryImpl implements HSQuery {
 			return anyImplementation;
 		}
 	}
-
 }

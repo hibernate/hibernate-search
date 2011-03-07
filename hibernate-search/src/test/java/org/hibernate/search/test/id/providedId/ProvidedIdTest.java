@@ -35,18 +35,18 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
-import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
-import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.QueryTimeoutException;
+import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
 import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 import org.hibernate.search.query.engine.impl.QueryHits;
+import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
+import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.test.util.ManualTransactionContext;
 
 /**
  * @author Navin Surtani
@@ -59,7 +59,7 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 				.addClass( ProvidedIdPerson.class )
 				.addClass( ProvidedIdPersonSub.class )
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
-				.addProperty(  Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() )
+				.addProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() )
 				.addProperty( "hibernate.search.default.transaction.merge_factor", "100" )
 				.addProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
@@ -87,7 +87,9 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 
 		tc.end();
 
-		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser(
+				SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer
+		);
 		Query luceneQuery = parser.parse( "Goat" );
 
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Search Query extension
@@ -102,8 +104,13 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 
 		//follows an example of what Infinispan Query actually needs to resolve a search request:
 		IndexSearcherWithPayload lowLevelSearcher = new IndexSearcherWithPayload( searcher, false, false );
-		QueryHits queryHits = new QueryHits( lowLevelSearcher, luceneQuery, null, null,
-				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY ), false, null );
+		QueryHits queryHits = new QueryHits(
+				lowLevelSearcher, luceneQuery, null, null,
+				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY ),
+				null,
+				false,
+				null
+		);
 		Set<String> identifiers = new HashSet<String>();
 		identifiers.add( "providedId" );
 		Set<Class<?>> targetedClasses = new HashSet<Class<?>>();
@@ -115,8 +122,9 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 				lowLevelSearcher,
 				luceneQuery,
 				0, 0, //not used in this case
-				targetedClasses );
-		HashSet<String> titles = new HashSet<String>(3);
+				targetedClasses
+		);
+		HashSet<String> titles = new HashSet<String>( 3 );
 		for ( int id = 0; id < hits.totalHits; id++ ) {
 			Long documentId = (Long) extractor.extract( id ).getId();
 			String projectedTitle = (String) extractor.extract( id ).getProjection()[0];
@@ -128,5 +136,4 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		assertTrue( titles.contains( "Big Goat" ) );
 		searcher.close();
 	}
-
 }
