@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -94,20 +94,5 @@ public abstract class ReflectionHelper {
 			throw new IllegalStateException( "Could not get property value", e );
 		}
 		return value;
-	}
-
-	public static Class<?> loadClass(String fqcn) {
-		try {
-			return org.hibernate.annotations.common.util.ReflectHelper.classForName(
-					fqcn, ReflectionHelper.class
-			);
-		}
-		catch ( ClassNotFoundException e ) {
-			return null;
-		}
-	}
-
-	public static boolean onClasspath(String fqcn) {
-		return loadClass( fqcn ) != null;
 	}
 }
