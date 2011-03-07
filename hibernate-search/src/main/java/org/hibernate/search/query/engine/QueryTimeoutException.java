@@ -29,7 +29,7 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 /**
  * Represent a timeout during a Fulltext search in the HSQuery.
  * The object source integration should catch this and throw a
- * relevent exception for the object source. For example in Hibernate Core, an
+ * relevant exception for the object source. For example in Hibernate Core, an
  * {@link org.hibernate.QueryTimeoutException}.
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.

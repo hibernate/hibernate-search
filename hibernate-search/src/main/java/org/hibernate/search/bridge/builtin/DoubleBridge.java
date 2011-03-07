@@ -33,6 +33,6 @@ import org.hibernate.annotations.common.util.StringHelper;
 public class DoubleBridge extends NumberBridge {
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) return null;
-		return new Double( stringValue );
+		return Double.valueOf( stringValue );
 	}
 }
