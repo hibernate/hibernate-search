@@ -43,6 +43,7 @@ public class EntityDescriptor {
 	private Map<String,Object> providedId;
 	private Set<Map<String,Object>> classBridges = new HashSet<Map<String,Object>>();
 	private Map<String, Object> dynamicBoost;
+	private Map<String, Object> cacheInMemory;
 	
 	public Map<String, Object> getIndexed() {
 		return indexed;
@@ -73,9 +74,17 @@ public class EntityDescriptor {
 	public void setSimilariy(Map<String, Object> similarity) {
 		this.similarity = similarity;
 	}
-
+	
 	public Map<String, Object> getSimilarity() {
 		return similarity;
+	}
+	
+	public Map<String, Object> getCacheInMemory() {
+		return cacheInMemory;
+	}
+
+	public void setCacheInMemory(Map<String, Object> cacheInMemory) {
+		this.cacheInMemory = cacheInMemory;
 	}
 
 	public void setBoost(Map<String, Object> boost) {

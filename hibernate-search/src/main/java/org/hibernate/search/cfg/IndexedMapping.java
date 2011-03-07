@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.annotations.FieldCacheType;
 
 public class IndexedMapping {
 	
@@ -45,9 +46,16 @@ public class IndexedMapping {
 		entity.setIndexed(indexed);
 	}
 	
-	public EntityMapping indexName(String indexName) {
-		this.indexed.put("index", indexName);
-		return entityMapping;
+	public IndexedMapping indexName(String indexName) {
+		this.indexed.put( "index", indexName );
+		return this;
+	}
+	
+	public IndexedMapping cacheFromIndex(FieldCacheType type) {
+		Map<String, Object> cacheInMemory = new HashMap<String, Object>(1);
+		cacheInMemory.put( "value", type );
+		entity.setCacheInMemory(cacheInMemory);
+		return this;
 	}
 	
 	public IndexedMapping similarity(Class<?> impl) {

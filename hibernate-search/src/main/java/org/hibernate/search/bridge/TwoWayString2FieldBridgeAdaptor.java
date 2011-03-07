@@ -70,4 +70,9 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 			return stringBridge.stringToObject( stringValue );
 		}
 	}
+
+	public TwoWayStringBridge unwrap() {
+		return stringBridge;
+	}
+	
 }

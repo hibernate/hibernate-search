@@ -49,6 +49,7 @@ import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
 import org.hibernate.search.annotations.Boost;
+import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.CalendarBridge;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
@@ -479,43 +480,59 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		}
 
 		private void createIndexed(EntityDescriptor entity) {
-			Class<? extends Annotation> annotationType = Indexed.class;
-			AnnotationDescriptor annotation = new AnnotationDescriptor( annotationType );
-			if ( entity.getIndexed() != null ) {
-				for ( Map.Entry<String, Object> entry : entity.getIndexed().entrySet() ) {
-					annotation.setValue( entry.getKey(), entry.getValue() );
+			{
+				Class<? extends Annotation> annotationType = Indexed.class;
+				AnnotationDescriptor annotation = new AnnotationDescriptor( annotationType );
+				if ( entity.getIndexed() != null ) {
+					for ( Map.Entry<String, Object> entry : entity.getIndexed().entrySet() ) {
+						annotation.setValue( entry.getKey(), entry.getValue() );
+					}
+					annotations.put( annotationType, AnnotationFactory.create( annotation ) );
 				}
-				annotations.put( annotationType, AnnotationFactory.create( annotation ) );
 			}
-
-			if ( entity.getSimilarity() != null ) {
-				annotation = new AnnotationDescriptor( Similarity.class );
-				for ( Map.Entry<String, Object> entry : entity.getSimilarity().entrySet() ) {
-					annotation.setValue( entry.getKey(), entry.getValue() );
+			{
+				if ( entity.getSimilarity() != null ) {
+					AnnotationDescriptor annotation = new AnnotationDescriptor( Similarity.class );
+					for ( Map.Entry<String, Object> entry : entity.getSimilarity().entrySet() ) {
+						annotation.setValue( entry.getKey(), entry.getValue() );
+					}
+					annotations.put( Similarity.class, AnnotationFactory.create( annotation ) );
 				}
-				annotations.put( Similarity.class, AnnotationFactory.create( annotation ) );
 			}
-
-			if ( entity.getBoost() != null ) {
-				annotation = new AnnotationDescriptor( Boost.class );
-				for ( Map.Entry<String, Object> entry : entity.getBoost().entrySet() ) {
-					annotation.setValue( entry.getKey(), entry.getValue() );
+			{
+				if ( entity.getCacheInMemory() != null ) {
+					AnnotationDescriptor annotation = new AnnotationDescriptor( CacheFromIndex.class );
+					for ( Map.Entry<String, Object> entry : entity.getCacheInMemory().entrySet() ) {
+						annotation.setValue( entry.getKey(), entry.getValue() );
+					}
+					annotations.put( CacheFromIndex.class, AnnotationFactory.create( annotation ) );
 				}
-				annotations.put( Boost.class, AnnotationFactory.create( annotation ) );
 			}
-
-			if ( entity.getAnalyzerDiscriminator() != null ) {
-				annotation = new AnnotationDescriptor( AnalyzerDiscriminator.class );
-				for ( Map.Entry<String, Object> entry : entity.getAnalyzerDiscriminator().entrySet() ) {
-					annotation.setValue( entry.getKey(), entry.getValue() );
+			{
+				if ( entity.getBoost() != null ) {
+					AnnotationDescriptor annotation = new AnnotationDescriptor( Boost.class );
+					for ( Map.Entry<String, Object> entry : entity.getBoost().entrySet() ) {
+						annotation.setValue( entry.getKey(), entry.getValue() );
+					}
+					annotations.put( Boost.class, AnnotationFactory.create( annotation ) );
 				}
-				annotations.put( AnalyzerDiscriminator.class, AnnotationFactory.create( annotation ) );
 			}
-			if ( entity.getFullTextFilterDefs().size() > 0 ) {
-				AnnotationDescriptor fullTextFilterDefsAnnotation = new AnnotationDescriptor( FullTextFilterDefs.class );
-				FullTextFilterDef[] fullTextFilterDefArray = createFullTextFilterDefArray( entity.getFullTextFilterDefs() );
-				fullTextFilterDefsAnnotation.setValue( "value", fullTextFilterDefArray );
-				annotations.put( FullTextFilterDefs.class, AnnotationFactory.create( fullTextFilterDefsAnnotation ) );
+			{
+				if ( entity.getAnalyzerDiscriminator() != null ) {
+					AnnotationDescriptor annotation = new AnnotationDescriptor( AnalyzerDiscriminator.class );
+					for ( Map.Entry<String, Object> entry : entity.getAnalyzerDiscriminator().entrySet() ) {
+						annotation.setValue( entry.getKey(), entry.getValue() );
+					}
+					annotations.put( AnalyzerDiscriminator.class, AnnotationFactory.create( annotation ) );
+				}
+			}
+			{
+				if ( entity.getFullTextFilterDefs().size() > 0 ) {
+					AnnotationDescriptor fullTextFilterDefsAnnotation = new AnnotationDescriptor( FullTextFilterDefs.class );
+					FullTextFilterDef[] fullTextFilterDefArray = createFullTextFilterDefArray( entity.getFullTextFilterDefs() );
+					fullTextFilterDefsAnnotation.setValue( "value", fullTextFilterDefArray );
+					annotations.put( FullTextFilterDefs.class, AnnotationFactory.create( fullTextFilterDefsAnnotation ) );
+				}
 			}
 			if ( entity.getProvidedId() != null ) {
 				createProvidedId( entity );

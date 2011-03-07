@@ -67,25 +67,30 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 	 * @param expectedFieldNames
 	 */
 	public static void assertFieldSelectorEnabled(String... expectedFieldNames) {
-		assertNotNull( FieldSelectorLeakingReaderProvider.fieldSelector );
-		MapFieldSelector selector = (MapFieldSelector) fieldSelector;
-		Map<String, FieldSelectorResult> fieldSelections;
-		try {
-			Field field = MapFieldSelector.class.getDeclaredField( "fieldSelections" );
-			ReflectionHelper.setAccessible( field );
-			fieldSelections = (Map<String, FieldSelectorResult>) field.get( selector );
+		if ( expectedFieldNames == null || expectedFieldNames.length == 0 ) {
+			assertNull( FieldSelectorLeakingReaderProvider.fieldSelector );
 		}
-		catch (NoSuchFieldException e) {
-			throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
+		else {
+			assertNotNull( FieldSelectorLeakingReaderProvider.fieldSelector );
+			MapFieldSelector selector = (MapFieldSelector) fieldSelector;
+			Map<String, FieldSelectorResult> fieldSelections;
+			try {
+				Field field = MapFieldSelector.class.getDeclaredField( "fieldSelections" );
+				ReflectionHelper.setAccessible( field );
+				fieldSelections = (Map<String, FieldSelectorResult>) field.get( selector );
+			}
+			catch (NoSuchFieldException e) {
+				throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
+			}
+			catch (IllegalArgumentException e) {
+				throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
+			}
+			catch (IllegalAccessException e) {
+				throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
+			}
+			assertNotNull( fieldSelections );
+			assertEquals( expectedFieldNames.length, fieldSelections.size() );
 		}
-		catch (IllegalArgumentException e) {
-			throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
-		}
-		catch (IllegalAccessException e) {
-			throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
-		}
-		assertNotNull( fieldSelections );
-		assertEquals( expectedFieldNames.length, fieldSelections.size() );
 	}
 	
 	public static void assertFieldSelectorDisabled() {

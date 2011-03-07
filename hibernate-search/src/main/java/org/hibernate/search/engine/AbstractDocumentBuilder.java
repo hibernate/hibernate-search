@@ -85,7 +85,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private static final Logger log = LoggerFactory.make();
 
 	private final XClass beanXClass;
-	private final Class<?> beanClass;
+	protected final Class<?> beanClass;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;

@@ -60,6 +60,10 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 			return fieldBridge.objectToString( object );
 		}
 	}
+	
+	public TwoWayFieldBridge unwrap() {
+		return fieldBridge;
+	}
 
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		fieldBridge.set( name, value, document, luceneOptions );

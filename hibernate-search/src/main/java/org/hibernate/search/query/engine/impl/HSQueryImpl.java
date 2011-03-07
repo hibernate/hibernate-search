@@ -41,7 +41,6 @@ import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.FullTextFilter;
@@ -62,9 +61,11 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.query.fieldcache.FieldCacheCollectorFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
 import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
@@ -72,8 +73,10 @@ import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik <hardy@hibernate.org>
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class HSQueryImpl implements HSQuery {
+	
 	private static final Logger log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
@@ -96,6 +99,7 @@ public class HSQueryImpl implements HSQuery {
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
 	private TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
+	private boolean useFieldCacheOnTypes = false;
 
 	public HSQueryImpl(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
@@ -364,10 +368,10 @@ public class HSQueryImpl implements HSQuery {
 		}
 
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
-			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, getTimeoutManagerImpl() );
+			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, getTimeoutManagerImpl(), useFieldCacheOnClasses(), getAppropriateIdFieldCollectorFactory() );
 		}
 		else {
-			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, n, getTimeoutManagerImpl() );
+			queryHits = new QueryHits( searcher, filteredQuery, filter, sort, n, getTimeoutManagerImpl(), useFieldCacheOnClasses(), getAppropriateIdFieldCollectorFactory() );
 		}
 		resultSize = queryHits.totalHits;
 
@@ -399,17 +403,6 @@ public class HSQueryImpl implements HSQuery {
 			else {
 				return ( int ) tmpMaxResult;
 			}
-		}
-	}
-
-	private int max(int first, int totalHits) {
-		if ( maxResults == null ) {
-			return totalHits - 1;
-		}
-		else {
-			return maxResults + first < totalHits ?
-					first + maxResults - 1 :
-					totalHits - 1;
 		}
 	}
 
@@ -452,6 +445,7 @@ public class HSQueryImpl implements HSQuery {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
+				useFieldCacheOnTypes = useFieldCacheOnTypes || builder.getFieldCacheOption().enableOnType();
 				populateDirectories( targetedDirectories, builder );
 			}
 			classesAndSubclasses = null;
@@ -477,6 +471,7 @@ public class HSQueryImpl implements HSQuery {
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
+				useFieldCacheOnTypes = useFieldCacheOnTypes || builder.getFieldCacheOption().enableOnType();
 				populateDirectories( targetedDirectories, builder );
 			}
 			this.classesAndSubclasses = involvedClasses;
@@ -807,13 +802,66 @@ public class HSQueryImpl implements HSQuery {
 			return filteredQuery;
 		}
 	}
-
-	private String getQueryString() {
-		return luceneQuery.toString();
+	
+	private int max(int first, int totalHits) {
+		if ( maxResults == null ) {
+			return totalHits - 1;
+		}
+		else {
+			return maxResults + first < totalHits ?
+					first + maxResults - 1 :
+					totalHits - 1;
+		}
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
 		return searchFactoryImplementor;
+	}
+	
+	private boolean useFieldCacheOnClasses() {
+		if ( classesAndSubclasses.size() <= 1 ) {
+			log.debug( "FieldCache on classes disabled as class type extraction from the index is not needed" );
+			// force it to false, as we won't need classes at all
+			return false;
+		}
+		if ( log.isDebugEnabled() ) {
+			if ( useFieldCacheOnTypes ) {
+				log.debug( "FieldCache on classes enabled for Query {}", this.luceneQuery );
+			}
+			else {
+				log.debug( "FieldCache on classes disabled for Query {}", this.luceneQuery );
+			}
+		}
+		return useFieldCacheOnTypes;
+	}
+	
+	/**
+	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
+	 */
+	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
+		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
+		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
+		FieldCacheCollectorFactory anyImplementation = null;
+		for ( Class<?> clazz : classesAndSubclasses ) {
+			DocumentBuilderIndexedEntity<?> docBuilder = builders.get( clazz );
+			FieldCacheCollectorFactory fieldCacheCollectionFactory = docBuilder.getIdFieldCacheCollectionFactory();
+			if ( fieldCacheCollectionFactory == null ) {
+				// some implementation disable it, so we won't use it
+				return null;
+			}
+			anyImplementation = fieldCacheCollectionFactory;
+			allCollectors.add( fieldCacheCollectionFactory );
+		}
+		if ( allCollectors.size() != 1 ) {
+			log.debug( "Multiple FieldCache Collectors should be applied for ID field: IdFieldCollector disabled" );
+			// some implementations have different requirements
+			return null;
+		}
+		else {
+			// they are all the same, return any:
+			return anyImplementation;
+		}
 	}
 
 }

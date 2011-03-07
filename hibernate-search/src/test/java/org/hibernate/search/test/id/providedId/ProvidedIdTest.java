@@ -103,7 +103,7 @@ public class ProvidedIdTest extends junit.framework.TestCase {
 		//follows an example of what Infinispan Query actually needs to resolve a search request:
 		IndexSearcherWithPayload lowLevelSearcher = new IndexSearcherWithPayload( searcher, false, false );
 		QueryHits queryHits = new QueryHits( lowLevelSearcher, luceneQuery, null, null,
-				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY ) );
+				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY ), false, null );
 		Set<String> identifiers = new HashSet<String>();
 		identifiers.add( "providedId" );
 		Set<Class<?>> targetedClasses = new HashSet<Class<?>>();

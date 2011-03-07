@@ -1,7 +1,9 @@
 package org.hibernate.search.test.engine;
 
+import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -21,6 +23,7 @@ import java.util.Collection;
  */
 @Entity
 @Indexed (index = "numeric_field_test")
+@CacheFromIndex(FieldCacheType.CLASS_AND_ID)
 public class Location {
 
 	@Id
@@ -68,7 +71,7 @@ public class Location {
 	public Location(int id, Long counter, double latitude, Double longitude,
 					Integer ranking, String description, Double multiple, Country country) {
 		this.id = id;
-		this.counter = counter;       
+		this.counter = counter;
 		this.longitude = longitude;
 		this.latitude = latitude;
 		this.ranking = ranking;
@@ -82,7 +85,10 @@ public class Location {
 			pinPoints[i].setLocation(this);
 			this.pinPoints.add(pinPoints[i]);
 		}
-
-
 	}
+
+	public String getDescription() {
+		return description;
+	}
+	
 }

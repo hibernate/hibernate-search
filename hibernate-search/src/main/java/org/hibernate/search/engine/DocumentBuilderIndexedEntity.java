@@ -47,7 +47,9 @@ import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.ProvidedId;
@@ -67,6 +69,9 @@ import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.ContextualExceptionBridge;
 import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.query.fieldcache.ClassLoadingStrategySelector;
+import org.hibernate.search.query.fieldcache.FieldCacheCollectorFactory;
+import org.hibernate.search.query.fieldcache.FieldCollectorType;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -143,8 +148,18 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * The member - if any - annotated with @Id
 	 */
 	private XProperty jpaIdAnnotatedMember; //FIXME: to remove, needed only for isIdMatchingJpaId()
+	
+	/**
+	 * Type of allowed FieldCache usage
+	 */
+	private final FieldCacheType fieldCacheUsage;
 
 	private final String identifierName;
+
+	/**
+	 * Which strategy to use to load values from the FieldCache
+	 */
+	private final FieldCacheCollectorFactory idFieldCacheCollectorFactory;
 
 	/**
 	 * Creates a document builder for entities annotated with <code>@Indexed</code>.
@@ -168,7 +183,15 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( idKeywordName == null ) {
 			throw new SearchException( "No document id in: " + clazz );
 		}
+		CacheFromIndex fieldCacheOptions = clazz.getAnnotation( CacheFromIndex.class );
+		if ( fieldCacheOptions == null ) {
+			this.fieldCacheUsage = FieldCacheType.CLASS;
+		}
+		else {
+			this.fieldCacheUsage = fieldCacheOptions.value();
+		}
 		checkAllowFieldSelection();
+		idFieldCacheCollectorFactory = figureIdFieldCacheUsage();
 		if ( log.isDebugEnabled() ) {
 			log.debug(
 					"Field selection in projections is set to {} for entity {}.",
@@ -182,8 +205,25 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		this.identifierName = idProvided ? null : idGetter.getName();
 	}
 
+	private FieldCacheCollectorFactory figureIdFieldCacheUsage() {
+		if ( this.fieldCacheUsage.enableOnId() ) {
+			FieldCollectorType collectorTypeForId = ClassLoadingStrategySelector.guessAppropriateCollectorType( idBridge );
+			if ( collectorTypeForId == null ) {
+				log.warn( "FieldCache was enabled on class " + this.beanClass + " but for this type of identifier we can't extract values from the FieldCache: cache disabled" );
+				return null;
+			}
+			TwoWayStringBridge twoWayIdStringBridge = ClassLoadingStrategySelector.getTwoWayStringBridge( idBridge );
+			return new FieldCacheCollectorFactory( getIdKeywordName(), collectorTypeForId, twoWayIdStringBridge );
+		}
+		return null;
+	}
+
 	public XMember getIdGetter() {
 		return idGetter;
+	}
+	
+	public FieldCacheCollectorFactory getIdFieldCacheCollectionFactory() {
+		return idFieldCacheCollectorFactory;
 	}
 
 	protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
@@ -560,6 +600,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	public boolean allowFieldSelectionInProjection() {
 		return allowFieldSelectionInProjection;
+	}
+	
+	public FieldCacheType getFieldCacheOption() {
+		return fieldCacheUsage;
 	}
 
 	public Term getTerm(Serializable id) {

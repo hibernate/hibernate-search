@@ -41,34 +41,57 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.Weight;
 
 import org.hibernate.QueryTimeoutException;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.query.fieldcache.FieldCacheCollector;
+import org.hibernate.search.query.fieldcache.FieldCacheCollectorFactory;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
  * reload the underlying <code>TopDocs</code> if required.
  *
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class QueryHits {
 
 	private static final int DEFAULT_TOP_DOC_RETRIEVAL_SIZE = 100;
 	public final org.apache.lucene.search.Query preparedQuery;
-	//we only accept indexSearcher atm which means we can copy its the Collector creation strategy
+	//we only accept indexSearcher atm which means we can copy its Collector creation strategy
 	public final IndexSearcherWithPayload searcher;
 	public final Filter filter;
 	public final Sort sort;
 	public int totalHits;
 	public TopDocs topDocs;
 	private final TimeoutManagerImpl timeoutManager;
+	
+	/**
+	 * Sets if we have to use a FieldCache to store Class values matching {@link ProjectionConstants#OBJECT_CLASS}
+	 */
+	private final boolean enableFieldCacheOnClassName;
+	
+	/**
+	 * If enabled, after hits collection it will contain the Class instances for each hit
+	 */
+	private FieldCacheCollector<String> classTypeCollector;
+	
+	/**
+	 * If enabled, a Collector will collect values from the primary keys
+	 */
+	private final FieldCacheCollectorFactory idFieldCollectorFactory;
+	private FieldCacheCollector idFieldCollector;
 
 	public QueryHits(IndexSearcherWithPayload searcher,
-					 org.apache.lucene.search.Query preparedQuery,
-					 Filter filter,
-					 Sort sort,
-					 TimeoutManagerImpl timeoutManager)
+			org.apache.lucene.search.Query preparedQuery,
+			Filter filter,
+			Sort sort,
+			TimeoutManagerImpl timeoutManager,
+			boolean enableFieldCacheOnTypes,
+			FieldCacheCollectorFactory idFieldCollector)
 			throws IOException {
-		this( searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager );
+		this( searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE,
+				timeoutManager, enableFieldCacheOnTypes, idFieldCollector );
 	}
 
 	public QueryHits(IndexSearcherWithPayload searcher,
@@ -76,13 +99,17 @@ public class QueryHits {
 					 Filter filter,
 					 Sort sort,
 					 Integer n,
-					 TimeoutManagerImpl timeoutManager )
+					 TimeoutManagerImpl timeoutManager,
+					 boolean enableFieldCacheOnTypes,
+					 FieldCacheCollectorFactory idFieldCollector)
 			throws IOException {
 		this.timeoutManager = timeoutManager;
 		this.preparedQuery = preparedQuery;
 		this.searcher = searcher;
 		this.filter = filter;
 		this.sort = sort;
+		this.enableFieldCacheOnClassName = enableFieldCacheOnTypes;
+		this.idFieldCollectorFactory = idFieldCollector;
 		updateTopDocs( n );
 		this.totalHits = topDocs.totalHits;
 	}
@@ -130,10 +157,11 @@ public class QueryHits {
 	 */
 	private boolean updateTopDocs(int n) throws IOException {
 		final TopDocsCollector<?> topCollector;
-		Collector maybeTimeLimitingCollector; //need that because TimeLimitingCollector is not a TopDocsCollector
+		Collector collector; //need that because TimeLimitingCollector is not a TopDocsCollector
 		//copied from IndexSearcher#search
+		int totalMaxDocs = searcher.getSearcher().maxDoc();
 		//we only accept indexSearcher atm which means we can copy its the Collector creation strategy
-		final int maxDocs = Math.min( n, searcher.getSearcher().maxDoc() );
+		final int maxDocs = Math.min( n, totalMaxDocs );
 		final Weight weight = preparedQuery.weight( searcher.getSearcher() );
 		if ( sort == null ) {
 			topCollector = TopScoreDocCollector.create(maxDocs, !weight.scoresDocsOutOfOrder());
@@ -141,7 +169,7 @@ public class QueryHits {
 		else {
 			boolean fillFields = true;
 			topCollector = TopFieldCollector.create(
-					sort, 
+					sort,
 					maxDocs,
 					fillFields,
 					searcher.isFieldSortDoTrackScores(),
@@ -149,7 +177,7 @@ public class QueryHits {
 					!weight.scoresDocsOutOfOrder()
 			);
 		}
-		maybeTimeLimitingCollector = topCollector;
+		collector = topCollector;
 		boolean timeoutAt0 = false;
 		if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT ) {
 			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
@@ -160,7 +188,7 @@ public class QueryHits {
 						timeoutAt0 = true;
 					}
 				}
-				maybeTimeLimitingCollector = new TimeLimitingCollector(topCollector, timeoutLeft );
+				collector = new TimeLimitingCollector(topCollector, timeoutLeft );
 			}
 			else {
 				if ( timeoutManager.isTimedOut() ) {
@@ -170,7 +198,9 @@ public class QueryHits {
 		}
 		try {
 			if (!timeoutAt0) {
-				searcher.getSearcher().search(weight, filter, maybeTimeLimitingCollector);
+				collector = optionallyEnableFieldCacheOnTypes( collector, totalMaxDocs, maxDocs );
+				collector = optionallyEnableFieldCacheOnIds( collector, totalMaxDocs, maxDocs );
+				searcher.getSearcher().search(weight, filter, collector);
 			}
 		}
 		catch ( TimeLimitingCollector.TimeExceededException e ) {
@@ -182,4 +212,33 @@ public class QueryHits {
 		topDocs = topCollector.topDocs();
 		return timeoutManager.isTimedOut();
 	}
+
+	private Collector optionallyEnableFieldCacheOnIds(Collector collector, int totalMaxDocs, int maxDocs) {
+		if ( idFieldCollectorFactory != null ) {
+			idFieldCollector = idFieldCollectorFactory.createFieldCollector( collector, totalMaxDocs, maxDocs );
+			return idFieldCollector;
+		}
+		return collector;
+	}
+
+	private Collector optionallyEnableFieldCacheOnTypes(Collector collector, int totalMaxDocs, int expectedMatchesCount) {
+		if ( enableFieldCacheOnClassName ) {
+			classTypeCollector = FieldCacheCollectorFactory
+				.CLASS_TYPE_FIELDCACHE_COLLECTOR_FACTORY
+				.createFieldCollector(collector, totalMaxDocs, expectedMatchesCount);
+			return classTypeCollector;
+		}
+		else {
+			return collector;
+		}
+	}
+
+	public FieldCacheCollector<String> getClassTypeCollector() {
+		return classTypeCollector;
+	}
+	
+	public FieldCacheCollector getIdsCollector() {
+		return idFieldCollector;
+	}
+	
 }

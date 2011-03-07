@@ -40,6 +40,7 @@ import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.fieldcache.FieldCacheCollector;
 
 /**
  * DocumentExtractor is a traverser over the full-text results (EntityInfo)
@@ -59,6 +60,9 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class DocumentExtractorImpl implements DocumentExtractor {
+	
+	private static final Float FLOAT_ONE = Float.valueOf( 1f );
+	
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
 	private final QueryHits queryHits;
@@ -67,11 +71,13 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private boolean allowFieldSelection;
 	private boolean needId;
 	private final Map<String,Class> targetedClasses;
-	private final Class singleClassIfPossible;
 	private int firstIndex;
 	private int maxIndex;
 	private Object query;
-
+	private final Class singleClassIfPossible; //null when not possible
+	private final FieldCacheCollector<String> classTypeCollector; //null when not used
+	private final FieldCacheCollector idsCollector; //null when not used
+	
 	public DocumentExtractorImpl(QueryHits queryHits,
 			SearchFactoryImplementor searchFactoryImplementor,
 			String[] projection,
@@ -106,6 +112,8 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		this.query = query;
 		this.firstIndex = firstIndex;
 		this.maxIndex = maxIndex;
+		this.classTypeCollector = queryHits.getClassTypeCollector();
+		this.idsCollector = queryHits.getIdsCollector();
 		initFieldSelection( projection, idFieldNames );
 	}
 
@@ -154,10 +162,10 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				}
 			}
 		}
-		if ( singleClassIfPossible == null ) {
+		if ( singleClassIfPossible == null && classTypeCollector == null ) {
 			fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
 		}
-		if ( needId ) {
+		if ( needId && idsCollector == null ) {
 			for ( String idFieldName : idFieldNames ) {
 				fields.put( idFieldName, FieldSelectorResult.LOAD );
 			}
@@ -168,13 +176,16 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			String key = fields.keySet().iterator().next();
 			fields.put( key, FieldSelectorResult.LOAD_AND_BREAK );
 		}
-		this.fieldSelector = new MapFieldSelector( fields );
+		if ( fields.size() != 0 ) {
+			this.fieldSelector = new MapFieldSelector( fields );
+		}
+		// else: this.fieldSelector = null; //We need no fields at all
 	}
 
-	private EntityInfo extract(Document document) {
-		Class clazz = extractClass( document );
+	private EntityInfo extractEntityInfo(int docId, Document document) {
+		Class clazz = extractClass( docId, document );
 		String idName = DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
-		Serializable id = needId ? DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document ) : null;
+		Serializable id = extractId( docId, document, clazz );
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
 			projected = DocumentBuilderHelper.getDocumentFields(
@@ -184,14 +195,30 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		return new EntityInfoImpl( clazz, idName, id, projected );
 	}
 
-	private Class extractClass(Document document) {
+	private Serializable extractId(int docId, Document document, Class clazz) {
+		if ( ! needId ) {
+			return null;
+		}
+		else if ( this.idsCollector != null ) {
+			return (Serializable) this.idsCollector.getValue( docId );
+		}
+		else return DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document );
+	}
+
+	private Class extractClass(int docId, Document document) {
 		//maybe we can avoid document extraction:
 		if ( singleClassIfPossible != null ) {
 			return singleClassIfPossible;
 		}
-		String className = document.get( DocumentBuilder.CLASS_FIELDNAME );
+		final String className;
+		if ( classTypeCollector != null ) {
+			className = classTypeCollector.getValue( docId );
+		}
+		else {
+			className = document.get( DocumentBuilder.CLASS_FIELDNAME );
+		}
+		//and quite likely we can avoid the Reflect helper:
 		Class clazz = targetedClasses.get( className );
-		//and maybe we can avoid the Reflect helper:
 		if ( clazz != null ) {
 			return clazz;
 		}
@@ -201,18 +228,12 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	}
 
 	public EntityInfo extract(int index) throws IOException {
-		Document doc;
-		if ( allowFieldSelection ) {
-			doc = queryHits.doc( index, fieldSelector );
-		}
-		else {
-			doc = queryHits.doc( index );
-		}
+		int docId = queryHits.docId( index );
+		Document document = extractDocument( index );
 
-		EntityInfo entityInfo = extract( doc );
+		EntityInfo entityInfo = extractEntityInfo( docId, document );
 		Object[] eip = entityInfo.getProjection();
 
-		// TODO - if we are only looking for score (unlikely), avoid accessing doc (lazy load)
 		if ( eip != null && eip.length > 0 ) {
 			for ( int x = 0; x < projection.length; x++ ) {
 				if ( ProjectionConstants.SCORE.equals( projection[x] ) ) {
@@ -222,13 +243,13 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 					eip[x] = entityInfo.getId();
 				}
 				else if ( ProjectionConstants.DOCUMENT.equals( projection[x] ) ) {
-					eip[x] = doc;
+					eip[x] = document;
 				}
 				else if ( ProjectionConstants.DOCUMENT_ID.equals( projection[x] ) ) {
-					eip[x] = queryHits.docId( index );
+					eip[x] = docId;
 				}
 				else if ( ProjectionConstants.BOOST.equals( projection[x] ) ) {
-					eip[x] = doc.getBoost();
+					eip[x] = FLOAT_ONE;
 				}
 				else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
 					eip[x] = queryHits.explain( index );
@@ -257,4 +278,20 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	public void close() {
 		searcher.closeSearcher( query, searchFactoryImplementor );
 	}
+
+	private Document extractDocument(int index) throws IOException {
+		if ( allowFieldSelection ) {
+			if ( fieldSelector == null ) {
+				//we need no fields
+				return null;
+			}
+			else {
+				return queryHits.doc( index, fieldSelector );
+			}
+		}
+		else {
+			return queryHits.doc( index );
+		}
+	}
+	
 }
