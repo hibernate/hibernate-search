@@ -31,7 +31,12 @@ import org.apache.lucene.analysis.TokenStream;
 /**
  * @author Hardy Ferentschik
  */
-public class FooAnalyzer extends Analyzer {
+public final class FooAnalyzer extends Analyzer {
+	
+	public FooAnalyzer() {
+		super();
+	}
+	
 	@Override
 	public TokenStream tokenStream(String fieldName, Reader reader) {
 		return null;

@@ -184,7 +184,8 @@ public class ClassLoaderHelper {
 		catch ( InvocationTargetException e ) {
 			throw new SearchException(
 					"Unable to instantiate analyzer class: " + classToInstantiate.getName() +
-							". Verify it has a no-args public constructor and is not abstract.", e
+							". Verify it has a no-args public constructor and is not abstract."
+					+ " Also Analyzer implementation classes or their tokenStream() and reusableTokenStream() implementations must be final.", e
 			);
 		}
 		return analyzerInstance;
