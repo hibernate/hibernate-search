@@ -61,9 +61,7 @@ public class CustomLockProviderTest {
 			Throwable causeSearch = e.getCause();
 			assertNotNull( causeSearch );
 			assertTrue( causeSearch instanceof org.hibernate.search.SearchException );
-			Throwable causeLockin = causeSearch.getCause();
-			assertNotNull( causeLockin );
-			assertEquals( "Unable to find locking_strategy implementation class: org.hibernate.NotExistingFactory", causeLockin.getMessage() );
+			assertEquals( "Unable to find locking_strategy implementation class: org.hibernate.NotExistingFactory", causeSearch.getMessage() );
 		}
 	}
 
