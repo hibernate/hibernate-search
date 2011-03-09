@@ -42,14 +42,17 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 
 	private final RAMDirectory directory = new RAMDirectory();
 	private String indexName;
+	private Properties properties;
 
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		indexName = directoryProviderName;
-		directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties ) );
+		this.properties = properties;
 	}
 
 	public void start() {
 		try {
+			directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties ) );
+			properties = null;
 			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
 			IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
 			iw.close();
