@@ -848,22 +848,7 @@ public class MyEntity {
       by the <classname>TokenFilter</classname>s. Hibernate Search supports
       this infrastructure by utilizing the Solr analyzer framework.</para>
 
-      <warning>
-        <para>Prior to Search version 3.3.0.Beta2 it was required to add the
-        Solr dependency <emphasis>org.apache.solr:solr-core</emphasis> when
-        you wanted to use the analyzer definition framework. As of version
-        3.3.0.Beta2 this is not the case anymore. The required Solr code is
-        encapsulated in the artifact
-        <emphasis>org.hibernate:hibernate-search-analyzers</emphasis>. In case
-        you are using maven just add the following dependency (see also <ulink
-        url="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-593">HSEARCH-593</ulink>):<programlisting>&lt;dependency&gt;
-   &lt;groupId&gt;org.hibernate&lt;/groupId&gt; 
-   &lt;artifactId&gt;hibernate-search-analyzers&lt;/artifactId&gt;
-   &lt;version&gt;&version;&lt;/version&gt;
-&lt;dependency&gt;</programlisting></para>
-      </warning>
-
-      <tip>
+      <note>
         <para>Some of the analyzers and filters will require additional
         dependencies. For example to use the snowball stemmer you have to also
         include the <literal>lucene-snowball</literal> jar and for the
@@ -874,7 +859,18 @@ public class MyEntity {
         linkend="table-available-tokenizers" /> and <xref
         linkend="table-available-filters" /> to see which anaylzers and
         filters have additional dependencies</para>
-      </tip>
+        <para>Prior to Search version 3.3.0.Beta2 it was required to add the
+        Solr dependency <emphasis>org.apache.solr:solr-core</emphasis> when
+        you wanted to use the analyzer definition framework. In case
+        you are using Maven this is no longer needed: all required Solr
+        dependencies are now defined as dependencies of the artifact
+        <emphasis>org.hibernate:hibernate-search-analyzers</emphasis>;
+        just add the following dependency :<programlisting>&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search-analyzers&lt;/artifactId&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
+&lt;dependency&gt;</programlisting></para>
+      </note>
 
       <para>Let's have a look at a concrete example now - <xref
       linkend="example-analyzer-def" />. First a char filter is defined by its
@@ -1072,15 +1068,14 @@ public class Team {
               </row>
 
               <row>
-                <entry><classname>HTMLStripStandardTokenizerFactory</classname></entry>
+                <entry><classname>HTMLStripCharFilterFactory</classname></entry>
 
                 <entry>Remove HTML tags, keep the text and pass it to a
-                StandardTokenizer. @Deprecated, use the
-                HTMLStripCharFilterFactory instead</entry>
+                StandardTokenizer.</entry>
 
                 <entry>none</entry>
 
-                <entry>none</entry>
+                <entry><literal>solr-core</literal></entry>
               </row>
 
               <row>
@@ -1093,7 +1088,7 @@ public class Team {
                 expression to use for tokenizing</para><para>group: says which
                 pattern group to extract into tokens</para></entry>
 
-                <entry><literal>commons-io</literal></entry>
+                <entry><literal>solr-core</literal></entry>
               </row>
             </tbody>
           </tgroup>
@@ -1123,7 +1118,7 @@ public class Team {
 
                 <entry>none</entry>
 
-                <entry>none</entry>
+                <entry><literal>solr-core</literal></entry>
               </row>
 
               <row>
@@ -1133,7 +1128,7 @@ public class Team {
 
                 <entry>none</entry>
 
-                <entry>none</entry>
+                <entry><literal>solr-core</literal></entry>
               </row>
 
               <row>
@@ -1147,7 +1142,7 @@ public class Team {
                 <literal>case</literal> should be ignore when comparing stop
                 words, <literal>false</literal> otherwise </para></entry>
 
-                <entry>none</entry>
+                <entry><literal>solr-core</literal></entry>
               </row>
 
               <row>
@@ -1161,7 +1156,7 @@ public class Team {
                 Finnish, French, German, Italian, Norwegian, Portuguese,
                 Russian, Spanish, Swedish and a few more</entry>
 
-                <entry><literal>lucene-snowball</literal></entry>
+                <entry><literal>solr-core</literal></entry>
               </row>
 
               <row>
@@ -1171,7 +1166,7 @@ public class Team {
 
                 <entry>none</entry>
 
-                <entry>none</entry>
+                <entry><literal>solr-core</literal></entry>
               </row>
 
               <row>
@@ -1189,7 +1184,7 @@ public class Team {
                 maximum length of the code to be generated. Supported only for
                 Metaphone and DoubleMetaphone encodings</para></entry>
 
-                <entry><literal>commons-codec</literal></entry>
+                <entry><literal>solr-core</literal> and <literal>commons-codec</literal></entry>
               </row>
 
               <row>
@@ -1208,7 +1203,8 @@ public class Team {
                 <classname>CollationKeyFilter</classname> javadocs for more
                 info</entry>
 
-                <entry><literal>lucene-collation, commons-io</literal></entry>
+                <entry><literal>solr-core</literal> and
+                   <literal>commons-io</literal></entry>
               </row>
             </tbody>
           </tgroup>
