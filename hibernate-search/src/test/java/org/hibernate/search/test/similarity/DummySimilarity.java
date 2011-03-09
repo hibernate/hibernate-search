@@ -23,17 +23,19 @@
  */
 package org.hibernate.search.test.similarity;
 
-import org.apache.lucene.search.DefaultSimilarity;
+import org.apache.lucene.index.FieldInvertState;
+import org.apache.lucene.search.Similarity;
 
 /**
  * @author Emmanuel Bernard
  */
 @SuppressWarnings("serial")
-public class DummySimilarity extends DefaultSimilarity {
+public class DummySimilarity extends Similarity {
+	
 	private float CONST = 1.0f;
 
 	@Override
-	public float lengthNorm(String fieldName, int numTerms) {
+	public float computeNorm(String field, FieldInvertState state) {
 		return CONST;
 	}
 
@@ -43,12 +45,12 @@ public class DummySimilarity extends DefaultSimilarity {
 	}
 
 	@Override
-	public float tf(float freq) {
+	public float sloppyFreq(int distance) {
 		return CONST;
 	}
 
 	@Override
-	public float sloppyFreq(int distance) {
+	public float tf(float freq) {
 		return CONST;
 	}
 
@@ -61,4 +63,5 @@ public class DummySimilarity extends DefaultSimilarity {
 	public float coord(int overlap, int maxOverlap) {
 		return CONST;
 	}
+
 }

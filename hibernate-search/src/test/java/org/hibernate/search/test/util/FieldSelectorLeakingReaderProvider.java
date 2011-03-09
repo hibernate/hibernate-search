@@ -300,10 +300,10 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			return delegate.getSequentialSubReaders();
 		}
 
-		public Object getFieldCacheKey() {
-			return delegate.getFieldCacheKey();
+		public Object getCoreCacheKey() {
+			return delegate.getCoreCacheKey();
 		}
-
+		
 		public Object getDeletesCacheKey() {
 			return delegate.getDeletesCacheKey();
 		}
