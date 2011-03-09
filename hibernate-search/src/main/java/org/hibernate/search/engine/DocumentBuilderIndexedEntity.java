@@ -51,7 +51,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.ProvidedId;
@@ -71,9 +70,9 @@ import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.ContextualExceptionBridge;
 import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.ClassLoadingStrategySelector;
-import org.hibernate.search.query.fieldcache.FieldCacheCollectorFactory;
-import org.hibernate.search.query.fieldcache.FieldCollectorType;
+import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -154,7 +153,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	/**
 	 * Type of allowed FieldCache usage
 	 */
-	private final Set<FieldCacheType> fieldCacheUsage;
+	private final Set<org.hibernate.search.annotations.FieldCacheType> fieldCacheUsage;
 
 	private final String identifierName;
 
@@ -187,14 +186,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 		CacheFromIndex fieldCacheOptions = clazz.getAnnotation( CacheFromIndex.class );
 		if ( fieldCacheOptions == null ) {
-			this.fieldCacheUsage = Collections.unmodifiableSet( EnumSet.of( FieldCacheType.CLASS ) );
+			this.fieldCacheUsage = Collections.unmodifiableSet( EnumSet.of( org.hibernate.search.annotations.FieldCacheType.CLASS ) );
 		}
 		else {
-			EnumSet<FieldCacheType> enabledTypes = EnumSet.noneOf( FieldCacheType.class );
-			for (FieldCacheType t : fieldCacheOptions.value() ) {
+			EnumSet<org.hibernate.search.annotations.FieldCacheType> enabledTypes = EnumSet.noneOf( org.hibernate.search.annotations.FieldCacheType.class );
+			for ( org.hibernate.search.annotations.FieldCacheType t : fieldCacheOptions.value() ) {
 				enabledTypes.add( t );
 			}
-			if ( enabledTypes.size() != 1 && enabledTypes.contains( FieldCacheType.NOTHING ) ) {
+			if ( enabledTypes.size() != 1 && enabledTypes.contains( org.hibernate.search.annotations.FieldCacheType.NOTHING ) ) {
 				throw new SearchException( "CacheFromIndex configured with conflicting parameters:" +
 						" if FieldCacheType.NOTHING is enabled, no other options can be added" );
 			}
@@ -216,8 +215,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	private FieldCacheCollectorFactory figureIdFieldCacheUsage() {
-		if ( this.fieldCacheUsage.contains( FieldCacheType.ID ) ) {
-			FieldCollectorType collectorTypeForId = ClassLoadingStrategySelector.guessAppropriateCollectorType( idBridge );
+		if ( this.fieldCacheUsage.contains( org.hibernate.search.annotations.FieldCacheType.ID ) ) {
+			FieldCacheLoadingType collectorTypeForId = ClassLoadingStrategySelector.guessAppropriateCollectorType( idBridge );
 			if ( collectorTypeForId == null ) {
 				log.warn( "FieldCache was enabled on class " + this.beanClass + " but for this type of identifier we can't extract values from the FieldCache: cache disabled" );
 				return null;
@@ -612,7 +611,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return allowFieldSelectionInProjection;
 	}
 	
-	public Set<FieldCacheType> getFieldCacheOption() {
+	public Set<org.hibernate.search.annotations.FieldCacheType> getFieldCacheOption() {
 		return fieldCacheUsage;
 	}
 

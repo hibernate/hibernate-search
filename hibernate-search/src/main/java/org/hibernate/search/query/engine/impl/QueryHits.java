@@ -47,12 +47,12 @@ import org.apache.lucene.search.Weight;
 
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.query.FacetCollector;
+import org.hibernate.search.query.collector.FacetCollector;
+import org.hibernate.search.query.collector.FieldCacheCollector;
+import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.FacetRequest;
 import org.hibernate.search.query.facet.FacetResult;
-import org.hibernate.search.query.fieldcache.FieldCacheCollector;
-import org.hibernate.search.query.fieldcache.FieldCacheCollectorFactory;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
@@ -80,9 +80,9 @@ public class QueryHits {
 	private final boolean enableFieldCacheOnClassName;
 
 	/**
-	 * If enabled, after hits collection it will contain the Class instances for each hit
+	 * If enabled, after hits collection it will contain the class name for each hit
 	 */
-	private FieldCacheCollector<String> classTypeCollector;
+	private FieldCacheCollector classTypeCollector;
 
 	/**
 	 * If enabled, a Collector will collect values from the primary keys
@@ -305,7 +305,7 @@ public class QueryHits {
 	private Collector optionallyEnableFieldCacheOnTypes(Collector collector, int totalMaxDocs, int expectedMatchesCount) {
 		if ( enableFieldCacheOnClassName ) {
 			classTypeCollector = FieldCacheCollectorFactory
-					.CLASS_TYPE_FIELDCACHE_COLLECTOR_FACTORY
+					.CLASS_TYPE_FIELD_CACHE_COLLECTOR_FACTORY
 					.createFieldCollector( collector, totalMaxDocs, expectedMatchesCount );
 			return classTypeCollector;
 		}
@@ -314,12 +314,11 @@ public class QueryHits {
 		}
 	}
 
-	public FieldCacheCollector<String> getClassTypeCollector() {
+	public FieldCacheCollector getClassTypeCollector() {
 		return classTypeCollector;
 	}
 
 	public FieldCacheCollector getIdsCollector() {
 		return idFieldCollector;
 	}
-
 }

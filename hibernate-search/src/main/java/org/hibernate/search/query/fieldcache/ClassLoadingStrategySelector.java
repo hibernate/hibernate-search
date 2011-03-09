@@ -29,33 +29,33 @@ import org.hibernate.search.bridge.builtin.IntegerNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.LongNumericFieldBridge;
 
 /**
- * A FieldCacheCollectorFactory requires two parameters which are inferred from
+ * A {@code FieldCacheCollectorFactory} requires two parameters which are inferred from
  * the type of field and it's applied bridges. Not all cases can be covered.
  * This class contains helpers to extract the proper parameters to create such a factory.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class ClassLoadingStrategySelector {
 
-	public static FieldCollectorType guessAppropriateCollectorType(TwoWayFieldBridge idBridge) {
-		if ( idBridge instanceof NullEncodingTwoWayFieldBridge ) {
-			NullEncodingTwoWayFieldBridge encoding = (NullEncodingTwoWayFieldBridge) idBridge;
+	public static FieldCacheLoadingType guessAppropriateCollectorType(TwoWayFieldBridge fieldBridge) {
+		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
+			NullEncodingTwoWayFieldBridge encoding = (NullEncodingTwoWayFieldBridge) fieldBridge;
 			return guessAppropriateCollectorType( encoding.unwrap() );
 		}
-		else if ( idBridge instanceof TwoWayString2FieldBridgeAdaptor ) {
-			return FieldCollectorType.STRING;
+		else if ( fieldBridge instanceof TwoWayString2FieldBridgeAdaptor ) {
+			return FieldCacheLoadingType.STRING;
 		}
-		else if ( idBridge instanceof IntegerNumericFieldBridge ) {
-			return FieldCollectorType.INT;
+		else if ( fieldBridge instanceof IntegerNumericFieldBridge ) {
+			return FieldCacheLoadingType.INT;
 		}
-		else if ( idBridge instanceof LongNumericFieldBridge ) {
-			return FieldCollectorType.LONG;
+		else if ( fieldBridge instanceof LongNumericFieldBridge ) {
+			return FieldCacheLoadingType.LONG;
 		}
-		else if ( idBridge instanceof DoubleNumericFieldBridge ) {
-			return FieldCollectorType.DOUBLE;
+		else if ( fieldBridge instanceof DoubleNumericFieldBridge ) {
+			return FieldCacheLoadingType.DOUBLE;
 		}
-		else if ( idBridge instanceof FloatNumericFieldBridge ) {
-			return FieldCollectorType.FLOAT;
+		else if ( fieldBridge instanceof FloatNumericFieldBridge ) {
+			return FieldCacheLoadingType.FLOAT;
 		}
 		else {
 			// we don't know how to extract this: no fieldCache will be available
@@ -64,20 +64,23 @@ public class ClassLoadingStrategySelector {
 	}
 
 	/**
-	 * @return null if we can't extract a TwoWayStringBridge
+	 * Extracts (if possible) the two way string bridge from a given two way field bridge
+	 *
+	 * @param fieldBridge the field bridge from which to extract (unwrap) the two way string bridge
+	 *
+	 * @return the underlying string bridge or {@code null} if we can't extract it
 	 */
-	public static TwoWayStringBridge getTwoWayStringBridge(TwoWayFieldBridge idBridge) {
-		if ( idBridge instanceof NullEncodingTwoWayFieldBridge ) {
-			NullEncodingTwoWayFieldBridge encoding = (NullEncodingTwoWayFieldBridge) idBridge;
+	public static TwoWayStringBridge getTwoWayStringBridge(TwoWayFieldBridge fieldBridge) {
+		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {
+			NullEncodingTwoWayFieldBridge encoding = (NullEncodingTwoWayFieldBridge) fieldBridge;
 			return getTwoWayStringBridge( encoding.unwrap() );
 		}
-		else if ( idBridge instanceof TwoWayString2FieldBridgeAdaptor ) {
-			TwoWayString2FieldBridgeAdaptor adaptor = (TwoWayString2FieldBridgeAdaptor) idBridge;
+		else if ( fieldBridge instanceof TwoWayString2FieldBridgeAdaptor ) {
+			TwoWayString2FieldBridgeAdaptor adaptor = (TwoWayString2FieldBridgeAdaptor) fieldBridge;
 			return adaptor.unwrap();
 		}
 		else {
 			return null;
 		}
 	}
-
 }

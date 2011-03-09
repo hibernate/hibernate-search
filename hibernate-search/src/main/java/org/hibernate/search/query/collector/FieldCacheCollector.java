@@ -17,7 +17,7 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.query.fieldcache;
+package org.hibernate.search.query.collector;
 
 import java.io.IOException;
 
@@ -29,14 +29,13 @@ import org.apache.lucene.search.Scorer;
  * Because Lucene's Collector is not an interface, we have to create extensions of it.
  * All our implementations need a {@link #getValue(int)}, so we need an
  * abstract superclass defining it.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public abstract class FieldCacheCollector<T> extends Collector {
-	
+public abstract class FieldCacheCollector extends Collector {
 	protected final Collector delegate;
 	private final boolean acceptsDocsOutOfOrder;
-	
+
 	public FieldCacheCollector(Collector delegate) {
 		this.delegate = delegate;
 		this.acceptsDocsOutOfOrder = delegate.acceptsDocsOutOfOrder();
@@ -46,7 +45,7 @@ public abstract class FieldCacheCollector<T> extends Collector {
 	public final void setScorer(Scorer scorer) throws IOException {
 		this.delegate.setScorer( scorer );
 	}
-	
+
 	@Override
 	public final boolean acceptsDocsOutOfOrder() {
 		return acceptsDocsOutOfOrder;
@@ -58,6 +57,5 @@ public abstract class FieldCacheCollector<T> extends Collector {
 	@Override
 	public abstract void setNextReader(IndexReader reader, int docBase) throws IOException;
 
-	public abstract T getValue(int docId);
-	
+	public abstract Object getValue(int docId);
 }

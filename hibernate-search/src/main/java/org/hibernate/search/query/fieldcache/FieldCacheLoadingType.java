@@ -19,36 +19,55 @@
 
 package org.hibernate.search.query.fieldcache;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Just an indirection to different constructors, pointing to the proper
  * FieldCache extractor per type.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public enum FieldCollectorType {
-	
+public enum FieldCacheLoadingType {
 	STRING {
-		FieldLoadingStrategy<String> createLoadingStrategy(String fieldName) {
+		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new StringFieldLoadingStrategy( fieldName );
 		}
-	}, INT {
-		FieldLoadingStrategy<Integer> createLoadingStrategy(String fieldName) {
+	},
+	INT {
+		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new IntFieldLoadingStrategy( fieldName );
 		}
-	}, LONG {
-		FieldLoadingStrategy<Long> createLoadingStrategy(String fieldName) {
+	},
+	LONG {
+		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new LongFieldLoadingStrategy( fieldName );
 		}
-	}, DOUBLE {
-		FieldLoadingStrategy<Double> createLoadingStrategy(String fieldName) {
+	},
+	DOUBLE {
+		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new DoubleFieldLoadingStrategy( fieldName );
 		}
-	}, FLOAT {
-		FieldLoadingStrategy<Float> createLoadingStrategy(String fieldName) {
+	},
+	FLOAT {
+		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new FloatFieldLoadingStrategy( fieldName );
 		}
 	};
-	
-	abstract <T> FieldLoadingStrategy<T> createLoadingStrategy(String fieldName);
 
+	static Map<Class<?>, FieldCacheLoadingType> fieldCacheTypes = new HashMap<Class<?>, FieldCacheLoadingType>();
+
+	static {
+		fieldCacheTypes.put( String.class, STRING );
+		fieldCacheTypes.put( Integer.class, INT );
+		fieldCacheTypes.put( Long.class, LONG );
+		fieldCacheTypes.put( Double.class, DOUBLE );
+		fieldCacheTypes.put( Float.class, FLOAT );
+	}
+
+	public abstract FieldLoadingStrategy createLoadingStrategy(String fieldName);
+
+	public static FieldLoadingStrategy getLoadingStrategy(String fieldName, Class<?> type) {
+		return fieldCacheTypes.get( type ).createLoadingStrategy( fieldName );
+	}
 }

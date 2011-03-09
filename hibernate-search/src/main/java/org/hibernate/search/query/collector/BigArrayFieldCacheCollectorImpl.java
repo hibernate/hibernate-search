@@ -17,31 +17,32 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.query.fieldcache;
+package org.hibernate.search.query.collector;
 
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 
+import org.hibernate.search.query.collector.FieldCacheCollector;
+import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
+
 /**
- * FieldCacheCollector using an internal array to collect extracted values
- * from the FieldCache. Note that the size of the array is as big as the number
- * of Documents in the index, so if we only need to collect a small amount
+ * {@code FieldCacheCollector} using an internal array to collect extracted values
+ * from the {@link org.apache.lucene.search.FieldCache}. Note that the size of the array is as big as the number
+ * of {@code Document}s in the index, so if we only need to collect a small amount
  * of values other implementations are likely able to be more conservative
  * on memory requirements.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-final class BigArrayFieldCacheCollectorImpl<T> extends FieldCacheCollector<T> {
-	
-	private final T[] valuePerDocumentId;
-	
-	private int currentDocBase;
-	private T[] currentCache;
-	private final FieldLoadingStrategy<T> cacheLoadingStrategy;
+final class BigArrayFieldCacheCollectorImpl extends FieldCacheCollector {
+	private final Object[] valuePerDocumentId;
 
-	public BigArrayFieldCacheCollectorImpl(Collector delegate, FieldLoadingStrategy<T> cacheLoadingStrategy, T[] valueContainer) {
+	private int currentDocBase;
+	private final FieldLoadingStrategy cacheLoadingStrategy;
+
+	public BigArrayFieldCacheCollectorImpl(Collector delegate, FieldLoadingStrategy cacheLoadingStrategy, Object[] valueContainer) {
 		super( delegate );
 		this.cacheLoadingStrategy = cacheLoadingStrategy;
 		this.valuePerDocumentId = valueContainer;
@@ -61,8 +62,7 @@ final class BigArrayFieldCacheCollectorImpl<T> extends FieldCacheCollector<T> {
 		this.delegate.setNextReader( reader, docBase );
 	}
 
-	public T getValue(int docId) {
+	public Object getValue(int docId) {
 		return valuePerDocumentId[docId];
 	}
-	
 }

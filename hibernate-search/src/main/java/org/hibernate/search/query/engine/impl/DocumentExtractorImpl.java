@@ -22,34 +22,31 @@ package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Set;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.document.MapFieldSelector;
-import org.apache.lucene.document.FieldSelector;
 
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentBuilderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.query.engine.impl.EntityInfoImpl;
-import org.hibernate.search.query.engine.impl.QueryHits;
-import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.fieldcache.FieldCacheCollector;
+import org.hibernate.search.query.collector.FieldCacheCollector;
 
 /**
  * DocumentExtractor is a traverser over the full-text results (EntityInfo)
  *
  * This operation is as lazy as possible:
- *  - the query is executed eagerly
- *  - results are not retrieved until actually requested
+ * - the query is executed eagerly
+ * - results are not retrieved until actually requested
  *
- *  #getFirstIndex and #getMaxIndex define the boundaries available to #extract.
+ * #getFirstIndex and #getMaxIndex define the boundaries available to #extract.
  *
  * DocumentExtractor objects *must* be closed when the results are no longer traversed.
  * #close
@@ -60,9 +57,9 @@ import org.hibernate.search.query.fieldcache.FieldCacheCollector;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class DocumentExtractorImpl implements DocumentExtractor {
-	
+
 	private static final Float FLOAT_ONE = Float.valueOf( 1f );
-	
+
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
 	private final QueryHits queryHits;
@@ -70,24 +67,24 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private FieldSelector fieldSelector;
 	private boolean allowFieldSelection;
 	private boolean needId;
-	private final Map<String,Class> targetedClasses;
+	private final Map<String, Class> targetedClasses;
 	private int firstIndex;
 	private int maxIndex;
 	private Object query;
 	private final Class singleClassIfPossible; //null when not possible
-	private final FieldCacheCollector<String> classTypeCollector; //null when not used
+	private final FieldCacheCollector classTypeCollector; //null when not used
 	private final FieldCacheCollector idsCollector; //null when not used
-	
+
 	public DocumentExtractorImpl(QueryHits queryHits,
-			SearchFactoryImplementor searchFactoryImplementor,
-			String[] projection,
-			Set<String> idFieldNames,
-			boolean allowFieldSelection,
-			IndexSearcherWithPayload searcher,
-			Object query,
-			int firstIndex,
-			int maxIndex,
-			Set<Class<?>> classesAndSubclasses) {
+								 SearchFactoryImplementor searchFactoryImplementor,
+								 String[] projection,
+								 Set<String> idFieldNames,
+								 boolean allowFieldSelection,
+								 IndexSearcherWithPayload searcher,
+								 Object query,
+								 int firstIndex,
+								 int maxIndex,
+								 Set<Class<?>> classesAndSubclasses) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		if ( projection != null ) {
 			this.projection = projection.clone();
@@ -97,7 +94,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 		this.queryHits = queryHits;
 		this.allowFieldSelection = allowFieldSelection;
-		this.targetedClasses = new HashMap<String,Class>( classesAndSubclasses.size() );
+		this.targetedClasses = new HashMap<String, Class>( classesAndSubclasses.size() );
 		for ( Class<?> clazz : classesAndSubclasses ) {
 			//useful to reload classes from index without using reflection
 			targetedClasses.put( clazz.getName(), clazz );
@@ -196,13 +193,15 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	}
 
 	private Serializable extractId(int docId, Document document, Class clazz) {
-		if ( ! needId ) {
+		if ( !needId ) {
 			return null;
 		}
 		else if ( this.idsCollector != null ) {
 			return (Serializable) this.idsCollector.getValue( docId );
 		}
-		else return DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document );
+		else {
+			return DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document );
+		}
 	}
 
 	private Class extractClass(int docId, Document document) {
@@ -212,7 +211,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 		final String className;
 		if ( classTypeCollector != null ) {
-			className = classTypeCollector.getValue( docId );
+			className = (String) classTypeCollector.getValue( docId );
 		}
 		else {
 			className = document.get( DocumentBuilder.CLASS_FIELDNAME );
@@ -255,7 +254,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 					eip[x] = queryHits.explain( index );
 				}
 				else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
-						eip[x] = entityInfo.getClazz();
+					eip[x] = entityInfo.getClazz();
 				}
 				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 					//THIS could be projected more than once
@@ -293,5 +292,5 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			return queryHits.doc( index );
 		}
 	}
-	
+
 }

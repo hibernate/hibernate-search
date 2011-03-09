@@ -22,10 +22,9 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query;
+package org.hibernate.search.query.collector;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -44,6 +43,8 @@ import org.hibernate.search.query.facet.FacetRange;
 import org.hibernate.search.query.facet.FacetRequest;
 import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
+import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
 
 import static org.hibernate.search.util.CollectionHelper.newArrayList;
 import static org.hibernate.search.util.CollectionHelper.newHashMap;
@@ -65,9 +66,9 @@ public class FacetCollector extends Collector {
 	private final FacetRequest facetRequest;
 
 	/**
-	 * A container wrapping around the Lucene field cache data
+	 * Used to load field values from the Lucene field cache
 	 */
-	private final FieldCacheContainer fieldCache;
+	private final FieldLoadingStrategy fieldLoader;
 
 	/**
 	 * A counter mapped to the field name for which it is counting
@@ -84,7 +85,9 @@ public class FacetCollector extends Collector {
 		this.delegate = delegate;
 		this.facetRequest = facetRequest;
 		this.facetCounts = createFacetCounter( facetRequest );
-		fieldCache = new FieldCacheContainer();
+		fieldLoader = FieldCacheLoadingType.getLoadingStrategy(
+				this.facetRequest.getFieldName(), this.facetRequest.getFieldCacheType()
+		);
 	}
 
 	@Override
@@ -98,12 +101,10 @@ public class FacetCollector extends Collector {
 
 	@Override
 	public void collect(int doc) throws IOException {
-
-		if ( fieldCache.containsCacheArray( facetRequest.getFieldCacheType() ) ) {
-			Object value = fieldCache.getCacheValue( facetRequest.getFieldCacheType(), doc );
+		Object value = fieldLoader.collect( doc );
+		if ( value != null ) {
 			facetCounts.countValue( value );
 		}
-
 		delegate.collect( doc );
 	}
 
@@ -146,11 +147,7 @@ public class FacetCollector extends Collector {
 	}
 
 	private void initialiseFieldCaches(IndexReader reader) throws IOException {
-		Collection<String> existingFieldNames = reader.getFieldNames( IndexReader.FieldOption.ALL );
-		String fieldName = facetRequest.getFieldName();
-		if ( existingFieldNames.contains( fieldName ) ) {
-			fieldCache.storeCacheArray( reader, facetRequest.getFieldName(), facetRequest.getFieldCacheType() );
-		}
+		fieldLoader.loadNewCacheValues( reader );
 	}
 
 	private <N extends Number> FacetCounter createFacetCounter(FacetRequest request) {

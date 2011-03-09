@@ -17,51 +17,49 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.query.fieldcache;
+package org.hibernate.search.query.collector;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Collector;
+import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.query.collector.FieldCacheCollector;
 
 /**
- * This Collector uses an internal Map to store collected values from the FieldCache.
- * Beware that when this map grows too much the put operation becomes a performance bottleneck,
- * so for large resultsets you should use BigArrayFieldCacheCollectorImpl instead.
+ * Wraps a FieldCacheCollector in such a way that {@link #getValue(int)} returns objects as transformed
+ * by a {@link TwoWayStringBridge} to transform from String form to the object.
  * 
- * @see BigArrayFieldCacheCollectorImpl
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-final class MapFieldCacheCollectorImpl<T> extends FieldCacheCollector<T> {
+public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
 	
-	private final FieldLoadingStrategy<T> cacheCollector;
-	private final Map<Integer, T> valuePerDocumentId = new HashMap<Integer, T>();
-	
-	private int currentDocBase;
+	private final TwoWayStringBridge stringBridge;
+	private final FieldCacheCollector privateDelegate;
 
-	public MapFieldCacheCollectorImpl(Collector delegate, FieldLoadingStrategy<T> collectorStrategy) {
+	/**
+	 * @param delegate Actually uses the delegate Collector implementation
+	 * @param twoWayStringBridge Converts returned values using this {@link TwoWayStringBridge#stringToObject(String)}
+	 */
+	public TwoWayTransformingFieldCacheCollector(FieldCacheCollector delegate, TwoWayStringBridge twoWayStringBridge) {
 		super( delegate );
-		this.cacheCollector = collectorStrategy;
+		this.privateDelegate = delegate;
+		this.stringBridge = twoWayStringBridge;
 	}
 
 	@Override
 	public void collect(int doc) throws IOException {
-		//warning when changing this method: extremely performance sensitive!
-		this.delegate.collect( doc );
-		this.valuePerDocumentId.put( Integer.valueOf( currentDocBase + doc ), cacheCollector.collect( doc ) );
+		delegate.collect( doc );
 	}
 
 	@Override
 	public void setNextReader(IndexReader reader, int docBase) throws IOException {
-		this.currentDocBase = docBase;
-		this.cacheCollector.loadNewCacheValues( reader );
-		this.delegate.setNextReader( reader, docBase );
+		delegate.setNextReader( reader, docBase );
 	}
 
-	public T getValue(int docId) {
-		return valuePerDocumentId.get( Integer.valueOf( docId ) );
+	@Override
+	public Object getValue(int docId) {
+		String value = (String) privateDelegate.getValue( docId );
+		return stringBridge.stringToObject( value );
 	}
-	
+
 }

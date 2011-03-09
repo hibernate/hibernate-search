@@ -55,6 +55,7 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
+import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -63,8 +64,6 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.FacetRequest;
 import org.hibernate.search.query.facet.FacetResult;
-import org.hibernate.search.query.fieldcache.FieldCacheCollectorFactory;
-import org.hibernate.search.query.fieldcache.FieldCollectorType;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -502,7 +501,8 @@ public class HSQueryImpl implements HSQuery {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
-				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption().contains( FieldCacheType.CLASS );
+				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
+						.contains( FieldCacheType.CLASS );
 				populateDirectories( targetedDirectories, builder );
 			}
 			classesAndSubclasses = null;
@@ -528,7 +528,8 @@ public class HSQueryImpl implements HSQuery {
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
-				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption().contains( FieldCacheType.CLASS );
+				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
+						.contains( FieldCacheType.CLASS );
 				populateDirectories( targetedDirectories, builder );
 			}
 			this.classesAndSubclasses = involvedClasses;

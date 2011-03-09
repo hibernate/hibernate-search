@@ -27,12 +27,11 @@ import org.apache.lucene.search.FieldCache;
 /**
  * We need a collection of similar implementations, one per each FieldCache.DEFAULT.accessmethod
  * to be able to deal with arrays of primitive values without autoboxing all of them.
- * 
- * @see FieldLoadingStrategy
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @see FieldLoadingStrategy
  */
-public final class FloatFieldLoadingStrategy implements FieldLoadingStrategy<Float> {
-	
+public final class FloatFieldLoadingStrategy implements FieldLoadingStrategy {
 	private final String fieldName;
 	private float[] currentCache;
 
@@ -47,5 +46,4 @@ public final class FloatFieldLoadingStrategy implements FieldLoadingStrategy<Flo
 	public Float collect(int relativeDocId) {
 		return currentCache[relativeDocId];
 	}
-	
 }
