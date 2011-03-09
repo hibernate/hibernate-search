@@ -288,7 +288,7 @@ public class Myth {
 }
 
 Date birthdate = ...;
-Query luceneQuery = mythQb.keywork().onField("creationDate").matching(birthdate).createQuery();
+Query luceneQuery = mythQb.keyword().onField("creationDate").matching(birthdate).createQuery();
 </programlisting>
 
         <note>
@@ -686,7 +686,7 @@ fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
 
           <programlisting language="JAVA" role="JAVA">
 org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
-org.apache.lucene.search.Sort sort = new Sort(new SortField("title"), SortField.STRING);
+org.apache.lucene.search.Sort sort = new Sort(new SortField("title", SortField.STRING));
 <emphasis role="bold">query.setSort(sort);</emphasis>
 List results = query.list();
 </programlisting>
