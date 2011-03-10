@@ -76,6 +76,18 @@ public class Car {
 	public String getMake() {
 		return make;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer();
+		sb.append( "Car" );
+		sb.append( "{id=" ).append( id );
+		sb.append( ", color='" ).append( color ).append( '\'' );
+		sb.append( ", make='" ).append( make ).append( '\'' );
+		sb.append( ", cubicCapacity=" ).append( cubicCapacity );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
 
 

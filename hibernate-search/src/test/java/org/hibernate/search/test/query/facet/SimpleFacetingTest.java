@@ -33,102 +33,79 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetRequest;
 import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.search.query.facet.FacetSortOrder;
-import org.hibernate.search.test.SearchTestCase;
 
 
 /**
  * @author Hardy Ferentschik
  */
-public class SimpleFacetingTest extends SearchTestCase {
-
-	private static final String[] colors = { "red", "black", "white", "blue" };
-	private static final String[] makes = { "Honda", "Toyota", "BMW", "Mercedes" };
-	private static final int[] ccs = { 2407, 2831, 3398 };
-
-	private FullTextSession fullTextSession;
-	private Transaction tx;
-
-	private String indexFieldName = "cubicCapacity";
-	private String facetName = "ccs";
-	private QueryBuilder builder;
-
-	public void setUp() throws Exception {
-		super.setUp();
-		fullTextSession = Search.getFullTextSession( openSession() );
-		loadTestData( fullTextSession );
-		builder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Car.class ).get();
-		tx = fullTextSession.beginTransaction();
-	}
-
-	public void tearDown() throws Exception {
-		tx.commit();
-		fullTextSession.clear();
-		fullTextSession.close();
-		super.tearDown();
-	}
+public class SimpleFacetingTest extends AbstractFacetTest {
+	private final String indexFieldName = "cubicCapacity";
+	private final String facetName = "ccs";
 
 	public void testSimpleFaceting() throws Exception {
-		FacetRequest request = builder.facet()
+		FacetRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
+				.discrete()
 				.createFacet();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = assertAndReturnFacetList( query );
+		List<Facet> facetList = getFacetListForFacet( query, facetName );
 		assertEquals( "Wrong number of facets", 4, facetList.size() );
 	}
 
 	public void testDefaultSortOrderIsCount() throws Exception {
-		FacetRequest request = builder.facet()
+		FacetRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
+				.discrete()
 				.createFacet();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = assertAndReturnFacetList( query );
-		assertCounts( facetList, new int[] { 5, 4, 4, 0 } );
+		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		assertFacetCounts( facetList, new int[] { 5, 4, 4, 0 } );
 	}
 
 	public void testCountSortOrderAsc() throws Exception {
-		FacetRequest request = builder.facet()
+		FacetRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
+				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
 				.createFacet();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = assertAndReturnFacetList( query );
-		assertCounts( facetList, new int[] { 0, 4, 4, 5 } );
+		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		assertFacetCounts( facetList, new int[] { 0, 4, 4, 5 } );
 	}
 
 	public void testCountSortOrderDesc() throws Exception {
-		FacetRequest request = builder.facet()
+		FacetRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
+				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_DESC )
 				.createFacet();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = assertAndReturnFacetList( query );
-		assertCounts( facetList, new int[] { 5, 4, 4, 0 } );
+		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		assertFacetCounts( facetList, new int[] { 5, 4, 4, 0 } );
 	}
 
 	public void testAlphabeticalSortOrder() throws Exception {
-		FacetRequest request = builder.facet()
+		FacetRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
+				.discrete()
 				.orderedBy( FacetSortOrder.FIELD_VALUE )
 				.createFacet();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = assertAndReturnFacetList( query );
+		List<Facet> facetList = getFacetListForFacet( query, facetName );
 		for ( int i = 1; i < facetList.size() - 1; i++ ) {
 			String previousFacetValue = facetList.get( i - 1 ).getValue();
 			String currentFacetValue = facetList.get( i ).getValue();
@@ -137,23 +114,38 @@ public class SimpleFacetingTest extends SearchTestCase {
 	}
 
 	public void testZeroCountsExcluded() throws Exception {
-		FacetRequest request = builder.facet()
+		FacetRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
+				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_DESC )
 				.includeZeroCounts( false )
 				.createFacet();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = assertAndReturnFacetList( query );
-		assertCounts( facetList, new int[] { 5, 4, 4 } );
+		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		assertFacetCounts( facetList, new int[] { 5, 4, 4 } );
+	}
+
+	public void testMaxFacetCounts() throws Exception {
+		FacetRequest request = queryBuilder( Car.class ).facet()
+				.name( facetName )
+				.onField( indexFieldName )
+				.discrete()
+				.maxFacetCount( 1 )
+				.createFacet();
+		FullTextQuery query = queryHondaWithFacet( request );
+
+		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		assertEquals( "The number of facets should be restricted", 1, facetList.size() );
 	}
 
 	public void testNullFieldNameThrowsException() {
 		try {
-			builder.facet()
+			queryBuilder( Car.class ).facet()
 					.name( facetName )
 					.onField( null )
+					.discrete()
 					.createFacet();
 			fail( "null should not be a valid field name" );
 		}
@@ -164,9 +156,10 @@ public class SimpleFacetingTest extends SearchTestCase {
 
 	public void testNullRequestNameThrowsException() {
 		try {
-			builder.facet()
+			queryBuilder( Car.class ).facet()
 					.name( null )
 					.onField( indexFieldName )
+					.discrete()
 					.createFacet();
 			fail( "null should not be a valid request name" );
 		}
@@ -177,9 +170,10 @@ public class SimpleFacetingTest extends SearchTestCase {
 
 	// todo - decide on the final behavior of this. Maybe throw an exception?
 	public void testUnknownFieldNameReturnsEmptyResults() {
-		FacetRequest request = builder.facet()
+		FacetRequest request = queryBuilder( Car.class ).facet()
 				.name( "foo" )
 				.onField( "foobar" )
+				.discrete()
 				.createFacet();
 		FullTextQuery query = queryHondaWithFacet( request );
 
@@ -191,9 +185,10 @@ public class SimpleFacetingTest extends SearchTestCase {
 	}
 
 	public void testEnableDisableFacets() {
-		FacetRequest request = builder.facet()
+		FacetRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
+				.discrete()
 				.createFacet();
 		FullTextQuery query = queryHondaWithFacet( request );
 		Map<String, FacetResult> results = query.getFacetResults();
@@ -209,15 +204,17 @@ public class SimpleFacetingTest extends SearchTestCase {
 
 	public void testMultipleFacets() {
 		final String descendingOrderedFacet = "desc";
-		FacetRequest requestDesc = builder.facet()
+		FacetRequest requestDesc = queryBuilder( Car.class ).facet()
 				.name( descendingOrderedFacet )
 				.onField( indexFieldName )
+				.discrete()
 				.createFacet();
 
 		final String ascendingOrderedFacet = "asc";
-		FacetRequest requestAsc = builder.facet()
+		FacetRequest requestAsc = queryBuilder( Car.class ).facet()
 				.name( ascendingOrderedFacet )
 				.onField( indexFieldName )
+				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
 				.createFacet();
 		TermQuery term = new TermQuery( new Term( "make", "honda" ) );
@@ -229,50 +226,31 @@ public class SimpleFacetingTest extends SearchTestCase {
 		Map<String, FacetResult> results = query.getFacetResults();
 		assertTrue( "We should have two facet result", results.size() == 2 );
 		FacetResult facetResult = results.get( descendingOrderedFacet );
-		assertCounts( facetResult.getFacets(), new int[] { 5, 4, 4, 0 } );
+		assertFacetCounts( facetResult.getFacets(), new int[] { 5, 4, 4, 0 } );
 
 		facetResult = results.get( ascendingOrderedFacet );
-		assertCounts( facetResult.getFacets(), new int[] { 0, 4, 4, 5 } );
+		assertFacetCounts( facetResult.getFacets(), new int[] { 0, 4, 4, 5 } );
 
 		query.disableFacet( descendingOrderedFacet );
 		results = query.getFacetResults();
 		assertTrue( "We should have only one result", results.size() == 1 );
 		facetResult = results.get( ascendingOrderedFacet );
-		assertCounts( facetResult.getFacets(), new int[] { 0, 4, 4, 5 } );
+		assertFacetCounts( facetResult.getFacets(), new int[] { 0, 4, 4, 5 } );
 
 		query.disableFacet( ascendingOrderedFacet );
 		results = query.getFacetResults();
 		assertTrue( "We should have no facets", results.size() == 0 );
 	}
 
-
-	private void assertCounts(List<Facet> facetList, int[] counts) {
-		assertTrue( "Wrong number of facets", facetList.size() == counts.length );
-		for ( int i = 0; i < facetList.size(); i++ ) {
-			assertEquals( "Wrong facet count for facet " + i, counts[i], facetList.get( i ).getCount() );
-		}
-	}
-
-	private List<Facet> assertAndReturnFacetList(FullTextQuery query) {
-		Map<String, FacetResult> results = query.getFacetResults();
-		assertNotNull( results );
-		FacetResult facetResult = results.get( facetName );
-		assertNotNull( facetResult );
-		assertEquals( "Wrong facet field name", indexFieldName, facetResult.getFieldName() );
-		List<Facet> facetList = facetResult.getFacets();
-		assertNotNull( facetList );
-		return facetList;
-	}
-
 	private FullTextQuery queryHondaWithFacet(FacetRequest request) {
-		Query luceneQuery = builder.keyword().onField( "make" ).matching( "Honda" ).createQuery();
+		Query luceneQuery = queryBuilder( Car.class ).keyword().onField( "make" ).matching( "Honda" ).createQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		query.enableFacet( request );
 		assertEquals( "Wrong number of query matches", 13, query.getResultSize() );
 		return query;
 	}
 
-	private void loadTestData(Session session) {
+	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
 		for ( String make : makes ) {
 			for ( String color : colors ) {

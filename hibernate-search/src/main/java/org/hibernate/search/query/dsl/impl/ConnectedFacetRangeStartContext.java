@@ -24,21 +24,22 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.hibernate.search.query.dsl.FacetRangeContext;
 import org.hibernate.search.query.dsl.FacetRangeLimitContext;
+import org.hibernate.search.query.dsl.FacetRangeStartContext;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ConnectedFacetRangeContext<N extends Number> implements FacetRangeContext<N> {
+public class ConnectedFacetRangeStartContext<T> implements FacetRangeStartContext<T> {
 	private final FacetBuildingContext context;
 
-	public ConnectedFacetRangeContext(FacetBuildingContext context) {
+	public ConnectedFacetRangeStartContext(FacetBuildingContext context) {
 		this.context = context;
 	}
 
-	public FacetRangeLimitContext<N> from(N rangeStart) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public FacetRangeLimitContext<T> from(T rangeStart) {
+		context.setRangeStart( rangeStart );
+		return new ConnectedFacetRangeLimitContext<T>( context );
 	}
 }
 

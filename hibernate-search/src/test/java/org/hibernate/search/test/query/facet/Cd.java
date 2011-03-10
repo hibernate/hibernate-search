@@ -67,6 +67,17 @@ public class Cd {
 	public int getPrice() {
 		return price;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer();
+		sb.append( "Cd" );
+		sb.append( "{id=" ).append( id );
+		sb.append( ", name='" ).append( name ).append( '\'' );
+		sb.append( ", price=" ).append( price );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
 
 

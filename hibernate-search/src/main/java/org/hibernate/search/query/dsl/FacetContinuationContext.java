@@ -24,18 +24,23 @@
 
 package org.hibernate.search.query.dsl;
 
-import org.hibernate.search.query.facet.FacetSortOrder;
-
 /**
  * @author Hardy Ferentschik
  */
-public interface FacetContinuationContext extends FacetParameterContext {
+public interface FacetContinuationContext {
 	/**
 	 * Start building a range request
 	 *
 	 * @return a {@code FacetRangeContext} to continue building the facet request
 	 */
-	<N extends Number> FacetRangeContext<N> range();
+	<T> FacetRangeStartContext<T> range();
+
+	/**
+	 * Start building a discrete facet
+	 *
+	 * @return  a {@code FacetRangeContext} to continue building the facet request
+	 */
+	DiscreteFacetContext discrete();
 }
 
 

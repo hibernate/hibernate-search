@@ -22,12 +22,40 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query.dsl;
+package org.hibernate.search.query.dsl.impl;
+
+import org.hibernate.search.query.dsl.FacetParameterContext;
+import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetSortOrder;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface FacetRangeLimitContext<T> {
-	FacetRangeLimitContext<T> excludeLimit();
-	FacetRangeEndContext<T> to(T upperLimit);
+public class ConnectedFacetParameterContext implements FacetParameterContext {
+	private final FacetBuildingContext context;
+
+	public ConnectedFacetParameterContext(FacetBuildingContext context) {
+		this.context = context;
+	}
+
+	public FacetParameterContext orderedBy(FacetSortOrder sort) {
+		context.setSort( sort );
+		return this;
+	}
+
+	public FacetParameterContext includeZeroCounts(boolean zeroCounts) {
+		context.setIncludeZeroCount( zeroCounts );
+		return this;
+	}
+
+	public FacetParameterContext maxFacetCount(int maxFacetCount) {
+		context.setMaxFacetCount( maxFacetCount );
+		return this;
+	}
+
+	public FacetRequest createFacet() {
+		return context.getFacetRequest();
+	}
 }
+
+

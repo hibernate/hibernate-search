@@ -25,7 +25,6 @@ package org.hibernate.search.filter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
@@ -42,23 +41,38 @@ import org.hibernate.annotations.common.AssertionFailure;
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  */
 public class ChainedFilter extends Filter {
-
 	private static final long serialVersionUID = -6153052295766531920L;
 
 	private final List<Filter> chainedFilters = new ArrayList<Filter>();
 
+	/**
+	 * Add the specified filter to the chain of filters
+	 *
+	 * @param filter the filter to add to the filter chain. Cannot be {@code null}.
+	 */
 	public void addFilter(Filter filter) {
+		if ( filter == null ) {
+			throw new IllegalArgumentException( "The specified filter cannot be null" );
+		}
 		this.chainedFilters.add( filter );
+	}
+
+	/**
+	 * Returns the specified filter from the current filter chain.
+	 *
+	 * @param filter the filter to remove form the chaim
+	 *
+	 * @return {@code true} if this chained filter contained the specified filter, {@code false} otherwise.
+	 */
+	public boolean removeFilter(Filter filter) {
+		return this.chainedFilters.remove( filter );
 	}
 
 	public boolean isEmpty() {
 		return chainedFilters.size() == 0;
-	}
-
-	public BitSet bits(IndexReader reader) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -83,11 +97,12 @@ public class ChainedFilter extends Filter {
 		}
 	}
 
+	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder( "ChainedFilter [" );
-		for ( Filter filter : chainedFilters ) {
-			sb.append( "\n  " ).append( filter.toString() );
-		}
-		return sb.append( "\n]" ).toString();
+		final StringBuffer sb = new StringBuffer();
+		sb.append( "ChainedFilter" );
+		sb.append( "{chainedFilters=" ).append( chainedFilters );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }

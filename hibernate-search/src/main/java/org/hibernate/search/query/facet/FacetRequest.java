@@ -50,6 +50,12 @@ public abstract class FacetRequest {
 	 */
 	private boolean includeZeroCounts = true;
 
+	/**
+	 * The maximum number of {@link Facet}s to return for this request. A negative value means that all
+	 * facets will be included
+	 */
+	private int maxNumberOfFacets = 1;
+
 	public FacetRequest(String name, String fieldName) {
 		if ( name == null ) {
 			throw new IllegalArgumentException( "The request name name cannot be null" );
@@ -77,7 +83,17 @@ public abstract class FacetRequest {
 		return sort;
 	}
 
+	public int getMaxNumberOfFacets() {
+		return maxNumberOfFacets;
+	}
+
+	public void setMaxNumberOfFacets(int maxNumberOfFacets) {
+		this.maxNumberOfFacets = maxNumberOfFacets;
+	}
+
 	public abstract Class<?> getFieldCacheType();
+
+	public abstract Facet createFacet(String value, int count);
 
 	public boolean includeZeroCounts() {
 		return includeZeroCounts;
@@ -95,6 +111,7 @@ public abstract class FacetRequest {
 		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( ", sort=" ).append( sort );
 		sb.append( ", includeZeroCounts=" ).append( includeZeroCounts );
+		sb.append( ", maxNumberOfFacets=" ).append( maxNumberOfFacets );
 		sb.append( '}' );
 		return sb.toString();
 	}

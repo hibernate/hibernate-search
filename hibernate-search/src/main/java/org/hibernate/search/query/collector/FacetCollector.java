@@ -119,22 +119,25 @@ public class FacetCollector extends Collector {
 	}
 
 	public FacetResult getFacetResult() {
-		List<Facet> facetList = createSortedFacetList(
-				facetCounts, facetRequest.getSort(), facetRequest.includeZeroCounts()
-		);
+		List<Facet> facetList = createSortedFacetList( facetCounts, facetRequest );
 		return new FacetResult( facetRequest.getName(), facetRequest.getFieldName(), facetList );
 	}
 
-	private List<Facet> createSortedFacetList(FacetCounter counter, FacetSortOrder sort, boolean includeZeroCounts) {
+	private List<Facet> createSortedFacetList(FacetCounter counter, FacetRequest request) {
 		List<Facet> facetList = newArrayList();
+		int includedFacetCount = 0;
 		for ( Map.Entry<String, Integer> countEntry : counter.getCounts().entrySet() ) {
-			Facet facet = new Facet( countEntry.getKey(), countEntry.getValue() );
-			if ( !includeZeroCounts && facet.getCount() == 0 ) {
+			Facet facet = request.createFacet( countEntry.getKey(), countEntry.getValue() );
+			if ( !request.includeZeroCounts() && facet.getCount() == 0 ) {
 				continue;
 			}
+			if ( facetRequest.getMaxNumberOfFacets() > 0 && includedFacetCount == facetRequest.getMaxNumberOfFacets() ) {
+				break;
+			}
 			facetList.add( facet );
+			includedFacetCount++;
 		}
-		Collections.sort( facetList, new FacetComparator( sort ) );
+		Collections.sort( facetList, new FacetComparator( request.getSort() ) );
 		return facetList;
 	}
 
@@ -227,25 +230,25 @@ public class FacetCollector extends Collector {
 		abstract void countValue(Object value);
 	}
 
-	static public class SimpleFacetCounter extends FacetCounter {
+	static class SimpleFacetCounter extends FacetCounter {
 		void countValue(Object value) {
 			incrementCount( (String) value );
 		}
 	}
 
-	static public class RangeFacetCounter<N extends Number> extends FacetCounter {
-		private final List<FacetRange<N>> ranges;
+	static class RangeFacetCounter<T> extends FacetCounter {
+		private final List<FacetRange<T>> ranges;
 
-		RangeFacetCounter(RangeFacetRequest<N> request) {
+		RangeFacetCounter(RangeFacetRequest<T> request) {
 			this.ranges = request.getFacetRangeList();
-			for ( FacetRange<N> range : ranges ) {
+			for ( FacetRange<T> range : ranges ) {
 				initCount( range.getRangeString() );
 			}
 		}
 
 		void countValue(Object value) {
-			for ( FacetRange<N> range : ranges ) {
-				if ( range.isInRange( (N) value ) ) {
+			for ( FacetRange<T> range : ranges ) {
+				if ( range.isInRange( (T) value ) ) {
 					incrementCount( range.getRangeString() );
 				}
 			}

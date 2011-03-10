@@ -43,6 +43,16 @@ public interface FacetParameterContext extends FacetTermination {
 	 * @return a {@code FacetParameterContext} to continue building the facet request
 	 */
 	FacetParameterContext includeZeroCounts(boolean zeroCounts);
+
+	/**
+	 * Limits the maximum numbers of facets to the specified number.
+	 *
+	 * @param maxFacetCount the maximum number of facets to include in the response. A negative value means that
+	 * all facets will be included
+	 *
+	 * @return a {@code FacetParameterContext} to continue building the facet request
+	 */
+	FacetParameterContext maxFacetCount(int maxFacetCount);
 }
 
 

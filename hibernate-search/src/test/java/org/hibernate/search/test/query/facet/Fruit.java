@@ -31,6 +31,7 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
 
 /**
  * @author Hardy Ferentschik
@@ -46,6 +47,7 @@ public class Fruit {
 	private String name;
 
 	@Field(index = Index.UN_TOKENIZED)
+	@NumericField
 	private Double price;
 
 	private Fruit() {

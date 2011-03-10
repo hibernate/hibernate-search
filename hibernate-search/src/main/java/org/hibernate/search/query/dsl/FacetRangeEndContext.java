@@ -27,6 +27,6 @@ package org.hibernate.search.query.dsl;
 /**
  * @author Hardy Ferentschik
  */
-public interface FacetRangeEndContext<N extends Number> extends FacetRangeContext<N>, FacetTermination {
-	FacetRangeEndContext<N> excludeLimit();
+public interface FacetRangeEndContext<T> extends FacetRangeStartContext<T>, FacetTermination {
+	FacetRangeEndContext<T> excludeLimit();
 }

@@ -24,6 +24,10 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import org.apache.lucene.search.FieldCacheTermsFilter;
+import org.apache.lucene.search.Filter;
+
+import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetRequest;
 
 /**
@@ -37,5 +41,21 @@ public class DiscreteFacetRequest extends FacetRequest {
 	@Override
 	public Class<?> getFieldCacheType() {
 		return String.class;
+	}
+
+	@Override
+	public Facet createFacet(String value, int count) {
+		return new SimpleFacet( getFieldName(), value, count );
+	}
+
+	static class SimpleFacet extends Facet {
+		SimpleFacet(String fieldName, String value, int count) {
+			super( fieldName, value, count );
+		}
+
+		@Override
+		public Filter getFacetFilter() {
+			return new FieldCacheTermsFilter( getFieldName(), getValue() );
+		}
 	}
 }

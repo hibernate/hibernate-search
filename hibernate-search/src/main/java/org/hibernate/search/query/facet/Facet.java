@@ -24,16 +24,20 @@
 
 package org.hibernate.search.query.facet;
 
+import org.apache.lucene.search.Filter;
+
 /**
  * A single facet (field value and count).
  *
  * @author Hardy Ferentschik
  */
-public class Facet {
+public abstract class Facet {
+	private final String fieldName;
 	private final String value;
 	private final int count;
 
-	public Facet(String value, int count) {
+	public Facet(String fieldName, String value, int count) {
+		this.fieldName = fieldName;
 		this.count = count;
 		this.value = value;
 	}
@@ -46,11 +50,18 @@ public class Facet {
 		return value;
 	}
 
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	public abstract Filter getFacetFilter();
+
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
+		final StringBuffer sb = new StringBuffer();
 		sb.append( "Facet" );
-		sb.append( "{value='" ).append( value ).append( '\'' );
+		sb.append( "{fieldName='" ).append( fieldName ).append( '\'' );
+		sb.append( ", value='" ).append( value ).append( '\'' );
 		sb.append( ", count=" ).append( count );
 		sb.append( '}' );
 		return sb.toString();

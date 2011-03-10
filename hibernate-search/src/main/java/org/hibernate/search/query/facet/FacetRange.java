@@ -24,26 +24,28 @@
 
 package org.hibernate.search.query.facet;
 
+import org.hibernate.AssertionFailure;
+
 /**
  * @author Hardy Ferentschik
  */
-public class FacetRange<N extends Number> {
+public class FacetRange<T> {
 	private static final String MIN_INCLUDED = "[";
 	private static final String MIN_EXCLUDED = "(";
 	private static final String MAX_INCLUDED = "]";
 	private static final String MAX_EXCLUDED = ")";
 
-	private final N min;
-	private final N max;
+	private final T min;
+	private final T max;
 	private final boolean includeMin;
 	private final boolean includeMax;
 	private final String rangeString;
 
-	public FacetRange(N min, N max) {
+	public FacetRange(T min, T max) {
 		this( min, max, true, true );
 	}
 
-	public FacetRange(N min, N max, boolean includeMin, boolean includeMax) {
+	public FacetRange(T min, T max, boolean includeMin, boolean includeMax) {
 		this.min = min;
 		this.max = max;
 		this.includeMax = includeMax;
@@ -69,11 +71,11 @@ public class FacetRange<N extends Number> {
 		this.rangeString = builder.toString();
 	}
 
-	public N getMin() {
+	public T getMin() {
 		return min;
 	}
 
-	public N getMax() {
+	public T getMax() {
 		return max;
 	}
 
@@ -85,7 +87,20 @@ public class FacetRange<N extends Number> {
 		return includeMax;
 	}
 
-	public boolean isInRange(N value) {
+	public boolean isInRange(T value) {
+		if ( value instanceof Number ) {
+			return isInRangeNumber( (Number) value, (Number) min, (Number) max );
+		}
+		else {
+			throw new AssertionFailure( "Unexpected value type: " + value.getClass().getName() );
+		}
+	}
+
+	public String getRangeString() {
+		return rangeString;
+	}
+
+	private boolean isInRangeNumber(Number value, Number min, Number max) {
 		int minCheck = compare( min, value );
 		if ( isIncludeMin() && minCheck > 0 ) {
 			return false;
@@ -104,12 +119,8 @@ public class FacetRange<N extends Number> {
 		return true;
 	}
 
-	public String getRangeString() {
-		return rangeString;
-	}
-
 	// todo - does this implementation of Number comparison hold?
-	private int compare(N number1, N number2) {
+	private int compare(Number number1, Number number2) {
 		if ( !number2.getClass().equals( number1.getClass() ) ) {
 			throw new IllegalStateException();
 		}
