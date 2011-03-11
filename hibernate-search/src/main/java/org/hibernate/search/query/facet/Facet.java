@@ -24,7 +24,7 @@
 
 package org.hibernate.search.query.facet;
 
-import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Query;
 
 /**
  * A single facet (field value and count).
@@ -54,11 +54,43 @@ public abstract class Facet {
 		return fieldName;
 	}
 
-	public abstract Filter getFacetFilter();
+	public abstract Query getFacetQuery();
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		Facet facet = (Facet) o;
+
+		if ( count != facet.count ) {
+			return false;
+		}
+		if ( fieldName != null ? !fieldName.equals( facet.fieldName ) : facet.fieldName != null ) {
+			return false;
+		}
+		if ( value != null ? !value.equals( facet.value ) : facet.value != null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = fieldName != null ? fieldName.hashCode() : 0;
+		result = 31 * result + ( value != null ? value.hashCode() : 0 );
+		result = 31 * result + count;
+		return result;
+	}
 
 	@Override
 	public String toString() {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		sb.append( "Facet" );
 		sb.append( "{fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( ", value='" ).append( value ).append( '\'' );

@@ -26,15 +26,17 @@ package org.hibernate.search.jpa;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.Query;
 
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Sort;
+
 import org.hibernate.Criteria;
+import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
+import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.transform.ResultTransformer;
-import org.hibernate.search.ProjectionConstants;
-import org.hibernate.search.FullTextFilter;
 
 /**
  * The base interface for lucene powered searches.
@@ -53,6 +55,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * order the hibernate objects.
 	 *
 	 * @param sort The lucene sort object.
+	 *
 	 * @return this for method chaining
 	 */
 	FullTextQuery setSort(Sort sort);
@@ -62,6 +65,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Semi-deprecated? a preferred way is to use the @FullTextFilterDef approach
 	 *
 	 * @param filter The lucene filter.
+	 *
 	 * @return this for method chaining
 	 */
 	FullTextQuery setFilter(Filter filter);
@@ -82,7 +86,6 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * No projection (criteria.setProjection() ) allowed, the root entity must be the only returned type
 	 * No where restriction can be defined either.
-	 *
 	 */
 	FullTextQuery setCriteriaQuery(Criteria criteria);
 
@@ -95,7 +98,6 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * Unless notified in their JavaDoc, all built-in bridges are two-way. All @DocumentId fields are projectable by design.
 	 *
 	 * If the projected field is not a projectable field, null is returned in the object[]
-	 *
 	 */
 	FullTextQuery setProjection(String... fields);
 
@@ -110,9 +112,12 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	void disableFullTextFilter(String name);
 
 	/**
-	 *
+	 * @return return the manager for all faceting related operations
+	 */
+	FacetManager getFacetManager();
+
+	/**
 	 * defines a result transformer used during projection
-	 *
 	 */
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
@@ -122,6 +127,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * in the current query
 	 *
 	 * @param documentId Lucene Document id to be explain. This is NOT the object id
+	 *
 	 * @return Lucene Explanation
 	 */
 	Explanation explain(int documentId);

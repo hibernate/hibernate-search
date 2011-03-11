@@ -25,14 +25,13 @@
 package org.hibernate.search.test.query.facet;
 
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetRequest;
-import org.hibernate.search.query.facet.FacetResult;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
 
 /**
@@ -43,25 +42,24 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	private final String priceRange = "priceRange";
 
 	public void testRangeQueryForInteger() {
-		FacetRequest rangeRequest = queryBuilder( Cd.class ).facet()
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
 				.range()
 				.from( 0 ).to( 1000 )
 				.from( 1001 ).to( 1500 )
 				.from( 1501 ).to( 3000 )
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
-		query.enableFacet( rangeRequest );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
 
-		Map<String, FacetResult> results = query.getFacetResults();
-		assertTrue( "We should have three facet result", results.size() == 1 );
-		List<Facet> facets = results.get( priceRange ).getFacets();
+		List<Facet> facets = facetManager.getFacets( priceRange );
 		assertFacetCounts( facets, new int[] { 5, 3, 2 } );
 	}
 
 	public void testRangeQueryForDoubleWithZeroCount() {
-		FacetRequest rangeRequest = queryBuilder( Fruit.class ).facet()
+		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
 				.range()
@@ -69,17 +67,17 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = createMatchAllQuery( Fruit.class );
-		query.enableFacet( rangeRequest );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
 
-		Map<String, FacetResult> results = query.getFacetResults();
-		List<Facet> facets = results.get( priceRange ).getFacets();
+		List<Facet> facets = facetManager.getFacets( priceRange );
 		assertFacetCounts( facets, new int[] { 5, 3, 2, 0 } );
 	}
 
 	public void testRangeQueryForDoubleWithoutZeroCount() {
-		FacetRequest rangeRequest = queryBuilder( Fruit.class ).facet()
+		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
 				.range()
@@ -87,15 +85,15 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
-				.createFacet();
+				.createFacetRequest();
 		rangeRequest.setSort( FacetSortOrder.COUNT_ASC );
 		rangeRequest.setIncludeZeroCounts( false );
 
 		FullTextQuery query = createMatchAllQuery( Fruit.class );
-		query.enableFacet( rangeRequest );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
 
-		Map<String, FacetResult> results = query.getFacetResults();
-		List<Facet> facets = results.get( priceRange ).getFacets();
+		List<Facet> facets = query.getFacetManager().getFacets( priceRange );
 		assertFacetCounts( facets, new int[] { 2, 3, 5 } );
 		assertEquals( "[0.0, 1.0]", facets.get( 0 ).getValue() );
 		assertEquals( "[1.01, 1.5]", facets.get( 1 ).getValue() );

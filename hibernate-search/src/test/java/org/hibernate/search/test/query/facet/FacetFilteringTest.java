@@ -25,15 +25,14 @@ package org.hibernate.search.test.query.facet;
 
 import java.util.List;
 
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetFilter;
-import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
@@ -43,86 +42,79 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		final String indexFieldName = "cubicCapacity";
 		final String facetName = "ccs";
 		Query luceneQuery = queryBuilder( Car.class ).keyword().onField( "make" ).matching( "Honda" ).createQuery();
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacet();
+				.createFacetRequest();
 
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
-		query.enableFacet( request );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( request );
 		assertEquals( "Wrong number of query matches", 13, query.getResultSize() );
 
-		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		List<Facet> facetList = facetManager.getFacets( facetName );
 		assertFacetCounts( facetList, new int[] { 5, 4, 4, 0 } );
 
-		Filter facetFilter = facetList.get( 0 ).getFacetFilter();
-		query.setFilter( facetFilter );
+		facetManager.getFacetGroup( facetName ).selectFacets( facetList.get( 0 ) );
 
-		assertEquals( "Wrong number of query matches", 5, query.getResultSize() );
-		List<Facet> newFacetList = getFacetListForFacet( query, facetName );
+		assertEquals( "Wrong number of query matches", 5, query.list().size() );
+		List<Facet> newFacetList = facetManager.getFacets( facetName );
 		assertFacetCounts( newFacetList, new int[] { 5, 0, 0, 0 } );
 
-		facetFilter = facetList.get( 1 ).getFacetFilter();
-		query.setFilter( facetFilter );
+		facetManager.getFacetGroup( facetName ).selectFacets( facetList.get( 1 ) );
 
-		assertEquals( "Wrong number of query matches", 4, query.getResultSize() );
-		newFacetList = getFacetListForFacet( query, facetName );
-		assertFacetCounts( newFacetList, new int[] { 4, 0, 0, 0 } );
+		assertEquals( "Wrong number of query matches", 9, query.list().size() );
+		newFacetList = facetManager.getFacets( facetName );
+		assertFacetCounts( newFacetList, new int[] { 5, 4, 0, 0 } );
 	}
 
 	public void testMultipleFacetDrillDown() throws Exception {
 		final String ccsFacetName = "ccs";
 		final String ccsFacetFieldName = "cubicCapacity";
-		FacetRequest ccsFacetRequest = queryBuilder( Car.class ).facet()
+		FacetingRequest ccsFacetRequest = queryBuilder( Car.class ).facet()
 				.name( ccsFacetName )
 				.onField( ccsFacetFieldName )
 				.discrete()
-				.createFacet();
+				.createFacetRequest();
 
 		final String colorFacetName = "color";
 		final String colorFacetFieldName = "color";
-		FacetRequest colorFacetRequest = queryBuilder( Car.class ).facet()
+		FacetingRequest colorFacetRequest = queryBuilder( Car.class ).facet()
 				.name( colorFacetName )
 				.onField( colorFacetFieldName )
 				.discrete()
-				.createFacet();
+				.createFacetRequest();
 
 		FullTextQuery query = createMatchAllQuery( Car.class );
-		query.enableFacet( colorFacetRequest );
-		query.enableFacet( ccsFacetRequest );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( colorFacetRequest );
+		facetManager.enableFaceting( ccsFacetRequest );
 		assertEquals( "Wrong number of query matches", 50, query.getResultSize() );
+		assertFacetCounts( facetManager.getFacets( colorFacetName ), new int[] { 12, 12, 12, 12, 2 } );
+		assertFacetCounts( facetManager.getFacets( ccsFacetName ), new int[] { 17, 16, 16, 1 } );
 
-		List<Facet> colorFacetList = getFacetListForFacet( query, colorFacetName );
-		assertFacetCounts( colorFacetList, new int[] { 12, 12, 12, 12, 2 } );
+		Facet colorFacet = facetManager.getFacets( colorFacetName ).get( 0 );
+		facetManager.getFacetGroup( colorFacetName ).selectFacets( colorFacet );
+		assertFacetCounts( facetManager.getFacets( colorFacetName ), new int[] { 12, 0, 0, 0, 0 } );
+		assertFacetCounts( facetManager.getFacets( ccsFacetName ), new int[] { 4, 4, 4, 0 } );
 
-		List<Facet> ccsFacetList = getFacetListForFacet( query, ccsFacetName );
-		assertFacetCounts( ccsFacetList, new int[] { 17, 16, 16, 1 } );
+		Facet ccsFacet = facetManager.getFacets( ccsFacetName ).get( 0 );
+		facetManager.getFacetGroup( colorFacetName ).selectFacets( colorFacet );
+		facetManager.getFacetGroup( ccsFacetName ).selectFacets( ccsFacet );
+		assertFacetCounts( facetManager.getFacets( colorFacetName ), new int[] { 4, 0, 0, 0, 0 } );
+		assertFacetCounts( facetManager.getFacets( ccsFacetName ), new int[] { 4, 0, 0, 0 } );
 
-		FacetFilter facetFilter = new FacetFilter();
-		query.setFilter( facetFilter );
-
-		facetFilter.addFacet( colorFacetList.get( 0 ) );
-		colorFacetList = getFacetListForFacet( query, colorFacetName );
-		assertFacetCounts( colorFacetList, new int[] { 12, 0, 0, 0, 0 } );
-
-		ccsFacetList = getFacetListForFacet( query, ccsFacetName );
-		assertFacetCounts( ccsFacetList, new int[] { 4, 4, 4, 0 } );
-
-		facetFilter.addFacet( ccsFacetList.get( 0 ) );
-		// needs to set the filter explicitly atm, because I need the query state to reset
-		query.setFilter( facetFilter );
-		colorFacetList = getFacetListForFacet( query, colorFacetName );
-		assertFacetCounts( colorFacetList, new int[] { 4, 0, 0, 0, 0 } );
-
-		ccsFacetList = getFacetListForFacet( query, ccsFacetName );
-		assertFacetCounts( ccsFacetList, new int[] { 4, 0, 0, 0 } );
+		facetManager.getFacetGroup( colorFacetName ).clearSelectedFacets();
+		facetManager.getFacetGroup( ccsFacetName ).clearSelectedFacets();
+		assertFacetCounts( facetManager.getFacets( colorFacetName ), new int[] { 12, 12, 12, 12, 2 } );
+		assertFacetCounts( facetManager.getFacets( ccsFacetName ), new int[] { 17, 16, 16, 1 } );
 	}
 
 	public void testRangeFacetDrillDown() {
 		final String indexFieldName = "price";
 		final String priceRange = "priceRange";
-		FacetRequest rangeRequest = queryBuilder( Fruit.class ).facet()
+		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
 				.onField( indexFieldName )
 				.range()
@@ -130,20 +122,20 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = createMatchAllQuery( Fruit.class );
-		query.enableFacet( rangeRequest );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
 
 		assertEquals( "Wrong number of query matches", 10, query.getResultSize() );
 
-		List<Facet> facets = getFacetListForFacet( query, priceRange );
+		List<Facet> facets = facetManager.getFacets( priceRange );
 		assertFacetCounts( facets, new int[] { 5, 3, 2, 0 } );
 
-		Filter facetFilter = facets.get( 2 ).getFacetFilter();
-		query.setFilter( facetFilter );
+		facetManager.getFacetGroup( priceRange ).selectFacets( facets.get( 2 ) );
 
-		assertEquals( "Wrong number of query matches", 2, query.getResultSize() );
-		List<Facet> newFacetList = getFacetListForFacet( query, priceRange );
+		assertEquals( "Wrong number of query matches", 2, query.list().size() );
+		List<Facet> newFacetList = facetManager.getFacets( priceRange );
 		assertFacetCounts( newFacetList, new int[] { 2, 0, 0, 0 } );
 	}
 

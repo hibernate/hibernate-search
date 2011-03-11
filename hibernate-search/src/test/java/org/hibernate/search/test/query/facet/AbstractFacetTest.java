@@ -24,7 +24,6 @@
 package org.hibernate.search.test.query.facet;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.search.Query;
 
@@ -35,9 +34,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.search.test.SearchTestCase;
-
 
 /**
  * @author Hardy Ferentschik
@@ -106,16 +103,6 @@ public abstract class AbstractFacetTest extends SearchTestCase {
 		for ( int i = 0; i < facetList.size(); i++ ) {
 			assertEquals( "Wrong facet count for facet " + i, counts[i], facetList.get( i ).getCount() );
 		}
-	}
-
-	public List<Facet> getFacetListForFacet(FullTextQuery query, String facetName) {
-		Map<String, FacetResult> results = query.getFacetResults();
-		assertNotNull( results );
-		FacetResult facetResult = results.get( facetName );
-		assertNotNull( facetResult );
-		List<Facet> facetList = facetResult.getFacets();
-		assertNotNull( facetList );
-		return facetList;
 	}
 
 	public abstract void loadTestData(Session session);

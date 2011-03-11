@@ -24,14 +24,15 @@
 
 package org.hibernate.search.query.dsl;
 
-import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
  */
 public interface FacetTermination {
 	/**
-	 * @return the {@link FacetRequest} produced by the building process.
+	 * @return the {@link org.hibernate.search.query.facet.FacetingRequest} produced by the building process.
 	 */
-	FacetRequest createFacet();
+	FacetingRequest createFacetRequest();
 }

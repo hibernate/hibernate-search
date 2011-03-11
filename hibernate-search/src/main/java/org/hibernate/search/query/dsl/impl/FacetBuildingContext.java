@@ -27,8 +27,9 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.List;
 
 import org.hibernate.search.query.facet.FacetRange;
-import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 import static org.hibernate.search.util.CollectionHelper.newArrayList;
 
@@ -97,8 +98,8 @@ class FacetBuildingContext<T> {
 		includeRangeEnd = true;
 	}
 
-	FacetRequest getFacetRequest() {
-		FacetRequest request;
+	FacetingRequest getFacetRequest() {
+		FacetingRequest request;
 		if ( isRangeQuery ) {
 			request = new RangeFacetRequest<T>( name, fieldName, rangeList );
 		}
@@ -113,7 +114,7 @@ class FacetBuildingContext<T> {
 
 	@Override
 	public String toString() {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		sb.append( "FacetBuildingContext" );
 		sb.append( "{name='" ).append( name ).append( '\'' );
 		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );

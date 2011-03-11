@@ -26,19 +26,19 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.util.List;
 
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.NumericRangeFilter;
+import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetRange;
-import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
  */
 // todo have some helper method or constructors to create range requests using a start and increment
-public class RangeFacetRequest<T> extends FacetRequest {
+public class RangeFacetRequest<T> extends FacetingRequest {
 	private final List<FacetRange<T>> facetRangeList;
 
 	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges) {
@@ -95,19 +95,19 @@ public class RangeFacetRequest<T> extends FacetRequest {
 		}
 
 		@Override
-		public Filter getFacetFilter() {
+		public Query getFacetQuery() {
 			if ( range.getMin() instanceof Number ) {
-				return createNumericRangeFilter();
+				return createNumericRangeQuery();
 			}
 			else {
 				throw new AssertionFailure( "Unsupported range type" );
 			}
 		}
 
-		private Filter createNumericRangeFilter() {
-			NumericRangeFilter filter;
+		private Query createNumericRangeQuery() {
+			NumericRangeQuery query;
 			if ( range.getMin() instanceof Double ) {
-				filter = NumericRangeFilter.newDoubleRange(
+				query = NumericRangeQuery.newDoubleRange(
 						getFieldName(),
 						(Double) range.getMin(),
 						(Double) range.getMax(),
@@ -116,7 +116,7 @@ public class RangeFacetRequest<T> extends FacetRequest {
 				);
 			}
 			else if ( range.getMin() instanceof Float ) {
-				filter = NumericRangeFilter.newFloatRange(
+				query = NumericRangeQuery.newFloatRange(
 						getFieldName(),
 						(Float) range.getMin(),
 						(Float) range.getMax(),
@@ -125,7 +125,7 @@ public class RangeFacetRequest<T> extends FacetRequest {
 				);
 			}
 			else if ( range.getMin() instanceof Integer ) {
-				filter = NumericRangeFilter.newIntRange(
+				query = NumericRangeQuery.newIntRange(
 						getFieldName(),
 						(Integer) range.getMin(),
 						(Integer) range.getMax(),
@@ -135,7 +135,7 @@ public class RangeFacetRequest<T> extends FacetRequest {
 			}
 
 			else if ( range.getMin() instanceof Long ) {
-				filter = NumericRangeFilter.newLongRange(
+				query = NumericRangeQuery.newLongRange(
 						getFieldName(),
 						(Long) range.getMin(),
 						(Long) range.getMax(),
@@ -146,7 +146,7 @@ public class RangeFacetRequest<T> extends FacetRequest {
 			else {
 				throw new AssertionFailure( "Unsupported range type" );
 			}
-			return filter;
+			return query;
 		}
 	}
 }

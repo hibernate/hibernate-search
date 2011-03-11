@@ -21,45 +21,24 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+package org.hibernate.search.query.engine.spi;
 
-package org.hibernate.search.query.facet;
-
-import java.util.List;
+import org.hibernate.search.query.facet.Facet;
 
 /**
+ * Groups a set of {@link org.hibernate.search.query.facet.Facet} to be applied onto a query.
+ * The facet criteria within a {@code FacetSelection} are combined in a disjunction.
+ *
  * @author Hardy Ferentschik
  */
-public class FacetResult {
-	private final String name;
-	private final String fieldName;
-	private final List<Facet> facets;
+public interface FacetSelection {
+	/**
+	 * @param facets An array of facets which have to be applied as disjunction onto the current query
+	 */
+	void selectFacets(Facet... facets);
 
-	public FacetResult(String name, String fieldName, List<Facet> facets) {
-		this.name = name;
-		this.fieldName = fieldName;
-		this.facets = facets;
-	}
-
-	public List<Facet> getFacets() {
-		return facets;
-	}
-
-	public String getFieldName() {
-		return fieldName;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "FacetResult" );
-		sb.append( "{facets=" ).append( facets );
-		sb.append( '}' );
-		return sb.toString();
-	}
+	/**
+	 * Clear all facets in this selection
+	 */
+	void clearSelectedFacets();
 }
-
-

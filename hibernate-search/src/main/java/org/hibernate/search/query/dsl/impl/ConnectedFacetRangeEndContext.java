@@ -2,7 +2,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.query.dsl.FacetRangeEndContext;
 import org.hibernate.search.query.dsl.FacetRangeLimitContext;
-import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
@@ -25,7 +25,7 @@ public class ConnectedFacetRangeEndContext<T> implements FacetRangeEndContext<T>
 		return new ConnectedFacetRangeLimitContext<T>( context );
 	}
 
-	public FacetRequest createFacet() {
+	public FacetingRequest createFacetRequest() {
 		context.makeRange();
 		return context.getFacetRequest();
 	}

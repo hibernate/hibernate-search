@@ -249,11 +249,11 @@ public class Address implements Serializable {
 
 
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		displayAddress(buf, this);
 		return buf.toString();
 	}
-	private void displayAddress(StringBuffer buf, Address address) {
+	private void displayAddress(StringBuilder buf, Address address) {
 //		buf.append(Constants.TAB + Constants.TAB + "Address 1: " + address.getAddress1() + Constants.NEW_LINE);
 //		buf.append(Constants.TAB + Constants.TAB +"Address 2: " + address.getAddress2() + Constants.NEW_LINE);
 //		buf.append(Constants.TAB + Constants.TAB +"Town: " + address.getTown() + Constants.NEW_LINE);

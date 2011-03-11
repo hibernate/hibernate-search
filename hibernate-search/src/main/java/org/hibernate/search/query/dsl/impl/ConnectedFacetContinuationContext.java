@@ -28,7 +28,7 @@ import org.hibernate.search.query.dsl.DiscreteFacetContext;
 import org.hibernate.search.query.dsl.FacetContinuationContext;
 import org.hibernate.search.query.dsl.FacetParameterContext;
 import org.hibernate.search.query.dsl.FacetRangeStartContext;
-import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
 
 /**

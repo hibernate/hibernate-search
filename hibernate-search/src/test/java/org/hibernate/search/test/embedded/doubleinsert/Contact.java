@@ -219,7 +219,7 @@ public class Contact  implements Serializable {
     	});
     }
 
-	protected void displayPhonesAndAddresses(StringBuffer buf) {
+	protected void displayPhonesAndAddresses(StringBuilder buf) {
 //		buf.append(Constants.NEW_LINE);
 //		buf.append("Phone Detail(s):" + Constants.NEW_LINE);
 //		if (null != this.getPhoneNumbers() && 0 != this.getPhoneNumbers().size()) {

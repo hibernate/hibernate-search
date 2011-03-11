@@ -24,16 +24,17 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.FieldCacheTermsFilter;
-import org.apache.lucene.search.Filter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DiscreteFacetRequest extends FacetRequest {
+public class DiscreteFacetRequest extends FacetingRequest {
 	DiscreteFacetRequest(String name, String fieldName) {
 		super( name, fieldName );
 	}
@@ -54,8 +55,8 @@ public class DiscreteFacetRequest extends FacetRequest {
 		}
 
 		@Override
-		public Filter getFacetFilter() {
-			return new FieldCacheTermsFilter( getFieldName(), getValue() );
+		public Query getFacetQuery() {
+			return new TermQuery( new Term( getFieldName(), getValue() ) );
 		}
 	}
 }

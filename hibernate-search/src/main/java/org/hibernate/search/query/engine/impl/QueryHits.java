@@ -51,8 +51,9 @@ import org.hibernate.search.query.collector.FacetCollector;
 import org.hibernate.search.query.collector.FieldCacheCollector;
 import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.facet.FacetRequest;
-import org.hibernate.search.query.facet.FacetResult;
+import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
@@ -69,12 +70,12 @@ public class QueryHits {
 	private final IndexSearcherWithPayload searcher;
 	private final Filter filter;
 	private final Sort sort;
-	private final Map<String, FacetRequest> facetRequests;
+	private final Map<String, FacetingRequest> facetRequests;
 	private final TimeoutManagerImpl timeoutManager;
 
 	private int totalHits;
 	private TopDocs topDocs;
-	private Map<String, FacetResult> facetResultMap;
+	private Map<String, List<Facet>> facetMap;
 	private List<FacetCollector> facetCollectors;
 
 	private final boolean enableFieldCacheOnClassName;
@@ -95,7 +96,7 @@ public class QueryHits {
 					 Filter filter,
 					 Sort sort,
 					 TimeoutManagerImpl timeoutManager,
-					 Map<String, FacetRequest> facetRequests,
+					 Map<String, FacetingRequest> facetRequests,
 					 boolean enableFieldCacheOnTypes,
 					 FieldCacheCollectorFactory idFieldCollector)
 			throws IOException {
@@ -111,7 +112,7 @@ public class QueryHits {
 					 Sort sort,
 					 Integer n,
 					 TimeoutManagerImpl timeoutManager,
-					 Map<String, FacetRequest> facetRequests,
+					 Map<String, FacetingRequest> facetRequests,
 					 boolean enableFieldCacheOnTypes,
 					 FieldCacheCollectorFactory idFieldCollector)
 			throws IOException {
@@ -177,11 +178,11 @@ public class QueryHits {
 		return topDocs;
 	}
 
-	public Map<String, FacetResult> getFacetResults() {
+	public Map<String, List<Facet>> getFacets() {
 		if ( facetRequests == null || facetRequests.size() == 0 ) {
 			return Collections.emptyMap();
 		}
-		return facetResultMap;
+		return facetMap;
 	}
 
 	/**
@@ -219,10 +220,9 @@ public class QueryHits {
 
 		// if we were collecting facet data we have to update our instance state
 		if ( facetCollectors != null && !facetCollectors.isEmpty() ) {
-			facetResultMap = new HashMap<String, FacetResult>();
+			facetMap = new HashMap<String, List<Facet>>();
 			for ( FacetCollector facetCollector : facetCollectors ) {
-				FacetResult facetResult = facetCollector.getFacetResult();
-				facetResultMap.put( facetResult.getName(), facetResult );
+				facetMap.put( facetCollector.getFacetName(), facetCollector.getFacetList() );
 			}
 		}
 		timeoutManager.isTimedOut();
@@ -234,7 +234,7 @@ public class QueryHits {
 		}
 		facetCollectors = new ArrayList<FacetCollector>();
 		Collector nextInChain = collector;
-		for ( FacetRequest entry : facetRequests.values() ) {
+		for ( FacetingRequest entry : facetRequests.values() ) {
 			FacetCollector facetCollector = new FacetCollector( nextInChain, entry );
 			nextInChain = facetCollector;
 			facetCollectors.add( facetCollector );

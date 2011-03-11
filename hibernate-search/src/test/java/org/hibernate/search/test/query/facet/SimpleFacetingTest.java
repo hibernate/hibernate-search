@@ -24,7 +24,6 @@
 package org.hibernate.search.test.query.facet;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -33,11 +32,10 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetRequest;
-import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.search.query.facet.FacetSortOrder;
-
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
@@ -47,65 +45,65 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	private final String facetName = "ccs";
 
 	public void testSimpleFaceting() throws Exception {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
 		assertEquals( "Wrong number of facets", 4, facetList.size() );
 	}
 
 	public void testDefaultSortOrderIsCount() throws Exception {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
 		assertFacetCounts( facetList, new int[] { 5, 4, 4, 0 } );
 	}
 
 	public void testCountSortOrderAsc() throws Exception {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
 		assertFacetCounts( facetList, new int[] { 0, 4, 4, 5 } );
 	}
 
 	public void testCountSortOrderDesc() throws Exception {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_DESC )
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
 		assertFacetCounts( facetList, new int[] { 5, 4, 4, 0 } );
 	}
 
 	public void testAlphabeticalSortOrder() throws Exception {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.FIELD_VALUE )
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
 		for ( int i = 1; i < facetList.size() - 1; i++ ) {
 			String previousFacetValue = facetList.get( i - 1 ).getValue();
 			String currentFacetValue = facetList.get( i ).getValue();
@@ -114,29 +112,29 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	public void testZeroCountsExcluded() throws Exception {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_DESC )
 				.includeZeroCounts( false )
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
 		assertFacetCounts( facetList, new int[] { 5, 4, 4 } );
 	}
 
 	public void testMaxFacetCounts() throws Exception {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
 				.maxFacetCount( 1 )
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
-		List<Facet> facetList = getFacetListForFacet( query, facetName );
+		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
 		assertEquals( "The number of facets should be restricted", 1, facetList.size() );
 	}
 
@@ -146,7 +144,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 					.name( facetName )
 					.onField( null )
 					.discrete()
-					.createFacet();
+					.createFacetRequest();
 			fail( "null should not be a valid field name" );
 		}
 		catch ( IllegalArgumentException e ) {
@@ -160,7 +158,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 					.name( null )
 					.onField( indexFieldName )
 					.discrete()
-					.createFacet();
+					.createFacetRequest();
 			fail( "null should not be a valid request name" );
 		}
 		catch ( IllegalArgumentException e ) {
@@ -170,82 +168,82 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 
 	// todo - decide on the final behavior of this. Maybe throw an exception?
 	public void testUnknownFieldNameReturnsEmptyResults() {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( "foo" )
 				.onField( "foobar" )
 				.discrete()
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
-
-		Map<String, FacetResult> results = query.getFacetResults();
-		assertNotNull( results );
-		FacetResult facetResult = results.get( "foo" );
-		assertNotNull( facetResult );
-		assertTrue( "A unknown field name should not create any facets", facetResult.getFacets().size() == 0 );
+		assertTrue(
+				"A unknown field name should not create any facets",
+				query.getFacetManager().getFacets( "foo" ).size() == 0
+		);
 	}
 
 	public void testEnableDisableFacets() {
-		FacetRequest request = queryBuilder( Car.class ).facet()
+		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacet();
+				.createFacetRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
-		Map<String, FacetResult> results = query.getFacetResults();
-		assertNotNull( results );
-		assertTrue( "We should have one facet result", results.size() == 1 );
 
-		query.disableFacet( facetName );
+		assertTrue( "We should have facet results", query.getFacetManager().getFacets( facetName ).size() > 0 );
+
+		query.getFacetManager().disableFaceting( facetName );
 		query.list();
-		results = query.getFacetResults();
-		assertNotNull( results );
-		assertTrue( "We should have no facets", results.size() == 0 );
+
+		assertTrue( "We should have no facets", query.getFacetManager().getFacets( facetName ).size() == 0 );
 	}
 
 	public void testMultipleFacets() {
 		final String descendingOrderedFacet = "desc";
-		FacetRequest requestDesc = queryBuilder( Car.class ).facet()
+		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()
 				.name( descendingOrderedFacet )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacet();
+				.createFacetRequest();
 
 		final String ascendingOrderedFacet = "asc";
-		FacetRequest requestAsc = queryBuilder( Car.class ).facet()
+		FacetingRequest requestAsc = queryBuilder( Car.class ).facet()
 				.name( ascendingOrderedFacet )
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
-				.createFacet();
+				.createFacetRequest();
 		TermQuery term = new TermQuery( new Term( "make", "honda" ) );
 		FullTextQuery query = fullTextSession.createFullTextQuery( term, Car.class );
+		FacetManager facetManager = query.getFacetManager();
 
-		query.enableFacet( requestDesc );
-		query.enableFacet( requestAsc );
+		facetManager.enableFaceting( requestDesc );
+		facetManager.enableFaceting( requestAsc );
 
-		Map<String, FacetResult> results = query.getFacetResults();
-		assertTrue( "We should have two facet result", results.size() == 2 );
-		FacetResult facetResult = results.get( descendingOrderedFacet );
-		assertFacetCounts( facetResult.getFacets(), new int[] { 5, 4, 4, 0 } );
+		assertFacetCounts( facetManager.getFacets( descendingOrderedFacet ), new int[] { 5, 4, 4, 0 } );
+		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 4, 4, 5 } );
 
-		facetResult = results.get( ascendingOrderedFacet );
-		assertFacetCounts( facetResult.getFacets(), new int[] { 0, 4, 4, 5 } );
+		facetManager.disableFaceting( descendingOrderedFacet );
+		assertTrue(
+				"descendingOrderedFacet should be disabled", query.getFacetManager().getFacets(
+				descendingOrderedFacet
+		).isEmpty()
+		);
+		assertFacetCounts( facetManager.getFacets( ascendingOrderedFacet ), new int[] { 0, 4, 4, 5 } );
 
-		query.disableFacet( descendingOrderedFacet );
-		results = query.getFacetResults();
-		assertTrue( "We should have only one result", results.size() == 1 );
-		facetResult = results.get( ascendingOrderedFacet );
-		assertFacetCounts( facetResult.getFacets(), new int[] { 0, 4, 4, 5 } );
-
-		query.disableFacet( ascendingOrderedFacet );
-		results = query.getFacetResults();
-		assertTrue( "We should have no facets", results.size() == 0 );
+		facetManager.disableFaceting( ascendingOrderedFacet );
+		assertTrue(
+				"descendingOrderedFacet should be disabled",
+				facetManager.getFacets( descendingOrderedFacet ).isEmpty()
+		);
+		assertTrue(
+				"ascendingOrderedFacet should be disabled",
+				facetManager.getFacets( ascendingOrderedFacet ).isEmpty()
+		);
 	}
 
-	private FullTextQuery queryHondaWithFacet(FacetRequest request) {
+	private FullTextQuery queryHondaWithFacet(FacetingRequest request) {
 		Query luceneQuery = queryBuilder( Car.class ).keyword().onField( "make" ).matching( "Honda" ).createQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
-		query.enableFacet( request );
+		query.getFacetManager().enableFaceting( request );
 		assertEquals( "Wrong number of query matches", 13, query.getResultSize() );
 		return query;
 	}

@@ -24,25 +24,32 @@
 package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.FlushModeType;
+import javax.persistence.LockModeType;
 import javax.persistence.LockTimeoutException;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
+import javax.persistence.Parameter;
 import javax.persistence.PersistenceException;
 import javax.persistence.PessimisticLockException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-import javax.persistence.LockModeType;
-import javax.persistence.Parameter;
 
+import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.Explanation;
 
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
@@ -64,6 +71,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
+import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -156,12 +164,15 @@ public class FullTextQueryImpl implements FullTextQuery {
 		}
 	}
 
-	//TODO mutualize this code with the EM this will fix the rollback issues
+	public FacetManager getFacetManager() {
+		return query.getFacetManager();
+	}
 
-	@SuppressWarnings({ "ThrowableInstanceNeverThrown" })
+	//TODO mutualize this code with the EM this will fix the rollback issues
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" })
 	private void throwPersistenceException(Exception e) {
 		if ( e instanceof StaleStateException ) {
-			PersistenceException pe = wrapStaleStateException( ( StaleStateException ) e );
+			PersistenceException pe = wrapStaleStateException( (StaleStateException) e );
 			throwPersistenceException( pe );
 		}
 		else if ( e instanceof org.hibernate.OptimisticLockException ) {
@@ -177,7 +188,9 @@ public class FullTextQueryImpl implements FullTextQuery {
 			throwPersistenceException( new EntityExistsException( e ) );
 		}
 		else if ( e instanceof org.hibernate.QueryTimeoutException ) {
-			javax.persistence.QueryTimeoutException converted = new javax.persistence.QueryTimeoutException(e.getMessage(), e);
+			javax.persistence.QueryTimeoutException converted = new javax.persistence.QueryTimeoutException(
+					e.getMessage(), e
+			);
 			throwPersistenceException( converted );
 		}
 		else if ( e instanceof ObjectNotFoundException ) {
@@ -204,11 +217,11 @@ public class FullTextQueryImpl implements FullTextQuery {
 	public PersistenceException wrapLockException(HibernateException e, LockOptions lockOptions) {
 		PersistenceException pe;
 		if ( e instanceof org.hibernate.OptimisticLockException ) {
-			org.hibernate.OptimisticLockException ole = ( org.hibernate.OptimisticLockException ) e;
+			org.hibernate.OptimisticLockException ole = (org.hibernate.OptimisticLockException) e;
 			pe = new OptimisticLockException( ole.getMessage(), ole, ole.getEntity() );
 		}
 		else if ( e instanceof org.hibernate.PessimisticLockException ) {
-			org.hibernate.PessimisticLockException ple = ( org.hibernate.PessimisticLockException ) e;
+			org.hibernate.PessimisticLockException ple = (org.hibernate.PessimisticLockException) e;
 			if ( lockOptions != null && lockOptions.getTimeOut() > -1 ) {
 				// assume lock timeout occurred if a timeout or NO WAIT was specified
 				pe = new LockTimeoutException( ple.getMessage(), ple, ple.getEntity() );
@@ -230,11 +243,11 @@ public class FullTextQueryImpl implements FullTextQuery {
 		throw e;
 	}
 
-	@SuppressWarnings({ "ThrowableInstanceNeverThrown" })
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown" })
 	PersistenceException wrapStaleStateException(StaleStateException e) {
 		PersistenceException pe;
 		if ( e instanceof StaleObjectStateException ) {
-			StaleObjectStateException sose = ( StaleObjectStateException ) e;
+			StaleObjectStateException sose = (StaleObjectStateException) e;
 			Serializable identifier = sose.getIdentifier();
 			if ( identifier != null ) {
 				Object entity = session.load( sose.getEntityName(), identifier );
@@ -256,7 +269,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return pe;
 	}
 
-	@SuppressWarnings({ "ThrowableInstanceNeverThrown" })
+	@SuppressWarnings( { "ThrowableInstanceNeverThrown", "unchecked" })
 	public Object getSingleResult() {
 		try {
 			List result = query.list();
@@ -359,7 +372,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 				//nothing
 			}
 			else if ( value instanceof String ) {
-				query.setTimeout( new Long( (String) value ).longValue(), TimeUnit.MILLISECONDS );
+				query.setTimeout( Long.parseLong( (String) value ), TimeUnit.MILLISECONDS );
 			}
 			else if ( value instanceof Number ) {
 				query.setTimeout( ( (Number) value ).longValue(), TimeUnit.MILLISECONDS );
@@ -404,6 +417,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@SuppressWarnings("unchecked")
 	public Set<Parameter<?>> getParameters() {
 		return Collections.EMPTY_SET;
 	}

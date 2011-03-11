@@ -62,8 +62,6 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.facet.FacetRequest;
-import org.hibernate.search.query.facet.FacetResult;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -95,33 +93,32 @@ public class HSQueryImpl implements HSQuery {
 	private String[] projectedFields;
 	private int firstResult;
 	private Integer maxResults;
-	private Integer resultSize;
 	private Set<Class<?>> classesAndSubclasses;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
 	private TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
 	private boolean useFieldCacheOnClassTypes = false;
+	private FacetManagerImpl facetManager;
 
 	/**
-	 * The map of currently active/enabled facet requests.
+	 * The number of results for this query. This field gets populated once {@link #queryResultSize}, {@link #queryEntityInfos}
+	 * or {@link #queryDocumentExtractor} is called.
 	 */
-	private final Map<String, FacetRequest> facetRequests = newHashMap();
-	/**
-	 * Keeps track of faceting results.
-	 */
-	private Map<String, FacetResult> facetResults;
+	private Integer resultSize;
 
 	public HSQueryImpl(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
 
 	public HSQuery luceneQuery(Query query) {
+		clearCachedResults();
 		this.luceneQuery = query;
 		return this;
 	}
 
 	public HSQuery targetedEntities(List<Class<?>> classes) {
+		clearCachedResults();
 		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>( classes );
 		final Class[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
 		this.indexedTargetedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( classesAsArray );
@@ -138,6 +135,7 @@ public class HSQueryImpl implements HSQuery {
 	}
 
 	public HSQuery filter(Filter filter) {
+		clearCachedResults();
 		this.userFilter = filter;
 		return this;
 	}
@@ -203,6 +201,13 @@ public class HSQueryImpl implements HSQuery {
 
 	public TimeoutManager getTimeoutManager() {
 		return getTimeoutManagerImpl();
+	}
+
+	public FacetManagerImpl getFacetManager() {
+		if ( facetManager == null ) {
+			facetManager = new FacetManagerImpl( this );
+		}
+		return facetManager;
 	}
 
 	public Query getLuceneQuery() {
@@ -332,6 +337,7 @@ public class HSQueryImpl implements HSQuery {
 	}
 
 	public FullTextFilter enableFullTextFilter(String name) {
+		clearCachedResults();
 		FullTextFilterImpl filterDefinition = filterDefinitions.get( name );
 		if ( filterDefinition != null ) {
 			return filterDefinition;
@@ -348,31 +354,8 @@ public class HSQueryImpl implements HSQuery {
 	}
 
 	public void disableFullTextFilter(String name) {
+		clearCachedResults();
 		filterDefinitions.remove( name );
-	}
-
-	public HSQuery enableFacet(FacetRequest facet) {
-		facetRequests.put( facet.getName(), facet );
-		return this;
-	}
-
-	public void disableFacet(String name) {
-		facetRequests.remove( name );
-		if ( facetResults != null ) {
-			facetResults.remove( name );
-		}
-	}
-
-	public Map<String, FacetResult> getFacetResults() {
-		// if there are no facet requests we don't have to do anything
-		if ( facetRequests.isEmpty() ) {
-			return Collections.emptyMap();
-		}
-		// we have facet request, but the query hasn't executed yet. trigger the query via getting the result size
-		if ( !facetRequests.isEmpty() && facetResults == null ) {
-			queryResultSize();
-		}
-		return facetResults;
 	}
 
 	private void closeSearcher(IndexSearcherWithPayload searcherWithPayload) {
@@ -380,6 +363,14 @@ public class HSQueryImpl implements HSQuery {
 			return;
 		}
 		searcherWithPayload.closeSearcher( luceneQuery, searchFactoryImplementor );
+	}
+
+	/**
+	 * This class caches some of the query results and we need to reset the state in case something in the query
+	 * changes (eg a new filter is set).
+	 */
+	void clearCachedResults() {
+		resultSize = null;
 	}
 
 	/**
@@ -410,7 +401,7 @@ public class HSQueryImpl implements HSQuery {
 					filter,
 					sort,
 					getTimeoutManagerImpl(),
-					facetRequests,
+					facetManager.getFacetRequests(),
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory()
 			);
@@ -423,7 +414,7 @@ public class HSQueryImpl implements HSQuery {
 					sort,
 					n,
 					getTimeoutManagerImpl(),
-					facetRequests,
+					facetManager.getFacetRequests(),
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory()
 			);
@@ -434,7 +425,7 @@ public class HSQueryImpl implements HSQuery {
 			searchFactoryImplementor.getStatisticsImplementor()
 					.searchExecuted( filteredQuery.toString(), System.nanoTime() - startTime );
 		}
-		facetResults = queryHits.getFacetResults();
+		facetManager.setFacetResults( queryHits.getFacets() );
 		return queryHits;
 	}
 
@@ -633,9 +624,8 @@ public class HSQueryImpl implements HSQuery {
 	}
 
 	private void buildFilters() {
-		ChainedFilter chainedFilter = null;
+		ChainedFilter chainedFilter = new ChainedFilter();
 		if ( !filterDefinitions.isEmpty() ) {
-			chainedFilter = new ChainedFilter();
 			for ( FullTextFilterImpl fullTextFilter : filterDefinitions.values() ) {
 				Filter filter = buildLuceneFilter( fullTextFilter );
 				if ( filter != null ) {
@@ -645,14 +635,14 @@ public class HSQueryImpl implements HSQuery {
 		}
 
 		if ( userFilter != null ) {
-			//chainedFilter is not always necessary here but the code is easier to read
-			if ( chainedFilter == null ) {
-				chainedFilter = new ChainedFilter();
-			}
 			chainedFilter.addFilter( userFilter );
 		}
 
-		if ( chainedFilter == null || chainedFilter.isEmpty() ) {
+		if ( getFacetManager().getFacetFilter() != null ) {
+			chainedFilter.addFilter( facetManager.getFacetFilter() );
+		}
+
+		if ( chainedFilter.isEmpty() ) {
 			filter = null;
 		}
 		else {

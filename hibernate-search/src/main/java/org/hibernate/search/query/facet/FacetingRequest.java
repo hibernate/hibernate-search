@@ -29,7 +29,7 @@ package org.hibernate.search.query.facet;
  *
  * @author Hardy Ferentschik
  */
-public abstract class FacetRequest {
+public abstract class FacetingRequest {
 	/**
 	 * A user specified name for the facet request
 	 */
@@ -56,7 +56,7 @@ public abstract class FacetRequest {
 	 */
 	private int maxNumberOfFacets = 1;
 
-	public FacetRequest(String name, String fieldName) {
+	public FacetingRequest(String name, String fieldName) {
 		if ( name == null ) {
 			throw new IllegalArgumentException( "The request name name cannot be null" );
 		}
@@ -105,8 +105,8 @@ public abstract class FacetRequest {
 
 	@Override
 	public String toString() {
-		final StringBuffer sb = new StringBuffer();
-		sb.append( "FacetRequest" );
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "FacetingRequest" );
 		sb.append( "{name='" ).append( name ).append( '\'' );
 		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( ", sort=" ).append( sort );

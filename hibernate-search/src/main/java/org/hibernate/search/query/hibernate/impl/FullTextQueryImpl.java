@@ -56,8 +56,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.facet.FacetRequest;
-import org.hibernate.search.query.facet.FacetResult;
+import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.transform.ResultTransformer;
 
@@ -299,17 +298,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		hSearchQuery.disableFullTextFilter( name );
 	}
 
-	public FullTextQuery enableFacet(FacetRequest facet) {
-		hSearchQuery.enableFacet( facet );
-		return this;
-	}
-
-	public Map<String, FacetResult> getFacetResults() {
-		return hSearchQuery.getFacetResults();
-	}
-
-	public void disableFacet(String name) {
-		hSearchQuery.disableFacet( name );
+	public FacetManager getFacetManager() {
+		return hSearchQuery.getFacetManager();
 	}
 
 	@Override

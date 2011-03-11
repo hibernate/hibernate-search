@@ -80,7 +80,7 @@ public class BusinessContact extends Contact {
 //		return new HashCodeBuilder().append(new Object[]{new Long(this.getId()), this.getBusinessName(), this.getUrl()}).toHashCode();
 //	}
 // 	public String toString() {
-//		StringBuffer buf = new StringBuffer();
+//		StringBuilder buf = new StringBuilder();
 //		buf.append("Business Name: " + this.getBusinessName() + Constants.NEW_LINE);
 //		buf.append("Business Url: " +  this.getUrl() + Constants.NEW_LINE);
 //		buf.append("Email: " + this.getEmail() + Constants.NEW_LINE);

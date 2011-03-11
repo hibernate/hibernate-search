@@ -21,7 +21,6 @@
 package org.hibernate.search.query.engine.spi;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.search.Explanation;
@@ -32,8 +31,6 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.query.facet.FacetRequest;
-import org.hibernate.search.query.facet.FacetResult;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).
@@ -128,6 +125,7 @@ public interface HSQuery extends ProjectionConstants {
 	 * If the projected field is not a projectable field, null is returned in the object[]
 	 *
 	 * @param fields the projected field names
+	 *
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery projection(String... fields);
@@ -171,6 +169,11 @@ public interface HSQuery extends ProjectionConstants {
 	 * @return the timeout manager. Make sure to wrap your HSQuery usage around a {@code timeoutManager.start()} and  {@code timeoutManager.stop()}.
 	 */
 	TimeoutManager getTimeoutManager();
+
+	/**
+	 * @return return the manager for all faceting related operations
+	 */
+	FacetManager getFacetManager();
 
 	/**
 	 * @return the underlying Lucene query
@@ -240,25 +243,4 @@ public interface HSQuery extends ProjectionConstants {
 	 * @deprecated should be at most SearchFactoryIntegrator, preferably removed altogether
 	 */
 	SearchFactoryImplementor getSearchFactoryImplementor();
-
-	/**
-	 * Enable a facet request.
-	 *
-	 * @param facet the facet request
-	 *
-	 * @return {@code this} to allow method chaining
-	 */
-	HSQuery enableFacet(FacetRequest facet);
-
-	/**
-	 * @return returns the faceting results
-	 */
-	Map<String, FacetResult> getFacetResults();
-
-	/**
-	 * Disable a facet with the given name.
-	 *
-	 * @param name the name of the facet to disable.
-	 */
-	void disableFacet(String name);
 }

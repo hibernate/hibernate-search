@@ -40,9 +40,9 @@ import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetRange;
-import org.hibernate.search.query.facet.FacetRequest;
-import org.hibernate.search.query.facet.FacetResult;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
 import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
 
@@ -63,7 +63,7 @@ public class FacetCollector extends Collector {
 	/**
 	 * Facet request this collector handles
 	 */
-	private final FacetRequest facetRequest;
+	private final FacetingRequest facetRequest;
 
 	/**
 	 * Used to load field values from the Lucene field cache
@@ -81,7 +81,7 @@ public class FacetCollector extends Collector {
 	 */
 	private boolean initialised = false;
 
-	public FacetCollector(Collector delegate, FacetRequest facetRequest) {
+	public FacetCollector(Collector delegate, FacetingRequest facetRequest) {
 		this.delegate = delegate;
 		this.facetRequest = facetRequest;
 		this.facetCounts = createFacetCounter( facetRequest );
@@ -118,12 +118,15 @@ public class FacetCollector extends Collector {
 		return delegate.acceptsDocsOutOfOrder();
 	}
 
-	public FacetResult getFacetResult() {
-		List<Facet> facetList = createSortedFacetList( facetCounts, facetRequest );
-		return new FacetResult( facetRequest.getName(), facetRequest.getFieldName(), facetList );
+	public String getFacetName() {
+		return facetRequest.getName();
 	}
 
-	private List<Facet> createSortedFacetList(FacetCounter counter, FacetRequest request) {
+	public List<Facet> getFacetList() {
+		return createSortedFacetList( facetCounts, facetRequest );
+	}
+
+	private List<Facet> createSortedFacetList(FacetCounter counter, FacetingRequest request) {
 		List<Facet> facetList = newArrayList();
 		int includedFacetCount = 0;
 		for ( Map.Entry<String, Integer> countEntry : counter.getCounts().entrySet() ) {
@@ -153,7 +156,7 @@ public class FacetCollector extends Collector {
 		fieldLoader.loadNewCacheValues( reader );
 	}
 
-	private <N extends Number> FacetCounter createFacetCounter(FacetRequest request) {
+	private <N extends Number> FacetCounter createFacetCounter(FacetingRequest request) {
 		if ( request instanceof DiscreteFacetRequest ) {
 			return new SimpleFacetCounter();
 		}

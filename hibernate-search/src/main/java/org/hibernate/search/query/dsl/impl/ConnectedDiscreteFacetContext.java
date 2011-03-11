@@ -2,7 +2,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.query.dsl.DiscreteFacetContext;
 import org.hibernate.search.query.dsl.FacetParameterContext;
-import org.hibernate.search.query.facet.FacetRequest;
+import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
 
 /**
@@ -30,7 +30,7 @@ public class ConnectedDiscreteFacetContext implements DiscreteFacetContext {
 		return new ConnectedFacetParameterContext( context );
 	}
 
-	public FacetRequest createFacet() {
+	public FacetingRequest createFacetRequest() {
 		return context.getFacetRequest();
 	}
 }

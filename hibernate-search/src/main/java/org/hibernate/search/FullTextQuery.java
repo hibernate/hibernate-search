@@ -23,7 +23,6 @@
  */
 package org.hibernate.search;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Explanation;
@@ -34,8 +33,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
-import org.hibernate.search.query.facet.FacetRequest;
-import org.hibernate.search.query.facet.FacetResult;
+import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -128,25 +126,9 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	void disableFullTextFilter(String name);
 
 	/**
-	 * Enable a facet request.
-	 *
-	 * @param facet the facet request
-	 *
-	 * @return {@code this} to allow method chaining
+	 * @return return the manager for all faceting related operations
 	 */
-	FullTextQuery enableFacet(FacetRequest facet);
-
-	/**
-	 * @return returns the faceting results
-	 */
-	Map<String, FacetResult> getFacetResults();
-
-	/**
-	 * Disable a facet with the given name.
-	 *
-	 * @param name the name of the facet to disable.
-	 */
-	void disableFacet(String name);
+	FacetManager getFacetManager();
 
 	/**
 	 * Return the Lucene {@link org.apache.lucene.search.Explanation}
