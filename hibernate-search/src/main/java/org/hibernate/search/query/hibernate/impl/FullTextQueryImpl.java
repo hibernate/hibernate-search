@@ -267,6 +267,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> type) {
 		if ( type == org.apache.lucene.search.Query.class ) {
 			return (T) hSearchQuery.getLuceneQuery();
