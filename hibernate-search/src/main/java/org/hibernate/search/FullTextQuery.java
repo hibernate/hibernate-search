@@ -160,12 +160,12 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	Explanation explain(int documentId);
 
 	/**
-	 * {link:Query#setFirstResult}
+	 * {@link Query#setFirstResult}
 	 */
 	FullTextQuery setFirstResult(int firstResult);
 
 	/**
-	 * {link:Query#setMaxResults}
+	 * {@link Query#setMaxResults}
 	 */
 	FullTextQuery setMaxResults(int maxResults);
 
