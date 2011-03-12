@@ -33,7 +33,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -54,15 +56,21 @@ import org.hibernate.search.util.LoggerFactory;
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
+ * @author Oliver Siegmar
  */
-public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> {
+public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 
 	private static final Logger log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 
+	private volatile boolean initialized;
+	private volatile boolean startRequested;
+	private volatile boolean started;
+
 	private volatile int current; //used also as memory barrier of all other values, which are set once.
 
 	//variables having visibility granted by a read of "current"
+	private volatile Directory dummyDirectory;
 	private FSDirectory directory1;
 	private FSDirectory directory2;
 	private String indexName;
@@ -73,7 +81,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 	private File indexDir;
 	private String directoryProviderName;
 	private Properties properties;
-	private TriggerTask task;
+	private UpdateTask updateTask;
 
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.properties = properties;
@@ -91,10 +99,19 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
+
+		if ( checkCurrentMarkerInSource() ) {
+			initialized = true;
+		} else {
+			log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
+			long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
+			timer.schedule( new InitTask(), period, period );
+		}
+
 		current = 0; //publish all state to other threads
 	}
 
-	private void checkCurrentMarkerInSource() {
+	private boolean checkCurrentMarkerInSource() {
 		int retry;
 		try {
 			retry = Integer.parseInt( properties.getProperty( Environment.RETRY_MARKER_LOOKUP, "0" ) );
@@ -124,12 +141,18 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 				break;
 			}
 		}
-		if ( !currentMarkerInSource ) {
-			throw new IllegalStateException( "No current marker in source directory. Has the master being started once already?" );
-		}
+		return currentMarkerInSource;
 	}
 
 	public void start() {
+		startRequested = true;
+		if ( initialized ) {
+			startIt();
+		}
+	}
+
+	public void startIt() {
+		@SuppressWarnings("unused")
 		int readCurrentState = current; //Unneeded value, but ensure visibility of state protected by memory barrier
 		int currentToBe = 0;
 		try {
@@ -179,13 +202,21 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		catch ( IOException e ) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
-		task = new TriggerTask( sourceIndexDir, indexDir );
+		updateTask = new UpdateTask( sourceIndexDir, indexDir );
 		long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
-		timer.scheduleAtFixedRate( task, period, period );
+		timer.scheduleAtFixedRate( updateTask, period, period );
 		this.current = currentToBe;
+		started = true;
 	}
 
-	public FSDirectory getDirectory() {
+	public Directory getDirectory() {
+		if ( !started ) {
+			if ( dummyDirectory == null ) {
+				dummyDirectory = new RAMDirectory();
+			}
+			return dummyDirectory;
+		}
+
 		int readState = current;// to have the read consistent in the next two "if"s.
 		if ( readState == 1 ) {
 			return directory1;
@@ -228,12 +259,33 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		return 37 * hash + indexName.hashCode();
 	}
 
-	class TriggerTask extends TimerTask {
+	class InitTask extends TimerTask {
+	
+		@Override
+		public void run() {
+			if ( !initialized ) {
+				if ( checkCurrentMarkerInSource() ) {
+					initialized = true;
+					log.info( "Found current marker in source directory - initialization succeeded" );
+				} else {
+					log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
+				}
+			}
+			
+			if ( startRequested && !started ) {
+				cancel();
+				startIt();
+			}
+		}
+	
+	}
+
+	class UpdateTask extends TimerTask {
 
 		private final ExecutorService executor;
 		private final CopyDirectory copyTask;
 
-		public TriggerTask(File sourceIndexDir, File destination) {
+		public UpdateTask(File sourceIndexDir, File destination) {
 			executor = Executors.newSingleThreadExecutor();
 			copyTask = new CopyDirectory( sourceIndexDir, destination );
 		}
@@ -340,18 +392,20 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 		@SuppressWarnings("unused")
 		int readCurrentState = current; //unneded value, but ensure visibility of state protected by memory barrier
 		timer.cancel();
-		task.stop();
-		try {
-			directory1.close();
+		if ( updateTask != null ) {
+			updateTask.stop();
 		}
-		catch ( Exception e ) {
-			log.error( "Unable to properly close Lucene directory {}" + directory1.getFile(), e );
-		}
-		try {
-			directory2.close();
-		}
-		catch ( Exception e ) {
-			log.error( "Unable to properly close Lucene directory {}" + directory2.getFile(), e );
+		closeDirectory( directory1 );
+		closeDirectory( directory2 );
+	}
+	
+	private void closeDirectory(Directory directory) {
+		if ( directory != null ) {
+			try {
+				directory.close();
+			} catch ( Exception e ) {
+				log.error( "Unable to properly close Lucene directory " + directory, e );
+			}
 		}
 	}
 }
