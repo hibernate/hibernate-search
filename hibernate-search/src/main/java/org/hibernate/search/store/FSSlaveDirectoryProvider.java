@@ -119,8 +119,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<FSDirectory> 
 			}
 			currentMarkerInSource =
 					new File( sourceIndexDir, "current1" ).exists()
-					|| new File(sourceIndexDir, "current2").exists();
-			if (currentMarkerInSource) {
+					|| new File( sourceIndexDir, "current2" ).exists();
+			if ( currentMarkerInSource ) {
 				break;
 			}
 		}
