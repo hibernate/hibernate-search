@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
@@ -88,7 +89,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		this.directoryProviderName = directoryProviderName;
 		//source guessing
 		sourceIndexDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, false );
-		checkCurrentMarkerInSource();
+		currentMarkerIsInSource();
 		log.debug( "Source directory: {}", sourceIndexDir.getPath() );
 		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
 		log.debug( "Index directory: {}", indexDir.getPath() );
@@ -100,7 +101,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
 
-		if ( checkCurrentMarkerInSource() ) {
+		if ( currentMarkerIsInSource() ) {
 			initialized = true;
 		} else {
 			log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
@@ -111,17 +112,11 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		current = 0; //publish all state to other threads
 	}
 
-	private boolean checkCurrentMarkerInSource() {
-		int retry;
-		try {
-			retry = Integer.parseInt( properties.getProperty( Environment.RETRY_MARKER_LOOKUP, "0" ) );
-			if (retry < 0) {
-				throw new NumberFormatException( );
-			}
-		}
-		catch ( NumberFormatException e ) {
-			throw new SearchException("retry_marker_lookup options must be a positive number: "
-					+ properties.getProperty( Environment.RETRY_MARKER_LOOKUP ) );
+	private boolean currentMarkerIsInSource() {
+		int retry = ConfigurationParseHelper.getIntValue( properties, Environment.RETRY_MARKER_LOOKUP, 0 );
+		if ( retry < 0 ) {
+			throw new SearchException( Environment.RETRY_MARKER_LOOKUP +
+					" option must be a positive integer, but was \"" + retry + "\"" );
 		}
 		boolean currentMarkerInSource = false;
 		for ( int tried = 0 ; tried <= retry ; tried++ ) {
@@ -254,7 +249,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		// but from a practical POV this is fine since we only call this method
 		// after initialize call
 		@SuppressWarnings("unused")
-		int readCurrentState = current; //unneded value, but ensure visibility of indexName
+		int readCurrentState = current; //unneeded value, but ensure visibility of indexName
 		int hash = 11;
 		return 37 * hash + indexName.hashCode();
 	}
@@ -390,7 +385,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 
 	public void stop() {
 		@SuppressWarnings("unused")
-		int readCurrentState = current; //unneded value, but ensure visibility of state protected by memory barrier
+		int readCurrentState = current; //unneeded value, but ensure visibility of state protected by memory barrier
 		timer.cancel();
 		if ( updateTask != null ) {
 			updateTask.stop();
