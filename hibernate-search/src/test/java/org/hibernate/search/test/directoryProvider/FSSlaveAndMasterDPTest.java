@@ -52,7 +52,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 	private static final Logger log = LoggerFactory.make();
 
-	private static File root;
+	static File root;
 
 	static {
 		String buildDir = System.getProperty( "build.dir" );
@@ -66,22 +66,22 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	/**
 	 * The lucene index directory which is shared between master and slave.
 	 */
-	private String masterCopy = "/master/copy";
+	final static String masterCopy = "/master/copy";
 
 	/**
 	 * The lucene index directory which is specific to the master node.
 	 */
-	private String masterMain = "/master/main";
+	final static String masterMain = "/master/main";
 
 	/**
 	 * The lucene index directory which is specific to the slave node.
 	 */
-	private String slave = "/slave";
+	final static String slave = "/slave";
 
 	/**
 	 * The lucene index directory which is specific to the slave node.
 	 */
-	private String slaveUnready = "/slaveUnready";
+	final static String slaveUnready = "/slaveUnready";
 
 	/**
 	 * Verifies that copies of the master get properly copied to the slaves.
@@ -180,9 +180,8 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	private Session getSlaveSession() {
 		return getSessionFactories()[1].openSession();
 	}
-
-	protected void setUp() throws Exception {
-
+	
+	static void prepareDirectories() {
 		if ( root.exists() ) {
 			FileHelper.delete( root );
 		}
@@ -210,11 +209,19 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		if ( !slaveUnreadyFile.mkdirs() ) {
 			throw new HibernateException( "Unable to setup slave directory" );
 		}
+	}
+
+	protected void setUp() throws Exception {
+		prepareDirectories();
 		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
+		cleanupDirectories();
+	}
+
+	static void cleanupDirectories() {
 		log.info( "Deleting test directory {} ", root.getAbsolutePath() );
 		FileHelper.delete( root );
 	}
