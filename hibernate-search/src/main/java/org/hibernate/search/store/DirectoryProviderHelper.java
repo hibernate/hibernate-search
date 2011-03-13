@@ -30,13 +30,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
-import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.NativeFSLockFactory;
@@ -48,6 +46,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
@@ -68,6 +67,7 @@ public final class DirectoryProviderHelper {
 	private static final String INDEX_BASE_PROP_NAME = "indexBase";
 	private static final String INDEX_NAME_PROP_NAME = "indexName";
 	private static final String REFRESH_PROP_NAME = "refresh";
+	private static final String RETRY_INITIALIZE_PROP_NAME = "retry_initialize_period";
 
 	private DirectoryProviderHelper() {
 	}
@@ -274,6 +274,20 @@ public final class DirectoryProviderHelper {
 							+ indexName
 			);
 		}
+	}
+	
+	/**
+	 * @param properties the configuration of the DirectoryProvider
+	 * @param directoryProviderName the name of the DirectoryProvider, used for error reporting
+	 * @return The period in milliseconds to keep retrying initialization of a DirectoryProvider 
+	 */
+	static long getRetryInitializePeriod(Properties properties, String directoryProviderName) {
+		int retry_period_seconds = ConfigurationParseHelper.getIntValue( properties, RETRY_INITIALIZE_PROP_NAME, 0 );
+		log.debug( "Retry initialize period for Directory {}: {} seconds", directoryProviderName, retry_period_seconds );
+		if ( retry_period_seconds < 0 ) {
+			throw new SearchException( RETRY_INITIALIZE_PROP_NAME + " for Directory " + directoryProviderName + " must be a positive integer" );
+		}
+		return retry_period_seconds * 1000; //convert into milliseconds
 	}
 
 	static long getRefreshPeriod(Properties properties, String directoryProviderName) {

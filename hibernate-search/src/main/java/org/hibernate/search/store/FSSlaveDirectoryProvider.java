@@ -131,8 +131,13 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	public void start() {
 		if ( ! attemptInitializeAndStart() ) {
 			// if we failed to initialize and/or start, we'll try again later: setup a timer
-			long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
-			timer.schedule( new InitTask(), period, period );
+			long period = DirectoryProviderHelper.getRetryInitializePeriod( properties, directoryProviderName );
+			if ( period != 0 ) {
+				timer.schedule( new InitTask(), period, period );
+			}
+			else {
+				throw new SearchException( "Failed to initialize DirectoryProvider " + directoryProviderName );
+			}
 		}
 	}
 
