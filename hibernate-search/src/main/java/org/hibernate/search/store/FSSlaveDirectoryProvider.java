@@ -258,21 +258,27 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	
 		@Override
 		public void run() {
-			if ( !initialized ) {
-				if ( checkCurrentMarkerInSource() ) {
-					initialized = true;
-					log.info( "Found current marker in source directory - initialization succeeded" );
-				} else {
-					log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
+			try {
+				if ( !initialized ) {
+					if ( currentMarkerIsInSource() ) {
+						initialized = true;
+						log.info( "Found current marker in source directory - initialization succeeded" );
+					} else {
+						log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
+					}
+				}
+				
+				if ( startRequested && !started ) {
+					cancel();
+					startIt();
 				}
 			}
-			
-			if ( startRequested && !started ) {
-				cancel();
-				startIt();
+			catch (RuntimeException re) {
+				// we need this to make sure the error is logged somewhere,
+				// as we're executing it in the timer thread
+				log.error( "Failed to initialize SlaveDirectoryProvider " + indexName, re );
 			}
 		}
-	
 	}
 
 	class UpdateTask extends TimerTask {
