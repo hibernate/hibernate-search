@@ -269,7 +269,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cfg[1].setProperty( "hibernate.search.default.refresh", "1" ); //every second
 		//keep the fqcn to make sure non short cut solutions still work
 		cfg[1].setProperty(
-				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSSlaveDirectoryProvider"
+				"hibernate.search.default.directory_provider", "filesystem-slave"
 		);
 	}
 }
