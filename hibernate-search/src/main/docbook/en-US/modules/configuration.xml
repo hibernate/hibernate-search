@@ -286,9 +286,20 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.provider.CustomDi
             see <xref
             linkend="search-configuration-directory-lockfactories" />
             </para><para><literal>retry_marker_lookup</literal> : optional,
-            default to 0. Defines how many times, we look for the marker files
+            default to 0. Defines how many times we look for the marker files
             in the source directory before failing. Waiting 5 seconds between
-            each try. </para><para><literal>filesystem_access_type</literal>:
+            each try. </para>
+            <para><literal>retry_initialize_period</literal> : optional,
+            set an integer value in seconds to enable the retry initialize feature:
+            if the slave can't find the master
+            index it will try again until it's found in background, without preventing
+            the application to start: fullText queries performed
+            before the index is initialized are not blocked but will return empty results.
+            When not enabling the option or explicitly setting it to zero it will fail
+            with an exception instead of scheduling a retry timer. To prevent the application from
+            starting without an invalid index but still control an initialization
+            timeout, see <literal>retry_marker_lookup</literal> instead.</para>
+            <para><literal>filesystem_access_type</literal>:
             allows to determine the exact type of
             <classname>FSDirectory</classname> implementation used by this
             <classname>DirectoryProvider</classname>. Allowed values are
