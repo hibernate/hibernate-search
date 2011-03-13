@@ -133,10 +133,11 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			// if we failed to initialize and/or start, we'll try again later: setup a timer
 			long period = DirectoryProviderHelper.getRetryInitializePeriod( properties, directoryProviderName );
 			if ( period != 0 ) {
-				timer.schedule( new InitTask(), period, period );
+				scheduleTask( new InitTask(), period );
 			}
 			else {
-				throw new SearchException( "Failed to initialize DirectoryProvider " + directoryProviderName );
+				throw new SearchException( "Failed to initialize DirectoryProvider \""
+						+ directoryProviderName + "\": could not find marker file in index source" );
 			}
 		}
 	}
@@ -194,7 +195,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		}
 		updateTask = new UpdateTask( sourceIndexDir, indexDir );
 		long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
-		timer.scheduleAtFixedRate( updateTask, period, period );
+		scheduleTask( updateTask, period );
 		this.current = currentToBe;
 		started = true;
 	}
@@ -272,13 +273,13 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	/**
 	 * @return true if both initialize and start succeeded
 	 */
-	private synchronized boolean attemptInitializeAndStart() {
+	protected synchronized boolean attemptInitializeAndStart() {
 		if ( !initialized ) {
 			if ( currentMarkerIsInSource() ) {
 				initialized = true;
 				log.info( "Found current marker in source directory - initialization succeeded" );
 			} else {
-				log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
+				log.warn( "No current marker in source directory. Has the master being started already?" );
 			}
 		}
 		if ( initialized ) {
@@ -415,4 +416,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			}
 		}
 	}
+	
+	protected void scheduleTask(TimerTask task, long period) {
+		timer.schedule( task, period, period );
+	}
+	
 }
