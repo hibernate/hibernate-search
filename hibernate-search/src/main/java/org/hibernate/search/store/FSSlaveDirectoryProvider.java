@@ -64,9 +64,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	private static final Logger log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 
-	private volatile boolean initialized;
-	private volatile boolean startRequested;
-	private volatile boolean started;
+	private volatile boolean initialized = false;
+	private volatile boolean started = false;
 
 	private volatile int current; //used also as memory barrier of all other values, which are set once.
 
@@ -89,7 +88,6 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		this.directoryProviderName = directoryProviderName;
 		//source guessing
 		sourceIndexDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, false );
-		currentMarkerIsInSource();
 		log.debug( "Source directory: {}", sourceIndexDir.getPath() );
 		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
 		log.debug( "Index directory: {}", indexDir.getPath() );
@@ -100,15 +98,6 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
-
-		if ( currentMarkerIsInSource() ) {
-			initialized = true;
-		} else {
-			log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
-			long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
-			timer.schedule( new InitTask(), period, period );
-		}
-
 		current = 0; //publish all state to other threads
 	}
 
@@ -140,13 +129,14 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	}
 
 	public void start() {
-		startRequested = true;
-		if ( initialized ) {
-			startIt();
+		if ( ! attemptInitializeAndStart() ) {
+			// if we failed to initialize and/or start, we'll try again later: setup a timer
+			long period = DirectoryProviderHelper.getRefreshPeriod( properties, directoryProviderName );
+			timer.schedule( new InitTask(), period, period );
 		}
 	}
 
-	public void startIt() {
+	private void startIt() {
 		@SuppressWarnings("unused")
 		int readCurrentState = current; //Unneeded value, but ensure visibility of state protected by memory barrier
 		int currentToBe = 0;
@@ -261,18 +251,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		@Override
 		public void run() {
 			try {
-				if ( !initialized ) {
-					if ( currentMarkerIsInSource() ) {
-						initialized = true;
-						log.info( "Found current marker in source directory - initialization succeeded" );
-					} else {
-						log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
-					}
-				}
-				
-				if ( startRequested && !started ) {
+				if ( attemptInitializeAndStart() ) {
+					// then this task is no longer needed
 					cancel();
-					startIt();
 				}
 			}
 			catch (RuntimeException re) {
@@ -281,6 +262,24 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				log.error( "Failed to initialize SlaveDirectoryProvider " + indexName, re );
 			}
 		}
+	}
+	
+	/**
+	 * @return true if both initialize and start succeeded
+	 */
+	private synchronized boolean attemptInitializeAndStart() {
+		if ( !initialized ) {
+			if ( currentMarkerIsInSource() ) {
+				initialized = true;
+				log.info( "Found current marker in source directory - initialization succeeded" );
+			} else {
+				log.warn( "No current marker in source directory. Has the master being started once already? Will retry to initialize ..." );
+			}
+		}
+		if ( initialized ) {
+			startIt();
+		}
+		return this.started;
 	}
 
 	class UpdateTask extends TimerTask {
