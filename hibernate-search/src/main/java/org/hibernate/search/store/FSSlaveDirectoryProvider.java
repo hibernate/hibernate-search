@@ -207,7 +207,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	public Directory getDirectory() {
 		if ( !started ) {
 			if ( dummyDirectory == null ) {
-				dummyDirectory = new RAMDirectory();
+				RAMDirectory directory = new RAMDirectory();
+				DirectoryProviderHelper.initializeIndexIfNeeded( directory );
+				dummyDirectory = directory;
 			}
 			return dummyDirectory;
 		}
