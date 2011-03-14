@@ -60,30 +60,30 @@ public class ContextualExceptionBridge implements FieldBridge {
 	}
 
 	protected BridgeException buildBridgeException(Exception e, String method) {
-		StringBuilder error = new StringBuilder("Exception while calling bridge#");
-		error.append(method);
+		StringBuilder error = new StringBuilder( "Exception while calling bridge#" );
+		error.append( method );
 		if ( clazz != null ) {
-			error.append("\n\tclass: ").append( clazz.getName() );
+			error.append( "\n\tclass: " ).append( clazz.getName() );
 		}
 		if ( path.size() > 0 ) {
-			error.append("\n\tpath: ");
-			for(XMember pathNode : path) {
-				error.append( pathNode.getName() ).append(".");
+			error.append( "\n\tpath: " );
+			for( XMember pathNode : path ) {
+				error.append( pathNode.getName() ).append( "." );
 			}
 			error.deleteCharAt( error.length() - 1 );
 		}
 		if ( fieldName != null ) {
-			error.append("\n\tfield bridge: ").append(fieldName);
+			error.append( "\n\tfield bridge: " ).append( fieldName );
 		}
-		throw new BridgeException(error.toString(), e);
+		throw new BridgeException( error.toString(), e );
 	}
 
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		try {
-			delegate.set(name, value, document, luceneOptions);
+			delegate.set( name, value, document, luceneOptions );
 		}
 		catch (Exception e) {
-			throw buildBridgeException(e, "set");
+			throw buildBridgeException( e, "set" );
 		}
 	}
 
