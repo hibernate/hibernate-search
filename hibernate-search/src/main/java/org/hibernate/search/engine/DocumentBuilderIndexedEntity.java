@@ -429,7 +429,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				.setClass( entityType )
 				.setFieldName( idKeywordName );
 		if ( idGetter != null ) {
-			contextualBridge.pushMethod( idGetter.getName() );
+			contextualBridge.pushMethod( idGetter );
 		}
 		contextualBridge.set( idKeywordName, id, doc, luceneOptions );
 		if ( idGetter != null ) {
@@ -477,7 +477,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			final String fieldName = propertiesMetadata.fieldNames.get( i );
 			contextualBridge
 					.setFieldBridge( fieldBridge )
-					.pushMethod( member.getName() )
+					.pushMethod( member )
 					.setFieldName( fieldName )
 					.set(
 							fieldName, value, doc,
@@ -494,7 +494,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// recursively process embedded objects
 		for ( int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++ ) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
-			contextualBridge.pushMethod( member.getName() );
+			contextualBridge.pushMethod( member );
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 			//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
 

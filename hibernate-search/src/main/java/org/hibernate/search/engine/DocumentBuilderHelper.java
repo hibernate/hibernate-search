@@ -72,7 +72,7 @@ public final class DocumentBuilderHelper {
 				.setClass( clazz )
 				.setFieldName( fieldName )
 				.setFieldBridge( fieldBridge )
-				.pushMethod( "identifier" );
+				.pushIdentifierMethod();
 		return (Serializable) contextualBridge.get( fieldName, document );
 	}
 
@@ -100,7 +100,7 @@ public final class DocumentBuilderHelper {
 		if ( builderIndexedEntity.getIdKeywordName() != null ) {
 			final XMember member = builderIndexedEntity.getIdGetter();
 			if ( member != null ) {
-				contextualBridge.pushMethod( member.getName() );
+				contextualBridge.pushMethod( member );
 			}
 			populateResult(
 					builderIndexedEntity.getIdKeywordName(),
@@ -149,7 +149,7 @@ public final class DocumentBuilderHelper {
 		final int nbrFoEntityFields = metadata.fieldNames.size();
 		for ( int index = 0; index < nbrFoEntityFields; index++ ) {
 			final String fieldName = metadata.fieldNames.get( index );
-			contextualBridge.pushMethod( metadata.fieldGetters.get( index ).getName() );
+			contextualBridge.pushMethod( metadata.fieldGetters.get( index ) );
 			populateResult(
 					fieldName,
 					metadata.fieldBridges.get( index ),
@@ -168,7 +168,7 @@ public final class DocumentBuilderHelper {
 			//there is nothing we can do for collections
 			if ( metadata.embeddedContainers
 					.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
-				contextualBridge.pushMethod( metadata.embeddedGetters.get( index ).getName() );
+				contextualBridge.pushMethod( metadata.embeddedGetters.get( index ) );
 				processFieldsForProjection(
 						metadata.embeddedPropertiesMetadata.get( index ), fields, result, document, contextualBridge
 				);

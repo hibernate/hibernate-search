@@ -24,7 +24,12 @@
 
 package org.hibernate.search.bridge.util;
 
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+
 import org.apache.lucene.document.Document;
+import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
@@ -34,6 +39,9 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  * @author Emmanuel Bernard
  */
 public class ContextualException2WayBridge extends ContextualExceptionBridge implements TwoWayFieldBridge {
+	
+	private static final NamedVirtualXMember IDENTIFIER = new NamedVirtualXMember( "identifier" );
+	
 	private TwoWayFieldBridge delegate;
 	private StringBridge stringBridge;
 
@@ -77,8 +85,8 @@ public class ContextualException2WayBridge extends ContextualExceptionBridge imp
 		}
 	}
 
-	public ContextualException2WayBridge pushMethod(String name) {
-		super.pushMethod(name);
+	public ContextualException2WayBridge pushMethod(XMember xMember) {
+		super.pushMethod( xMember );
 		return this;
 	}
 
@@ -93,4 +101,80 @@ public class ContextualException2WayBridge extends ContextualExceptionBridge imp
 		this.delegate = null;
 		return this;
 	}
+
+	public ContextualException2WayBridge pushIdentifierMethod() {
+		super.pushMethod( IDENTIFIER );
+		return this;
+	}
+	
+	private static class NamedVirtualXMember implements XMember {
+		
+		private final String name;
+
+		NamedVirtualXMember(String name) {
+			this.name = name;
+		}
+
+		public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+			throw new UnsupportedOperationException();
+		}
+
+		public <T extends Annotation> boolean isAnnotationPresent(Class<T> annotationType) {
+			throw new UnsupportedOperationException();
+		}
+
+		public Annotation[] getAnnotations() {
+			throw new UnsupportedOperationException();
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public boolean isCollection() {
+			return false;
+		}
+
+		public boolean isArray() {
+			return false;
+		}
+
+		public Class<? extends Collection> getCollectionClass() {
+			throw new UnsupportedOperationException();
+		}
+
+		public XClass getType() {
+			throw new UnsupportedOperationException();
+		}
+
+		public XClass getElementClass() {
+			throw new UnsupportedOperationException();
+		}
+
+		public XClass getClassOrElementClass() {
+			throw new UnsupportedOperationException();
+		}
+
+		public XClass getMapKey() {
+			throw new UnsupportedOperationException();
+		}
+
+		public int getModifiers() {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setAccessible(boolean accessible) {
+		}
+
+		public Object invoke(Object target, Object... parameters) {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean isTypeResolved() {
+			throw new UnsupportedOperationException();
+		}
+		
+	}
+	
+
 }

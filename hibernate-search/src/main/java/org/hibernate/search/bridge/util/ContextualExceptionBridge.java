@@ -25,11 +25,12 @@
 package org.hibernate.search.bridge.util;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,7 +41,7 @@ import java.util.List;
 public class ContextualExceptionBridge implements FieldBridge {
 	private FieldBridge delegate;
 	protected Class<?> clazz;
-	protected List<String> path = new ArrayList<String>(5);
+	protected List<XMember> path = new LinkedList<XMember>();
 	protected String fieldName;
 
 	public ContextualExceptionBridge setFieldBridge(FieldBridge delegate) {
@@ -66,8 +67,8 @@ public class ContextualExceptionBridge implements FieldBridge {
 		}
 		if ( path.size() > 0 ) {
 			error.append("\n\tpath: ");
-			for(String pathNode : path) {
-				error.append(pathNode).append(".");
+			for(XMember pathNode : path) {
+				error.append( pathNode.getName() ).append(".");
 			}
 			error.deleteCharAt( error.length() - 1 );
 		}
@@ -86,8 +87,8 @@ public class ContextualExceptionBridge implements FieldBridge {
 		}
 	}
 
-	public ContextualExceptionBridge pushMethod(String name) {
-		path.add(name);
+	public ContextualExceptionBridge pushMethod(XMember xMember) {
+		path.add( xMember );
 		return this;
 	}
 
@@ -95,4 +96,5 @@ public class ContextualExceptionBridge implements FieldBridge {
 		path.remove( path.size() - 1 );
 		return this;
 	}
+
 }
