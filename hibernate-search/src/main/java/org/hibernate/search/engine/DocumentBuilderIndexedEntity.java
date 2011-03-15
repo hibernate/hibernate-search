@@ -69,6 +69,8 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.ContextualExceptionBridge;
+import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
+import org.hibernate.search.engine.spi.EntityInitializer;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.ClassLoadingStrategySelector;
@@ -353,7 +355,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		if ( add ) {
-			queue.add( createAddWork( entityClass, entity, id, idInString, batch ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, HibernateStatelessInitializer.INSTANCE, batch ) );
 		}
 	}
 	
@@ -373,9 +375,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return contextualBridge.objectToString( value );
 	}
 
-	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, boolean isBatch) {
+	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, EntityInitializer sessionInitializer, boolean isBatch) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap );
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
 		AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new AddLuceneWork( id, idInString, entityClass, doc, isBatch );
@@ -393,16 +395,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param id the entity id.
 	 * @param fieldToAnalyzerMap this maps gets populated while generating the <code>Document</code>.
 	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
+	 * @param objectInitializer 
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
-	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap) {
+	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, EntityInitializer objectInitializer) {
 		if ( fieldToAnalyzerMap == null ) {
 			throw new IllegalArgumentException( "fieldToAnalyzerMap cannot be null" );
 		}
 
 		Document doc = new Document();
-		final Class<?> entityType = HibernateHelper.getClass( instance );
+		final Class<?> entityType = objectInitializer.getClass( instance );
 		doc.setBoost( getMetadata().getClassBoost( instance ) );
 
 		// add the class name of the entity to the document
@@ -437,7 +440,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 		// finally add all other document fields
 		Set<String> processedFieldNames = new HashSet<String>();
-		buildDocumentFields( instance, doc, getMetadata(), fieldToAnalyzerMap, processedFieldNames, contextualBridge );
+		buildDocumentFields( instance, doc, getMetadata(), fieldToAnalyzerMap, processedFieldNames, contextualBridge, objectInitializer );
 		return doc;
 	}
 
@@ -446,13 +449,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									 PropertiesMetadata propertiesMetadata,
 									 Map<String, String> fieldToAnalyzerMap,
 									 Set<String> processedFieldNames,
-									 ContextualExceptionBridge contextualBridge) {
+									 ContextualExceptionBridge contextualBridge,
+									 EntityInitializer objectInitializer) {
 		if ( instance == null ) {
 			return;
 		}
 
 		// needed for field access: I cannot work in the proxied version
-		Object unproxiedInstance = HibernateHelper.unproxy( instance );
+		Object unproxiedInstance = objectInitializer.unproxy( instance );
 
 		// process the class bridges
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
@@ -503,6 +507,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			PropertiesMetadata embeddedMetadata = propertiesMetadata.embeddedPropertiesMetadata.get( i );
 			switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
 				case ARRAY:
+					Object[] array = objectInitializer.initializeArray( (Object[]) value );
 					for ( Object arrayValue : (Object[]) value ) {
 						buildDocumentFields(
 								arrayValue,
@@ -510,37 +515,48 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 								embeddedMetadata,
 								fieldToAnalyzerMap,
 								processedFieldNames,
-								contextualBridge
+								contextualBridge,
+								objectInitializer
 						);
 					}
 					break;
 				case COLLECTION:
-					for ( Object collectionValue : (Collection) value ) {
+					Collection collection = objectInitializer.initializeCollection( (Collection) value );
+					for ( Object collectionValue : collection ) {
 						buildDocumentFields(
 								collectionValue,
 								doc,
 								embeddedMetadata,
 								fieldToAnalyzerMap,
 								processedFieldNames,
-								contextualBridge
+								contextualBridge,
+								objectInitializer
 						);
 					}
 					break;
 				case MAP:
-					for ( Object collectionValue : ( (Map) value ).values() ) {
+					Map map = objectInitializer.initializeMap( (Map) value );
+					for ( Object collectionValue : map.values() ) {
 						buildDocumentFields(
 								collectionValue,
 								doc,
 								embeddedMetadata,
 								fieldToAnalyzerMap,
 								processedFieldNames,
-								contextualBridge
+								contextualBridge,
+								objectInitializer
 						);
 					}
 					break;
 				case OBJECT:
 					buildDocumentFields(
-							value, doc, embeddedMetadata, fieldToAnalyzerMap, processedFieldNames, contextualBridge
+							value,
+							doc,
+							embeddedMetadata,
+							fieldToAnalyzerMap,
+							processedFieldNames,
+							contextualBridge,
+							objectInitializer
 					);
 					break;
 				default:

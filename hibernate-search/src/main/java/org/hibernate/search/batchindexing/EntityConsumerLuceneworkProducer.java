@@ -34,12 +34,15 @@ import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.util.ContextualException2WayBridge;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
+import org.hibernate.search.engine.spi.EntityInitializer;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
@@ -109,6 +112,8 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 	}
 
 	private void indexAllQueue(Session session) {
+		final EntityInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
+				(SessionImplementor) session );
 		try {
 			while ( true ) {
 				List<?> takeList = source.take();
@@ -120,7 +125,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 					for ( Object take : takeList ) {
 						//trick to attach the objects to session:
 						session.buildLockRequest( LockOptions.NONE ).lock( take );
-						index( take, session );
+						index( take, session, sessionInitializer );
 						monitor.documentsBuilt( 1 );
 						session.clear();
 					}
@@ -134,7 +139,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void index( Object entity, Session session ) throws InterruptedException {
+	private void index( Object entity, Session session, EntityInitializer sessionInitializer ) throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
 		DocumentBuilderIndexedEntity docBuilder = documentBuilders.get( clazz );
@@ -152,7 +157,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 		String idInString = contextualBridge.objectToString( id );
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
-		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, true );
+		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer, true );
 		backend.enqueueAsyncWork( addWork );
 	}
 	

@@ -1,0 +1,69 @@
+/* 
+ * JBoss, Home of Professional Open Source
+ * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+ * as indicated by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ */
+
+package org.hibernate.search.engine.impl;
+
+import java.util.Collection;
+import java.util.Map;
+
+import org.hibernate.collection.PersistentCollection;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.persister.collection.CollectionPersister;
+import org.hibernate.search.engine.spi.EntityInitializer;
+
+/**
+ * This EntityInitializer is relative to a specific Hibernate Session,
+ * so it's able to attach detached collections to it's Session.
+ * 
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ */
+public class HibernateSessionLoadingInitializer extends HibernateStatelessInitializer implements EntityInitializer {
+
+	private final SessionImplementor hibernateSession;
+
+	public HibernateSessionLoadingInitializer(SessionImplementor hibernateSession) {
+		this.hibernateSession = hibernateSession;
+	}
+	
+	@Override
+	public <T> Collection<T> initializeCollection(Collection<T> value) {
+		if ( value instanceof PersistentCollection ) {
+			preparePersistentCollection( ( PersistentCollection ) value );
+		}
+		return value;
+	}
+
+	@Override
+	public <K,V> Map<K,V> initializeMap(Map<K,V> value) {
+		if ( value instanceof PersistentCollection ) {
+			preparePersistentCollection( ( PersistentCollection ) value );
+		}
+		return value;
+	}
+	
+	private void preparePersistentCollection( PersistentCollection value ) {
+		// we have to check that it's not already associated, might have happened via cascading:
+		if ( value.setCurrentSession( hibernateSession ) ) {
+			String role = value.getRole();
+			CollectionPersister collectionPersister = hibernateSession.getFactory().getCollectionPersister( role );
+			hibernateSession.getPersistenceContext().addInitializedDetachedCollection( collectionPersister, value );
+		}
+	}
+	
+}
