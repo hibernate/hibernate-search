@@ -53,9 +53,9 @@ public class RetryInitializeTest extends TestCase {
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		FSSlaveAndMasterDPTest.cleanupDirectories();
 		if ( slave != null ) slave.close();
 		if ( master != null ) master.close();
+		FSSlaveAndMasterDPTest.cleanupDirectories();
 	}
 	
 	public void testStandardInitialization() {
@@ -113,7 +113,7 @@ public class RetryInitializeTest extends TestCase {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( SnowStorm.class )
 			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
-			.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave )
+			.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/slave" )
 			.setProperty( "hibernate.search.default.directory_provider", FSSlaveDirectoryProviderTestingExtension.class.getName() );
 		if ( enableRetryInitializePeriod ) {
 			builder.setProperty( "hibernate.search.default.retry_initialize_period", "12" );
