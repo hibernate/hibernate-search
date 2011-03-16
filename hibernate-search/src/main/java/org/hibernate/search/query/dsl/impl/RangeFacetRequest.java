@@ -31,13 +31,12 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
  */
 // todo have some helper method or constructors to create range requests using a start and increment
-public class RangeFacetRequest<T> extends FacetingRequest {
+public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	private final List<FacetRange<T>> facetRangeList;
 
 	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges) {
@@ -89,7 +88,7 @@ public class RangeFacetRequest<T> extends FacetingRequest {
 		return range;
 	}
 
-	static class RangeFacet<T> extends Facet {
+	static class RangeFacet<T> extends AbstractFacet {
 		private FacetRange<T> range;
 
 		RangeFacet(String fieldName, FacetRange<T> range, int count) {

@@ -29,12 +29,11 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DiscreteFacetRequest extends FacetingRequest {
+public class DiscreteFacetRequest extends FacetingRequestImpl {
 	DiscreteFacetRequest(String name, String fieldName) {
 		super( name, fieldName );
 	}
@@ -49,7 +48,7 @@ public class DiscreteFacetRequest extends FacetingRequest {
 		return new SimpleFacet( getFieldName(), value, count );
 	}
 
-	static class SimpleFacet extends Facet {
+	static class SimpleFacet extends AbstractFacet {
 		SimpleFacet(String fieldName, String value, int count) {
 			super( fieldName, value, count );
 		}

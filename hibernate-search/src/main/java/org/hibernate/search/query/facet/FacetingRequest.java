@@ -25,96 +25,26 @@
 package org.hibernate.search.query.facet;
 
 /**
- * Base class for faceting requests.
+ * Faceting request interface.
  *
  * @author Hardy Ferentschik
  */
-public abstract class FacetingRequest {
-	/**
-	 * A user specified name for the facet request
-	 */
-	private final String name;
+public interface FacetingRequest {
+	public String getName();
 
-	/**
-	 * The document field name to facet on
-	 */
-	private final String fieldName;
+	public String getFieldName();
 
-	/**
-	 * Specified in which order the facets will be returned
-	 */
-	private FacetSortOrder sort = FacetSortOrder.COUNT_DESC;
+	public void setSort(FacetSortOrder sort);
 
-	/**
-	 * Whether a facet value with 0 occurrences
-	 */
-	private boolean includeZeroCounts = true;
+	public FacetSortOrder getSort();
 
-	/**
-	 * The maximum number of {@link Facet}s to return for this request. A negative value means that all
-	 * facets will be included
-	 */
-	private int maxNumberOfFacets = 1;
+	public int getMaxNumberOfFacets();
 
-	public FacetingRequest(String name, String fieldName) {
-		if ( name == null ) {
-			throw new IllegalArgumentException( "The request name name cannot be null" );
-		}
-		if ( fieldName == null ) {
-			throw new IllegalArgumentException( "The field name cannot be null" );
-		}
-		this.name = name;
-		this.fieldName = fieldName;
-	}
+	public void setMaxNumberOfFacets(int maxNumberOfFacets);
 
-	public String getName() {
-		return name;
-	}
+	public boolean includeZeroCounts();
 
-	public String getFieldName() {
-		return fieldName;
-	}
-
-	public void setSort(FacetSortOrder sort) {
-		this.sort = sort;
-	}
-
-	public FacetSortOrder getSort() {
-		return sort;
-	}
-
-	public int getMaxNumberOfFacets() {
-		return maxNumberOfFacets;
-	}
-
-	public void setMaxNumberOfFacets(int maxNumberOfFacets) {
-		this.maxNumberOfFacets = maxNumberOfFacets;
-	}
-
-	public abstract Class<?> getFieldCacheType();
-
-	public abstract Facet createFacet(String value, int count);
-
-	public boolean includeZeroCounts() {
-		return includeZeroCounts;
-	}
-
-	public void setIncludeZeroCounts(boolean includeZeroCounts) {
-		this.includeZeroCounts = includeZeroCounts;
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "FacetingRequest" );
-		sb.append( "{name='" ).append( name ).append( '\'' );
-		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
-		sb.append( ", sort=" ).append( sort );
-		sb.append( ", includeZeroCounts=" ).append( includeZeroCounts );
-		sb.append( ", maxNumberOfFacets=" ).append( maxNumberOfFacets );
-		sb.append( '}' );
-		return sb.toString();
-	}
+	public void setIncludeZeroCounts(boolean includeZeroCounts);
 }
 
 

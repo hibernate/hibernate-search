@@ -31,73 +31,14 @@ import org.apache.lucene.search.Query;
  *
  * @author Hardy Ferentschik
  */
-public abstract class Facet {
-	private final String fieldName;
-	private final String value;
-	private final int count;
+public interface Facet {
+	public int getCount();
 
-	public Facet(String fieldName, String value, int count) {
-		this.fieldName = fieldName;
-		this.count = count;
-		this.value = value;
-	}
+	public String getValue();
 
-	public int getCount() {
-		return count;
-	}
+	public String getFieldName();
 
-	public String getValue() {
-		return value;
-	}
-
-	public String getFieldName() {
-		return fieldName;
-	}
-
-	public abstract Query getFacetQuery();
-
-	@Override
-	public boolean equals(Object o) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( o == null || getClass() != o.getClass() ) {
-			return false;
-		}
-
-		Facet facet = (Facet) o;
-
-		if ( count != facet.count ) {
-			return false;
-		}
-		if ( fieldName != null ? !fieldName.equals( facet.fieldName ) : facet.fieldName != null ) {
-			return false;
-		}
-		if ( value != null ? !value.equals( facet.value ) : facet.value != null ) {
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = fieldName != null ? fieldName.hashCode() : 0;
-		result = 31 * result + ( value != null ? value.hashCode() : 0 );
-		result = 31 * result + count;
-		return result;
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "Facet" );
-		sb.append( "{fieldName='" ).append( fieldName ).append( '\'' );
-		sb.append( ", value='" ).append( value ).append( '\'' );
-		sb.append( ", count=" ).append( count );
-		sb.append( '}' );
-		return sb.toString();
-	}
+	public Query getFacetQuery();
 }
 
 

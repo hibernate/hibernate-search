@@ -34,6 +34,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 
+import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.FacetSelection;
 import org.hibernate.search.query.facet.Facet;
@@ -51,7 +52,7 @@ public class FacetManagerImpl implements FacetManager {
 	/**
 	 * The map of currently active/enabled facet requests.
 	 */
-	private final Map<String, FacetingRequest> facetRequests = newHashMap();
+	private final Map<String, FacetingRequestImpl> facetRequests = newHashMap();
 
 	/**
 	 * Keep track of the current facet selection groups.
@@ -79,7 +80,7 @@ public class FacetManagerImpl implements FacetManager {
 	}
 
 	public FacetManager enableFaceting(FacetingRequest facetingRequest) {
-		facetRequests.put( facetingRequest.getName(), facetingRequest );
+		facetRequests.put( facetingRequest.getName(), (FacetingRequestImpl) facetingRequest );
 		queryHasChanged();
 		return this;
 	}
@@ -117,7 +118,7 @@ public class FacetManagerImpl implements FacetManager {
 		return selection;
 	}
 
-	Map<String, FacetingRequest> getFacetRequests() {
+	Map<String, FacetingRequestImpl> getFacetRequests() {
 		return facetRequests;
 	}
 

@@ -50,9 +50,9 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.query.collector.FacetCollector;
 import org.hibernate.search.query.collector.FieldCacheCollector;
 import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
+import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
@@ -69,7 +69,7 @@ public class QueryHits {
 	private final IndexSearcherWithPayload searcher;
 	private final Filter filter;
 	private final Sort sort;
-	private final Map<String, FacetingRequest> facetRequests;
+	private final Map<String, FacetingRequestImpl> facetRequests;
 	private final TimeoutManagerImpl timeoutManager;
 
 	private int totalHits;
@@ -95,7 +95,7 @@ public class QueryHits {
 					 Filter filter,
 					 Sort sort,
 					 TimeoutManagerImpl timeoutManager,
-					 Map<String, FacetingRequest> facetRequests,
+					 Map<String, FacetingRequestImpl> facetRequests,
 					 boolean enableFieldCacheOnTypes,
 					 FieldCacheCollectorFactory idFieldCollector)
 			throws IOException {
@@ -111,7 +111,7 @@ public class QueryHits {
 					 Sort sort,
 					 Integer n,
 					 TimeoutManagerImpl timeoutManager,
-					 Map<String, FacetingRequest> facetRequests,
+					 Map<String, FacetingRequestImpl> facetRequests,
 					 boolean enableFieldCacheOnTypes,
 					 FieldCacheCollectorFactory idFieldCollector)
 			throws IOException {
@@ -233,7 +233,7 @@ public class QueryHits {
 		}
 		facetCollectors = new ArrayList<FacetCollector>();
 		Collector nextInChain = collector;
-		for ( FacetingRequest entry : facetRequests.values() ) {
+		for ( FacetingRequestImpl entry : facetRequests.values() ) {
 			FacetCollector facetCollector = new FacetCollector( nextInChain, entry );
 			nextInChain = facetCollector;
 			facetCollectors.add( facetCollector );
