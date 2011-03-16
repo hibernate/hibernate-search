@@ -24,7 +24,8 @@
 
 package org.hibernate.search.query.facet;
 
-import org.hibernate.AssertionFailure;
+
+import org.hibernate.annotations.common.AssertionFailure;
 
 /**
  * @author Hardy Ferentschik
