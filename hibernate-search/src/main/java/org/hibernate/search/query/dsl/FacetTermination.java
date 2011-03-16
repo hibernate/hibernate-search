@@ -34,5 +34,5 @@ public interface FacetTermination {
 	/**
 	 * @return the {@link org.hibernate.search.query.facet.FacetingRequest} produced by the building process.
 	 */
-	FacetingRequest createFacetRequest();
+	FacetingRequest createFacetingRequest();
 }

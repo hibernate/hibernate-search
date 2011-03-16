@@ -46,7 +46,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacetRequest();
+				.createFacetingRequest();
 
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		FacetManager facetManager = query.getFacetManager();
@@ -76,7 +76,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.name( ccsFacetName )
 				.onField( ccsFacetFieldName )
 				.discrete()
-				.createFacetRequest();
+				.createFacetingRequest();
 
 		final String colorFacetName = "color";
 		final String colorFacetFieldName = "color";
@@ -84,7 +84,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.name( colorFacetName )
 				.onField( colorFacetFieldName )
 				.discrete()
-				.createFacetRequest();
+				.createFacetingRequest();
 
 		FullTextQuery query = createMatchAllQuery( Car.class );
 		FacetManager facetManager = query.getFacetManager();
@@ -122,7 +122,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Fruit.class );
 		FacetManager facetManager = query.getFacetManager();
 		facetManager.enableFaceting( rangeRequest );

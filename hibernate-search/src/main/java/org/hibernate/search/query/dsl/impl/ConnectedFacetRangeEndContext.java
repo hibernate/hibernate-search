@@ -49,7 +49,7 @@ public class ConnectedFacetRangeEndContext<T> implements FacetRangeEndContext<T>
 		return new ConnectedFacetRangeLimitContext<T>( context );
 	}
 
-	public FacetingRequest createFacetRequest() {
+	public FacetingRequest createFacetingRequest() {
 		context.makeRange();
 		return context.getFacetRequest();
 	}

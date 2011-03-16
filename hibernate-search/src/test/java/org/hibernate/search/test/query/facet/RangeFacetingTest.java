@@ -49,7 +49,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 0 ).to( 1000 )
 				.from( 1001 ).to( 1500 )
 				.from( 1501 ).to( 3000 )
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
 		FacetManager facetManager = query.getFacetManager();
 		facetManager.enableFaceting( rangeRequest );
@@ -67,7 +67,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Fruit.class );
 		FacetManager facetManager = query.getFacetManager();
 		facetManager.enableFaceting( rangeRequest );
@@ -85,7 +85,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
-				.createFacetRequest();
+				.createFacetingRequest();
 		rangeRequest.setSort( FacetSortOrder.COUNT_ASC );
 		rangeRequest.setIncludeZeroCounts( false );
 

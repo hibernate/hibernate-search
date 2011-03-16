@@ -54,7 +54,7 @@ public class ConnectedDiscreteFacetContext implements DiscreteFacetContext {
 		return new ConnectedFacetParameterContext( context );
 	}
 
-	public FacetingRequest createFacetRequest() {
+	public FacetingRequest createFacetingRequest() {
 		return context.getFacetRequest();
 	}
 }

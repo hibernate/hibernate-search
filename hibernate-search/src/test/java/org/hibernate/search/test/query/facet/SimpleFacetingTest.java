@@ -49,7 +49,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
@@ -61,7 +61,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
@@ -74,7 +74,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
@@ -87,7 +87,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_DESC )
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
@@ -100,7 +100,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.FIELD_VALUE )
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
@@ -118,7 +118,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_DESC )
 				.includeZeroCounts( false )
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
@@ -131,7 +131,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.onField( indexFieldName )
 				.discrete()
 				.maxFacetCount( 1 )
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
@@ -144,7 +144,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 					.name( facetName )
 					.onField( null )
 					.discrete()
-					.createFacetRequest();
+					.createFacetingRequest();
 			fail( "null should not be a valid field name" );
 		}
 		catch ( IllegalArgumentException e ) {
@@ -158,7 +158,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 					.name( null )
 					.onField( indexFieldName )
 					.discrete()
-					.createFacetRequest();
+					.createFacetingRequest();
 			fail( "null should not be a valid request name" );
 		}
 		catch ( IllegalArgumentException e ) {
@@ -172,7 +172,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.name( "foo" )
 				.onField( "foobar" )
 				.discrete()
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 		assertTrue(
 				"A unknown field name should not create any facets",
@@ -185,7 +185,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacetRequest();
+				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		assertTrue( "We should have facet results", query.getFacetManager().getFacets( facetName ).size() > 0 );
@@ -202,7 +202,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.name( descendingOrderedFacet )
 				.onField( indexFieldName )
 				.discrete()
-				.createFacetRequest();
+				.createFacetingRequest();
 
 		final String ascendingOrderedFacet = "asc";
 		FacetingRequest requestAsc = queryBuilder( Car.class ).facet()
@@ -210,7 +210,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.onField( indexFieldName )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_ASC )
-				.createFacetRequest();
+				.createFacetingRequest();
 		TermQuery term = new TermQuery( new Term( "make", "honda" ) );
 		FullTextQuery query = fullTextSession.createFullTextQuery( term, Car.class );
 		FacetManager facetManager = query.getFacetManager();
