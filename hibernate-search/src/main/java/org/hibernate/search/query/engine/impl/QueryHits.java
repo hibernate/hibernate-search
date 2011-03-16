@@ -53,7 +53,6 @@ import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
