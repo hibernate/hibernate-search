@@ -26,10 +26,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.query.dsl.DiscreteFacetContext;
 import org.hibernate.search.query.dsl.FacetContinuationContext;
-import org.hibernate.search.query.dsl.FacetParameterContext;
-import org.hibernate.search.query.dsl.FacetRangeStartContext;
-import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.dsl.FacetRangeAboveBelowContext;
 
 /**
  * @author Hardy Ferentschik
@@ -41,9 +38,9 @@ public class ConnectedFacetContinuationContext implements FacetContinuationConte
 		this.context = context;
 	}
 
-	public <T> FacetRangeStartContext<T> range() {
+	public <T> FacetRangeAboveBelowContext<T> range() {
 		context.setRangeQuery( true );
-		return new ConnectedFacetRangeStartContext<T>(context);
+		return new ConnectedFacetRangeAboveBelowContext<T>(context);
 	}
 
 	public DiscreteFacetContext discrete() {

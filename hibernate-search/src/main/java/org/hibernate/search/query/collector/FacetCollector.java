@@ -37,12 +37,11 @@ import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Scorer;
 
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
+import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetRange;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
-import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
 import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
 

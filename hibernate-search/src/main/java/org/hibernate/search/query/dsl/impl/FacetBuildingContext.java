@@ -26,8 +26,7 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.util.List;
 
-import org.hibernate.search.query.facet.FacetRange;
-import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 
@@ -37,6 +36,20 @@ import static org.hibernate.search.util.CollectionHelper.newArrayList;
  * @author Hardy Ferentschik
  */
 class FacetBuildingContext<T> {
+	/**
+	 * The list of types which are supported for range faceting
+	 */
+	private static final List<Class<?>> allowedRangeTypes = newArrayList();
+
+	static {
+		allowedRangeTypes.add( String.class );
+		allowedRangeTypes.add( String.class );
+		allowedRangeTypes.add( Integer.class );
+		allowedRangeTypes.add( Long.class );
+		allowedRangeTypes.add( Double.class );
+		allowedRangeTypes.add( Float.class );
+	}
+
 	private String name;
 	private String fieldName;
 	private FacetSortOrder sort = FacetSortOrder.COUNT_DESC;
@@ -90,7 +103,14 @@ class FacetBuildingContext<T> {
 	}
 
 	public void makeRange() {
-		FacetRange<T> facetRange = new FacetRange<T>( rangeStart, rangeEnd, includeRangeStart, includeRangeEnd );
+		Class<?> type = getRangeType();
+		assertValidRangeType( type );
+		FacetRange<T> facetRange = new FacetRange<T>(
+				nullSafeGetMin( rangeStart, type ),
+				nullSafeGetMax( rangeEnd, type ),
+				includeRangeStart,
+				includeRangeEnd
+		);
 		rangeList.add( facetRange );
 		rangeStart = null;
 		rangeEnd = null;
@@ -98,7 +118,70 @@ class FacetBuildingContext<T> {
 		includeRangeEnd = true;
 	}
 
-	FacetingRequest getFacetRequest() {
+	private void assertValidRangeType(Class<?> clazz) {
+		if ( !allowedRangeTypes.contains( clazz ) ) {
+			throw new SearchException( "Unsupported range type: " + clazz.getName() );
+		}
+	}
+
+	private Class<?> getRangeType() {
+		if ( rangeStart == null && rangeEnd == null ) {
+			throw new SearchException( "You have to at least specify a start or end of the range" );
+		}
+		T tmp = rangeStart;
+		if ( tmp == null ) {
+			tmp = rangeEnd;
+		}
+		return tmp.getClass();
+	}
+
+	private T nullSafeGetMin(T min, Class<?> type) {
+		if ( min != null ) {
+			return min;
+		}
+		T minValue;
+		if ( Double.class.equals( type ) ) {
+			minValue = (T) Double.valueOf( Double.MIN_VALUE );
+		}
+		else if ( Float.class.equals( type ) ) {
+			minValue = (T) Float.valueOf( Float.MIN_VALUE );
+		}
+		else if ( Integer.class.equals( type ) ) {
+			minValue = (T) Integer.valueOf( Integer.MIN_VALUE );
+		}
+		else if ( Long.class.equals( type ) ) {
+			minValue = (T) Long.valueOf( Long.MIN_VALUE );
+		}
+		else {
+			throw new SearchException( "Unsupported range type: " + type.getName() );
+		}
+		return minValue;
+	}
+
+	private T nullSafeGetMax(T max, Class<?> type) {
+		if ( max != null ) {
+			return max;
+		}
+		T maxValue;
+		if ( Double.class.equals( type ) ) {
+			maxValue = (T) Double.valueOf( Double.MAX_VALUE );
+		}
+		else if ( Float.class.equals( type ) ) {
+			maxValue = (T) Float.valueOf( Float.MAX_VALUE );
+		}
+		else if ( Integer.class.equals( type ) ) {
+			maxValue = (T) Integer.valueOf( Integer.MAX_VALUE );
+		}
+		else if ( Long.class.equals( type ) ) {
+			maxValue = (T) Long.valueOf( Long.MAX_VALUE );
+		}
+		else {
+			throw new SearchException( "Unsupported range type: " + type.getName() );
+		}
+		return maxValue;
+	}
+
+	FacetingRequest getFacetingRequest() {
 		FacetingRequest request;
 		if ( isRangeQuery ) {
 			request = new RangeFacetRequest<T>( name, fieldName, rangeList );

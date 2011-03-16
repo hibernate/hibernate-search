@@ -31,7 +31,6 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetRange;
 import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
@@ -55,8 +54,12 @@ public class RangeFacetRequest<T> extends FacetingRequest {
 
 	@Override
 	public Class<?> getFieldCacheType() {
-		// safe since we have at least one facet range
-		return facetRangeList.get( 0 ).getMin().getClass();
+		// safe since we have at least one facet range set
+		Object o = facetRangeList.get( 0 ).getMin();
+		if ( o == null ) {
+			o = facetRangeList.get( 0 ).getMax();
+		}
+		return o.getClass();
 	}
 
 	@Override

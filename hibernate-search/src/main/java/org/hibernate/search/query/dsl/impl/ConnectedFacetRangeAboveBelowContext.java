@@ -21,46 +21,38 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
 package org.hibernate.search.query.dsl.impl;
 
+import org.hibernate.search.query.dsl.FacetRangeAboveBelowContext;
 import org.hibernate.search.query.dsl.FacetRangeAboveContext;
-import org.hibernate.search.query.dsl.FacetRangeEndContext;
+import org.hibernate.search.query.dsl.FacetRangeBelowContinuationContext;
 import org.hibernate.search.query.dsl.FacetRangeLimitContext;
-import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ConnectedFacetRangeEndContext<T> implements FacetRangeEndContext<T> {
+public class ConnectedFacetRangeAboveBelowContext<T> implements FacetRangeAboveBelowContext<T> {
 	private final FacetBuildingContext context;
 
-	public ConnectedFacetRangeEndContext(FacetBuildingContext context) {
+	public ConnectedFacetRangeAboveBelowContext(FacetBuildingContext context) {
 		this.context = context;
 	}
 
-	public FacetRangeEndContext<T> excludeLimit() {
-		context.setIncludeRangeEnd( false );
-		context.makeRange();
-		return this;
-	}
-
-	public FacetRangeAboveContext<T> above(T max) {
-		context.makeRange();
-		context.setRangeStart( max );
-		context.setRangeEnd( null );
-		return new ConnectedFacetRangeAboveContext<T>(context);
-	}
-
 	public FacetRangeLimitContext<T> from(T rangeStart) {
-		context.makeRange();
 		context.setRangeStart( rangeStart );
 		return new ConnectedFacetRangeLimitContext<T>( context );
 	}
 
-	public FacetingRequest createFacetingRequest() {
-		context.makeRange();
-		return context.getFacetingRequest();
+	public FacetRangeBelowContinuationContext<T> below(T min) {
+		context.setRangeStart( null );
+		context.setRangeEnd( min );
+		return new ConnectedFacetRangeBelowContinuationContext( context );
+	}
+
+	public FacetRangeAboveContext<T> above(T max) {
+		context.setRangeStart( max );
+		context.setRangeEnd( null );
+		return new ConnectedFacetRangeAboveContext<T>( context );
 	}
 }
 

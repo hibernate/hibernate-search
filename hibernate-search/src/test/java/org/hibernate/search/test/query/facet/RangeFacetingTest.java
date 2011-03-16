@@ -29,10 +29,11 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik
@@ -49,6 +50,99 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 0 ).to( 1000 )
 				.from( 1001 ).to( 1500 )
 				.from( 1501 ).to( 3000 )
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( priceRange );
+		assertFacetCounts( facets, new int[] { 5, 3, 2 } );
+	}
+
+	public void testRangeBelow() {
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( priceRange )
+				.onField( indexFieldName )
+				.range()
+				.below( 1500 )
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( priceRange );
+		assertFacetCounts( facets, new int[] { 5 } );
+	}
+
+	public void testRangeBelowExcludeLimit() {
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( priceRange )
+				.onField( indexFieldName )
+				.range()
+				.below( 1500 ).excludeLimit()
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( priceRange );
+		assertFacetCounts( facets, new int[] { 2 } );
+	}
+
+	public void testRangeAbove() {
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( priceRange )
+				.onField( indexFieldName )
+				.range()
+				.above( 1500 )
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( priceRange );
+		assertFacetCounts( facets, new int[] { 8 } );
+	}
+
+	public void testRangeAboveExcludeLimit() {
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( priceRange )
+				.onField( indexFieldName )
+				.range()
+				.above( 1500 ).excludeLimit()
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( priceRange );
+		assertFacetCounts( facets, new int[] { 5 } );
+	}
+
+	public void testRangeAboveBelow() {
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( priceRange )
+				.onField( indexFieldName )
+				.range()
+				.below( 1500 )
+				.above( 1500 ).excludeLimit()
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( priceRange );
+		assertFacetCounts( facets, new int[] { 5, 5 } );
+	}
+
+	public void testRangeBelowMiddleAbove() {
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( priceRange )
+				.onField( indexFieldName )
+				.range()
+				.below( 1000 )
+				.from( 1001 ).to( 1500 )
+				.above( 1500 ).excludeLimit()
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
 		FacetManager facetManager = query.getFacetManager();
@@ -98,6 +192,36 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		assertEquals( "[0.0, 1.0]", facets.get( 0 ).getValue() );
 		assertEquals( "[1.01, 1.5]", facets.get( 1 ).getValue() );
 		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
+	}
+
+	public void testRangeQueryWithUnsupportedType() {
+		try {
+			queryBuilder( Cd.class ).facet()
+					.name( priceRange )
+					.onField( indexFieldName )
+					.range()
+					.from( new Object() ).to( new Object() )
+					.createFacetingRequest();
+			fail( "Unsupported range faceting type" );
+		}
+		catch ( SearchException e ) {
+			// success
+		}
+	}
+
+	public void testRangeQueryWithNullToAndFrom() {
+		try {
+			queryBuilder( Cd.class ).facet()
+					.name( priceRange )
+					.onField( indexFieldName )
+					.range()
+					.from( null ).to( null )
+					.createFacetingRequest();
+			fail( "Unsupported range faceting type" );
+		}
+		catch ( SearchException e ) {
+			// success
+		}
 	}
 
 	public void loadTestData(Session session) {

@@ -33,7 +33,7 @@ public interface FacetContinuationContext {
 	 *
 	 * @return a {@code FacetRangeContext} to continue building the facet request
 	 */
-	<T> FacetRangeStartContext<T> range();
+	<T> FacetRangeAboveBelowContext<T> range();
 
 	/**
 	 * Start building a discrete facet

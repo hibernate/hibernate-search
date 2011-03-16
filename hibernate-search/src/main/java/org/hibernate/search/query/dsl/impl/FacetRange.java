@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.query.facet;
+package org.hibernate.search.query.dsl.impl;
 
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -38,15 +38,16 @@ public class FacetRange<T> {
 
 	private final T min;
 	private final T max;
+
 	private final boolean includeMin;
 	private final boolean includeMax;
 	private final String rangeString;
 
-	public FacetRange(T min, T max) {
-		this( min, max, true, true );
-	}
-
 	public FacetRange(T min, T max, boolean includeMin, boolean includeMax) {
+		if ( max == null || min == null ) {
+			throw new IllegalArgumentException( "At least one end of the range has to be specified" );
+		}
+
 		this.min = min;
 		this.max = max;
 		this.includeMax = includeMax;
