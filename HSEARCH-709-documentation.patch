@@ -1,0 +1,22 @@
+diff --git a/hibernate-search/src/main/docbook/en-US/modules/query.xml b/hibernate-search/src/main/docbook/en-US/modules/query.xml
+index 5b6e95f..53cc521 100755
+--- a/hibernate-search/src/main/docbook/en-US/modules/query.xml
++++ b/hibernate-search/src/main/docbook/en-US/modules/query.xml
+@@ -288,7 +288,7 @@ public class Myth {
+ }
+ 
+ Date birthdate = ...;
+-Query luceneQuery = mythQb.keywork().onField("creationDate").matching(birthdate).createQuery();
++Query luceneQuery = mythQb.keyword().onField("creationDate").matching(birthdate).createQuery();
+ </programlisting>
+ 
+         <note>
+@@ -686,7 +686,7 @@ fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
+ 
+           <programlisting language="JAVA" role="JAVA">
+ org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
+-org.apache.lucene.search.Sort sort = new Sort(new SortField("title"), SortField.STRING);
++org.apache.lucene.search.Sort sort = new Sort(new SortField("title", SortField.STRING));
+ <emphasis role="bold">query.setSort(sort);</emphasis>
+ List results = query.list();
+ </programlisting>
