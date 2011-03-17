@@ -31,6 +31,7 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.RangeFacet;
 
 /**
  * @author Hardy Ferentschik
@@ -65,7 +66,7 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	public Facet createFacet(String value, int count) {
 		// todo improve implementation. we should not depend on the string value (HF)
 		FacetRange<T> range = findFacetRange( value );
-		return new RangeFacet<T>( getFieldName(), range, count );
+		return new RangeFacetImpl<T>( getName(), getFieldName(), range, count );
 	}
 
 	@Override
@@ -88,11 +89,11 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 		return range;
 	}
 
-	static class RangeFacet<T> extends AbstractFacet {
+	static class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 		private FacetRange<T> range;
 
-		RangeFacet(String fieldName, FacetRange<T> range, int count) {
-			super( fieldName, range.getRangeString(), count );
+		RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count) {
+			super( facetingName, fieldName, range.getRangeString(), count );
 			this.range = range;
 		}
 
@@ -106,6 +107,22 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 			}
 		}
 
+		public T getMin() {
+			return range.getMin();
+		}
+
+		public T getMax() {
+			return range.getMax();
+		}
+
+		public boolean isIncludeMin() {
+			return range.isMinIncluded();
+		}
+
+		public boolean isIncludeMax() {
+			return range.isMaxIncluded();
+		}
+
 		private Query createNumericRangeQuery() {
 			NumericRangeQuery query;
 			if ( range.getMin() instanceof Double ) {
@@ -113,8 +130,8 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 						getFieldName(),
 						(Double) range.getMin(),
 						(Double) range.getMax(),
-						range.isIncludeMin(),
-						range.isIncludeMax()
+						range.isMinIncluded(),
+						range.isMaxIncluded()
 				);
 			}
 			else if ( range.getMin() instanceof Float ) {
@@ -122,8 +139,8 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 						getFieldName(),
 						(Float) range.getMin(),
 						(Float) range.getMax(),
-						range.isIncludeMin(),
-						range.isIncludeMax()
+						range.isMinIncluded(),
+						range.isMaxIncluded()
 				);
 			}
 			else if ( range.getMin() instanceof Integer ) {
@@ -131,8 +148,8 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 						getFieldName(),
 						(Integer) range.getMin(),
 						(Integer) range.getMax(),
-						range.isIncludeMin(),
-						range.isIncludeMax()
+						range.isMinIncluded(),
+						range.isMaxIncluded()
 				);
 			}
 
@@ -141,8 +158,8 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 						getFieldName(),
 						(Long) range.getMin(),
 						(Long) range.getMax(),
-						range.isIncludeMin(),
-						range.isIncludeMax()
+						range.isMinIncluded(),
+						range.isMaxIncluded()
 				);
 			}
 			else {

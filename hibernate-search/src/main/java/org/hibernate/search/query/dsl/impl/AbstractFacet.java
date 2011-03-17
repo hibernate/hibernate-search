@@ -34,11 +34,13 @@ import org.hibernate.search.query.facet.Facet;
  * @author Hardy Ferentschik
  */
 public abstract class AbstractFacet implements Facet {
+	private final String facetingName;
 	private final String fieldName;
 	private final String value;
 	private final int count;
 
-	public AbstractFacet(String fieldName, String value, int count) {
+	public AbstractFacet(String facetingName, String fieldName, String value, int count) {
+		this.facetingName = facetingName;
 		this.fieldName = fieldName;
 		this.count = count;
 		this.value = value;
@@ -56,6 +58,10 @@ public abstract class AbstractFacet implements Facet {
 		return fieldName;
 	}
 
+	public String getFacetingName() {
+		return facetingName;
+	}
+
 	public abstract Query getFacetQuery();
 
 	@Override
@@ -67,15 +73,18 @@ public abstract class AbstractFacet implements Facet {
 			return false;
 		}
 
-		AbstractFacet facet = (AbstractFacet) o;
+		AbstractFacet that = (AbstractFacet) o;
 
-		if ( count != facet.count ) {
+		if ( count != that.count ) {
 			return false;
 		}
-		if ( fieldName != null ? !fieldName.equals( facet.fieldName ) : facet.fieldName != null ) {
+		if ( facetingName != null ? !facetingName.equals( that.facetingName ) : that.facetingName != null ) {
 			return false;
 		}
-		if ( value != null ? !value.equals( facet.value ) : facet.value != null ) {
+		if ( fieldName != null ? !fieldName.equals( that.fieldName ) : that.fieldName != null ) {
+			return false;
+		}
+		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
 			return false;
 		}
 
@@ -84,7 +93,8 @@ public abstract class AbstractFacet implements Facet {
 
 	@Override
 	public int hashCode() {
-		int result = fieldName != null ? fieldName.hashCode() : 0;
+		int result = facetingName != null ? facetingName.hashCode() : 0;
+		result = 31 * result + ( fieldName != null ? fieldName.hashCode() : 0 );
 		result = 31 * result + ( value != null ? value.hashCode() : 0 );
 		result = 31 * result + count;
 		return result;
@@ -93,8 +103,9 @@ public abstract class AbstractFacet implements Facet {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( "Facet" );
-		sb.append( "{fieldName='" ).append( fieldName ).append( '\'' );
+		sb.append( "AbstractFacet" );
+		sb.append( "{facetingName='" ).append( facetingName ).append( '\'' );
+		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( ", value='" ).append( value ).append( '\'' );
 		sb.append( ", count=" ).append( count );
 		sb.append( '}' );

@@ -21,41 +21,17 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
-package org.hibernate.search.query.dsl.impl;
-
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-
-import org.hibernate.search.query.facet.Facet;
+package org.hibernate.search.query.facet;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DiscreteFacetRequest extends FacetingRequestImpl {
-	DiscreteFacetRequest(String name, String fieldName) {
-		super( name, fieldName );
-	}
+public interface RangeFacet<T> extends Facet {
+	public T getMin();
 
-	@Override
-	public Class<?> getFieldCacheType() {
-		return String.class;
-	}
+	public T getMax();
 
-	@Override
-	public Facet createFacet(String value, int count) {
-		return new SimpleFacet( getName(), getFieldName(), value, count );
-	}
+	public boolean isIncludeMin();
 
-	static class SimpleFacet extends AbstractFacet {
-		SimpleFacet(String facetingName, String fieldName, String value, int count) {
-			super( facetingName, fieldName, value, count );
-		}
-
-		@Override
-		public Query getFacetQuery() {
-			return new TermQuery( new Term( getFieldName(), getValue() ) );
-		}
-	}
+	public boolean isIncludeMax();
 }

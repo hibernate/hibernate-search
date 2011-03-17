@@ -81,11 +81,11 @@ public class FacetRange<T> {
 		return max;
 	}
 
-	public boolean isIncludeMin() {
+	public boolean isMinIncluded() {
 		return includeMin;
 	}
 
-	public boolean isIncludeMax() {
+	public boolean isMaxIncluded() {
 		return includeMax;
 	}
 
@@ -104,18 +104,18 @@ public class FacetRange<T> {
 
 	private boolean isInRangeNumber(Number value, Number min, Number max) {
 		int minCheck = compare( min, value );
-		if ( isIncludeMin() && minCheck > 0 ) {
+		if ( isMinIncluded() && minCheck > 0 ) {
 			return false;
 		}
-		else if ( !isIncludeMin() && minCheck >= 0 ) {
+		else if ( !isMinIncluded() && minCheck >= 0 ) {
 			return false;
 		}
 
 		int maxCheck = compare( value, max );
-		if ( isIncludeMax() && maxCheck > 0 ) {
+		if ( isMaxIncluded() && maxCheck > 0 ) {
 			return false;
 		}
-		else if ( !isIncludeMax() && maxCheck >= 0 ) {
+		else if ( !isMaxIncluded() && maxCheck >= 0 ) {
 			return false;
 		}
 		return true;

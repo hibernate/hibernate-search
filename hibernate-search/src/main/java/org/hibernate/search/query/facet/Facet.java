@@ -32,11 +32,13 @@ import org.apache.lucene.search.Query;
  * @author Hardy Ferentschik
  */
 public interface Facet {
-	public int getCount();
+	public String getFacetingName();
+
+	public String getFieldName();
 
 	public String getValue();
 
-	public String getFieldName();
+	public int getCount();
 
 	public Query getFacetQuery();
 }
