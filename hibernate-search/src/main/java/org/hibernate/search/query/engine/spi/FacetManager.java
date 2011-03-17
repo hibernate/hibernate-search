@@ -26,6 +26,7 @@ package org.hibernate.search.query.engine.spi;
 import java.util.List;
 
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetSelection;
 import org.hibernate.search.query.facet.FacetingRequest;
 
 /**

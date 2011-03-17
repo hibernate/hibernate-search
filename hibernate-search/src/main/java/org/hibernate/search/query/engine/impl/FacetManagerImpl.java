@@ -36,8 +36,8 @@ import org.apache.lucene.search.QueryWrapperFilter;
 
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.FacetManager;
-import org.hibernate.search.query.engine.spi.FacetSelection;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetSelection;
 import org.hibernate.search.query.facet.FacetingRequest;
 
 import static org.hibernate.search.util.CollectionHelper.newArrayList;
@@ -168,6 +168,13 @@ public class FacetManagerImpl implements FacetManager {
 			}
 			facetList.addAll( Arrays.asList( facets ) );
 			queryHasChanged();
+		}
+
+		public void deSelectFacets(Facet... facets) {
+			boolean hasChanged = facetList.removeAll( Arrays.asList( facets ) );
+			if ( hasChanged ) {
+				queryHasChanged();
+			}
 		}
 
 		public void clearSelectedFacets() {

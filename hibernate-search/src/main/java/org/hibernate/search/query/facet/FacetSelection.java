@@ -21,13 +21,11 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.query.engine.spi;
-
-import org.hibernate.search.query.facet.Facet;
+package org.hibernate.search.query.facet;
 
 /**
  * Groups a set of {@link org.hibernate.search.query.facet.Facet} to be applied onto a query.
- * The facet criteria within a {@code FacetSelection} are combined in a disjunction.
+ * The facet criteria within a {@code FacetSelection} are combined in a disjunction (logical OR).
  *
  * @author Hardy Ferentschik
  */
@@ -36,6 +34,12 @@ public interface FacetSelection {
 	 * @param facets An array of facets which have to be applied as disjunction onto the current query
 	 */
 	void selectFacets(Facet... facets);
+
+	/**
+	 * @param facets An array of facets to e removed from the current facet. Facets which were not part of this
+	 * selection will be ignored.
+	 */
+	void deSelectFacets(Facet... facets);
 
 	/**
 	 * Clear all facets in this selection
