@@ -83,11 +83,13 @@
         <developer>
             <id>hardy.ferentschik</id>
             <name>Hardy Ferentschik</name>
+            <email>hardy@hibernate.org</email>
             <url>http://in.relation.to/Bloggers/Hardy</url>
         </developer>
         <developer>
             <id>sannegrinovero</id>
             <name>Sanne Grinovero</name>
+            <email>sanne@hibernate.org</email>
             <url>http://in.relation.to/Bloggers/Sanne</url>
         </developer>
     </developers>
