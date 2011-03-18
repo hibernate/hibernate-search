@@ -1,0 +1,145 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ *
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+ */
+package org.hibernate.search.query.dsl.impl;
+
+import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermRangeQuery;
+
+import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.query.facet.RangeFacet;
+
+/**
+ * @author Hardy Ferentschik
+ */
+public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
+	private final FacetRange<T> range;
+	private final int rangeIndex;
+
+	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index) {
+		super( facetingName, fieldName, range.getRangeString(), count );
+		this.range = range;
+		this.rangeIndex = index;
+	}
+
+	@Override
+	public Query getFacetQuery() {
+		Object minOrMax = getNonNullMinOrMax( range );
+		if ( minOrMax instanceof Number ) {
+			return createNumericRangeQuery();
+		}
+		else if ( minOrMax instanceof String ) {
+			return createRangeQuery();
+		}
+
+		else {
+			throw new AssertionFailure( "Unsupported range type" );
+		}
+	}
+
+	public int getRangeIndex() {
+		return rangeIndex;
+	}
+
+	public T getMin() {
+		return range.getMin();
+	}
+
+	public T getMax() {
+		return range.getMax();
+	}
+
+	public boolean isIncludeMin() {
+		return range.isMinIncluded();
+	}
+
+	public boolean isIncludeMax() {
+		return range.isMaxIncluded();
+	}
+
+	private Object getNonNullMinOrMax(FacetRange<T> range) {
+		Object o = range.getMin();
+		if ( o == null ) {
+			o = range.getMax();
+		}
+		return o;
+	}
+
+	private Query createNumericRangeQuery() {
+		NumericRangeQuery query;
+		if ( range.getMin() instanceof Double ) {
+			query = NumericRangeQuery.newDoubleRange(
+					getFieldName(),
+					(Double) range.getMin(),
+					(Double) range.getMax(),
+					range.isMinIncluded(),
+					range.isMaxIncluded()
+			);
+		}
+		else if ( range.getMin() instanceof Float ) {
+			query = NumericRangeQuery.newFloatRange(
+					getFieldName(),
+					(Float) range.getMin(),
+					(Float) range.getMax(),
+					range.isMinIncluded(),
+					range.isMaxIncluded()
+			);
+		}
+		else if ( range.getMin() instanceof Integer ) {
+			query = NumericRangeQuery.newIntRange(
+					getFieldName(),
+					(Integer) range.getMin(),
+					(Integer) range.getMax(),
+					range.isMinIncluded(),
+					range.isMaxIncluded()
+			);
+		}
+
+		else if ( range.getMin() instanceof Long ) {
+			query = NumericRangeQuery.newLongRange(
+					getFieldName(),
+					(Long) range.getMin(),
+					(Long) range.getMax(),
+					range.isMinIncluded(),
+					range.isMaxIncluded()
+			);
+		}
+		else {
+			throw new AssertionFailure( "Unsupported range type" );
+		}
+		return query;
+	}
+
+	private Query createRangeQuery() {
+		return new TermRangeQuery(
+				getFieldName(),
+				(String) range.getMin(),
+				(String) range.getMax(),
+				range.isMinIncluded(),
+				range.isMaxIncluded()
+		);
+	}
+}
+
+

@@ -21,9 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
 package org.hibernate.search.query.dsl.impl;
-
 
 import org.hibernate.annotations.common.AssertionFailure;
 
@@ -44,7 +42,7 @@ public class FacetRange<T> {
 	private final String rangeString;
 
 	public FacetRange(T min, T max, boolean includeMin, boolean includeMax) {
-		if ( max == null || min == null ) {
+		if ( max == null && min == null ) {
 			throw new IllegalArgumentException( "At least one end of the range has to be specified" );
 		}
 
@@ -60,10 +58,13 @@ public class FacetRange<T> {
 		else {
 			builder.append( MIN_EXCLUDED );
 		}
-		builder.append( min );
+		if ( min != null ) {
+			builder.append( min );
+		}
 		builder.append( ", " );
-		builder.append( max );
-
+		if ( max != null ) {
+			builder.append( max );
+		}
 		if ( includeMax ) {
 			builder.append( MAX_INCLUDED );
 		}
@@ -93,6 +94,9 @@ public class FacetRange<T> {
 		if ( value instanceof Number ) {
 			return isInRangeNumber( (Number) value, (Number) min, (Number) max );
 		}
+		else if ( value instanceof String ) {
+			return isInRangeString( (String) value, (String) min, (String) max );
+		}
 		else {
 			throw new AssertionFailure( "Unexpected value type: " + value.getClass().getName() );
 		}
@@ -102,7 +106,68 @@ public class FacetRange<T> {
 		return rangeString;
 	}
 
+	private boolean isInRangeString(String value, String min, String max) {
+		// below range
+		if ( min == null ) {
+			if ( isMaxIncluded() ) {
+				return value.compareTo( max ) <= 0;
+			}
+			else {
+				return value.compareTo( max ) < 0;
+			}
+		}
+
+		// above range
+		if ( max == null ) {
+			if ( isMinIncluded() ) {
+				return value.compareTo( min ) >= 0;
+			}
+			else {
+				return value.compareTo( min ) > 0;
+			}
+		}
+
+		// from .. to range
+		int minCheck = min.compareTo( value );
+		if ( isMinIncluded() && minCheck > 0 ) {
+			return false;
+		}
+		else if ( !isMinIncluded() && minCheck >= 0 ) {
+			return false;
+		}
+
+		int maxCheck = value.compareTo( max );
+		if ( isMaxIncluded() && maxCheck > 0 ) {
+			return false;
+		}
+		else if ( !isMaxIncluded() && maxCheck >= 0 ) {
+			return false;
+		}
+		return true;
+	}
+
 	private boolean isInRangeNumber(Number value, Number min, Number max) {
+		// below range
+		if ( min == null ) {
+			if ( isMaxIncluded() ) {
+				return compare( value, max ) <= 0;
+			}
+			else {
+				return compare( value, max ) < 0;
+			}
+		}
+
+		// above range
+		if ( max == null ) {
+			if ( isMinIncluded() ) {
+				return compare( value, min ) >= 0;
+			}
+			else {
+				return compare( value, min ) > 0;
+			}
+		}
+
+		// from .. to range
 		int minCheck = compare( min, value );
 		if ( isMinIncluded() && minCheck > 0 ) {
 			return false;

@@ -39,9 +39,11 @@ import org.apache.lucene.search.Scorer;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
+import org.hibernate.search.query.dsl.impl.RangeFacetImpl;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.facet.RangeFacet;
 import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
 import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
 
@@ -202,7 +204,12 @@ public class FacetCollector extends Collector {
 				return facet2.getCount() - facet1.getCount();
 			}
 			else {
-				return facet1.getValue().compareTo( facet2.getValue() );
+				if ( facet1 instanceof RangeFacet && facet2 instanceof RangeFacet ) {
+					return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
+				}
+				else {
+					return facet1.getValue().compareTo( facet2.getValue() );
+				}
 			}
 		}
 	}

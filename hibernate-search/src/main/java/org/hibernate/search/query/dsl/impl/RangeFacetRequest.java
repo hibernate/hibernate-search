@@ -21,7 +21,6 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
 package org.hibernate.search.query.dsl.impl;
 
 import java.util.List;
@@ -65,8 +64,9 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	@Override
 	public Facet createFacet(String value, int count) {
 		// todo improve implementation. we should not depend on the string value (HF)
-		FacetRange<T> range = findFacetRange( value );
-		return new RangeFacetImpl<T>( getFacetingName(), getFieldName(), range, count );
+		int facetIndex = findFacetRangeIndex( value );
+		FacetRange<T> range = facetRangeList.get( facetIndex );
+		return new RangeFacetImpl<T>( getFacetingName(), getFieldName(), range, count, facetIndex );
 	}
 
 	@Override
@@ -76,96 +76,14 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 				"} " + super.toString();
 	}
 
-	private FacetRange<T> findFacetRange(String value) {
-		FacetRange<T> range = null;
+	private int findFacetRangeIndex(String value) {
+		int index = 0;
 		for ( FacetRange<T> facetRange : facetRangeList ) {
 			if ( facetRange.getRangeString().equals( value ) ) {
-				range = facetRange;
+				return index;
 			}
+			index++;
 		}
-		if ( range == null ) {
-			throw new AssertionFailure( "There should have been a matching facet range" );
-		}
-		return range;
-	}
-
-	static class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
-		private FacetRange<T> range;
-
-		RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count) {
-			super( facetingName, fieldName, range.getRangeString(), count );
-			this.range = range;
-		}
-
-		@Override
-		public Query getFacetQuery() {
-			if ( range.getMin() instanceof Number ) {
-				return createNumericRangeQuery();
-			}
-			else {
-				throw new AssertionFailure( "Unsupported range type" );
-			}
-		}
-
-		public T getMin() {
-			return range.getMin();
-		}
-
-		public T getMax() {
-			return range.getMax();
-		}
-
-		public boolean isIncludeMin() {
-			return range.isMinIncluded();
-		}
-
-		public boolean isIncludeMax() {
-			return range.isMaxIncluded();
-		}
-
-		private Query createNumericRangeQuery() {
-			NumericRangeQuery query;
-			if ( range.getMin() instanceof Double ) {
-				query = NumericRangeQuery.newDoubleRange(
-						getFieldName(),
-						(Double) range.getMin(),
-						(Double) range.getMax(),
-						range.isMinIncluded(),
-						range.isMaxIncluded()
-				);
-			}
-			else if ( range.getMin() instanceof Float ) {
-				query = NumericRangeQuery.newFloatRange(
-						getFieldName(),
-						(Float) range.getMin(),
-						(Float) range.getMax(),
-						range.isMinIncluded(),
-						range.isMaxIncluded()
-				);
-			}
-			else if ( range.getMin() instanceof Integer ) {
-				query = NumericRangeQuery.newIntRange(
-						getFieldName(),
-						(Integer) range.getMin(),
-						(Integer) range.getMax(),
-						range.isMinIncluded(),
-						range.isMaxIncluded()
-				);
-			}
-
-			else if ( range.getMin() instanceof Long ) {
-				query = NumericRangeQuery.newLongRange(
-						getFieldName(),
-						(Long) range.getMin(),
-						(Long) range.getMax(),
-						range.isMinIncluded(),
-						range.isMaxIncluded()
-				);
-			}
-			else {
-				throw new AssertionFailure( "Unsupported range type" );
-			}
-			return query;
-		}
+		return -1;
 	}
 }

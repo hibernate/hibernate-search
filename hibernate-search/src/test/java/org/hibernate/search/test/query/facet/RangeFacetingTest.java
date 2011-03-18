@@ -194,6 +194,30 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
 	}
 
+	public void testRangeString() {
+		final String facetingName = "albumNameFaceting";
+		final String fieldName = "name_un_analyzed";
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( facetingName )
+				.onField( fieldName )
+				.range()
+				.below( "S" ).excludeLimit()
+				.from( "S" ).to( "U" )
+				.above( "U" ).excludeLimit()
+				.orderedBy( FacetSortOrder.FIELD_VALUE )
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( facetingName );
+		assertFacetCounts( facets, new int[] { 7, 1, 2 } );
+
+		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 0 ) );
+		facets = facetManager.getFacets( facetingName );
+		assertFacetCounts( facets, new int[] { 7, 0, 0 } );
+	}
+
 	public void testRangeQueryWithUnsupportedType() {
 		try {
 			queryBuilder( Cd.class ).facet()

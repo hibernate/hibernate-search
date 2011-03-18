@@ -53,7 +53,7 @@ public abstract class AbstractFacetTest extends SearchTestCase {
 			"Any old wind that blows",
 			"Unearthed",
 			"The man comes around",
-			"The man in black"
+			"Water from the Wells of Home "
 	};
 	public static final int[] albumPrices = { 499, 999, 1500, 1500, 1500, 1600, 1700, 1800, 2000, 2500 };
 

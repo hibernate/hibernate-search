@@ -29,6 +29,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 
@@ -42,7 +43,10 @@ public class Cd {
 	@GeneratedValue
 	private int id;
 
-	@Field
+	@Fields( {
+			@Field,
+			@Field(name = "name_un_analyzed", index = Index.UN_TOKENIZED)
+	})
 	private String name;
 
 	@Field(index = Index.UN_TOKENIZED)
