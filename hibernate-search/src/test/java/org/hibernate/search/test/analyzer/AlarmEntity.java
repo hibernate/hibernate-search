@@ -36,7 +36,7 @@ import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Indexed(index="idx1")
-@Analyzer(impl = Test1Analyzer.class)
+@Analyzer(impl = AnalyzerForTests1.class)
 public class AlarmEntity {
 	
 	@Id
@@ -48,8 +48,8 @@ public class AlarmEntity {
 	private String property;
 	
 	@Fields({
-		@Field(name = "description_analyzer2", index = Index.TOKENIZED, analyzer = @Analyzer(impl = Test2Analyzer.class)),
-		@Field(name = "description_analyzer3", index = Index.TOKENIZED, analyzer = @Analyzer(impl = Test3Analyzer.class)) })
+		@Field(name = "description_analyzer2", index = Index.TOKENIZED, analyzer = @Analyzer(impl = AnalyzerForTests2.class)),
+		@Field(name = "description_analyzer3", index = Index.TOKENIZED, analyzer = @Analyzer(impl = AnalyzerForTests3.class)) })
 	private String alarmDescription;
 
 	public Integer getId() {

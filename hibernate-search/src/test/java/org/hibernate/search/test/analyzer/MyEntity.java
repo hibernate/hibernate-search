@@ -40,7 +40,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
  */
 @Entity
 @Indexed(index="idx1")
-@Analyzer(impl = Test1Analyzer.class)
+@Analyzer(impl = AnalyzerForTests1.class)
 public class MyEntity {
 	@Id
 	@GeneratedValue
@@ -51,11 +51,11 @@ public class MyEntity {
 	private String entity;
 
 	@Field(index = Index.TOKENIZED)
-	@Analyzer(impl = Test2Analyzer.class)
+	@Analyzer(impl = AnalyzerForTests2.class)
 	private String property;
 
-	@Field(index = Index.TOKENIZED, analyzer = @Analyzer(impl = Test3Analyzer.class) )
-	@Analyzer(impl = Test2Analyzer.class)
+	@Field(index = Index.TOKENIZED, analyzer = @Analyzer(impl = AnalyzerForTests3.class) )
+	@Analyzer(impl = AnalyzerForTests2.class)
 	private String field;
 
 	@Field(index = Index.UN_TOKENIZED)

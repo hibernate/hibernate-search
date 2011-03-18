@@ -28,10 +28,11 @@ import org.apache.lucene.util.Version;
 /**
  * @author Emmanuel Bernard
  */
-public final class Test3Analyzer extends AbstractTestAnalyzer {
-	private final String[] tokens = { "music", "elephant", "energy" };
+public final class AnalyzerForTests1 extends AbstractTestAnalyzer {
 
-	public Test3Analyzer(Version version) {
+	private final String[] tokens = { "alarm", "dog", "performance" };
+
+	public AnalyzerForTests1(Version version) {
 	}
 
 	protected String[] getTokens() {

@@ -56,14 +56,14 @@ import org.hibernate.search.store.RAMDirectoryProvider;
 /**
  * @author Sanne Grinovero
  */
-public class TestableSharingBufferReaderProvider extends SharingBufferReaderProvider {
+public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProvider {
 
 	private static final int NUM_DIRECTORY_PROVIDERS = 4;
 	private final Vector<MockIndexReader> createdReadersHistory = new Vector<MockIndexReader>( 500 );
 	final Map<Directory, TestManipulatorPerDP> manipulators = new ConcurrentHashMap<Directory, TestManipulatorPerDP>();
 	final List<DirectoryProvider> directoryProviders = Collections.synchronizedList(new ArrayList<DirectoryProvider>());
 	
-	public TestableSharingBufferReaderProvider() {
+	public ExtendedSharingBufferReaderProvider() {
 		for ( int i = 0; i < NUM_DIRECTORY_PROVIDERS; i++ ) {
 			TestManipulatorPerDP tm = new TestManipulatorPerDP( i );
 			manipulators.put( tm.dp.getDirectory(), tm );

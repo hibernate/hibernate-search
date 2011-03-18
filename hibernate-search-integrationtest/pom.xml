@@ -157,8 +157,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
-            <!-- override version for annotation based JUnit -->
             <scope>test</scope>
         </dependency>
 

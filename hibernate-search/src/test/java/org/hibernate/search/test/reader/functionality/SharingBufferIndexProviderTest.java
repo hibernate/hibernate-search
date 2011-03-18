@@ -34,8 +34,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.test.reader.functionality.TestableSharingBufferReaderProvider.MockIndexReader;
-import org.hibernate.search.test.reader.functionality.TestableSharingBufferReaderProvider.TestManipulatorPerDP;
+import org.hibernate.search.test.reader.functionality.ExtendedSharingBufferReaderProvider.MockIndexReader;
+import org.hibernate.search.test.reader.functionality.ExtendedSharingBufferReaderProvider.TestManipulatorPerDP;
 
 import junit.framework.TestCase;
 
@@ -44,7 +44,7 @@ import junit.framework.TestCase;
  */
 public class SharingBufferIndexProviderTest extends TestCase {
 	
-	private final TestableSharingBufferReaderProvider readerProvider = new TestableSharingBufferReaderProvider();
+	private final ExtendedSharingBufferReaderProvider readerProvider = new ExtendedSharingBufferReaderProvider();
 	private final CountDownLatch startSignal = new CountDownLatch(1);
 	private final Runnable searchTask = new SearchTask();
 	private final Runnable changeTask = new ChangeTask();

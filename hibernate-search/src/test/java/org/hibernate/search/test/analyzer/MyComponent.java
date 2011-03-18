@@ -32,7 +32,7 @@ import org.hibernate.search.annotations.Analyzer;
  */
 public class MyComponent {
 	@Field(index = Index.TOKENIZED)
-	@Analyzer(impl = Test4Analyzer.class)
+	@Analyzer(impl = AnalyzerForTests4.class)
 	private String componentProperty;
 
 	public String getComponentProperty() {
