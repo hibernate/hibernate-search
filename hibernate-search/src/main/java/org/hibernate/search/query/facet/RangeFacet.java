@@ -27,11 +27,23 @@ package org.hibernate.search.query.facet;
  * @author Hardy Ferentschik
  */
 public interface RangeFacet<T> extends Facet {
+	/**
+	 * @return the lower boundary of this range
+	 */
 	public T getMin();
 
+	/**
+	 * @return the upper boundary of this range
+	 */
 	public T getMax();
 
+	/**
+	 * @return {@code true} if the lower boundary is included in the range, {@code false} otherwise
+	 */
 	public boolean isIncludeMin();
 
+	/**
+	 * @return {@code true} if the upper boundary is included in the range, {@code false} otherwise
+	 */
 	public boolean isIncludeMax();
 }

@@ -179,9 +179,9 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
+				.includeZeroCounts( false )
+				.orderedBy( FacetSortOrder.COUNT_ASC )
 				.createFacetingRequest();
-		rangeRequest.setSort( FacetSortOrder.COUNT_ASC );
-		rangeRequest.setIncludeZeroCounts( false );
 
 		FullTextQuery query = createMatchAllQuery( Fruit.class );
 		FacetManager facetManager = query.getFacetManager();

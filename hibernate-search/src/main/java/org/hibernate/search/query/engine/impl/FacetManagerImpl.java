@@ -80,7 +80,7 @@ public class FacetManagerImpl implements FacetManager {
 	}
 
 	public FacetManager enableFaceting(FacetingRequest facetingRequest) {
-		facetRequests.put( facetingRequest.getName(), (FacetingRequestImpl) facetingRequest );
+		facetRequests.put( facetingRequest.getFacetingName(), (FacetingRequestImpl) facetingRequest );
 		queryHasChanged();
 		return this;
 	}
@@ -170,7 +170,11 @@ public class FacetManagerImpl implements FacetManager {
 			queryHasChanged();
 		}
 
-		public void deSelectFacets(Facet... facets) {
+		public List<Facet> getSelectedFacets() {
+			return Collections.unmodifiableList( facetList );
+		}
+
+		public void deselectFacets(Facet... facets) {
 			boolean hasChanged = facetList.removeAll( Arrays.asList( facets ) );
 			if ( hasChanged ) {
 				queryHasChanged();

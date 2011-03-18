@@ -71,7 +71,7 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 		this.fieldName = fieldName;
 	}
 
-	public String getName() {
+	public String getFacetingName() {
 		return name;
 	}
 
@@ -99,7 +99,7 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 
 	public abstract Facet createFacet(String value, int count);
 
-	public boolean includeZeroCounts() {
+	public boolean hasZeroCountsIncluded() {
 		return includeZeroCounts;
 	}
 

@@ -8,10 +8,12 @@ import org.hibernate.search.query.facet.FacetingRequest;
 /**
  * @author Hardy Ferentschik
  */
-public class ConnectedFacetRangeBelowContinuationContext<T> implements FacetRangeBelowContinuationContext<T> {
+public class ConnectedFacetRangeBelowContinuationContext<T> extends ConnectedFacetParameterContext
+		implements FacetRangeBelowContinuationContext<T> {
 	private final FacetBuildingContext context;
 
 	public ConnectedFacetRangeBelowContinuationContext(FacetBuildingContext context) {
+		super( context );
 		this.context = context;
 	}
 

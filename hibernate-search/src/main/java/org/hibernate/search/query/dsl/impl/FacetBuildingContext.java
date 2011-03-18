@@ -182,7 +182,7 @@ class FacetBuildingContext<T> {
 	}
 
 	FacetingRequest getFacetingRequest() {
-		FacetingRequest request;
+		FacetingRequestImpl request;
 		if ( isRangeQuery ) {
 			request = new RangeFacetRequest<T>( name, fieldName, rangeList );
 		}

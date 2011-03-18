@@ -118,7 +118,7 @@ public class FacetCollector extends Collector {
 	}
 
 	public String getFacetName() {
-		return facetRequest.getName();
+		return facetRequest.getFacetingName();
 	}
 
 	public List<Facet> getFacetList() {
@@ -130,7 +130,7 @@ public class FacetCollector extends Collector {
 		int includedFacetCount = 0;
 		for ( Map.Entry<String, Integer> countEntry : counter.getCounts().entrySet() ) {
 			Facet facet = request.createFacet( countEntry.getKey(), countEntry.getValue() );
-			if ( !request.includeZeroCounts() && facet.getCount() == 0 ) {
+			if ( !request.hasZeroCountsIncluded() && facet.getCount() == 0 ) {
 				continue;
 			}
 			if ( facetRequest.getMaxNumberOfFacets() > 0 && includedFacetCount == facetRequest.getMaxNumberOfFacets() ) {
@@ -145,7 +145,7 @@ public class FacetCollector extends Collector {
 
 	private void initialiseCollector(IndexReader reader) throws IOException {
 		// we only need to initialise the counts in case we have to include 0 counts as well
-		if ( facetRequest.includeZeroCounts() && facetRequest instanceof DiscreteFacetRequest ) {
+		if ( facetRequest.hasZeroCountsIncluded() && facetRequest instanceof DiscreteFacetRequest ) {
 			initFacetCounts( reader );
 		}
 		initialised = true;

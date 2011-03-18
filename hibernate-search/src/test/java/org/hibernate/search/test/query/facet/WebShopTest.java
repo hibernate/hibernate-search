@@ -186,7 +186,7 @@ public class WebShopTest extends AbstractFacetTest {
 					.range()
 					.below( 2500 ).excludeLimit()
 					.from( 2500 ).to( 3000 )
-					.above( 3000 )
+					.above( 3000 ).excludeLimit()
 					.createFacetingRequest();
 
 

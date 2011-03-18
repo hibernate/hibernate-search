@@ -45,7 +45,7 @@ public class DiscreteFacetRequest extends FacetingRequestImpl {
 
 	@Override
 	public Facet createFacet(String value, int count) {
-		return new SimpleFacet( getName(), getFieldName(), value, count );
+		return new SimpleFacet( getFacetingName(), getFieldName(), value, count );
 	}
 
 	static class SimpleFacet extends AbstractFacet {

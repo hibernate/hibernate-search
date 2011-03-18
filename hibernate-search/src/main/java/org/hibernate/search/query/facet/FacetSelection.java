@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.query.facet;
 
+import java.util.List;
+
 /**
  * Groups a set of {@link org.hibernate.search.query.facet.Facet} to be applied onto a query.
  * The facet criteria within a {@code FacetSelection} are combined in a disjunction (logical OR).
@@ -36,10 +38,15 @@ public interface FacetSelection {
 	void selectFacets(Facet... facets);
 
 	/**
+	 * @return returns an unmodifiable list of the currently selected facets
+	 */
+	List<Facet> getSelectedFacets();
+
+	/**
 	 * @param facets An array of facets to e removed from the current facet. Facets which were not part of this
 	 * selection will be ignored.
 	 */
-	void deSelectFacets(Facet... facets);
+	void deselectFacets(Facet... facets);
 
 	/**
 	 * Clear all facets in this selection

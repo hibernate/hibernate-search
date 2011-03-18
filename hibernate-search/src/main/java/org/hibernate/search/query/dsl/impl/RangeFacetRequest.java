@@ -66,7 +66,7 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	public Facet createFacet(String value, int count) {
 		// todo improve implementation. we should not depend on the string value (HF)
 		FacetRange<T> range = findFacetRange( value );
-		return new RangeFacetImpl<T>( getName(), getFieldName(), range, count );
+		return new RangeFacetImpl<T>( getFacetingName(), getFieldName(), range, count );
 	}
 
 	@Override

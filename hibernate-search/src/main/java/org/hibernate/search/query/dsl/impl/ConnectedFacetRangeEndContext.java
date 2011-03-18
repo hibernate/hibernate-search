@@ -32,10 +32,12 @@ import org.hibernate.search.query.facet.FacetingRequest;
 /**
  * @author Hardy Ferentschik
  */
-public class ConnectedFacetRangeEndContext<T> implements FacetRangeEndContext<T> {
+public class ConnectedFacetRangeEndContext<T> extends ConnectedFacetParameterContext
+		implements FacetRangeEndContext<T> {
 	private final FacetBuildingContext context;
 
 	public ConnectedFacetRangeEndContext(FacetBuildingContext context) {
+		super( context );
 		this.context = context;
 	}
 
@@ -49,7 +51,7 @@ public class ConnectedFacetRangeEndContext<T> implements FacetRangeEndContext<T>
 		context.makeRange();
 		context.setRangeStart( max );
 		context.setRangeEnd( null );
-		return new ConnectedFacetRangeAboveContext<T>(context);
+		return new ConnectedFacetRangeAboveContext<T>( context );
 	}
 
 	public FacetRangeLimitContext<T> from(T rangeStart) {

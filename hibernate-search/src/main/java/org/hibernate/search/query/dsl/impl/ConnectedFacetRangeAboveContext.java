@@ -6,10 +6,12 @@ import org.hibernate.search.query.facet.FacetingRequest;
 /**
  * @author Hardy Ferentschik
  */
-public class ConnectedFacetRangeAboveContext<T> implements FacetRangeAboveContext<T> {
+public class ConnectedFacetRangeAboveContext<T> extends ConnectedFacetParameterContext
+		implements FacetRangeAboveContext<T> {
 	private final FacetBuildingContext context;
 
 	public ConnectedFacetRangeAboveContext(FacetBuildingContext context) {
+		super( context );
 		this.context = context;
 	}
 
