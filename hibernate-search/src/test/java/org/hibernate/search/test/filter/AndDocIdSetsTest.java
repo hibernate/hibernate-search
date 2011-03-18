@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
@@ -40,6 +39,8 @@ import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.SortedVIntList;
 
 import org.hibernate.search.filter.AndDocIdSet;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Functionality testcase for org.hibernate.search.filter.AndDocIdSet.
@@ -54,7 +55,7 @@ import org.hibernate.search.filter.AndDocIdSet;
  * @see AndDocIdSet
  * @see BitSet
  */
-public class AndDocIdSetsTest extends TestCase {
+public class AndDocIdSetsTest {
 
 	static final List<Integer> testDataFrom0to9 = toImmutableList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 	static final List<Integer> testDataFrom1to10 = toImmutableList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
@@ -83,6 +84,7 @@ public class AndDocIdSetsTest extends TestCase {
 	// auto-testing of test utility methods for AND operations on test arrays
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testAndingArrays() {
 		List<Integer> andLists = andLists( testDataFrom0to9, testDataFrom1to10 );
 		assertTrue( andLists.containsAll( testDataFrom1to9 ) );
@@ -100,6 +102,7 @@ public class AndDocIdSetsTest extends TestCase {
 
 	// auto-testing of test utility methods for conversion in DocIdSetIterator
 
+	@Test
 	public void testIteratorMatchesTestArray() throws IOException {
 		DocIdSet docIdSet0_9 = arrayToDocIdSet( testDataFrom0to9 );
 		DocIdSetIterator docIdSetIterator = docIdSet0_9.iterator();
@@ -109,6 +112,7 @@ public class AndDocIdSetsTest extends TestCase {
 		assertEquals( DocIdSetIterator.NO_MORE_DOCS, docIdSetIterator.advance( 10 ) );
 	}
 
+	@Test
 	public void testAndDocIdSets() {
 		List<DocIdSet> filters = new ArrayList<DocIdSet>( 2 );
 		filters.add( arrayToDocIdSet( testDataFrom0to9 ) );
@@ -118,6 +122,7 @@ public class AndDocIdSetsTest extends TestCase {
 		assertTrue( docIdSetsEqual( expected, testedSet ) );
 	}
 
+	@Test
 	public void testOnRandomBigArrays() {
 		onRandomBigArraysTest( 13L );
 		onRandomBigArraysTest( 9L );
@@ -286,7 +291,7 @@ public class AndDocIdSetsTest extends TestCase {
 	}
 
 	// HSEARCH-610
-
+	@Test
 	public void testWithOpenBitSet() throws IOException {
 		DocIdSet idSet1 = new OpenBitSet( new long[] { 1121 }, 1 );  // bits 0, 5, 6, 10
 		DocIdSet idSet2 = new OpenBitSet( new long[] { 64 }, 1 ); // bit 6
@@ -297,7 +302,7 @@ public class AndDocIdSetsTest extends TestCase {
 	}
 
 	// HSEARCH-610
-
+	@Test
 	public void testWithDocIdBitSet() throws IOException {
 		DocIdSet idSet1 = integersToDocIdSet( 0, 5, 6, 10 );
 		DocIdSet idSet2 = integersToDocIdSet( 6 );
@@ -308,7 +313,7 @@ public class AndDocIdSetsTest extends TestCase {
 	}
 
 	// HSEARCH-610
-
+	@Test
 	public void testWithSortedVIntList() throws IOException {
 		SortedVIntList idSet1 = new SortedVIntList( 0, 5, 6, 10 );
 		SortedVIntList idSet2 = new SortedVIntList( 6 );
@@ -318,6 +323,7 @@ public class AndDocIdSetsTest extends TestCase {
 		assertTrue( docIdSetsEqual( expected, actual ) );
 	}
 
+	@Test
 	public void testEmptyDocIdSet() throws Exception {
 		DocIdSet idSet1 = new DocIdBitSet( new BitSet() );
 		DocIdSet idSet2 = integersToDocIdSet( 0, 5, 6, 10 );

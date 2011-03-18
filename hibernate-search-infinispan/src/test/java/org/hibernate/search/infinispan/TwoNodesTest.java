@@ -25,9 +25,7 @@ package org.hibernate.search.infinispan;
 
 import java.util.List;
 
-import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 import org.apache.lucene.search.Query;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
@@ -40,6 +38,11 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.JGroupsEnvironment;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * We start two different Hibernate Search instances, both using
  * an InfinispanDirectoryProvider as the default DirectoryProvider
@@ -48,11 +51,12 @@ import org.hibernate.search.test.util.JGroupsEnvironment;
  *
  * @author Sanne Grinovero
  */
-public class TwoNodesTest extends TestCase {
+public class TwoNodesTest {
 
-	final FullTextSessionBuilder nodea = new FullTextSessionBuilder();
-	final FullTextSessionBuilder nodeb = new FullTextSessionBuilder();
+	FullTextSessionBuilder nodea;
+	FullTextSessionBuilder nodeb;
 
+	@Test
 	public void testSomething() {
 		final String to = "spam@hibernate.org";
 		final String messageText = "to get started as a real spam expert, search for 'getting an iphone' on Hibernate forums";
@@ -77,15 +81,17 @@ public class TwoNodesTest extends TestCase {
 					.matching( "Hibernate Getting Started" )
 					.createQuery();
 			List list = fullTextSession.createFullTextQuery( query ).setProjection( "message" ).list();
-			Assert.assertEquals( 1, list.size() );
+			assertEquals( 1, list.size() );
 			Object[] result = (Object[]) list.get( 0 );
-			Assert.assertEquals( messageText, result[0] );
+			assertEquals( messageText, result[0] );
 			transaction.commit();
 		}
 	}
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
+		nodea = new FullTextSessionBuilder();
+		nodeb = new FullTextSessionBuilder();
 		JGroupsEnvironment.initJGroupsProperties();
 		prepareCommonConfiguration( nodea );
 		nodea.build();
@@ -133,8 +139,8 @@ public class TwoNodesTest extends TestCase {
 		cfg.addAnnotatedClass( SimpleEmail.class );
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		nodea.close();
 		nodeb.close();
 	}

@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
@@ -41,13 +40,18 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.textbuilder.SentenceInventor;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * Tests the fullTextSession.createIndexer() API
  * for basic functionality.
  *
  * @author Sanne Grinovero
  */
-public class IndexingGeneratedCorpusTest extends TestCase {
+public class IndexingGeneratedCorpusTest {
 
 	private final int BOOK_NUM = 140;
 	private final int ANCIENTBOOK_NUM = 120;
@@ -58,9 +62,8 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 	private FullTextSessionBuilder builder;
 	private int totalEntitiesInDB = 0;
 
-	@Override
+	@Before
 	public void setUp() throws Exception {
-		super.setUp();
 		builder = new FullTextSessionBuilder();
 		builder
 				.addAnnotatedClass( Book.class )
@@ -78,8 +81,8 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		storeAllBooksInNation();
 	}
 
-	@Override
-	protected void tearDown() {
+	@After
+	public void tearDown() {
 		builder.close();
 	}
 
@@ -131,6 +134,7 @@ public class IndexingGeneratedCorpusTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testBatchIndexing() throws InterruptedException {
 		verifyResultNumbers(); //initial count of entities should match expectations
 		purgeAll(); // empty indexes

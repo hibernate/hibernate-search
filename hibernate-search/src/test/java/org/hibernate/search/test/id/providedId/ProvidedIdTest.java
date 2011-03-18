@@ -48,12 +48,16 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * @author Navin Surtani
  * @author Sanne Grinovero
  */
-public class ProvidedIdTest extends junit.framework.TestCase {
+public class ProvidedIdTest {
 
+	@Test
 	public void testProvidedId() throws Exception {
 		final ManualConfiguration configuration = new ManualConfiguration()
 				.addClass( ProvidedIdPerson.class )

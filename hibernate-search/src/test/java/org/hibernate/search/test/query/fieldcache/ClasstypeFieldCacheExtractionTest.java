@@ -42,23 +42,28 @@ import org.hibernate.search.test.configuration.ProductCatalog;
 import org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
+import org.junit.Test;
+
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class ClasstypeFieldCacheExtractionTest extends TestCase {
+public class ClasstypeFieldCacheExtractionTest {
 	
+	@Test
 	public void testWithoutFieldCacheOnMixedIds() {
 		// no caches, mixed classes and multiple id fieldnames
 		Mapping.enableFieldCache = new FieldCacheType[0];
 		wrapper( true, "id", "addressId", ProjectionConstants.OBJECT_CLASS );
 	}
 	
+	@Test
 	public void testWithFieldCacheOnTypOnMixedIds() {
 		// multiple id fieldnames, multiple classes but cached
 		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS };
 		wrapper( true, "id", "addressId" );
 	}
 	
+	@Test
 	public void testWithFieldCacheOnTypeAndIdOnMixedIds() {
 		// works the same as CLASS because one of the entities uses a different fieldname
 		// which forces us to disable ID caching
@@ -66,18 +71,21 @@ public class ClasstypeFieldCacheExtractionTest extends TestCase {
 		wrapper( true, "id", "addressId" );
 	}
 	
+	@Test
 	public void testWithoutFieldCache() {
 		// single type: doesn't need classtype even without caches
 		Mapping.enableFieldCache = new FieldCacheType[0];
 		wrapper( false, "id" );
 	}
 	
+	@Test
 	public void testWithFieldCacheOnType() {
 		// single type: doesn't need classtype cache
 		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS };
 		wrapper( false, "id" );
 	}
 	
+	@Test
 	public void testWithFieldCacheOnTypeAndId() {
 		// nothing needs to be extracted, full cache
 		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS, FieldCacheType.ID };

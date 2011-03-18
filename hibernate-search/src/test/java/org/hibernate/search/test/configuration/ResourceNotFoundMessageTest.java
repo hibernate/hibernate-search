@@ -25,7 +25,6 @@
 package org.hibernate.search.test.configuration;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.StopFilterFactory;
@@ -36,13 +35,16 @@ import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
+import org.junit.Test;
+
 /**
  * Verifies a proper message is thrown when a resource is not found
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class ResourceNotFoundMessageTest extends TestCase {
+public class ResourceNotFoundMessageTest {
 
+	@Test
 	public void testIllegalAnalyzerDefinition() {
 		try {
 			new FullTextSessionBuilder()

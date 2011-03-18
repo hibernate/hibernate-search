@@ -37,12 +37,13 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.reader.functionality.ExtendedSharingBufferReaderProvider.MockIndexReader;
 import org.hibernate.search.test.reader.functionality.ExtendedSharingBufferReaderProvider.TestManipulatorPerDP;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author Sanne Grinovero
  */
-public class SharingBufferIndexProviderTest extends TestCase {
+public class SharingBufferIndexProviderTest {
 	
 	private final ExtendedSharingBufferReaderProvider readerProvider = new ExtendedSharingBufferReaderProvider();
 	private final CountDownLatch startSignal = new CountDownLatch(1);
@@ -53,6 +54,7 @@ public class SharingBufferIndexProviderTest extends TestCase {
 	private static final int SEARCHES_NUM = 50000;
 	private static final Random random = new Random();
 	
+	@Test
 	public void testStressingMock() throws InterruptedException {
 		readerProvider.initialize(null, null);
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( 200 );//much chaos

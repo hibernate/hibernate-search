@@ -21,15 +21,18 @@ package org.hibernate.search.test.directoryProvider;
 
 import java.io.File;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.HibernateException;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterCopy;
 import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterMain;
@@ -41,38 +44,35 @@ import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class RetryInitializeTest extends TestCase {
+public class RetryInitializeTest {
 	
 	private FullTextSessionBuilder slave;
 	private FullTextSessionBuilder master;
 	
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		FSSlaveAndMasterDPTest.prepareDirectories();
-		super.setUp();
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	public void tearDown() throws Exception {
 		if ( slave != null ) slave.close();
 		if ( master != null ) master.close();
 		FSSlaveAndMasterDPTest.cleanupDirectories();
 	}
 	
+	@Test
 	public void testStandardInitialization() {
 		master = createMasterNode();
 		slave = createSlaveNode( false );
 	}
 	
+	@Test(expected=HibernateException.class)
 	public void testInitiallyFailing() {
-		try {
-			slave = createSlaveNode( false );
-			Assert.fail( "should have failed DirectoryProvider initialization" );
-		}
-		catch (HibernateException he) {
-			//expected: master didn't initialize the slave directory
-		}
+		slave = createSlaveNode( false );
 	}
 	
+	@Test
 	public void testMasterDelayedInitialization() {
 		slave = createSlaveNode(true);
 

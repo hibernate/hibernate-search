@@ -25,18 +25,20 @@ package org.hibernate.search.test.jmx;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualConfiguration;
 
+import org.junit.Test;
+
 /**
  * @author Hardy Ferentschik
  */
-public class MutableSearchFactoryAndJMXTest extends TestCase {
-	public void testRebuildFactory() throws Exception {
+public class MutableSearchFactoryAndJMXTest {
+	
+	@Test
+	public void testRebuildFactory() {
 		File targetDir = SearchTestCase.getTargetDir();
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();

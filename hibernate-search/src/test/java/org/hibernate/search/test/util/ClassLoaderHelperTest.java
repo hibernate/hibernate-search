@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.util;
 
-import junit.framework.TestCase;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.DefaultSimilarity;
@@ -38,14 +37,18 @@ import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.util.ClassLoaderHelper;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * Tests for {@code ClassLoaderHelper}. Verifying amongst other that it throws easy to understand exceptions.
  *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class ClassLoaderHelperTest extends TestCase {
+public class ClassLoaderHelperTest {
 
+	@Test
 	public void testInstanceFromName() {
 		BatchBackend batchBackend = ClassLoaderHelper.instanceFromName(
 				BatchBackend.class, LuceneBatchBackend.class.getName(), getClass(), "Lucene batch backend"
@@ -65,6 +68,7 @@ public class ClassLoaderHelperTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testInstanceFromClass() {
 		//testing for interface implementation:
 		BatchBackend batchBackend = ClassLoaderHelper.instanceFromClass(
@@ -109,6 +113,7 @@ public class ClassLoaderHelperTest extends TestCase {
 		);
 	}
 
+	@Test
 	public void testLoadingAnalyzerWithVersionConstructor() {
 		Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass(
 				StandardAnalyzer.class, org.apache.lucene.util.Version.LUCENE_30
@@ -116,6 +121,7 @@ public class ClassLoaderHelperTest extends TestCase {
 		assertNotNull( "We should be able to instantiate an analyzer with a Lucene version parameter", analyzer );
 	}
 
+	@Test
 	public void testLoadingAnalyzerWithDefaultConstructor() {
 		Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass(
 				FooAnalyzer.class, org.apache.lucene.util.Version.LUCENE_30
@@ -123,6 +129,7 @@ public class ClassLoaderHelperTest extends TestCase {
 		assertNotNull( "We should be able to instantiate an analyzer which has only a default constructor", analyzer );
 	}
 
+	@Test
 	public void testLoadingAnalyzerWithNoVersionOrDefaultConstructor() {
 		try {
 			ClassLoaderHelper.analyzerInstanceFromClass(

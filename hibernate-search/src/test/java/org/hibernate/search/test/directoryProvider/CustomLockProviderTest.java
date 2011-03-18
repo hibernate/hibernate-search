@@ -23,15 +23,16 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
-import junit.framework.TestCase;
-
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author Sanne Grinovero
  */
-public class CustomLockProviderTest extends TestCase {
+public class CustomLockProviderTest {
 	
+	@Test
 	public void testUseOfCustomLockingFactory() {
 		assertNull( CustomLockFactoryFactory.optionValue );
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
@@ -44,6 +45,7 @@ public class CustomLockProviderTest extends TestCase {
 		assertEquals( "somethingHere", CustomLockFactoryFactory.optionValue );
 	}
 
+	@Test
 	public void testFailOnInexistentLockingFactory() {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		try {

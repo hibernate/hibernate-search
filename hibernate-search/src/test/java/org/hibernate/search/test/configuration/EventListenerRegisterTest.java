@@ -25,8 +25,6 @@ package org.hibernate.search.test.configuration;
 
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import org.hibernate.event.EventListeners;
 import org.hibernate.event.PostCollectionRecreateEvent;
 import org.hibernate.event.PostCollectionRecreateEventListener;
@@ -44,19 +42,23 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.event.EventListenerRegister;
 import org.hibernate.search.event.FullTextIndexEventListener;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * @author Sanne Grinovero
  */
-@SuppressWarnings("deprecation")
-public class EventListenerRegisterTest extends TestCase {
+public class EventListenerRegisterTest {
 
+	@Test
 	public void testRegisterOnEmptyListeners_CfgDisabled() {
 		EventListeners evListeners = new EventListeners();
 		EventListenerRegister.enableHibernateSearch( evListeners, makeConfiguration( false ) );
 		EventListenerRegister.enableHibernateSearch( evListeners, makeConfiguration( false ) );
 		assertPresence( false, evListeners );
 	}
-
+	
+	@Test
 	public void testRegisterOnEmptyListeners_CfgEnabled() {
 		EventListeners evListeners = new EventListeners();
 		//tests registering multiple times is idempotent:
@@ -65,6 +67,7 @@ public class EventListenerRegisterTest extends TestCase {
 		assertPresence( true, evListeners );
 	}
 
+	@Test
 	public void testRegisterOnEmptyListeners_CfgAuto() {
 		EventListeners evListeners = new EventListeners();
 		EventListenerRegister.enableHibernateSearch( evListeners, new Properties() );
@@ -72,10 +75,12 @@ public class EventListenerRegisterTest extends TestCase {
 		assertPresence( true, evListeners );
 	}
 
+	@Test
 	public void testOnAlreadyRegistered() {
 		helperOnAlreadyRegistered( new FullTextIndexEventListener(FullTextIndexEventListener.Installation.SINGLE_INSTANCE) );
 	}
 
+	@Test
 	public void testOnPopulatedEventListeners() {
 		EventListeners evListeners = makeSomeEventListeners();
 		EventListenerRegister.enableHibernateSearch( evListeners, new Properties() );

@@ -25,16 +25,16 @@ package org.hibernate.search.test.configuration;
 
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-
+import org.junit.Test;
+import static org.junit.Assert.*;
 /**
  * @author Sanne Grinovero
  */
-public class ConfigurationParseHelperTest extends TestCase {
+public class ConfigurationParseHelperTest {
 	
+	@Test
 	public void testIntegerParsers() {
 		assertEquals( 0, ConfigurationParseHelper.parseInt( "   0 ", "not important") );
 		assertEquals( 8, ConfigurationParseHelper.parseInt( null, 8, null ) );
@@ -53,6 +53,7 @@ public class ConfigurationParseHelperTest extends TestCase {
 		assertTrue( exceptionLaunched );
 	}
 	
+	@Test
 	public void testBooleanParsers() {
 		assertTrue( ConfigurationParseHelper.parseBoolean( "true", null ) );
 		assertTrue( ConfigurationParseHelper.parseBoolean( " True ", null ) );

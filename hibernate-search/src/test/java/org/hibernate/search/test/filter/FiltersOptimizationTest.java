@@ -34,20 +34,22 @@ import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.hibernate.search.filter.FilterOptimizationHelper;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Used to test org.hibernate.search.filter.FiltersOptimizationHelper
  * @see org.hibernate.search.filter.FilterOptimizationHelper
  * @author Sanne Grinovero
  */
-public class FiltersOptimizationTest extends TestCase {
+public class FiltersOptimizationTest {
 	
 	/**
 	 * in some cases optimizations are not possible,
 	 * test that mergeByBitAnds returns the same instance
 	 * in that case.
 	 */
+	@Test
 	public void testSkipMerging() {
 		List<DocIdSet> dataIn = new ArrayList<DocIdSet>( 3 );
 		dataIn.add( makeOpenBitSetTestSet( 1,2,3,5,8,9,10,11 ) );
@@ -64,6 +66,7 @@ public class FiltersOptimizationTest extends TestCase {
 	 * (rather than build the iterator).
 	 * @throws IOException should not be thrown
 	 */
+	@Test
 	public void testDoMergingOnOpenBitSet() throws IOException {
 		List<DocIdSet> dataIn = new ArrayList<DocIdSet>( 3 );
 		dataIn.add( makeOpenBitSetTestSet( 1,2,5,8,9,10,11 ) );
@@ -84,6 +87,7 @@ public class FiltersOptimizationTest extends TestCase {
 	 * (rather than build the iterator).
 	 * @throws IOException should be thrown
 	 */
+	@Test
 	public void testDoMergingOnJavaBitSet() throws IOException {
 		List<DocIdSet> dataIn = new ArrayList<DocIdSet>( 3 );
 		dataIn.add( makeBitSetTestSet( 1,2,5,8,9,10,11 ) );
@@ -102,6 +106,7 @@ public class FiltersOptimizationTest extends TestCase {
 	 * Used to this test the testcase's helper method isIdSetSequenceSameTo
 	 * @throws IOException
 	 */
+	@Test
 	public void testSelfIdSequenceTester() throws IOException {
 		assertTrue( isIdSetSequenceSameTo(
 				makeOpenBitSetTestSet( 1,2,3,5,8,11 ),

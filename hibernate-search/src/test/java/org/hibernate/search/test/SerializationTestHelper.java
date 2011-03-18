@@ -33,12 +33,13 @@ import java.util.List;
 
 import org.hibernate.search.test.SerializationTestHelper.Foo.TestInnerClass;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author Sanne Grinovero
  */
-public class SerializationTestHelper extends TestCase {
+public class SerializationTestHelper {
 	
 	/**
 	 * Duplicates an object using Serialization, it moves
@@ -65,6 +66,7 @@ public class SerializationTestHelper extends TestCase {
 	    return copy;
 	}
 	
+	@Test
 	public void testSelf() throws IOException, ClassNotFoundException {
 		Foo a = new Foo();
 		a.list.add( new TestInnerClass(30) );

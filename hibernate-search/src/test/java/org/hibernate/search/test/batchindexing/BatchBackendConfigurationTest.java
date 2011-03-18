@@ -24,7 +24,6 @@
 package org.hibernate.search.test.batchindexing;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
@@ -32,15 +31,18 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
+import org.junit.Test;
+
 /**
  * Verifies the batch backend is considering the configuration properties
  * @author Sanne Grinovero
  */
-public class BatchBackendConfigurationTest extends TestCase {
+public class BatchBackendConfigurationTest {
 	
 	/**
 	 * Verifies the batch configuration is read by the backend
 	 */
+	@Test
 	public void testConfigurationIsRead() throws InterruptedException {
 		FullTextSessionBuilder fsBuilder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Book.class )
@@ -62,6 +64,7 @@ public class BatchBackendConfigurationTest extends TestCase {
 		fsBuilder.close();
 	}
 	
+	@Test
 	public void testConfigurationIsOverriden() throws InterruptedException {
 		FullTextSessionBuilder fsBuilder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Book.class )

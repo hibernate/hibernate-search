@@ -23,8 +23,6 @@
  */
 package org.hibernate.search.test.configuration;
 
-import junit.framework.TestCase;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
@@ -32,11 +30,15 @@ import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFacto
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * @author Sanne Grinovero
  */
-public class CustomBackendTest extends TestCase {
+public class CustomBackendTest {
 	
+	@Test
 	public void test() {
 		verifyBackendUsage( "blackhole", BlackHoleBackendQueueProcessorFactory.class );
 		verifyBackendUsage( "lucene", LuceneBackendQueueProcessorFactory.class );

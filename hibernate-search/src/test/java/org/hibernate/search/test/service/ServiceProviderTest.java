@@ -1,16 +1,19 @@
 package org.hibernate.search.test.service;
 
-import junit.framework.TestCase;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.util.ManualConfiguration;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * @author Emmanuel Bernard
  */
-public class ServiceProviderTest extends TestCase {
+public class ServiceProviderTest {
+	
+	@Test
 	public void testManagedService() throws Exception {
 		MyServiceProvider.resetActive();
 		assertNull( MyServiceProvider.isActive() );
@@ -23,6 +26,7 @@ public class ServiceProviderTest extends TestCase {
 		assertFalse( MyServiceProvider.isActive() );
 	}
 
+	@Test
 	public void testProvidedService() throws Exception {
 		ProvidedServiceProvider.resetActive();
 		assertNull( ProvidedServiceProvider.isActive() );
@@ -37,6 +41,7 @@ public class ServiceProviderTest extends TestCase {
 		assertNull( ProvidedServiceProvider.isActive() );
 	}
 
+	@Test
 	public void testServiceNotFound() throws Exception {
 		final ManualConfiguration configuration = new ManualConfiguration();
 		configuration.addProperty( "hibernate.search.default.directory_provider", NoServiceDirectoryProvider.class.getName() )

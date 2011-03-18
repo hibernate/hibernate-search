@@ -33,7 +33,12 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
-import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for org.hibernate.search.query.ScrollableResultsImpl
@@ -41,14 +46,13 @@ import junit.framework.TestCase;
  * @see org.hibernate.search.query.hibernate.impl.ScrollableResultsImpl
  * @author Sanne Grinovero
  */
-public class ScrollableResultsTest extends TestCase {
+public class ScrollableResultsTest {
 	
 	private FullTextSessionBuilder builder;
 	private FullTextSession sess;
 
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() {
 		builder = new FullTextSessionBuilder();
 		builder
 			.addAnnotatedClass( AlternateBook.class )
@@ -67,15 +71,15 @@ public class ScrollableResultsTest extends TestCase {
 		tx.commit();
 	}
 	
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() {
 		builder.close();
-		super.tearDown();
 	}
 
 	/**
 	 * Test forward scrolling using pagination
 	 */
+	@Test
 	public void testScrollingForward() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
@@ -111,6 +115,7 @@ public class ScrollableResultsTest extends TestCase {
 	 * TODO to verify correct FetchSize behavior I've been debugging
 	 * the behavior; we should add a mock library to automate this kind of tests.
 	 */
+	@Test
 	public void testScrollingBackwards() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
@@ -141,6 +146,7 @@ public class ScrollableResultsTest extends TestCase {
 	 * Test that all entities returned by a ScrollableResults
 	 * are always attached to Session
 	 */
+	@Test
 	public void testResultsAreManaged() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
@@ -186,6 +192,7 @@ public class ScrollableResultsTest extends TestCase {
 	 * and that the projected entities are managed, even in case
 	 * of evict usage for memory management.
 	 */
+	@Test
 	public void testScrollProjectionAndManaged() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "dept", "num") );

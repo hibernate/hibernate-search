@@ -27,22 +27,27 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import junit.framework.TestCase;
 import org.slf4j.Logger;
 
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
 
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class FileHelperTest extends TestCase {
+public class FileHelperTest {
 	private static final Logger log = LoggerFactory.make();
 
 	private static File root;
 
-	static {
+	@BeforeClass
+	public static void prepareRootDirectory() {
 		String buildDir = System.getProperty( "build.dir" );
 		if ( buildDir == null ) {
 			buildDir = ".";
@@ -78,8 +83,8 @@ public class FileHelperTest extends TestCase {
 		os.close();
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	public void tearDown() throws Exception {
 		File dir = new File( root, srcDir );
 		FileHelper.delete( dir );
 		dir = new File( root, destDir );
@@ -87,6 +92,7 @@ public class FileHelperTest extends TestCase {
 		FileHelper.delete( root );
 	}
 
+	@Test
 	public void testSynchronize() throws Exception {
 		// create a src directory structure
 		File src = new File( root, srcDir );

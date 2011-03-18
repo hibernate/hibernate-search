@@ -29,12 +29,15 @@ import java.util.Enumeration;
 
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.test.SerializationTestHelper;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author Sanne Grinovero
  */
-public class MaskedPropertiesTest extends junit.framework.TestCase {
+public class MaskedPropertiesTest {
 
+	@Test
 	public void testConfigurationParsingPrecedence() {
 		Properties cfg = new Properties();
 		cfg.put( "hibernate.search.Animals.transaction.indexwriter.max_merge_docs", "1" );
@@ -71,6 +74,7 @@ public class MaskedPropertiesTest extends junit.framework.TestCase {
 		}
 	}
 	
+	@Test
 	public void testSerializability() throws IOException, ClassNotFoundException {
 		Properties cfg = new Properties();
 		cfg.setProperty( "base.key", "value" );
@@ -81,6 +85,7 @@ public class MaskedPropertiesTest extends junit.framework.TestCase {
 		assertEquals( "value", theCopy.getProperty( "key" ) );
 	}
 	
+	@Test
 	public void testListingKeys() {
 		Properties defaultProp = new Properties();
 		defaultProp.put( "some.inherited.prop", "to test standard Properties fallback behaviour" );

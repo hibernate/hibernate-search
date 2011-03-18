@@ -23,7 +23,8 @@
  */
 package org.hibernate.search.test.util.textbuilder;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Tests WordDictionary and WordInventor,
@@ -36,8 +37,9 @@ import junit.framework.TestCase;
  * 
  * @author Sanne Grinovero
  */
-public class TextProductionTest extends TestCase {
+public class TextProductionTest {
 	
+	@Test
 	public void testSomeWordsGetBuilt() {
 		SentenceInventor wi = new SentenceInventor( 7L, 200 );
 		String randomPeriod = wi.nextPeriod();

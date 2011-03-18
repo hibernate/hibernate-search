@@ -26,18 +26,20 @@ package org.hibernate.search.test.directoryProvider;
 import java.io.File;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProviderHelper;
 import org.hibernate.search.util.FileHelper;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author Gavin King
  * @author Sanne Grinovero
  */
-public class DirectoryProviderHelperTest extends TestCase {
+public class DirectoryProviderHelperTest {
 
+	@Test
 	public void testMkdirsDetermineIndex() {
 		String root = "./testDir/dir1/dir2";
 		String relative = "dir3";
@@ -53,6 +55,7 @@ public class DirectoryProviderHelperTest extends TestCase {
 		FileHelper.delete( new File( "./testDir" ) );
 	}
 
+	@Test
 	public void testMkdirsGetSource() {
 		String root = "./testDir";
 		String relative = "dir1/dir2/dir3";
@@ -68,6 +71,7 @@ public class DirectoryProviderHelperTest extends TestCase {
 		FileHelper.delete( new File( root ) );
 	}
 
+	@Test
 	public void testConfiguringCopyBufferSize() {
 		Properties prop = new Properties();
 		long mB = 1024 * 1024;

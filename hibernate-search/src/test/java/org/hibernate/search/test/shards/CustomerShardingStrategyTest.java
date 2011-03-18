@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.shards;
 
-import junit.framework.TestCase;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
@@ -31,17 +30,22 @@ import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.RAMDirectoryProvider;
 
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * @author Chase Seibert
  */
-public class CustomerShardingStrategyTest extends TestCase {
+public class CustomerShardingStrategyTest {
 
 	private CustomerShardingStrategy shardStrategy;
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		shardStrategy = new CustomerShardingStrategy();
 		
-		// initilaize w/ 10 shards
+		// initialize w/ 10 shards
 		shardStrategy.initialize( null, new DirectoryProvider[] {
 				new RAMDirectoryProvider(), 
 				new RAMDirectoryProvider(),
@@ -56,6 +60,7 @@ public class CustomerShardingStrategyTest extends TestCase {
 		} );
 	}
 
+	@Test
 	public void testGetDirectoryProvidersForQuery() {
 		
 		FullTextFilterImpl filter = new FullTextFilterImpl();

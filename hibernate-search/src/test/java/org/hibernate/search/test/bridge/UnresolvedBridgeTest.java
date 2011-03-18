@@ -25,22 +25,26 @@ package org.hibernate.search.test.bridge;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.SearchException;
-import junit.framework.TestCase;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author Emmanuel Bernard
  */
-public class UnresolvedBridgeTest extends TestCase {
+public class UnresolvedBridgeTest {
+	
+	@Test
 	public void testSerializableType() throws Exception {
 		Configuration cfg = new Configuration();
 
-		for (int i = 0; i < getAnnotatedClasses().length; i++) {
+		for ( int i = 0; i < getAnnotatedClasses().length; i++ ) {
 			cfg.addAnnotatedClass( getAnnotatedClasses()[i] );
 		}
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		try {
 			cfg.buildSessionFactory();
-			fail("Undefined bridge went through");
+			fail( "Undefined bridge went through" );
 		}
 		catch( Exception e ) {
 			Throwable ee = e;
@@ -59,7 +63,6 @@ public class UnresolvedBridgeTest extends TestCase {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Gangster.class

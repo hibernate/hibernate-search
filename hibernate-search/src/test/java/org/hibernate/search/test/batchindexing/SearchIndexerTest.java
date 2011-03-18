@@ -25,8 +25,6 @@ package org.hibernate.search.test.batchindexing;
 
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -38,12 +36,16 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.MassIndexerImpl;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
-public class SearchIndexerTest extends TestCase {
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class SearchIndexerTest {
 	
 	/**
 	 * test that the MassIndexer is properly identifying the root entities
 	 * from the selection of classes to be indexed.
 	 */
+	@Test
 	public void testEntityHierarchy() {
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
 			.addAnnotatedClass( ModernBook.class )
@@ -101,6 +103,7 @@ public class SearchIndexerTest extends TestCase {
 	 * Test to verify that the identifier loading works even when
 	 * the property is not called "id" 
 	 */
+	@Test
 	public void testIdentifierNaming() throws InterruptedException {
 		//disable automatic indexing, to test manual index creation.
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()

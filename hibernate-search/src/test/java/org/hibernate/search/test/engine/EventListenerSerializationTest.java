@@ -25,18 +25,19 @@ package org.hibernate.search.test.engine;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.test.SerializationTestHelper;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Tests that the FullTextIndexEventListener is Serializable
  *
  * @author Sanne Grinovero
  */
-public class EventListenerSerializationTest extends TestCase {
+public class EventListenerSerializationTest {
 
+	@Test
 	public void testEventListenerSerializable() throws IOException, ClassNotFoundException {
 		FullTextIndexEventListener eventListener = new FullTextIndexEventListener(FullTextIndexEventListener.Installation.SINGLE_INSTANCE);
 		eventListener.addSynchronization( null, null );

@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import junit.framework.TestCase;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -51,19 +50,24 @@ import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  * @author Emmanuel Bernard
  */
-public class MutableFactoryTest extends TestCase {
+public class MutableFactoryTest {
 
 	public static final Logger log = LoggerFactory.make();
 
+	@Test
 	public void testCreateEmptyFactory() throws Exception {
 		final ManualConfiguration configuration = new ManualConfiguration();
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		sf.close();
 	}
 
+	@Test
 	public void testAddingClassFullModel() throws Exception {
 		ManualConfiguration configuration = new ManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" );
@@ -115,6 +119,7 @@ public class MutableFactoryTest extends TestCase {
 		sf.close();
 	}
 
+	@Test
 	public void testAddingClassSimpleAPI() throws Exception {
 		ManualConfiguration configuration = new ManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" );
@@ -174,8 +179,8 @@ public class MutableFactoryTest extends TestCase {
 		sfi.getWorker().performWork( work, tc );
 	}
 
+	@Test
 	public void testMultiThreadedAddClasses() throws Exception {
-
 		File indexDir = initIndexDirectory();
 		try {
 			doTestMultiThreadedClasses(indexDir);
