@@ -41,7 +41,7 @@ import org.hibernate.search.util.FileHelper;
 public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 
 	/* needs to be sensibly higher than org.hibernate.search.batchindexing.Executors.QUEUE_MAX_LENGTH */
-	private static final int NUM_SAVED_ENTITIES = 3000;
+	private static final int NUM_SAVED_ENTITIES = 40;
 
 	public void testWorkLongerThanMaxQueueSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -85,6 +85,7 @@ public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 		//needs FSDirectory to have the index contents survive the SessionFactory close
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.setProperty( "hibernate.search.default.max_queue_length", "5" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.show_sql", "false" );
 		cfg.setProperty( "hibernate.format_sql", "false" );
