@@ -31,6 +31,7 @@ import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
@@ -55,7 +56,7 @@ public interface WorkerBuildContext extends BuildContext {
 
 	Similarity getSimilarity(DirectoryProvider<?> directoryProvider);
 
-	boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> directoryProvider);
+	DirectoryProviderData getDirectoryProviderData(DirectoryProvider<?> provider);
 
 	ErrorHandler getErrorHandler();
 

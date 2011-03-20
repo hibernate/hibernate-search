@@ -40,6 +40,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.configuration.MaskedProperty;
+import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
@@ -170,17 +171,18 @@ public class DirectoryProviderFactory {
 		}
 		int index = providers.indexOf( provider );
 		boolean exclusiveIndexUsage = isExclusiveIndexUsageEnabled( directoryProviderName, indexProps );
+		int maximumQueueSize = extractMaxQueueSize( directoryProviderName, indexProps );
 		if ( index != -1 ) {
 			//share the same Directory provider for the same underlying store
 			final DirectoryProvider<?> directoryProvider = providers.get( index );
-			context.addClassToDirectoryProvider( entity, directoryProvider, exclusiveIndexUsage );
+			context.addClassToDirectoryProvider( entity, directoryProvider, exclusiveIndexUsage, maximumQueueSize );
 			return directoryProvider;
 		}
 		else {
 			configureOptimizerStrategy( context, indexProps, provider );
 			configureIndexingParameters( context, indexProps, provider );
 			providers.add( provider );
-			context.addClassToDirectoryProvider( entity, provider, exclusiveIndexUsage );
+			context.addClassToDirectoryProvider( entity, provider, exclusiveIndexUsage, maximumQueueSize );
 			return provider;
 		}
 	}
@@ -319,6 +321,28 @@ public class DirectoryProviderFactory {
 				"Illegal value for property " + Environment.EXCLUSIVE_INDEX_USE + " on index " + directoryProviderName
 		);
 		return exclusiveIndexUsage;
+	}
+
+	/**
+	 * @param directoryProviderName
+	 * @param indexProps MaskedProperties for this DirectoryProvider
+	 * @return the maximum queue length to be used on this DP
+	 */
+	private static int extractMaxQueueSize(String directoryProviderName, Properties indexProps) {
+		String maxQueueSize = indexProps.getProperty( Environment.MAX_QUEUE_LENGTH );
+		if ( maxQueueSize != null ) {
+			int parsedInt= ConfigurationParseHelper
+					.parseInt( maxQueueSize, Executors.QUEUE_MAX_LENGTH,
+					"Illegal value for property " + Environment.MAX_QUEUE_LENGTH + " on index " + directoryProviderName );
+			if ( parsedInt < 1 ) {
+				throw new SearchException( "Property " + Environment.MAX_QUEUE_LENGTH + " on index "
+						+ directoryProviderName + "must be strictly positive" );
+			}
+			return parsedInt;
+		}
+		else {
+			return Executors.QUEUE_MAX_LENGTH;
+		}
 	}
 
 }

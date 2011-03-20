@@ -561,7 +561,8 @@ public class SearchFactoryBuilder {
 			factoryState.getDirectoryProviderIndexingParams().put( provider, indexingParams );
 		}
 
-		public void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider, boolean exclusiveIndexUsage) {
+		public void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider,
+				boolean exclusiveIndexUsage, int maximumQueueSize) {
 			final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData = factoryState.getDirectoryProviderData();
 			DirectoryProviderData data = dirProviderData.get( directoryProvider );
 			if ( data == null ) {
@@ -570,6 +571,7 @@ public class SearchFactoryBuilder {
 			}
 			data.getClasses().add( entity );
 			data.setExclusiveIndexUsage( exclusiveIndexUsage );
+			data.setMaxQueueLength( maximumQueueSize );
 		}
 
 		public SearchFactoryImplementor getUninitializedSearchFactory() {
@@ -622,8 +624,8 @@ public class SearchFactoryBuilder {
 			return similarity;
 		}
 
-		public boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> provider) {
-			return factoryState.getDirectoryProviderData().get( provider ).isExclusiveIndexUsage();
+		public DirectoryProviderData getDirectoryProviderData(DirectoryProvider<?> provider) {
+			return factoryState.getDirectoryProviderData().get( provider );
 		}
 
 		public ErrorHandler getErrorHandler() {

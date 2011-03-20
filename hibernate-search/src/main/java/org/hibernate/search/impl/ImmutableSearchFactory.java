@@ -385,8 +385,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return similarity;
 	}
 
-	public boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> provider) {
-		return dirProviderData.get( provider ).isExclusiveIndexUsage();
+	public DirectoryProviderData getDirectoryProviderData(DirectoryProvider<?> provider) {
+		return dirProviderData.get( provider );
 	}
 
 	public ErrorHandler getErrorHandler() {

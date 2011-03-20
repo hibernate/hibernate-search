@@ -79,8 +79,6 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 
 	Similarity getSimilarity(DirectoryProvider<?> directoryProvider);
 
-	boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> provider);
-
 	ErrorHandler getErrorHandler();
 
 	boolean isJMXEnabled();

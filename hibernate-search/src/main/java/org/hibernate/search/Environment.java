@@ -172,4 +172,12 @@ public final class Environment {
 	 * Affect semantics of entity updates only.
 	 */
 	public static final String ENABLE_DIRTY_CHECK = "hibernate.search.enable_dirty_check";
+
+	/**
+	 * The lucene backend has a separate writing thread for each index, the work pushed to each thread
+	 * is put in a queue which grows up to a maximum number of elements, which is configured by this
+	 * setting and defaults to 1000.
+	 * When the limit is reached work producers are blocked until some work has been processed.
+	 */
+	public static final String MAX_QUEUE_LENGTH = "max_queue_length";
 }

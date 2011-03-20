@@ -172,10 +172,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getSimilarity( directoryProvider );
 	}
 
-	public boolean isExclusiveIndexUsageEnabled(DirectoryProvider<?> provider) {
-		return delegate.isExclusiveIndexUsageEnabled( provider );
-	}
-
 	public ErrorHandler getErrorHandler() {
 		return delegate.getErrorHandler();
 	}

@@ -37,5 +37,6 @@ public interface WritableBuildContext extends BuildContext {
 
 	void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams);
 
-	void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider, boolean exclusiveIndexUsage);
+	void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider,
+			boolean exclusiveIndexUsage, int maximumQueueSize);
 }

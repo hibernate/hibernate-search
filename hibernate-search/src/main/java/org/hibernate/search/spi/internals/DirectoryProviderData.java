@@ -30,6 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.search.batchindexing.Executors;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
@@ -41,6 +42,7 @@ public class DirectoryProviderData {
 	private final Set<Class<?>> classes = new HashSet<Class<?>>( 2 );
 	private Similarity similarity = null;
 	private boolean exclusiveIndexUsage;
+	private int maxQueueLength = Executors.QUEUE_MAX_LENGTH;
 
 	public void setOptimizerStrategy(OptimizerStrategy optimizerStrategy) {
 		this.optimizerStrategy = optimizerStrategy;
@@ -55,7 +57,6 @@ public class DirectoryProviderData {
 	}
 
 	public ReentrantLock getDirLock() {
-
 		return dirLock;
 	}
 
@@ -74,4 +75,13 @@ public class DirectoryProviderData {
 	public boolean isExclusiveIndexUsage() {
 		return exclusiveIndexUsage;
 	}
+
+	public void setMaxQueueLength(int maxQueueLength) {
+		this.maxQueueLength = maxQueueLength;
+	}
+
+	public int getMaxQueueLength() {
+		return maxQueueLength;
+	}
+
 }

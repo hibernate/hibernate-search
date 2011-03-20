@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 public class Executors {
 	
 	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
-	private static final int QUEUE_MAX_LENGTH = 1000; //TODO have it configurable?
+	public static final int QUEUE_MAX_LENGTH = 1000;
 	
 	private static final Logger log = LoggerFactory.make();
 	
