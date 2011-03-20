@@ -78,9 +78,8 @@ public class WorkerTestCase extends SearchTestCase {
 			es.execute( work );
 			es.execute( reverseWork );
 		}
-		while ( work.count.get() < iteration - 1 ) {
-			Thread.sleep( 20 );
-		}
+		es.shutdown();
+		es.awaitTermination( 1, TimeUnit.MINUTES );
 		getSessions().close();
 		System.out.println(
 				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: "
