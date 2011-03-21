@@ -24,6 +24,8 @@
 
 package org.hibernate.search.test.query.facet;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -39,6 +41,7 @@ import org.hibernate.search.query.facet.FacetingRequest;
  * @author Hardy Ferentschik
  */
 public class RangeFacetingTest extends AbstractFacetTest {
+	private static final DateFormat formatter = new SimpleDateFormat( "yyyy" );
 	private final String indexFieldName = "price";
 	private final String priceRange = "priceRange";
 
@@ -194,7 +197,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
 	}
 
-	public void testRangeString() {
+	public void testStringRangeFaceting() {
 		final String facetingName = "albumNameFaceting";
 		final String fieldName = "name_un_analyzed";
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
@@ -204,7 +207,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.below( "S" ).excludeLimit()
 				.from( "S" ).to( "U" )
 				.above( "U" ).excludeLimit()
-				.orderedBy( FacetSortOrder.FIELD_VALUE )
+				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
 		FacetManager facetManager = query.getFacetManager();
@@ -216,6 +219,32 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 0 ) );
 		facets = facetManager.getFacets( facetingName );
 		assertFacetCounts( facets, new int[] { 7, 0, 0 } );
+	}
+
+	public void testDateRangeFaceting() throws Exception {
+		final String facetingName = "albumYearFaceting";
+		final String fieldName = "releaseYear";
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( facetingName )
+				.onField( fieldName )
+				.range()
+				.below( formatter.parse( "1970" ) ).excludeLimit()
+				.from( formatter.parse( "1970" ) ).to( formatter.parse( "1979" ) )
+				.from( formatter.parse( "1980" ) ).to( formatter.parse( "1989" ) )
+				.from( formatter.parse( "1990" ) ).to( formatter.parse( "1999" ) )
+				.above( formatter.parse( "2000" ) ).excludeLimit()
+				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( facetingName );
+		assertFacetCounts( facets, new int[] { 1, 2, 2, 0, 5 } );
+
+		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 4 ) );
+		facets = facetManager.getFacets( facetingName );
+		assertFacetCounts( facets, new int[] { 0, 0, 0, 0, 5 } );
 	}
 
 	public void testRangeQueryWithUnsupportedType() {
@@ -251,7 +280,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
 		for ( int i = 0; i < albums.length; i++ ) {
-			Cd cd = new Cd( albums[i], albumPrices[i] );
+			Cd cd = new Cd( albums[i], albumPrices[i], releaseDates[i] );
 			session.save( cd );
 		}
 		for ( int i = 0; i < fruits.length; i++ ) {

@@ -151,7 +151,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * The member - if any - annotated with @Id
 	 */
 	private XProperty jpaIdAnnotatedMember; //FIXME: to remove, needed only for isIdMatchingJpaId()
-	
+
 	/**
 	 * Type of allowed FieldCache usage
 	 */
@@ -196,8 +196,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				enabledTypes.add( t );
 			}
 			if ( enabledTypes.size() != 1 && enabledTypes.contains( org.hibernate.search.annotations.FieldCacheType.NOTHING ) ) {
-				throw new SearchException( "CacheFromIndex configured with conflicting parameters:" +
-						" if FieldCacheType.NOTHING is enabled, no other options can be added" );
+				throw new SearchException(
+						"CacheFromIndex configured with conflicting parameters:" +
+								" if FieldCacheType.NOTHING is enabled, no other options can be added"
+				);
 			}
 			this.fieldCacheUsage = Collections.unmodifiableSet( enabledTypes );
 		}
@@ -218,7 +220,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	private FieldCacheCollectorFactory figureIdFieldCacheUsage() {
 		if ( this.fieldCacheUsage.contains( org.hibernate.search.annotations.FieldCacheType.ID ) ) {
-			FieldCacheLoadingType collectorTypeForId = ClassLoadingStrategySelector.guessAppropriateCollectorType( idBridge );
+			FieldCacheLoadingType collectorTypeForId = ClassLoadingStrategySelector.guessAppropriateCollectorType(
+					idBridge
+			);
 			if ( collectorTypeForId == null ) {
 				log.warn( "FieldCache was enabled on class " + this.beanClass + " but for this type of identifier we can't extract values from the FieldCache: cache disabled" );
 				return null;
@@ -232,7 +236,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	public XMember getIdGetter() {
 		return idGetter;
 	}
-	
+
 	public FieldCacheCollectorFactory getIdFieldCacheCollectionFactory() {
 		return idFieldCacheCollectorFactory;
 	}
@@ -348,17 +352,21 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 		return id;
 	}
-	
+
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue) {
 		String idInString = objectToString( idBridge, idKeywordName, id );
 		if ( delete ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		if ( add ) {
-			queue.add( createAddWork( entityClass, entity, id, idInString, HibernateStatelessInitializer.INSTANCE, batch ) );
+			queue.add(
+					createAddWork(
+							entityClass, entity, id, idInString, HibernateStatelessInitializer.INSTANCE, batch
+					)
+			);
 		}
 	}
-	
+
 	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value) {
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
 				.setClass( getBeanClass() )
@@ -395,7 +403,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param id the entity id.
 	 * @param fieldToAnalyzerMap this maps gets populated while generating the <code>Document</code>.
 	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
-	 * @param objectInitializer 
+	 * @param objectInitializer
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
@@ -440,7 +448,15 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 		// finally add all other document fields
 		Set<String> processedFieldNames = new HashSet<String>();
-		buildDocumentFields( instance, doc, getMetadata(), fieldToAnalyzerMap, processedFieldNames, contextualBridge, objectInitializer );
+		buildDocumentFields(
+				instance,
+				doc,
+				getMetadata(),
+				fieldToAnalyzerMap,
+				processedFieldNames,
+				contextualBridge,
+				objectInitializer
+		);
 		return doc;
 	}
 
@@ -606,7 +622,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	public String getIdentifierName() {
 		return identifierName;
 	}
-	
+
 	public DirectoryProvider[] getDirectoryProviders() {
 		if ( getEntityState() != EntityState.INDEXED ) {
 			throw new AssertionFailure( "Contained in only entity: getDirectoryProvider should not have been called." );
@@ -626,7 +642,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	public boolean allowFieldSelectionInProjection() {
 		return allowFieldSelectionInProjection;
 	}
-	
+
 	public Set<org.hibernate.search.annotations.FieldCacheType> getFieldCacheOption() {
 		return fieldCacheUsage;
 	}
@@ -661,7 +677,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		Object unproxiedEntity = HibernateHelper.unproxy( entity );
 		return (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, idGetter );
 	}
-	
+
 	public String objectToString(String fieldName, Object value) {
 		if ( fieldName == null ) {
 			throw new AssertionFailure( "Field name should not be null" );
@@ -700,6 +716,26 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	public FieldBridge getBridge(String fieldName) {
 		return getBridge( getMetadata(), fieldName );
+	}
+
+	public boolean isFieldIndexed(String fieldName) {
+		String foundFieldName = getMappedFieldName( getMetadata(), fieldName );
+		return foundFieldName != null;
+	}
+
+	private String getMappedFieldName(PropertiesMetadata metadata, String fieldName) {
+		if ( metadata.fieldNames.contains( fieldName ) ) {
+			return fieldName;
+		}
+
+		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
+		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
+			String foundFieldName = getMappedFieldName( metadata.embeddedPropertiesMetadata.get( index ), fieldName );
+			if ( foundFieldName != null ) {
+				return foundFieldName;
+			}
+		}
+		return null;
 	}
 
 	private FieldBridge getBridge(PropertiesMetadata metadata, String fieldName) {
@@ -784,7 +820,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	boolean requiresProvidedId() {
 		return this.idProvided;
 	}
-	
+
 	/**
 	 * FIXME remove the need for such a method, we should always be able to rely on Work.id,
 	 * but to respect @DocumentId which is being processed in the DocumentBuilder currently
@@ -792,8 +828,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 */
 	@Override
 	boolean isIdMatchingJpaId() {
-		return ( ! idProvided &&
+		return ( !idProvided &&
 				( documentIdAnnotatedMember == null || documentIdAnnotatedMember.equals( jpaIdAnnotatedMember ) )
-								);
+		);
 	}
 }

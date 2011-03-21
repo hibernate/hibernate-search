@@ -24,9 +24,12 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 
@@ -47,7 +50,11 @@ class FacetBuildingContext<T> {
 		allowedRangeTypes.add( Long.class );
 		allowedRangeTypes.add( Double.class );
 		allowedRangeTypes.add( Float.class );
+		allowedRangeTypes.add( Date.class );
 	}
+
+	private final SearchFactoryImplementor factory;
+	private final Class<?> entityType;
 
 	private String name;
 	private String fieldName;
@@ -60,6 +67,12 @@ class FacetBuildingContext<T> {
 	private T rangeEnd;
 	private boolean includeRangeEnd = true;
 	private int maxFacetCount = -1;
+	private DocumentBuilderIndexedEntity<?> documentBuilder;
+
+	public FacetBuildingContext(SearchFactoryImplementor factory, Class<?> entityType) {
+		this.factory = factory;
+		this.entityType = entityType;
+	}
 
 	void setName(String name) {
 		this.name = name;
@@ -67,6 +80,7 @@ class FacetBuildingContext<T> {
 
 	void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
+		assertFacetingFieldExists();
 	}
 
 	void setSort(FacetSortOrder sort) {
@@ -105,10 +119,13 @@ class FacetBuildingContext<T> {
 		Class<?> type = getRangeType();
 		assertValidRangeType( type );
 		FacetRange<T> facetRange = new FacetRange<T>(
+				type,
 				rangeStart,
 				rangeEnd,
 				includeRangeStart,
-				includeRangeEnd
+				includeRangeEnd,
+				fieldName,
+				documentBuilder
 		);
 		rangeList.add( facetRange );
 		rangeStart = null;
@@ -137,15 +154,40 @@ class FacetBuildingContext<T> {
 	FacetingRequest getFacetingRequest() {
 		FacetingRequestImpl request;
 		if ( isRangeQuery ) {
-			request = new RangeFacetRequest<T>( name, fieldName, rangeList );
+			request = new RangeFacetRequest<T>( name, fieldName, rangeList, documentBuilder );
 		}
 		else {
+			if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( sort ) ) {
+				throw new SearchException(
+						"RANGE_DEFINITION_ODER is not a valid sort order for a discrete faceting request."
+				);
+			}
 			request = new DiscreteFacetRequest( name, fieldName );
 		}
 		request.setSort( sort );
 		request.setIncludeZeroCounts( includeZeroCount );
 		request.setMaxNumberOfFacets( maxFacetCount );
 		return request;
+	}
+
+	private void assertFacetingFieldExists() {
+		if ( fieldName == null ) {
+			throw new IllegalArgumentException( "null is an invalid field name" );
+		}
+
+		documentBuilder = factory.getDocumentBuilderIndexedEntity( entityType );
+		if ( documentBuilder == null ) {
+			throw new SearchException(
+					"Entity " + entityType.getName()
+							+ " does not seems to be a indexed entity. Unable to create faceting request"
+			);
+		}
+
+		if ( !documentBuilder.isFieldIndexed( fieldName ) ) {
+			throw new SearchException(
+					"The field name " + fieldName + " is not a indexed field of entity " + entityType.getName()
+			);
+		}
 	}
 
 	@Override

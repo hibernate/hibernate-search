@@ -23,7 +23,10 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
+import java.util.Date;
+
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 
 /**
  * @author Hardy Ferentschik
@@ -36,21 +39,86 @@ public class FacetRange<T> {
 
 	private final T min;
 	private final T max;
-
 	private final boolean includeMin;
 	private final boolean includeMax;
 	private final String rangeString;
+	private final String fieldName;
+	private final Class<?> rangeType;
 
-	public FacetRange(T min, T max, boolean includeMin, boolean includeMax) {
+	private String stringMin;
+	private String stringMax;
+
+	public FacetRange(Class<?> rangeType,
+					  T min,
+					  T max,
+					  boolean includeMin,
+					  boolean includeMax,
+					  String fieldName,
+					  DocumentBuilderIndexedEntity<?> documentBuilder) {
 		if ( max == null && min == null ) {
 			throw new IllegalArgumentException( "At least one end of the range has to be specified" );
+		}
+
+		if ( documentBuilder == null ) {
+			throw new AssertionFailure(
+					"null is not a valid document builder"
+			);
 		}
 
 		this.min = min;
 		this.max = max;
 		this.includeMax = includeMax;
 		this.includeMin = includeMin;
+		this.fieldName = fieldName;
+		this.rangeString = buildRangeString();
+		this.rangeType = rangeType;
 
+		if ( Date.class.equals( rangeType ) ) {
+			stringMin = documentBuilder.objectToString( fieldName, min );
+			stringMax = documentBuilder.objectToString( fieldName, max );
+		}
+	}
+
+	public T getMin() {
+		return min;
+	}
+
+	public T getMax() {
+		return max;
+	}
+
+	public boolean isMinIncluded() {
+		return includeMin;
+	}
+
+	public boolean isMaxIncluded() {
+		return includeMax;
+	}
+
+	public boolean isInRange(T value) {
+		if ( Number.class.isAssignableFrom( rangeType ) ) {
+			return isInRangeNumber( (Number) value, (Number) min, (Number) max );
+		}
+		else if ( String.class.equals( rangeType ) ) {
+			return isInRangeString( (String) value, (String) min, (String) max );
+		}
+		else if ( Date.class.equals( rangeType ) ) {
+			return isInRangeString(
+					(String) value,
+					stringMin,
+					stringMax
+			);
+		}
+		else {
+			throw new AssertionFailure( "Unexpected value type: " + value.getClass().getName() );
+		}
+	}
+
+	public String getRangeString() {
+		return rangeString;
+	}
+
+	private String buildRangeString() {
 		StringBuilder builder = new StringBuilder();
 		if ( includeMin ) {
 			builder.append( MIN_INCLUDED );
@@ -71,39 +139,7 @@ public class FacetRange<T> {
 		else {
 			builder.append( MAX_EXCLUDED );
 		}
-		this.rangeString = builder.toString();
-	}
-
-	public T getMin() {
-		return min;
-	}
-
-	public T getMax() {
-		return max;
-	}
-
-	public boolean isMinIncluded() {
-		return includeMin;
-	}
-
-	public boolean isMaxIncluded() {
-		return includeMax;
-	}
-
-	public boolean isInRange(T value) {
-		if ( value instanceof Number ) {
-			return isInRangeNumber( (Number) value, (Number) min, (Number) max );
-		}
-		else if ( value instanceof String ) {
-			return isInRangeString( (String) value, (String) min, (String) max );
-		}
-		else {
-			throw new AssertionFailure( "Unexpected value type: " + value.getClass().getName() );
-		}
-	}
-
-	public String getRangeString() {
-		return rangeString;
+		return builder.toString();
 	}
 
 	private boolean isInRangeString(String value, String min, String max) {
@@ -207,12 +243,16 @@ public class FacetRange<T> {
 
 	@Override
 	public String toString() {
-		return "FacetRange{" +
-				"min=" + min +
-				", max=" + max +
-				", includeMin=" + includeMin +
-				", includeMax=" + includeMax +
-				'}';
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "FacetRange" );
+		sb.append( "{min=" ).append( min );
+		sb.append( ", max=" ).append( max );
+		sb.append( ", includeMin=" ).append( includeMin );
+		sb.append( ", includeMax=" ).append( includeMax );
+		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
+		sb.append( ", rangeType=" ).append( rangeType );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
 

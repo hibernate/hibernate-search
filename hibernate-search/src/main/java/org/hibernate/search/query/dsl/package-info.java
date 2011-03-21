@@ -22,8 +22,8 @@
  * Boston, MA  02110-1301  USA
  */
 /**
- * Provide a domain specific language to write Lucene queries.
- * 
+ * Provide a domain specific language to write Lucene queries and create faceting requests.
+ *
  * While this API is slightly subject to change we highly encourage users to
  * to go for it as it provides many benefits.
  */

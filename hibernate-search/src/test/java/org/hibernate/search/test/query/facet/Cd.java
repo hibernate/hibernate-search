@@ -24,14 +24,20 @@
 
 package org.hibernate.search.test.query.facet;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Resolution;
 
 /**
  * @author Hardy Ferentschik
@@ -39,6 +45,8 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Indexed
 public class Cd {
+	private static final DateFormat formatter = new SimpleDateFormat( "yyyy" );
+
 	@Id
 	@GeneratedValue
 	private int id;
@@ -52,12 +60,22 @@ public class Cd {
 	@Field(index = Index.UN_TOKENIZED)
 	private int price;
 
+	@Field(index = Index.UN_TOKENIZED)
+	@DateBridge(resolution = Resolution.YEAR)
+	private Date releaseYear;
+
 	private Cd() {
 	}
 
-	public Cd(String name, int price) {
+	public Cd(String name, int price, String releaseYear) {
 		this.name = name;
 		this.price = price;
+		try {
+			this.releaseYear = formatter.parse( releaseYear );
+		}
+		catch ( ParseException e ) {
+			throw new IllegalArgumentException( "wrong date format" );
+		}
 	}
 
 	public int getId() {
@@ -72,6 +90,10 @@ public class Cd {
 		return price;
 	}
 
+	public Date getReleaseYear() {
+		return releaseYear;
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -79,6 +101,7 @@ public class Cd {
 		sb.append( "{id=" ).append( id );
 		sb.append( ", name='" ).append( name ).append( '\'' );
 		sb.append( ", price=" ).append( price );
+		sb.append( ", releaseYear=" ).append( releaseYear );
 		sb.append( '}' );
 		return sb.toString();
 	}

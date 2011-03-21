@@ -23,28 +23,26 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
+import java.util.Date;
 import java.util.List;
 
-import org.apache.lucene.search.NumericRangeQuery;
-import org.apache.lucene.search.Query;
-
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.query.facet.RangeFacet;
 
 /**
  * @author Hardy Ferentschik
  */
-// todo have some helper method or constructors to create range requests using a start and increment
 public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	private final List<FacetRange<T>> facetRangeList;
+	private final DocumentBuilderIndexedEntity<?> documentBuilder;
 
-	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges) {
+	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges, DocumentBuilderIndexedEntity<?> documentBuilder) {
 		super( name, fieldName );
 		if ( facetRanges == null || facetRanges.isEmpty() ) {
 			throw new IllegalArgumentException( "At least one facet range must be specified" );
 		}
 		this.facetRangeList = facetRanges;
+		this.documentBuilder = documentBuilder;
 	}
 
 	public List<FacetRange<T>> getFacetRangeList() {
@@ -58,7 +56,13 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 		if ( o == null ) {
 			o = facetRangeList.get( 0 ).getMax();
 		}
-		return o.getClass();
+
+		if ( o instanceof Date ) { // for date faceting we are using the string field cache
+			return String.class;
+		}
+		else {
+			return o.getClass();
+		}
 	}
 
 	@Override
@@ -66,7 +70,7 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 		// todo improve implementation. we should not depend on the string value (HF)
 		int facetIndex = findFacetRangeIndex( value );
 		FacetRange<T> range = facetRangeList.get( facetIndex );
-		return new RangeFacetImpl<T>( getFacetingName(), getFieldName(), range, count, facetIndex );
+		return new RangeFacetImpl<T>( getFacetingName(), getFieldName(), range, count, facetIndex, documentBuilder );
 	}
 
 	@Override

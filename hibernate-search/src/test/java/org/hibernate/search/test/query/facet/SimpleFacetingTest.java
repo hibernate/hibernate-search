@@ -32,6 +32,7 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
@@ -166,18 +167,33 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		}
 	}
 
-	// todo - decide on the final behavior of this. Maybe throw an exception?
-	public void testUnknownFieldNameReturnsEmptyResults() {
-		FacetingRequest request = queryBuilder( Car.class ).facet()
-				.name( "foo" )
-				.onField( "foobar" )
-				.discrete()
-				.createFacetingRequest();
-		FullTextQuery query = queryHondaWithFacet( request );
-		assertTrue(
-				"A unknown field name should not create any facets",
-				query.getFacetManager().getFacets( "foo" ).size() == 0
-		);
+	public void testUnknownFieldNameThrowsException() {
+		try {
+			FacetingRequest request = queryBuilder( Car.class ).facet()
+					.name( "foo" )
+					.onField( "foobar" )
+					.discrete()
+					.createFacetingRequest();
+			fail( "Trying to create a faceting request on an unknown field name" );
+		}
+		catch ( SearchException e ) {
+			// success
+		}
+	}
+
+	public void testRangeDefinitionSortOrderThrowsExceptionForDiscreteFaceting() {
+		try {
+			queryBuilder( Car.class ).facet()
+					.name( facetName )
+					.onField( indexFieldName )
+					.discrete()
+					.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
+					.createFacetingRequest();
+			fail( "RANGE_DEFINITION_ODER not allowed on discrete faceting" );
+		}
+		catch ( SearchException e ) {
+			// success
+		}
 	}
 
 	public void testEnableDisableFacets() {

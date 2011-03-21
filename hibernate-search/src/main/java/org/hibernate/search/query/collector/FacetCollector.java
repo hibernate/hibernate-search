@@ -43,7 +43,6 @@ import org.hibernate.search.query.dsl.impl.RangeFacetImpl;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
-import org.hibernate.search.query.facet.RangeFacet;
 import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
 import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
 
@@ -203,13 +202,11 @@ public class FacetCollector extends Collector {
 			else if ( FacetSortOrder.COUNT_DESC.equals( sortOder ) ) {
 				return facet2.getCount() - facet1.getCount();
 			}
+			else if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( sortOder ) ) {
+				return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
+			}
 			else {
-				if ( facet1 instanceof RangeFacet && facet2 instanceof RangeFacet ) {
-					return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
-				}
-				else {
-					return facet1.getValue().compareTo( facet2.getValue() );
-				}
+				return facet1.getValue().compareTo( facet2.getValue() );
 			}
 		}
 	}
