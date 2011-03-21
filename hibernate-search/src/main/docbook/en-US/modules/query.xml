@@ -1697,7 +1697,7 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
     <title>Faceting</title>
 
     <para><ulink url="http://en.wikipedia.org/wiki/Faceted_search">Faceted
-    search</ulink> is a technique which allows to devide the results of a
+    search</ulink> is a technique which allows to divide the results of a
     query into multiple categories. This categorisation includes the
     calculation of hit counts for each category and the ability to further
     restrict search results based on these facets (categories). The core
@@ -1790,7 +1790,7 @@ FacetingRequest labelFacetingRequest = builder.facet()
       facets returned.</para>
 
       <tip>
-        <para>There are several preconditions a indexed field has to meet in
+        <para>There are several preconditions an indexed field has to meet in
         order to apply faceting on it. The indexed property must be of type
         <classname>String</classname>, <classname>Date</classname> or a
         subtype of <classname>Number</classname>. Furthermore the property has
