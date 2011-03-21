@@ -1,6 +1,33 @@
 Hibernate Search Changelog
 ==========================
 
+3.4.0.Beta1 (21-03-2011)
+------------------------
+
+** Bug
+    * [HSEARCH-620] - Archetype does not deploy on JBoss Nexus repository due to missing pom fields
+    * [HSEARCH-689] - MassIndexer throwing LazyInitializationException on associated collections
+    * [HSEARCH-706] - Use FieldCacheCollector for faceting and introduce FacetManager interface to collect all facet related methods
+    * [HSEARCH-709] - Minor typos in documentation
+    * [HSEARCH-716] - Lucene FieldCache might not load all required values
+
+** Improvement
+    * [HSEARCH-323] - Fault tolerant FSSlaveDirectoryProvider (Oliver Siegmar)
+    * [HSEARCH-520] - Make work queue size configurable in Lucene backend
+    * [HSEARCH-701] - Avoid reflection used for debugging purposes during query results processing
+    * [HSEARCH-712] - Add below / above support in faceting DSL
+    * [HSEARCH-715] - Update JUnit to v.4
+
+** New Feature
+    * [HSEARCH-708] - Allow date range faceting
+
+** Task
+    * [HSEARCH-543] - SyncBackendLongWorklistsStressTest takes too long to execute (~40s)
+    * [HSEARCH-695] - Remove deprecated constructor form DocumentExtractor
+    * [HSEARCH-714] - Upgrade to Hibernate Core 3.6.2
+    * [HSEARCH-717] - Write documentation for faceting
+
+
 3.4.0.Alpha1 (07-03-2011)
 ------------------------
 
