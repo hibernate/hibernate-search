@@ -24,6 +24,8 @@ import java.io.IOException;
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.query.collector.FieldCacheCollector;
+import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Wraps a FieldCacheCollector in such a way that {@link #getValue(int)} returns objects as transformed
@@ -32,6 +34,8 @@ import org.hibernate.search.query.collector.FieldCacheCollector;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
+	
+	private static final Logger log = LoggerFactory.make();
 	
 	private final TwoWayStringBridge stringBridge;
 	private final FieldCacheCollector privateDelegate;
@@ -59,6 +63,11 @@ public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
 	@Override
 	public Object getValue(int docId) {
 		String value = (String) privateDelegate.getValue( docId );
+		if ( value == null ) {
+			log.warn( "unexpected: value is missing from FieldCache. This is likely a bug in the FieldCache implementation, " +
+				"Hibernate Search might have to workaround this by slightly inaccurate faceting values or reduced performance." );
+			return null;
+		}
 		return stringBridge.stringToObject( value );
 	}
 

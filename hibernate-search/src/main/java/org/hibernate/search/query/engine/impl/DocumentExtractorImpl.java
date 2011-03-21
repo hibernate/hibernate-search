@@ -38,6 +38,8 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.collector.FieldCacheCollector;
+import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * DocumentExtractor is a traverser over the full-text results (EntityInfo)
@@ -59,6 +61,7 @@ import org.hibernate.search.query.collector.FieldCacheCollector;
 public class DocumentExtractorImpl implements DocumentExtractor {
 
 	private static final Float FLOAT_ONE = Float.valueOf( 1f );
+	private static final Logger log = LoggerFactory.make();
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
@@ -179,8 +182,8 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		// else: this.fieldSelector = null; //We need no fields at all
 	}
 
-	private EntityInfo extractEntityInfo(int docId, Document document) {
-		Class clazz = extractClass( docId, document );
+	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex) throws IOException {
+		Class clazz = extractClass( docId, document, scoreDocIndex );
 		String idName = DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
 		Serializable id = extractId( docId, document, clazz );
 		Object[] projected = null;
@@ -204,14 +207,18 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 	}
 
-	private Class extractClass(int docId, Document document) {
+	private Class extractClass(int docId, Document document, int scoreDocIndex) throws IOException {
 		//maybe we can avoid document extraction:
 		if ( singleClassIfPossible != null ) {
 			return singleClassIfPossible;
 		}
-		final String className;
+		String className;
 		if ( classTypeCollector != null ) {
 			className = (String) classTypeCollector.getValue( docId );
+			if ( className == null ) {
+				log.warn( "forced to use Document extraction to workaround FieldCache bug in Lucene" );
+				className = forceClassNameExtraction( scoreDocIndex );
+			}
 		}
 		else {
 			className = document.get( DocumentBuilder.CLASS_FIELDNAME );
@@ -226,17 +233,17 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 	}
 
-	public EntityInfo extract(int index) throws IOException {
-		int docId = queryHits.docId( index );
-		Document document = extractDocument( index );
+	public EntityInfo extract(int scoreDocIndex) throws IOException {
+		int docId = queryHits.docId( scoreDocIndex );
+		Document document = extractDocument( scoreDocIndex );
 
-		EntityInfo entityInfo = extractEntityInfo( docId, document );
+		EntityInfo entityInfo = extractEntityInfo( docId, document, scoreDocIndex );
 		Object[] eip = entityInfo.getProjection();
 
 		if ( eip != null && eip.length > 0 ) {
 			for ( int x = 0; x < projection.length; x++ ) {
 				if ( ProjectionConstants.SCORE.equals( projection[x] ) ) {
-					eip[x] = queryHits.score( index );
+					eip[x] = queryHits.score( scoreDocIndex );
 				}
 				else if ( ProjectionConstants.ID.equals( projection[x] ) ) {
 					eip[x] = entityInfo.getId();
@@ -251,7 +258,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 					eip[x] = FLOAT_ONE;
 				}
 				else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
-					eip[x] = queryHits.explain( index );
+					eip[x] = queryHits.explain( scoreDocIndex );
 				}
 				else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
 					eip[x] = entityInfo.getClazz();
@@ -291,6 +298,21 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		else {
 			return queryHits.doc( index );
 		}
+	}
+	
+	/**
+	 * In rare cases the Lucene FieldCache might fail to return a value, at this point we already extracted
+	 * the Document so we need to repeat the process to extract the missing field only.
+	 * @param scoreDocIndex
+	 * @return
+	 * @throws IOException
+	 */
+	private String forceClassNameExtraction(int scoreDocIndex) throws IOException {
+		Map<String, FieldSelectorResult> fields = new HashMap<String, FieldSelectorResult>( 1 );
+		fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD_AND_BREAK );
+		MapFieldSelector classOnly = new MapFieldSelector( fields );
+		Document doc = queryHits.doc( scoreDocIndex, classOnly );
+		return doc.get( DocumentBuilder.CLASS_FIELDNAME );
 	}
 
 }

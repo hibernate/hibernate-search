@@ -39,6 +39,7 @@ import static org.hibernate.search.util.CollectionHelper.newHashMap;
  * @see org.hibernate.search.query.collector.BigArrayFieldCacheCollectorImpl
  */
 final class MapFieldCacheCollectorImpl extends FieldCacheCollector {
+	
 	private final FieldLoadingStrategy collectorStrategy;
 	private final Map<Integer, Object> valuePerDocumentId = newHashMap();
 
@@ -53,7 +54,8 @@ final class MapFieldCacheCollectorImpl extends FieldCacheCollector {
 	public void collect(int doc) throws IOException {
 		//warning when changing this method: extremely performance sensitive!
 		this.delegate.collect( doc );
-		this.valuePerDocumentId.put( currentDocBase + doc, collectorStrategy.collect( doc ) );
+		Object collected = collectorStrategy.collect( doc );
+		this.valuePerDocumentId.put( currentDocBase + doc, collected );
 	}
 
 	@Override
