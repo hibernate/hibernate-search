@@ -179,7 +179,7 @@ class FacetBuildingContext<T> {
 		if ( documentBuilder == null ) {
 			throw new SearchException(
 					"Entity " + entityType.getName()
-							+ " does not seems to be a indexed entity. Unable to create faceting request"
+							+ " is not an indexed entity. Unable to create faceting request"
 			);
 		}
 	}
