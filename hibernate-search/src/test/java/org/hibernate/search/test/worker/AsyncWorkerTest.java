@@ -32,6 +32,7 @@ import org.apache.lucene.analysis.StopAnalyzer;
  */
 public class AsyncWorkerTest extends WorkerTestCase {
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
@@ -40,6 +41,11 @@ public class AsyncWorkerTest extends WorkerTestCase {
 		cfg.setProperty( Environment.WORKER_EXECUTION, "async" );
 		cfg.setProperty( Environment.WORKER_PREFIX + "thread_pool.size", "1" );
 		cfg.setProperty( Environment.WORKER_PREFIX + "buffer_queue.max", "10" );
+	}
+	
+	@Override
+	protected boolean isWorkerSync() {
+		return false;
 	}
 
 }
