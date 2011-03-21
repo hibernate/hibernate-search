@@ -1276,6 +1276,17 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             <entry><literal>false</literal> (releases locks as soon as
             possible)</entry>
           </row>
+          
+          <row>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].max_queue_length</literal></entry>
+
+            <entry><para>Each index has a separate "pipeline" which contains the updates to be applied
+            to the index. When this queue is full adding more operations to the queue becomes a blocking operation.
+            Configuring this setting doesn't make much sense unless the <literal>worker.execution</literal> is configured as
+            <literal>async</literal>.</para></entry>
+
+            <entry><literal>1000</literal></entry>
+          </row>
 
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_delete_terms</literal></entry>
