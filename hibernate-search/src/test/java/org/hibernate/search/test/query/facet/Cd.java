@@ -37,6 +37,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 
 /**
@@ -58,6 +59,7 @@ public class Cd {
 	private String name;
 
 	@Field(index = Index.UN_TOKENIZED)
+	@NumericField
 	private int price;
 
 	@Field(index = Index.UN_TOKENIZED)
