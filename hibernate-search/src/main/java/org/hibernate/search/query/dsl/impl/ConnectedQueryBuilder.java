@@ -66,6 +66,6 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 	}
 
 	public FacetContext facet() {
-		return new ConnectedFacetContext( new FacetBuildingContext() );
+		return new ConnectedFacetContext( new FacetBuildingContext( context.getFactory(), context.getEntityType() ) );
 	}
 }

@@ -23,11 +23,14 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
+import java.util.Date;
+
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.facet.RangeFacet;
 
 /**
@@ -36,11 +39,13 @@ import org.hibernate.search.query.facet.RangeFacet;
 public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 	private final FacetRange<T> range;
 	private final int rangeIndex;
+	private final DocumentBuilderIndexedEntity<?> documentBuilder;
 
-	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index) {
+	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index, DocumentBuilderIndexedEntity<?> documentBuilder) {
 		super( facetingName, fieldName, range.getRangeString(), count );
 		this.range = range;
 		this.rangeIndex = index;
+		this.documentBuilder = documentBuilder;
 	}
 
 	@Override
@@ -50,9 +55,21 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 			return createNumericRangeQuery();
 		}
 		else if ( minOrMax instanceof String ) {
-			return createRangeQuery();
+			return createRangeQuery(
+					(String) range.getMin(),
+					(String) range.getMax(),
+					range.isMinIncluded(),
+					range.isMaxIncluded()
+			);
 		}
-
+		else if ( minOrMax instanceof Date ) {
+			return createRangeQuery(
+					documentBuilder.objectToString( getFieldName(), range.getMin() ),
+					documentBuilder.objectToString( getFieldName(), range.getMax() ),
+					range.isMinIncluded(),
+					range.isMaxIncluded()
+			);
+		}
 		else {
 			throw new AssertionFailure( "Unsupported range type" );
 		}
@@ -131,13 +148,13 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 		return query;
 	}
 
-	private Query createRangeQuery() {
+	private Query createRangeQuery(String min, String max, boolean includeMin, boolean includeMax) {
 		return new TermRangeQuery(
 				getFieldName(),
-				(String) range.getMin(),
-				(String) range.getMax(),
-				range.isMinIncluded(),
-				range.isMaxIncluded()
+				min,
+				max,
+				includeMin,
+				includeMax
 		);
 	}
 }

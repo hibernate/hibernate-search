@@ -43,5 +43,10 @@ public enum FacetSortOrder {
 	/**
 	 * Facets are returned in the alphabetical order
 	 */
-	FIELD_VALUE
+	FIELD_VALUE,
+
+	/**
+	 * The order in which ranges were defined. Only valid for range faceting
+	 */
+	RANGE_DEFINITION_ODER
 }
