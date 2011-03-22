@@ -33,7 +33,6 @@ import org.hibernate.search.backend.LuceneWork;
 /**
  * @author Lukasz Moren
  */
-
 public class JGroupsReceiver extends ReceiverAdapter {
 
 	public static int queues;

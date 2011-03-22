@@ -49,7 +49,8 @@ import org.hibernate.search.test.jgroups.master.TShirt;
  */
 public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
-	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
+	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "testing-flush-udp.xml";
+	public static final long NETWORK_TIMEOUT = 50;
 
 	public void testJGroupsBackend() throws Exception {
 
@@ -66,7 +67,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		s.persist( ts2 );
 		tx.commit();
 
-		Thread.sleep( 3000 );
+		Thread.sleep( NETWORK_TIMEOUT );
 
 		FullTextSession ftSess = Search.getFullTextSession( openSession() );
 		ftSess.getTransaction().begin();
@@ -84,7 +85,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		tx.commit();
 
 		//need to sleep for the message consumption
-		Thread.sleep( 3000 );
+		Thread.sleep( NETWORK_TIMEOUT );
 
 		luceneQuery = parser.parse( "logo:Peter pan" );
 		query = ftSess.createFullTextQuery( luceneQuery );
@@ -98,7 +99,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		tx.commit();
 
 		//Need to sleep for the message consumption
-		Thread.sleep( 3000 );
+		Thread.sleep( NETWORK_TIMEOUT );
 
 		luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
 		query = ftSess.createFullTextQuery( luceneQuery );

@@ -32,6 +32,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.XMLHelper;
 
 /**
@@ -45,7 +46,6 @@ import org.hibernate.search.util.XMLHelper;
  *
  * @author Lukasz Moren
  */
-
 public class JGroupsSlaveTest extends SearchTestCase {
 
 	public static final String CHANNEL_NAME = "HSearchCluster";
@@ -69,7 +69,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		tx.commit();
 
 		//need to sleep for the message consumption
-		Thread.sleep( 500 );
+		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
 
 		assertEquals( 1, JGroupsReceiver.queues );
 		assertEquals( 2, JGroupsReceiver.works );
@@ -82,7 +82,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		tx.commit();
 
 		//need to sleep for the message consumption
-		Thread.sleep( 500 );
+		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
 
 		assertEquals( 1, JGroupsReceiver.queues );
 		assertEquals( 2, JGroupsReceiver.works );
@@ -94,7 +94,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		tx.commit();
 
 		//Need to sleep for the message consumption
-		Thread.sleep( 500 );
+		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
 
 		assertEquals( 1, JGroupsReceiver.queues );
 		assertEquals( 1, JGroupsReceiver.works );
@@ -151,31 +151,31 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				"     thread_naming_pattern=\"pl\"" +
 				"     thread_pool.enabled=\"true\"" +
 				"     thread_pool.min_threads=\"1\"" +
-				"     thread_pool.max_threads=\"25\"" +
-				"     thread_pool.keep_alive_time=\"5000\"" +
+				"     thread_pool.max_threads=\"5\"" +
+				"     thread_pool.keep_alive_time=\"500\"" +
 				"     thread_pool.queue_enabled=\"false\"" +
 				"     thread_pool.queue_max_size=\"100\"" +
 				"     thread_pool.rejection_policy=\"Run\"" +
 				"     oob_thread_pool.enabled=\"true\"" +
 				"     oob_thread_pool.min_threads=\"1\"" +
 				"     oob_thread_pool.max_threads=\"8\"" +
-				"     oob_thread_pool.keep_alive_time=\"5000\"" +
+				"     oob_thread_pool.keep_alive_time=\"500\"" +
 				"     oob_thread_pool.queue_enabled=\"false\"" +
 				"     oob_thread_pool.queue_max_size=\"100\"" +
 				"     oob_thread_pool.rejection_policy=\"Run\"/>" +
-				"<PING timeout=\"2000\" num_initial_members=\"3\"/>" +
+				"<PING timeout=\"100\" num_initial_members=\"2\"/>" +
 				"<MERGE2 max_interval=\"30000\" min_interval=\"10000\"/>" +
 				"<FD_SOCK/>" +
 				"<FD timeout=\"10000\" max_tries=\"5\" shun=\"true\"/>" +
 				"<VERIFY_SUSPECT timeout=\"1500\"/>" +
 				"<pbcast.NAKACK " +
 				"            use_mcast_xmit=\"false\" gc_lag=\"0\"" +
-				"            retransmit_timeout=\"300,600,1200,2400,4800\"" +
+				"            retransmit_timeout=\"30,60,120,240,480\"" +
 				"            discard_delivered_msgs=\"false\"/>" +
-				"<UNICAST timeout=\"300,600,1200,2400,3600\"/>" +
+				"<UNICAST timeout=\"30,60,120,240,360\"/>" +
 				"<pbcast.STABLE stability_delay=\"1000\" desired_avg_gossip=\"50000\"" +
 				"            max_bytes=\"400000\"/>   " +
-				"<pbcast.GMS print_local_addr=\"true\" join_timeout=\"3000\"" +
+				"<pbcast.GMS print_local_addr=\"true\" join_timeout=\"200\"" +
 				"            shun=\"false\"" +
 				"            view_bundling=\"true\"/>" +
 				"<FC max_credits=\"20000000\" min_threshold=\"0.10\"/>" +

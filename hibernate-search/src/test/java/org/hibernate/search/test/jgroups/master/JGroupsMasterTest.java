@@ -45,6 +45,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.test.jms.master.TShirt;
 
 /**
@@ -74,7 +75,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 		sendMessage( queue );
 
-		Thread.sleep( 3000 );
+		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
 
 		FullTextSession ftSess = Search.getFullTextSession( openSession() );
 		ftSess.getTransaction().begin();
@@ -172,13 +173,13 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 	private String prepareJGroupsConfigurationString() {
 		return "UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):" +
-				"PING(timeout=3000;num_initial_members=6):" +
-				"FD(timeout=5000):" +
-				"VERIFY_SUSPECT(timeout=1500):" +
+				"PING(timeout=100;num_initial_members=2):" +
+				"FD(timeout=500):" +
+				"VERIFY_SUSPECT(timeout=500):" +
 				"pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):" +
 				"UNICAST(timeout=5000):" +
 				"FRAG:" +
-				"pbcast.GMS(join_timeout=3000;" +
+				"pbcast.GMS(join_timeout=30;" +
 				"shun=false;print_local_addr=true)";
 	}
 
