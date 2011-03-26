@@ -254,4 +254,9 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	public boolean isDirtyChecksEnabled() {
 		return delegate.isDirtyChecksEnabled();
 	}
+
+	public boolean isStopped() {
+		return delegate.isStopped();
+	}
+	
 }

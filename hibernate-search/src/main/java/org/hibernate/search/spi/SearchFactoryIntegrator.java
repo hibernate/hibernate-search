@@ -63,4 +63,10 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	 *  - get the number of results
 	 */
 	HSQuery createHSQuery();
+
+	/**
+	 * @return true if the SearchFactory was stopped
+	 */
+	boolean isStopped();
+	
 }

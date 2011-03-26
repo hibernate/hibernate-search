@@ -417,4 +417,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	public boolean isDirtyChecksEnabled() {
 		return enableDirtyChecks;
 	}
+
+	public boolean isStopped() {
+		return stopped.get();
+	}
 }
