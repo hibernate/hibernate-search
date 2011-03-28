@@ -23,10 +23,12 @@
  */
 package org.hibernate.search.test.configuration.mutablefactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import junit.framework.Assert;
 
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -43,11 +45,11 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
-import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.LoggerFactory;
 
 import org.junit.Test;
@@ -88,7 +90,7 @@ public class MutableFactoryTest {
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
 		//we know there is only one DP
-		DirectoryProvider provider = sf
+		DirectoryProvider<?> provider = sf
 				.getDirectoryProviders( A.class )[0];
 		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
@@ -137,7 +139,7 @@ public class MutableFactoryTest {
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
 		//we know there is only one DP
-		DirectoryProvider provider = sf
+		DirectoryProvider<?> provider = sf
 				.getDirectoryProviders( A.class )[0];
 		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
@@ -181,20 +183,10 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testMultiThreadedAddClasses() throws Exception {
-		File indexDir = initIndexDirectory();
-		try {
-			doTestMultiThreadedClasses(indexDir);
-		}
-		finally {
-			cleanIndexDir( indexDir );
-		}
-	}
-
-	private void doTestMultiThreadedClasses(File indexDir) throws Exception {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "filesystem" )
-				.addProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
+				//We need to check that properties aren't lost: avoid fs as it's the default configuration
+				.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		List<DoAddClasses> runnables = new ArrayList<DoAddClasses>(10);
 		final int nbrOfThread = 10;
@@ -207,8 +199,8 @@ public class MutableFactoryTest {
 		for (Runnable runnable : runnables) {
 			poolExecutor.execute( runnable );
 		}
+		poolExecutor.shutdown();
 
-		//poolExecutor.awaitTermination( 1, TimeUnit.MINUTES );
 		boolean inProgress;
 		do {
 			Thread.sleep( 100 );
@@ -223,35 +215,18 @@ public class MutableFactoryTest {
 			assertFalse( "thread failed #" + runnable.getWorkNumber() + " Failure: " + runnable.getFailureInfo(), runnable.isFailure() );
 		}
 
-		poolExecutor.shutdown();
+		poolExecutor.awaitTermination( 1, TimeUnit.MINUTES );
 
 		for (int i = 0 ; i < nbrOfThread*nbrOfClassesPerThread ; i++) {
 			Query luceneQuery = parser.parse( "Emmanuel" + i);
 			final Class<?> classByNumber = getClassAByNumber( i );
+			DirectoryProvider<?>[] directoryProviders = sf.getDirectoryProviders( classByNumber );
+			assertNotNull( directoryProviders );
 			DirectoryProvider<?> provider = sf.getDirectoryProviders( classByNumber )[0];
 			IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
 			TopDocs hits = searcher.search( luceneQuery, 1000 );
 			assertEquals( 1, hits.totalHits );
 		}
-	}
-
-	private void cleanIndexDir(File indexDir) {
-		FileHelper.delete( indexDir );
-	}
-
-	private File initIndexDirectory() {
-		String buildDir = System.getProperty( "build.dir" );
-		if ( buildDir == null ) {
-			buildDir = ".";
-		}
-		File current = new File( buildDir );
-		File indexDir = new File( current, "indextemp" );
-		boolean created = indexDir.mkdir();
-		if (!created) {
-			FileHelper.delete( indexDir );
-			indexDir.mkdir();
-		}
-		return indexDir;
 	}
 
 	private static Class<?> getClassAByNumber(int i) throws ClassNotFoundException {
@@ -268,7 +243,7 @@ public class MutableFactoryTest {
 		private final int factorOfClassesPerThread;
 		private final QueryParser parser;
 		private final int nbrOfClassesPerThread;
-		private volatile Boolean failure;
+		private volatile Boolean failure = false;
 		private volatile String failureInfo;
 
 		public String getFailureInfo() {
@@ -301,6 +276,9 @@ public class MutableFactoryTest {
 					ManualTransactionContext context = new ManualTransactionContext();
 					MutableFactoryTest.doIndexWork(entity, i, factory, context );
 					context.end();
+					
+					DirectoryProvider<?>[] directoryProviders = factory.getDirectoryProviders( aClass );
+					Assert.assertTrue( "Configuration lost: expected RAM directory", directoryProviders[0] instanceof RAMDirectoryProvider );
 
 					Query luceneQuery = parser.parse( "Emmanuel" + i);
 					DirectoryProvider<?> provider = factory.getDirectoryProviders( aClass )[0];
@@ -311,10 +289,7 @@ public class MutableFactoryTest {
 						failureInfo = "failure: Emmanuel" + i + " for " + aClass.getName();
 						return;
 					}
-					//System.out.println("success: Emmanuel" + i + " for " + aClass.getName() );
 				}
-				//System.out.println("success: Emmanuel" + factorOfClassesPerThread );
-				failure = false;
 			}
 			catch ( Exception e ) {
 				this.failure = true;
