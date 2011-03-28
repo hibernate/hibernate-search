@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+3.4.0.CR1 (28-03-2011)
+----------------------
+
+** Bug
+    * [HSEARCH-719] - MutableSearchFactory might skip copying properties from previous SearchFactory during incrementalRebuild
+
+** New Feature
+    * [HSEARCH-718] - Expose "isStopped" method on SearchFactoryIntegrator interface
+
+
 3.4.0.Beta1 (21-03-2011)
 ------------------------
 
