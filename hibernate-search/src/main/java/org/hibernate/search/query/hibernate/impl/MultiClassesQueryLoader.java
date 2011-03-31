@@ -155,7 +155,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			DocumentBuilderIndexedEntity<?> provider = searchFactoryImplementor.getDocumentBuilderIndexedEntity( rootEntity );
 			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
 			this.mappedSubclasses = provider.getMappedSubclasses();
-			this.criteria = session.createCriteria( rootEntity );
+			this.criteria = null; //default
 		}
 	}
 }

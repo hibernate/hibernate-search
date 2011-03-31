@@ -66,6 +66,11 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 			return;
 		}
 
+		//criteria query not overridden, define one
+		if ( criteria == null ) {
+			criteria = session.createCriteria( entityType );
+		}
+
 		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
 		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
 				indexedEntities.iterator().next()

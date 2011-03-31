@@ -80,9 +80,6 @@ public class QueryLoader extends AbstractLoader {
 		if ( entityType == null ) {
 			throw new AssertionFailure( "EntityType not defined" );
 		}
-		if ( criteria == null ) {
-			criteria = session.createCriteria( entityType );
-		}
 
 		objectsInitializer.initializeObjects(
 				entityInfos,
