@@ -79,7 +79,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		}
 		entityMatadata = new ArrayList<RootEntityMetadata>( safeEntityTypes.size() );
 		for (Class clazz :  safeEntityTypes) {
-			entityMatadata.add( new RootEntityMetadata( clazz, searchFactoryImplementor, session ) );
+			entityMatadata.add( new RootEntityMetadata( clazz, searchFactoryImplementor ) );
 		}
 	}
 
@@ -150,7 +150,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		public final Set<Class<?>> mappedSubclasses;
 		private final Criteria criteria;
 
-		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor, Session session) {
+		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor) {
 			this.rootEntity = rootEntity;
 			DocumentBuilderIndexedEntity<?> provider = searchFactoryImplementor.getDocumentBuilderIndexedEntity( rootEntity );
 			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
