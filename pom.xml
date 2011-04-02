@@ -176,17 +176,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-collation</artifactId>
-                <version>${luceneVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.ibm.icu</groupId>
-                        <artifactId>icu4j</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-spellchecker</artifactId>
                 <version>${luceneVersion}</version>
             </dependency>
@@ -230,11 +219,6 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-testing</artifactId>
                 <version>${hibernateVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-snowball</artifactId>
-                <version>${luceneVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>

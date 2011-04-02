@@ -82,8 +82,6 @@
                         <scope>test</scope>
                         <includes>
                             <include>org.apache.lucene:lucene-analyzers</include>
-                            <include>org.apache.lucene:lucene-snowball</include>
-                            <include>org.apache.lucene:lucene-collation</include>
                             <include>commons-codec:commons-codec</include>
                             <include>commons-io:commons-io</include>
                             <include>org.slf4j:slf4j-log4j12</include>
@@ -137,10 +135,6 @@
         </file>
         <file>
             <source>changelog.txt</source>
-            <outputDirectory>/</outputDirectory>
-        </file>
-        <file>
-            <source>hibernate-search-analyzers/license.txt</source>
             <outputDirectory>/</outputDirectory>
         </file>
     </files>
