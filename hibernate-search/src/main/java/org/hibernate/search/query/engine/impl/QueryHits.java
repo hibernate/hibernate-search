@@ -43,6 +43,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.search.Weight;
 
 import org.hibernate.QueryTimeoutException;
@@ -124,7 +125,6 @@ public class QueryHits {
 		this.enableFieldCacheOnClassName = enableFieldCacheOnTypes;
 		this.idFieldCollectorFactory = idFieldCollector;
 		updateTopDocs( n );
-		this.totalHits = topDocs.totalHits;
 	}
 
 	public Document doc(int index) throws IOException {
@@ -195,39 +195,56 @@ public class QueryHits {
 		final int maxDocs = Math.min( n, totalMaxDocs );
 		final Weight weight = preparedQuery.weight( searcher.getSearcher() );
 
-		TopDocsCollector<?> topDocCollector = createTopDocCollector( maxDocs, weight );
-		Collector collector = decorateWithTimeOutCollector( topDocCollector );
+		final TopDocsCollector<?> topDocCollector;
+		final TotalHitCountCollector hitCountCollector;
+		Collector collector = null;
+		if ( maxDocs != 0 ) {
+			topDocCollector = createTopDocCollector( maxDocs, weight );
+			hitCountCollector = null;
+			collector = topDocCollector;
+			collector = optionallyEnableFieldCacheOnTypes( collector, totalMaxDocs, maxDocs );
+			collector = optionallyEnableFieldCacheOnIds( collector, totalMaxDocs, maxDocs );
+			collector = optionallyEnableFacetingCollectors( collector );
+		}
+		else {
+			topDocCollector = null;
+			hitCountCollector = new TotalHitCountCollector();
+			collector = hitCountCollector;
+		}
+		collector = decorateWithTimeOutCollector( collector );
 
 		boolean timeoutNow = isImmediateTimeout();
 		if ( !timeoutNow ) {
 			try {
-				collector = optionallyEnableFieldCacheOnTypes( collector, totalMaxDocs, maxDocs );
-				collector = optionallyEnableFieldCacheOnIds( collector, totalMaxDocs, maxDocs );
-				collector = optionallyFacetingCollectors( collector );
 				searcher.getSearcher().search( weight, filter, collector );
 			}
 			catch ( TimeLimitingCollector.TimeExceededException e ) {
 				//we have reached the time limit and stopped before the end
 				//TimeoutManager.isTimedOut should be above that limit but set if for safety
 				timeoutManager.forceTimedOut();
-				topDocs = topDocCollector.topDocs();
 			}
 		}
 
-		// update top docs
-		topDocs = topDocCollector.topDocs();
-
-		// if we were collecting facet data we have to update our instance state
-		if ( facetCollectors != null && !facetCollectors.isEmpty() ) {
-			facetMap = new HashMap<String, List<Facet>>();
-			for ( FacetCollector facetCollector : facetCollectors ) {
-				facetMap.put( facetCollector.getFacetName(), facetCollector.getFacetList() );
+		// update top docs and totalHits
+		if ( maxDocs != 0 ) {
+			this.topDocs = topDocCollector.topDocs();
+			this.totalHits = topDocs.totalHits;
+			// if we were collecting facet data we have to update our instance state
+			if ( facetCollectors != null && !facetCollectors.isEmpty() ) {
+				facetMap = new HashMap<String, List<Facet>>();
+				for ( FacetCollector facetCollector : facetCollectors ) {
+					facetMap.put( facetCollector.getFacetName(), facetCollector.getFacetList() );
+				}
 			}
+		}
+		else {
+			this.topDocs = null;
+			this.totalHits = hitCountCollector.getTotalHits();
 		}
 		timeoutManager.isTimedOut();
 	}
 
-	private Collector optionallyFacetingCollectors(Collector collector) {
+	private Collector optionallyEnableFacetingCollectors(Collector collector) {
 		if ( facetRequests == null || facetRequests.isEmpty() ) {
 			return collector;
 		}

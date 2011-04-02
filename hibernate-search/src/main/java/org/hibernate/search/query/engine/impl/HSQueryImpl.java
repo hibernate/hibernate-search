@@ -294,12 +294,9 @@ public class HSQueryImpl implements HSQuery {
 				resultSize = 0;
 			}
 			else {
-				TopDocs hits;
 				try {
-					hits = getQueryHits(
-							searcher, 1
-					).getTopDocs(); // Lucene enforces that at least one top doc will be retrieved.
-					resultSize = hits.totalHits;
+					QueryHits queryHits = getQueryHits( searcher, 0 );
+					resultSize = queryHits.getTotalHits();
 				}
 				catch ( IOException e ) {
 					throw new SearchException( "Unable to query Lucene index", e );
@@ -404,6 +401,19 @@ public class HSQueryImpl implements HSQuery {
 					facetManager.getFacetRequests(),
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory()
+			);
+		}
+		else if ( 0 == n) {
+			queryHits = new QueryHits(
+					searcher,
+					filteredQuery,
+					filter,
+					null,
+					0,
+					getTimeoutManagerImpl(),
+					null,
+					false,
+					null
 			);
 		}
 		else {
