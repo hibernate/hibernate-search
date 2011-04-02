@@ -35,6 +35,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
+import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSelection;
@@ -98,11 +99,16 @@ public class FacetManagerImpl implements FacetManager {
 		if ( facetRequests.isEmpty() || !facetRequests.containsKey( facetingName ) ) {
 			return Collections.emptyList();
 		}
-
-		// todo need to find a better way of doing this (HF)
-		// ugly - relying on the fact that query.queryResultSize() won't trigger another query execution unless
-		// the query state has changed
-		query.queryResultSize();
+		
+		List<Facet> facets = null;
+		if ( facetResults != null ) {
+			facets = facetResults.get( facetingName );
+		}
+		if ( facets != null ) {
+			return facets;
+		}
+		DocumentExtractor queryDocumentExtractor = query.queryDocumentExtractor();
+		queryDocumentExtractor.close();
 		return facetResults.get( facetingName );
 	}
 
@@ -128,6 +134,7 @@ public class FacetManagerImpl implements FacetManager {
 
 	void queryHasChanged() {
 		facetFilter = null;
+		this.facetResults = null;
 		query.clearCachedResults();
 	}
 
