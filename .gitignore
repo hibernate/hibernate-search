@@ -6,10 +6,8 @@
 buildSrc/.gradle
 
 # Build output directies
-/target
-*/target
-/build
-*/build
+target
+build
 
 # IntelliJ specific files/directories
 /out
