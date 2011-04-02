@@ -29,12 +29,12 @@
 # i.e. when we are running the ConcurrentMergeErrorHandledTest
 
 RULE org.apache.lucene.index.ConcurrentMergeScheduler throws IOException in service thread
-CLASS org.apache.lucene.index.IndexWriter
-METHOD checkpoint
+CLASS org.apache.lucene.index.ConcurrentMergeScheduler
+METHOD merge
 IF flagged("createIndexWriterIOException")
 	DO	
 		clear("createIndexWriterIOException");
-		traceln( "This invocation of checkpoint() is going to throw an IOException\n" );
+		traceln( "Next invocation of ConcurrentMergeScheduler.merge() is going to throw an IOException\n" );
 		throw new IOException("Byteman said: your disk is full!");
 ENDRULE
 
