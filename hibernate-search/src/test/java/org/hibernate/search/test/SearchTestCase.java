@@ -244,7 +244,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	}
 
 	public static Version getTargetLuceneVersion() {
-		return Version.LUCENE_29;
+		return Version.LUCENE_31;
 	}
 	
 	protected SearchFactoryImplementor getSearchFactoryImpl() {
