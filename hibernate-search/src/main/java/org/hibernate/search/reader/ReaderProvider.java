@@ -53,7 +53,7 @@ public interface ReaderProvider {
 	void closeReader(IndexReader reader);
 
 	/**
-	 * Inialize the reader provider before its use.
+	 * Initialize the reader provider before its use.
 	 */
 	void initialize(Properties props, BuildContext context);
 
