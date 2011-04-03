@@ -25,9 +25,12 @@ package org.hibernate.search.backend.configuration;
 
 import java.io.Serializable;
 
-import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.LogByteSizeMergePolicy;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.util.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Represents possible options to be applied to an
@@ -38,74 +41,80 @@ import org.hibernate.search.SearchException;
 public enum IndexWriterSetting implements Serializable {
 
 	/**
-	 * @see org.apache.lucene.index.IndexWriter#setMaxBufferedDeleteTerms(int)
+	 * @see org.apache.lucene.index.IndexWriterConfig#setMaxBufferedDeleteTerms(int)
 	 */
 	MAX_BUFFERED_DELETE_TERMS( "max_buffered_delete_terms" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setMaxBufferedDeleteTerms( value );
+		public void applySetting(IndexWriterConfig writerConfig, int value) {
+			writerConfig.setMaxBufferedDeleteTerms( value );
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriter#setMaxBufferedDocs(int)
+	 * @see org.apache.lucene.index.IndexWriterConfig#setMaxBufferedDocs(int)
 	 */
 	MAX_BUFFERED_DOCS( "max_buffered_docs" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setMaxBufferedDocs( value );
+		public void applySetting(IndexWriterConfig writerConfig, int value) {
+			writerConfig.setMaxBufferedDocs( value );
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriter#setMaxFieldLength(int)
+	 * No longer applied - use a LimitTokenCountAnalyzer.
+	 * @see org.apache.lucene.analysis.LimitTokenCountAnalyzer
+	 * @deprecated
 	 */
 	MAX_FIELD_LENGTH( "max_field_length" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setMaxFieldLength( value );
+		public void applySetting(IndexWriterConfig writerConfig, int value) {
+			log.warn( "Configuration option 'max_field_length' is no longer applied. Use LimitTokenCountAnalyzer instead" );
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriter#setMaxMergeDocs(int)
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeDocs(int)
 	 */
 	MAX_MERGE_DOCS( "max_merge_docs" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setMaxMergeDocs( value );
+		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
+			logByteSizeMergePolicy.setMaxMergeDocs( value );
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriter#setMergeFactor(int)
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMergeFactor(int)
 	 */
 	MERGE_FACTOR( "merge_factor" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setMergeFactor( value );
+		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
+			logByteSizeMergePolicy.setMergeFactor( value );
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriter#setRAMBufferSizeMB(double)
+	 * @see org.apache.lucene.index.IndexWriterConfig#setRAMBufferSizeMB(double)
 	 */
 	RAM_BUFFER_SIZE( "ram_buffer_size" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setRAMBufferSizeMB( value );
+		public void applySetting(IndexWriterConfig writerConfig, int value) {
+			writerConfig.setRAMBufferSizeMB( value );
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriter#setTermIndexInterval(int)
+	 * @see org.apache.lucene.index.IndexWriterConfig#setTermIndexInterval(int)
 	 */
 	TERM_INDEX_INTERVAL( "term_index_interval" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setTermIndexInterval( value );
+		public void applySetting(IndexWriterConfig writerConfig, int value) {
+			writerConfig.setTermIndexInterval( value );
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriter#setUseCompoundFile(boolean)
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setUseCompoundFile(boolean)
 	 */
 	USE_COMPOUND_FILE( "use_compound_file" ) {
-		public void applySetting(IndexWriter writer, int value) {
-			writer.setUseCompoundFile( intToBoolean( value ) );
-		}
-
 		@Override
 		public Integer parseVal(String value) {
 			return USE_COMPOUND_FILE.parseBoolean( value );
 		}
+
+		@Override
+		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
+			boolean useCompoundFile = intToBoolean( value );
+			logByteSizeMergePolicy.setUseCompoundFile( useCompoundFile );
+		}
 	};
+	
+	private static final Logger log = LoggerFactory.make();
 
 	private static final Integer TRUE = 1;
 	private static final Integer FALSE = 0;
@@ -119,7 +128,15 @@ public enum IndexWriterSetting implements Serializable {
 	/**
 	 * @throws IllegalArgumentException when user selects an invalid value; should be wrapped.
 	 */
-	public abstract void applySetting(IndexWriter writer, int value);
+	public void applySetting(IndexWriterConfig writerConfig, int value) {
+		// nothing to do unless overriden
+	}
+	/**
+	 * @throws IllegalArgumentException when user selects an invalid value; should be wrapped.
+	 */
+	public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
+		// nothing to do unless overriden
+	}
 
 	/**
 	 * @return The key used in configuration files to select an option.

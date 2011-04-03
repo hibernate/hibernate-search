@@ -1310,28 +1310,6 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_field_length</literal></entry>
-
-            <entry><para>The maximum number of terms that will be indexed for
-            a single field. This limits the amount of memory required for
-            indexing so that very large data will not crash the indexing
-            process by running out of memory. This setting refers to the
-            number of running terms, not to the number of different
-            terms.</para> <para>This silently truncates large documents,
-            excluding from the index all terms that occur further in the
-            document. If you know your source documents are large, be sure to
-            set this value high enough to accommodate the expected size. If
-            you set it to Integer.MAX_VALUE, then the only limit is your
-            memory, but you should anticipate an OutOfMemoryError. </para>
-            <para>If setting this value in <literal>batch</literal>
-            differently than in <literal>transaction</literal> you may get
-            different data (and results) in your index depending on the
-            indexing mode.</para></entry>
-
-            <entry>10000</entry>
-          </row>
-
-          <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_merge_docs</literal></entry>
 
             <entry><para>Defines the largest number of documents allowed in a

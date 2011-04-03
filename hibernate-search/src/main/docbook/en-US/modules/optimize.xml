@@ -144,10 +144,6 @@ searchFactory.optimize();</programlisting>
         </listitem>
 
         <listitem>
-          <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_field_length</literal>
-        </listitem>
-
-        <listitem>
           <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[batch|transaction].max_merge_docs</literal>
         </listitem>
 

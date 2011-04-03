@@ -294,10 +294,6 @@ transaction.commit();</programlisting>
       </listitem>
 
       <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_field_length</literal>
-      </listitem>
-
-      <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_merge_docs</literal>
       </listitem>
 
@@ -317,6 +313,9 @@ transaction.commit();</programlisting>
         <literal>hibernate.search.batchbackend.concurrent_writers</literal>
       </listitem>
     </itemizedlist>
+    
+    <para>Previous versions also had a <literal>max_field_length</literal> but this was removed from Lucene,
+    it's possible to obtain a similar effect by using a <classname>LimitTokenCountAnalyzer</classname>.</para>
 
     <para>All <literal>.indexwriter</literal> parameters are Lucene specific
     and Hibernate Search is just passing these parameters through - see <xref

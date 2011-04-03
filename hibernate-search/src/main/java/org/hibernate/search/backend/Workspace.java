@@ -31,12 +31,16 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.Similarity;
+import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.backend.LuceneIndexingParameters.ParameterSet;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -61,9 +65,12 @@ import org.hibernate.search.util.LoggerFactory;
 public class Workspace {
 
 	private static final Logger log = LoggerFactory.make();
-	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer();
-	private static final IndexWriter.MaxFieldLength maxFieldLength =
-		new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
+	
+	/**
+	 * This Analyzer is never used in practice: during Add operation it's overriden.
+	 * So we don't care for the Version, using whatever Lucene thinks is safer.
+	 */
+	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer( Version.LUCENE_31 );
 	
 	// invariant state:
 
@@ -73,8 +80,10 @@ public class Workspace {
 	private final ReentrantLock lock;
 	private final Set<Class<?>> entitiesInDirectory;
 	private final LuceneIndexingParameters indexingParams;
-	private final Similarity similarity;
 	private final ErrorHandler errorHandler;
+	
+	private final IndexWriterConfig writerConfig = new IndexWriterConfig( Version.LUCENE_31, SIMPLE_ANALYZER );
+	private final IndexWriterConfig batchWriterConfig = new IndexWriterConfig( Version.LUCENE_31, SIMPLE_ANALYZER );
 
 	// variable state:
 	
@@ -93,10 +102,15 @@ public class Workspace {
 		this.directoryProvider = provider;
 		this.optimizerStrategy = context.getOptimizerStrategy( directoryProvider );
 		this.entitiesInDirectory = context.getClassesInDirectoryProvider( provider );
-		this.indexingParams = context.getIndexingParameters( directoryProvider );
 		this.lock = context.getDirectoryProviderLock( provider );
-		this.similarity = context.getSimilarity( directoryProvider );
+		this.indexingParams = context.getIndexingParameters( directoryProvider );
 		this.errorHandler = errorHandler;
+		LuceneIndexingParameters indexingParams = context.getIndexingParameters( directoryProvider );
+		indexingParams.applyToWriter( writerConfig, false );
+		indexingParams.applyToWriter( batchWriterConfig, true );
+		Similarity similarity = context.getSimilarity( directoryProvider );
+		writerConfig.setSimilarity( similarity );
+		batchWriterConfig.setSimilarity( similarity );
 	}
 
 	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilder(Class<T> entity) {
@@ -156,12 +170,16 @@ public class Workspace {
 		if ( writer != null )
 			return writer;
 		try {
-			writer = new IndexWriter( directoryProvider.getDirectory(), SIMPLE_ANALYZER, false, maxFieldLength ); // has been created at init time
-			indexingParams.applyToWriter( writer, batchmode );
-			writer.setSimilarity( similarity );
-			MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler );
-			writer.setMergeScheduler( mergeScheduler );
-			log.trace( "IndexWriter opened" );
+			if ( batchmode ) {
+				ParameterSet indexingParameters = indexingParams.getBatchIndexParameters();
+				writer = createNewIndexWriter( directoryProvider, this.batchWriterConfig, indexingParameters );
+				log.trace( "IndexWriter opened using batch configuration" );
+			}
+			else {
+				ParameterSet indexingParameters = indexingParams.getTransactionIndexParameters();
+				writer = createNewIndexWriter( directoryProvider, this.writerConfig, indexingParameters );
+				log.trace( "IndexWriter opened using default configuration" );
+			}
 		}
 		catch ( IOException ioe ) {
 			writer = null;
@@ -170,6 +188,21 @@ public class Workspace {
 		return writer;
 	}
 	
+	/**
+	 * Create as new IndexWriter using the passed in IndexWriterConfig as a template, but still applies some late changes:
+	 * we need to override the MergeScheduler to handle background errors, and a new instance needs to be created for each
+	 * new IndexWriter.
+	 * Also each new IndexWriter needs a new MergePolicy.
+	 */
+	private IndexWriter createNewIndexWriter(DirectoryProvider<?> directoryProvider, IndexWriterConfig writerConfig, ParameterSet indexingParameters) throws IOException {
+		LogByteSizeMergePolicy newMergePolicy = indexingParameters.getNewMergePolicy(); //TODO make it possible to configure a different policy?
+		writerConfig.setMergePolicy( newMergePolicy );
+		MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler );
+		writerConfig.setMergeScheduler( mergeScheduler );
+		IndexWriter writer = new IndexWriter( directoryProvider.getDirectory(), writerConfig );
+		return writer;
+	}
+
 	/**
 	 * @see #getIndexWriter(boolean, ErrorContextBuilder)
 	 */

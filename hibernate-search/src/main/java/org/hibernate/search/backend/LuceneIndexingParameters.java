@@ -28,7 +28,8 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
@@ -152,12 +153,12 @@ public class LuceneIndexingParameters implements Serializable {
 		 * Applies the parameters represented by this to a writer.
 		 * Undefined parameters are not set, leaving the lucene default.
 		 *
-		 * @param writer the IndexWriter whereto the parameters will be applied.
+		 * @param writerConfig the IndexWriter configuration whereto the parameters will be applied.
 		 */
-		public void applyToWriter(IndexWriter writer) {
+		public void applyToWriter(IndexWriterConfig writerConfig) {
 			for ( Map.Entry<IndexWriterSetting, Integer> entry : parameters.entrySet() ) {
 				try {
-					entry.getKey().applySetting( writer, entry.getValue() );
+					entry.getKey().applySetting( writerConfig, entry.getValue() );
 				}
 				catch ( IllegalArgumentException e ) {
 					//TODO if DirectoryProvider had getDirectoryName() exceptions could tell better
@@ -167,6 +168,27 @@ public class LuceneIndexingParameters implements Serializable {
 					);
 				}
 			}
+		}
+		
+		/**
+		 * Creates a new LogByteSizeMergePolicy as configured by this property set.
+		 * @return a new LogByteSizeMergePolicy instance.
+		 */
+		public LogByteSizeMergePolicy getNewMergePolicy() {
+			LogByteSizeMergePolicy logByteSizeMergePolicy = new LogByteSizeMergePolicy();
+			for ( Map.Entry<IndexWriterSetting, Integer> entry : parameters.entrySet() ) {
+				try {
+					entry.getKey().applySetting( logByteSizeMergePolicy, entry.getValue() );
+				}
+				catch ( IllegalArgumentException e ) {
+					//TODO if DirectoryProvider had getDirectoryName() exceptions could tell better
+					throw new SearchException(
+							"Illegal IndexWriter setting "
+									+ entry.getKey().getKey() + " " + e.getMessage(), e
+					);
+				}
+			}
+			return logByteSizeMergePolicy;
 		}
 
 		public Integer getCurrentValueFor(IndexWriterSetting ws) {
@@ -224,12 +246,12 @@ public class LuceneIndexingParameters implements Serializable {
 		}
 	}
 
-	public void applyToWriter(IndexWriter writer, boolean batch) {
+	public void applyToWriter(IndexWriterConfig writerConfig, boolean batch) {
 		if ( batch ) {
-			getBatchIndexParameters().applyToWriter( writer );
+			getBatchIndexParameters().applyToWriter( writerConfig );
 		}
 		else {
-			getTransactionIndexParameters().applyToWriter( writer );
+			getTransactionIndexParameters().applyToWriter( writerConfig );
 		}
 	}
 
