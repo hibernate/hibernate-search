@@ -24,6 +24,9 @@
 package org.hibernate.search.test.util;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.hibernate.Session;
@@ -33,6 +36,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.util.FileHelper;
 import org.slf4j.Logger;
 
@@ -50,7 +54,8 @@ public class FullTextSessionBuilder {
 
 	private static final File indexDir;
 
-	private Configuration cfg;
+	private final Properties cfg = new Properties();
+	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private SessionFactory sessionFactory;
 	private boolean usingFileSystem = false;
 	
@@ -65,7 +70,6 @@ public class FullTextSessionBuilder {
 	}
 	
 	public FullTextSessionBuilder() {
-		cfg = new Configuration();
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
 		
 		//cache:
@@ -113,7 +117,7 @@ public class FullTextSessionBuilder {
 	 * @return the same builder (this)
 	 */
 	public FullTextSessionBuilder addAnnotatedClass(Class annotatedClass) {
-		cfg.addAnnotatedClass( annotatedClass );
+		annotatedClasses.add( annotatedClass );
 		return this;
 	}
 	
@@ -147,7 +151,12 @@ public class FullTextSessionBuilder {
 	 * Builds the sessionFactory as configured so far.
 	 */
 	public FullTextSessionBuilder build() {
-		sessionFactory = cfg.buildSessionFactory();
+		Configuration hibConfiguration = new Configuration();
+		for ( Class<?> annotatedClass : annotatedClasses ) {
+			hibConfiguration.addAnnotatedClass( annotatedClass );
+		}
+		hibConfiguration.getProperties().putAll( cfg );
+		sessionFactory = hibConfiguration.buildSessionFactory();
 		return this;
 	}
 
@@ -162,6 +171,19 @@ public class FullTextSessionBuilder {
 		finally {
 			fullTextSession.close();
 		}
+	}
+
+	/**
+	 * Defines a programmatic configuration to be used by Search
+	 * @return the enabled SearchMapping. change it to define the mapping programmatically.
+	 */
+	public SearchMapping fluentMapping() {
+		SearchMapping mapping = (SearchMapping) cfg.get( org.hibernate.search.Environment.MODEL_MAPPING );
+		if ( mapping == null ) {
+			mapping = new SearchMapping();
+			cfg.put( org.hibernate.search.Environment.MODEL_MAPPING, mapping );
+		}
+		return mapping;
 	}
 	
 }
