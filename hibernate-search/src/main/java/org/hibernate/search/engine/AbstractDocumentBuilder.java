@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
@@ -85,6 +86,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private static final Logger log = LoggerFactory.make();
 
 	private final XClass beanXClass;
+	protected final String beanXClassName;
 	protected final Class<?> beanClass;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private int level = 0;
@@ -93,6 +95,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	private boolean isRoot;
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
+	protected final Set<String> indexedEmbeddedCollectionRoles = new TreeSet<String>();
+	protected final Set<String> containedInCollectionRoles = new TreeSet<String>();
 
 	protected final PropertiesMetadata metadata = new PropertiesMetadata();
 	protected EntityState entityState;
@@ -114,6 +118,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanXClass = xClass;
+		this.beanXClassName = xClass.getName();
 		this.reflectionManager = reflectionManager;
 		this.beanClass = reflectionManager.toClass( xClass );
 		this.similarity = similarity; //set the index similarity before the class level one to detect conflict
@@ -564,12 +569,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( containedAnn != null ) {
 			ReflectionHelper.setAccessible( member );
 			propertiesMetadata.containedInGetters.add( member );
+			this.containedInCollectionRoles.add( this.beanXClassName + "." + member.getName() );
 		}
 	}
 
 	private void checkForIndexedEmbedded(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, Set<XClass> processedClasses, ConfigContext context) {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
+			this.indexedEmbeddedCollectionRoles.add( this.beanXClassName + "." + member.getName() );
 			int oldMaxLevel = maxLevel;
 			int potentialLevel = embeddedAnn.depth() + level;
 			if ( potentialLevel < 0 ) {
@@ -790,11 +797,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( dirtyPropertyNames == null || dirtyPropertyNames.length == 0 ) {
 			return true; // it appears some collection work has no oldState -> reindex
 		}
-		if ( metadata.classBridges.size() > 0 ) {
-			return true; // can't know what a classBridge is going to look at -> reindex //TODO nice new feature to have?
-		}
-		if ( !( metadata.classBoostStrategy instanceof DefaultBoostStrategy ) ) {
-			return true; // as with classbridge: might be affected by any field //TODO nice new feature to have?
+		if ( ! stateInspectionOptimizationsEnabled() ) {
+			return true;
 		}
 
 		for ( String dirtyPropertyName : dirtyPropertyNames ) {
@@ -913,6 +917,45 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 * @return true if @DocumentId and @Id are found on the same property
 	 */
 	boolean isIdMatchingJpaId() {
+		return true;
+	}
+
+	/**
+	 * Returns true if the collection event is not going to affect the index state,
+	 * so that the indexing event can be skipped.
+	 * @param collectionRole
+	 * @return true if the collection Role does not affect index state
+	 * @since 3.4
+	 */
+	public boolean isCollectionRoleExcluded(String collectionRole) {
+		if ( collectionRole == null ) {
+			return false;
+		}
+		else {
+			if ( stateInspectionOptimizationsEnabled() ) {
+				return ! ( this.indexedEmbeddedCollectionRoles.contains( collectionRole )
+						|| this.containedInCollectionRoles.contains( collectionRole ) );
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	
+	/**
+	 * Verifies entity level preconditions to know if it's safe to skip index updates based
+	 * on specific field or collection updates.
+	 * @return true if it seems safe to apply such optimizations
+	 */
+	boolean stateInspectionOptimizationsEnabled() {
+		if ( metadata.classBridges.size() > 0 ) {
+			log.debug( "State inspection optimization disabled as ClassBridges are enabled on entity {}", this.beanXClassName );
+			return false; // can't know what a classBridge is going to look at -> reindex //TODO nice new feature to have?
+		}
+		if ( !( metadata.classBoostStrategy instanceof DefaultBoostStrategy ) ) {
+			log.debug( "State inspection optimization disabled as DynamicBoost is enabled on entity {}", this.beanXClassName );
+			return false; // as with classbridge: might be affected by any field //TODO nice new feature to have?
+		}
 		return true;
 	}
 }
