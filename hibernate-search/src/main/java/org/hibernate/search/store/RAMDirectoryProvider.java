@@ -53,9 +53,7 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 		try {
 			directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties ) );
 			properties = null;
-			IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
-			IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
-			iw.close();
+			DirectoryProviderHelper.initializeIndexIfNeeded( directory );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + indexName, e );

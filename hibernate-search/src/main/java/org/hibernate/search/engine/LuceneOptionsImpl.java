@@ -115,7 +115,7 @@ class LuceneOptionsImpl implements LuceneOptions {
 	private void compressedFieldAdd(String name, String indexedString, Document document) {
 		byte[] compressedString = CompressionTools.compressString( indexedString );
 		// indexed is implicitly set to false when using byte[]
-		Field field = new Field( name, compressedString, Field.Store.YES );
+		Field field = new Field( name, compressedString );
 		document.add( field );
 	}
 

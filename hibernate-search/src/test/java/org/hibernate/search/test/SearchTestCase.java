@@ -65,7 +65,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 
 	public static final Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
 	public static final Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
-	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer();
+	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer( getTargetLuceneVersion() );
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	protected static final File indexDir;

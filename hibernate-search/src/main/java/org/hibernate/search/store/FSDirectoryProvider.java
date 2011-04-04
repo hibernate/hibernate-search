@@ -79,7 +79,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 			directory.close();
 		}
 		catch ( Exception e ) {
-			log.error( "Unable to properly close Lucene directory {}" + directory.getFile(), e );
+			log.error( "Unable to properly close Lucene directory {}" + directory.getDirectory(), e );
 		}
 	}
 

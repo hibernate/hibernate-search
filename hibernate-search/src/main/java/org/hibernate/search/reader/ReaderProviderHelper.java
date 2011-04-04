@@ -31,8 +31,6 @@ import java.util.Set;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiSearcher;
-import org.apache.lucene.search.Searchable;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.ReflectionHelper;
 
@@ -111,7 +109,7 @@ public abstract class ReaderProviderHelper {
 	 * @param searchable The searchable to find the IndexReaders for
 	 * @return A list of all base IndexReaders used within this searchable
 	 */
-	public static Set<IndexReader> getIndexReaders(Searchable searchable) {
+	public static Set<IndexReader> getIndexReaders(IndexSearcher searchable) {
 		Set<IndexReader> readers = new HashSet<IndexReader>();
 		getIndexReadersInternal( readers, searchable );
 		return readers;
@@ -136,12 +134,7 @@ public abstract class ReaderProviderHelper {
 	 * @param obj	 The object to find the readers within
 	 */
 	private static void getIndexReadersInternal(Set<IndexReader> readers, Object obj) {
-		if ( obj instanceof MultiSearcher ) {
-			for (Searchable s : ( (MultiSearcher) obj ).getSearchables()) {
-				getIndexReadersInternal( readers, s );
-			}
-		}
-		else if ( obj instanceof IndexSearcher ) {
+		if ( obj instanceof IndexSearcher ) {
 			getIndexReadersInternal( readers, ( (IndexSearcher) obj ).getIndexReader() );
 		}
 		else if ( obj instanceof IndexReader ) {

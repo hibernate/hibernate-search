@@ -32,6 +32,8 @@ import java.util.Properties;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
@@ -42,6 +44,7 @@ import org.apache.lucene.store.NoLockFactory;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
+import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.util.StringHelper;
@@ -147,15 +150,21 @@ public final class DirectoryProviderHelper {
 	 * @throws SearchException in case of lock acquisition timeouts, IOException, or if a corrupt index is found
 	 */
 	public static void initializeIndexIfNeeded(Directory directory) {
+		//version doesn't really matter as we won't use the Analyzer
+		Version version = Version.LUCENE_31;
+		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
 		try {
 			if ( ! IndexReader.indexExists( directory ) ) {
-				IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
-				IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
+				IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE ); 
+				IndexWriter iw = new IndexWriter( directory, iwriterConfig );
 				iw.close();
 			}
 		}
 		catch (IOException e) {
 			throw new SearchException( "Could not initialize index", e );
+		}
+		finally {
+			analyzer.close();
 		}
 	}
 
@@ -204,7 +213,7 @@ public final class DirectoryProviderHelper {
 			return new SingleInstanceLockFactory();
 		}
 		else if ( "none".equals( lockFactoryName ) ) {
-			return new NoLockFactory();
+			return NoLockFactory.getNoLockFactory();
 		}
 		else {
 			LockFactoryFactory lockFactoryFactory = ClassLoaderHelper.instanceFromName(
