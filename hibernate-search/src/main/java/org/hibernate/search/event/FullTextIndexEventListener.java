@@ -231,15 +231,18 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	}
 
 	protected void processCollectionEvent(AbstractCollectionEvent event) {
-		Object entity = event.getAffectedOwnerOrNull();
-		if ( entity == null ) {
-			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
-			// or property-ref is used
-			//Should log really but we don't know if we're interested in this collection for indexing
-			return;
-		}
 		if ( used ) {
-			if ( getDocumentBuilder( entity ) != null ) {
+			Object entity = event.getAffectedOwnerOrNull();
+			if ( entity == null ) {
+				//Hibernate cannot determine every single time the owner especially in case detached objects are involved
+				// or property-ref is used
+				//Should log really but we don't know if we're interested in this collection for indexing
+				return;
+			}
+			String collectionRole = event.getCollection().getRole();
+			AbstractDocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
+			
+			if ( documentBuilder != null && ! documentBuilder.isCollectionRoleExcluded( collectionRole ) ) {
 				Serializable id = getId( entity, event );
 				if ( id == null ) {
 					log.warn(
