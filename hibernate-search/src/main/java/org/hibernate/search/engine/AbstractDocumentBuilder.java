@@ -340,17 +340,17 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
 								 Set<XClass> processedClasses, ConfigContext context) {
-		List<XClass> hierarchy = new ArrayList<XClass>();
-		for ( XClass currentClass = clazz; currentClass != null; currentClass = currentClass.getSuperclass() ) {
-			hierarchy.add( currentClass );
+		List<XClass> hierarchy = new LinkedList<XClass>();
+		XClass next = null;
+		for ( XClass previousClass = clazz; previousClass != null; previousClass = next ) {
+			next = previousClass.getSuperclass();
+			if ( next != null ) {
+				hierarchy.add( 0, previousClass ); // append to head to create a list in top-down iteration order
+			}
 		}
 
-		/*
-		* Iterate the class hierarchy top down. This allows to override the default analyzer for the properties if the class holds one
-		*/
-		for ( int index = hierarchy.size() - 1; index >= 0; index-- ) {
-			XClass currentClass = hierarchy.get( index );
-
+		// Iterate the class hierarchy top down. This allows to override the default analyzer for the properties if the class holds one
+		for ( XClass currentClass : hierarchy ) {
 			initializeClassLevelAnnotations( currentClass, propertiesMetadata, isRoot, prefix, context );
 
 			// rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
