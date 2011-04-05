@@ -51,19 +51,20 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
 		FacetManager facetManager = query.getFacetManager();
 		facetManager.enableFaceting( request );
+		query.setFirstResult( 0 ).setMaxResults( 1 );
 		assertEquals( "Wrong number of query matches", 13, query.getResultSize() );
 
 		List<Facet> facetList = facetManager.getFacets( facetName );
 		assertFacetCounts( facetList, new int[] { 5, 4, 4, 0 } );
 
 		facetManager.getFacetGroup( facetName ).selectFacets( facetList.get( 0 ) );
-
-		assertEquals( "Wrong number of query matches", 5, query.list().size() );
+		query.list();
+		assertEquals( "Wrong number of query matches", 5, query.getResultSize() );
 		List<Facet> newFacetList = facetManager.getFacets( facetName );
 		assertFacetCounts( newFacetList, new int[] { 5, 0, 0, 0 } );
 
 		facetManager.getFacetGroup( facetName ).selectFacets( facetList.get( 1 ) );
-
+		query.setMaxResults( Integer.MAX_VALUE );
 		assertEquals( "Wrong number of query matches", 9, query.list().size() );
 		newFacetList = facetManager.getFacets( facetName );
 		assertFacetCounts( newFacetList, new int[] { 5, 4, 0, 0 } );
