@@ -25,11 +25,13 @@ import org.hibernate.Transaction;
 import org.hibernate.collection.PersistentBag;
 import org.hibernate.collection.PersistentSet;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
@@ -40,39 +42,63 @@ import static junit.framework.Assert.assertTrue;
 public class CollectionUpdateEventTest {
 
 	@Test
-	public void test() {
-		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory();
-		initializeData( fulltextSessionBuilder );
-		FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
+	public void testWithClassBridge() {
+		testScenario( true );
+	}
+	
+	@Test
+	public void testWithoutClassBridge() {
+		testScenario( false );
+	}
+	
+	private void testScenario(boolean usingClassBridge) {
+		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge );
 		try {
-			Catalog catalog = (Catalog) fullTextSession.get( Catalog.class, 1L );
-			PersistentSet catalogItems = (PersistentSet) catalog.getCatalogItems();
-			PersistentBag consumers = (PersistentBag) catalog.getConsumers();
-			assertFalse( "collection catalogItems should not be initialized", catalogItems.wasInitialized() );
-			assertFalse( "collection consumers should not be initialized", consumers.wasInitialized() );
-			updateCatalogsCollection( fullTextSession, catalog );
-			assertFalse( "collection catalogItems should not be initialized", catalogItems.wasInitialized() );
-			assertTrue( "collection consumers should not be initialized", consumers.wasInitialized() );
+			initializeData( fulltextSessionBuilder );
+			FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
+			try {
+				Catalog catalog = (Catalog) fullTextSession.get( Catalog.class, 1L );
+				PersistentSet catalogItems = (PersistentSet) catalog.getCatalogItems();
+				PersistentBag consumers = (PersistentBag) catalog.getConsumers();
+				assertFalse( "collection catalogItems should not be initialized", catalogItems.wasInitialized() );
+				assertFalse( "collection consumers should not be initialized", consumers.wasInitialized() );
+				updateCatalogsCollection( fullTextSession, catalog );
+				assertEquals( "collection catalogItems should not be initialized", usingClassBridge, catalogItems.wasInitialized() );
+				assertTrue( "collection consumers should not be initialized", consumers.wasInitialized() );
+			} finally {
+				fullTextSession.close();
+			}
 		} finally {
-			fullTextSession.close();
+			fulltextSessionBuilder.close();
 		}
 	}
 	
-	private FullTextSessionBuilder createSearchFactory() {
+	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Catalog.class )
 			.addAnnotatedClass( CatalogItem.class )
 			.addAnnotatedClass( Consumer.class )
 			.addAnnotatedClass( Item.class );
-		builder.fluentMapping()
+		SearchMapping fluentMapping = builder.fluentMapping();
+		fluentMapping
 			.entity( Catalog.class )
 				.property( "catalogItems", ElementType.FIELD ).containedIn()
 			.entity( CatalogItem.class )
 				.property( "item", ElementType.FIELD ).containedIn()
-				.property( "catalog", ElementType.FIELD ).indexEmbedded()
+				.property( "catalog", ElementType.FIELD ).indexEmbedded();
+		if ( defineClassBridge ) {
+			fluentMapping
+				.entity( Item.class )
+					.classBridge( ItemClassBridge.class )
+					.indexed()
+					.property( "catalogItems", ElementType.FIELD ).indexEmbedded();
+		}
+		else {
+			fluentMapping
 			.entity( Item.class )
 				.indexed()
 				.property( "catalogItems", ElementType.FIELD ).indexEmbedded();
+		}
 		return builder.build();
 	}
 
