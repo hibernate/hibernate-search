@@ -17,10 +17,10 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.test.event;
+package org.hibernate.search.test.engine.optimizations;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -29,7 +29,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Proxy;
@@ -41,21 +43,27 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy = false)
-@Table(name="item")
-public class Item {
+@Table(name = "consumer")
+public class Consumer {
 	
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long itemId;
+	private Long consumerId;
 
-	@OneToMany(mappedBy="item", cascade={ CascadeType.REMOVE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
-	private Set<CatalogItem> catalogItems = new HashSet<CatalogItem>();
-	
 	@Column(length = 255)
 	private String name;
 
-	@Column(length = 255)
-	private String color;
+	@ManyToMany(cascade = { CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, fetch = FetchType.LAZY)
+	@JoinTable(name = "consumer_catalog", joinColumns = @JoinColumn(name = "consumerId"), inverseJoinColumns = @JoinColumn(name = "catalogId"))
+	private List<Catalog> catalogs = new ArrayList<Catalog>();
+
+	public Long getConsumerId() {
+		return consumerId;
+	}
+
+	public void setConsumerId(Long consumerId) {
+		this.consumerId = consumerId;
+	}
 
 	public String getName() {
 		return name;
@@ -65,28 +73,11 @@ public class Item {
 		this.name = name;
 	}
 
-	public String getColor() {
-		return color;
+	public List<Catalog> getCatalogs() {
+		return catalogs;
 	}
 
-	public void setColor(String kind) {
-		this.color = kind;
+	public void setCatalogs(List<Catalog> catalogs) {
+		this.catalogs = catalogs;
 	}
-	
-	public Long getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(Long doughnutId) {
-		this.itemId = doughnutId;
-	}
-
-	public Set<CatalogItem> getCatalogItems() {
-		return catalogItems;
-	}
-
-	public void setCatalogItems(Set<CatalogItem> catalogItems) {
-		this.catalogItems = catalogItems;
-	}
-
 }
