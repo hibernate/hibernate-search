@@ -25,13 +25,12 @@ import org.hibernate.Transaction;
 import org.hibernate.collection.PersistentBag;
 import org.hibernate.collection.PersistentSet;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.cfg.EntityMapping;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.assertEquals;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
@@ -50,7 +49,7 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithClassBridge() {
-		testScenario( true, 2 );
+		testScenario( true, 2, false );
 	}
 	
 	/**
@@ -58,7 +57,7 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithoutClassBridge() {
-		testScenario( false, 2 );
+		testScenario( false, 2, false );
 	}
 	
 	/**
@@ -67,11 +66,20 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithNoEnoughDepth() {
-		testScenario( true, 1 );
+		testScenario( true, 1, false );
 	}
 	
-	private void testScenario(boolean usingClassBridge, int depth) {
-		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth );
+	/**
+	 * Test again with a no-enough-depth scenario, but having the classbridge
+	 * defined close to the collection (far from the root entity)
+	 */
+	@Test
+	public void testWithDeepClassBridge() {
+		testScenario( false, 1, true );
+	}
+	
+	private void testScenario(boolean usingClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
+		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth, usingClassbridgeOnEmbedded );
 		try {
 			initializeData( fulltextSessionBuilder );
 			FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
@@ -79,11 +87,23 @@ public class CollectionUpdateEventTest {
 				Catalog catalog = (Catalog) fullTextSession.get( Catalog.class, 1L );
 				PersistentSet catalogItems = (PersistentSet) catalog.getCatalogItems();
 				PersistentBag consumers = (PersistentBag) catalog.getConsumers();
-				assertFalse( "collection catalogItems should not be initialized", catalogItems.wasInitialized() );
-				assertFalse( "collection consumers should not be initialized", consumers.wasInitialized() );
+				assertThat( consumers.wasInitialized() )
+					.as( "consumers should not be initialized" )
+					.isFalse();
+				assertThat( consumers.wasInitialized() )
+					.as( "catalogItems should not be initialized" )
+					.isFalse();
 				updateCatalogsCollection( fullTextSession, catalog );
-				assertEquals( "collection catalogItems should not be initialized", usingClassBridge && depth > 1 , catalogItems.wasInitialized() );
-				assertTrue( "collection consumers should not be initialized", consumers.wasInitialized() );
+				if ( ( usingClassBridge || usingClassbridgeOnEmbedded ) && depth > 1 ) {
+					assertThat( catalogItems.wasInitialized() )
+						.as( "catalogItems should have been initialized" )
+						.isTrue();
+				}
+				else {
+					assertThat( catalogItems.wasInitialized() )
+						.as( "catalogItems should not be initialized" )
+						.isFalse();
+				}
 			} finally {
 				fullTextSession.close();
 			}
@@ -92,19 +112,23 @@ public class CollectionUpdateEventTest {
 		}
 	}
 	
-	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth) {
+	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Catalog.class )
 			.addAnnotatedClass( CatalogItem.class )
 			.addAnnotatedClass( Consumer.class )
 			.addAnnotatedClass( Item.class );
 		SearchMapping fluentMapping = builder.fluentMapping();
-		fluentMapping
-			.entity( Catalog.class )
-				.property( "catalogItems", ElementType.FIELD ).containedIn()
-			.entity( CatalogItem.class )
-				.property( "item", ElementType.FIELD ).containedIn()
-				.property( "catalog", ElementType.FIELD ).indexEmbedded();
+		EntityMapping catalogMapping = fluentMapping
+			.entity( Catalog.class );
+		if ( usingClassbridgeOnEmbedded ) {
+			catalogMapping.classBridge( ItemClassBridge.class );
+		}
+		catalogMapping
+			.property( "catalogItems", ElementType.FIELD ).containedIn()
+		.entity( CatalogItem.class )
+			.property( "item", ElementType.FIELD ).containedIn()
+			.property( "catalog", ElementType.FIELD ).indexEmbedded();
 		if ( defineClassBridge ) {
 			fluentMapping
 				.entity( Item.class )
@@ -114,9 +138,9 @@ public class CollectionUpdateEventTest {
 		}
 		else {
 			fluentMapping
-			.entity( Item.class )
-				.indexed()
-				.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
+				.entity( Item.class )
+					.indexed()
+					.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
 		}
 		return builder.build();
 	}
