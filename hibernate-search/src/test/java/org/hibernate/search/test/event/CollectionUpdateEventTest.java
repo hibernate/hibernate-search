@@ -32,7 +32,6 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.assertEquals;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
@@ -88,10 +87,12 @@ public class CollectionUpdateEventTest {
 				assertFalse( "collection catalogItems should not be initialized", catalogItems.wasInitialized() );
 				assertFalse( "collection consumers should not be initialized", consumers.wasInitialized() );
 				updateCatalogsCollection( fullTextSession, catalog );
-				assertEquals( "collection catalogItems should not be initialized",
-						( usingClassBridge || usingClassbridgeOnEmbedded ) && depth > 1,
-						catalogItems.wasInitialized() );
-				assertTrue( "collection consumers should not be initialized", consumers.wasInitialized() );
+				if ( ( usingClassBridge || usingClassbridgeOnEmbedded ) && depth > 1 ) {
+					assertTrue( "collection catalogItems should have been initialized", catalogItems.wasInitialized() );
+				}
+				else {
+					assertFalse( "collection catalogItems should not be initialized", catalogItems.wasInitialized() );
+				}
 			} finally {
 				fullTextSession.close();
 			}
