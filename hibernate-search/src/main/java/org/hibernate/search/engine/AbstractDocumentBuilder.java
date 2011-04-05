@@ -948,7 +948,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			return false;
 		}
 		else {
-			if ( stateInspectionOptimizationsEnabled() ) {
+			// don't check stateInspectionOptimizationsEnabled() as it might ignore depth limit
+			if ( stateInspectionOptimizationsEnabled ) {
 				return ! ( this.indexedEmbeddedCollectionRoles.contains( collectionRole )
 						|| this.containedInCollectionRoles.contains( collectionRole ) );
 			}
@@ -979,7 +980,9 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 	
 	/**
-	 * 
+	 * Makes sure isCollectionRoleExcluded will always return false, so that
+	 * collection update events are always processed.
+	 * @see #isCollectionRoleExcluded(String)
 	 */
 	public void forcestateInspectionOptimizationsDisabled() {
 		this.stateInspectionOptimizationsEnabled = false;

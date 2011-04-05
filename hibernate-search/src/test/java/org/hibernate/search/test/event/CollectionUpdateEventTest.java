@@ -25,6 +25,7 @@ import org.hibernate.Transaction;
 import org.hibernate.collection.PersistentBag;
 import org.hibernate.collection.PersistentSet;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.cfg.EntityMapping;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
@@ -50,7 +51,7 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithClassBridge() {
-		testScenario( true, 2 );
+		testScenario( true, 2, false );
 	}
 	
 	/**
@@ -58,7 +59,7 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithoutClassBridge() {
-		testScenario( false, 2 );
+		testScenario( false, 2, false );
 	}
 	
 	/**
@@ -67,11 +68,16 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithNoEnoughDepth() {
-		testScenario( true, 1 );
+		testScenario( true, 1, false );
 	}
 	
-	private void testScenario(boolean usingClassBridge, int depth) {
-		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth );
+	@Test
+	public void testWithDeepClassBridge() {
+		testScenario( false, 1, true );
+	}
+	
+	private void testScenario(boolean usingClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
+		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth, usingClassbridgeOnEmbedded );
 		try {
 			initializeData( fulltextSessionBuilder );
 			FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
@@ -82,7 +88,9 @@ public class CollectionUpdateEventTest {
 				assertFalse( "collection catalogItems should not be initialized", catalogItems.wasInitialized() );
 				assertFalse( "collection consumers should not be initialized", consumers.wasInitialized() );
 				updateCatalogsCollection( fullTextSession, catalog );
-				assertEquals( "collection catalogItems should not be initialized", usingClassBridge && depth > 1 , catalogItems.wasInitialized() );
+				assertEquals( "collection catalogItems should not be initialized",
+						( usingClassBridge || usingClassbridgeOnEmbedded ) && depth > 1,
+						catalogItems.wasInitialized() );
 				assertTrue( "collection consumers should not be initialized", consumers.wasInitialized() );
 			} finally {
 				fullTextSession.close();
@@ -92,15 +100,19 @@ public class CollectionUpdateEventTest {
 		}
 	}
 	
-	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth) {
+	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Catalog.class )
 			.addAnnotatedClass( CatalogItem.class )
 			.addAnnotatedClass( Consumer.class )
 			.addAnnotatedClass( Item.class );
 		SearchMapping fluentMapping = builder.fluentMapping();
-		fluentMapping
-			.entity( Catalog.class )
+		EntityMapping catalogMapping = fluentMapping
+			.entity( Catalog.class );
+		if ( usingClassbridgeOnEmbedded ) {
+			catalogMapping.classBridge( ItemClassBridge.class );
+		}
+			catalogMapping
 				.property( "catalogItems", ElementType.FIELD ).containedIn()
 			.entity( CatalogItem.class )
 				.property( "item", ElementType.FIELD ).containedIn()
