@@ -94,9 +94,10 @@ public class AnalyzerTest extends SearchTestCase {
 		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( cfg );
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
+		Set<XClass> optimizationBlaskList = new HashSet<XClass>();
 		ConfigContext context = new ConfigContext( searchConfig );
 		try {
-			new DocumentBuilderContainedEntity( xclass, context, reflectionManager );
+			new DocumentBuilderContainedEntity( xclass, context, reflectionManager, optimizationBlaskList );
 			fail();
 		}
 		catch ( SearchException e ) {

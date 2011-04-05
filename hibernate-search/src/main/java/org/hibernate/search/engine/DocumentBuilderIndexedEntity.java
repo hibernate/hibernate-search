@@ -172,10 +172,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param providerWrapper wrapper for access to directory providers for the underlying Lucene indexes
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 */
-	public DocumentBuilderIndexedEntity(
-			XClass clazz, ConfigContext context, DirectoryProviderFactory.DirectoryProviders providerWrapper, ReflectionManager reflectionManager) {
-
-		super( clazz, context, providerWrapper.getSimilarity(), reflectionManager );
+	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, DirectoryProviderFactory.DirectoryProviders providerWrapper,
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlaskList) {
+		super( clazz, context, providerWrapper.getSimilarity(), reflectionManager, optimizationBlaskList );
 		// special case @ProvidedId
 		ProvidedId provided = findProvidedId( clazz, reflectionManager );
 		if ( provided != null ) {

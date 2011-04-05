@@ -25,6 +25,7 @@ package org.hibernate.search.engine;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -50,8 +51,9 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	 * @param context Handle to default configuration settings.
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 */
-	public DocumentBuilderContainedEntity(XClass xClass, ConfigContext context, ReflectionManager reflectionManager) {
-		super( xClass, context, null, reflectionManager );
+	public DocumentBuilderContainedEntity(XClass xClass, ConfigContext context,
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlaskList) {
+		super( xClass, context, null, reflectionManager, optimizationBlaskList );
 		//done after init:
 		if ( metadata.containedInGetters.size() == 0 ) {
 			this.entityState = EntityState.NON_INDEXABLE;
