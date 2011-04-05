@@ -340,8 +340,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
 								 Set<XClass> processedClasses, ConfigContext context) {
-		List<XClass> hierarchy = new ArrayList<XClass>();
-		for ( XClass currentClass = clazz; currentClass != null; currentClass = currentClass.getSuperclass() ) {
+		List<XClass> hierarchy = new LinkedList<XClass>();
+		XClass next = null;
+		for ( XClass currentClass = clazz; currentClass != null; currentClass = next ) {
+			next = currentClass.getSuperclass();
+			if ( next == null ) break; //avoid scanning of java.lang.Object
 			hierarchy.add( currentClass );
 		}
 
