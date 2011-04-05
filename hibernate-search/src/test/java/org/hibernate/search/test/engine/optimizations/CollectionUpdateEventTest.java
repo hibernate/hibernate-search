@@ -17,7 +17,7 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.test.event;
+package org.hibernate.search.test.engine.optimizations;
 
 import java.lang.annotation.ElementType;
 

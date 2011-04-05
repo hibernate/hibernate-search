@@ -17,21 +17,20 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.test.event;
+package org.hibernate.search.test.engine.optimizations;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Proxy;
@@ -43,41 +42,54 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy = false)
-@Table(name = "consumer")
-public class Consumer {
+@Table(name="catalog")
+public class Catalog {
 	
 	@Id()
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long consumerId;
+	private Long catalogId;
 
 	@Column(length = 255)
 	private String name;
+	
+	@OneToMany(mappedBy="catalog", cascade={ CascadeType.REMOVE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
+	private Set<CatalogItem> catalogItems = new HashSet<CatalogItem>();
 
-	@ManyToMany(cascade = { CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, fetch = FetchType.LAZY)
-	@JoinTable(name = "consumer_catalog", joinColumns = @JoinColumn(name = "consumerId"), inverseJoinColumns = @JoinColumn(name = "catalogId"))
-	private List<Catalog> catalogs = new ArrayList<Catalog>();
+	@ManyToMany(fetch=FetchType.LAZY, mappedBy="catalogs", cascade={CascadeType.PERSIST})
+	private List<Consumer> consumers = new ArrayList<Consumer>();
 
-	public Long getConsumerId() {
-		return consumerId;
+	public Catalog() {
 	}
 
-	public void setConsumerId(Long consumerId) {
-		this.consumerId = consumerId;
+	public Long getCatalogId() {
+		return catalogId;
+	}
+
+	public void setCatalogId(Long catalogId) {
+		this.catalogId = catalogId;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String color) {
+		this.name = color;
 	}
 
-	public List<Catalog> getCatalogs() {
-		return catalogs;
+	public Set<CatalogItem> getCatalogItems() {
+		return catalogItems;
 	}
 
-	public void setCatalogs(List<Catalog> catalogs) {
-		this.catalogs = catalogs;
+	public void setCatalogItems(Set<CatalogItem> catalogItems) {
+		this.catalogItems = catalogItems;
 	}
+
+	public List<Consumer> getConsumers() {
+		return consumers;
+	}
+
+	public void setConsumers(List<Consumer> consumers) {
+		this.consumers = consumers;
+	}
+
 }
