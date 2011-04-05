@@ -17,20 +17,21 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.test.event;
+package org.hibernate.search.test.engine.optimizations;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
-import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Proxy;
 
 /**
@@ -40,49 +41,52 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy = false)
-@Table(name="catalog_item")
-public class CatalogItem {
-
-	public CatalogItem() {
-	}
-
-	@Id()
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long catalogItemId;
-
-	@ManyToOne(fetch=FetchType.LAZY, targetEntity=Item.class)
-	@JoinColumn(name = "itemId")
-	@LazyToOne(LazyToOneOption.PROXY)
-	@NaturalId
-	private Item item;
+@Table(name="item")
+public class Item {
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "catalogId")
-	@NaturalId
-	private Catalog catalog;
+	@Id()
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long itemId;
 
-	public Long getCatalogItemId() {
-		return catalogItemId;
+	@OneToMany(mappedBy="item", cascade={ CascadeType.REMOVE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
+	private Set<CatalogItem> catalogItems = new HashSet<CatalogItem>();
+	
+	@Column(length = 255)
+	private String name;
+
+	@Column(length = 255)
+	private String color;
+
+	public String getName() {
+		return name;
 	}
 
-	public void setCatalogItemId(Long catalogItemId) {
-		this.catalogItemId = catalogItemId;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public Item getItem() {
-		return item;
+	public String getColor() {
+		return color;
 	}
 
-	public void setItem(Item item) {
-		this.item = item;
+	public void setColor(String kind) {
+		this.color = kind;
+	}
+	
+	public Long getItemId() {
+		return itemId;
 	}
 
-	public Catalog getCatalog() {
-		return catalog;
+	public void setItemId(Long doughnutId) {
+		this.itemId = doughnutId;
 	}
 
-	public void setCatalog(Catalog catalog) {
-		this.catalog = catalog;
+	public Set<CatalogItem> getCatalogItems() {
+		return catalogItems;
+	}
+
+	public void setCatalogItems(Set<CatalogItem> catalogItems) {
+		this.catalogItems = catalogItems;
 	}
 
 }

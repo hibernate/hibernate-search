@@ -17,22 +17,20 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.test.event;
+package org.hibernate.search.test.engine.optimizations;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Proxy;
 
 /**
@@ -42,54 +40,49 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy = false)
-@Table(name="catalog")
-public class Catalog {
-	
+@Table(name="catalog_item")
+public class CatalogItem {
+
+	public CatalogItem() {
+	}
+
 	@Id()
-	private Long catalogId;
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long catalogItemId;
 
-	@Column(length = 255)
-	private String name;
+	@ManyToOne(fetch=FetchType.LAZY, targetEntity=Item.class)
+	@JoinColumn(name = "itemId")
+	@LazyToOne(LazyToOneOption.PROXY)
+	@NaturalId
+	private Item item;
 	
-	@OneToMany(mappedBy="catalog", cascade={ CascadeType.REMOVE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
-	private Set<CatalogItem> catalogItems = new HashSet<CatalogItem>();
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "catalogId")
+	@NaturalId
+	private Catalog catalog;
 
-	@ManyToMany(fetch=FetchType.LAZY, mappedBy="catalogs", cascade={CascadeType.PERSIST})
-	private List<Consumer> consumers = new ArrayList<Consumer>();
-
-	public Catalog() {
+	public Long getCatalogItemId() {
+		return catalogItemId;
 	}
 
-	public Long getCatalogId() {
-		return catalogId;
+	public void setCatalogItemId(Long catalogItemId) {
+		this.catalogItemId = catalogItemId;
 	}
 
-	public void setCatalogId(Long catalogId) {
-		this.catalogId = catalogId;
+	public Item getItem() {
+		return item;
 	}
 
-	public String getName() {
-		return name;
+	public void setItem(Item item) {
+		this.item = item;
 	}
 
-	public void setName(String color) {
-		this.name = color;
+	public Catalog getCatalog() {
+		return catalog;
 	}
 
-	public Set<CatalogItem> getCatalogItems() {
-		return catalogItems;
-	}
-
-	public void setCatalogItems(Set<CatalogItem> catalogItems) {
-		this.catalogItems = catalogItems;
-	}
-
-	public List<Consumer> getConsumers() {
-		return consumers;
-	}
-
-	public void setConsumers(List<Consumer> consumers) {
-		this.consumers = consumers;
+	public void setCatalog(Catalog catalog) {
+		this.catalog = catalog;
 	}
 
 }
