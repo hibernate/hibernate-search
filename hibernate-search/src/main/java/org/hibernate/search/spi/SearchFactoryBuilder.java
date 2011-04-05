@@ -346,7 +346,6 @@ public class SearchFactoryBuilder {
 
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager, BuildContext buildContext) {
 		ConfigContext context = new ConfigContext( cfg );
-		Iterator<Class<?>> iter = cfg.getClassMappings();
 		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
 		initProgrammaticAnalyzers( context, reflectionManager );
@@ -354,17 +353,13 @@ public class SearchFactoryBuilder {
 		final PolymorphicIndexHierarchy indexingHierarchy = factoryState.getIndexHierarchy();
 		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = factoryState.getDocumentBuildersIndexedEntities();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
-		while ( iter.hasNext() ) {
-			Class<?> mappedClass = iter.next();
-			if ( mappedClass == null ) {
-				continue;
-			}
-			@SuppressWarnings("unchecked")
-			XClass mappedXClass = reflectionManager.toXClass( mappedClass );
-			if ( mappedXClass == null ) {
-				continue;
-			}
+		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
+		final Map<XClass, Class> classMappings = initializeClassMappings( cfg, reflectionManager );
+		for ( Map.Entry<XClass, Class> mapping : classMappings.entrySet() ) {
 
+			XClass mappedXClass = mapping.getKey();
+			Class mappedClass = mapping.getValue();
+			
 			if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
 
 				if ( mappedXClass.isAbstract() ) {
@@ -382,7 +377,8 @@ public class SearchFactoryBuilder {
 								mappedXClass,
 								context,
 								providers,
-								reflectionManager
+								reflectionManager,
+								optimizationBlackListedTypes
 						);
 
 				indexingHierarchy.addIndexedClass( mappedClass );
@@ -392,7 +388,7 @@ public class SearchFactoryBuilder {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
 				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
-						mappedXClass, context, reflectionManager
+						mappedXClass, context, reflectionManager, optimizationBlackListedTypes
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
@@ -402,8 +398,56 @@ public class SearchFactoryBuilder {
 			bindFilterDefs( mappedXClass );
 			//TODO should analyzer def for classes at their same level???
 		}
+		disableBlackListedTypesOptimization( classMappings, optimizationBlackListedTypes, documentBuildersIndexedEntities, documentBuildersContainedEntities );
 		factoryState.setAnalyzers( context.initLazyAnalyzers() );
 		factory.startDirectoryProviders();
+	}
+
+	/**
+	 * @param classMappings
+	 * @param optimizationBlackListX
+	 * @param documentBuildersIndexedEntities
+	 * @param documentBuildersContainedEntities
+	 */
+	private void disableBlackListedTypesOptimization(Map<XClass, Class> classMappings,
+			Set<XClass> optimizationBlackListX,
+			Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities,
+			Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities) {
+		for ( XClass xClass : optimizationBlackListX ) {
+			Class type = classMappings.get( xClass );
+			if ( type != null ) {
+				log.trace( "Dirty checking optimizations disabled for class {}", type );
+				DocumentBuilderIndexedEntity<?> documentBuilderIndexedEntity = documentBuildersIndexedEntities.get( type );
+				if ( documentBuilderIndexedEntity != null ) {
+					documentBuilderIndexedEntity.forceStateInspectionOptimizationsDisabled();
+				}
+				DocumentBuilderContainedEntity<?> documentBuilderContainedEntity = documentBuildersContainedEntities.get( type );
+				if ( documentBuilderContainedEntity != null ) {
+					documentBuilderContainedEntity.forceStateInspectionOptimizationsDisabled();
+				}
+			}
+		}
+	}
+
+	/**
+	 * prepares XClasses from configuration
+	 */
+	private static Map<XClass, Class> initializeClassMappings(SearchConfiguration cfg, ReflectionManager reflectionManager) {
+		Iterator<Class<?>> iter = cfg.getClassMappings();
+		Map<XClass, Class> map = new HashMap<XClass, Class>();
+		while ( iter.hasNext() ) {
+			Class<?> mappedClass = iter.next();
+			if ( mappedClass == null ) {
+				continue;
+			}
+			@SuppressWarnings("unchecked")
+			XClass mappedXClass = reflectionManager.toXClass( mappedClass );
+			if ( mappedXClass == null ) {
+				continue;
+			}
+			map.put( mappedXClass, mappedClass );
+		}
+		return map;
 	}
 
 	private void bindFilterDefs(XClass mappedXClass) {

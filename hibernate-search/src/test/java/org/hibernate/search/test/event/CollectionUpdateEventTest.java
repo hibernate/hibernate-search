@@ -35,24 +35,43 @@ import static junit.framework.Assert.assertEquals;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
+ * Updating a collection in an entity which is not indexed, but has some other property marked
+ * as containedIn, should generally not trigger indexing of the containedIn objects, unless
+ * we can't tell for sure the index state is not going to be affected.
  * 
  * @author Sanne Grinovero
  * @author Tom Waterhouse
  */
 public class CollectionUpdateEventTest {
 
+	/**
+	 * If the top level class has a classbridge or dynamicboost, then we can't safely
+	 * enable this optimization.
+	 */
 	@Test
 	public void testWithClassBridge() {
-		testScenario( true );
+		testScenario( true, 2 );
 	}
 	
+	/**
+	 * The indexing should be skipped when no custom bridges are used.
+	 */
 	@Test
 	public void testWithoutClassBridge() {
-		testScenario( false );
+		testScenario( false, 2 );
 	}
 	
-	private void testScenario(boolean usingClassBridge) {
-		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge );
+	/**
+	 * Test having a depth which is not enough to reach the dirty collection.
+	 * We should be able to optimize this case.
+	 */
+	@Test
+	public void testWithNoEnoughDepth() {
+		testScenario( true, 1 );
+	}
+	
+	private void testScenario(boolean usingClassBridge, int depth) {
+		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth );
 		try {
 			initializeData( fulltextSessionBuilder );
 			FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
@@ -63,7 +82,7 @@ public class CollectionUpdateEventTest {
 				assertFalse( "collection catalogItems should not be initialized", catalogItems.wasInitialized() );
 				assertFalse( "collection consumers should not be initialized", consumers.wasInitialized() );
 				updateCatalogsCollection( fullTextSession, catalog );
-				assertEquals( "collection catalogItems should not be initialized", usingClassBridge, catalogItems.wasInitialized() );
+				assertEquals( "collection catalogItems should not be initialized", usingClassBridge && depth > 1 , catalogItems.wasInitialized() );
 				assertTrue( "collection consumers should not be initialized", consumers.wasInitialized() );
 			} finally {
 				fullTextSession.close();
@@ -73,7 +92,7 @@ public class CollectionUpdateEventTest {
 		}
 	}
 	
-	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge) {
+	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Catalog.class )
 			.addAnnotatedClass( CatalogItem.class )
@@ -91,13 +110,13 @@ public class CollectionUpdateEventTest {
 				.entity( Item.class )
 					.classBridge( ItemClassBridge.class )
 					.indexed()
-					.property( "catalogItems", ElementType.FIELD ).indexEmbedded();
+					.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
 		}
 		else {
 			fluentMapping
 			.entity( Item.class )
 				.indexed()
-				.property( "catalogItems", ElementType.FIELD ).indexEmbedded();
+				.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
 		}
 		return builder.build();
 	}

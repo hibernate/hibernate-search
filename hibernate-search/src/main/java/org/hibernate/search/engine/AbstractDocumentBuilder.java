@@ -102,6 +102,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	protected EntityState entityState;
 	protected ReflectionManager reflectionManager; //available only during initialization and post-initialization
 
+	private boolean stateInspectionOptimizationsEnabled = true;
+
 	/**
 	 * Constructor used on contained entities not annotated with {@code @Indexed} themselves.
 	 *
@@ -110,7 +112,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 * @param similarity The index level similarity
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 */
-	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity, ReflectionManager reflectionManager) {
+	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity, ReflectionManager reflectionManager, Set<XClass> optimizationBlackList) {
 
 		if ( xClass == null ) {
 			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
@@ -129,7 +131,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 		Set<XClass> processedClasses = new HashSet<XClass>();
 		processedClasses.add( xClass );
-		initializeClass( xClass, metadata, true, "", processedClasses, context );
+		initializeClass( xClass, metadata, true, "", processedClasses, context, optimizationBlackList, false );
 
 		this.analyzer.setGlobalAnalyzer( metadata.analyzer );
 
@@ -344,7 +346,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
-								 Set<XClass> processedClasses, ConfigContext context) {
+								 Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizationsArg) {
 		List<XClass> hierarchy = new LinkedList<XClass>();
 		XClass next = null;
 		for ( XClass previousClass = clazz; previousClass != null; previousClass = next ) {
@@ -357,20 +359,29 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		// Iterate the class hierarchy top down. This allows to override the default analyzer for the properties if the class holds one
 		for ( XClass currentClass : hierarchy ) {
 			initializeClassLevelAnnotations( currentClass, propertiesMetadata, isRoot, prefix, context );
+		}
+		
+		// if optimizations are enabled, we allow for state in indexedEmbedded objects which are not
+		// explicitly indexed (Field or indexedembedded) to skip index update triggering.
+		// we don't allow this if the reference is reachable via a custom fieldbridge or classbridge,
+		// as state changes from values out of our control could affect the index.
+		boolean disableOptimizations = disableOptimizationsArg || ! stateInspectionOptimizationsEnabled();
 
+		// iterate again for the properties and fields
+		for ( XClass currentClass : hierarchy ) {
 			// rejecting non properties (ie regular methods) because the object is loaded from Hibernate,
 			// so indexing a non property does not make sense
 			List<XProperty> methods = currentClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 			for ( XProperty method : methods ) {
 				initializeMemberLevelAnnotations(
-						method, propertiesMetadata, isRoot, prefix, processedClasses, context
+						method, propertiesMetadata, isRoot, prefix, processedClasses, context, optimizationBlackList, disableOptimizations
 				);
 			}
 
 			List<XProperty> fields = currentClass.getDeclaredProperties( XClass.ACCESS_FIELD );
 			for ( XProperty field : fields ) {
 				initializeMemberLevelAnnotations(
-						field, propertiesMetadata, isRoot, prefix, processedClasses, context
+						field, propertiesMetadata, isRoot, prefix, processedClasses, context, optimizationBlackList, disableOptimizations
 				);
 			}
 		}
@@ -421,12 +432,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	private void initializeMemberLevelAnnotations(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
-												  String prefix, Set<XClass> processedClasses, ConfigContext context) {
+					String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
 		checkForField( member, propertiesMetadata, prefix, context );
 		checkForFields( member, propertiesMetadata, prefix, context );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
-		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context );
+		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context, optimizationBlackList, disableOptimizations );
 		checkForContainedIn( member, propertiesMetadata );
 		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context );
 	}
@@ -570,7 +581,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void checkForIndexedEmbedded(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, Set<XClass> processedClasses, ConfigContext context) {
+	private void checkForIndexedEmbedded(XProperty member, PropertiesMetadata propertiesMetadata, String prefix,
+			Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
 			this.indexedEmbeddedCollectionRoles.add( StringHelper.qualify( this.beanXClassName, member.getName() ) );
@@ -589,6 +601,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			else {
 				elementClass = reflectionManager.toXClass( embeddedAnn.targetElement() );
 			}
+			
 			if ( maxLevel == Integer.MAX_VALUE //infinite
 					&& processedClasses.contains( elementClass ) ) {
 				throw new SearchException(
@@ -610,7 +623,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				Analyzer analyzer = getAnalyzer( member, context );
 				metadata.analyzer = analyzer != null ? analyzer : propertiesMetadata.analyzer;
 				String localPrefix = buildEmbeddedPrefix( prefix, embeddedAnn, member );
-				initializeClass( elementClass, metadata, false, localPrefix, processedClasses, context );
+				
+				if ( disableOptimizations ) {
+					optimizationBlackList.add( elementClass );
+				}
+				
+				initializeClass( elementClass, metadata, false, localPrefix, processedClasses, context, optimizationBlackList, disableOptimizations );
 				/**
 				 * We will only index the "expected" type but that's OK, HQL cannot do down-casting either
 				 */
@@ -945,6 +963,9 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 * @return true if it seems safe to apply such optimizations
 	 */
 	boolean stateInspectionOptimizationsEnabled() {
+		if ( ! stateInspectionOptimizationsEnabled ) {
+			return false;
+		}
 		if ( metadata.classBridges.size() > 0 ) {
 			log.trace( "State inspection optimization disabled as ClassBridges are enabled on entity {}", this.beanXClassName );
 			return false; // can't know what a classBridge is going to look at -> reindex //TODO nice new feature to have?
@@ -954,5 +975,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			return false; // as with classbridge: might be affected by any field //TODO nice new feature to have?
 		}
 		return true;
+	}
+	
+	/**
+	 * 
+	 */
+	public void forceStateInspectionOptimizationsDisabled() {
+		this.stateInspectionOptimizationsEnabled = false;
 	}
 }
