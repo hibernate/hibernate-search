@@ -947,7 +947,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			return false;
 		}
 		else {
-			if ( stateInspectionOptimizationsEnabled() ) {
+			// don't check stateInspectionOptimizationsEnabled() as it might ignore depth limit:
+			// it will disable optimization even if we have classbridges, but we're too deep
+			// to be reachable. The evaluation of stateInspectionOptimizationsEnabled() was
+			// actually stored in stateInspectionOptimizationsEnabled, but limiting to depth recursion.
+			if ( stateInspectionOptimizationsEnabled ) {
 				return ! ( this.indexedEmbeddedCollectionRoles.contains( collectionRole )
 						|| this.containedInCollectionRoles.contains( collectionRole ) );
 			}
@@ -978,7 +982,9 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 	
 	/**
-	 * 
+	 * Makes sure isCollectionRoleExcluded will always return false, so that
+	 * collection update events are always processed.
+	 * @see #isCollectionRoleExcluded(String)
 	 */
 	public void forceStateInspectionOptimizationsDisabled() {
 		this.stateInspectionOptimizationsEnabled = false;
