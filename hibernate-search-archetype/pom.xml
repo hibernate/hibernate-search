@@ -6,7 +6,7 @@
         The link to the hibernate-search parent POM only exists out of convenience since we are creating
         this archetype from an existing module of the Hibernate Search code base.
         If you want to know more about this process check the maven-archetype-plugin documentation
-        http://maven.apache.org/archetype/maven-archetype-plugin, epecially the goal create-from-project
+        http://maven.apache.org/archetype/maven-archetype-plugin, especially the goal create-from-project
       
         If you want to use this quick-start project as the base for your own application you should remove the
         <parent> entry. See also the other pointers in this pom!
@@ -22,6 +22,46 @@
     <packaging>jar</packaging>
     <name>Hibernate Search Quickstart</name>
     <url>http://www.myorganization.org</url>
+    <description>Hibernate Search quickstart is an archetype for a minimal application using fulltext query capabilities. Use it as an example project.</description>
+    
+    <scm>
+        <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
+        <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
+        <url>http://github.com/hibernate/hibernate-search</url>
+    </scm>
+
+    <organization>
+        <name>Hibernate</name>
+        <url>http://www.hibernate.org</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <id>epbernard</id>
+            <name>Emmanuel Bernard</name>
+            <email>emmanuel@hibernate.org</email>
+            <url>http://in.relation.to/Bloggers/Emmanuel</url>
+        </developer>
+        <developer>
+            <id>hardy.ferentschik</id>
+            <name>Hardy Ferentschik</name>
+            <email>hardy@hibernate.org</email>
+            <url>http://in.relation.to/Bloggers/Hardy</url>
+        </developer>
+        <developer>
+            <id>sannegrinovero</id>
+            <name>Sanne Grinovero</name>
+            <email>sanne@hibernate.org</email>
+            <url>http://in.relation.to/Bloggers/Sanne</url>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
