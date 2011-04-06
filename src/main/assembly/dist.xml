@@ -59,8 +59,29 @@
                         <scope>runtime</scope>
                         <excludes>
                             <exclude>jgroups:jgroups</exclude>
+                            <exclude>org.jgroups:jgroups</exclude>
+                            <exclude>org.infinispan:infinispan-core</exclude>
+                            <exclude>org.infinispan:infinispan-lucene-directory</exclude>
                             <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
                             <exclude>org.apache.lucene:lucene-analyzers</exclude>
+                            <exclude>org.hibernate:hibernate-search</exclude>
+                            <exclude>org.hibernate:hibernate-search-analyzers</exclude>
+                            <exclude>org.rhq.helpers:rhq-pluginAnnotations</exclude>
+                            <exclude>i18nlog:i18nlog</exclude>
+                            <exclude>org.jboss.marshalling:river</exclude>
+                            <exclude>org.apache.lucene:lucene-highlighter</exclude>
+                            <exclude>org.apache.lucene:lucene-memory</exclude>
+                            <exclude>org.apache.lucene:lucene-misc</exclude>
+                            <exclude>org.apache.lucene:lucene-spatial</exclude>
+                            <exclude>org.apache.lucene:lucene-spellchecker</exclude>
+                            <exclude>org.apache.lucene:lucene-smartcn</exclude>
+                            <exclude>org.jboss.marshalling:marshalling-api</exclude>
+                            <exclude>org.apache.solr:solr-analysis-extras</exclude>
+                            <exclude>org.apache.solr:solr-solrj</exclude>
+                            <exclude>org.apache.solr:solr-commons-csv</exclude>
+                            <exclude>org.apache.solr:solr-core</exclude>
+                            <exclude>org.apache.lucene:lucene-stempel</exclude>
+                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
                         </excludes>
                     </dependencySet>
 
@@ -68,7 +89,15 @@
                         <outputDirectory>/dist/lib/optional</outputDirectory>
                         <includes>
                             <include>jgroups:jgroups</include>
+                            <include>org.infinispan:infinispan-core</include>
+                            <include>org.infinispan:infinispan-lucene-directory</include>
+                            <include>org.apache.lucene:lucene-analyzers</include>
+                            <include>org.apache.solr:solr-analysis-extras</include>
+                            <include>org.apache.solr:solr-core</include>
+                            <include>org.jgroups:jgroups</include>
                             <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
+                            <include>org.hibernate:hibernate-search-analyzers</include>
+                            <include>org.rhq.helpers:rhq-pluginAnnotations</include>
                         </includes>
                     </dependencySet>
 
@@ -81,10 +110,10 @@
                         <outputDirectory>/dist/lib/optional</outputDirectory>
                         <scope>test</scope>
                         <includes>
-                            <include>org.apache.lucene:lucene-analyzers</include>
                             <include>commons-codec:commons-codec</include>
                             <include>commons-io:commons-io</include>
                             <include>org.slf4j:slf4j-log4j12</include>
+                            <include>log4j:log4j</include>
                         </includes>
                     </dependencySet>
 
@@ -115,7 +144,6 @@
                             <exclude>commons-collections:commons-collections</exclude>
                             <exclude>org.slf4j:slf4j-api</exclude>
                             <exclude>dom4j:dom4j</exclude>
-                            <exclude>javax.transaction:jta</exclude>
                         </excludes>
                     </dependencySet>
                 </dependencySets>
