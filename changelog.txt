@@ -1,6 +1,22 @@
 Hibernate Search Changelog
 ==========================
 
+3.4.0.CR2 (06-04-2011)
+----------------------
+
+** Bug
+    * [HSEARCH-679] - Entity whose related entity collection is updated causes loading of @ContainedIn entities
+    * [HSEARCH-721] - When using DatabaseRetrievalMethod.FIND_BY_ID, HSearch still constructs a Criteria query (though it does not use it)
+
+** Improvement
+    * [HSEARCH-705] - Migrate to Lucene 3.1
+
+** Task
+    * [HSEARCH-722] - Speedup JGroups tests
+    * [HSEARCH-724] - Fix build assembly - jars in release distribution are misplaced
+    * [HSEARCH-725] - Archetype not deploying because of incomplete metadata
+
+
 3.4.0.CR1 (28-03-2011)
 ----------------------
 
