@@ -10,11 +10,11 @@ Hibernate Search Changelog
 
 ** Improvement
     * [HSEARCH-705] - Migrate to Lucene 3.1
-    * [HSEARCH-723] - Upgrade to Infinispan 5
 
 ** Task
     * [HSEARCH-722] - Speedup JGroups tests
     * [HSEARCH-724] - Fix build assembly - jars in release distribution are misplaced
+    * [HSEARCH-725] - Archetype not deploying because of incomplete metadata
 
 
 3.4.0.CR1 (28-03-2011)
