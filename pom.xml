@@ -131,7 +131,7 @@
     <properties>
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.1.0</luceneVersion>
-        <infinispanVersion>4.2.1.FINAL</infinispanVersion>
+        <infinispanVersion>5.0.0.BETA1</infinispanVersion>
         <hibernateVersion>3.6.2.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Final</hibernateCommonsAnnotationVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
