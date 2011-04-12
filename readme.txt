@@ -21,7 +21,7 @@ This version of Hibernate Search requires:
 Instructions
 ------------
 
-Unzip to installation directory and read the documentation available in dist/docs/reference
+Unzip to installation directory and read the documentation available in docs/reference
 
 
 Contact
