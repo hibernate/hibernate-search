@@ -42,7 +42,7 @@ import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
- * Checks that the Slave in a JMS configuration proplerly places index jobs onto the queue.
+ * Checks that the Slave in a JMS configuration property places index jobs onto the queue.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -55,7 +55,7 @@ public class JMSSlaveTest extends SearchTestCase {
 	private static final String QUEUE_NAME = "queue/searchtest";
 
 	/**
-	 * Name of the connection factort as found in JNDI (see jndi.properties).
+	 * Name of the connection factory as found in JNDI (see jndi.properties).
 	 */
 	private static final String CONNECTION_FACTORY_NAME = "java:/ConnectionFactory";
 
