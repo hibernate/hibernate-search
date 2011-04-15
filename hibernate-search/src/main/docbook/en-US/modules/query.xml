@@ -1700,18 +1700,45 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
     search</ulink> is a technique which allows to divide the results of a
     query into multiple categories. This categorisation includes the
     calculation of hit counts for each category and the ability to further
-    restrict search results based on these facets (categories). The core
-    faceting functionality in Hibernate Search is made available via the
-    classes <classname>QueryBuilder</classname> and
-    <classname>FullTextQuery</classname>. The former allows to create faceting
-    requests whereas the latter gives access to the so called
-    <classname>FacetManager</classname>. With the help of the
-    <classname>FacetManager</classname> faceting requests can be applied on a
-    query and selected facets can be added to an existing query in order to
-    refine search results. The following sections will describe the faceting
-    process in more detail. The examples will use the entity
-    <classname>Cd</classname> as shown in <xref
-    linkend="example-faceting-entity" />: </para>
+    restrict search results based on these facets (categories). <xref lang=""
+    linkend="example-amazon-facets" /> shows a faceting example. The search
+    results in fifteen hits which are displayed on the main part of the page.
+    The navigation bar on the left, however, shows the category<emphasis>
+    Computers &amp; Internet</emphasis> with its subcategories
+    <emphasis>Programming</emphasis>, <emphasis>Computer Science</emphasis>,
+    <emphasis>Dabatbases</emphasis>, <emphasis>Software</emphasis>,
+    <emphasis>Web Development,</emphasis> <emphasis>Networking</emphasis> and
+    <emphasis>Home Computing</emphasis>. For each of these subcategories the
+    number of books is shown matching the main search criteria and belonging
+    to the respective subcategory. This division of the category
+    <emphasis>Computers &amp; Internet</emphasis> is one concrete search
+    facet. Another one is for example the average customer review.</para>
+
+    <example id="example-amazon-facets">
+      <title>Search for <emphasis>'Hibernate Search'</emphasis> on
+      Amazon</title>
+
+      <mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center" fileref="faceting.png" width="14cm" />
+        </imageobject>
+
+        <imageobject role="html">
+          <imagedata align="center" depth="3cm" fileref="faceting.png" />
+        </imageobject>
+      </mediaobject>
+    </example>
+
+    <para>In Hibernate Search the classes <classname>QueryBuilder</classname>
+    and <classname>FullTextQuery</classname>are the entry point into the
+    faceting API. The former allows to create faceting requests whereas the
+    latter gives access to the so called <classname>FacetManager</classname>.
+    With the help of the <classname>FacetManager</classname> faceting requests
+    can be applied on a query and selected facets can be added to an existing
+    query in order to refine search results. The following sections will
+    describe the faceting process in more detail. The examples will use the
+    entity <classname>Cd</classname> as shown in <xref
+    linkend="example-faceting-entity" />:</para>
 
     <example id="example-faceting-entity">
       <title>Entity Cd</title>
@@ -1831,7 +1858,7 @@ FacetingRequest priceacetingRequest = queryBuilder( Cd.class ).facet()
       seen how to create a faceting request. Now it is time to apply it on a
       query. The key is the <classname>FacetManager</classname> which can be
       retrieved via the <classname>FullTextQuery</classname> (see <xref
-      linkend="example-applying-faceting" />). </para>
+      linkend="example-applying-faceting" />).</para>
 
       <example id="example-applying-faceting">
         <title>Applying a faceting request</title>
