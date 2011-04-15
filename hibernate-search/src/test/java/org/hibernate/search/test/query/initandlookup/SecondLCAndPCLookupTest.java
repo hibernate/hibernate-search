@@ -23,7 +23,9 @@ package org.hibernate.search.test.query.initandlookup;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
+import org.fest.assertions.Condition;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -185,6 +187,15 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		statistics.setStatisticsEnabled( true );
 		setData( session, statistics );
 
+		Transaction tx = session.beginTransaction();
+		Kernel k = new Kernel();
+		k.setCodeName( "notpresent" );
+		k.setProduct( "Polgeiser" );
+		session.persist( k );
+		session.flush();
+		Search.getFullTextSession( session ).flushToIndexes();
+		tx.rollback(); //ie do not store notpresent
+
 		session.clear();
 		//make sure the 2LC is empty
 		session.getSessionFactory().getCache().evictEntityRegion( Kernel.class );
@@ -202,6 +213,19 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		fullTextQuery.initializeObjectsWith( ObjectLookupMethod.SKIP, DatabaseRetrievalMethod.FIND_BY_ID );
 		List list = fullTextQuery.list();
 		assertThat( list.size() ).isEqualTo( 2 );
+		for ( Object o : list ) {
+			assertThat( o ).satisfies( new Condition<Object>() {
+				@Override
+				public boolean matches(Object value) {
+					return Hibernate.isInitialized( value );
+				}
+			} );
+		}
+
+		for ( Object o : list ) {
+			o.toString(); //check true initialization
+		}
+
 		assertThat( statistics.getSecondLevelCacheHitCount() )
 			.isEqualTo( 0 );
 		assertThat( statistics.getQueryExecutionCount() )

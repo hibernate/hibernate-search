@@ -56,6 +56,7 @@ public class ObjectLoaderHelper {
 						"Object found in Search index but not in database: {} with id {}",
 						entityInfo.getClazz(), entityInfo.getId()
 				);
+				session.evict( maybeProxy );
 				maybeProxy = null;
 			}
 			else {
