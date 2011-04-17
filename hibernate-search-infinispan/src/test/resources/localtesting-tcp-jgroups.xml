@@ -1,7 +1,8 @@
 <config xmlns="urn:org:jgroups"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="urn:org:jgroups file:schema/JGroups-2.8.xsd">
+        xsi:schemaLocation="urn:org:jgroups file:schema/JGroups-2.12.xsd">
    <UDP
+         use_local_host="true"
          mcast_addr="${jgroups.udp.mcast_addr:228.6.7.8}"
          mcast_port="${jgroups.udp.mcast_port:46655}"
          tos="8"
@@ -13,7 +14,7 @@
          discard_incompatible_packets="true"
          max_bundle_size="64000"
          max_bundle_timeout="30"
-         ip_ttl="${jgroups.udp.ip_ttl:2}"
+         ip_ttl="${jgroups.udp.ip_ttl:1}"
          enable_bundling="true"
          enable_diagnostics="false"
 
@@ -36,17 +37,17 @@
          oob_thread_pool.rejection_policy="Discard"
          />
 
-   <PING timeout="3000" num_initial_members="3"/>
-   <MERGE2 max_interval="30000" min_interval="10000"/>
+   <PING timeout="100" num_initial_members="2"/>
+   <MERGE2 max_interval="3000" min_interval="1000"/>
    <FD_SOCK/>
    <FD_ALL/>
    <BARRIER />
    <pbcast.NAKACK use_stats_for_retransmission="false"
                    exponential_backoff="0"
                    use_mcast_xmit="true" gc_lag="0"
-                   retransmit_timeout="300,600,1200"
+                   retransmit_timeout="30,60,120"
                    discard_delivered_msgs="true"/>
-   <UNICAST timeout="300,600,1200"/>
+   <UNICAST timeout="30,60,120"/>
    <pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000" max_bytes="1000000"/>
    <pbcast.GMS print_local_addr="false" join_timeout="3000" view_bundling="true"/>
    <UFC max_credits="500000" min_threshold="0.20"/>
