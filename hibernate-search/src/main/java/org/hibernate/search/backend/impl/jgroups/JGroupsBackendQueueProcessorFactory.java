@@ -41,6 +41,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.JGroupsHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.XMLHelper;
 import org.hibernate.util.ConfigHelper;
@@ -70,6 +71,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 	protected Address address;
 
 	public void initialize(Properties props, WorkerBuildContext context) {
+		JGroupsHelper.verifyIPv4IsPreferred();
 		this.searchFactory = context.getUninitializedSearchFactory();
 
 		if ( props.containsKey( JG_CLUSTER_NAME ) ) {

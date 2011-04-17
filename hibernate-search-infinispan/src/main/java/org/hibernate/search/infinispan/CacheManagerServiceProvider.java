@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.util.JGroupsHelper;
 import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.util.NamingHelper;
 import org.hibernate.util.PropertiesHelper;
@@ -81,6 +82,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 
 	@Override
 	public void start(Properties properties) {
+		JGroupsHelper.verifyIPv4IsPreferred();
 		String name = PropertiesHelper.getString( CACHE_MANAGER_RESOURCE_PROP, properties, null );
 		if ( name == null ) {
 			// No JNDI lookup configured: start the CacheManager
@@ -90,6 +92,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 			);
 			try {
 				cacheManager = new DefaultCacheManager( cfgName );
+				cacheManager.start();
 				manageCacheManager = true;
 			}
 			catch ( IOException e ) {
