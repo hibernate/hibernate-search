@@ -36,30 +36,35 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.hibernate.search.test.util.JGroupsEnvironment;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * We start two different Hibernate Search instances, both using
  * an InfinispanDirectoryProvider as the default DirectoryProvider
  * for all entities.
+ * Then after some indexing was done we verify the index contains expected data
+ * both on the other node and on a third just started node.
+ * 
  * Set <code>-Djava.net.preferIPv4Stack=true</code> as this is required by JGroups.
  *
  * @author Sanne Grinovero
  */
 public class TwoNodesTest {
 
+	private final String to = "spam@hibernate.org";
+	private final String messageText = "to get started as a real spam expert, search for 'getting an iphone' on Hibernate forums";
+
 	FullTextSessionBuilder nodea;
 	FullTextSessionBuilder nodeb;
 
 	@Test
 	public void testSomething() {
-		final String to = "spam@hibernate.org";
-		final String messageText = "to get started as a real spam expert, search for 'getting an iphone' on Hibernate forums";
+		assertEquals( 2, clusterSize( nodea ) );
+		// index an entity:
 		{
 			FullTextSession fullTextSession = nodea.openFullTextSession();
 			Transaction transaction = fullTextSession.beginTransaction();
@@ -68,9 +73,30 @@ public class TwoNodesTest {
 			mail.message = messageText;
 			fullTextSession.save( mail );
 			transaction.commit();
+			fullTextSession.close();
 		}
-		{
-			FullTextSession fullTextSession = nodeb.openFullTextSession();
+		// verify nodeb is able to find it:
+		verifyNodeSeesUpdatedIndex( nodeb );
+		// now start a new node, it will join the cluster and receive the current index state:
+		FullTextSessionBuilder nodeC = new FullTextSessionBuilder();
+		prepareCommonConfiguration( nodeC );
+		nodeC.build();
+		assertEquals( 3, clusterSize( nodea ) );
+		try {
+			// verify the new node is able to perform the same searches:
+			verifyNodeSeesUpdatedIndex(nodeC);
+		}
+		finally {
+			nodeC.close();
+		}
+		assertEquals( 2, clusterSize( nodea ) );
+		verifyNodeSeesUpdatedIndex( nodea );
+		verifyNodeSeesUpdatedIndex( nodeb );
+	}
+
+	private void verifyNodeSeesUpdatedIndex(FullTextSessionBuilder node) {
+		FullTextSession fullTextSession = node.openFullTextSession();
+		try {
 			Transaction transaction = fullTextSession.beginTransaction();
 			QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
 					.buildQueryBuilder()
@@ -86,48 +112,50 @@ public class TwoNodesTest {
 			assertEquals( messageText, result[0] );
 			transaction.commit();
 		}
+		finally {
+			fullTextSession.close();
+		}
 	}
 
 	@Before
 	public void setUp() throws Exception {
 		nodea = new FullTextSessionBuilder();
 		nodeb = new FullTextSessionBuilder();
-		JGroupsEnvironment.initJGroupsProperties();
 		prepareCommonConfiguration( nodea );
 		nodea.build();
 		prepareCommonConfiguration( nodeb );
 		nodeb.build();
 
-		InfinispanDirectoryProvider directoryProviderA = extractInfinispanDirectoryProvider( nodea );
-		EmbeddedCacheManager cacheManager = directoryProviderA.getCacheManager();
-		waitMembersCount( cacheManager, 2 );
+		waitMembersCount( nodea, 2 );
 	}
 
 	/**
 	 * Wait some time for the cluster to form
-	 *
-	 * @param cacheManager
-	 * @param expectedSize
-	 *
-	 * @throws InterruptedException
 	 */
-	private void waitMembersCount(EmbeddedCacheManager cacheManager, int expectedSize) throws InterruptedException {
+	private void waitMembersCount(FullTextSessionBuilder node, int expectedSize) throws InterruptedException {
 		int currentSize = 0;
 		int loopCounter = 0;
 		while ( currentSize < expectedSize ) {
 			Thread.sleep( 10 );
-			List<Address> members = cacheManager.getMembers();
-			currentSize = members.size();
+			currentSize = clusterSize( node );
 			if ( loopCounter > 200 ) {
 				throw new AssertionFailedError( "timeout while waiting for all nodes to join in cluster" );
 			}
 		}
 	}
 
-	public InfinispanDirectoryProvider extractInfinispanDirectoryProvider(FullTextSessionBuilder sessionBuilder) {
-		SearchFactory searchFactory = sessionBuilder.getSearchFactory();
+	/**
+	 * Counts the number of nodes in the cluster on this node
+	 * @param node the FullTextSessionBuilder representing the current node
+	 * @return
+	 */
+	private int clusterSize(FullTextSessionBuilder node) {
+		SearchFactory searchFactory = node.getSearchFactory();
 		DirectoryProvider[] directoryProviders = searchFactory.getDirectoryProviders( SimpleEmail.class );
-		return (InfinispanDirectoryProvider) directoryProviders[0];
+		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) directoryProviders[0];
+		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();
+		List<Address> members = cacheManager.getMembers();
+		return members.size();
 	}
 
 	private void prepareCommonConfiguration(FullTextSessionBuilder cfg) {
