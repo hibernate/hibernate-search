@@ -288,20 +288,20 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.provider.CustomDi
             </para><para><literal>retry_marker_lookup</literal> : optional,
             default to 0. Defines how many times we look for the marker files
             in the source directory before failing. Waiting 5 seconds between
-            each try. </para>
-            <para><literal>retry_initialize_period</literal> : optional,
-            set an integer value in seconds to enable the retry initialize feature:
-            if the slave can't find the master
-            index it will try again until it's found in background, without preventing
-            the application to start: fullText queries performed
-            before the index is initialized are not blocked but will return empty results.
-            When not enabling the option or explicitly setting it to zero it will fail
-            with an exception instead of scheduling a retry timer. To prevent the application from
-            starting without an invalid index but still control an initialization
-            timeout, see <literal>retry_marker_lookup</literal> instead.</para>
-            <para><literal>filesystem_access_type</literal>:
-            allows to determine the exact type of
-            <classname>FSDirectory</classname> implementation used by this
+            each try. </para> <para><literal>retry_initialize_period</literal>
+            : optional, set an integer value in seconds to enable the retry
+            initialize feature: if the slave can't find the master index it
+            will try again until it's found in background, without preventing
+            the application to start: fullText queries performed before the
+            index is initialized are not blocked but will return empty
+            results. When not enabling the option or explicitly setting it to
+            zero it will fail with an exception instead of scheduling a retry
+            timer. To prevent the application from starting without an invalid
+            index but still control an initialization timeout, see
+            <literal>retry_marker_lookup</literal> instead.</para>
+            <para><literal>filesystem_access_type</literal>: allows to
+            determine the exact type of <classname>FSDirectory</classname>
+            implementation used by this
             <classname>DirectoryProvider</classname>. Allowed values are
             <literal>auto</literal> (the default value, selects
             <classname>NIOFSDirectory</classname> on non Windows systems,
@@ -1033,10 +1033,10 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     <title>Infinispan Directory configuration</title>
 
     <para>Infinispan is a distributed, scalable, highly available data grid
-    platform which supports autodiscovery of peer nodes. It is possible to
-    store the Lucene index in Infinispan, making it easy to setup a clustered
-    configuration with Hibernate Search and having updates to the index
-    available on other nodes very quickly.</para>
+    platform which supports autodiscovery of peer nodes. Using Infinispan and
+    Hibernate Search in combination, it is possible to store the Lucene index
+    in a distributed environment where index updates are quickly available on
+    all nodes.</para>
 
     <para>This section describes in greater detail how to configure Hibernate
     Search to use an Infinispan Lucene Directory.</para>
@@ -1044,7 +1044,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     <para>When using an Infinispan Directory the index is stored in memory and
     shared across multiple nodes. It is considered a single directory across
     all participating nodes. If a node updates the index, all other nodes are
-    affected as well. Updates on one node can be immediately searched for in
+    updated as well. Updates on one node can be immediately searched for in
     the whole cluster.</para>
 
     <para>The default configuration replicates all data defining the index
@@ -1053,10 +1053,11 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     information is replicated to a subset of all cluster members.</para>
 
     <para>It is also possible to offload part or most information to a
-    <literal>CacheStore</literal>, such as plain filesystem,
-    Amazon S3, Cassandra, Berkley DB, JDBC standard databases. You can configure it
-    to have a <literal>CacheStore</literal> on each node or have a single centralized one
-    shared by each node.</para>
+    <literal>CacheStore</literal>, such as plain filesystem, Amazon S3,
+    Cassandra, Berkley DB or standard relational databases. You can configure
+    it to have a <literal>CacheStore</literal> on each node or have a single
+    centralized one shared by each node.</para>
+
     <para>See the <ulink url="http://www.jboss.org/infinispan/"> Infinispan
     documentation</ulink> for all Infinispan configuration options.</para>
 
@@ -1089,8 +1090,8 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       These last two jars are distributed by <ulink
       url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>.
       Also make sure to update JGroups to a version matching the Infinispan
-      requirements. The version normally distributed with Hibernate Search is older
-      to maintain Java 5 compatibility.</para>
+      requirements. The version normally distributed with Hibernate Search is
+      older to maintain Java 5 compatibility.</para>
     </section>
 
     <section>
@@ -1101,38 +1102,44 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       nodes will share the same index and it is likely that
       <classname>IndexWriter</classname>s being active on different nodes will
       try to acquire the lock on the same index. So instead of sending updates
-      directly to the index, send it to a JMS queue or JGroups channel and have
-      a single node apply all changes on behalf of all other nodes.</para>
-      
-      <para>Configuring a non-default backend is not a requirement but a performance
-      optimization as locks are enabled to have a single node writing.</para>
+      directly to the index, send it to a JMS queue or JGroups channel and
+      have a single node apply all changes on behalf of all other
+      nodes.</para>
+
+      <para>Configuring a non-default backend is not a requirement but a
+      performance optimization as locks are enabled to have a single node
+      writing.</para>
 
       <para>To configure a JMS slave only the backend must be replaced, the
       directory provider must be set to <literal>infinispan</literal>; set the
       same directory provider on the master, they will connect without the
       need to setup the copy job across nodes. Using the JGroups backend is
-      very similar: just combine the backend configuration with the
+      very similar - just combine the backend configuration with the
       <literal>infinispan</literal> directory provider.</para>
     </section>
 
     <section>
       <title>Infinispan Configuration</title>
-      
-      <para>The most simple configuration only requires to enable the backend:</para>
-      
+
+      <para>The most simple configuration only requires to enable the
+      backend:</para>
+
       <programlisting>hibernate.search.default.directory_provider infinispan</programlisting>
-      
-      <para>That's all what is needed to get a cluster-replicated index, but the
-      default configuration does not enable any form of permanent persistence for the index;
-      to enable such a feature an Infinispan configuration file should be provided.</para>
 
-      <para>To use Infinispan, Hibernate Search requirest a <classname>CacheManager</classname>;
-      it can lookup and reuse an existing <classname>CacheManager,</classname>
-      via JNDI, or start and manage a new one. In the latter case Hibernate Search will
-      start and stop it ( closing occurs when the Hibernate
-      <classname>SessionFactory</classname> is closed).</para>
+      <para>That's all what is needed to get a cluster-replicated index, but
+      the default configuration does not enable any form of permanent
+      persistence for the index; to enable such a feature an Infinispan
+      configuration file should be provided.</para>
 
-      <para>To use and existing <classname>CacheManager</classname> via JNDI (optional parameter):</para>
+      <para>To use Infinispan, Hibernate Search requirest a
+      <classname>CacheManager</classname>; it can lookup and reuse an existing
+      <classname>CacheManager,</classname> via JNDI, or start and manage a new
+      one. In the latter case Hibernate Search will start and stop it (
+      closing occurs when the Hibernate <classname>SessionFactory</classname>
+      is closed).</para>
+
+      <para>To use and existing <classname>CacheManager</classname> via JNDI
+      (optional parameter):</para>
 
       <programlisting>hibernate.search.infinispan.cachemanager_jndiname = [jndiname]</programlisting>
 
@@ -1148,17 +1155,19 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       should work fine in most cases but does not store the index in a
       persistent cache store.</para>
 
-      <para>As mentioned in <xref
-      linkend="directory-provider-table" />, each index makes use of
-      three caches, so three different caches should be configured as shown in
-      the <literal>default-hibernatesearch-infinispan.xml</literal> provided
-      in the <literal>hibernate-search-infinispan.jar</literal>. Several
-      indexes can share the same caches.</para>
-      
-      <warning><para>Infinispan uses JGroups, which requires the JVM property
-      <literal>java.net.preferIPv4Stack</literal> be set to <literal>true</literal>:
-      <code>-Djava.net.preferIPv4Stack=true</code>
-      </para></warning>
+      <para>As mentioned in <xref linkend="directory-provider-table" />, each
+      index makes use of three caches, so three different caches should be
+      configured as shown in the
+      <literal>default-hibernatesearch-infinispan.xml</literal> provided in
+      the <literal>hibernate-search-infinispan.jar</literal>. Several indexes
+      can share the same caches.</para>
+
+      <warning>
+        <para>Infinispan uses JGroups, which requires the JVM property
+        <literal>java.net.preferIPv4Stack</literal> be set to
+        <literal>true</literal>:
+        <code>-Djava.net.preferIPv4Stack=true</code></para>
+      </warning>
     </section>
   </section>
 
@@ -1290,13 +1299,15 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             <entry><literal>false</literal> (releases locks as soon as
             possible)</entry>
           </row>
-          
+
           <row>
             <entry><literal>hibernate.search.[default|&lt;indexname&gt;].max_queue_length</literal></entry>
 
-            <entry><para>Each index has a separate "pipeline" which contains the updates to be applied
-            to the index. When this queue is full adding more operations to the queue becomes a blocking operation.
-            Configuring this setting doesn't make much sense unless the <literal>worker.execution</literal> is configured as
+            <entry><para>Each index has a separate "pipeline" which contains
+            the updates to be applied to the index. When this queue is full
+            adding more operations to the queue becomes a blocking operation.
+            Configuring this setting doesn't make much sense unless the
+            <literal>worker.execution</literal> is configured as
             <literal>async</literal>.</para></entry>
 
             <entry><literal>1000</literal></entry>
