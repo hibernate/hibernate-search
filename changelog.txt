@@ -1,6 +1,22 @@
 Hibernate Search Changelog
 ==========================
 
+3.4.0.Final (18-04-2011)
+------------------------
+
+** Bug
+    * [HSEARCH-727] - Non initialized entities are returned in the list when using initializeObjectsWith( ObjectLookupMethod.SKIP, DatabaseRetrievalMethod.FIND_BY_ID )
+
+** Improvement
+    * [HSEARCH-720] - Add a screenshot of amazon.com and the related concepts pointed via arrow for faceting
+    * [HSEARCH-730] - Proper error messages when preferIPv4Stack JVM option was not defined
+
+** Task
+    * [HSEARCH-729] - Add a test on dynamic cluster formation for Infinispan Directory
+    * [HSEARCH-731] - Upgrade Hibernate Core to 3.6.3.Final
+    * [HSEARCH-733] - prevent JBoss transactions in integration tests module from creating log files
+
+
 3.4.0.CR2 (06-04-2011)
 ----------------------
 
