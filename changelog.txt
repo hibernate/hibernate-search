@@ -6,6 +6,7 @@ Hibernate Search Changelog
 
 ** Bug
     * [HSEARCH-727] - Non initialized entities are returned in the list when using initializeObjectsWith( ObjectLookupMethod.SKIP, DatabaseRetrievalMethod.FIND_BY_ID )
+    * [HSEARCH-734] - NPE when deleting a collection which triggers @IndexedEmbedded
 
 ** Improvement
     * [HSEARCH-720] - Add a screenshot of amazon.com and the related concepts pointed via arrow for faceting
