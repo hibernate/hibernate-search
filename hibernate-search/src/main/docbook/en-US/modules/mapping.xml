@@ -393,7 +393,7 @@ public class Book {
       <example id="example-indexing-associations">
         <title>Indexing associations</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Place {
     @Id
@@ -693,11 +693,12 @@ public class Essay {
       However, there are usecases in which the boost factor may depends on the
       actual state of the entity. In this case you can use the
       <literal>@DynamicBoost </literal>annotation together with an
-      accompanying custom <classname>BoostStrategy</classname>.<example
+      accompanying custom <classname>BoostStrategy</classname>.</para>
+      <example
           id="example-dynamic-boosting">
           <title>Dynamic boost examle</title>
 
-          <programlisting>public enum PersonType {
+          <programlisting language="JAVA" role="JAVA">public enum PersonType {
     NORMAL,
     VIP
 }
@@ -721,8 +722,8 @@ public class VIPBoostStrategy implements BoostStrategy {
             return 1.0f;
         }
     }
-}</programlisting>
-        </example>In <xref linkend="example-dynamic-boosting" /> a dynamic
+}</programlisting></example>
+      <para>In <xref linkend="example-dynamic-boosting" /> a dynamic
       boost is defined on class level specifying
       <classname>VIPBoostStrategy</classname> as implementation of the
       <classname>BoostStrategy</classname> interface to be used at indexing
@@ -886,10 +887,11 @@ public class MyEntity {
         <title><classname>@AnalyzerDef</classname> and the Solr
         framework</title>
 
-        <programlisting>@AnalyzerDef(name="customanalyzer",
+        <programlisting language="JAVA" role="JAVA">@AnalyzerDef(name="customanalyzer",
   charFilters = {
     @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
-      @Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+      @Parameter(name = "mapping",
+        value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
     })
   },
   tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
@@ -897,7 +899,8 @@ public class MyEntity {
     @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
     @TokenFilterDef(factory = LowerCaseFilterFactory.class),
     @TokenFilterDef(factory = StopFilterFactory.class, params = {
-      @Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
+      @Parameter(name="words",
+        value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
       @Parameter(name="ignoreCase", value="true")
     })
 })
@@ -921,10 +924,11 @@ public class Team {
       <example id="example-analyzer-def-charset">
         <title>Use a specific charset to load the property file</title>
 
-        <programlisting>@AnalyzerDef(name="customanalyzer",
+        <programlisting language="JAVA" role="JAVA">@AnalyzerDef(name="customanalyzer",
   charFilters = {
     @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
-      @Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+      @Parameter(name = "mapping",
+        value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
     })
   },
   tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
@@ -932,7 +936,8 @@ public class Team {
     @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
     @TokenFilterDef(factory = LowerCaseFilterFactory.class),
     @TokenFilterDef(factory = StopFilterFactory.class, params = {
-      @Parameter(name="words", value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
+      @Parameter(name="words",
+        value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
       @Parameter(name="resource_charset", value = "UTF-16BE"),
       @Parameter(name="ignoreCase", value="true")
   })
@@ -950,7 +955,7 @@ public class Team {
         <title id="example-referencing-analyzer-def" remap="">Referencing an
         analyzer by name</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 @AnalyzerDef(name="customanalyzer", ... )
 public class Team {
@@ -976,7 +981,7 @@ public class Team {
       <classname>SearchFactory</classname> which is quite useful wen building
       queries.</para>
 
-      <programlisting>Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("customanalyzer");</programlisting>
+      <programlisting language="JAVA" role="JAVA">Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("customanalyzer");</programlisting>
 
       <para>Fields in queries should be analyzed with the same analyzer used
       to index the field so that they speak a common "language": the same
@@ -1233,10 +1238,10 @@ public class Team {
       <xref linkend="example-analyzer-discriminator" /> demonstrates the usage
       of this annotation.</para>
 
-      <para><example id="example-analyzer-discriminator">
+      <example id="example-analyzer-discriminator">
           <title>Usage of @AnalyzerDiscriminator</title>
 
-          <programlisting>@Entity
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 @AnalyzerDefs({
   @AnalyzerDef(name = "en",
@@ -1273,7 +1278,7 @@ public class BlogEntry {
     ...
 }</programlisting>
 
-          <programlisting>public class LanguageDiscriminator implements Discriminator {
+          <programlisting language="JAVA" role="JAVA">public class LanguageDiscriminator implements Discriminator {
 
     public String getAnalyzerDefinitionName(Object value, Object entity, String field) {
         if ( value == null || !( entity instanceof Article ) ) {
@@ -1283,7 +1288,7 @@ public class BlogEntry {
 
     }
 }</programlisting>
-        </example></para>
+        </example>
 
       <para>The prerequisite for using
       <classname>@AnalyzerDiscriminator</classname> is that all analyzers
@@ -1348,7 +1353,7 @@ public class BlogEntry {
         <title>Using the scoped analyzer when building a full-text
         query</title>
 
-        <programlisting>org.apache.lucene.queryParser.QueryParser parser = new QueryParser(
+        <programlisting language="JAVA" role="JAVA">org.apache.lucene.queryParser.QueryParser parser = new QueryParser(
     "title", 
     fullTextSession.getSearchFactory().getAnalyzer( Song.class )
 );
@@ -1449,7 +1454,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
             </literal> ). The date pattern will then be truncated
             accordingly.</para>
 
-            <programlisting>@Entity 
+            <programlisting language="JAVA" role="JAVA">@Entity 
 @Indexed
 public class Meeting {
     @Field(index=Index.UN_TOKENIZED)
@@ -1508,7 +1513,7 @@ public class Meeting {
           <title>Custom <classname>StringBridge</classname>
           implementation</title>
 
-          <programlisting>/**
+          <programlisting language="JAVA" role="JAVA">/**
  * Padding Integer bridge.
  * All numbers will be padded with 0 to match 5 digits
  *
@@ -1536,7 +1541,7 @@ public class PaddedIntegerBridge implements <emphasis role="bold">StringBridge</
         use this bridge thanks to the <literal>@FieldBridge</literal>
         annotation:</para>
 
-        <programlisting><emphasis role="bold">@FieldBridge(impl = PaddedIntegerBridge.class)</emphasis>
+        <programlisting language="JAVA" role="JAVA"><emphasis role="bold">@FieldBridge(impl = PaddedIntegerBridge.class)</emphasis>
 private Integer length;                </programlisting>
 
         <section>
@@ -1552,7 +1557,7 @@ private Integer length;                </programlisting>
           <example id="example-passing-bridge-paremters">
             <title>Passing parameters to your bridge implementation</title>
 
-            <programlisting>public class PaddedIntegerBridge implements StringBridge, <emphasis
+            <programlisting language="JAVA" role="JAVA">public class PaddedIntegerBridge implements StringBridge, <emphasis
                 role="bold">ParameterizedBridge</emphasis> {
 
     public static String PADDING_PROPERTY = "padding";
@@ -1634,7 +1639,7 @@ private Integer length;                </programlisting>
             <title>Implementing a TwoWayStringBridge usable for id
             properties</title>
 
-            <programlisting>public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
+            <programlisting language="JAVA" role="JAVA">public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
 
     public static String PADDING_PROPERTY = "padding";
     private int padding = 5; //default
@@ -1691,7 +1696,7 @@ private Integer id;
         <example id="example-field-bridge">
           <title>Implementing the FieldBridge interface</title>
 
-          <programlisting>/**
+          <programlisting language="JAVA" role="JAVA">/**
  * Store the date in 3 different fields - year, month, day - to ease Range Query per
  * year, month or day (eg get all the elements of December for the last 5 years).
  * @author Emmanuel Bernard
@@ -1772,7 +1777,7 @@ private Date date;                </programlisting>
         <example id="example-class-bridge">
           <title>Implementing a class bridge</title>
 
-          <programlisting>@Entity
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 <emphasis role="bold">@ClassBridge</emphasis>(name="branchnetwork",
              index=Index.TOKENIZED,
@@ -1795,7 +1800,8 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
         this.sepChar = (String) parameters.get( "sepChar" );
     }
 
-    <emphasis role="bold">public void set(String name, Object value, Document document, LuceneOptions luceneOptions)</emphasis> {
+    <emphasis role="bold">public void set(
+        String name, Object value, Document document, LuceneOptions luceneOptions)</emphasis> {
         // In this particular class the name of the new field was passed
         // from the name field of the ClassBridge Annotation. This is not
         // a requirement. It just works that way in this instance. The
@@ -1810,7 +1816,8 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
             fieldValue2 = "";
         }
         String fieldValue = fieldValue1 + sepChar + fieldValue2;
-        Field field = new Field( name, fieldValue, luceneOptions.getStore(), luceneOptions.getIndex(), luceneOptions.getTermVector() );
+        Field field = new Field( name, fieldValue, luceneOptions.getStore(),
+            luceneOptions.getIndex(), luceneOptions.getTermVector() );
         field.setBoost( luceneOptions.getBoost() );
         document.add( field );
    }
@@ -1855,7 +1862,7 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
       <example>
         <title>Providing your own id</title>
 
-        <programlisting>@ProvidedId (bridge = org.my.own.package.MyCustomBridge)
+        <programlisting language="JAVA" role="JAVA">@ProvidedId (bridge = org.my.own.package.MyCustomBridge)
 @Indexed
 public class MyClass{
     @Field
@@ -1909,7 +1916,7 @@ public class MyClass{
     <literal>hibernate.search.model_mapping</literal> or it's type-safe
     representation <classname>Environment.MODEL_MAPPING</classname>.</para>
 
-    <programlisting>SearchMapping mapping = new SearchMapping();
+    <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 [...]
 configuration.setProperty( Environment.MODEL_MAPPING, mapping );
 
@@ -1947,17 +1954,17 @@ EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", pro
       as <classname>@Indexed</classname>, the following example demonstrates
       how to programmatically achieve this.</para>
 
-      <para><example>
+      <example>
           <title>Marking an entity indexable</title>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+          <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping.entity(Address.class)
            .indexed()
                .indexName("Address_Index"); //optional
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
-        </example></para>
+        </example>
 
       <para>As you can see you must first create a
       <classname>SearchMapping</classname> object which is the root object
@@ -1973,7 +1980,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <example>
         <title>Annotation example of indexing entity</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed(index="Address_Index")
 public class Address {
 ....
@@ -1986,10 +1993,10 @@ public class Address {
 
       <para>To set a property as a document id:</para>
 
-      <para><example>
+      <example>
           <title>Enabling document id with programmatic model</title>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+          <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping.entity(Address.class).indexed()
            .property("addressId", ElementType.FIELD) //field access
@@ -1997,16 +2004,16 @@ mapping.entity(Address.class).indexed()
                    .name("id");
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping);</programlisting>
-        </example></para>
+        </example>
 
       <para>The above is equivalent to annotating a property in the entity as
       <classname>@DocumentId</classname> as seen in the following
       example:</para>
 
-      <para><example>
+      <example>
           <title>DocumentId annotation definition</title>
 
-          <programlisting>@Entity
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Address {
  @Id
@@ -2019,7 +2026,7 @@ public class Address {
 
           <para>The next section demonstrates how to programmatically define
           analyzers.</para>
-        </example></para>
+        </example>
     </section>
 
     <section>
@@ -2032,10 +2039,10 @@ public class Address {
       filter that you define can optionally take in parameters as seen in the
       following example :</para>
 
-      <para><example>
+      <example>
           <title>Defining analyzers using programmatic model</title>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+          <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping
     <emphasis role="bold">.analyzerDef( "ngram", StandardTokenizerFactory.class )
@@ -2055,7 +2062,7 @@ mapping
                 .name("id");
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
-        </example></para>
+        </example>
 
       <para>The analyzer mapping defined above is equivalent to the annotation
       model using <classname>@AnalyzerDef</classname> in conjunction with
@@ -2064,7 +2071,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <example>
         <title>Analyzer definition using annotation</title>
 
-        <programlisting>@Indexed
+        <programlisting language="JAVA" role="JAVA">@Indexed
 @Entity
 @AnalyzerDefs({
   @AnalyzerDef(name = "ngram",
@@ -2109,10 +2116,10 @@ public class Address {
       full text filter definition using the <methodname>fullTextFilterDef
       </methodname>method.</para>
 
-      <para><example>
+      <example>
           <title>Defining full text definition programmatically</title>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+          <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping
     .analyzerDef( "en", StandardTokenizerFactory.class )
@@ -2135,7 +2142,7 @@ mapping
                 .store(Store.NO);
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
-        </example></para>
+        </example>
 
       <para>The previous example can effectively been seen as annotating your
       entity with <classname>@FullTextFilterDef</classname> like below:</para>
@@ -2143,7 +2150,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <example>
         <title>Using annotation to define full text filter definition</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 @AnalyzerDefs({
   @AnalyzerDef(name = "en",
@@ -2187,10 +2194,10 @@ public class Address {
       <methodname>bridge</methodname> and <methodname>analyzer</methodname>
       definitions.</para>
 
-      <para><example>
+      <example>
           <title>Indexing fields using programmatic API</title>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+          <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping
     .analyzerDef( "en", StandardTokenizerFactory.class )
@@ -2210,7 +2217,7 @@ mapping
                 .analyzer("en");</emphasis>
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
-        </example></para>
+        </example>
 
       <para>The above example of marking fields as indexable is equivalent to
       defining fields using <classname>@Field</classname> as seen
@@ -2219,7 +2226,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <example>
         <title>Indexing fields using annotation</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 @AnalyzerDefs({
   @AnalyzerDef(name = "en",
@@ -2259,10 +2266,10 @@ public class Address {
       can be done by calling <methodname>prefix</methodname> as seen in the
       example below:</para>
 
-      <para><example>
+      <example>
           <title>Programmatically defining embedded entites</title>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+          <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mappping
     .entity(ProductCatalog.class)
@@ -2283,7 +2290,7 @@ mappping
                 .prefix("catalog.items"); //optional</emphasis>
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
-        </example></para>
+        </example>
 
       <para>The next example shows the same definition using annotation
       (<classname>@IndexEmbedded</classname>):</para>
@@ -2291,7 +2298,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <example>
         <title>Using @IndexEmbedded</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class ProductCatalog {
  @Id
@@ -2326,7 +2333,7 @@ public class ProductCatalog {
       <example>
         <title>Programmatically defining ContainedIn</title>
 
-        <programlisting>SearchMapping mapping = new SearchMapping();
+        <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mappping
     .entity(ProductCatalog.class)
@@ -2352,10 +2359,10 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <para>This is equivalent to defining <classname>@ContainedIn</classname>
       in your entity:</para>
 
-      <para><example>
+      <example>
           <title>Annotation approach for ContainedIn</title>
 
-          <programlisting>@Entity
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class ProductCatalog {
  
@@ -2377,9 +2384,7 @@ public class ProductCatalog {
  private List&lt;Item&gt; getItems() {...}
 
  ...
-
 }
-
 
 @Entity
 public class Item {
@@ -2397,7 +2402,7 @@ public class Item {
 
  ...
 }</programlisting>
-        </example></para>
+        </example>
     </section>
 
     <section>
@@ -2409,10 +2414,10 @@ public class Item {
       after you have defined a <methodname>field()</methodname> in the
       <classname>SearchMapping </classname>hierarchy.</para>
 
-      <para><example>
+      <example>
           <title>Programmatic model for defining calendar/date bridge</title>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+          <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping
     .entity(Address.class)
@@ -2428,7 +2433,7 @@ mapping
         <emphasis role="bold">.calendarBridge(Resolution.DAY)</emphasis>;
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
-        </example></para>
+        </example>
 
       <para>See below for defining the above using
       <classname>@CalendarBridge</classname> and
@@ -2437,7 +2442,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <example>
         <title>@CalendarBridge and @DateBridge definition</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Address {
  
@@ -2473,10 +2478,10 @@ public class Address {
       class. The below shows an example of programmatically defining a
       bridge:</para>
 
-      <para><example>
+      <example>
           <title>Defining field bridges programmatically</title>
 
-          <programlisting>SearchMapping mapping = new SearchMapping();
+          <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping
     .entity(Address.class)
@@ -2491,17 +2496,16 @@ mapping
                     .param( "size", "4" )</emphasis>;
  
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
-        </example></para>
+        </example>
 
       <para>The above can equally be defined using annotations, as seen in the
       next example.</para>
 
-      <para><example>
+      <example>
           <title>Defining field bridges using annotation</title>
 
-          <programlisting>@Entity
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
-
 public class Address {
  
  @Id
@@ -2519,7 +2523,7 @@ public class Address {
 
  ...
 }</programlisting>
-        </example></para>
+        </example>
     </section>
 
     <section>
@@ -2531,7 +2535,7 @@ public class Address {
       <example>
         <title>Defining class briges using API</title>
 
-        <programlisting>SearchMapping mapping = new SearchMapping();
+        <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping
     .entity(Departments.class)
@@ -2561,7 +2565,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
       <example>
         <title>Using @ClassBridge</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 @ClassBridges ( {
   @ClassBridge(name="branchnetwork",
@@ -2582,7 +2586,6 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 public class Departments {
 
 ....
-
 }</programlisting>
       </example>
     </section>
@@ -2596,7 +2599,7 @@ public class Departments {
       <example>
         <title>DynamicBoost mapping using programmatic model</title>
 
-        <programlisting>SearchMapping mapping = new SearchMapping();
+        <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
 mapping
   .entity(DynamicBoostedDescLibrary.class)
@@ -2618,7 +2621,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <example>
         <title>Using the @DynamicBoost</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 @DynamicBoost(impl = CustomBoostStrategy.class)
 public class DynamicBoostedDescriptionLibrary {
@@ -2639,7 +2642,6 @@ public class DynamicBoostedDescriptionLibrary {
  }
   
  .......
-
 }</programlisting>
       </example>
     </section>

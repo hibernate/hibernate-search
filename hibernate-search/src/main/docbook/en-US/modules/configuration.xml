@@ -137,7 +137,7 @@ public class Action { ... }</programlisting>
       <programlisting>hibernate.search.default.directory_provider filesystem
 hibernate.search.default.indexBase=/usr/lucene/indexes
 hibernate.search.Rules.directory_provider ram
-hibernate.search.Actions.directory_provider com.acme.hibernate.provider.CustomDirectoryProvider</programlisting>
+hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryProvider</programlisting>
     </example>
 
     <tip>
@@ -976,7 +976,7 @@ hibernate.search.worker.backend = jgroupsMaster   </programlisting>
       <example id="example-jgroup-xml-configuration">
         <title>JGroups transport protocol configuration</title>
 
-        <programlisting language="XML">## JGroups configuration options
+        <programlisting language="XML" role="XML">## JGroups configuration options
 # OPTION 1 - udp.xml file needs to be located in the classpath
 hibernate.search.worker.backend.jgroups.configurationFile = udp.xml
 

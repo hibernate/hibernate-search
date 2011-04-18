@@ -564,9 +564,7 @@ em.close();  </programlisting>
       <title>Using <classname>@AnalyzerDef</classname> and the Solr framework
       to define and use an analyzer</title>
 
-      <programlisting language="JAVA">package example;
-...
-@Entity
+      <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 <emphasis role="bold">@AnalyzerDef(name = "customanalyzer",
   tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),

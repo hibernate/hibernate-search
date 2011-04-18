@@ -271,7 +271,7 @@ finally {
       <example>
         <title>Example of a directory provider using a cache service</title>
 
-        <programlisting>public CustomDirectoryProvider implements DirectoryProvider&lt;RAMDirectory&gt; {
+        <programlisting language="JAVA" role="JAVA">public CustomDirectoryProvider implements DirectoryProvider&lt;RAMDirectory&gt; {
     private BuildContext context;
 
     public void initialize(

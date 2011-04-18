@@ -334,7 +334,8 @@ public class Myth {
 }
 
 Date birthdate = ...;
-Query luceneQuery = mythQb.keyword().onField("name").matching("Sisiphus").createQuery();
+Query luceneQuery = mythQb.keyword().onField("name").matching("Sisiphus")
+   .createQuery();
 </programlisting>
 
         <para>The matching word "Sisiphus" will be lower-cased and then split
@@ -504,7 +505,8 @@ Query luceneQuery = mythQB
         </itemizedlist>
 
         <para>The subqueries can be any Lucene query including a boolean query
-        itself. Let's look at a few examples:<programlisting><!--TODO role JAVA fails here. needs to investigate-->//look for popular modern myths that are not urban
+        itself. Let's look at a few examples:</para>
+        <programlisting language="JAVA" role="JAVA">//look for popular modern myths that are not urban
 Date twentiethCentury = ...;
 Query luceneQuery = mythQB
     .bool()
@@ -534,7 +536,7 @@ Query luceneQuery = mythQB
         .matching( "religion" )
         .createQuery() 
       )
-    .createQuery();</programlisting></para>
+    .createQuery();</programlisting>
       </section>
 
       <section>
@@ -628,11 +630,13 @@ org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQ
         <example id="example-filtering-by-entity-type">
           <title>Filtering the search result by entity type</title>
 
-          <programlisting language="JAVA" role="JAVA">fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+          <programlisting language="JAVA" role="JAVA">fullTextQuery = fullTextSession
+    .createFullTextQuery( luceneQuery, Customer.class );
 
 // or
 
-fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
+fullTextQuery = fullTextSession
+    .createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
         </example>
 
         <para>In <xref linkend="example-filtering-by-entity-type" /> the first
@@ -686,7 +690,8 @@ fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
 
           <programlisting language="JAVA" role="JAVA">
 org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
-org.apache.lucene.search.Sort sort = new Sort(new SortField("title", SortField.STRING));
+org.apache.lucene.search.Sort sort = new Sort(
+    new SortField("title", SortField.STRING));
 <emphasis role="bold">query.setSort(sort);</emphasis>
 List results = query.list();
 </programlisting>
@@ -749,7 +754,7 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
           <title>Using projection instead of returning the full domain
           object</title>
 
-          <programlisting>org.hibernate.search.FullTextQuery query = 
+          <programlisting language="JAVA" role="JAVA">org.hibernate.search.FullTextQuery query = 
     s.createFullTextQuery( luceneQuery, Book.class );
 query.<emphasis role="bold">setProjection( "id", "summary", "body", "mainAuthor.name" )</emphasis>;
 List results = query.list();
@@ -806,7 +811,7 @@ String authorName = firstResult[3];</programlisting>
         <example>
           <title>Using projection in order to retrieve meta data</title>
 
-          <programlisting>org.hibernate.search.FullTextQuery query = 
+          <programlisting language="JAVA" role="JAVA">org.hibernate.search.FullTextQuery query = 
     s.createFullTextQuery( luceneQuery, Book.class );
 query.<emphasis role="bold">setProjection( 
     FullTextQuery.SCORE, 
@@ -885,7 +890,7 @@ String authorName = firstResult[2];</programlisting>
         <example>
           <title>Check the second-level cache before using a query</title>
 
-          <programlisting>FullTextQuery query = session.createFullTextQuery(luceneQuery, User.class);
+          <programlisting language="JAVA" role="JAVA">FullTextQuery query = session.createFullTextQuery(luceneQuery, User.class);
 query.initializeObjectWith(
     ObjectLookupMethod.SECOND_LEVEL_CACHE,
     DatabaseRetrievalMethod.QUERY
@@ -1005,7 +1010,7 @@ query.initializeObjectWith(
           <example>
             <title>Defining a timeout in query execution</title>
 
-            <programlisting>Query luceneQuery = ...;
+            <programlisting language="JAVA" role="JAVA">Query luceneQuery = ...;
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
@@ -1041,7 +1046,7 @@ catch (org.hibernate.QueryTimeoutException e) {
           <example>
             <title>Defining a timeout in query execution</title>
 
-            <programlisting>Query luceneQuery = ...;
+            <programlisting language="JAVA" role="JAVA">Query luceneQuery = ...;
 FullTextQuery query = fullTextEM.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in milliseconds
@@ -1081,7 +1086,7 @@ catch (javax.persistence.QueryTimeoutException e) {
           <example>
             <title>Defining a time limit in query execution</title>
 
-            <programlisting>Query luceneQuery = ...;
+            <programlisting language="JAVA" role="JAVA">Query luceneQuery = ...;
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
@@ -1103,7 +1108,7 @@ List results = query.list();</programlisting>
           <example>
             <title>Determines when a query returns partial results</title>
 
-            <programlisting>Query luceneQuery = ...;
+            <programlisting language="JAVA" role="JAVA">Query luceneQuery = ...;
 FullTextQuery query = fullTextSession.createFullTextQuery(luceneQuery, User.class);
 
 //define the timeout in seconds
@@ -1162,7 +1167,7 @@ if ( query.hasPartialResults() ) {
       <literal>fetchSize</literal> objects in one pass.</para>
 
       <important>
-        <para>Pagination is a preferred over scrolling.</para>
+        <para>Pagination is preferred over scrolling.</para>
       </important>
     </section>
 
@@ -1196,7 +1201,7 @@ if ( query.hasPartialResults() ) {
       <example>
         <title>Determining the result size of a query</title>
 
-        <programlisting>org.hibernate.search.FullTextQuery query = 
+        <programlisting language="JAVA" role="JAVA">org.hibernate.search.FullTextQuery query = 
     s.createFullTextQuery( luceneQuery, Book.class );
 //return the number of matching books without loading a single one
 assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; 
@@ -1228,7 +1233,7 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; </program
       <example>
         <title>Using ResultTransformer in conjunction with projections</title>
 
-        <programlisting>org.hibernate.search.FullTextQuery query = 
+        <programlisting language="JAVA" role="JAVA">org.hibernate.search.FullTextQuery query = 
     s.createFullTextQuery( luceneQuery, Book.class );
 query.setProjection( "title", "mainAuthor.name" );
 
@@ -1289,7 +1294,7 @@ for(BookView view : results) {
         <title>Retrieving the Lucene Explanation object using
         projection</title>
 
-        <programlisting>FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )
+        <programlisting language="JAVA" role="JAVA">FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )
         .setProjection( 
              FullTextQuery.DOCUMENT_ID, 
              <emphasis role="bold">FullTextQuery.EXPLANATION</emphasis>, 
@@ -1342,7 +1347,7 @@ for (Object[] result : results) {
     <example>
       <title>Enabling fulltext filters for a given query</title>
 
-      <programlisting>fullTextQuery = s.createFullTextQuery( query, Driver.class );
+      <programlisting language="JAVA" role="JAVA">fullTextQuery = s.createFullTextQuery( query, Driver.class );
 fullTextQuery.enableFullTextFilter("bestDriver");
 fullTextQuery.enableFullTextFilter("security").setParameter( "login", "andre" );
 fullTextQuery.list(); //returns only best drivers where andre has credentials</programlisting>
@@ -1372,7 +1377,7 @@ fullTextQuery.list(); //returns only best drivers where andre has credentials</p
 })
 public class Driver { ... }</programlisting>
 
-      <programlisting>public class BestDriversFilter extends <emphasis
+      <programlisting language="JAVA" role="JAVA">public class BestDriversFilter extends <emphasis
           role="bold">org.apache.lucene.search.Filter</emphasis> {
 
     public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
@@ -1436,7 +1441,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     <example>
       <title>Using parameters in the actual filter implementation</title>
 
-      <programlisting>public class SecurityFilterFactory {
+      <programlisting language="JAVA" role="JAVA">public class SecurityFilterFactory {
     private Integer level;
 
     /**
@@ -1628,27 +1633,31 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
   return providers;
  }
 
- public DirectoryProvider&lt;?&gt; getDirectoryProviderForAddition(Class&lt;?&gt; entity, Serializable id, String idInString, Document document) {
+ public DirectoryProvider&lt;?&gt; getDirectoryProviderForAddition(
+     Class&lt;?&gt; entity, Serializable id, String idInString, Document document) {
   Integer customerID = Integer.parseInt(document.getField("customerID").stringValue());
   return providers[customerID];
  }
 
- public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForDeletion(Class&lt;?&gt; entity, Serializable id, String idInString) {
+ public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForDeletion(
+     Class&lt;?&gt; entity, Serializable id, String idInString) {
   return getDirectoryProvidersForAllShards();
  }
 
-<emphasis role="bold"> /**
+  /**
   * Optimization; don't search ALL shards and union the results; in this case, we 
   * can be certain that all the data for a particular customer Filter is in a single
   * shard; simply return that shard by customerID.
   */
- public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
+ public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForQuery(
+     FullTextFilterImplementor[] filters) {
   FFullTextFilter filter = getCustomerFilter(filters, "customer");
   if (filter == null) {
    return getDirectoryProvidersForAllShards();
   }
   else {
-   return new DirectoryProvider[] { providers[Integer.parseInt(filter.getParameter("customerID").toString())] };
+   return new DirectoryProvider[] { providers[Integer.parseInt(
+       filter.getParameter("customerID").toString())] };
   }
  }
 
@@ -1657,7 +1666,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
    if (filter.getName().equals(name)) return filter;
   }
   return null;
- }</emphasis>
+ }
 }</programlisting>
 
       <para>In this example, if the filter named <literal>customer</literal>
@@ -1679,7 +1688,6 @@ public class Customer {
    ...
 }
 
-
 FullTextQuery query = ftEm.createFullTextQuery(luceneQuery, Customer.class);
 <emphasis role="bold">query.enableFulltextFilter("customer").setParameter("CustomerID", 5);</emphasis>
 @SuppressWarnings("unchecked")
@@ -1693,7 +1701,7 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
     </section>
   </section>
 
-  <section>
+  <section id="query-faceting" revision="1">
     <title>Faceting</title>
 
     <para><ulink url="http://en.wikipedia.org/wiki/Faceted_search">Faceted
