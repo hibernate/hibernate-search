@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.collection.PersistentCollection;
 import org.hibernate.engine.EntityEntry;
 import org.hibernate.event.AbstractCollectionEvent;
 import org.hibernate.event.AbstractEvent;
@@ -239,7 +240,14 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 				//Should log really but we don't know if we're interested in this collection for indexing
 				return;
 			}
-			String collectionRole = event.getCollection().getRole();
+			PersistentCollection persistentCollection = event.getCollection();
+			final String collectionRole;
+			if ( persistentCollection != null ) {
+				collectionRole = persistentCollection.getRole();
+			}
+			else {
+				collectionRole = null;
+			}
 			AbstractDocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
 			
 			if ( documentBuilder != null && ! documentBuilder.isCollectionRoleExcluded( collectionRole ) ) {
