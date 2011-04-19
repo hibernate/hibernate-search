@@ -19,14 +19,16 @@
 
 package org.hibernate.search.infinispan;
 
+import static junit.framework.Assert.assertEquals;
+import static org.hibernate.search.infinispan.ClusterTestHelper.clusterSize;
+import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
+import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
@@ -48,7 +50,7 @@ import org.junit.Test;
  */
 public class LiveRunningTest {
 	
-	private static final int TEST_RUNS = 70;
+	private static final int TEST_RUNS = 17;
 	private static final int MAX_SLAVES = 5;
 	
 	private final FullTextSessionBuilder master = createClusterNode();
@@ -83,12 +85,12 @@ public class LiveRunningTest {
 	}
 
 	private void assertView(FullTextSessionBuilder node) {
-		Assert.assertEquals( slaves.size() + 1 , TwoNodesTest.clusterSize( node ) );
+		assertEquals( slaves.size() + 1 , clusterSize( node ) );
 		FullTextSession session = node.openFullTextSession();
 		try {
 			FullTextQuery fullTextQuery = session.createFullTextQuery( new MatchAllDocsQuery() );
 			int resultSize = fullTextQuery.getResultSize();
-			Assert.assertEquals( storedEmailsCount, resultSize );
+			assertEquals( storedEmailsCount, resultSize );
 		}
 		finally{
 			session.close();
@@ -134,32 +136,12 @@ public class LiveRunningTest {
 	
 	private void waitForAllJoinsCompleted() {
 		int expectedSize = slaves.size() + 1;
-		TwoNodesTest.waitMembersCount( master, expectedSize );
+		waitMembersCount( master, expectedSize );
 		for (FullTextSessionBuilder slave : slaves) {
-			TwoNodesTest.waitMembersCount( slave, expectedSize );
+			waitMembersCount( slave, expectedSize );
 		}
 	}
 
-	private FullTextSessionBuilder createClusterNode() {
-		FullTextSessionBuilder node = new FullTextSessionBuilder()
-			.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
-			// fragment on every 7 bytes: don't use this on a real case!
-			// only done to make sure we generate lots of small fragments.
-			.setProperty( "hibernate.search.default.chunk_size", "7" )
-			// this schema is shared across nodes, so don't drop it on shutdown:
-			.setProperty( Environment.HBM2DDL_AUTO, "create" )
-			.setProperty(
-					CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME,
-					"testing-hibernatesearch-infinispan.xml" )
-			// share the same in-memory database connection pool
-			.setProperty(
-					Environment.CONNECTION_PROVIDER,
-					org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
-					)
-			.addAnnotatedClass( SimpleEmail.class );
-		return node.build();
-	}
-	
 	@BeforeClass
 	public static void prepareConnectionPool() {
 		ClusterSharedConnectionProvider.realStart();

@@ -23,27 +23,23 @@
  */
 package org.hibernate.search.infinispan;
 
+import static junit.framework.Assert.assertEquals;
+import static org.hibernate.search.infinispan.ClusterTestHelper.clusterSize;
+import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
+import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
+
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
 import org.apache.lucene.search.Query;
-import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.remoting.transport.Address;
-
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 /**
  * We start two different Hibernate Search instances, both using
@@ -81,9 +77,7 @@ public class TwoNodesTest {
 		// verify nodeb is able to find it:
 		verifyNodeSeesUpdatedIndex( nodeb );
 		// now start a new node, it will join the cluster and receive the current index state:
-		FullTextSessionBuilder nodeC = new FullTextSessionBuilder();
-		prepareCommonConfiguration( nodeC );
-		nodeC.build();
+		FullTextSessionBuilder nodeC = createClusterNode();
 		assertEquals( 3, clusterSize( nodea ) );
 		try {
 			// verify the new node is able to perform the same searches:
@@ -122,61 +116,9 @@ public class TwoNodesTest {
 
 	@Before
 	public void setUp() throws Exception {
-		nodea = new FullTextSessionBuilder();
-		nodeb = new FullTextSessionBuilder();
-		prepareCommonConfiguration( nodea );
-		nodea.build();
-		prepareCommonConfiguration( nodeb );
-		nodeb.build();
-
+		nodea = createClusterNode();
+		nodeb = createClusterNode();
 		waitMembersCount( nodea, 2 );
-	}
-
-	/**
-	 * Wait some time for the cluster to form
-	 */
-	public static void waitMembersCount(FullTextSessionBuilder node, int expectedSize) {
-		int currentSize = 0;
-		int loopCounter = 0;
-		while ( currentSize < expectedSize ) {
-			try {
-				Thread.sleep( 10 );
-			}
-			catch ( InterruptedException e ) {
-				e.printStackTrace();
-			}
-			currentSize = clusterSize( node );
-			if ( loopCounter > 200 ) {
-				throw new AssertionFailedError( "timeout while waiting for all nodes to join in cluster" );
-			}
-		}
-	}
-
-	/**
-	 * Counts the number of nodes in the cluster on this node
-	 * @param node the FullTextSessionBuilder representing the current node
-	 * @return
-	 */
-	public static int clusterSize(FullTextSessionBuilder node) {
-		SearchFactory searchFactory = node.getSearchFactory();
-		DirectoryProvider[] directoryProviders = searchFactory.getDirectoryProviders( SimpleEmail.class );
-		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) directoryProviders[0];
-		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();
-		List<Address> members = cacheManager.getMembers();
-		return members.size();
-	}
-
-	private void prepareCommonConfiguration(FullTextSessionBuilder cfg) {
-		cfg.setProperty( "hibernate.search.default.directory_provider", "infinispan" );
-		cfg.setProperty(
-				CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME,
-				"testing-hibernatesearch-infinispan.xml"
-		)
-		.setProperty(
-					Environment.CONNECTION_PROVIDER,
-					org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
-					)
-		.addAnnotatedClass( SimpleEmail.class );
 	}
 
 	@After
