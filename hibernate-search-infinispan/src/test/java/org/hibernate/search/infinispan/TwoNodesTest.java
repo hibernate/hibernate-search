@@ -31,6 +31,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
 
 import org.hibernate.Transaction;
+import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -38,7 +39,9 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
@@ -132,11 +135,16 @@ public class TwoNodesTest {
 	/**
 	 * Wait some time for the cluster to form
 	 */
-	private void waitMembersCount(FullTextSessionBuilder node, int expectedSize) throws InterruptedException {
+	public static void waitMembersCount(FullTextSessionBuilder node, int expectedSize) {
 		int currentSize = 0;
 		int loopCounter = 0;
 		while ( currentSize < expectedSize ) {
-			Thread.sleep( 10 );
+			try {
+				Thread.sleep( 10 );
+			}
+			catch ( InterruptedException e ) {
+				e.printStackTrace();
+			}
 			currentSize = clusterSize( node );
 			if ( loopCounter > 200 ) {
 				throw new AssertionFailedError( "timeout while waiting for all nodes to join in cluster" );
@@ -149,7 +157,7 @@ public class TwoNodesTest {
 	 * @param node the FullTextSessionBuilder representing the current node
 	 * @return
 	 */
-	private int clusterSize(FullTextSessionBuilder node) {
+	public static int clusterSize(FullTextSessionBuilder node) {
 		SearchFactory searchFactory = node.getSearchFactory();
 		DirectoryProvider[] directoryProviders = searchFactory.getDirectoryProviders( SimpleEmail.class );
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) directoryProviders[0];
@@ -163,13 +171,27 @@ public class TwoNodesTest {
 		cfg.setProperty(
 				CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME,
 				"testing-hibernatesearch-infinispan.xml"
-		);
-		cfg.addAnnotatedClass( SimpleEmail.class );
+		)
+		.setProperty(
+					Environment.CONNECTION_PROVIDER,
+					org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
+					)
+		.addAnnotatedClass( SimpleEmail.class );
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		nodea.close();
 		nodeb.close();
+	}
+	
+	@BeforeClass
+	public static void prepareConnectionPool() {
+		ClusterSharedConnectionProvider.realStart();
+	}
+	
+	@AfterClass
+	public static void shutdownConnectionPool() {
+		ClusterSharedConnectionProvider.realStop();
 	}
 }

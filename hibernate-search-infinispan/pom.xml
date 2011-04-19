@@ -65,6 +65,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -81,7 +86,9 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</argLine>
+                    <!-- MaxPermSize is needed for profiling sessions,
+                         java.net.preferIPv4Stack and jgroups.bind_addr are needed for JGroups -->
+                    <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -XX:MaxPermSize=256m</argLine>
                     <systemProperties>
                         <property>
                             <name>com.sun.management.jmxremote</name>
