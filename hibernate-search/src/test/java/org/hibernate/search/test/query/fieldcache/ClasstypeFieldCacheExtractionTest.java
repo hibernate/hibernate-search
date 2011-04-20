@@ -117,12 +117,14 @@ public class ClasstypeFieldCacheExtractionTest {
 		QueryBuilder queryBuilder = builder.getSearchFactory().buildQueryBuilder().forEntity( Item.class ).get();
 		Query query = queryBuilder.all().createQuery();
 		FullTextSession fullTextSession = builder.openFullTextSession();
-		fullTextSession.beginTransaction();
+		Transaction transaction = fullTextSession.beginTransaction();
 		FieldSelectorLeakingReaderProvider.resetFieldSelector();
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query );
 		List list = fullTextQuery.list();
 		Assert.assertEquals( 2, list.size() );
 		FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled( expectedLoadedFields );
+		transaction.commit();
+		fullTextSession.close();
 	}
 
 	private void storeDemoData(FullTextSessionBuilder builder) {
