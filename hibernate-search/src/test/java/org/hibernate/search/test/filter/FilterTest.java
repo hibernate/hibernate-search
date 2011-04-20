@@ -40,6 +40,7 @@ import org.hibernate.search.test.SearchTestCase;
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class FilterTest extends SearchTestCase {
 
@@ -139,6 +140,11 @@ public class FilterTest extends SearchTestCase {
 		Filter dateFilter = new TermRangeFilter("delivery", "2001", "2005", true, true);
 		ftQuery.setFilter( dateFilter );
 		assertEquals("Should select only liz", 1, ftQuery.getResultSize() );
+		
+		ftQuery = s.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "bestDriver" );
+		ftQuery.enableFullTextFilter( "empty" );
+		assertEquals("two filters, one is empty, should not match anything", 0, ftQuery.getResultSize() );
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );
 		ftQuery.setFilter( dateFilter );
@@ -202,7 +208,6 @@ public class FilterTest extends SearchTestCase {
 		setCfg( null ); // force a configuration rebuild
 	}
 
-	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Driver.class,

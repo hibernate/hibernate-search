@@ -46,7 +46,8 @@ import org.hibernate.search.annotations.FilterCacheModeType;
 		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache = FilterCacheModeType.NONE), //actual Filter implementation
 		@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS), //Filter factory with parameters
 		@FullTextFilterDef(name = "cacheresultstest", impl = ExcludeAllFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
-		@FullTextFilterDef(name = "cacheinstancetest", impl = InstanceBasedExcludeAllFilter.class, cache = FilterCacheModeType.INSTANCE_ONLY)
+		@FullTextFilterDef(name = "cacheinstancetest", impl = InstanceBasedExcludeAllFilter.class, cache = FilterCacheModeType.INSTANCE_ONLY),
+		@FullTextFilterDef(name = "empty", impl = NullReturningEmptyFilter.class, cache = FilterCacheModeType.INSTANCE_ONLY)
 })
 public class Driver {
 	@Id
