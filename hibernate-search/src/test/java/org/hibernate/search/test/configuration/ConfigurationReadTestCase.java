@@ -43,10 +43,6 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 
 	private SearchFactoryImplementor searchFactory;
 
-	protected enum TransactionType {
-		TRANSACTION, BATCH
-	}
-	
 	public ConfigurationReadTestCase() {
 		
 	}
@@ -61,45 +57,33 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 		getBaseIndexDir().mkdirs();
 	}
 
-	protected final void assertValueIsDefault(Class testEntity, TransactionType parmGroup, IndexWriterSetting setting) {
-		assertValueIsDefault( testEntity, 0, parmGroup, setting );
+	protected final void assertValueIsDefault(Class testEntity, IndexWriterSetting setting) {
+		assertValueIsDefault( testEntity, 0, setting );
 	}
 
-	protected final void assertValueIsDefault(Class testEntity, int shard, TransactionType parmGroup, IndexWriterSetting setting) {
-		boolean batch = isBatch( parmGroup );
-		assertNull( "shard:" + shard + " batch=" + batch + " setting:" + setting.getKey() + " : value was expected unset!",
-				getParameter( shard, batch, setting, testEntity ) );
+	protected final void assertValueIsDefault(Class testEntity, int shard, IndexWriterSetting setting) {
+		assertNull( "shard:" + shard + " setting:" + setting.getKey() + " : value was expected unset!",
+				getParameter( shard, setting, testEntity ) );
 	}
 
-	protected final void assertValueIsSet(Class testEntity, TransactionType parmGroup, IndexWriterSetting setting, int expectedValue) {
-		assertValueIsSet( testEntity, 0, parmGroup, setting, expectedValue );
+	protected final void assertValueIsSet(Class testEntity, IndexWriterSetting setting, int expectedValue) {
+		assertValueIsSet( testEntity, 0, setting, expectedValue );
 	}
 
-	protected final void assertValueIsSet(Class testEntity, int shard, TransactionType parmGroup, IndexWriterSetting setting, int expectedValue) {
-		boolean batch = isBatch( parmGroup );
-		assertNotNull( "shard:" + shard + " batch=" + batch + " setting:" + setting.getKey(),
-				getParameter( shard, batch, setting, testEntity ) );
-		assertEquals( "shard:" + shard + " batch=" + batch + " setting:" + setting.getKey(), expectedValue,
-				(int) getParameter( shard, batch, setting, testEntity ) );
+	protected final void assertValueIsSet(Class testEntity, int shard, IndexWriterSetting setting, int expectedValue) {
+		assertNotNull( "shard:" + shard + " setting:" + setting.getKey(),
+				getParameter( shard, setting, testEntity ) );
+		assertEquals( "shard:" + shard + " setting:" + setting.getKey(), expectedValue,
+				(int) getParameter( shard, setting, testEntity ) );
 	}
 
 	protected final SearchFactoryImplementor getSearchFactory() {
 		return searchFactory;
 	}
 
-	private boolean isBatch(TransactionType parmGroup) {
-		return parmGroup == TransactionType.BATCH;
-	}
-
-	private Integer getParameter(int shard, boolean batch, IndexWriterSetting setting, Class testEntity) {
-		if ( batch ) {
-			return searchFactory.getIndexingParameters( searchFactory.getDirectoryProviders( testEntity )[shard] )
-															.getBatchIndexParameters().getCurrentValueFor( setting );
-		}
-		else {
-			return searchFactory.getIndexingParameters( searchFactory.getDirectoryProviders( testEntity )[shard] )
-															.getTransactionIndexParameters().getCurrentValueFor( setting );
-		}
+	private Integer getParameter(int shard, IndexWriterSetting setting, Class testEntity) {
+		return searchFactory.getIndexingParameters( searchFactory.getDirectoryProviders( testEntity )[shard] )
+														.getIndexParameters().getCurrentValueFor( setting );
 	}
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {

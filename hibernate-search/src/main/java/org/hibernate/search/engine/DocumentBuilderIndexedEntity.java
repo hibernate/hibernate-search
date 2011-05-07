@@ -349,13 +349,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return id;
 	}
 	
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue) {
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue) {
 		String idInString = objectToString( idBridge, idKeywordName, id );
 		if ( delete ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		if ( add ) {
-			queue.add( createAddWork( entityClass, entity, id, idInString, HibernateStatelessInitializer.INSTANCE, batch ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, HibernateStatelessInitializer.INSTANCE ) );
 		}
 	}
 	
@@ -375,15 +375,15 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return contextualBridge.objectToString( value );
 	}
 
-	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, EntityInitializer sessionInitializer, boolean isBatch) {
+	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, EntityInitializer sessionInitializer) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
 		AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
-			addWork = new AddLuceneWork( id, idInString, entityClass, doc, isBatch );
+			addWork = new AddLuceneWork( id, idInString, entityClass, doc );
 		}
 		else {
-			addWork = new AddLuceneWork( id, idInString, entityClass, doc, fieldToAnalyzerMap, isBatch );
+			addWork = new AddLuceneWork( id, idInString, entityClass, doc, fieldToAnalyzerMap );
 		}
 		return addWork;
 	}

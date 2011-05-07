@@ -1,6 +1,6 @@
 Hibernate Search
 ==================================================
-Version: 3.4.0.Final, 18-04-2011
+Version: 4.0.0-SNAPSHOT dd-mm-yyyy
 
 Description
 -----------

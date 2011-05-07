@@ -65,7 +65,7 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	}
 
 	@Override
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, boolean batch, List<LuceneWork> queue) {
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue) {
 		// nothing to do
 	}
 

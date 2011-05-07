@@ -46,11 +46,6 @@ public abstract class LuceneWork implements Serializable {
 	private final Document document;
 	private final Class entityClass;
 	private final Serializable id;
-	
-	/**
-	 * Flag indicating if this lucene work has to be indexed in batch mode.
-	 */
-	private final boolean batch;
 	private final String idInString;
 
 	public LuceneWork(Serializable id, String idInString, Class entity) {
@@ -58,19 +53,10 @@ public abstract class LuceneWork implements Serializable {
 	}
 
 	public LuceneWork(Serializable id, String idInString, Class entity, Document document) {
-		this( id, idInString, entity, document, false );
-	}
-
-	public LuceneWork(Serializable id, String idInString, Class entity, Document document, boolean batch) {
 		this.id = id;
 		this.idInString = idInString;
 		this.entityClass = entity;
 		this.document = document;
-		this.batch = batch;
-	}
-
-	public boolean isBatch() {
-		return batch;
 	}
 
 	public Document getDocument() {

@@ -1217,24 +1217,22 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     either as default values applying for all indexes, on a per index basis,
     or even per shard.</para>
 
-    <para>There are two sets of parameters allowing for different performance
-    settings depending on the use case. During indexing operations triggered
-    by database modifications, the parameters are grouped by the
-    <literal>transaction</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.transaction.&lt;parameter_name&gt;</programlisting>
-    When indexing occurs via <literal>FullTextSession.index()</literal> or via
-    a <classname>MassIndexer</classname> (see <xref
-    linkend="search-batchindex" />), the used properties are those grouped
-    under the <literal>batch</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.&lt;parameter_name&gt;</programlisting></para>
+    <para>There are several low level <literal>IndexWriter</literal> settings
+    which can be tuned for different use cases. These parameters are grouped by the
+    <literal>indexwriter</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.&lt;parameter_name&gt;</programlisting>
+    </para>
 
-    <para>If no value is set for a <literal>batch</literal> value in a
+    <para>If no value is set for an <literal>indexwriter</literal> value in a
     specific shard configuration, Hibernate Search will look at the index
     section, then at the default section.<example
         id="example-performamce-option-configuration">
         <title>Example performance option configuration</title>
 
-        <programlisting>hibernate.search.Animals.2.indexwriter.transaction.max_merge_docs 10
-hibernate.search.Animals.2.indexwriter.transaction.merge_factor 20
-hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
+        <programlisting>hibernate.search.Animals.2.indexwriter.max_merge_docs 10
+hibernate.search.Animals.2.indexwriter.merge_factor 20
+hibernate.search.Animals.2.indexwriter.term_index_interval default
+hibernate.search.default.indexwriter.max_merge_docs 100
+hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
       </example> The configuration in <xref
     linkend="example-performamce-option-configuration" /> will result in these
     settings applied on the second shard of the <classname>Animal</classname>
@@ -1242,19 +1240,19 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
 
     <itemizedlist>
       <listitem>
-        <para><literal>transaction.max_merge_docs</literal> = 10</para>
+        <para><literal>max_merge_docs</literal> = 10</para>
       </listitem>
 
       <listitem>
-        <para><literal>batch.max_merge_docs</literal> = 100</para>
+        <para><literal>merge_factor</literal> = 20</para>
       </listitem>
 
       <listitem>
-        <para><literal>transaction.merge_factor</literal> = 20</para>
+        <para><literal>ram_buffer_size</literal> = 64MB</para>
       </listitem>
-
+      
       <listitem>
-        <para><literal>batch.merge_factor</literal> = Lucene default</para>
+        <para><literal>term_index_interval</literal> = Lucene default</para>
       </listitem>
     </itemizedlist>
 
@@ -1267,11 +1265,11 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
     about Lucene indexing performance, please refer to the Lucene
     documentation.</para>
 
-    <warning>
-      <para>Previous versions had the <literal>batch</literal> parameters
-      inherit from <literal>transaction</literal> properties. This needs now
-      to be explicitly set.</para>
-    </warning>
+    <info>
+      <para>Previous versions had a concepts of <literal>batch</literal>
+      and <literal>transaction</literal> properties. This is no longer the case
+      as the backend will always perform work using the same settings.</para>
+    </info>
 
     <table id="table-performance-parameters">
       <title>List of indexing performance and behavior properties</title>
@@ -1314,7 +1312,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_delete_terms</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_buffered_delete_terms</literal></entry>
 
             <entry><para>Determines the minimal number of delete terms
             required before the buffered in-memory delete terms are applied
@@ -1325,7 +1323,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_buffered_docs</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_buffered_docs</literal></entry>
 
             <entry><para>Controls the amount of documents buffered in memory
             during indexing. The bigger the more RAM is
@@ -1335,18 +1333,17 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].max_merge_docs</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_merge_docs</literal></entry>
 
             <entry><para>Defines the largest number of documents allowed in a
-            segment. Larger values are best for batched indexing and speedier
-            searches. Small values are best for transaction
-            indexing.</para></entry>
+            segment. Smaller values perform better on frequently changing indexes, larger values
+            provide better search performance if the index does not change often.</para></entry>
 
             <entry>Unlimited (Integer.MAX_VALUE)</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].merge_factor</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_factor</literal></entry>
 
             <entry><para>Controls segment merge frequency and size. </para>
             <para>Determines how often segment indexes are merged when
@@ -1356,14 +1353,14 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
             during indexing, and while searches on unoptimized indexes are
             slower, indexing is faster. Thus larger values (&gt; 10) are best
             for batch index creation, and smaller values (&lt; 10) for indexes
-            that are interactively maintained. The value must no be lower than
+            that are interactively maintained. The value must not be lower than
             2.</para></entry>
 
             <entry>10</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].ram_buffer_size</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.ram_buffer_size</literal></entry>
 
             <entry><para>Controls the amount of RAM in MB dedicated to
             document buffers. When used together max_buffered_docs a flush
@@ -1376,7 +1373,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].term_index_interval</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.term_index_interval</literal></entry>
 
             <entry><para>Expert: Set the interval between indexed
             terms.</para> <para>Large values cause less memory to be used by
@@ -1389,7 +1386,7 @@ hibernate.search.default.indexwriter.batch.max_merge_docs 100</programlisting>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.[transaction|batch].use_compound_file</literal></entry>
+            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.use_compound_file</literal></entry>
 
             <entry>The advantage of using the compound file format is that
             less file descriptors are used. The disadvantage is that indexing

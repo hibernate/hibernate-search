@@ -290,23 +290,23 @@ transaction.commit();</programlisting>
       </listitem>
 
       <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_buffered_docs</literal>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_buffered_docs</literal>
       </listitem>
 
       <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.max_merge_docs</literal>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_merge_docs</literal>
       </listitem>
 
       <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.merge_factor</literal>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_factor</literal>
       </listitem>
 
       <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.ram_buffer_size</literal>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.ram_buffer_size</literal>
       </listitem>
 
       <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.batch.term_index_interval</literal>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.term_index_interval</literal>
       </listitem>
       
       <listitem>

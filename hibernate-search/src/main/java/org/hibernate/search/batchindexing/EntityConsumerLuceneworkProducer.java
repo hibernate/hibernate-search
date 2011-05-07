@@ -157,7 +157,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 		String idInString = contextualBridge.objectToString( id );
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
-		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer, true );
+		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer );
 		backend.enqueueAsyncWork( addWork );
 	}
 	

@@ -93,7 +93,7 @@ class DirectoryProviderWorkspace {
 	public void doWorkInSync(LuceneWork work) {
 		checkIsNotClosed();
 		LuceneWorkDelegate delegate = work.getWorkDelegate( visitor );
-		delegate.performWork( work, workspace.getIndexWriter( true ) );
+		delegate.performWork( work, workspace.getIndexWriter() );
 		delegate.logWorkDone( work , monitor );
 		//if the IndexWriter was opened, it's not closed now.
 	}

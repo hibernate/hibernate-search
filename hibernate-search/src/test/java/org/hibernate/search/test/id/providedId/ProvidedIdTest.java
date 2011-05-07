@@ -64,8 +64,8 @@ public class ProvidedIdTest {
 				.addClass( ProvidedIdPersonSub.class )
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() )
-				.addProperty( "hibernate.search.default.transaction.merge_factor", "100" )
-				.addProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
+				.addProperty( "hibernate.search.default.indexwriter.merge_factor", "100" )
+				.addProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 
 		ProvidedIdPerson person1 = new ProvidedIdPerson();

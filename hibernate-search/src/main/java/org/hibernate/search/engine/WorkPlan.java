@@ -323,13 +323,6 @@ public class WorkPlan {
 		private boolean add = false;
 		
 		/**
-		 * Any work of type {@link WorkType#INDEX} triggers batch=true for the whole unit of work,
-		 * so if any work enables it it stays enabled for everyone.
-		 * Having batch=true currently only affects the IndexWriter performance tuning options.
-		 */
-		private boolean batch = false;
-		
-		/**
 		 * Needed to stop recursion for processing ContainedIn
 		 * of already processed instances.
 		 */
@@ -373,7 +366,6 @@ public class WorkPlan {
 			case INDEX:
 				add = true;
 				delete = true;
-				batch = true;
 				break;
 			case PURGE_ALL:
 				// not breaking intentionally: PURGE_ALL should not reach this
@@ -396,8 +388,6 @@ public class WorkPlan {
 			WorkType type = work.getType();
 			switch ( type ) {
 			case INDEX:
-				batch = true;
-				// not breaking intentionally
 			case UPDATE:
 				if ( add && !delete ) {
 					// noop: the entity was newly created in this same unit of work
@@ -446,7 +436,7 @@ public class WorkPlan {
 		 */
 		public void enqueueLuceneWork(Class<T> entityClass, Serializable indexingId, AbstractDocumentBuilder<T> entityBuilder, List<LuceneWork> luceneQueue) {
 			if ( add || delete ) {
-				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, batch, luceneQueue );
+				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue );
 			}
 		}
 		
