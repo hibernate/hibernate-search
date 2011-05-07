@@ -19,9 +19,9 @@
 
 package org.hibernate.search.query.fieldcache;
 
-import org.hibernate.search.bridge.NullEncodingTwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.DoubleNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.FloatNumericFieldBridge;
@@ -76,7 +76,7 @@ public class ClassLoadingStrategySelector {
 			return getTwoWayStringBridge( encoding.unwrap() );
 		}
 		else if ( fieldBridge instanceof TwoWayString2FieldBridgeAdaptor ) {
-			TwoWayString2FieldBridgeAdaptor adaptor = (TwoWayString2FieldBridgeAdaptor) fieldBridge;
+			TwoWayString2FieldBridgeAdaptor adaptor = (TwoWayString2FieldBridgeAdaptor ) fieldBridge;
 			return adaptor.unwrap();
 		}
 		else {
