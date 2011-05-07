@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
 
-import org.hibernate.search.batchindexing.Executors;
+import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**

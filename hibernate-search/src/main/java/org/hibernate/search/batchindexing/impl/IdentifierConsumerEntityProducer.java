@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.batchindexing;
+package org.hibernate.search.batchindexing.impl;
 
 import java.io.Serializable;
 import java.util.List;
@@ -35,6 +35,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.LoggerFactory;
 import org.slf4j.Logger;
 

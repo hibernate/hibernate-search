@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
-import org.hibernate.search.batchindexing.Executors;
+import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.spi.SearchFactoryIntegrator;

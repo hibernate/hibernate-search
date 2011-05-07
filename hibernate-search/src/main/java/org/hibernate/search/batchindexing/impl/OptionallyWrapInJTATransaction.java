@@ -1,4 +1,4 @@
-package org.hibernate.search.batchindexing;
+package org.hibernate.search.batchindexing.impl;
 
 import javax.transaction.Status;
 import javax.transaction.SystemException;
