@@ -65,7 +65,7 @@ public class ClusterTestHelper {
 			.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
 			// fragment on every 7 bytes: don't use this on a real case!
 			// only done to make sure we generate lots of small fragments.
-			.setProperty( "hibernate.search.default.chunk_size", "13" )
+			.setProperty( "hibernate.search.default.indexwriter.chunk_size", "13" )
 			// this schema is shared across nodes, so don't drop it on shutdown:
 			.setProperty( Environment.HBM2DDL_AUTO, "create" )
 			.setProperty(

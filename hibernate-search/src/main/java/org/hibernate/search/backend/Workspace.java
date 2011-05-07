@@ -83,7 +83,6 @@ public class Workspace {
 	private final ErrorHandler errorHandler;
 	
 	private final IndexWriterConfig writerConfig = new IndexWriterConfig( Version.LUCENE_31, SIMPLE_ANALYZER );
-	private final IndexWriterConfig batchWriterConfig = new IndexWriterConfig( Version.LUCENE_31, SIMPLE_ANALYZER );
 
 	// variable state:
 	
@@ -106,11 +105,9 @@ public class Workspace {
 		this.indexingParams = context.getIndexingParameters( directoryProvider );
 		this.errorHandler = errorHandler;
 		LuceneIndexingParameters indexingParams = context.getIndexingParameters( directoryProvider );
-		indexingParams.applyToWriter( writerConfig, false );
-		indexingParams.applyToWriter( batchWriterConfig, true );
+		indexingParams.applyToWriter( writerConfig );
 		Similarity similarity = context.getSimilarity( directoryProvider );
 		writerConfig.setSimilarity( similarity );
-		batchWriterConfig.setSimilarity( similarity );
 	}
 
 	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilder(Class<T> entity) {
@@ -161,25 +158,16 @@ public class Workspace {
 
 	/**
 	 * Gets the IndexWriter, opening one if needed.
-	 * @param batchmode when true the indexWriter settings for batch mode will be applied.
-	 * Ignored if IndexWriter is open already.
 	 * @param errorContextBuilder might contain some context useful to provide when handling IOExceptions
 	 * @return a new IndexWriter or one already open.
 	 */
-	public synchronized IndexWriter getIndexWriter(boolean batchmode, ErrorContextBuilder errorContextBuilder) {
+	public synchronized IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
 		if ( writer != null )
 			return writer;
 		try {
-			if ( batchmode ) {
-				ParameterSet indexingParameters = indexingParams.getBatchIndexParameters();
-				writer = createNewIndexWriter( directoryProvider, this.batchWriterConfig, indexingParameters );
-				log.trace( "IndexWriter opened using batch configuration" );
-			}
-			else {
-				ParameterSet indexingParameters = indexingParams.getTransactionIndexParameters();
-				writer = createNewIndexWriter( directoryProvider, this.writerConfig, indexingParameters );
-				log.trace( "IndexWriter opened using default configuration" );
-			}
+			ParameterSet indexingParameters = indexingParams.getIndexParameters();
+			writer = createNewIndexWriter( directoryProvider, this.writerConfig, indexingParameters );
+			log.trace( "IndexWriter opened" );
 		}
 		catch ( IOException ioe ) {
 			writer = null;
@@ -204,10 +192,10 @@ public class Workspace {
 	}
 
 	/**
-	 * @see #getIndexWriter(boolean, ErrorContextBuilder)
+	 * @see #getIndexWriter(ErrorContextBuilder)
 	 */
-	public IndexWriter getIndexWriter(boolean batchmode) {
-		return getIndexWriter( batchmode, null );
+	public IndexWriter getIndexWriter() {
+		return getIndexWriter( null );
 	}
 
 	/**

@@ -62,9 +62,6 @@ class PerDPQueueProcessor implements Runnable {
 	private final List<LuceneWork> workOnWriter = new ArrayList<LuceneWork>();
 	private final ErrorHandler handler;
 	
-	// if any work needs batchmode, set corresponding flag to true:
-	private boolean batchmode = false;
-	
 	/**
 	 * @param resources All resources for the given DirectoryProvider are collected
 	 *  from this wrapping object.
@@ -82,10 +79,6 @@ class PerDPQueueProcessor implements Runnable {
 	 * @param work
 	 */
 	public void addWork(LuceneWork work) {
-		if ( work.isBatch() ) {
-			batchmode = true;
-			log.debug( "Batch mode enabled" );
-		}
 		workOnWriter.add( work );
 	}
 
@@ -100,7 +93,7 @@ class PerDPQueueProcessor implements Runnable {
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
 		errorContextBuilder.allWorkToBeDone( workOnWriter );
 		try {
-			IndexWriter indexWriter = workspace.getIndexWriter( batchmode, errorContextBuilder );
+			IndexWriter indexWriter = workspace.getIndexWriter(  errorContextBuilder );
 			try {
 				for ( LuceneWork lw : workOnWriter ) {
 					lw.getWorkDelegate( worker ).performWork( lw, indexWriter );

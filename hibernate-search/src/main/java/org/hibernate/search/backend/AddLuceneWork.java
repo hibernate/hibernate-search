@@ -38,19 +38,11 @@ public class AddLuceneWork extends LuceneWork implements Serializable {
 	private final Map<String, String> fieldToAnalyzerMap;
 
 	public AddLuceneWork(Serializable id, String idInString, Class entity, Document document) {
-		this( id, idInString, entity, document, false );
-	}
-
-	public AddLuceneWork(Serializable id, String idInString, Class entity, Document document, boolean batch) {
-		this( id, idInString, entity, document, null, batch );
+		this( id, idInString, entity, document, null );
 	}
 
 	public AddLuceneWork(Serializable id, String idInString, Class entity, Document document, Map<String, String> fieldToAnalyzerMap) {
-		this( id, idInString, entity, document, fieldToAnalyzerMap, false );
-	}
-
-	public AddLuceneWork(Serializable id, String idInString, Class entity, Document document, Map<String, String> fieldToAnalyzerMap, boolean batch) {
-		super( id, idInString, entity, document, batch );
+		super( id, idInString, entity, document );
 		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
 	}
 

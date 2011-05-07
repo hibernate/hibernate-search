@@ -150,8 +150,8 @@ public abstract class SearchTestCase extends HibernateTestCase {
 		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 
-		cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
-		cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
+		cfg.setProperty( "hibernate.search.default.indexwriter.merge_factor", "100" );
+		cfg.setProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
 	}
 
 	protected Directory getDirectory(Class<?> clazz) {

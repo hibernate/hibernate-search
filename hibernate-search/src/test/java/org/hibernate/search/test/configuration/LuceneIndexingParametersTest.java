@@ -38,8 +38,6 @@ import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERG
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.RAM_BUFFER_SIZE;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.USE_COMPOUND_FILE;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_FIELD_LENGTH;
-import static org.hibernate.search.test.configuration.ConfigurationReadTestCase.TransactionType.TRANSACTION;
-import static org.hibernate.search.test.configuration.ConfigurationReadTestCase.TransactionType.BATCH;
 
 /**
  * @author Sanne Grinovero
@@ -49,85 +47,55 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		
-		cfg.setProperty( "hibernate.search.default.batch.ram_buffer_size", "1" );
-		cfg.setProperty( "hibernate.search.default.transaction.use_compound_file", "false" );
-		cfg.setProperty( "hibernate.search.default.batch.use_compound_file", "true" ); //should see a warning about this
-//set by super : cfg.setProperty( "hibernate.search.default.batch.max_buffered_docs", "1000" );
+		cfg.setProperty( "hibernate.search.default.indexwriter.ram_buffer_size", "1" );
+		cfg.setProperty( "hibernate.search.default.indexwriter.use_compound_file", "false" );
+//set by super : cfg.setProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
+		cfg.setProperty( "hibernate.search.default.indexwriter.max_merge_docs", "9" );
+//set by super : cfg.setProperty( "hibernate.search.default.indexwriter.merge_factor", "100" );
 		
-		cfg.setProperty( "hibernate.search.default.transaction.ram_buffer_size", "2" );
-		cfg.setProperty( "hibernate.search.default.transaction.max_merge_docs", "9" );
-//set by super : cfg.setProperty( "hibernate.search.default.transaction.merge_factor", "100" );
-		cfg.setProperty( "hibernate.search.default.transaction.max_buffered_docs", "11" );
+		cfg.setProperty( "hibernate.search.Book.indexwriter.max_merge_docs", "12" );
+		cfg.setProperty( "hibernate.search.Book.indexwriter.use_compound_file", "false" );
+		cfg.setProperty( "hibernate.search.Book.indexwriter.merge_factor", "13" );
+		cfg.setProperty( "hibernate.search.Book.indexwriter.max_buffered_docs", "14" );
+		cfg.setProperty( "hibernate.search.Book.indexwriter.ram_buffer_size", "4" );
 		
-		cfg.setProperty( "hibernate.search.Book.batch.max_merge_docs", "12" );
-		cfg.setProperty( "hibernate.search.Book.transaction.use_compound_file", "false" );
-		cfg.setProperty( "hibernate.search.Book.batch.merge_factor", "13" );
-		// new keyword "indexwriter" is also supported to group parameters:
-		cfg.setProperty( "hibernate.search.Book.indexwriter.batch.max_buffered_docs", "14" );
-		
-		cfg.setProperty( "hibernate.search.Book.indexwriter.transaction.ram_buffer_size", "4" );
-		cfg.setProperty( "hibernate.search.Book.transaction.max_merge_docs", "15" );
-		cfg.setProperty( "hibernate.search.Book.transaction.merge_factor", "16" );
-		cfg.setProperty( "hibernate.search.Book.transaction.max_buffered_docs", "17" );
-		
-		cfg.setProperty( "hibernate.search.Documents.transaction.ram_buffer_size", "default" );
-		cfg.setProperty( "hibernate.search.Documents.transaction.max_merge_docs", "5" );
-		cfg.setProperty( "hibernate.search.Documents.transaction.merge_factor", "6" );
-		cfg.setProperty( "hibernate.search.Documents.transaction.max_buffered_docs", "7" );
-		cfg.setProperty( "hibernate.search.Documents.batch.max_merge_docs", "9" );
-		cfg.setProperty( "hibernate.search.Documents.transaction.max_field_length", "7" );
-		cfg.setProperty( "hibernate.search.Documents.batch.max_field_length", "9" );
+		cfg.setProperty( "hibernate.search.Documents.indexwriter.ram_buffer_size", "default" );
+		cfg.setProperty( "hibernate.search.Documents.indexwriter.merge_factor", "6" );
+		cfg.setProperty( "hibernate.search.Documents.indexwriter.max_buffered_docs", "7" );
+		cfg.setProperty( "hibernate.search.Documents.indexwriter.max_merge_docs", "9" );
+		cfg.setProperty( "hibernate.search.Documents.indexwriter.max_field_length", "9" );
 	}
 	
 	public void testDefaultIndexProviderParameters() {
-		assertValueIsSet( Author.class, BATCH, USE_COMPOUND_FILE, 1 );
-		assertValueIsSet( Author.class, TRANSACTION, RAM_BUFFER_SIZE, 2 );
-		assertValueIsSet( Author.class, TRANSACTION, MAX_MERGE_DOCS, 9 );
-		assertValueIsSet( Author.class, TRANSACTION, MAX_BUFFERED_DOCS,  11 );
-		assertValueIsSet( Author.class, TRANSACTION, MERGE_FACTOR,  100 );
-	}
-	
-	public void testBatchParametersGlobals() {
-		assertValueIsSet( Author.class, BATCH, RAM_BUFFER_SIZE, 1 );
-		assertValueIsDefault( Author.class, BATCH, MAX_MERGE_DOCS );
-		assertValueIsSet( Author.class, BATCH, MAX_BUFFERED_DOCS, 1000 );
+		assertValueIsSet( Author.class, USE_COMPOUND_FILE, 0 );
+		assertValueIsSet( Author.class, RAM_BUFFER_SIZE, 1 );
+		assertValueIsSet( Author.class, MAX_MERGE_DOCS, 9 );
+		assertValueIsSet( Author.class, MAX_BUFFERED_DOCS,  1000 );
+		assertValueIsSet( Author.class, MERGE_FACTOR,  100 );
 	}
 	
 	public void testMaxFieldLength() {
 		// there should also be logged a warning being logged about these:
-		assertValueIsSet( Document.class, TRANSACTION, MAX_FIELD_LENGTH, 7 );
-		assertValueIsSet( Document.class, BATCH, MAX_FIELD_LENGTH, 9 );
+		assertValueIsSet( Document.class, MAX_FIELD_LENGTH, 9 );
 	}
 	
-	public void testExplicitBatchParameters() {
-		assertValueIsSet( Book.class, BATCH, MAX_MERGE_DOCS, 12 );
-		assertValueIsSet( Book.class, BATCH, MAX_BUFFERED_DOCS, 14 );
-		assertValueIsSet( Book.class, BATCH, MERGE_FACTOR, 13 );
-		assertValueIsSet( Book.class, TRANSACTION, USE_COMPOUND_FILE, 0 );
-	}
-	
-	public void testInheritedBatchParameters() {
-		assertValueIsSet( Book.class, BATCH, RAM_BUFFER_SIZE, 1 );
-	}
-	
-	public void testTransactionParameters() {
-		assertValueIsSet( Book.class, TRANSACTION, RAM_BUFFER_SIZE, 4 );
-		assertValueIsSet( Book.class, TRANSACTION, MAX_MERGE_DOCS, 15 );
-		assertValueIsSet( Book.class, TRANSACTION, MAX_BUFFERED_DOCS, 17 );
-		assertValueIsSet( Book.class, TRANSACTION, MERGE_FACTOR, 16 );
+	public void testSpecificTypeParametersOverride() {
+		assertValueIsSet( Book.class, MAX_MERGE_DOCS, 12 );
+		assertValueIsSet( Book.class, MAX_BUFFERED_DOCS, 14 );
+		assertValueIsSet( Book.class, MERGE_FACTOR, 13 );
+		assertValueIsSet( Book.class, USE_COMPOUND_FILE, 0 );
+		assertValueIsSet( Book.class, RAM_BUFFER_SIZE, 4 );
 	}
 	
 	public void testDefaultKeywordOverwritesInherited() {
-		assertValueIsDefault( Document.class, TRANSACTION, RAM_BUFFER_SIZE );
-		assertValueIsDefault( Document.class, TRANSACTION, RAM_BUFFER_SIZE );
+		assertValueIsDefault( Document.class, RAM_BUFFER_SIZE );
 	}
 	
 	public void testSerializability() throws IOException, ClassNotFoundException {
 		LuceneIndexingParameters param = new LuceneIndexingParameters( new Properties() );
 		LuceneIndexingParameters paramCopy = (LuceneIndexingParameters)
 			SerializationTestHelper.duplicateBySerialization( param );
-		assertEquals( param.getBatchIndexParameters(), paramCopy.getBatchIndexParameters() );
-		assertEquals( param.getTransactionIndexParameters(), paramCopy.getTransactionIndexParameters() );
+		assertEquals( param.getIndexParameters(), paramCopy.getIndexParameters() );
 	}
 	
 	protected Class<?>[] getAnnotatedClasses() {
