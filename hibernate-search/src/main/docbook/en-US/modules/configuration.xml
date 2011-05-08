@@ -1218,9 +1218,8 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     or even per shard.</para>
 
     <para>There are several low level <literal>IndexWriter</literal> settings
-    which can be tuned for different use cases. These parameters are grouped by the
-    <literal>indexwriter</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.&lt;parameter_name&gt;</programlisting>
-    </para>
+    which can be tuned for different use cases. These parameters are grouped
+    by the <literal>indexwriter</literal> keyword: <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexwriter.&lt;parameter_name&gt;</programlisting></para>
 
     <para>If no value is set for an <literal>indexwriter</literal> value in a
     specific shard configuration, Hibernate Search will look at the index
@@ -1250,7 +1249,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
       <listitem>
         <para><literal>ram_buffer_size</literal> = 64MB</para>
       </listitem>
-      
+
       <listitem>
         <para><literal>term_index_interval</literal> = Lucene default</para>
       </listitem>
@@ -1266,9 +1265,10 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
     documentation.</para>
 
     <info>
-      <para>Previous versions had a concepts of <literal>batch</literal>
-      and <literal>transaction</literal> properties. This is no longer the case
-      as the backend will always perform work using the same settings.</para>
+      <para>Previous versions of Search had the notion of
+      <literal>batch</literal> and <literal>transaction</literal> properties.
+      This is no longer the case as the backend will always perform work using
+      the same settings.</para>
     </info>
 
     <table id="table-performance-parameters">
@@ -1287,106 +1287,162 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
         <tbody>
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].exclusive_index_use</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].   
+exclusive_index_use</literallayout>
+            </entry>
 
-            <entry><para>Set to <literal>true</literal> when no other process
-            will need to write to the same index. This will enable Hibernate
-            Search to work in exlusive mode on the index and improve
-            performance when writing changes to the index.</para></entry>
+            <entry>
+              <para>Set to <literal>true</literal> when no other process will
+              need to write to the same index. This will enable Hibernate
+              Search to work in exlusive mode on the index and improve
+              performance when writing changes to the index.</para>
+            </entry>
 
             <entry><literal>false</literal> (releases locks as soon as
             possible)</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].max_queue_length</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].   
+max_queue_length</literallayout>
+            </entry>
 
-            <entry><para>Each index has a separate "pipeline" which contains
-            the updates to be applied to the index. When this queue is full
-            adding more operations to the queue becomes a blocking operation.
-            Configuring this setting doesn't make much sense unless the
-            <literal>worker.execution</literal> is configured as
-            <literal>async</literal>.</para></entry>
+            <entry>
+              <para>Each index has a separate "pipeline" which contains the
+              updates to be applied to the index. When this queue is full
+              adding more operations to the queue becomes a blocking
+              operation. Configuring this setting doesn't make much sense
+              unless the <literal>worker.execution</literal> is configured as
+              <literal>async</literal>.</para>
+            </entry>
 
-            <entry><literal>1000</literal></entry>
+            <entry>
+              <literal>1000</literal>
+            </entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_buffered_delete_terms</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.max_buffered_delete_terms</literallayout>
+            </entry>
 
-            <entry><para>Determines the minimal number of delete terms
-            required before the buffered in-memory delete terms are applied
-            and flushed. If there are documents buffered in memory at the
-            time, they are merged and a new segment is created.</para></entry>
+            <entry>
+              <para>Determines the minimal number of delete terms required
+              before the buffered in-memory delete terms are applied and
+              flushed. If there are documents buffered in memory at the time,
+              they are merged and a new segment is created.</para>
+            </entry>
 
             <entry>Disabled (flushes by RAM usage)</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_buffered_docs</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.max_buffered_docs</literallayout>
+            </entry>
 
-            <entry><para>Controls the amount of documents buffered in memory
-            during indexing. The bigger the more RAM is
-            consumed.</para></entry>
+            <entry>
+              <para>Controls the amount of documents buffered in memory during
+              indexing. The bigger the more RAM is consumed.</para>
+            </entry>
 
             <entry>Disabled (flushes by RAM usage)</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_merge_docs</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.max_merge_docs</literallayout>
+            </entry>
 
-            <entry><para>Defines the largest number of documents allowed in a
-            segment. Smaller values perform better on frequently changing indexes, larger values
-            provide better search performance if the index does not change often.</para></entry>
+            <entry>
+              <para>Defines the largest number of documents allowed in a
+              segment. Smaller values perform better on frequently changing
+              indexes, larger values provide better search performance if the
+              index does not change often.</para>
+            </entry>
 
             <entry>Unlimited (Integer.MAX_VALUE)</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_factor</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_factor</literallayout>
+            </entry>
 
-            <entry><para>Controls segment merge frequency and size. </para>
-            <para>Determines how often segment indexes are merged when
-            insertion occurs. With smaller values, less RAM is used while
-            indexing, and searches on unoptimized indexes are faster, but
-            indexing speed is slower. With larger values, more RAM is used
-            during indexing, and while searches on unoptimized indexes are
-            slower, indexing is faster. Thus larger values (&gt; 10) are best
-            for batch index creation, and smaller values (&lt; 10) for indexes
-            that are interactively maintained. The value must not be lower than
-            2.</para></entry>
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Determines how often segment indexes are merged when
+              insertion occurs. With smaller values, less RAM is used while
+              indexing, and searches on unoptimized indexes are faster, but
+              indexing speed is slower. With larger values, more RAM is used
+              during indexing, and while searches on unoptimized indexes are
+              slower, indexing is faster. Thus larger values (&gt; 10) are
+              best for batch index creation, and smaller values (&lt; 10) for
+              indexes that are interactively maintained. The value must not be
+              lower than 2.</para>
+            </entry>
 
             <entry>10</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.ram_buffer_size</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.ram_buffer_size</literallayout>
+            </entry>
 
-            <entry><para>Controls the amount of RAM in MB dedicated to
-            document buffers. When used together max_buffered_docs a flush
-            occurs for whichever event happens first.</para> <para>Generally
-            for faster indexing performance it's best to flush by RAM usage
-            instead of document count and use as large a RAM buffer as you
-            can.</para></entry>
+            <entry>
+              <para>Controls the amount of RAM in MB dedicated to document
+              buffers. When used together max_buffered_docs a flush occurs for
+              whichever event happens first.</para>
+
+              <para>Generally for faster indexing performance it's best to
+              flush by RAM usage instead of document count and use as large a
+              RAM buffer as you can.</para>
+            </entry>
 
             <entry>16 MB</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.term_index_interval</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.term_index_interval</literallayout>
+            </entry>
 
-            <entry><para>Expert: Set the interval between indexed
-            terms.</para> <para>Large values cause less memory to be used by
-            IndexReader, but slow random-access to terms. Small values cause
-            more memory to be used by an IndexReader, and speed random-access
-            to terms. See Lucene documentation for more
-            details.</para></entry>
+            <entry>
+              <para>Expert: Set the interval between indexed terms.</para>
+
+              <para>Large values cause less memory to be used by IndexReader,
+              but slow random-access to terms. Small values cause more memory
+              to be used by an IndexReader, and speed random-access to terms.
+              See Lucene documentation for more details.</para>
+            </entry>
 
             <entry>128</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.use_compound_file</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.use_compound_file</literallayout>
+            </entry>
 
             <entry>The advantage of using the compound file format is that
             less file descriptors are used. The disadvantage is that indexing
@@ -1402,21 +1458,30 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.enable_dirty_check</literal></entry>
+            <entry>
+              <literallayout>hibernate.search.
+enable_dirty_check</literallayout>
+            </entry>
 
-            <entry><para>Not all entity changes require an update of the
-            Lucene index. If all of the updated entity properties (dirty
-            properties) are not indexed Hibernate Search will skip the
-            re-indexing work.</para><para>Disable this option if you use
-            custom <literal>FieldBridge</literal>s which need to be invoked at
-            each update event (even though the property for which the field
-            bridge is configured has not changed).</para><para>This
-            optimization will not be applied on classes using a
-            <literal>@ClassBridge</literal> or a
-            <literal>@DynamicBoost</literal>.</para><para>Boolean parameter,
-            use "<literal>true</literal>" or "<literal>false</literal>". The
-            default value for this option is
-            <literal>true</literal>.</para></entry>
+            <entry>
+              <para>Not all entity changes require an update of the Lucene
+              index. If all of the updated entity properties (dirty
+              properties) are not indexed Hibernate Search will skip the
+              re-indexing work.</para>
+
+              <para>Disable this option if you use custom
+              <literal>FieldBridge</literal>s which need to be invoked at each
+              update event (even though the property for which the field
+              bridge is configured has not changed).</para>
+
+              <para>This optimization will not be applied on classes using a
+              <literal>@ClassBridge</literal> or a
+              <literal>@DynamicBoost</literal>.</para>
+
+              <para>Boolean parameter, use "<literal>true</literal>" or
+              "<literal>false</literal>". The default value for this option is
+              <literal>true</literal>.</para>
+            </entry>
 
             <entry>true</entry>
           </row>
