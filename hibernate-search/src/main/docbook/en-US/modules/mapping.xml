@@ -1914,11 +1914,25 @@ public class MyClass{
     the XML stream.</para>
 
     <para>In order to use the programmatic model you must first construct a
-    <classname>SearchMapping</classname> object. This object is passed to
-    Hibernate Search via a property set to the <classname>Configuration
-    </classname>object. The property key is
-    <literal>hibernate.search.model_mapping</literal> or it's type-safe
-    representation <classname>Environment.MODEL_MAPPING</classname>.</para>
+    <classname>SearchMapping</classname> object which you can do in two
+    ways:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>directly</para>
+      </listitem>
+
+      <listitem>
+        <para>via a factory</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>You can pass the <classname>SearchMapping</classname> object
+    directly via the property key
+    <literal>hibernate.search.model_mapping</literal> or its type-safe
+    representation <classname>Environment.MODEL_MAPPING</classname>. Use the
+    <classname>Configuration</classname> API or the Map passed to the JPA
+    <classname>Persistence</classname> bootstrap methods.</para>
 
     <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 [...]
@@ -1930,6 +1944,44 @@ SearchMapping mapping = new SearchMapping();
 Map&lt;String,String&gt; properties = new HashMap&lt;String,String)(1);
 properties.put( Environment.MODEL_MAPPING, mapping );
 EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", properties );</programlisting>
+
+    <para>Alternatively, you can create a factory class (ie. hosting a method
+    annotated with <classname>@Factory</classname>) whose factory method
+    returns the <classname>SearchMapping</classname> object. The factory class
+    must have a no-arg constructor and its fully qualified class name is
+    passed to the property key
+    <literal>hibernate.search.model_mapping</literal> or its type-safe
+    representation <classname>Environment.MODEL_MAPPING</classname>. This
+    approach is useful when you do not necessarily control the bootstrap
+    process like in a Java EE, CDI or Spring Framework container.</para>
+
+    <example>
+      <title>Use a mapping factory</title>
+
+      <programlisting language="JAVA" role="JAVA">public class MyAppSearchMappingFactory {
+    @Factory
+    public SearchMapping getSearchMapping() {
+        SearchMapping mapping = new SearchMapping();
+        mapping
+                .analyzerDef( "ngram", StandardTokenizerFactory.class )
+                    .filter( LowerCaseFilterFactory.class )
+                    .filter( NGramFilterFactory.class )
+                        .param( "minGramSize", "3" )
+                        .param( "maxGramSize", "3" );
+        return mapping;
+    }
+}</programlisting>
+
+      <programlisting language="XML" role="XML">&lt;persistence ...&gt;
+    &lt;persistence-unit name="users"&gt;
+        ...
+        &lt;properties&gt;
+            &lt;property name="hibernate.search.model_mapping"
+                      value="com.acme.MyAppSearchMappingFactory"/&gt;
+        &lt;/properties&gt;
+    &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</programlisting>
+    </example>
 
     <para>The <classname>SearchMapping</classname> is the root object which
     contains all the necessary indexable entities and fields. From there, the
