@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.bridge.util;
+package org.hibernate.search.bridge.util.impl;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.annotations.common.reflection.XMember;

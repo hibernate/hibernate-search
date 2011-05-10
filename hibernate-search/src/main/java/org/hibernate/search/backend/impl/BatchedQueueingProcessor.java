@@ -44,7 +44,7 @@ import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProces
 import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
-import org.hibernate.search.batchindexing.Executors;
+import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.LoggerFactory;
 

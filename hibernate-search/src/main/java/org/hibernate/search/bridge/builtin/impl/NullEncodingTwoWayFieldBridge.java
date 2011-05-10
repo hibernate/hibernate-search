@@ -21,58 +21,54 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.bridge;
 
-import java.util.zip.DataFormatException;
+package org.hibernate.search.bridge.builtin.impl;
 
-import org.apache.lucene.document.CompressionTools;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.hibernate.search.SearchException;
+
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
- * Bridge to use a TwoWayStringBridge as a TwoWayFieldBridge
- *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-//TODO use Generics to avoid double declaration of stringBridge 
-public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor implements TwoWayFieldBridge {
+public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 
-	private final TwoWayStringBridge stringBridge;
+	private final TwoWayFieldBridge fieldBridge;
+	private final String nullMarker;
 
-	public TwoWayString2FieldBridgeAdaptor(TwoWayStringBridge stringBridge) {
-		super( stringBridge );
-		this.stringBridge = stringBridge;
-	}
-
-	public String objectToString(Object object) {
-		return stringBridge.objectToString( object );
+	public NullEncodingTwoWayFieldBridge(TwoWayFieldBridge fieldBridge, String nullMarker) {
+		this.fieldBridge = fieldBridge;
+		this.nullMarker = nullMarker;
 	}
 
 	public Object get(String name, Document document) {
 		Field field = document.getField( name );
-		if (field == null) {
-			return stringBridge.stringToObject( null );
+		String stringValue = field.stringValue();
+		if ( nullMarker.equals( stringValue ) ) {
+			return null;
 		}
 		else {
-			String stringValue;
-			if ( field.isBinary() ) {
-				try {
-					stringValue = CompressionTools.decompressString( field.getBinaryValue() );
-				}
-				catch (DataFormatException e) {
-					throw new SearchException( "Field " + name + " looks like binary but couldn't be decompressed" );
-				}
-			}
-			else {
-				stringValue = field.stringValue();
-			}
-			return stringBridge.stringToObject( stringValue );
+			return fieldBridge.get( name, document );
 		}
 	}
 
-	public TwoWayStringBridge unwrap() {
-		return stringBridge;
+	public String objectToString(Object object) {
+		if ( object == null ) {
+			return nullMarker;
+		}
+		else {
+			return fieldBridge.objectToString( object );
+		}
 	}
 	
+	public TwoWayFieldBridge unwrap() {
+		return fieldBridge;
+	}
+
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+		fieldBridge.set( name, value, document, luceneOptions );
+	}
 }

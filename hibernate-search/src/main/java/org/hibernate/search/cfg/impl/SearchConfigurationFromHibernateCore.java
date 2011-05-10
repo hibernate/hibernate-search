@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.cfg;
+package org.hibernate.search.cfg.impl;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -32,6 +32,8 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**

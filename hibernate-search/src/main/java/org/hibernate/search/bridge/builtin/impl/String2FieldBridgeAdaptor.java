@@ -21,9 +21,13 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.bridge;
+package org.hibernate.search.bridge.builtin.impl;
 
 import org.apache.lucene.document.Document;
+
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.StringBridge;
 
 /**
  * Bridge to use a StringBridge as a FieldBridge.

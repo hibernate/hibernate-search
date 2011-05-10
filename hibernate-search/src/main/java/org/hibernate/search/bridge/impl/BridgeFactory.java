@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.bridge;
+package org.hibernate.search.bridge.impl;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -42,6 +42,13 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.ParameterizedBridge;
+import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.BigDecimalBridge;
 import org.hibernate.search.bridge.builtin.BigIntegerBridge;
 import org.hibernate.search.bridge.builtin.BooleanBridge;

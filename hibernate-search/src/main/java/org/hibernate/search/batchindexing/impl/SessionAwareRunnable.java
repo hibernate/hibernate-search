@@ -1,4 +1,4 @@
-package org.hibernate.search.batchindexing;
+package org.hibernate.search.batchindexing.impl;
 
 import org.hibernate.Session;
 
