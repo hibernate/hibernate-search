@@ -63,10 +63,6 @@ public abstract class ReaderProviderFactory {
 		else if ( "shared".equalsIgnoreCase( impl ) ) {
 			readerProvider = new SharingBufferReaderProvider();
 		}
-		//will remove next "else":
-		else if ( "shared-segments".equalsIgnoreCase( impl ) ) {
-			readerProvider = new SharingBufferReaderProvider();
-		}
 		else {
 			readerProvider = ClassLoaderHelper.instanceFromName(
 					ReaderProvider.class, impl,

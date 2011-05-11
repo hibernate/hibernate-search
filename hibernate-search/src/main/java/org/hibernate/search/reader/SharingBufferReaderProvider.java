@@ -45,8 +45,7 @@ import org.hibernate.search.util.LoggerFactory;
 
 /**
  * This <code>ReaderProvider</code> shares IndexReaders as long as they are "current";
- * main difference with SharedReaderProvider is the way to update the Readers when needed:
- * this uses IndexReader.reopen() which should improve performance on larger indexes
+ * It uses IndexReader.reopen() which should improve performance on larger indexes
  * as it shares buffers with previous IndexReader generation for the segments which didn't change.
  *
  * @author Sanne Grinovero
