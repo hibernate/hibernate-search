@@ -57,16 +57,6 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	},
 	/**
-	 * No longer applied - use a LimitTokenCountAnalyzer.
-	 * @see org.apache.lucene.analysis.LimitTokenCountAnalyzer
-	 * @deprecated
-	 */
-	MAX_FIELD_LENGTH( "max_field_length" ) {
-		public void applySetting(IndexWriterConfig writerConfig, int value) {
-			log.warn( "Configuration option 'max_field_length' is no longer applied. Use LimitTokenCountAnalyzer instead" );
-		}
-	},
-	/**
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeDocs(int)
 	 */
 	MAX_MERGE_DOCS( "max_merge_docs" ) {

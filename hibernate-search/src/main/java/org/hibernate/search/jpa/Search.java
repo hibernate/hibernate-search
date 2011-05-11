@@ -51,11 +51,4 @@ public final class Search {
 		}
 	}
 
-	/**
-	 * @deprecated As of release 3.1.0, replaced by {@link #getFullTextEntityManager}
-	 */
-	@Deprecated
-	public static FullTextEntityManager createFullTextEntityManager(EntityManager em) {
-		return getFullTextEntityManager( em );
-	}
 }

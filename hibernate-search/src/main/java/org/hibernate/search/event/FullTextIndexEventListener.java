@@ -111,19 +111,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			0
 	);
 
-	/**
-	 * @deprecated As of Hibernate Search 3.3. This method was used for instantiating the event listener when configured
-	 *             in a configuration file. Since Hibernate Core 3.6 Hibernate Search will always be automatically enabled if available
-	 *             on the classpath.
-	 */
-	public FullTextIndexEventListener() {
-		String msg = "FullTextIndexEventListener default constructor is obsolete. Remove all explicit" +
-				"event listener configuration. As of Hibernate Core 3.6 Hibernate Search will be automatically enabled " +
-				"if it is detected on the classpath.";
-		log.error( msg );
-		throw new SearchException( msg );
-	}
-
 	public FullTextIndexEventListener(Installation installation) {
 		this.installation = installation;
 		//TODO remove this code when moving to Core 4 (HSEARCH-660)
@@ -141,7 +128,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	/**
 	 * Initialize method called by Hibernate Core when the SessionFactory starts
 	 */
-
 	public void initialize(Configuration cfg) {
 		if ( installation != SINGLE_INSTANCE ) {
 			throw new SearchException( "Only Installation.SINGLE_INSTANCE is supported" );
@@ -338,12 +324,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	}
 
 	public static enum Installation {
-		SINGLE_INSTANCE,
-
-		/**
-		 * @see #FullTextIndexEventListener()
-		 * @deprecated As of Hibernate Search 3.3.
-		 */
-		MULTIPLE_INSTANCE
+		SINGLE_INSTANCE
 	}
 }

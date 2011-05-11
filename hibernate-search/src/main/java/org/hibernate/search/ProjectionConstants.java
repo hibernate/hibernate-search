@@ -45,13 +45,6 @@ public interface ProjectionConstants {
 	public String SCORE = "__HSearch_Score";
 
 	/**
-	 * The boost value of the Lucene document.
-	 *
-	 * @deprecated always return 1
-	 */
-	public String BOOST = "__HSearch_Boost";
-
-	/**
 	 * Object id property
 	 */
 	public String ID = "__HSearch_id";

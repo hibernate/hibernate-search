@@ -60,7 +60,6 @@ import org.slf4j.Logger;
  */
 public class DocumentExtractorImpl implements DocumentExtractor {
 
-	private static final Float FLOAT_ONE = Float.valueOf( 1f );
 	private static final Logger log = LoggerFactory.make();
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
@@ -140,9 +139,6 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 					return;
 				}
 				else if ( ProjectionConstants.SCORE.equals( projectionName ) ) {
-					continue;
-				}
-				else if ( ProjectionConstants.BOOST.equals( projectionName ) ) {
 					continue;
 				}
 				else if ( ProjectionConstants.ID.equals( projectionName ) ) {
@@ -253,9 +249,6 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				}
 				else if ( ProjectionConstants.DOCUMENT_ID.equals( projection[x] ) ) {
 					eip[x] = docId;
-				}
-				else if ( ProjectionConstants.BOOST.equals( projection[x] ) ) {
-					eip[x] = FLOAT_ONE;
 				}
 				else if ( ProjectionConstants.EXPLANATION.equals( projection[x] ) ) {
 					eip[x] = queryHits.explain( scoreDocIndex );

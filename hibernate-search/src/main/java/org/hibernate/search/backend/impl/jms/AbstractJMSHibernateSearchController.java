@@ -34,6 +34,7 @@ import javax.jms.ObjectMessage;
 import org.slf4j.Logger;
 
 import org.hibernate.Session;
+import org.hibernate.search.Search;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.ContextHelper;

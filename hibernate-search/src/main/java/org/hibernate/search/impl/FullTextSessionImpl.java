@@ -90,7 +90,6 @@ import org.hibernate.type.Type;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-@SuppressWarnings("deprecation")
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
 	private final Session session;
 	private final SessionImplementor sessionImplementor;
