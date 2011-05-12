@@ -37,7 +37,6 @@ import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERGE_FACTOR;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.RAM_BUFFER_SIZE;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.USE_COMPOUND_FILE;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_FIELD_LENGTH;
 
 /**
  * @author Sanne Grinovero
@@ -72,11 +71,6 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Author.class, MAX_MERGE_DOCS, 9 );
 		assertValueIsSet( Author.class, MAX_BUFFERED_DOCS,  1000 );
 		assertValueIsSet( Author.class, MERGE_FACTOR,  100 );
-	}
-	
-	public void testMaxFieldLength() {
-		// there should also be logged a warning being logged about these:
-		assertValueIsSet( Document.class, MAX_FIELD_LENGTH, 9 );
 	}
 	
 	public void testSpecificTypeParametersOverride() {

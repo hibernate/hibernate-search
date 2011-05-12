@@ -604,6 +604,12 @@ public class Book {
   ... 
 }</programlisting>
     </example>
+    <para>Using <classname>@AnalyzerDef</classname> only defines an Analyzer,
+    you still have to apply it to entities and or properties using
+    <classname>@Analyzer</classname>. Like in the above example the <literal>customanalyzer</literal>
+    is defined but not applied on the entity: it's applied on the <literal>title</literal>
+    and <literal>subtitle</literal> properties only. An analyzer definition is global, so you
+    can define it on any entity and reuse the definition on other entities.</para>
   </section>
 
   <section>

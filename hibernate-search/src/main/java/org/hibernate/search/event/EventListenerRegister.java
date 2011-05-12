@@ -178,7 +178,6 @@ public class EventListenerRegister {
 	 *
 	 * @return true if it is contained in.
 	 */
-	@SuppressWarnings("deprecation")
 	private static boolean isPresentInListeners(Object[] listeners) {
 		for ( Object eventListener : listeners ) {
 			if ( FullTextIndexEventListener.class == eventListener.getClass() ) {

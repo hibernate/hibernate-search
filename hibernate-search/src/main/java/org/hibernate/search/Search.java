@@ -46,11 +46,4 @@ public final class Search {
 		}
 	}
 
-	/**
-	 * @deprecated As of release 3.1.0, replaced by {@link #getFullTextSession(Session)}
-	 */
-	@Deprecated
-	public static FullTextSession createFullTextSession(Session session) {
-		return getFullTextSession( session );
-	}
 }
