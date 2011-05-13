@@ -300,6 +300,22 @@ transaction.commit();</programlisting>
       <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_factor</literal>
       </listitem>
+      
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_min_size</literal>
+      </listitem>
+      
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_max_size</literal>
+      </listitem>
+      
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_max_optimize_size</literal>
+      </listitem>
+      
+      <listitem>
+        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_calibrate_by_deletes</literal>
+      </listitem>
 
       <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.ram_buffer_size</literal>

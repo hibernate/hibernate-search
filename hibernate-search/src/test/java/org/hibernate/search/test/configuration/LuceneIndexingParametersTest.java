@@ -37,6 +37,7 @@ import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERGE_FACTOR;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.RAM_BUFFER_SIZE;
 import static org.hibernate.search.backend.configuration.IndexWriterSetting.USE_COMPOUND_FILE;
+import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERGE_MAX_OPTIMIZE_SIZE;
 
 /**
  * @author Sanne Grinovero
@@ -57,6 +58,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		cfg.setProperty( "hibernate.search.Book.indexwriter.merge_factor", "13" );
 		cfg.setProperty( "hibernate.search.Book.indexwriter.max_buffered_docs", "14" );
 		cfg.setProperty( "hibernate.search.Book.indexwriter.ram_buffer_size", "4" );
+		cfg.setProperty( "hibernate.search.Book.indexwriter.merge_max_optimize_size", "256");
 		
 		cfg.setProperty( "hibernate.search.Documents.indexwriter.ram_buffer_size", "default" );
 		cfg.setProperty( "hibernate.search.Documents.indexwriter.merge_factor", "6" );
@@ -79,6 +81,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Book.class, MERGE_FACTOR, 13 );
 		assertValueIsSet( Book.class, USE_COMPOUND_FILE, 0 );
 		assertValueIsSet( Book.class, RAM_BUFFER_SIZE, 4 );
+		assertValueIsSet( Book.class, MERGE_MAX_OPTIMIZE_SIZE, 256 );
 	}
 	
 	public void testDefaultKeywordOverwritesInherited() {

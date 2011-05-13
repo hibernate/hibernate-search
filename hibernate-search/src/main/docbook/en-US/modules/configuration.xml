@@ -1397,6 +1397,88 @@ indexwriter.merge_factor</literallayout>
 
             <entry>10</entry>
           </row>
+          
+          <row>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_min_size</literallayout>
+            </entry>
+
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Segments smaller than this size (in MB) are always
+              considered for the next segment merge operation.</para>
+              <para>Setting this too large might result in expensive
+              merge operations, even tough they are less frequent.</para>
+              <para>See also <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+              <fieldsynopsis>minMergeSize</fieldsynopsis>.</para>
+            </entry>
+
+            <entry>0 MB (actually ~1K)</entry>
+          </row>
+          
+          <row>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_max_size</literallayout>
+            </entry>
+
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Segments larger than this size (in MB) are never
+              merged in bigger segments.</para>
+              <para>This helps reduce memory requirements and avoids
+              some merging operations at the cost of optimal search speed. When
+              optimizing an index this value is ignored.</para>
+              <para>See also <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+              <fieldsynopsis>maxMergeSize</fieldsynopsis>.</para>
+            </entry>
+
+            <entry>Unlimited</entry>
+          </row>
+          
+          <row>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_max_optimize_size</literallayout>
+            </entry>
+
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Segments larger than this size (in MB) are not
+              merged in bigger segments even when optimizing the index
+              (see <literal>merge_max_size</literal> setting as well).</para>
+              <para>Applied to <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+              <fieldsynopsis>maxMergeSizeForOptimize</fieldsynopsis>.</para>
+            </entry>
+
+            <entry>Unlimited</entry>
+          </row>
+          
+          <row>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_calibrate_by_deletes</literallayout>
+            </entry>
+
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Set to <literal>false</literal> to not consider
+              deleted documents when estimating the merge policy.</para>
+              <para>Applied to <classname>org.apache.lucene.index.LogMergePolicy</classname>.
+              <fieldsynopsis>calibrateSizeByDeletes</fieldsynopsis>.</para>
+            </entry>
+
+            <entry><literal>true</literal></entry>
+          </row>
 
           <row>
             <entry>
@@ -1518,6 +1600,33 @@ enable_dirty_check</literallayout>
       <para>The <literal>blackhole</literal> backend is not meant to be used
       in production, only as a tool to identify indexing bottlenecks.</para>
     </warning>
+    
+        <section id="lucene-segment-size" revision="1">
+        <title>Control segment size</title>
+
+        <para>The options <literal>merge_max_size</literal>, <literal>merge_max_optimize_size</literal>,
+         <literal>merge_calibrate_by_deletes</literal> give you some control on the maximum size of the
+         segments being created, but you need to understand how they affect file sizes. If you
+         need to hard limit the size, consider that merging a segment is about adding it together
+         to another existing segment to forme a larger one, so you might want to set the max_size
+         for merge operations to less than half of your hard limit. Also segments might be
+         generated larger than your expected size when they are created: before they are
+         ever merged. A segment is never created much larged than <literal>ram_buffer_size</literal>,
+         but the threshold is checked as an estimate.</para>
+         
+         <para>Example:</para>
+
+        <programlisting>//to be fairly confident no files grow above 15MB, use:
+    hibernate.search.default.indexwriter.ram_buffer_size 10
+    hibernate.search.default.indexwriter.merge_max_optimize_size 7
+    hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
+    </section>
+    
+    <tip><para>When using the Infinispan Directory to cluster indexes make sure that your segments
+        are smaller than the <literal>chunk_size</literal> so that you avoid fragmenting segments
+        in the grid. Note that the <literal>chunk_size</literal> of the Infinispan Directory is
+        expressed in bytes, while the index tuning options are in MB.</para></tip>
+    
   </section>
 
   <section id="search-configuration-directory-lockfactories" revision="1">
