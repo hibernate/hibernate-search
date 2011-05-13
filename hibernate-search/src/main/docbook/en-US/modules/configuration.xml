@@ -1397,6 +1397,88 @@ indexwriter.merge_factor</literallayout>
 
             <entry>10</entry>
           </row>
+          
+          <row>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_min_size</literallayout>
+            </entry>
+
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Segments smaller than this size (in MB) are always
+              considered for the next segment merge operation.</para>
+              <para>Setting this too large might result in expensive
+              merge operations, even tough they are less frequent.</para>
+              <para>See also <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+              <fieldsynopsis>minMergeSize</fieldsynopsis>.</para>
+            </entry>
+
+            <entry>0 MB (actually ~1K)</entry>
+          </row>
+          
+          <row>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_max_size</literallayout>
+            </entry>
+
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Segments larger than this size (in MB) are never
+              merged in bigger segments.</para>
+              <para>This helps reduce memory requirements and avoids
+              some merging operations at the cost of optimal search speed. When
+              optimizing an index this value is ignored.</para>
+              <para>See also <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+              <fieldsynopsis>maxMergeSize</fieldsynopsis>.</para>
+            </entry>
+
+            <entry>Unlimited</entry>
+          </row>
+          
+          <row>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_max_optimize_size</literallayout>
+            </entry>
+
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Segments larger than this size (in MB) are not
+              merged in bigger segments even when optimizing the index
+              (see <literal>merge_max_size</literal> setting as well).</para>
+              <para>Applied to <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+              <fieldsynopsis>maxMergeSizeForOptimize</fieldsynopsis>.</para>
+            </entry>
+
+            <entry>Unlimited</entry>
+          </row>
+          
+          <row>
+            <entry>
+              <literallayout>hibernate.search.
+[default|&lt;indexname&gt;].
+indexwriter.merge_calibrate_by_deletes</literallayout>
+            </entry>
+
+            <entry>
+              <para>Controls segment merge frequency and size.</para>
+
+              <para>Set to <literal>false</literal> to not consider
+              deleted documents when estimating the merge policy.</para>
+              <para>Applied to <classname>org.apache.lucene.index.LogMergePolicy</classname>.
+              <fieldsynopsis>calibrateSizeByDeletes</fieldsynopsis>.</para>
+            </entry>
+
+            <entry><literal>true</literal></entry>
+          </row>
 
           <row>
             <entry>
