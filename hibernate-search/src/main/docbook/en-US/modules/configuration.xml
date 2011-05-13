@@ -1600,6 +1600,33 @@ enable_dirty_check</literallayout>
       <para>The <literal>blackhole</literal> backend is not meant to be used
       in production, only as a tool to identify indexing bottlenecks.</para>
     </warning>
+    
+        <section id="lucene-segment-size" revision="1">
+        <title>Control segment size</title>
+
+        <para>The options <literal>merge_max_size</literal>, <literal>merge_max_optimize_size</literal>,
+         <literal>merge_calibrate_by_deletes</literal> give you some control on the maximum size of the
+         segments being created, but you need to understand how they affect file sizes. If you
+         need to hard limit the size, consider that merging a segment is about adding it together
+         to another existing segment to forme a larger one, so you might want to set the max_size
+         for merge operations to less than half of your hard limit. Also segments might be
+         generated larger than your expected size when they are created: before they are
+         ever merged. A segment is never created much larged than <literal>ram_buffer_size</literal>,
+         but the threshold is checked as an estimate.</para>
+         
+         <para>Example:</para>
+
+        <programlisting>//to be fairly confident no files grow above 15MB, use:
+    hibernate.search.default.indexwriter.ram_buffer_size 10
+    hibernate.search.default.indexwriter.merge_max_optimize_size 7
+    hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
+    </section>
+    
+    <tip><para>When using the Infinispan Directory to cluster indexes make sure that your segments
+        are smaller than the <literal>chunk_size</literal> so that you avoid fragmenting segments
+        in the grid. Note that the <literal>chunk_size</literal> of the Infinispan Directory is
+        expressed in bytes, while the index tuning options are in MB.</para></tip>
+    
   </section>
 
   <section id="search-configuration-directory-lockfactories" revision="1">
