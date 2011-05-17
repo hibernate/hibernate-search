@@ -85,7 +85,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
 
 		assertEquals( 1, JGroupsReceiver.queues );
-		assertEquals( 2, JGroupsReceiver.works );
+		assertEquals( 1, JGroupsReceiver.works );
 
 		JGroupsReceiver.reset();
 		s = openSession();

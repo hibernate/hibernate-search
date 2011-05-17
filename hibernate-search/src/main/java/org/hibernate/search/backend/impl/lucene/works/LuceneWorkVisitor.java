@@ -27,6 +27,7 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.WorkVisitor;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -38,6 +39,7 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	
 	private final AddWorkDelegate addDelegate;
 	private final DeleteWorkDelegate deleteDelegate;
+	private final UpdateWorkDelegate updateDelegate;
 	private final OptimizeWorkDelegate optimizeDelegate;
 	private final PurgeAllWorkDelegate purgeAllDelegate;
 	
@@ -51,6 +53,7 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 		this.purgeAllDelegate = new PurgeAllWorkDelegate();
 		this.addDelegate = new AddWorkDelegate( workspace );
 		this.optimizeDelegate = new OptimizeWorkDelegate( workspace );
+		this.updateDelegate = new UpdateWorkDelegate( workspace, deleteDelegate );
 	}
 
 	public LuceneWorkDelegate getDelegate(AddLuceneWork addLuceneWork) {
@@ -67,6 +70,10 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 
 	public LuceneWorkDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
 		return purgeAllDelegate;
+	}
+
+	public LuceneWorkDelegate getDelegate(UpdateLuceneWork updateLuceneWork) {
+		return updateDelegate;
 	}
 	
 }

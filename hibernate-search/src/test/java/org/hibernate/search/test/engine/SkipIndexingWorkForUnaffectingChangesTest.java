@@ -69,7 +69,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 			Assert.assertEquals( 0, LeakingLuceneBackend.getLastProcessedQueue().size() );
 		}
 		else {
-			Assert.assertEquals( 2, LeakingLuceneBackend.getLastProcessedQueue().size() );
+			Assert.assertEquals( 1, LeakingLuceneBackend.getLastProcessedQueue().size() );
 		}
 
 		// now we make an indexing affecting change in the embedded object only,
@@ -80,7 +80,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		busStop = (BusStop) fullTextSession.load( BusStop.class, busStop.getId() );
 		busStop.setRoadName( "Mill Road" );
 		tx.commit();
-		Assert.assertEquals( 2, LeakingLuceneBackend.getLastProcessedQueue().size() ); //2 = delete+add
+		Assert.assertEquals( 1, LeakingLuceneBackend.getLastProcessedQueue().size() );
 		
 		LeakingLuceneBackend.reset();
 		fullTextSession.clear();
@@ -89,7 +89,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		//verify mutable property dirty-ness:
 		busStop.getStartingDate().setTime( 0L );
 		tx.commit();
-		Assert.assertEquals( 2, LeakingLuceneBackend.getLastProcessedQueue().size() ); //2 = delete+add
+		Assert.assertEquals( 1, LeakingLuceneBackend.getLastProcessedQueue().size() );
 
 		LeakingLuceneBackend.reset();
 		fullTextSession.close();

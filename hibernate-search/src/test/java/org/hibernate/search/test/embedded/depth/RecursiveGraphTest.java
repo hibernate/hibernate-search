@@ -60,20 +60,20 @@ public class RecursiveGraphTest extends SearchTestCase {
 		
 		LeakingLuceneBackend.reset();
 		renamePerson( 1L, "John Lackland" );
-		assertEquals( 2, countWorksDoneOnPerson( 1L ) );
+		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
 		assertEquals( 0, countWorksDoneOnPerson( 2L ) );
 		
 		LeakingLuceneBackend.reset();
 		renamePerson( 2L, "Henry II of New England" );
-		assertEquals( 2, countWorksDoneOnPerson( 1L ) );
-		assertEquals( 2, countWorksDoneOnPerson( 2L ) );
+		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
+		assertEquals( 1, countWorksDoneOnPerson( 2L ) );
 		
 		LeakingLuceneBackend.reset();
 		renamePerson( 16L, "Fulk 4th of Anjou" );
-		assertEquals( 2, countWorksDoneOnPerson( 16L ) );
+		assertEquals( 1, countWorksDoneOnPerson( 16L ) );
 		assertEquals( 0, countWorksDoneOnPerson( 17L ) );
-		assertEquals( 2, countWorksDoneOnPerson( 8L ) );
-		assertEquals( 2, countWorksDoneOnPerson( 4L ) );
+		assertEquals( 1, countWorksDoneOnPerson( 8L ) );
+		assertEquals( 1, countWorksDoneOnPerson( 4L ) );
 //		assertEquals( 0, countWorksDoneOnPerson( 2L ) ); //FIXME see HSEARCH-638
 //		assertEquals( 0, countWorksDoneOnPerson( 1L ) ); //FIXME see HSEARCH-638
 	}
