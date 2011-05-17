@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.infinispan;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import org.infinispan.Cache;
@@ -31,7 +30,6 @@ import org.infinispan.lucene.InfinispanDirectory;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.slf4j.Logger;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProviderHelper;
@@ -91,16 +89,8 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	@Override
 	public void stop() {
-		try {
-			directory.close();
-		}
-		catch ( IOException e ) {
-			// should never happen, #close() had a wrong signature
-			throw new SearchException( e );
-		}
-		finally {
-			context.releaseService( CacheManagerServiceProvider.class );
-		}
+		directory.close();
+		context.releaseService( CacheManagerServiceProvider.class );
 		log.debug( "Stopped InfinispanDirectory" );
 	}
 
