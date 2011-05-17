@@ -73,6 +73,39 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	},
 	/**
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMinMergeMB(int)
+	 */
+	MERGE_MIN_SIZE( "merge_min_size" ) {
+		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
+			logByteSizeMergePolicy.setMinMergeMB( value );
+		}
+	},
+	/**
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeMB(int)
+	 */
+	MERGE_MAX_SIZE( "merge_max_size" ) {
+		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
+			logByteSizeMergePolicy.setMaxMergeMB( value );
+		}
+	},
+	/**
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeMB(int)
+	 */
+	MERGE_MAX_OPTIMIZE_SIZE( "merge_max_optimize_size" ) {
+		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
+			logByteSizeMergePolicy.setMaxMergeMBForOptimize( value );
+		}
+	},
+	/**
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)
+	 */
+	MERGE_CALIBRATE_BY_DELETES( "merge_calibrate_by_deletes" ) {
+		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
+			boolean calibrateByDeletes = intToBoolean( value );
+			logByteSizeMergePolicy.setCalibrateSizeByDeletes( calibrateByDeletes );
+		}
+	},
+	/**
 	 * @see org.apache.lucene.index.IndexWriterConfig#setRAMBufferSizeMB(double)
 	 */
 	RAM_BUFFER_SIZE( "ram_buffer_size" ) {
