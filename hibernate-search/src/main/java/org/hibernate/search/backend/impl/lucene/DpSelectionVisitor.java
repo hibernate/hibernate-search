@@ -28,6 +28,7 @@ import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.WorkVisitor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -48,6 +49,10 @@ public class DpSelectionVisitor implements WorkVisitor<DpSelectionDelegate> {
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
 
 	public DpSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
+		return addDelegate;
+	}
+	
+	public DpSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 

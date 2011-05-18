@@ -41,5 +41,6 @@ public interface WorkVisitor<T> {
 	T getDelegate(DeleteLuceneWork deleteLuceneWork);
 	T getDelegate(OptimizeLuceneWork optimizeLuceneWork);
 	T getDelegate(PurgeAllLuceneWork purgeAllLuceneWork);
+	T getDelegate(UpdateLuceneWork updateLuceneWork);
 
 }

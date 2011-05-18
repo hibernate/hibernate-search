@@ -177,7 +177,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		return similarity;
 	}
 
-	public Analyzer getAnalyzer() {
+	public ScopedAnalyzer getAnalyzer() {
 		return analyzer;
 	}
 

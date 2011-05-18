@@ -99,7 +99,7 @@ public class JMSSlaveTest extends SearchTestCase {
 		Thread.sleep( 500 );
 
 		assertEquals( 1, SearchQueueChecker.queues );
-		assertEquals( 2, SearchQueueChecker.works ); //one update = 2 works
+		assertEquals( 1, SearchQueueChecker.works );
 
 		SearchQueueChecker.reset();
 		s = openSession();

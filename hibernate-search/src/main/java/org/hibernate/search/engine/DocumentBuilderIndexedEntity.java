@@ -59,6 +59,7 @@ import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
@@ -351,11 +352,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue) {
 		String idInString = objectToString( idBridge, idKeywordName, id );
-		if ( delete ) {
+		if ( delete && !add ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
-		if ( add ) {
+		else if ( add && !delete) {
 			queue.add( createAddWork( entityClass, entity, id, idInString, HibernateStatelessInitializer.INSTANCE ) );
+		}
+		else if ( add && delete ) {
+			queue.add( createUpdateWork( entityClass, entity, id, idInString, HibernateStatelessInitializer.INSTANCE ) );
 		}
 	}
 	
@@ -378,12 +382,25 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, EntityInitializer sessionInitializer) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
-		AddLuceneWork addWork;
+		final AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new AddLuceneWork( id, idInString, entityClass, doc );
 		}
 		else {
 			addWork = new AddLuceneWork( id, idInString, entityClass, doc, fieldToAnalyzerMap );
+		}
+		return addWork;
+	}
+	
+	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, EntityInitializer sessionInitializer) {
+		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
+		final UpdateLuceneWork addWork;
+		if ( fieldToAnalyzerMap.isEmpty() ) {
+			addWork = new UpdateLuceneWork( id, idInString, entityClass, doc );
+		}
+		else {
+			addWork = new UpdateLuceneWork( id, idInString, entityClass, doc, fieldToAnalyzerMap );
 		}
 		return addWork;
 	}

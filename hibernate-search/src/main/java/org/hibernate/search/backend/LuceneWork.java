@@ -24,6 +24,7 @@
 package org.hibernate.search.backend;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.apache.lucene.document.Document;
 
@@ -76,5 +77,9 @@ public abstract class LuceneWork implements Serializable {
 	}
 	
 	public abstract <T> T getWorkDelegate(WorkVisitor<T> visitor);
+
+	public Map<String, String> getFieldToAnalyzerMap() {
+		return null;
+	}
 
 }

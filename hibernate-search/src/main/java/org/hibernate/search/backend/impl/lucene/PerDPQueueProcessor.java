@@ -94,6 +94,10 @@ class PerDPQueueProcessor implements Runnable {
 		errorContextBuilder.allWorkToBeDone( workOnWriter );
 		try {
 			IndexWriter indexWriter = workspace.getIndexWriter(  errorContextBuilder );
+			if ( indexWriter == null ) {
+				log.error( "Couldn't open the IndexWriter becasue of previous error: operation skipped, index ouf of sync!" );
+				return;
+			}
 			try {
 				for ( LuceneWork lw : workOnWriter ) {
 					lw.getWorkDelegate( worker ).performWork( lw, indexWriter );
