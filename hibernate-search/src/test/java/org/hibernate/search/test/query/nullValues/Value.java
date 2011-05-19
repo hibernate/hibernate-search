@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.query.nullValues;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -53,6 +54,7 @@ public class Value {
 			store = Store.YES,
 			indexNullAs = "_dummy_",
 			bridge = @FieldBridge(impl = DummyStringBridge.class))
+	@Column(name="dummyvalue")
 	private String dummy;
 
 	public Value() {
