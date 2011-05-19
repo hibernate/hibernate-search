@@ -38,11 +38,11 @@ public interface FullTextSession extends Session {
 	 * Create a fulltext query on top of a native Lucene query returning the matching objects
 	 * of type <code>entities</code> and their respective subclasses.
 	 *
-	 * @param luceneQuery The native Lucene query to be rn against the Lucene index.
+	 * @param luceneQuery The native Lucene query to be run against the Lucene index.
 	 * @param entities List of classes for type filtering. The query result will only return entities of
 	 * the specified types and their respective subtype. If no class is specified no type filtering will take place.
 	 *
-	 * @return A <code>FullTextQuery</code> wrapping around the native Lucene wuery.
+	 * @return A <code>FullTextQuery</code> wrapping around the native Lucene query.
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
