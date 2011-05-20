@@ -81,7 +81,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "" + address.getAddressId() );
 		System.out.println(luceneQuery.toString(  ));
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
-		assertEquals( "documenId does not work properly", 1, query.getResultSize() );
+		assertEquals( "documentId does not work properly", 1, query.getResultSize() );
 
 		luceneQuery = parser.parse( "street1:peachtree" );
 		query = s.createFullTextQuery( luceneQuery ).setProjection( "idx_street2", FullTextQuery.THIS );
@@ -110,6 +110,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		FullTextQuery query = s.createFullTextQuery(q, Item.class);
 		assertEquals("Numeric field via programmatic config",1,query.getResultSize());
 
+		s.delete(query.list().get(0));
 		tx.commit();
 		s.close();
 
