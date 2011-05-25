@@ -87,7 +87,8 @@
             also be expressed in xml or code. <para>Hibernate Search, however,
             has itself its own set of annotations (<emphasis>@Indexed,
             @DocumentId, @Field,...</emphasis>) for which there exists so far
-            no alternative configuration. </para></entry>
+            no XML based alternative; a better option is to use
+            <xref linkend="hsearch-mapping-programmaticapi" />.</para></entry>
           </row>
         </tbody>
       </tgroup>
