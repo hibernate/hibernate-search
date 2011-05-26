@@ -32,15 +32,14 @@ import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.util.ReflectionHelper;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
-
-import org.slf4j.Logger;
 
 /**
  * package class extracting the SearchMappingFactory if needed
  */
 public class SearchMappingBuilder {
-	private static final Logger LOG = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make();
 
 	private SearchMappingBuilder() {
 	}
@@ -93,7 +92,7 @@ public class SearchMappingBuilder {
 	private static SearchMapping getNewInstanceOfSearchMapping(Class<?> clazz, Method method) {
 		SearchMapping mapping = null;
 		try {
-			LOG.debug("invoking factory method [ {}.{} ] to get search mapping instance", clazz.getName(), method.getName());
+			LOG.debugf("invoking factory method [ %s.%s ] to get search mapping instance", clazz.getName(), method.getName());
 			Object instance = clazz.newInstance();
 			mapping = (SearchMapping) method.invoke(instance);
 		} catch (Exception e) {

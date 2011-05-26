@@ -35,7 +35,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -60,7 +60,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public final class ConfigContext {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * If nothing else is specified we use {@code Version.LUCENE_30} as the default Lucene version. This version
@@ -211,7 +211,7 @@ public final class ConfigContext {
 					Similarity.class, similarityClassName, ConfigContext.class, "default similarity"
 			);
 		}
-		log.debug( "Using default similarity implementation: {}", defaultSimilarity.getClass().getName() );
+		log.debugf( "Using default similarity implementation: %s", defaultSimilarity.getClass().getName() );
 		return defaultSimilarity;
 	}
 

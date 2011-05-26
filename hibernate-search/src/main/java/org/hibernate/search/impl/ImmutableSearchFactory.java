@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.util.StringHelper;
@@ -91,7 +91,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		Version.touch();
 	}
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
@@ -175,14 +175,14 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 				worker.close();
 			}
 			catch ( Exception e ) {
-				log.error( "Worker raises an exception on close()", e );
+				log.workerException( e );
 			}
 
 			try {
 				readerProvider.destroy();
 			}
 			catch ( Exception e ) {
-				log.error( "ReaderProvider raises an exception on destroy()", e );
+				log.readerProviderExceptionOnDestroy( e );
 			}
 
 			//TODO move directory provider cleaning to DirectoryProviderFactory
@@ -191,7 +191,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 					dp.stop();
 				}
 				catch ( Exception e ) {
-					log.error( "DirectoryProvider raises an exception on stop() ", e );
+					log.directoryProviderExceptionOnStop( e );
 				}
 			}
 

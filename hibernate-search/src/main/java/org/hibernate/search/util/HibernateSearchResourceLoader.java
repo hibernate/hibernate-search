@@ -34,7 +34,7 @@ import java.util.List;
 
 import org.apache.solr.common.ResourceLoader;
 import org.apache.solr.util.plugin.ResourceLoaderAware;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.logging.LoggerFactory;
@@ -45,7 +45,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final String charset;
 
@@ -119,7 +119,7 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 			}
 			catch ( IOException e ) {
 				//we don't really care if we can't close
-				log.warn( "could not close resource: {}", e );
+				log.couldNotCloseResource( e );
 			}
 		}
 	}

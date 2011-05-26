@@ -33,7 +33,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * Utility class for synchronizing files/directories.
@@ -44,7 +44,7 @@ import org.slf4j.Logger;
  */
 public abstract class FileHelper {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private static final int FAT_PRECISION = 2000;
 	public static final long DEFAULT_COPY_BUFFER_SIZE = 16 * 1024 * 1024; // 16 MB
 
@@ -100,7 +100,7 @@ public abstract class FileHelper {
 
 	public static void synchronize(File source, File destination, boolean smart, long chunkSize) throws IOException {
 		if ( chunkSize <= 0 ) {
-			log.warn( "Chunk size must be positive: using default value." );
+			log.checkSizeMustBePositive();
 			chunkSize = DEFAULT_COPY_BUFFER_SIZE;
 		}
 		if ( source.isDirectory() ) {
@@ -183,7 +183,7 @@ public abstract class FileHelper {
 		}
 		boolean successTimestampOp = destFile.setLastModified( srcFile.lastModified() );
 		if ( !successTimestampOp ) {
-			log.warn( "Could not change timestamp for {}. Index synchronization may be slow.", destFile );
+			log.notChangeTimestamp( destFile );
 		}
 	}
 
@@ -195,7 +195,7 @@ public abstract class FileHelper {
 		}
 		if ( file.exists() ) {
 			if ( !file.delete() ) {
-				log.error( "Could not delete {}", file );
+				log.notDeleted( file );
 			}
 		}
 	}

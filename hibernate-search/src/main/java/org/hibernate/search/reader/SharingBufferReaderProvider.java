@@ -35,7 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.store.Directory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.spi.BuildContext;
@@ -52,7 +52,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class SharingBufferReaderProvider implements ReaderProvider {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * contains all Readers (most current per Directory and all unclosed old readers)
@@ -76,7 +76,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		else {
 			throw new AssertionFailure( "Everything should be wrapped in a MultiReader" );
 		}
-		log.debug( "Closing MultiReader: {}", multiReader );
+		log.debugf( "Closing MultiReader: %s", multiReader );
 		for ( IndexReader reader : readers ) {
 			ReaderUsagePair container = allReaders.get( reader );
 			container.close(); //virtual
@@ -126,17 +126,17 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		}
 
 		if ( allReaders.size() != 0 ) {
-			log.warn( "ReaderProvider contains readers not properly closed at destroy time" );
+			log.readersNotProperlyClosedinReaderProvider();
 		}
 	}
 
 	public IndexReader openReader(DirectoryProvider... directoryProviders) {
 		int length = directoryProviders.length;
 		IndexReader[] readers = new IndexReader[length];
-		log.debug( "Opening IndexReader for directoryProviders: {}", length );
+		log.debugf( "Opening IndexReader for directoryProviders: %d", length );
 		for ( int index = 0; index < length; index++ ) {
 			Directory directory = directoryProviders[index].getDirectory();
-			log.trace( "Opening IndexReader from {}", directory );
+			log.tracef( "Opening IndexReader from %s", directory );
 			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directory );
 			// might eg happen for FSSlaveDirectoryProvider or for mutable SearchFactory
 			if ( directoryLatestReader == null ) {
@@ -201,7 +201,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 					reader.close();
 				}
 				catch ( IOException e ) {
-					log.warn( "Unable to close Lucene IndexReader", e );
+					log.unableToCLoseLuceneIndexReader( e );
 				}
 				assert removed != null;
 			}

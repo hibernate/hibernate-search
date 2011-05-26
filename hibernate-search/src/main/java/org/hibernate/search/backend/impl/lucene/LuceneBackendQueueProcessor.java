@@ -32,7 +32,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 
@@ -53,7 +53,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 	private final ErrorHandler errorHandler;
 	
 	private static final DpSelectionVisitor providerSelectionVisitor = new DpSelectionVisitor();
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	LuceneBackendQueueProcessor(List<LuceneWork> queue,
 			SearchFactoryImplementor searchFactoryImplementor,
@@ -79,7 +79,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 			//this Runnable splits tasks in more runnables and then runs them:
 			processors.runAll( sync );
 		} catch ( Exception e ) {
-			log.error( "Error in backend", e );	
+			log.backendError( e );	
 			ErrorContextBuilder builder = new ErrorContextBuilder();
 			builder.errorThatOccurred( e );
 			errorHandler.handle( builder.createErrorContext() );

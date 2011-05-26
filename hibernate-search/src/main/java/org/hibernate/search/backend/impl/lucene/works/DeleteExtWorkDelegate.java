@@ -35,7 +35,7 @@ import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * Extension of <code>DeleteLuceneWork</code> bound to a single entity.
@@ -49,7 +49,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 
 	private final Class<?> managedType;
 	private final DocumentBuilderIndexedEntity<?> builder;
-	private final Logger log = LoggerFactory.make();
+	private final Log log = LoggerFactory.make();
 	private final boolean idIsNumeric;
 
 	DeleteExtWorkDelegate(Workspace workspace, WorkerBuildContext context) {
@@ -63,7 +63,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		checkType( work );
 		Serializable id = work.getId();
-		log.trace( "Removing {}#{} by id using an IndexWriter.", managedType, id );
+		log.tracef( "Removing %s#%s by id using an IndexWriter.", managedType, id );
 		try {
 			if( idIsNumeric ) {
 				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );

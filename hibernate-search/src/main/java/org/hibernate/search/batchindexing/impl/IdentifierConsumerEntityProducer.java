@@ -37,7 +37,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * This Runnable is consuming entity identifiers and
@@ -49,7 +49,7 @@ import org.slf4j.Logger;
  */
 public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final ProducerConsumerQueue<List<Serializable>> source;
 	private final ProducerConsumerQueue<List<?>> destination;
@@ -89,7 +89,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			transaction.commit();
 		}
 		catch (Throwable e) {
-			log.error( "error during batch indexing: ", e );
+			log.errorDuringBatchIndexing( e );
 		}
 		finally {
 			if (upperSession == null) {
@@ -107,7 +107,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 				if ( take != null ) {
 					@SuppressWarnings("unchecked")
 					List<Serializable> listIds = (List<Serializable>) take;
-					log.trace( "received list of ids {}", listIds );
+					log.tracef( "received list of ids %s", listIds );
 					loadList( listIds, session );
 				}
 			}

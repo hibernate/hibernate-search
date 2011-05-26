@@ -25,8 +25,6 @@ package org.hibernate.search.event;
 
 import java.util.Properties;
 
-import org.slf4j.Logger;
-
 import org.hibernate.event.EventListeners;
 import org.hibernate.event.FlushEventListener;
 import org.hibernate.event.PostCollectionRecreateEventListener;
@@ -36,6 +34,7 @@ import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.Environment;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
@@ -47,7 +46,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class EventListenerRegister {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * Add the FullTextIndexEventListener to all listeners, if enabled in configuration
@@ -60,10 +59,7 @@ public class EventListenerRegister {
 		// check whether search is explicitly disabled - if so there is nothing to do
 		String enableSearchListeners = properties.getProperty( Environment.AUTOREGISTER_LISTENERS );
 		if ( "false".equalsIgnoreCase( enableSearchListeners ) ) {
-			log.info(
-					"Property hibernate.search.autoregister_listeners is set to false." +
-							" No attempt will be made to register Hibernate Search event listeners."
-			);
+			log.eventListenerWontBeRegistered();
 			return;
 		}
 		final FullTextIndexEventListener searchListener =

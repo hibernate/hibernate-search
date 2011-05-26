@@ -38,7 +38,7 @@ import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * Represents the set of changes going to be applied to the index for the entities. A stream of Work is feed as input, a
@@ -51,7 +51,7 @@ import org.slf4j.Logger;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class WorkPlan {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	private final HashMap<Class<?>, PerClassWork<?>> byClass = new HashMap<Class<?>, PerClassWork<?>>();
 	
@@ -276,8 +276,7 @@ public class WorkPlan {
 		 */
 		void recurseContainedIn(T value) {
 			if ( documentBuilder.requiresProvidedId() ) {
-				log.warn( "@ContainedIn is pointing to an entity having @ProvidedId. This is not supported, indexing of contained in entities will be skipped."
-						+ "indexed data of the embedded object might become out of date in objects of type " + HibernateHelper.getClass( value ) );
+				log.containedInPointsToProvidedId( HibernateHelper.getClass( value ) );
 			}
 			else {
 				Serializable extractedId = documentBuilder.getId( value );

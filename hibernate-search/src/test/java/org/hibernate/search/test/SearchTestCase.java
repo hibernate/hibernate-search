@@ -49,6 +49,8 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.logging.Log;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
 
 /**
@@ -58,6 +60,8 @@ import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
  * @author Hardy Ferentschik
  */
 public abstract class SearchTestCase extends HibernateTestCase {
+
+	private static final Log log = LoggerFactory.make();
 
 	public static final Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
 	public static final Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
@@ -86,7 +90,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 				.getParentFile(); // target
 
 		indexDir = new File( targetDir, "indextemp" );
-		log.debug( "Using {} as index directory.", indexDir.getAbsolutePath() );
+		log.debugf( "Using %s as index directory.", indexDir.getAbsolutePath() );
 	}
 
 	public SearchTestCase() {
@@ -105,7 +109,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 			}
 			session.close();
 			session = null;
-			log.warn("Closing open session. Make sure to close sessions explicitly in your tests!");
+			log.debug("Closing open session. Make sure to close sessions explicitly in your tests!");
 		}
 		else {
 			session = null;

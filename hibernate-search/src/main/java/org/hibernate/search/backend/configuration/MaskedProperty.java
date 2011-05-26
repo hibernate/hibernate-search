@@ -38,8 +38,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
@@ -58,7 +57,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
 public class MaskedProperty extends Properties implements Serializable {
 	
 	private static final long serialVersionUID = -593307257383085113L;
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final Properties masked;
 	private final Properties fallBack;
@@ -98,7 +97,7 @@ public class MaskedProperty extends Properties implements Serializable {
 		String compositeKey = radix + key;
 		String value = masked.getProperty( compositeKey );
 		if ( value != null) {
-			log.trace( "found a match for key: [{}] value: {}", compositeKey, value );
+			log.tracef( "found a match for key: [%s] value: %s", compositeKey, value );
 			return value;
 		}
 		else if ( fallBack != null ) {

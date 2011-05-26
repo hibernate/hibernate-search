@@ -36,7 +36,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * This Runnable is going to feed the indexing queue
@@ -52,7 +52,7 @@ import org.slf4j.Logger;
  */
 public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final ProducerConsumerQueue<List<Serializable>> destination;
 	private final SessionFactory sessionFactory;
@@ -91,7 +91,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			inTransactionWrapper(upperSession);
 		}
 		catch (Throwable e) {
-			log.error( "error during batch indexing: ", e );
+			log.errorDuringBatchIndexing( e );
 		}
 		finally{
 			destination.producerStopping();
@@ -129,7 +129,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
 			totalCount = objectsLimit;
 		}
-		log.debug( "going to fetch {} primary keys", totalCount);
+		log.debugf( "going to fetch %d primary keys", totalCount);
 		monitor.addToTotalCount( totalCount );
 		
 		Criteria criteria = session
@@ -164,7 +164,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private void enqueueList(final List<Serializable> idsList) throws InterruptedException {
 		if ( ! idsList.isEmpty() ) {
 			destination.put( idsList );
-			log.trace( "produced a list of ids {}", idsList );
+			log.tracef( "produced a list of ids %s", idsList );
 		}
 	}
 

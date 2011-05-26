@@ -36,7 +36,7 @@ public class Version {
 	}
 
 	static {
-		LoggerFactory.make().info( "Hibernate Search {}", getVersionString() );
+		LoggerFactory.make().version( getVersionString() );
 	}
 
 	public static void touch() {

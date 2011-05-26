@@ -28,7 +28,7 @@ import java.io.IOException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.util.SoftLimitMRUCache;
 import org.hibernate.search.util.logging.LoggerFactory;
@@ -45,7 +45,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
 @SuppressWarnings("serial")
 public class CachingWrapperFilter extends Filter {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	public static final int DEFAULT_SIZE = 5;
 	
@@ -75,7 +75,7 @@ public class CachingWrapperFilter extends Filter {
 	public CachingWrapperFilter(Filter filter, int size) {
 		this.filter = filter;
 		final int softRefSize = size * HARD_TO_SOFT_RATIO;
-		log.debug( "Initialising SoftLimitMRUCache with hard ref size of {} and a soft ref of {}", size, softRefSize );
+		log.debugf( "Initialising SoftLimitMRUCache with hard ref size of %d and a soft ref of %d", size, softRefSize );
 		this.cache = new SoftLimitMRUCache( size, softRefSize );
 	}	
 

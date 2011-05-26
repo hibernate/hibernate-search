@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.util.logging.LoggerFactory;
 
@@ -35,7 +35,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class CloseIndexRunnable implements Runnable {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final Workspace workspace;
 
 	public CloseIndexRunnable(Workspace workspace) {

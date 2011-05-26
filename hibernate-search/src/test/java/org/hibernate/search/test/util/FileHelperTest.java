@@ -27,9 +27,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-
 import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 import org.junit.After;
@@ -42,7 +41,7 @@ import static org.junit.Assert.*;
  * @author Hardy Ferentschik
  */
 public class FileHelperTest {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make(Log.class);
 
 	private static File root;
 
@@ -53,7 +52,7 @@ public class FileHelperTest {
 			buildDir = ".";
 		}
 		root = new File( buildDir, "filehelper" );
-		log.info( "Using {} as test directory.", root.getAbsolutePath() );
+        log.infof( "Using %s as test directory.", root.getAbsolutePath() );
 	}
 
 	/**

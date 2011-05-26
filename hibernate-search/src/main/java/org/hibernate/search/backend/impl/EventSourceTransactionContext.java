@@ -28,7 +28,7 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.TransactionManager;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.HibernateException;
 import org.hibernate.action.AfterTransactionCompletionProcess;
@@ -51,7 +51,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class EventSourceTransactionContext implements TransactionContext, Serializable {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	private final EventSource eventSource;
 	

@@ -27,13 +27,13 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
-import org.slf4j.Logger;
 
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
@@ -43,7 +43,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 	
-	private static final Logger log = LoggerFactory.make();	
+	private static final Log log = LoggerFactory.make();	
 
 	private int operationMax = -1;
 	private int transactionMax = -1;

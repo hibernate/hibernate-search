@@ -32,7 +32,6 @@ import org.jgroups.Address;
 import org.jgroups.Channel;
 import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
-import org.slf4j.Logger;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
@@ -43,6 +42,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.JGroupsHelper;
 import org.hibernate.search.util.XMLHelper;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 import org.hibernate.util.ConfigHelper;
 
@@ -54,7 +54,7 @@ import org.hibernate.util.ConfigHelper;
  */
 public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	public static final String JGROUPS_PREFIX = Environment.WORKER_BACKEND + ".jgroups.";
 
@@ -85,7 +85,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 	}
 
 	private void prepareJGroupsChannel(Properties props) {
-		log.info( "Starting JGroups Channel" );
+		log.jGroupsStartingChannel();
 		try {
 			buildChannel( props );
 			channel.setOpt( Channel.AUTO_RECONNECT, Boolean.TRUE );
@@ -94,12 +94,10 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 		catch ( ChannelException e ) {
 			throw new SearchException( "Unable to connect to: [" + clusterName + "] JGroups channel" );
 		}
-		log.info( "Connected to cluster [ {} ]. The node address is {}", clusterName, getAddress() );
+		log.jGroupsConnectedToCluster(clusterName, getAddress() );
 
 		if ( !channel.flushSupported() ) {
-			log.warn(
-					"FLUSH is not present in your JGroups stack!  FLUSH is needed to ensure messages are not dropped while new nodes join the cluster.  Will proceed, but inconsistencies may arise!"
-			);
+			log.jGroupsFlushNotPresentInStack();
 		}
 	}
 
@@ -119,7 +117,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 					channel = new JChannel( ConfigHelper.locateConfig( cfg ) );
 				}
 				catch ( Exception e ) {
-					log.error( "Error while trying to create a channel using config files: {}", cfg );
+					log.jGroupsChannelCreationUsingFileError( cfg );
 					throw new SearchException( e );
 				}
 			}
@@ -130,7 +128,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 					channel = new JChannel( XMLHelper.elementFromString( cfg ) );
 				}
 				catch ( Exception e ) {
-					log.error( "Error while trying to create a channel using config XML: {}", cfg );
+					log.jGroupsChannelCreationUsingXmlError( cfg );
 					throw new SearchException( e );
 				}
 			}
@@ -141,26 +139,21 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 					channel = new JChannel( cfg );
 				}
 				catch ( Exception e ) {
-					log.error( "Error while trying to create a channel using config string: {}", cfg );
+					log.jGroupsChannelCreationFromStringError( cfg );
 					throw new SearchException( e );
 				}
 			}
 		}
 
 		if ( channel == null ) {
-			log.info(
-					"Unable to use any JGroups configuration mechanisms provided in properties {}. Using default JGroups configuration file!",
-					props
-			);
+			log.jGroupsConfigurationNotFoundInProperties( props );
 			try {
 				URL fileUrl = ConfigHelper.locateConfig( DEFAULT_JGROUPS_CONFIGURATION_FILE );
 				if ( fileUrl != null ) {
 					channel = new JChannel( fileUrl );
 				}
 				else {
-					log.warn(
-							"Default JGroups configuration file was not found. Attempt to start JGroups channel with default configuration!"
-					);
+					log.jGroupsDefaultConfigurationFileNotFound();
 					channel = new JChannel();
 				}
 			}
@@ -175,13 +168,13 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 	public void close() {
 		try {
 			if ( channel != null && channel.isOpen() ) {
-				log.info( "Disconnecting and closing JGroups Channel" );
+				log.jGroupsDisconnectingAndClosingChannel();
 				channel.disconnect();
 				channel.close();
 			}
 		}
 		catch ( Exception toLog ) {
-			log.error( "Problem closing channel; setting it to null", toLog );
+			log.jGroupsClosingChannelError( toLog );
 			channel = null;
 		}
 	}

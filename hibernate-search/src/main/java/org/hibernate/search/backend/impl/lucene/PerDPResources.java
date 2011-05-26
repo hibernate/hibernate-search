@@ -31,7 +31,7 @@ import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  */
 class PerDPResources {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	private final ExecutorService executor;
 	private final LuceneWorkVisitor visitor;
@@ -88,7 +88,7 @@ class PerDPResources {
 			executor.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
 		}
 		catch (InterruptedException e) {
-			log.warn( "Was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock" );
+			log.interruptedWhileWaitingForIndexActivity();
 		}
 	}
 

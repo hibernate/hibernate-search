@@ -35,7 +35,7 @@ import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * This runnable will prepare a pipeline for batch indexing
@@ -45,7 +45,7 @@ import org.slf4j.Logger;
  */
 public class BatchIndexingWorkspace implements Runnable {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	private final SearchFactoryImplementor searchFactory;
 	private final SessionFactory sessionFactory;
@@ -150,7 +150,7 @@ public class BatchIndexingWorkspace implements Runnable {
 			execDocBuilding.shutdown();
 			try {
 				producerEndSignal.await(); //await for all work being sent to the backend
-				log.debug( "All work for type {} has been produced", indexedType.getName() );
+				log.debugf( "All work for type %s has been produced", indexedType.getName() );
 			} catch (InterruptedException e) {
 				//restore interruption signal:
 				Thread.currentThread().interrupt();

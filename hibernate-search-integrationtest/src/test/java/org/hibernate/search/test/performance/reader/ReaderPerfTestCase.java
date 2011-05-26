@@ -36,7 +36,6 @@ import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-import org.slf4j.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -46,6 +45,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
@@ -53,7 +53,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public abstract class ReaderPerfTestCase extends SearchTestCase {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	protected void setUp() throws Exception {
 		File sub = getBaseIndexDir();

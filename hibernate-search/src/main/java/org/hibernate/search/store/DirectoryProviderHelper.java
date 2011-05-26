@@ -45,13 +45,12 @@ import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
-import org.slf4j.Logger;
-
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
@@ -60,7 +59,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class DirectoryProviderHelper {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private static final String ROOT_INDEX_PROP_NAME = "sourceBase";
 	private static final String RELATIVE_INDEX_PROP_NAME = "source";
@@ -139,7 +138,7 @@ public final class DirectoryProviderHelper {
 		// must use the setter (instead of using the constructor) to set the lockFactory, or Lucene will
 		// throw an exception if it's different than a previous setting.
 		fsDirectory.setLockFactory( lockFactory );
-		log.debug( "Initialize index: '{}'", indexDir.getAbsolutePath() );
+		log.debugf( "Initialize index: '%s'", indexDir.getAbsolutePath() );
 		initializeIndexIfNeeded( fsDirectory );
 		return fsDirectory;
 	}
@@ -255,7 +254,7 @@ public final class DirectoryProviderHelper {
 	 */
 	private static void makeSanityCheckedDirectory(File directory, String indexName, boolean verifyIsWritable) {
 		if ( !directory.exists() ) {
-			log.warn( "Index directory not found, creating: '" + directory.getAbsolutePath() + "'" );
+			log.indexDirectoryNotFoundCreatingNewOne( directory.getAbsolutePath() );
 			//if not existing, create the full path
 			if ( !directory.mkdirs() ) {
 				throw new SearchException(
@@ -292,7 +291,7 @@ public final class DirectoryProviderHelper {
 	 */
 	static long getRetryInitializePeriod(Properties properties, String directoryProviderName) {
 		int retry_period_seconds = ConfigurationParseHelper.getIntValue( properties, RETRY_INITIALIZE_PROP_NAME, 0 );
-		log.debug( "Retry initialize period for Directory {}: {} seconds", directoryProviderName, retry_period_seconds );
+		log.debugf( "Retry initialize period for Directory %s: %d seconds", directoryProviderName, retry_period_seconds );
 		if ( retry_period_seconds < 0 ) {
 			throw new SearchException( RETRY_INITIALIZE_PROP_NAME + " for Directory " + directoryProviderName + " must be a positive integer" );
 		}
@@ -310,7 +309,7 @@ public final class DirectoryProviderHelper {
 					"Unable to initialize index: " + directoryProviderName + "; refresh period is not numeric.", nfe
 			);
 		}
-		log.debug( "Refresh period: {} seconds", period );
+		log.debugf( "Refresh period: %d seconds", period );
 		return period * 1000; //per second
 	}
 

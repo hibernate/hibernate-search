@@ -29,11 +29,12 @@ import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.Receiver;
 import org.jgroups.View;
-import org.slf4j.Logger;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
+
 
 /**
  * Listen for messages from slave nodes and apply them into <code>LuceneBackendQueueProcessor</code>
@@ -45,7 +46,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class JGroupsMasterMessageListener implements Receiver {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private SearchFactoryImplementor searchFactory;
 
@@ -60,14 +61,14 @@ public class JGroupsMasterMessageListener implements Receiver {
 			queue = ( List<LuceneWork> ) message.getObject();
 		}
 		catch ( ClassCastException e ) {
-			log.error( "Illegal object retrieved from message.", e );
+			log.illegalObjectRetrievedFromMessage( e );
 			return;
 		}
 
 		if ( queue != null && !queue.isEmpty() ) {
 			if ( log.isDebugEnabled() ) {
-				log.debug(
-					"There are {} Lucene docs received from slave node {} to be processed by master",
+				log.debugf(
+					"There are %d Lucene docs received from slave node %s to be processed by master",
 					queue.size(),
 					message.getSrc()
 				);
@@ -76,7 +77,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 			worker.run();
 		}
 		else {
-			log.warn( "Received null or empty Lucene works list in message." );
+			log.receivedEmptyLuceneWOrksInMessage();
 		}
 	}
 
@@ -99,7 +100,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 	}
 
 	public void viewAccepted(View view) {
-		log.info( "Received new cluster view: {}", view );
+		log.jGroupsReceivedNewClusterView( view );
 	}
 
 	public void suspect(Address suspected_mbr) {

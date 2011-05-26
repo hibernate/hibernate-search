@@ -25,7 +25,7 @@ package org.hibernate.search.backend;
 
 import java.util.List;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -38,7 +38,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class WorkQueue {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private WorkPlan plan;
 
@@ -75,7 +75,7 @@ public class WorkQueue {
 
 	public WorkQueue splitQueue() {
 		if ( log.isTraceEnabled() ) {
-			log.trace( "Splitting workqueue with {} works", plan.size() );
+			log.tracef( "Splitting workqueue with %d works", plan.size() );
 		}
 		WorkQueue subQueue = new WorkQueue( searchFactoryImplementor, plan );
 		this.plan = new WorkPlan( searchFactoryImplementor );

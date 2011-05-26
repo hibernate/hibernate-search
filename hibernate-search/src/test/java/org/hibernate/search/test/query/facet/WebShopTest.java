@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.search.Query;
-import org.slf4j.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -40,6 +39,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.RangeFacet;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 import static org.hibernate.search.util.CollectionHelper.newArrayList;
@@ -51,7 +51,7 @@ import static org.hibernate.search.util.CollectionHelper.newHashMap;
  * @author Hardy Ferentschik
  */
 public class WebShopTest extends AbstractFacetTest {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make(Log.class);
 
 	public void testSimulateClient() {
 		// get hold of the search service
@@ -117,7 +117,7 @@ public class WebShopTest extends AbstractFacetTest {
 				}
 			}
 		}
-		log.info( "Indexed cars: " + allCars );
+		log.infof( "Indexed cars: %s", allCars );
 		tx.commit();
 		session.clear();
 	}

@@ -37,7 +37,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.document.Document;
-import org.slf4j.Logger;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.FullTextQuery;
@@ -45,13 +44,14 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public class SearcherThread implements Runnable {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make(Log.class);
 	private final int threadId;
 	private final String queryString;
 	private final SessionFactory sf;

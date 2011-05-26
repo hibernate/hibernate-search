@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.store.FSDirectory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
@@ -61,7 +61,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	// defined to have CURRENT_DIR_NAME[1] == "current"+"1":
 	private static final String[] CURRENT_DIR_NAME = { null, CURRENT1, CURRENT2 };
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 	
 	private volatile int current;
@@ -86,9 +86,9 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		this.directoryProviderName = directoryProviderName;
 		//source guessing
 		sourceDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, true );
-		log.debug( "Source directory: {}", sourceDir.getPath() );
+		log.debugf( "Source directory: %s", sourceDir.getPath() );
 		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
-		log.debug( "Index directory: {}", indexDir.getPath() );
+		log.debugf( "Index directory: %s", indexDir.getPath() );
 		try {
 			indexName = indexDir.getCanonicalPath();
 			directory = DirectoryProviderHelper.createFSIndex( indexDir, properties );
@@ -114,7 +114,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				currentLocal = 1;
 			}
 			else {
-				log.debug( "Source directory for '{}' will be initialized", indexName);
+				log.debugf( "Source directory for '%s' will be initialized", indexName);
 				currentLocal = 1;
 			}
 			String currentString = Integer.valueOf( currentLocal ).toString();
@@ -124,7 +124,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			new File( sourceDir, CURRENT2 ).delete();
 			//TODO small hole, no file can be found here
 			new File( sourceDir, CURRENT_DIR_NAME[currentLocal] ).createNewFile();
-			log.debug( "Current directory: {}", currentLocal );
+			log.debugf( "Current directory: %d", currentLocal );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
@@ -176,7 +176,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			directory.close();
 		}
 		catch (Exception e) {
-			log.error( "Unable to properly close Lucene directory {}" + directory.getDirectory(), e );
+			log.unableToCloseLuceneDirectory( directory.getDirectory(), e );
 		}
 	}
 
@@ -195,7 +195,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				executor.execute( copyTask );
 			}
 			else {
-				log.info( "Skipping directory synchronization, previous work still in progress: {}", indexName );
+				log.skippingDirectorySynchronization( indexName );
 			}
 		}
 		
@@ -223,25 +223,25 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				int index = oldIndex == 1 ? 2 : 1;
 				File destinationFile = new File( destination, Integer.valueOf(index).toString() );
 				try {
-					log.trace( "Copying {} into {}", source, destinationFile );
+					log.tracef( "Copying %s into %s", source, destinationFile );
 					FileHelper.synchronize( source, destinationFile, true, copyChunkSize );
 					current = index;
 				}
 				catch (IOException e) {
 					//don't change current
-					log.error( "Unable to synchronize source of " + indexName, e );
+					log.unableToSynchronizeSource( indexName, e );
 					return;
 				}
 				if ( ! new File( destination, CURRENT_DIR_NAME[oldIndex] ).delete() ) {
-					log.warn( "Unable to remove previous marker file from source of {}", indexName );
+					log.unableToRemovePreviousMarket( indexName );
 				}
 				try {
 					new File( destination, CURRENT_DIR_NAME[index]  ).createNewFile();
 				}
 				catch( IOException e ) {
-					log.warn( "Unable to create current marker in source of " + indexName, e );
+					log.unableToCreateCurrentMarker( indexName, e );
 				}
-				log.trace( "Copy for {} took {} ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
+				log.tracef( "Copy for %s took %d ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
 			}
 			finally {
 				directoryProviderLock.unlock();

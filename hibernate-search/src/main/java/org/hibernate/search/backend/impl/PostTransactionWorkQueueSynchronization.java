@@ -26,13 +26,12 @@ package org.hibernate.search.backend.impl;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
-import org.slf4j.Logger;
-
 import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.WeakIdentityHashMap;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
@@ -42,7 +41,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class PostTransactionWorkQueueSynchronization implements Synchronization {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * FullTextIndexEventListener is using a WeakIdentityHashMap<Session,Synchronization>
@@ -77,14 +76,14 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	public void beforeCompletion() {
 		if ( prepared ) {
 			if ( log.isTraceEnabled() ) {
-				log.trace(
-						"Transaction's beforeCompletion() phase already been processed, ignoring: {}", this.toString()
+				log.tracef(
+						"Transaction's beforeCompletion() phase already been processed, ignoring: %s", this.toString()
 				);
 			}
 		}
 		else {
 			if ( log.isTraceEnabled() ) {
-				log.trace( "Processing Transaction's beforeCompletion() phase: {}", this.toString() );
+				log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this.toString() );
 			}
 			queueingProcessor.prepareWorks( queue );
 			prepared = true;
@@ -95,16 +94,16 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {
 				if ( log.isTraceEnabled() ) {
-					log.trace(
-							"Processing Transaction's afterCompletion() phase for {}. Performing work.", this.toString()
+					log.tracef(
+							"Processing Transaction's afterCompletion() phase for %s. Performing work.", this.toString()
 					);
 				}
 				queueingProcessor.performWorks( queue );
 			}
 			else {
 				if ( log.isTraceEnabled() ) {
-					log.trace(
-							"Processing Transaction's afterCompletion() phase for {}. Cancelling work due to transaction status {}",
+					log.tracef(
+							"Processing Transaction's afterCompletion() phase for %s. Cancelling work due to transaction status %d",
 							this.toString(),
 							i
 					);

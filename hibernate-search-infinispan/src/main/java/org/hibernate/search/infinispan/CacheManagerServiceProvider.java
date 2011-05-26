@@ -31,9 +31,9 @@ import javax.naming.NamingException;
 
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
-import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.infinispan.logging.Log;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.JGroupsHelper;
 import org.hibernate.search.util.logging.LoggerFactory;
@@ -49,7 +49,7 @@ import org.hibernate.util.PropertiesHelper;
  */
 public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCacheManager> {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make(Log.class);
 
 	/**
 	 * If no configuration is defined an no JNDI lookup name is provided, than a new Infinispan CacheManager
@@ -115,8 +115,8 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 			return (EmbeddedCacheManager) ctx.lookup( jndiNamespace );
 		}
 		catch ( NamingException ne ) {
-			String msg = "Unable to retrieve CacheManager from JNDI [" + jndiNamespace + "]";
-			log.error( msg, ne );
+		    String msg = "Unable to retrieve CacheManager from JNDI [" + jndiNamespace + "]";
+			log.unableToRetrieveCacheManagerFromJndi(jndiNamespace, ne);
 			throw new SearchException( msg );
 		}
 		finally {
@@ -125,7 +125,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 					ctx.close();
 				}
 				catch ( NamingException ne ) {
-					log.error( "Unable to release initial context", ne );
+					log.unableToReleaseInitialContext(ne);
 				}
 			}
 		}

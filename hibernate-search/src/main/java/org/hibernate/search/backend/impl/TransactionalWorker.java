@@ -26,7 +26,7 @@ package org.hibernate.search.backend.impl;
 import java.util.Properties;
 import javax.transaction.Synchronization;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.QueueingProcessor;
@@ -53,7 +53,7 @@ public class TransactionalWorker implements Worker {
 
 	//note: there is one Worker instance per SearchFactory, reused concurrently for all sessions.
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	//this is being used from different threads, but doesn't need a
 	//synchronized map since for a given transaction, we have not concurrent access
@@ -83,10 +83,7 @@ public class TransactionalWorker implements Worker {
 		else {
 			// this is a workaround: isTransactionInProgress should return "true"
 			// for correct configurations.
-			log.warn(
-					"It appears changes are being pushed to the index out of a transaction. " +
-							"Register the IndexWorkFlushEventListener listener on flush to correctly manage Collections!"
-			);
+			log.pushedChangesOutOfTransaction();
 			WorkQueue queue = new WorkQueue( factory );
 			queueingProcessor.add( work, queue );
 			queueingProcessor.prepareWorks( queue );

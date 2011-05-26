@@ -26,7 +26,7 @@ package org.hibernate.search.backend.impl.lucene.works;
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexWriter;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -46,7 +46,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 class OptimizeWorkDelegate implements LuceneWorkDelegate {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final Workspace workspace;
 
@@ -56,7 +56,7 @@ class OptimizeWorkDelegate implements LuceneWorkDelegate {
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		final Class<?> entityType = work.getEntityClass();
-		log.trace( "optimize Lucene index: {}", entityType );
+		log.tracef( "optimize Lucene index: %s", entityType );
 		try {
 			writer.optimize();
 			workspace.optimize();

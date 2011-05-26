@@ -27,13 +27,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.slf4j.Logger;
-
 /**
  * @author Hardy Ferentschik
  */
 public class LoggerHelper {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	public static PrintStream getLoggingPrintStream() {
 		return new PrintStream( new CustomByteArrayOutputStream(), true );

@@ -33,8 +33,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
-import org.slf4j.Logger;
 
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
@@ -44,7 +44,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class AnalyzerUtils {
 
-	public static final Logger log = LoggerFactory.make();
+	public static final Log log = LoggerFactory.make();
 
 	public static Token[] tokensFromAnalysis(Analyzer analyzer, String field, String text) throws IOException {
 		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );

@@ -28,7 +28,7 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
@@ -57,7 +57,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class BatchedQueueingProcessor implements QueueingProcessor {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final boolean sync;
 	private final int batchSize;
@@ -159,7 +159,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 				executorService.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
 			}
 			catch ( InterruptedException e ) {
-				log.error( "Unable to properly shut down asynchronous indexing work", e );
+				log.unableToShutdownAsyncronousIndexing( e );
 			}
 		}
 		//and stop the backend

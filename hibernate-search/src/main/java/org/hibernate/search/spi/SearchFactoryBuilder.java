@@ -38,7 +38,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
@@ -108,7 +108,7 @@ public class SearchFactoryBuilder {
 		Version.touch();
 	}
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private SearchConfiguration cfg;
 	private MutableSearchFactory rootFactory;
@@ -363,7 +363,7 @@ public class SearchFactoryBuilder {
 			if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
 
 				if ( mappedXClass.isAbstract() ) {
-					log.warn( "Abstract classes can never insert index documents. Remove @Indexed." );
+					log.abstractClassesCannotInsertDocuments();
 					continue;
 				}
 
@@ -416,7 +416,7 @@ public class SearchFactoryBuilder {
 		for ( XClass xClass : optimizationBlackListX ) {
 			Class type = classMappings.get( xClass );
 			if ( type != null ) {
-				log.trace( "Dirty checking optimizations disabled for class {}", type );
+				log.tracef( "Dirty checking optimizations disabled for class %s", type );
 				DocumentBuilderIndexedEntity<?> documentBuilderIndexedEntity = documentBuildersIndexedEntities.get( type );
 				if ( documentBuilderIndexedEntity != null ) {
 					documentBuilderIndexedEntity.forceStateInspectionOptimizationsDisabled();

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.SearchConfiguration;
@@ -24,7 +24,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class ServiceManager {
 	private static final String SERVICES_FILE = "META-INF/services/" + ServiceProvider.class.getName();
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	//barrier protected by the Hibernate Search instantiation
 	private final Map<Class<ServiceProvider<?>>,ServiceProviderWrapper> managedProviders = new HashMap<Class<ServiceProvider<?>>,ServiceProviderWrapper>();
@@ -105,13 +105,13 @@ public class ServiceManager {
 	public void stopServices() {
 		for (ServiceProviderWrapper wrapper :  managedProviders.values() ) {
 			if ( wrapper.getCounter() != 0 ) {
-				log.warn( "service provider has been used but not released: {}", wrapper.getServiceProvider().getClass() );
+				log.serviceProviderNotReleased( wrapper.getServiceProvider().getClass() );
 			}
 			try {
 				wrapper.getServiceProvider().stop();
 			}
 			catch ( Exception e ) {
-				log.error( "Fail to properly stop service: {}", wrapper.getServiceProvider().getClass(), e );
+				log.stopServiceFailed( wrapper.getServiceProvider().getClass(), e );
 			}
 		}
 	}

@@ -32,7 +32,7 @@ import javax.jms.QueueConnection;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -43,7 +43,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class JMSBackendQueueProcessor implements Runnable {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private List<LuceneWork> queue;
 	private JMSBackendQueueProcessorFactory factory;
@@ -89,7 +89,7 @@ public class JMSBackendQueueProcessor implements Runnable {
 					cnn.close();
 				}
 			catch ( JMSException e ) {
-				log.warn( "Unable to close JMS connection for " + factory.getJmsQueueName(), e );
+				log.unableToCloseJmsConnection( factory.getJmsQueueName(), e );
 			}
 		}
 	}

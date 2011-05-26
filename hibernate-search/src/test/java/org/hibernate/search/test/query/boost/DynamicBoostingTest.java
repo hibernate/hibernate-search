@@ -28,18 +28,18 @@ import java.util.List;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.slf4j.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 public class DynamicBoostingTest extends SearchTestCase {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	public void testDynamicBoosts() throws Exception {
 
@@ -114,7 +114,7 @@ public class DynamicBoostingTest extends SearchTestCase {
 				queryResult = ( Object[] ) resultList.get( 0 );
 				score = ( Float ) queryResult[0];
 				String explanation = queryResult[1].toString();
-				log.debug( "score: " + score + " explanation: " + explanation );
+				log.debugf( "score: %f explanation: %s", score, explanation );
 			}
 		}
 		finally {

@@ -28,9 +28,9 @@ import java.util.Properties;
 import org.infinispan.Cache;
 import org.infinispan.lucene.InfinispanDirectory;
 import org.infinispan.manager.EmbeddedCacheManager;
-import org.slf4j.Logger;
 
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
+import org.hibernate.search.infinispan.logging.Log;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProviderHelper;
 import org.hibernate.search.util.logging.LoggerFactory;
@@ -43,7 +43,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class InfinispanDirectoryProvider implements org.hibernate.search.store.DirectoryProvider<InfinispanDirectory> {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make(Log.class);
 
 	public static final String DEFAULT_LOCKING_CACHENAME = "LuceneIndexesLocking";
 
@@ -84,7 +84,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		Cache lockingCache = cacheManager.getCache( lockingCacheName );
 		directory = new InfinispanDirectory( metadataCache, dataCache, lockingCache, directoryProviderName, chunkSize );
 		DirectoryProviderHelper.initializeIndexIfNeeded( directory );
-		log.debug( "Initialized Infinispan index: '{}'", directoryProviderName );
+		log.debugf( "Initialized Infinispan index: '%s'", directoryProviderName );
 	}
 
 	@Override

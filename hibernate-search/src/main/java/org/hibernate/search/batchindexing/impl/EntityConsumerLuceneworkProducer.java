@@ -47,7 +47,7 @@ import org.hibernate.search.engine.spi.EntityInitializer;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.logging.LoggerFactory;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * Component of batch-indexing pipeline, using chained producer-consumers.
@@ -58,7 +58,7 @@ import org.slf4j.Logger;
  */
 public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
@@ -101,7 +101,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 			transaction.commit();
 		}
 		catch (Throwable e) {
-			log.error( "error during batch indexing: ", e );
+			log.errorDuringBatchIndexing( e );
 		}
 		finally {
 			producerEndSignal.countDown();
@@ -122,7 +122,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 					break;
 				}
 				else {
-					log.trace( "received a list of objects to index: {}", takeList );
+					log.tracef( "received a list of objects to index: %s", takeList );
 					for ( Object take : takeList ) {
 						//trick to attach the objects to session:
 						session.buildLockRequest( LockOptions.NONE ).lock( take );

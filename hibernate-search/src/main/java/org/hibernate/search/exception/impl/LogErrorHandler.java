@@ -29,7 +29,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * @author Amin Mohammed-Coleman
@@ -38,7 +38,7 @@ import org.slf4j.Logger;
  */
 public class LogErrorHandler implements ErrorHandler {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	public void handle(ErrorContext context) {
 		
@@ -79,7 +79,7 @@ public class LogErrorHandler implements ErrorHandler {
 	}
 	
 	protected void logError(String errorMsg, Throwable exceptionThatOccurred) {
-		log.error( errorMsg, exceptionThatOccurred );
+		log.exceptionOccured( errorMsg, exceptionThatOccurred );
 	}
 	
 }

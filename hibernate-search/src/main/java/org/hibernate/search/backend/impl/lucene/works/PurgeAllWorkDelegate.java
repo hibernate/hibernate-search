@@ -25,7 +25,7 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -44,14 +44,14 @@ import org.hibernate.search.util.logging.LoggerFactory;
 */
 class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	PurgeAllWorkDelegate() {
 	}
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		final Class<?> entityType = work.getEntityClass();
-		log.trace( "purgeAll Lucene index using IndexWriter for type: {}", entityType );
+		log.tracef( "purgeAll Lucene index using IndexWriter for type: %s", entityType );
 		try {
 			Term term = new Term( DocumentBuilder.CLASS_FIELDNAME, entityType.getName() );
 			writer.deleteDocuments( term );

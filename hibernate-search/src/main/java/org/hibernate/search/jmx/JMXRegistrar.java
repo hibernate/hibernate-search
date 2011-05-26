@@ -28,7 +28,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.logging.LoggerFactory;
@@ -39,7 +39,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class JMXRegistrar {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private JMXRegistrar() {
 	}
@@ -82,7 +82,7 @@ public final class JMXRegistrar {
 				mbs.unregisterMBean( objectName );
 			}
 			catch ( Exception e ) {
-				log.warn( "Unable to un-register existing MBean: " + name, e );
+				log.unableToUnregisterExistingMBean( name, e );
 			}
 		}
 	}

@@ -23,7 +23,7 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class PersistenceContextObjectsInitializer implements ObjectsInitializer {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final ObjectsInitializer delegate;
 
 	public PersistenceContextObjectsInitializer(ObjectsInitializer delegate) {
@@ -52,7 +52,7 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
-			log.trace( "No object to initialize", maxResults );
+			log.tracef( "No object to initialize", maxResults );
 			return;
 		}
 
@@ -76,7 +76,7 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		}
 		//update entityInfos to only contains the remaining ones
 		final int remainingSize = remainingEntityInfos.size();
-		log.trace( "Initialized {} objects out of {} in the persistence context", maxResults - remainingSize, maxResults );
+		log.tracef( "Initialized %d objects out of %d in the persistence context", maxResults - remainingSize, maxResults );
 		if (remainingSize > 0) {
 			delegate.initializeObjects(
 					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),

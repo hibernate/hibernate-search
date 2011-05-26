@@ -36,7 +36,7 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchFactory;
@@ -64,7 +64,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
 //TODO renaming to "DirectoryWorkspace" would be nice.
 public class Workspace {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	/**
 	 * This Analyzer is never used in practice: during Add operation it's overriden.
@@ -259,7 +259,7 @@ public class Workspace {
 	 * Forces release of Directory lock. Should be used only to cleanup as error recovery.
 	 */
 	public synchronized void forceLockRelease() {
-		log.warn( "going to force release of the IndexWriter lock" );
+		log.forcingReleaseIndexWriterLock();
 		try {
 			try {
 				if ( writer != null ) {

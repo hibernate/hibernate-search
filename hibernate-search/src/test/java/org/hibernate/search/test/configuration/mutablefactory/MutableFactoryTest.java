@@ -35,7 +35,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.slf4j.Logger;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.backend.Work;
@@ -50,6 +49,7 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 import org.junit.Test;
@@ -60,7 +60,7 @@ import static org.junit.Assert.*;
  */
 public class MutableFactoryTest {
 
-	public static final Logger log = LoggerFactory.make();
+	public static final Log log = LoggerFactory.make();
 
 	@Test
 	public void testCreateEmptyFactory() throws Exception {

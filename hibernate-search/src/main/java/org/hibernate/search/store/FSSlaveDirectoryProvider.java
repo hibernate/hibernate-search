@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
@@ -61,7 +61,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
 
 	private volatile boolean initialized = false;
@@ -88,9 +88,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		this.directoryProviderName = directoryProviderName;
 		//source guessing
 		sourceIndexDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, false );
-		log.debug( "Source directory: {}", sourceIndexDir.getPath() );
+		log.debugf( "Source directory: %s", sourceIndexDir.getPath() );
 		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
-		log.debug( "Index directory: {}", indexDir.getPath() );
+		log.debugf( "Index directory: %s", indexDir.getPath() );
 		try {
 			indexName = indexDir.getCanonicalPath();
 		}
@@ -188,7 +188,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 					throw new SearchException( "Unable to create the directory marker file: " + indexName );
 				}
 			}
-			log.debug( "Current directory: {}", currentToBe );
+			log.debugf( "Current directory: %d", currentToBe );
 		}
 		catch ( IOException e ) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
@@ -265,7 +265,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			catch (RuntimeException re) {
 				// we need this to make sure the error is logged somewhere,
 				// as we're executing it in the timer thread
-				log.error( "Failed to initialize SlaveDirectoryProvider " + indexName, re );
+				log.failedSlaveDirectoryProviderInitialization( indexName, re );
 			}
 		}
 	}
@@ -277,9 +277,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		if ( !initialized ) {
 			if ( currentMarkerIsInSource() ) {
 				initialized = true;
-				log.info( "Found current marker in source directory - initialization succeeded" );
+				log.foundCurrentMarker();
 			} else {
-				log.warn( "No current marker in source directory. Has the master being started already?" );
+				log.noCurrentMarkerInSourceDirectory();
 			}
 		}
 		if ( initialized ) {
@@ -306,7 +306,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				if ( log.isTraceEnabled() ) {
 					@SuppressWarnings("unused")
 					int unneeded = current;//ensure visibility of indexName in Timer threads.
-					log.trace( "Skipping directory synchronization, previous work still in progress: {}", indexName );
+					log.tracef( "Skipping directory synchronization, previous work still in progress: %s", indexName );
 				}
 			}
 		}
@@ -331,7 +331,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			try {
 				File sourceFile = determineCurrentSourceFile();
 				if ( sourceFile == null ) {
-					log.warn( "Unable to determine current in source directory, will try again during the next synchronization" );
+					log.unableToDetermineCurrentInSourceDirectory();
 					return;
 				}
 
@@ -346,7 +346,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 					}
 				}
 				catch ( IOException ioe ) {
-					log.warn( "Unable to compare {} with {}.", sourceFile.getName(), currentDestinationFile.getName() );
+					log.unableToCompareSourceWithDestinationDirectory( sourceFile.getName(), currentDestinationFile.getName() );
 				}
 
 				// copy is required
@@ -354,24 +354,24 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				int index = oldIndex == 1 ? 2 : 1;
 				File destinationFile = new File( destination, Integer.valueOf( index ).toString() );
 				try {
-					log.trace( "Copying {} into {}", sourceFile, destinationFile );
+					log.tracef( "Copying %s into %s", sourceFile, destinationFile );
 					FileHelper.synchronize( sourceFile, destinationFile, true, copyChunkSize );
 					current = index;
-					log.trace( "Copy for {} took {} ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
+					log.tracef( "Copy for %s took %d ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
 				}
 				catch ( IOException e ) {
 					//don't change current
-					log.error( "Unable to synchronize " + indexName, e );
+				    log.unableToSynchronizeSource( indexName, e );
 					return;
 				}
 				if ( !new File( indexName, "current" + oldIndex ).delete() ) {
-					log.warn( "Unable to remove previous marker file in " + indexName );
+					log.unableToRemovePreviousMarket( indexName );
 				}
 				try {
 					new File( indexName, "current" + index ).createNewFile();
 				}
 				catch ( IOException e ) {
-					log.warn( "Unable to create current marker file in " + indexName, e );
+					log.unableToCreateCurrentMarker( indexName, e );
 				}
 			}
 			finally {
@@ -412,7 +412,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			try {
 				directory.close();
 			} catch ( Exception e ) {
-				log.error( "Unable to properly close Lucene directory " + directory, e );
+				log.unableToCloseLuceneDirectory( directory, e );
 			}
 		}
 	}

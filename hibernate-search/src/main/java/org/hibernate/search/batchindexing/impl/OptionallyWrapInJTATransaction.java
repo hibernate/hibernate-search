@@ -4,7 +4,7 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
@@ -24,7 +24,7 @@ import org.hibernate.transaction.TransactionFactory;
  */
 public class OptionallyWrapInJTATransaction implements Runnable {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final SessionFactoryImplementor factory;
 	private final SessionAwareRunnable sessionAwareRunnable;
@@ -92,13 +92,13 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 			}
 			catch (Throwable e) {
 				//TODO exception handling seems messy-ish
-				log.error( "Error while executing runnable wrapped in a JTA transaction", e );
+				log.errorExecutingRunnableInTransaction( e );
 				try {
 					factory.getTransactionManager().rollback();
 				}
 				catch ( SystemException e1 ) {
 					// we already have an exception, don't propagate this one
-					log.error( "Error while rollbacking transaction after " + e.getMessage(), e1 );
+					log.errorRollbackingTransaction( e.getMessage(), e1 );
 				}
 			}
 		}
@@ -132,7 +132,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 			}
 		}
 		catch ( SystemException e ) {
-			log.warn( "Cannot guess the Transaction Status: not starting a JTA transaction", e );
+			log.cannotGuessTransactionStatus( e );
 			return false;
 		}
 		log.trace( "Transaction in progress, no needs to start a JTA transaction" );

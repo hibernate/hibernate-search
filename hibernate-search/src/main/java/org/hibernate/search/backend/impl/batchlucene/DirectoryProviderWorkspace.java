@@ -27,8 +27,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -39,6 +37,7 @@ import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
@@ -53,7 +52,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  */
 class DirectoryProviderWorkspace {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	private final ExecutorService executor;
 	private final LuceneWorkVisitor visitor;
@@ -110,7 +109,7 @@ class DirectoryProviderWorkspace {
 		if ( closed.compareAndSet( false, true ) ) {
 			try {
 				if ( ! executor.isShutdown() ) {
-					log.error( "Terminating batch work! Index might end up in inconsistent state." );
+					log.terminatingBatchWorkCanCauseInconsistentState();
 					executor.shutdownNow();
 				}
 			}

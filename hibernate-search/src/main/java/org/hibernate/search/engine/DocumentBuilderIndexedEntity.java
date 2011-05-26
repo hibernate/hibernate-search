@@ -40,7 +40,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -93,7 +93,7 @@ import org.hibernate.search.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * Arrays of directory providers for the underlying Lucene indexes of the indexed entity.
@@ -205,8 +205,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		checkAllowFieldSelection();
 		idFieldCacheCollectorFactory = figureIdFieldCacheUsage();
 		if ( log.isDebugEnabled() ) {
-			log.debug(
-					"Field selection in projections is set to {} for entity {}.",
+			log.debugf(
+					"Field selection in projections is set to %b for entity %s.",
 					allowFieldSelectionInProjection,
 					clazz
 			);
@@ -221,7 +221,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( this.fieldCacheUsage.contains( org.hibernate.search.annotations.FieldCacheType.ID ) ) {
 			FieldCacheLoadingType collectorTypeForId = ClassLoadingStrategySelector.guessAppropriateCollectorType( idBridge );
 			if ( collectorTypeForId == null ) {
-				log.warn( "FieldCache was enabled on class " + this.beanClass + " but for this type of identifier we can't extract values from the FieldCache: cache disabled" );
+				log.cannotExtractValueForIdentifier( this.beanClass );
 				return null;
 			}
 			TwoWayStringBridge twoWayIdStringBridge = ClassLoadingStrategySelector.getTwoWayStringBridge( idBridge );

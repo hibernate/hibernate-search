@@ -38,7 +38,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.util.FileHelper;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * Use the builder pattern to provide a SessionFactory.
@@ -50,7 +50,7 @@ import org.slf4j.Logger;
  */
 public class FullTextSessionBuilder {
 	
-	private static final Logger log = org.hibernate.search.util.logging.LoggerFactory.make();
+	private static final Log log = org.hibernate.search.util.logging.LoggerFactory.make();
 
 	private static final File indexDir;
 
@@ -66,7 +66,7 @@ public class FullTextSessionBuilder {
 		}
 		File current = new File( buildDir );
 		indexDir = new File( current, "indextemp" );
-		log.debug( "Using {} as index directory.", indexDir.getAbsolutePath() );
+		log.debugf( "Using %s as index directory.", indexDir.getAbsolutePath() );
 	}
 	
 	public FullTextSessionBuilder() {

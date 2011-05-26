@@ -31,8 +31,8 @@ import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.logging.Log;
 import org.hibernate.search.util.logging.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * This backend does not do anything: the Documents are not
@@ -45,7 +45,7 @@ import org.slf4j.Logger;
  */
 public class BlackHoleBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	private final NoOp noOp = new NoOp();
 	
@@ -55,17 +55,17 @@ public class BlackHoleBackendQueueProcessorFactory implements UpdatableBackendQu
 
 	public void initialize(Properties props, WorkerBuildContext context) {
 		// no-op
-		log.warn( "initialized \"blackhole\" backend. Index changes will be prepared but discarded!" );
+		log.initializedBlackholeBackend();
 	}
 
 	public void close() {
 		// no-op
-		log.info( "closed \"blackhole\" backend." );
+		log.closedBlackholeBackend();
 	}
 
 	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context) {
 		//no-op
-		log.warn( "update DirectoryProviders \"blackhole\" backend. Index changes will be prepared but discarded!" );
+		log.updatedDirectoryProviders();
 	}
 
 	private static class NoOp implements Runnable {
