@@ -26,13 +26,13 @@ package org.hibernate.search.test.analyzer;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-import org.slf4j.Logger;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -42,7 +42,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class DoubleAnalyzerTest extends SearchTestCase {
 
-	public static final Logger log = LoggerFactory.make();
+	public static final Log log = LoggerFactory.make();
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { MyEntity.class, AlarmEntity.class };
