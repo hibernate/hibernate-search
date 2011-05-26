@@ -902,7 +902,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
       </example>
 
       <para>This example inherits from the abstract JMS controller class
-      available in the Hibernate Search source code and implements a JavaEE 5
+      available in the Hibernate Search source code and implements a JavaEE
       MDB. This implementation is given as an example and can be adjusted to
       make use of non Java EE Message Driven Beans. For more information about
       the <methodname>getSession()</methodname> and
@@ -1064,8 +1064,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     <section>
       <title>Requirements</title>
 
-      <para>Infinispan requires Java 6 and an updated version of JGroups. To
-      use the Infinispan directory via Maven, add the following
+      <para>To use the Infinispan directory via Maven, add the following
       dependencies:</para>
 
       <example>
@@ -1089,9 +1088,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       <literal>infinispan-core.jar</literal> to your application classpath.
       These last two jars are distributed by <ulink
       url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>.
-      Also make sure to update JGroups to a version matching the Infinispan
-      requirements. The version normally distributed with Hibernate Search is
-      older to maintain Java 5 compatibility.</para>
+      </para>
     </section>
 
     <section>

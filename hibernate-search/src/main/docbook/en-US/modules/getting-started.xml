@@ -47,9 +47,10 @@
           <row>
             <entry>Java Runtime</entry>
 
-            <entry>A JDK or JRE version <emphasis>5</emphasis> or greater. You
+            <entry>A JDK or JRE version <emphasis>6</emphasis> or greater. You
             can download a Java Runtime for Windows/Linux/Solaris <ulink
-            url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</ulink>.</entry>
+            url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</ulink>.
+            Hibernate Search 3.x was compatible with Java version <emphasis>5</emphasis> too.</entry>
           </row>
 
           <row>
@@ -86,7 +87,8 @@
             also be expressed in xml or code. <para>Hibernate Search, however,
             has itself its own set of annotations (<emphasis>@Indexed,
             @DocumentId, @Field,...</emphasis>) for which there exists so far
-            no alternative configuration. </para></entry>
+            no XML based alternative; a better option is to use
+            <xref linkend="hsearch-mapping-programmaticapi" />.</para></entry>
           </row>
         </tbody>
       </tgroup>

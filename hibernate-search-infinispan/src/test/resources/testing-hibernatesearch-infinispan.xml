@@ -24,6 +24,7 @@
         <transport
             clusterName="HibernateSearch-Infinispan-cluster"
             distributedSyncTimeout="50000"
+            transportClass="org.hibernate.search.infinispan.TestableJGroupsTransport"
             >
             <properties>
                 <property name="configurationFile" value="localtesting-tcp-jgroups.xml" />

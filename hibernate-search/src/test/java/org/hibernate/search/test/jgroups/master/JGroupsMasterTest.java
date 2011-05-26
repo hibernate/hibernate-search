@@ -26,6 +26,7 @@ package org.hibernate.search.test.jgroups.master;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -64,7 +65,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 	/**
 	 * Name of the JGroups channel used in test
 	 */
-	public static final String CHANNEL_NAME = "jgroups_test_channel";
+	public static final String CHANNEL_NAME = UUID.randomUUID().toString();
 
 	private JChannel channel;
 

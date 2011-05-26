@@ -24,6 +24,7 @@
 package org.hibernate.search.test.jgroups.common;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
@@ -51,6 +52,11 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "testing-flush-udp.xml";
 	public static final long NETWORK_TIMEOUT = 50;
+	
+	/**
+	 * Name of the JGroups channel used in test
+	 */
+	public static final String CHANNEL_NAME = UUID.randomUUID().toString();
 
 	public void testJGroupsBackend() throws Exception {
 
@@ -116,6 +122,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		//master jgroups configuration
 		super.configure( cfg );
 		cfg.setProperty( Environment.WORKER_BACKEND, "jgroupsMaster" );
+		forceChannelName( cfg );
 		cfg.setProperty( JGroupsBackendQueueProcessorFactory.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
 	}
 
@@ -124,7 +131,16 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		//slave jgroups configuration
 		super.commonConfigure( cfg );
 		cfg.setProperty( Environment.WORKER_BACKEND, "jgroupsSlave" );
+		forceChannelName( cfg );
 		cfg.setProperty( JGroupsBackendQueueProcessorFactory.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
+	}
+	
+	/**
+	 * Used to isolate the JGroups channel name from other potentially running tests
+	 * @param cfg the configuration to isolate
+	 */
+	private static void forceChannelName(Configuration cfg) {
+		cfg.setProperty( JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
 	}
 
 	@Override

@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.test.jgroups.slave;
 
+import java.util.UUID;
+
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
 
@@ -48,9 +50,10 @@ import org.hibernate.search.util.XMLHelper;
  */
 public class JGroupsSlaveTest extends SearchTestCase {
 
-	public static final String CHANNEL_NAME = "HSearchCluster";
-
 	private Channel channel;
+	
+	/** makes sure that different tests don't join **/
+	private final String CHANNEL_NAME = UUID.randomUUID().toString();
 
 	public void testMessageSend() throws Exception {
 
@@ -126,6 +129,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.WORKER_BACKEND, "jgroupsSlave" );
+		cfg.setProperty( JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
 		cfg.setProperty( JGroupsBackendQueueProcessorFactory.CONFIGURATION_XML, prepareXmlJGroupsConfiguration() );
 	}
 

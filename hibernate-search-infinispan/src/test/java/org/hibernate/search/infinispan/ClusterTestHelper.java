@@ -29,8 +29,6 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  * Helpers to setup several instances of Hibernate Search using
@@ -40,16 +38,6 @@ import org.junit.BeforeClass;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class ClusterTestHelper {
-	
-	@BeforeClass
-	public static void prepareConnectionPool() {
-		ClusterSharedConnectionProvider.realStart();
-	}
-	
-	@AfterClass
-	public static void shutdownConnectionPool() {
-		ClusterSharedConnectionProvider.realStop();
-	}
 	
 	/**
 	 * Create a clustered Hibernate Search instance.
