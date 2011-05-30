@@ -91,10 +91,5 @@ public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.format_sql", "false" );
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
-	}
 }
 

@@ -192,11 +192,22 @@ public class JMSMasterTest extends SearchTestCase {
 
 	protected void setUp() throws Exception {
 		// create and start the brokerService
-		brokerService = new BrokerService();
-		brokerService.setPersistent( false );
-		brokerService.start();
-
+		brokerService = createTestingBrokerService();
 		super.setUp();
+	}
+
+	/**
+	 * @return A started JMS Broker
+	 */
+	public static BrokerService createTestingBrokerService() throws Exception {
+		BrokerService brokerService = new BrokerService();
+		brokerService.setPersistent( false );
+		// disabling the following greatly speedups the tests:
+		brokerService.setUseJmx( false );
+		brokerService.setUseShutdownHook( false );
+		brokerService.setEnableStatistics( false );
+		brokerService.start();
+		return brokerService;
 	}
 
 	protected void tearDown() throws Exception {

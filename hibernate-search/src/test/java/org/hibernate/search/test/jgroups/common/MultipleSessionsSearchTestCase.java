@@ -29,7 +29,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.classic.Session;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
 
 /**
  * Test class to simulate clustered environment (one master, and one slave node)
@@ -86,22 +85,17 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		if ( getBaseIndexDir().exists() ) {
-			FileHelper.delete( getBaseIndexDir() );
-		}
 		super.setUp();
 		buildCommonSessionFactory();
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
-		super.tearDown();
-
-		//close session factories and clean index files
+		//close session factories
 		if ( slaveSessionFactory != null ) {
 			slaveSessionFactory.close();
 		}
-		FileHelper.delete( getBaseIndexDir() );
+		super.tearDown();
 	}
 
 	private void buildCommonSessionFactory() throws Exception {
