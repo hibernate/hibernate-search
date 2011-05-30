@@ -39,16 +39,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.event.FullTextIndexEventListener;
+import org.hibernate.search.util.FileHelper;
 import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
 
 /**
@@ -176,16 +175,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 			log.debug( "JMS based test. Skipping index emptying" );
 			return;
 		}
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx;
-		tx = s.beginTransaction();
-		for ( Class<?> clazz : getAnnotatedClasses() ) {
-			if ( clazz.getAnnotation( Indexed.class ) != null ) {
-				s.purgeAll( clazz );
-			}
-		}
-		tx.commit();
-		s.close();
+		FileHelper.delete( indexDir );
 	}
 
 	protected SearchFactory getSearchFactory() {
