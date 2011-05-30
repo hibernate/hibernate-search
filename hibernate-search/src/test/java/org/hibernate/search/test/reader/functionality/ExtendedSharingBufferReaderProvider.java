@@ -72,7 +72,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	}
 
 	public static class TestManipulatorPerDP {
-		private final AtomicBoolean isIndexReaderCurrent = new AtomicBoolean( false );//starts at true, see MockIndexReader contructor
+		private final AtomicBoolean isIndexReaderCurrent = new AtomicBoolean( false );//starts at true, see MockIndexReader constructor
 		private final AtomicBoolean isReaderCreated = new AtomicBoolean( false );
 		private final DirectoryProvider dp = new RAMDirectoryProvider();
 
@@ -287,13 +287,8 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 			throw new UnsupportedOperationException();
 		}
 
-//		@Override not defined in Lucene 2.9, added in 3.0
+		@Override
 		protected void doCommit(Map<String, String> commitUserData) {
-			throw new UnsupportedOperationException();
-		}
-
-//		@Override not defined in Lucene 3.0, existed before
-		protected void doCommit() {
 			throw new UnsupportedOperationException();
 		}
 
