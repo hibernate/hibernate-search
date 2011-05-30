@@ -34,7 +34,6 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -78,25 +77,6 @@ public class OptimizeTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-	}
-
-	protected void setUp() throws Exception {
-		File sub = getBaseIndexDir();
-		sub.mkdir();
-		File[] files = sub.listFiles();
-		for ( File file : files ) {
-			if ( file.isDirectory() ) {
-				FileHelper.delete( file );
-			}
-		}
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
-		setCfg( null ); //we need a fresh session factory each time for index set up
 	}
 
 	@SuppressWarnings("unchecked")
