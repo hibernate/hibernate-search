@@ -31,7 +31,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
 
 /**
  * Contains some utility methods to simplify coding of
@@ -53,8 +52,6 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 		fullTextSession.close();
-		FileHelper.delete( getBaseIndexDir() );
-		getBaseIndexDir().mkdirs();
 	}
 
 	protected final void assertValueIsDefault(Class testEntity, IndexWriterSetting setting) {
@@ -89,11 +86,6 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
-	}
-	
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		FileHelper.delete( getBaseIndexDir() );
 	}
 	
 	public static void assertCfgIsInvalid(Configuration configuration, Class[] mapping) {

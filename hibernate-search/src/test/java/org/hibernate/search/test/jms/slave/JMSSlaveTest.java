@@ -40,6 +40,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.jms.master.JMSMasterTest;
 
 /**
  * Checks that the Slave in a JMS configuration property places index jobs onto the queue.
@@ -118,10 +119,7 @@ public class JMSSlaveTest extends SearchTestCase {
 
 	protected void setUp() throws Exception {
 		// create and start the brokerService
-		brokerService = new BrokerService();
-		brokerService.setPersistent( false );
-		brokerService.start();
-
+		brokerService = JMSMasterTest.createTestingBrokerService();
 		super.setUp();
 	}
 
