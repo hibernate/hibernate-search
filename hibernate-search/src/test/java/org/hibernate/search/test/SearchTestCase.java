@@ -34,7 +34,6 @@ import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
-import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
@@ -50,7 +49,6 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.search.test.util.JGroupsEnvironment;
 import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
 
 /**
@@ -60,8 +58,6 @@ import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
  * @author Hardy Ferentschik
  */
 public abstract class SearchTestCase extends HibernateTestCase {
-
-	private static final Logger log = org.hibernate.search.util.LoggerFactory.make();
 
 	public static final Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
 	public static final Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
@@ -91,11 +87,6 @@ public abstract class SearchTestCase extends HibernateTestCase {
 
 		indexDir = new File( targetDir, "indextemp" );
 		log.debug( "Using {} as index directory.", indexDir.getAbsolutePath() );
-	}
-
-	// some system properties needed for JGroups
-	static {
-		JGroupsEnvironment.initJGroupsProperties();
 	}
 
 	public SearchTestCase() {
