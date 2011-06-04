@@ -37,6 +37,7 @@ import org.apache.solr.util.plugin.ResourceLoaderAware;
 import org.slf4j.Logger;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard

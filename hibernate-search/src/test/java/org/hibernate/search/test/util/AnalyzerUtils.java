@@ -35,7 +35,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.slf4j.Logger;
 
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Helper class to test analyzers. Taken and modified from <i>Lucene in Action</i>.

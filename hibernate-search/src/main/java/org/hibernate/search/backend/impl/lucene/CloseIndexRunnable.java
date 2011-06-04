@@ -25,7 +25,7 @@ package org.hibernate.search.backend.impl.lucene;
 
 import org.slf4j.Logger;
 import org.hibernate.search.backend.Workspace;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Runnable to close the IndexWriter of a Workspace, if open.

@@ -35,7 +35,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 public class DynamicBoostingTest extends SearchTestCase {
 

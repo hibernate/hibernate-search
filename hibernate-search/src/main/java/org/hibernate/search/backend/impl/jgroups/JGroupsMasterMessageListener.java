@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Listen for messages from slave nodes and apply them into <code>LuceneBackendQueueProcessor</code>

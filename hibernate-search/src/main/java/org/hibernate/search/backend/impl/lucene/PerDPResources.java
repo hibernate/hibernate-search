@@ -30,7 +30,7 @@ import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.util.concurrent.ExecutorService;

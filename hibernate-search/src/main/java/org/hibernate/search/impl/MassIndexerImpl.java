@@ -38,7 +38,7 @@ import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.jmx.IndexingProgressMonitor;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Prepares and configures a BatchIndexingWorkspace to start rebuilding

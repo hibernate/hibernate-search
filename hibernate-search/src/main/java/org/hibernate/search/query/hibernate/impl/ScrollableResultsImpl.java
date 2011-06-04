@@ -45,7 +45,7 @@ import org.hibernate.engine.SessionImplementor;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.hibernate.type.Type;
 
 /**

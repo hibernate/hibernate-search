@@ -66,9 +66,9 @@ import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.AbstractDocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 import static org.hibernate.search.event.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
 

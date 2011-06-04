@@ -46,7 +46,7 @@ import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Batch work until {@link #performWorks} is called.

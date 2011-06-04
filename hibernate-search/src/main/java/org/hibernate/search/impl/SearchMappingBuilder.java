@@ -30,9 +30,9 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.util.ReflectionHelper;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 import org.slf4j.Logger;
 

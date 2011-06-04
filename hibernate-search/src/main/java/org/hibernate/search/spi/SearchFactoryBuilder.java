@@ -93,8 +93,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Build a search factory following the builder pattern.

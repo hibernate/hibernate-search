@@ -17,7 +17,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard

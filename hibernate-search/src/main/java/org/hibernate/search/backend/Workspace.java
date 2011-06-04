@@ -50,7 +50,7 @@ import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Lucene workspace for a DirectoryProvider.<p/>

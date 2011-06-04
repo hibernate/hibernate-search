@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 /**

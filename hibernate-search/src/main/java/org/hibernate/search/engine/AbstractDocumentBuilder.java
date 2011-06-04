@@ -72,10 +72,10 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.PassThroughAnalyzer;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.ScopedAnalyzer;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Abstract base class for the document builders.

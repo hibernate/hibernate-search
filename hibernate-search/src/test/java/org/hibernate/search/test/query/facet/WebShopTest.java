@@ -40,7 +40,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.RangeFacet;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 import static org.hibernate.search.util.CollectionHelper.newArrayList;
 import static org.hibernate.search.util.CollectionHelper.newHashMap;

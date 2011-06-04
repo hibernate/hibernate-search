@@ -36,8 +36,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ScopedAnalyzer;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Stateless implementation that performs an <code>AddLuceneWork</code>.

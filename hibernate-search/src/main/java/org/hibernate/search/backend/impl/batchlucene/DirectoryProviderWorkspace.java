@@ -39,7 +39,7 @@ import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Collects all resources needed to apply changes to one index.

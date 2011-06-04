@@ -32,8 +32,8 @@ import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.WeakIdentityHashMap;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Execute some work inside a transaction synchronization

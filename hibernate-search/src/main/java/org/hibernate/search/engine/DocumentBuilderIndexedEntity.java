@@ -80,8 +80,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.HibernateHelper;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Set up and provide a manager for classes which are directly annotated with <code>@Indexed</code>.

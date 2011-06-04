@@ -37,8 +37,8 @@ import org.hibernate.search.backend.Worker;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.HibernateHelper;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.WeakIdentityHashMap;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Queue works per transaction.

@@ -34,7 +34,7 @@ import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 /**

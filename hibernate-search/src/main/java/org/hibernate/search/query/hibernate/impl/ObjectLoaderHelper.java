@@ -35,7 +35,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.HibernateHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard

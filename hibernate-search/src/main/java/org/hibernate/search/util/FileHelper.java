@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 /**

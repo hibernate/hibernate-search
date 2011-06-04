@@ -35,7 +35,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;

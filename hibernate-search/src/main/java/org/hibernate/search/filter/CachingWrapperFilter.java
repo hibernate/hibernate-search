@@ -30,8 +30,8 @@ import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.slf4j.Logger;
 
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.SoftLimitMRUCache;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * A slightly different version of Lucene's original <code>CachingWrapperFilter</code> which

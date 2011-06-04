@@ -34,7 +34,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 /**

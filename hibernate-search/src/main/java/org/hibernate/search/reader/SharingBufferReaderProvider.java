@@ -41,7 +41,7 @@ import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * This <code>ReaderProvider</code> shares IndexReaders as long as they are "current";

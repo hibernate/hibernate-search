@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
 import org.hibernate.search.backend.configuration.MaskedProperty;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Wrapper class around the Lucene indexing parameters defined in IndexWriterSetting.

@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.engine.WorkPlan;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard

@@ -40,7 +40,7 @@ import org.hibernate.event.FlushEventListener;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Implementation of the transactional context on top of an EventSource (Session)

@@ -10,7 +10,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.classic.Session;
 import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.hibernate.transaction.TransactionFactory;
 
 /**

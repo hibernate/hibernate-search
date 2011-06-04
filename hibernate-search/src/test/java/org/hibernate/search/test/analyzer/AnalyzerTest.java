@@ -44,7 +44,7 @@ import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.AnalyzerUtils;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard

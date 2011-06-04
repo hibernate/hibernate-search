@@ -19,7 +19,7 @@
 
 package org.hibernate.search.test.util;
 
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.jboss.byteman.rule.Rule;
 import org.jboss.byteman.rule.helper.Helper;
 import org.slf4j.Logger;

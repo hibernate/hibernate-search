@@ -52,7 +52,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.FileHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard

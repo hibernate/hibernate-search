@@ -45,7 +45,7 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.engine.spi.EntityInitializer;
 import org.hibernate.search.util.HibernateHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 import org.slf4j.Logger;
 

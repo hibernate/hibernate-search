@@ -38,7 +38,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.ContextHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Implement the Hibernate Search controller responsible for processing the

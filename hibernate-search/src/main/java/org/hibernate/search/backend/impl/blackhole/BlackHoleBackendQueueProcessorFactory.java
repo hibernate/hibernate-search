@@ -31,7 +31,7 @@ import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 /**

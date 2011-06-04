@@ -28,7 +28,7 @@ import java.util.List;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.slf4j.Logger;
 
 /**

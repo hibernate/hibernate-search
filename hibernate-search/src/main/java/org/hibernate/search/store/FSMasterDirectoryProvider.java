@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.FileHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * File based DirectoryProvider that takes care of index copy

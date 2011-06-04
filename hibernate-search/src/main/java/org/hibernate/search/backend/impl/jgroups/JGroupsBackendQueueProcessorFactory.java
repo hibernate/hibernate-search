@@ -42,8 +42,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.JGroupsHelper;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.XMLHelper;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.hibernate.util.ConfigHelper;
 
 

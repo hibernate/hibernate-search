@@ -34,7 +34,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Optimization strategy triggered after a certain amount of operations

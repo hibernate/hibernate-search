@@ -30,7 +30,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 
 import org.hibernate.search.util.FileHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 import org.junit.After;
 import org.junit.BeforeClass;

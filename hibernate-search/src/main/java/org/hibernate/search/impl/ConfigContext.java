@@ -49,7 +49,7 @@ import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.DelegateNamedAnalyzer;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Provides access to some default configuration settings (eg default {@code Analyzer} or default

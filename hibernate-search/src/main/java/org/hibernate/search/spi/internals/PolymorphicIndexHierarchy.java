@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Helper class which keeps track of all super classes and interfaces of the indexed entities.
