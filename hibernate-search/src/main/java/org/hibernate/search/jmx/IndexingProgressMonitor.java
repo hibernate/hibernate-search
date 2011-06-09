@@ -25,10 +25,10 @@ package org.hibernate.search.jmx;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * A JMX based mass indexer progress monitor. This monitor will allow you to follow mass indexing progress via JMX.
@@ -36,7 +36,7 @@ import org.hibernate.search.util.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class IndexingProgressMonitor implements IndexingProgressMonitorMBean, MassIndexerProgressMonitor {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final AtomicLong documentsBuiltCounter = new AtomicLong();
@@ -70,7 +70,7 @@ public class IndexingProgressMonitor implements IndexingProgressMonitorMBean, Ma
 	}
 
 	public final void indexingCompleted() {
-		log.info( "Indexing completed. Reindexed {} entities. Unregistering MBean from server", totalCounter.get() );
+		log.indexingCompletedAndMBeanUnregistered( totalCounter.get() );
 		JMXRegistrar.unRegisterMBean( registeredName );
 	}
 

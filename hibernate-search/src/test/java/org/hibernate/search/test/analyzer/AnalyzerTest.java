@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.queryParser.QueryParser;
-import org.slf4j.Logger;
 
 import org.hibernate.Transaction;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -44,7 +43,8 @@ import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.AnalyzerUtils;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.Log;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -52,7 +52,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class AnalyzerTest extends SearchTestCase {
 
-	public static final Logger log = LoggerFactory.make();
+	public static final Log log = LoggerFactory.make();
 
 	public void testAnalyzerDiscriminator() throws Exception {
 		Article germanArticle = new Article();

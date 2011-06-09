@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.HibernateException;
 import org.hibernate.ScrollableResults;
@@ -45,7 +45,7 @@ import org.hibernate.engine.SessionImplementor;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.hibernate.type.Type;
 
 /**
@@ -74,7 +74,7 @@ import org.hibernate.type.Type;
  */
 public class ScrollableResultsImpl implements ScrollableResults {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final int first;
 	private final int max;
@@ -219,7 +219,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 			documentExtractor.close();
 		}
 		catch (SearchException e) {
-			log.warn( "Unable to properly close searcher in ScrollableResults", e );
+			log.unableToCloseSearcherInScrollableResult( e );
 		}
 	}
 

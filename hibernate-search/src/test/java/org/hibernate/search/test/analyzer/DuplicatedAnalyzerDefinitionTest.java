@@ -30,14 +30,14 @@ import org.apache.solr.analysis.GermanStemFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
-import org.slf4j.Logger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.Log;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Tests for HSEARCH-569.
@@ -46,7 +46,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 
-	public static final Logger log = LoggerFactory.make();
+	public static final Log log = LoggerFactory.make();
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { };

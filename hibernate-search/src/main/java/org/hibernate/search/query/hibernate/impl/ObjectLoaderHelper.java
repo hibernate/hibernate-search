@@ -26,7 +26,7 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -35,7 +35,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.HibernateHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -43,7 +43,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class ObjectLoaderHelper {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	public static Object load(EntityInfo entityInfo, Session session) {
 		Object maybeProxy = executeLoad( entityInfo, session );
@@ -52,8 +52,8 @@ public class ObjectLoaderHelper {
 		}
 		catch ( RuntimeException e ) {
 			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
-				log.debug(
-						"Object found in Search index but not in database: {} with id {}",
+				log.debugf(
+						"Object found in Search index but not in database: %s with id %s",
 						entityInfo.getClazz(), entityInfo.getId()
 				);
 				session.evict( maybeProxy );
@@ -80,8 +80,8 @@ public class ObjectLoaderHelper {
 			}
 			else {
 				if ( log.isDebugEnabled() ) {
-					log.debug(
-							"Object found in Search index but not in database: {} with {}",
+					log.debugf(
+							"Object found in Search index but not in database: %s with %s",
 							entityInfo.getClazz(), entityInfo.getId()
 					);
 				}

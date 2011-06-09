@@ -28,7 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
@@ -37,7 +37,7 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Makes sure that several different BatchIndexingWorkspace(s)
@@ -48,7 +48,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class BatchCoordinator implements Runnable {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final Class<?>[] rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final SearchFactoryImplementor searchFactoryImplementor;
@@ -101,7 +101,7 @@ public class BatchCoordinator implements Runnable {
 			afterBatch();
 		}
 		catch ( InterruptedException e ) {
-			log.error( "Batch indexing was interrupted" );
+			log.interruptedBatchIndexig();
 			Thread.currentThread().interrupt();
 		}
 		finally {

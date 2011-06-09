@@ -28,11 +28,11 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Use a Lucene {@link FSDirectory}. The base directory is represented by the property <i>hibernate.search.default.indexBase</i>
@@ -51,7 +51,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private FSDirectory directory;
 	private String indexName;
@@ -79,7 +79,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 			directory.close();
 		}
 		catch ( Exception e ) {
-			log.error( "Unable to properly close Lucene directory {}" + directory.getDirectory(), e );
+			log.unableToCloseLuceneDirectory( directory.getDirectory(), e );
 		}
 	}
 

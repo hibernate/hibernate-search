@@ -24,12 +24,12 @@ import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.reader.ReaderProvider;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
 
@@ -37,7 +37,7 @@ import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
 * @author Emmanuel Bernard
 */
 public class IndexSearcherWithPayload {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final IndexSearcher searcher;
 	private boolean fieldSortDoTrackScores;
 	private boolean fieldSortDoMaxScore;
@@ -74,7 +74,7 @@ public class IndexSearcherWithPayload {
 			}
 			catch (SearchException e) {
 				//catch is inside the for loop to make sure we try to close all of them
-				log.warn( "Unable to properly close searcher during lucene query: " + query.toString(), e );
+				log.unableToCloseSearcherDuringQuery( query.toString(), e );
 			}
 		}
 	}

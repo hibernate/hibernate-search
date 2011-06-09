@@ -32,7 +32,7 @@ import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
@@ -66,9 +66,9 @@ import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.AbstractDocumentBuilder;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 import static org.hibernate.search.event.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
 
@@ -90,7 +90,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener, FlushEventListener, Initializable, Destructible {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final Installation installation;
 
 	protected boolean used;
@@ -239,10 +239,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			if ( documentBuilder != null && ! documentBuilder.isCollectionRoleExcluded( collectionRole ) ) {
 				Serializable id = getId( entity, event );
 				if ( id == null ) {
-					log.warn(
-							"Unable to reindex entity on collection change, id cannot be extracted: {}",
-							event.getAffectedOwnerEntityName()
-					);
+					log.idCannotBeExtracted( event.getAffectedOwnerEntityName() );
 					return;
 				}
 				processWork( entity, id, WorkType.COLLECTION, event, false );

@@ -26,10 +26,10 @@ package org.hibernate.search.impl;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * A very simple implementation of {@code MassIndexerProgressMonitor} which
@@ -39,7 +39,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final AtomicLong totalCounter = new AtomicLong();
 	private volatile long startTime;
@@ -81,11 +81,11 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 
 	public void addToTotalCount(long count) {
 		totalCounter.addAndGet( count );
-		log.info( "Going to reindex {} entities", count );
+		log.indexingEntities( count );
 	}
 
 	public void indexingCompleted() {
-		log.info( "Reindexed {} entities", totalCounter.get() );
+		log.indexingEntitiesCompleted( totalCounter.get() );
 	}
 
 	protected int getStatusMessagePeriod() {
@@ -94,9 +94,9 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 
 	protected void printStatusMessage(long starttime, long totalTodoCount, long doneCount) {
 		long elapsedMs = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - starttime );
-		log.info( "{} documents indexed in {} ms", doneCount, elapsedMs );
+		log.indexingDocumentsCompleted( doneCount, elapsedMs );
 		float estimateSpeed = doneCount * 1000f / elapsedMs;
 		float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
-		log.info( "Indexing speed: {} documents/second; progress: {}%", estimateSpeed, estimatePercentileComplete );
+		log.indexingSpeed( estimateSpeed, estimatePercentileComplete );
 	}
 }

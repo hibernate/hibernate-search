@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -35,7 +35,7 @@ import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Initialize object using one or several criteria queries.
@@ -44,7 +44,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class CriteriaObjectsInitializer implements ObjectsInitializer {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private static final int MAX_IN_CLAUSE = 500;
 	
 	public static final CriteriaObjectsInitializer INSTANCE = new CriteriaObjectsInitializer();
@@ -60,7 +60,7 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 										 Session session) {
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
-		log.trace( "Load {} objects using criteria queries", maxResults );
+		log.tracef( "Load %d objects using criteria queries", maxResults );
 
 		if ( maxResults == 0 ) {
 			return;

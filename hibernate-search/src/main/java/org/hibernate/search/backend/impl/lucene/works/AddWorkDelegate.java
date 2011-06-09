@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -36,8 +36,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.util.LoggerFactory;
 import org.hibernate.search.util.ScopedAnalyzer;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Stateless implementation that performs an <code>AddLuceneWork</code>.
@@ -51,7 +51,7 @@ import org.hibernate.search.util.ScopedAnalyzer;
  */
 class AddWorkDelegate implements LuceneWorkDelegate {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final Workspace workspace;
 
@@ -104,7 +104,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		for ( Map.Entry<String, String> entry : fieldToAnalyzerMap.entrySet() ) {
 			Analyzer analyzer = workspace.getAnalyzer( entry.getValue() );
 			if ( analyzer == null ) {
-				log.warn( "Unable to retrieve named analyzer: " + entry.getValue() );
+				log.unableToRetrieveNamedAnalyzer( entry.getValue() );
 			}
 			else {
 				analyzerClone.addScopedAnalyzer( entry.getKey(), analyzer );

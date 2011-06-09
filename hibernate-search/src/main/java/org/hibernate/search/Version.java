@@ -23,7 +23,7 @@
  */
 package org.hibernate.search;
 
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -36,7 +36,7 @@ public class Version {
 	}
 
 	static {
-		LoggerFactory.make().info( "Hibernate Search {}", getVersionString() );
+		LoggerFactory.make().version( getVersionString() );
 	}
 
 	public static void touch() {

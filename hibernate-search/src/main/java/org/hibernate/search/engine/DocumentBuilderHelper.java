@@ -27,7 +27,7 @@ package org.hibernate.search.engine;
 import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.util.ReflectHelper;
@@ -36,13 +36,13 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
 public final class DocumentBuilderHelper {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private DocumentBuilderHelper() {
 	}
@@ -130,7 +130,7 @@ public final class DocumentBuilderHelper {
 				contextualBridge.setFieldName( fieldName ).setFieldBridge( (TwoWayFieldBridge) fieldBridge );
 				result[matchingPosition] = contextualBridge.get( fieldName, document );
 				if ( log.isTraceEnabled() ) {
-					log.trace( "Field {} projected as {}", fieldName, result[matchingPosition] );
+					log.tracef( "Field %s projected as %s", fieldName, result[matchingPosition] );
 				}
 			}
 			else {

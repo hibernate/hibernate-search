@@ -30,12 +30,12 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.IndexWriterSetting;
 import org.hibernate.search.backend.configuration.MaskedProperty;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Wrapper class around the Lucene indexing parameters defined in IndexWriterSetting.
@@ -49,7 +49,7 @@ import org.hibernate.search.util.LoggerFactory;
 public class LuceneIndexingParameters implements Serializable {
 
 	private static final long serialVersionUID = 5424606407623591663L;
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	// value keyword
 	public static final String EXPLICIT_DEFAULT_VALUE = "default";
@@ -90,7 +90,7 @@ public class LuceneIndexingParameters implements Serializable {
 				if ( !( value == null || EXPLICIT_DEFAULT_VALUE.equalsIgnoreCase( value ) ) ) {
 					if ( log.isDebugEnabled() ) {
 						//TODO add DirectoryProvider name when available to log message
-						log.debug( "Set index writer parameter " + key + " to value : " + value );
+						log.debugf( "Set index writer parameter %s to value : %s", key, value );
 					}
 					parameters.put( t, t.parseVal( value ) );
 				}

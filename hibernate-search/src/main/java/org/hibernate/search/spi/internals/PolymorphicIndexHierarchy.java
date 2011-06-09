@@ -30,16 +30,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Helper class which keeps track of all super classes and interfaces of the indexed entities.
  */
 //FIXME make it immutable (builder pattern)
 public class PolymorphicIndexHierarchy {
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private Map<Class<?>, Set<Class<?>>> classToIndexedClass;
 
@@ -79,7 +79,7 @@ public class PolymorphicIndexHierarchy {
 			}
 		}
 		if ( log.isTraceEnabled() ) {
-			log.trace( "Targeted indexed classes for {}: {}", Arrays.toString( classes ), indexedClasses );
+			log.tracef( "Targeted indexed classes for %s: %s", Arrays.toString( classes ), indexedClasses );
 		}
 		return indexedClasses;
 	}

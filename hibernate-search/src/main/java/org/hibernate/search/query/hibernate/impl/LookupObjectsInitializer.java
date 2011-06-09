@@ -20,14 +20,14 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Initializes objects using lookup by it.
@@ -40,7 +40,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class LookupObjectsInitializer implements ObjectsInitializer {
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	public static final LookupObjectsInitializer INSTANCE = new LookupObjectsInitializer();
 	
@@ -56,7 +56,7 @@ public class LookupObjectsInitializer implements ObjectsInitializer {
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
-			log.trace( "No object to initialize", maxResults );
+            log.tracef("No object to initialize", maxResults);
 			return;
 		}
 
@@ -64,6 +64,6 @@ public class LookupObjectsInitializer implements ObjectsInitializer {
 		for ( EntityInfo entityInfo : entityInfos ) {
 			ObjectLoaderHelper.load( entityInfo, session );
 		}
-		log.trace( "Initialized {} objects by lookup method.", maxResults );
+		log.tracef( "Initialized %d objects by lookup method.", maxResults );
 	}
 }

@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
 
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
@@ -38,7 +38,7 @@ import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.jmx.IndexingProgressMonitor;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Prepares and configures a BatchIndexingWorkspace to start rebuilding
@@ -50,7 +50,7 @@ import org.hibernate.search.util.LoggerFactory;
  */
 public class MassIndexerImpl implements MassIndexer {
 
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final SessionFactory sessionFactory;
@@ -123,7 +123,7 @@ public class MassIndexerImpl implements MassIndexer {
 			}
 		}
 		cleaned.removeAll( toRemove );
-		log.debug( "Targets for indexing job: {}", cleaned );
+		log.debugf( "Targets for indexing job: %s", cleaned );
 		return cleaned;
 	}
 

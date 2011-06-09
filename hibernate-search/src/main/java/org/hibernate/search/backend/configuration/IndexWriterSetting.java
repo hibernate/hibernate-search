@@ -27,10 +27,9 @@ import java.io.Serializable;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
-
 import org.hibernate.search.SearchException;
-import org.hibernate.search.util.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.Log;
+import org.hibernate.search.util.logging.LoggerFactory;
 
 /**
  * Represents possible options to be applied to an
@@ -137,7 +136,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	};
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 
 	private static final Integer TRUE = 1;
 	private static final Integer FALSE = 0;

@@ -19,10 +19,10 @@
 
 package org.hibernate.search.test.util;
 
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.Log;
+import org.hibernate.search.util.logging.LoggerFactory;
 import org.jboss.byteman.rule.Rule;
 import org.jboss.byteman.rule.helper.Helper;
-import org.slf4j.Logger;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -33,7 +33,7 @@ public class BytemanHelper extends Helper {
 		super( rule );
 	}
 
-	public static final Logger log = LoggerFactory.make();
+	public static final Log log = LoggerFactory.make();
 	
 	public void sleepASecond() {
 		try {

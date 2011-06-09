@@ -30,8 +30,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hibernate.search.util.LoggerFactory;
-import org.slf4j.Logger;
+import org.hibernate.search.util.logging.LoggerFactory;
+import org.hibernate.search.util.logging.Log;
 
 /**
  * Helper class to create threads;
@@ -44,7 +44,7 @@ public class Executors {
 	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
 	public static final int QUEUE_MAX_LENGTH = 1000;
 	
-	private static final Logger log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	
 	/**
 	 * Creates a new fixed size ThreadPoolExecutor.
@@ -125,7 +125,7 @@ public class Executors {
 				e.getQueue().put( r );
 			}
 			catch (InterruptedException e1) {
-				log.error( "Work discarded, thread was interrupted while waiting for space to schedule: {}", r );
+				log.interruptedWokError( r );
 			}
         }
     }
