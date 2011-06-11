@@ -50,7 +50,7 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

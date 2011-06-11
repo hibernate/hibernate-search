@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProviderHelper;
-import org.hibernate.search.util.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A DirectoryProvider using Infinispan to store the Index. This depends on the
