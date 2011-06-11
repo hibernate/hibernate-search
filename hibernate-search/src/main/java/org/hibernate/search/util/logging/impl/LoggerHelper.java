@@ -21,13 +21,12 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.util;
+package org.hibernate.search.util.logging.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.slf4j.Logger;
 
 /**
