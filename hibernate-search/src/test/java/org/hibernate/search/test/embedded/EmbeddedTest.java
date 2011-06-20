@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -329,6 +330,54 @@ public class EmbeddedTest extends SearchTestCase {
 		s.clear();
 		s.close();
 	}
+	
+	public void testEmbeddedToManyInSuperslass() throws ParseException {
+		ProductFeature f = new ProductFeature();
+		f.setName( "featurea" );
+		ProductFeature f2 = new ProductFeature();
+		f2.setName( "featureb" );
+		
+		AbstractProduct p = new Book();
+		p.setName( "A Book" );
+		f.setProduct(p);
+		p.getFeatures().add( f );
+		
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( p ); // Feature cascaded
+//		s.persist(f);
+		tx.commit();
+		
+		s.clear();
+		
+		FullTextSession session = Search.getFullTextSession( s );
+		tx = session.beginTransaction();
+		
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+		Query query;
+		List<?> result;
+		
+		query = parser.parse( "features.name:featurea" );
+		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
+		assertEquals( "collection of embedded ignored", 1, result.size() );
+		
+		// Add product features - product should be re-indexed
+		p = (AbstractProduct) result.get(0);
+		p.getFeatures().add(f2);
+		
+		tx.commit();
+		s.clear();
+		
+		tx = s.beginTransaction();
+		tx.commit();
+		s.clear();
+		
+		query = parser.parse( "features.name:featureb" );
+		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
+		assertEquals( "collection of embedded ignored", 1, result.size() );
+		
+		s.close();
+	}
 
 	protected void configure( org.hibernate.cfg.Configuration cfg ) {
 		super.configure( cfg );
@@ -336,7 +385,8 @@ public class EmbeddedTest extends SearchTestCase {
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Tower.class, Address.class, Product.class, Order.class, Author.class, Country.class,
-				State.class, StateCandidate.class, NonIndexedEntity.class
+				State.class, StateCandidate.class, NonIndexedEntity.class,
+				AbstractProduct.class, Book.class, ProductFeature.class
 		};
 	}
 }
