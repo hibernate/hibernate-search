@@ -374,14 +374,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			List<XProperty> methods = currentClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 			for ( XProperty method : methods ) {
 				initializeMemberLevelAnnotations(
-						method, propertiesMetadata, isRoot, prefix, processedClasses, context, optimizationBlackList, disableOptimizations
+						currentClass, method, propertiesMetadata, isRoot, prefix, processedClasses, context, optimizationBlackList, disableOptimizations
 				);
 			}
 
 			List<XProperty> fields = currentClass.getDeclaredProperties( XClass.ACCESS_FIELD );
 			for ( XProperty field : fields ) {
 				initializeMemberLevelAnnotations(
-						field, propertiesMetadata, isRoot, prefix, processedClasses, context, optimizationBlackList, disableOptimizations
+						currentClass, field, propertiesMetadata, isRoot, prefix, processedClasses, context, optimizationBlackList, disableOptimizations
 				);
 			}
 		}
@@ -431,13 +431,13 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void initializeMemberLevelAnnotations(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
+	private void initializeMemberLevelAnnotations(XClass currentClass, XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
 					String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
 		checkForField( member, propertiesMetadata, prefix, context );
 		checkForFields( member, propertiesMetadata, prefix, context );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
-		checkForIndexedEmbedded( member, propertiesMetadata, prefix, processedClasses, context, optimizationBlackList, disableOptimizations );
+		checkForIndexedEmbedded( currentClass, member, propertiesMetadata, prefix, processedClasses, context, optimizationBlackList, disableOptimizations );
 		checkForContainedIn( member, propertiesMetadata );
 		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context );
 	}
@@ -578,11 +578,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void checkForIndexedEmbedded(XProperty member, PropertiesMetadata propertiesMetadata, String prefix,
+	private void checkForIndexedEmbedded(XClass currentClass, XProperty member, PropertiesMetadata propertiesMetadata, String prefix,
 			Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
-			this.indexedEmbeddedCollectionRoles.add( StringHelper.qualify( this.beanXClassName, member.getName() ) );
+			this.indexedEmbeddedCollectionRoles.add( StringHelper.qualify( currentClass.getName(), member.getName() ) );
 			int oldMaxLevel = maxLevel;
 			int potentialLevel = embeddedAnn.depth() + level;
 			if ( potentialLevel < 0 ) {
