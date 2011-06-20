@@ -61,7 +61,6 @@ public class EntityMapping {
 		return this;
 	}
 
-	
 	public EntityMapping dynamicBoost(Class<? extends BoostStrategy>  impl) {
 		final Map<String, Object> dynamicBoost = new HashMap<String, Object>();
 		dynamicBoost.put("impl", impl);

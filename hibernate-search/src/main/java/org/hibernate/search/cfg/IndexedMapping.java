@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.solr.analysis.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.FieldCacheType;
+import org.hibernate.search.engine.BoostStrategy;
 
 public class IndexedMapping {
 	
@@ -72,13 +73,23 @@ public class IndexedMapping {
 		return this;
 	}
 
+	public IndexedMapping dynamicBoost(Class<? extends BoostStrategy>  impl) {
+		final Map<String, Object> dynamicBoost = new HashMap<String, Object>();
+		dynamicBoost.put("impl", impl);
+		entity.setDynamicBoost(dynamicBoost);
+		return this;
+	}
+
 	public IndexedMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
 		final Map<String, Object> discriminatorAnn = new HashMap<String, Object>();
 		discriminatorAnn.put( "impl", discriminator );
 		entity.setAnalyzerDiscriminator(discriminatorAnn);
 		return this;
 	}
-	
+
+	public IndexedClassBridgeMapping classBridge(Class<?> impl) {
+		return new IndexedClassBridgeMapping(mapping, entity, impl, this);
+	}
 	
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
 		return new FullTextFilterDefMapping(mapping, name, impl);
