@@ -35,6 +35,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
+
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -46,7 +48,6 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.DelegateNamedAnalyzer;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

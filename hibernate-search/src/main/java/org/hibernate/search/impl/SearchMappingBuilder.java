@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.util.ReflectionHelper;

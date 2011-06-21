@@ -41,7 +41,7 @@ import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;

@@ -28,7 +28,7 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
-import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.ClassLoaderHelper;
 

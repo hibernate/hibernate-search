@@ -21,13 +21,14 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.cfg;
+package org.hibernate.search.cfg.spi;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
