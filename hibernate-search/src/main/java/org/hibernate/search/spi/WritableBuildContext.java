@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.spi;
 
-import org.hibernate.search.backend.LuceneIndexingParameters;
+import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 

@@ -32,6 +32,8 @@ import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Session;
@@ -59,8 +61,6 @@ import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
-import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.AbstractDocumentBuilder;

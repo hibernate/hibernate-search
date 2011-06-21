@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.DirectoryProvider;

@@ -34,11 +34,12 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
+
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
-import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.WorkType;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.MutableSearchFactory;

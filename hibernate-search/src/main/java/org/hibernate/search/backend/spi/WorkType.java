@@ -21,38 +21,49 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend;
-
-import java.util.Properties;
-
-import org.hibernate.search.spi.WorkerBuildContext;
+package org.hibernate.search.backend.spi;
 
 /**
- * Perform work for a given context (eg a transaction). This implementation has to be threaded-safe.
- *
+ * Enumeration of the different types of Lucene work. This enumeration is used to specify the type
+ * of index operation to be executed. 
+ * 
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
+ * @author John Griffin
  */
-public interface Worker {
+public enum WorkType {
+	ADD(true),
+	UPDATE(true),
+	DELETE(false),
+	COLLECTION(true),
 	/**
-	 * Declare a work to be done within a given transaction context
-	 *
-	 * @param work the work to be executed
-	 * @param transactionContext transactional context information
+	 * Used to remove a specific instance
+	 * of a class from an index.
 	 */
-	void performWork(Work<?> work, TransactionContext transactionContext);
+	PURGE(false),
+	/**
+	 * Used to remove all instances of a
+	 * class from an index.
+	 */
+	PURGE_ALL(false),
+	
+	/**
+	 * This type is used for batch indexing.
+	 */
+	INDEX(true);
 
-	void initialize(Properties props, WorkerBuildContext context);
+	private final boolean searchForContainers;
+
+	private WorkType(boolean searchForContainers) {
+		this.searchForContainers = searchForContainers;
+	}
 
 	/**
-	 * clean resources
-	 * This method can return exceptions
+	 * When references are changed, either null or another one, we expect dirty checking to be triggered (both sides
+	 * have to be updated)
+	 * When the internal object is changed, we apply the {Add|Update}Work on containedIns
 	 */
-	void close();
-
-	/**
-	 * Flush any work queue.
-	 *
-	 * @param transactionContext the current transaction (context).
-	 */
-	void flushWorks(TransactionContext transactionContext);
+	public boolean searchForContainers() {
+		return this.searchForContainers;
+	}
 }

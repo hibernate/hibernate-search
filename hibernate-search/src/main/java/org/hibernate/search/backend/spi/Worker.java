@@ -21,49 +21,39 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend;
+package org.hibernate.search.backend.spi;
+
+import java.util.Properties;
+
+import org.hibernate.search.backend.TransactionContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
- * Enumeration of the different types of Lucene work. This enumeration is used to specify the type
- * of index operation to be executed. 
- * 
+ * Perform work for a given context (eg a transaction). This implementation has to be threaded-safe.
+ *
  * @author Emmanuel Bernard
- * @author Hardy Ferentschik
- * @author John Griffin
  */
-public enum WorkType {
-	ADD(true),
-	UPDATE(true),
-	DELETE(false),
-	COLLECTION(true),
+public interface Worker {
 	/**
-	 * Used to remove a specific instance
-	 * of a class from an index.
+	 * Declare a work to be done within a given transaction context
+	 *
+	 * @param work the work to be executed
+	 * @param transactionContext transactional context information
 	 */
-	PURGE(false),
-	/**
-	 * Used to remove all instances of a
-	 * class from an index.
-	 */
-	PURGE_ALL(false),
-	
-	/**
-	 * This type is used for batch indexing.
-	 */
-	INDEX(true);
+	void performWork(Work<?> work, TransactionContext transactionContext);
 
-	private final boolean searchForContainers;
-
-	private WorkType(boolean searchForContainers) {
-		this.searchForContainers = searchForContainers;
-	}
+	void initialize(Properties props, WorkerBuildContext context);
 
 	/**
-	 * When references are changed, either null or another one, we expect dirty checking to be triggered (both sides
-	 * have to be updated)
-	 * When the internal object is changed, we apply the {Add|Update}Work on containedIns
+	 * clean resources
+	 * This method can return exceptions
 	 */
-	public boolean searchForContainers() {
-		return this.searchForContainers;
-	}
+	void close();
+
+	/**
+	 * Flush any work queue.
+	 *
+	 * @param transactionContext the current transaction (context).
+	 */
+	void flushWorks(TransactionContext transactionContext);
 }

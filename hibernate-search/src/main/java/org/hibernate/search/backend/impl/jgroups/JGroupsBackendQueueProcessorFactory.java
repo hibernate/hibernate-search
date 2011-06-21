@@ -34,7 +34,7 @@ import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;

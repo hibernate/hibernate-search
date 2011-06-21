@@ -32,9 +32,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
 
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
-import org.hibernate.search.backend.LuceneIndexingParameters;
-import org.hibernate.search.backend.Worker;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;

@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.backend.impl;
 
-import org.hibernate.search.backend.Work;
+import org.hibernate.search.backend.spi.Work;
 
 /**
  * Pile work operations

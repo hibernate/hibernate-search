@@ -26,7 +26,7 @@ package org.hibernate.search.test.configuration;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.hibernate.search.backend.LuceneIndexingParameters;
+import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.test.query.Author;

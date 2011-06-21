@@ -26,12 +26,12 @@ package org.hibernate.search.backend.impl;
 import java.util.Properties;
 import javax.transaction.Synchronization;
 
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.Worker;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.HibernateHelper;
