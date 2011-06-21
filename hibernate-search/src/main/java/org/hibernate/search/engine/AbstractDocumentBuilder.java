@@ -431,14 +431,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void initializeMemberLevelAnnotations(XClass currentClass, XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
+	private void initializeMemberLevelAnnotations(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
 					String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
 		checkForField( member, propertiesMetadata, prefix, context );
 		checkForFields( member, propertiesMetadata, prefix, context );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
-		checkForIndexedEmbedded( currentClass, member, propertiesMetadata, prefix, processedClasses, context, optimizationBlackList, disableOptimizations );
-		checkForContainedIn( member, propertiesMetadata );
+		checkForIndexedEmbedded( classHostingMember, member, propertiesMetadata, prefix, processedClasses, context, optimizationBlackList, disableOptimizations );
+		checkForContainedIn( classHostingMember, member, propertiesMetadata );
 		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context );
 	}
 
@@ -572,20 +572,22 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void checkForContainedIn(XProperty member, PropertiesMetadata propertiesMetadata) {
+	private void checkForContainedIn(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata) {
 		ContainedIn containedAnn = member.getAnnotation( ContainedIn.class );
 		if ( containedAnn != null ) {
 			ReflectionHelper.setAccessible( member );
 			propertiesMetadata.containedInGetters.add( member );
-			this.containedInCollectionRoles.add( StringHelper.qualify( this.beanXClassName, member.getName() ) );
+			//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
+			this.containedInCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 		}
 	}
 
-	private void checkForIndexedEmbedded(XClass currentClass, XProperty member, PropertiesMetadata propertiesMetadata, String prefix,
+	private void checkForIndexedEmbedded(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix,
 			Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
-			this.indexedEmbeddedCollectionRoles.add( StringHelper.qualify( currentClass.getName(), member.getName() ) );
+			//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
+			this.indexedEmbeddedCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 			int oldMaxLevel = maxLevel;
 			int potentialLevel = embeddedAnn.depth() + level;
 			if ( potentialLevel < 0 ) {
