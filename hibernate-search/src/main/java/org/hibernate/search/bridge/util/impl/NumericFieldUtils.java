@@ -1,4 +1,4 @@
-package org.hibernate.search.bridge.util;
+package org.hibernate.search.bridge.util.impl;
 
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.search.NumericRangeQuery;
