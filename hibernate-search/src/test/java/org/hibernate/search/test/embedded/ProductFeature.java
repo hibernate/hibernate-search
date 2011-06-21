@@ -33,7 +33,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 
 /**
- * A mapping from product to it's "features"
+ * A mapping from product to its "features"
  *
  * @author Samppa Saarela
  */
