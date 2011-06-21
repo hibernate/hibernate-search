@@ -38,8 +38,8 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.LuceneIndexingParameters;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-import org.hibernate.search.backend.configuration.MaskedProperty;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.WritableBuildContext;
@@ -332,8 +332,10 @@ public class DirectoryProviderFactory {
 		String maxQueueSize = indexProps.getProperty( Environment.MAX_QUEUE_LENGTH );
 		if ( maxQueueSize != null ) {
 			int parsedInt= ConfigurationParseHelper
-					.parseInt( maxQueueSize, Executors.QUEUE_MAX_LENGTH,
-					"Illegal value for property " + Environment.MAX_QUEUE_LENGTH + " on index " + directoryProviderName );
+					.parseInt(
+							maxQueueSize, Executors.QUEUE_MAX_LENGTH,
+							"Illegal value for property " + Environment.MAX_QUEUE_LENGTH + " on index " + directoryProviderName
+					);
 			if ( parsedInt < 1 ) {
 				throw new SearchException( "Property " + Environment.MAX_QUEUE_LENGTH + " on index "
 						+ directoryProviderName + "must be strictly positive" );

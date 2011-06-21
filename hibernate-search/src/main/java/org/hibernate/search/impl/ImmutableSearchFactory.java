@@ -34,6 +34,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
+
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -46,8 +49,6 @@ import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.Worker;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;

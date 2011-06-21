@@ -27,7 +27,7 @@ import java.util.Properties;
 
 import org.apache.lucene.search.Filter;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.SoftLimitMRUCache;
 
 /**

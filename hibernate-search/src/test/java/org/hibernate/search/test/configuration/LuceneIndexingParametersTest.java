@@ -32,12 +32,12 @@ import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
 
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_BUFFERED_DOCS;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_MERGE_DOCS;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERGE_FACTOR;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.RAM_BUFFER_SIZE;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.USE_COMPOUND_FILE;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERGE_MAX_OPTIMIZE_SIZE;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_BUFFERED_DOCS;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_MERGE_DOCS;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MERGE_FACTOR;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.RAM_BUFFER_SIZE;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.USE_COMPOUND_FILE;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MERGE_MAX_OPTIMIZE_SIZE;
 
 /**
  * @author Sanne Grinovero

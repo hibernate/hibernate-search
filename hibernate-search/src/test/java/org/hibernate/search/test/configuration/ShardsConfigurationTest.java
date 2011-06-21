@@ -23,10 +23,10 @@
  */
 package org.hibernate.search.test.configuration;
 
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_BUFFERED_DOCS;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.MAX_MERGE_DOCS;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.MERGE_FACTOR;
-import static org.hibernate.search.backend.configuration.IndexWriterSetting.RAM_BUFFER_SIZE;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_BUFFERED_DOCS;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_MERGE_DOCS;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MERGE_FACTOR;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.RAM_BUFFER_SIZE;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.FSDirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;

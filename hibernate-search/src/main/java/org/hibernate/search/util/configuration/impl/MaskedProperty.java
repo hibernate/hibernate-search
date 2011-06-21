@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.configuration;
+package org.hibernate.search.util.configuration.impl;
 
 import java.io.IOException;
 import java.io.InputStream;

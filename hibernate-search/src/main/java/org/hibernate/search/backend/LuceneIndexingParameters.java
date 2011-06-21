@@ -30,11 +30,12 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
+
+import org.hibernate.search.backend.configuration.impl.IndexWriterSetting;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.configuration.IndexWriterSetting;
-import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
