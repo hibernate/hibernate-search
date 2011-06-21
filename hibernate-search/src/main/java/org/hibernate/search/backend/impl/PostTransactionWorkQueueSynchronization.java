@@ -26,9 +26,7 @@ package org.hibernate.search.backend.impl;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
-import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.WeakIdentityHashMap;
 import org.hibernate.search.util.logging.impl.Log;

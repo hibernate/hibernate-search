@@ -21,26 +21,44 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend;
+package org.hibernate.search.backend.impl;
+
+import org.hibernate.search.backend.Work;
 
 /**
- * A visitor delegate to manipulate a LuceneWork
- * needs to implement this interface.
- * This pattern enables any implementation to virtually add delegate
- * methods to the base LuceneWork without having to change them.
- * This contract however breaks if more subclasses of LuceneWork
- * are created, as a visitor must support all existing types.
- * 
- * @author Sanne Grinovero
+ * Pile work operations
+ * No thread safety has to be implemented, the queue being scoped already
+ * The implementation must be "stateless" wrt the queue through (ie not store the queue state)
  *
- * @param <T> used to force a return type of choice.
+ * FIXME this Interface does not make much sense, since the impl will not be changed
+ *
+ * @author Emmanuel Bernard
  */
-public interface WorkVisitor<T> {
+public interface QueueingProcessor {
+	/**
+	 * Add a work
+	 * TODO move that somewhere else, it does not really fit here
+	 */
+	void add(Work work, WorkQueue workQueue);
 
-	T getDelegate(AddLuceneWork addLuceneWork);
-	T getDelegate(DeleteLuceneWork deleteLuceneWork);
-	T getDelegate(OptimizeLuceneWork optimizeLuceneWork);
-	T getDelegate(PurgeAllLuceneWork purgeAllLuceneWork);
-	T getDelegate(UpdateLuceneWork updateLuceneWork);
+	/**
+	 * prepare resources for a later performWorks call
+	 */
+	void prepareWorks(WorkQueue workQueue);
 
+	/**
+	 * Execute works
+	 */
+	void performWorks(WorkQueue workQueue);
+
+	/**
+	 * Rollback works
+	 */
+	void cancelWorks(WorkQueue workQueue);
+
+	/**
+	 * clean resources
+	 * This method should log errors rather than raise an exception
+	 */
+	void close();
 }

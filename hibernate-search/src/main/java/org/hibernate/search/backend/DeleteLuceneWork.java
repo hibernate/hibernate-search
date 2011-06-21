@@ -25,6 +25,8 @@ package org.hibernate.search.backend;
 
 import java.io.Serializable;
 
+import org.hibernate.search.backend.impl.WorkVisitor;
+
 /**
  * @author Emmanuel Bernard
  */

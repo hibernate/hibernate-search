@@ -39,6 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.logging.impl.Log;
@@ -62,7 +63,6 @@ import org.hibernate.search.annotations.Key;
 import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
-import org.hibernate.search.backend.WorkerFactory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;

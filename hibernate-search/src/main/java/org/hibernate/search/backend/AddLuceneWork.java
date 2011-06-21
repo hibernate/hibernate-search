@@ -28,6 +28,8 @@ import java.util.Map;
 
 import org.apache.lucene.document.Document;
 
+import org.hibernate.search.backend.impl.WorkVisitor;
+
 /**
  * @author Emmanuel Bernard
  */

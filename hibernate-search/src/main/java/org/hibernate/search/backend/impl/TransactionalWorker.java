@@ -29,10 +29,8 @@ import javax.transaction.Synchronization;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.QueueingProcessor;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.WorkQueue;
 import org.hibernate.search.backend.Worker;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.WorkerBuildContext;
