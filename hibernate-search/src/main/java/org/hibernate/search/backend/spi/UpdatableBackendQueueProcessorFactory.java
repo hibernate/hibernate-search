@@ -21,40 +21,23 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend;
+package org.hibernate.search.backend.spi;
 
-import java.util.Properties;
-import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.store.DirectoryProvider;
 
 /**
- * Interface for different types of queue processor factories. Implementations need a no-arg constructor.
- * The factory typically prepares or pools the resources needed by the queue processor.
+ * Allow a BackendQueueProcessorFactory to be notified of {@code DirectoryProvider} changes.
  *
  * @author Emmanuel Bernard
+ * @experimental This API is experimental
  */
-public interface BackendQueueProcessorFactory {
-	
+public interface UpdatableBackendQueueProcessorFactory extends BackendQueueProcessorFactory {
 	/**
-	 * Used at startup, called once as first method.
-	 * @param props all configuration properties
-	 * @param context context giving access to required meta data
+	 * Update the list of <code>DirectoryProvider</code>s in case the SearchFactory is updated.
+	 * The processor factory should react and update its state accordingly.
 	 */
-	void initialize(Properties props, WorkerBuildContext context);
-
-	/**
-	 * Return a runnable implementation responsible for processing the queue to a given backend.
-	 *
-	 * @param queue The work queue to process.
-	 * @return <code>Runnable</code> which processes <code>queue</code> when started.
-	 */
-	Runnable getProcessor(List<LuceneWork> queue);
-	
-	/**
-	 * Used to shutdown and eventually release resources.
-	 * No other method should be used after this one.
-	 */
-	void close();
-	
+	void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context);
 }

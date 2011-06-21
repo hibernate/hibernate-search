@@ -37,7 +37,7 @@ import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.LuceneIndexingParameters;
+import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.batchindexing.impl.Executors;

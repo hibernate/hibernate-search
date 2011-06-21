@@ -26,7 +26,7 @@ package org.hibernate.search.util;
 
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
-import org.hibernate.search.backend.Work;
+import org.hibernate.search.backend.spi.Work;
 
 /**
  * @author Emmanuel Bernard

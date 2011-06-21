@@ -32,7 +32,7 @@ import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.WorkVisitor;

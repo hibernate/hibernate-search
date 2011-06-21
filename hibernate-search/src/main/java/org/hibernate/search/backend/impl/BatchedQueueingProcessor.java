@@ -28,15 +28,15 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.Work;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
