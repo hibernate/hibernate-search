@@ -28,7 +28,7 @@ import org.hibernate.Session;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.event.FullTextIndexEventListener;
+import org.hibernate.search.event.impl.FullTextIndexEventListener;
 
 /**
  * @author Emmanuel Bernard
@@ -46,7 +46,7 @@ public abstract class ContextHelper {
 		//FIXME this sucks since we mandate the event listener use
 		for ( PostInsertEventListener candidate : listeners ) {
 			if ( candidate instanceof FullTextIndexEventListener ) {
-				listener = (FullTextIndexEventListener) candidate;
+				listener = (FullTextIndexEventListener ) candidate;
 				break;
 			}
 		}

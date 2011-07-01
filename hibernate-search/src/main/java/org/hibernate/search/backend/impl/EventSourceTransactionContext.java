@@ -28,6 +28,7 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.TransactionManager;
 
+import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.HibernateException;
@@ -39,7 +40,6 @@ import org.hibernate.event.EventSource;
 import org.hibernate.event.FlushEventListener;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -138,7 +138,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 		FlushEventListener[] flushEventListeners = eventSource.getListeners().getFlushEventListeners();
 		for (FlushEventListener listener : flushEventListeners) {
 			if ( listener.getClass().equals( FullTextIndexEventListener.class ) ) {
-				return (FullTextIndexEventListener) listener;
+				return (FullTextIndexEventListener ) listener;
 			}
 		}
 		log.debug( "FullTextIndexEventListener was not registered as FlushEventListener" );
