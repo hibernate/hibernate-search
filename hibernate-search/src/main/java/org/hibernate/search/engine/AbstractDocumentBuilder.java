@@ -853,7 +853,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 * All field/property related properties are kept in lists. Retrieving all metadata for a given
 	 * property/field means accessing all the lists with the same index.
 	 */
-	protected static class PropertiesMetadata {
+	public static class PropertiesMetadata {
 		public float boost;
 		public Analyzer analyzer;
 		public Discriminator discriminator;

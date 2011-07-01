@@ -22,11 +22,15 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.engine;
+package org.hibernate.search.engine.impl;
 
 import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
+
+import org.hibernate.search.engine.AbstractDocumentBuilder;
+import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.reflection.XMember;
