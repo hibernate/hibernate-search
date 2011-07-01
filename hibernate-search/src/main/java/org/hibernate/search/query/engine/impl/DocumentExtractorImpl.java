@@ -34,7 +34,7 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.DocumentBuilder;
-import org.hibernate.search.engine.DocumentBuilderHelper;
+import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
