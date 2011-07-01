@@ -49,7 +49,7 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualTransactionContext;
@@ -338,7 +338,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 	
 	public void testProvidedIdMapping() throws Exception{
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		SearchFactoryImplementor sf = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+		SearchFactoryImplementor sf = (SearchFactoryImplementor ) fullTextSession.getSearchFactory();
 		
 		ProvidedIdEntry person1 = new ProvidedIdEntry();
 		person1.setName( "Big Goat" );

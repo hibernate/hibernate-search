@@ -24,7 +24,7 @@
 
 package org.hibernate.search.spi.internals;
 
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 /**
  * Search Factory implementor exposing its sharable state.

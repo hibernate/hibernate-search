@@ -30,7 +30,7 @@ import junit.framework.Assert;
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.embedded.depth.LeakingLuceneBackend;

@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

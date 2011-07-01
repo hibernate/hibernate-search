@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.engine.spi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -69,6 +69,8 @@ import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;

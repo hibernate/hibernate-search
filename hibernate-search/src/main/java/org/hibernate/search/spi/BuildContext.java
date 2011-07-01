@@ -26,7 +26,7 @@ package org.hibernate.search.spi;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**

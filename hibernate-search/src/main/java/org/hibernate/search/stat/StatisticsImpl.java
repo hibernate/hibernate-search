@@ -45,7 +45,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Version;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 

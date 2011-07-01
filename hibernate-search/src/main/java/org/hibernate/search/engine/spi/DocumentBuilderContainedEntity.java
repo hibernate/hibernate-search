@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.engine.spi;
 
 import java.io.Serializable;
 import java.util.List;
@@ -31,6 +31,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.impl.ConfigContext;
 
 /**

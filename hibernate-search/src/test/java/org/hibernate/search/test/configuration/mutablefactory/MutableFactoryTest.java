@@ -37,11 +37,11 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;

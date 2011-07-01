@@ -36,7 +36,7 @@ import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**

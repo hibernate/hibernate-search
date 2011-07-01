@@ -28,9 +28,9 @@ import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
 
-import org.hibernate.search.engine.AbstractDocumentBuilder;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.reflection.XMember;

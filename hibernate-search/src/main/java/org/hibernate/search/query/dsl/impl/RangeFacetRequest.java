@@ -26,7 +26,7 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.facet.Facet;
 
 /**
