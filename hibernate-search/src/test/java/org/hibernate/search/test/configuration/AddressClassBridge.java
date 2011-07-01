@@ -31,6 +31,6 @@ import org.hibernate.search.bridge.LuceneOptions;
 public class AddressClassBridge implements FieldBridge {
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		//do nothing
+		luceneOptions.addFieldToDocument( "AddressClassBridge", "Applied!", document );
 	}
 }

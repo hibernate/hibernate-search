@@ -89,6 +89,10 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		Object[] firstResult = (Object[]) query.list().get( 0 );
 		assertEquals( "@Field.store not respected", "JBoss", firstResult[0] );
 
+		// Verify that AddressClassBridge was applied as well:
+		luceneQuery = parser.parse( "AddressClassBridge:Applied\\!" );
+		assertEquals( 1, s.createFullTextQuery( luceneQuery ).getResultSize() );
+
 		s.delete( firstResult[1] );
 		tx.commit();
 		s.close();
