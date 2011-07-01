@@ -39,7 +39,7 @@ import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.FilterDef;
+import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;

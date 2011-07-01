@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.engine.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,6 +36,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.engine.AbstractDocumentBuilder;
+import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
@@ -132,7 +134,7 @@ public class WorkPlan {
 	 * Used for recursive processing of containedIn
 	 * @param value the entity to be processed
 	 */
-	<T> void recurseContainedIn(T value) {
+	public <T> void recurseContainedIn(T value) {
 		Class<T> entityClass = HibernateHelper.getClass( value );
 		PerClassWork classWork = getClassWork( entityClass );
 		classWork.recurseContainedIn( value );

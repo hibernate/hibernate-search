@@ -47,7 +47,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.FilterDef;
+import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.filter.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
