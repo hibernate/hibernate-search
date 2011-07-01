@@ -1,4 +1,4 @@
-package org.hibernate.search.event;
+package org.hibernate.search.event.impl;
 
 import org.hibernate.event.PostUpdateEvent;
 

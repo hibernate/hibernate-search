@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.event;
+package org.hibernate.search.event.impl;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -70,7 +70,7 @@ import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.event.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
+import static org.hibernate.search.event.impl.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
 
 /**
  * This listener supports setting a parent directory for all generated index files.

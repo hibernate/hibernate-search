@@ -25,7 +25,7 @@ package org.hibernate.search.test.engine;
 
 import java.io.IOException;
 
-import org.hibernate.search.event.FullTextIndexEventListener;
+import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -39,7 +39,7 @@ public class EventListenerSerializationTest {
 
 	@Test
 	public void testEventListenerSerializable() throws IOException, ClassNotFoundException {
-		FullTextIndexEventListener eventListener = new FullTextIndexEventListener(FullTextIndexEventListener.Installation.SINGLE_INSTANCE);
+		FullTextIndexEventListener eventListener = new FullTextIndexEventListener( FullTextIndexEventListener.Installation.SINGLE_INSTANCE );
 		eventListener.addSynchronization( null, null );
 		Object secondListener = SerializationTestHelper
 				.duplicateBySerialization(eventListener);
