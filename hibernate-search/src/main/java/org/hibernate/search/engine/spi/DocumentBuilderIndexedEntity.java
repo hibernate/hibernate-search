@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.engine.spi;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -73,7 +73,6 @@ import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridge;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
-import org.hibernate.search.engine.spi.EntityInitializer;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.ClassLoadingStrategySelector;

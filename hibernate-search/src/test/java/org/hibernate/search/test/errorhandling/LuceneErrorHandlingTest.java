@@ -39,7 +39,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.test.Document;

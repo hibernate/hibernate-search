@@ -28,11 +28,11 @@ import javax.transaction.Synchronization;
 
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.WeakIdentityHashMap;

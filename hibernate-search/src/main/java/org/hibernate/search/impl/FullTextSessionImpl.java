@@ -76,7 +76,7 @@ import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.util.ContextHelper;
 import org.hibernate.search.util.HibernateHelper;

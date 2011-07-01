@@ -49,7 +49,7 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualTransactionContext;

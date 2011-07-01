@@ -31,10 +31,10 @@ import java.util.Set;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**

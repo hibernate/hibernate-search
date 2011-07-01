@@ -29,6 +29,8 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
@@ -36,8 +38,6 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.PerDirectoryWorkProcessor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
