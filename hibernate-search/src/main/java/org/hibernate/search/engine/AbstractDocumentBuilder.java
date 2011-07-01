@@ -69,6 +69,8 @@ import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.engine.impl.DefaultBoostStrategy;
+import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.PassThroughAnalyzer;

@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.engine.impl;
 
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
@@ -45,7 +45,7 @@ import static org.hibernate.search.annotations.NumericField.PRECISION_STEP_DEFAU
  * @author Sanne Grinovero
  * @author Gustavo Fernandes
  */
-class LuceneOptionsImpl implements LuceneOptions {
+public class LuceneOptionsImpl implements LuceneOptions {
 
 	private final boolean storeCompressed;
 	private final boolean storeUncompressed;
