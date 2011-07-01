@@ -800,7 +800,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * To be removed, see org.hibernate.search.engine.DocumentBuilderIndexedEntity.isIdMatchingJpaId()
 	 */
 	@Override
-	boolean requiresProvidedId() {
+	public boolean requiresProvidedId() {
 		return this.idProvided;
 	}
 	
@@ -810,7 +810,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * finding out which id we need is tricky, and requires helpers method like this one.
 	 */
 	@Override
-	boolean isIdMatchingJpaId() {
+	public boolean isIdMatchingJpaId() {
 		return ( ! idProvided &&
 				( documentIdAnnotatedMember == null || documentIdAnnotatedMember.equals( jpaIdAnnotatedMember ) )
 								);

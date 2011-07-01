@@ -27,11 +27,11 @@ import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.engine.WorkPlan;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -119,7 +119,7 @@ public class WorkQueue {
 
 	/**
 	 * Returns an estimate of the to be performed operations
-	 * @see WorkPlan#size()
+	 * @see org.hibernate.search.engine.impl.WorkPlan#size()
 	 * @return the approximate size
 	 */
 	public int size() {

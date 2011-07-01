@@ -71,6 +71,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
+import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.PassThroughAnalyzer;
@@ -923,7 +924,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 *
 	 * @return true if a providedId needs to be provided for indexing
 	 */
-	boolean requiresProvidedId() {
+	public boolean requiresProvidedId() {
 		return false;
 	}
 
@@ -932,7 +933,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 *
 	 * @return true if @DocumentId and @Id are found on the same property
 	 */
-	boolean isIdMatchingJpaId() {
+	public boolean isIdMatchingJpaId() {
 		return true;
 	}
 

@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine;
+package org.hibernate.search.engine.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
