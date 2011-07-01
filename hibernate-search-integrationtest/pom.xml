@@ -17,7 +17,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jbossJTA.version>4.14.0.Final</jbossJTA.version>
+        <jbossJTA.version>4.15.1.Final</jbossJTA.version>
         <spring-release-version>3.0.5.RELEASE</spring-release-version>
     </properties>
 

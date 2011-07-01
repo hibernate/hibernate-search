@@ -243,4 +243,10 @@ public interface HSQuery extends ProjectionConstants {
 	 * @deprecated should be at most SearchFactoryIntegrator, preferably removed altogether
 	 */
 	SearchFactoryImplementor getSearchFactoryImplementor();
+
+	/**
+	 * @param searchFactory
+	 */
+	void afterDeserialise(SearchFactoryImplementor searchFactory);
+
 }

@@ -30,6 +30,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.document.MapFieldSelector;
+import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.DocumentBuilder;
@@ -306,6 +307,11 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		MapFieldSelector classOnly = new MapFieldSelector( fields );
 		Document doc = queryHits.doc( scoreDocIndex, classOnly );
 		return doc.get( DocumentBuilder.CLASS_FIELDNAME );
+	}
+
+	@Override
+	public TopDocs getTopDocs() {
+		return queryHits.getTopDocs();
 	}
 
 }

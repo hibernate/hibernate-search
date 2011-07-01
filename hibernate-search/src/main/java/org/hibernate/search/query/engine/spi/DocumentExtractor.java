@@ -22,6 +22,8 @@ package org.hibernate.search.query.engine.spi;
 
 import java.io.IOException;
 
+import org.apache.lucene.search.TopDocs;
+
 /**
  * DocumentExtractor is a traverser over the full-text results (EntityInfo)
  *
@@ -43,4 +45,6 @@ public interface DocumentExtractor {
 	int getMaxIndex();
 
 	void close();
+
+	TopDocs getTopDocs();
 }

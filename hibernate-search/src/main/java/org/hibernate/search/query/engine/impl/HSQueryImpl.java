@@ -21,6 +21,7 @@
 package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,14 +73,14 @@ import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik <hardy@hibernate.org>
  */
-public class HSQueryImpl implements HSQuery {
+public class HSQueryImpl implements HSQuery, Serializable {
 
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private transient SearchFactoryImplementor searchFactoryImplementor;
 	private Query luceneQuery;
 	private List<Class<?>> targetedEntities;
-	private TimeoutManagerImpl timeoutManager;
+	private transient TimeoutManagerImpl timeoutManager;
 	private Set<Class<?>> indexedTargetedEntities;
 	private boolean allowFieldSelectionInProjection = true;
 	/**
@@ -92,13 +93,13 @@ public class HSQueryImpl implements HSQuery {
 	private String[] projectedFields;
 	private int firstResult;
 	private Integer maxResults;
-	private Set<Class<?>> classesAndSubclasses;
+	private transient Set<Class<?>> classesAndSubclasses;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
-	private TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
+	private transient TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
 	private boolean useFieldCacheOnClassTypes = false;
-	private FacetManagerImpl facetManager;
+	private transient FacetManagerImpl facetManager;
 
 	/**
 	 * The number of results for this query. This field gets populated once {@link #queryResultSize}, {@link #queryEntityInfos}
@@ -107,6 +108,10 @@ public class HSQueryImpl implements HSQuery {
 	private Integer resultSize;
 
 	public HSQueryImpl(SearchFactoryImplementor searchFactoryImplementor) {
+		this.searchFactoryImplementor = searchFactoryImplementor;
+	}
+	
+	public void afterDeserialise(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
 
