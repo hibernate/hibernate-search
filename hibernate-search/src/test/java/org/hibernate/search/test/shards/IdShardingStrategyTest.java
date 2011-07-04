@@ -24,8 +24,8 @@
 package org.hibernate.search.test.shards;
 
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IdHashShardingStrategy;
-import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.store.impl.IdHashShardingStrategy;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 import org.junit.Before;
 import org.junit.Test;

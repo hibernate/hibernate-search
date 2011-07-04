@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.store;
+package org.hibernate.search.store.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +35,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.store.FSDirectory;
+
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.spi.BuildContext;

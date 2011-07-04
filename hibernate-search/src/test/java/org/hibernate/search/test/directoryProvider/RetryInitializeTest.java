@@ -39,7 +39,7 @@ import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest
 
 /**
  * Verifies basic behavior of FSSlaveDirectoryProvider around
- * {@link org.hibernate.search.store.DirectoryProviderHelper#getRetryInitializePeriod(Properties, String)}
+ * {@link org.hibernate.search.store.impl.DirectoryProviderHelper#getRetryInitializePeriod(Properties, String)}
  * (HSEARCH-323)
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.

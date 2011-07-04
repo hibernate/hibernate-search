@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.store;
+package org.hibernate.search.store.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +38,8 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.batchindexing.impl.Executors;

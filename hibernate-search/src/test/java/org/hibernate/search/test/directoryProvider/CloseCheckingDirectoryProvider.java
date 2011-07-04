@@ -24,7 +24,7 @@ import java.util.Properties;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 /**
  * Verifies that a DirectoryProvider lifecycle is managed properly:

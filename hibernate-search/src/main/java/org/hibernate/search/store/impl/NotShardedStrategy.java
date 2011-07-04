@@ -21,52 +21,43 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.store;
+package org.hibernate.search.store.impl;
 
 import java.util.Properties;
 import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
-
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.filter.FullTextFilterImplementor;
+import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * This implementation use idInString as the hashKey.
- * 
  * @author Emmanuel Bernard
  */
-public class IdHashShardingStrategy implements IndexShardingStrategy {
-	
-	private DirectoryProvider<?>[] providers;
+public class NotShardedStrategy implements IndexShardingStrategy {
+	private DirectoryProvider<?>[] directoryProvider;
 	public void initialize(Properties properties, DirectoryProvider<?>[] providers) {
-		this.providers = providers;
+		this.directoryProvider = providers;
+		if ( directoryProvider.length > 1) {
+			throw new AssertionFailure("Using SingleDirectoryProviderSelectionStrategy with multiple DirectryProviders");
+		}
 	}
 
 	public DirectoryProvider<?>[] getDirectoryProvidersForAllShards() {
-		return providers;
+		return directoryProvider;
 	}
 
 	public DirectoryProvider<?> getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-		return providers[ hashKey(idInString) ];
+		return directoryProvider[0];
 	}
 
 	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		if ( idInString == null ) return providers;
-		return new DirectoryProvider[] { providers[hashKey( idInString )] };
+		return directoryProvider;
 	}
 
 	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-		return getDirectoryProvidersForAllShards();
+		return directoryProvider;
 	}
 
-	private int hashKey(String key) {
-		// reproduce the hashCode implementation of String as documented in the javadoc
-		// to be safe cross Java version (in case it changes some day)
-		int hash = 0;
-		int length = key.length();
-		for ( int index = 0; index < length; index++ ) {
-			hash = 31 * hash + key.charAt( index );
-		}
-		return Math.abs( hash % providers.length );
-	}
 }

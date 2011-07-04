@@ -42,6 +42,7 @@ import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
 
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
+import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -78,7 +79,6 @@ import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
 import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.ReflectionHelper;

@@ -51,7 +51,7 @@ import org.hibernate.search.reader.impl.SharingBufferReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 /**
  * @author Sanne Grinovero

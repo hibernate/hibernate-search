@@ -37,7 +37,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.FSDirectoryProvider;
+import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**

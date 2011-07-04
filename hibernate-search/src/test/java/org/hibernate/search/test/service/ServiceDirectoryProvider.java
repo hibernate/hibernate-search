@@ -3,7 +3,7 @@ package org.hibernate.search.test.service;
 import java.util.Properties;
 
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 /**
  * @author Emmanuel Bernard
