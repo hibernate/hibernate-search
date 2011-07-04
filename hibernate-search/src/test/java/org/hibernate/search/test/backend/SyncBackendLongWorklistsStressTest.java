@@ -36,7 +36,6 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.Clock;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
 
 public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 

@@ -1,4 +1,6 @@
-/* 
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -28,7 +30,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.AlternateDocument;
@@ -61,7 +63,7 @@ public class QuerySerializationTest extends SearchTestCase {
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 		
 		//this is *not* the standard way to create a Query:
-		HSQuery hsQuery = searchFactory.createHSQuery().luceneQuery( query ).targetedEntities( new ArrayList() );
+		HSQuery hsQuery = searchFactory.createHSQuery().luceneQuery( query ).targetedEntities( new ArrayList<Class<?>>() );
 		int size = extractResultSize(hsQuery);
 		
 		assertEquals( "Should have found a match", 1, size );

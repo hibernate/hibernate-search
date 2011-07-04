@@ -28,12 +28,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 
-import static org.hibernate.search.util.CollectionHelper.newArrayList;
+import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
 
 /**
  * @author Hardy Ferentschik

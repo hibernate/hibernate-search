@@ -31,11 +31,11 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.impl.FullTextSessionImpl;
-import org.hibernate.search.util.ClassLoaderHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

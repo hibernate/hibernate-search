@@ -25,6 +25,8 @@ package org.hibernate.search.backend;
 
 import java.io.Serializable;
 
+import org.hibernate.search.backend.impl.WorkVisitor;
+
 /**
  * A unit of work triggering an optimize operation.
  * This work does not propagate to a cluster: it should be filtered before being sent to

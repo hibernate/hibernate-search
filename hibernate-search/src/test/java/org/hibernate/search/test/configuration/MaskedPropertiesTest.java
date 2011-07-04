@@ -27,8 +27,9 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Enumeration;
 
-import org.hibernate.search.backend.configuration.MaskedProperty;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.test.SerializationTestHelper;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 

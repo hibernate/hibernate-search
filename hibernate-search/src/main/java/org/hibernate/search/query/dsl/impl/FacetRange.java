@@ -26,7 +26,7 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.Date;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 
 /**
  * @author Hardy Ferentschik

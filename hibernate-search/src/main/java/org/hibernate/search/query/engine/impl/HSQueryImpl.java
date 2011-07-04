@@ -46,16 +46,17 @@ import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.DocumentBuilder;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.FilterDef;
-import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.filter.ChainedFilter;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.filter.StandardFilterKey;
+import org.hibernate.search.filter.impl.ChainedFilter;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
-import org.hibernate.search.filter.StandardFilterKey;
+import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
-import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
+import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -65,9 +66,9 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
-import static org.hibernate.search.util.CollectionHelper.newHashMap;
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
+import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
+import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInstance;
+import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResults;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -762,7 +763,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
 		if ( cacheResults( def.getCacheMode() ) ) {
 			int cachingWrapperFilterSize = searchFactoryImplementor.getFilterCacheBitResultsSize();
-			filter = new org.hibernate.search.filter.CachingWrapperFilter( filter, cachingWrapperFilterSize );
+			filter = new CachingWrapperFilter( filter, cachingWrapperFilterSize );
 		}
 
 		return filter;

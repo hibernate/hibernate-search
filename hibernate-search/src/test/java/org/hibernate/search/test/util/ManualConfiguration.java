@@ -28,7 +28,7 @@ import java.util.Properties;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.hibernate.search.cfg.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.spi.ServiceProvider;

@@ -25,6 +25,8 @@ package org.hibernate.search.backend;
 
 import java.io.Serializable;
 
+import org.hibernate.search.backend.impl.WorkVisitor;
+
 /**
  * A unit of work used to purge an entire index.
  *

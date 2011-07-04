@@ -28,24 +28,22 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.QueueingProcessor;
-import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.WorkQueue;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -102,8 +100,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 				backendQueueProcessorFactory = new SlaveJGroupsBackendQueueProcessorFactory();
 		}
 		else {
-			backendQueueProcessorFactory = ClassLoaderHelper.instanceFromName( BackendQueueProcessorFactory.class,
-					backend, BatchedQueueingProcessor.class, "processor" );
+			backendQueueProcessorFactory = ClassLoaderHelper.instanceFromName(
+					BackendQueueProcessorFactory.class,
+					backend, BatchedQueueingProcessor.class, "processor"
+			);
 		}
 		backendQueueProcessorFactory.initialize( properties, context );
 		context.setBackendQueueProcessorFactory( backendQueueProcessorFactory );

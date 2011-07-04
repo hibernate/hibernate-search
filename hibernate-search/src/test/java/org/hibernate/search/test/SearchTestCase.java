@@ -46,9 +46,9 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.SearchFactoryImplementor;
-import org.hibernate.search.event.FullTextIndexEventListener;
-import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.event.impl.FullTextIndexEventListener;
+import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
@@ -246,7 +246,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.close();
 		SearchFactory searchFactory = s.getSearchFactory();
-		return (SearchFactoryImplementor) searchFactory;
+		return (SearchFactoryImplementor ) searchFactory;
 	}
 
 	/**

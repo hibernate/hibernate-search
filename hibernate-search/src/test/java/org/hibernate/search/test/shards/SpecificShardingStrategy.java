@@ -26,9 +26,9 @@ package org.hibernate.search.test.shards;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IdHashShardingStrategy;
+import org.hibernate.search.store.impl.IdHashShardingStrategy;
 
-public class SpecificShardingStrategy extends IdHashShardingStrategy {	
+public class SpecificShardingStrategy extends IdHashShardingStrategy {
 
 	@Override
 	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {

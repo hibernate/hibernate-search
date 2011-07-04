@@ -9,7 +9,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
-import org.hibernate.search.bridge.util.NumericFieldUtils;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.test.SearchTestCase;
 
 import java.io.IOException;
@@ -113,7 +113,7 @@ public class NumericFieldTest extends SearchTestCase {
 	}
 
 	private List numericQueryFor(String fieldName, Object from, Object to, boolean includeLower, boolean includeUpper) {
-		Query query = NumericFieldUtils.createNumericRangeQuery(fieldName, from, to, includeLower, includeUpper);
+		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, from, to, includeLower, includeUpper );
 		return fullTextSession.createFullTextQuery(query, Location.class).list();
 	}
 

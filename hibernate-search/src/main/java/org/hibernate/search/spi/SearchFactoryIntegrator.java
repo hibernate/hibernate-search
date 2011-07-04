@@ -24,7 +24,7 @@
 package org.hibernate.search.spi;
 
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.backend.Worker;
+import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.query.engine.spi.HSQuery;
 
 /**

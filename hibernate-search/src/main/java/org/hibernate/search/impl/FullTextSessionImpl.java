@@ -73,13 +73,13 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.backend.Work;
-import org.hibernate.search.backend.WorkType;
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
-import org.hibernate.search.util.ContextHelper;
-import org.hibernate.search.util.HibernateHelper;
+import org.hibernate.search.util.impl.ContextHelper;
+import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.stat.SessionStatistics;
 import org.hibernate.type.Type;
 

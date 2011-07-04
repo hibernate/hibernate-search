@@ -32,14 +32,14 @@ import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.WorkVisitor;
+import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.test.Document;

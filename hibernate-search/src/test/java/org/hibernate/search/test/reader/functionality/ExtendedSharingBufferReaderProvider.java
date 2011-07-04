@@ -46,12 +46,12 @@ import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 
+import org.hibernate.search.reader.impl.ReaderProviderHelper;
+import org.hibernate.search.reader.impl.SharingBufferReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.reader.ReaderProviderHelper;
-import org.hibernate.search.reader.SharingBufferReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 /**
  * @author Sanne Grinovero

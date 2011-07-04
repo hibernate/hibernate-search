@@ -38,7 +38,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.HibernateHelper;
+import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.stat.Statistics;
 
 /**

@@ -21,7 +21,7 @@ package org.hibernate.search.test.directoryProvider;
 
 import java.util.TimerTask;
 
-import org.hibernate.search.store.FSSlaveDirectoryProvider;
+import org.hibernate.search.store.impl.FSSlaveDirectoryProvider;
 
 /**
  * Extending FSSlaveDirectoryProvider to test it via static fields.

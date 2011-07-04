@@ -28,7 +28,7 @@ import org.apache.lucene.document.Field;
 
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.RAMDirectoryProvider;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class CustomerShardingStrategyTest {
 				new RAMDirectoryProvider(),
 				new RAMDirectoryProvider(),
 				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider() 
+				new RAMDirectoryProvider()
 		} );
 	}
 

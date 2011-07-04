@@ -38,6 +38,25 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
+
+import org.hibernate.search.backend.impl.WorkerFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
+import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityState;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.filter.impl.CachingWrapperFilter;
+import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
+import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.reader.impl.ReaderProviderFactory;
+import org.hibernate.search.store.impl.DirectoryProviderFactory;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.reflection.MetadataProvider;
@@ -56,24 +75,11 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Key;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
-import org.hibernate.search.backend.LuceneIndexingParameters;
-import org.hibernate.search.backend.UpdatableBackendQueueProcessorFactory;
-import org.hibernate.search.backend.WorkerFactory;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-import org.hibernate.search.cfg.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.EntityState;
-import org.hibernate.search.engine.FilterDef;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
-import org.hibernate.search.filter.CachingWrapperFilter;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.filter.MRUFilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.impl.ImmutableSearchFactory;
@@ -83,17 +89,12 @@ import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.jmx.IndexControl;
-import org.hibernate.search.jmx.JMXRegistrar;
-import org.hibernate.search.reader.ReaderProviderFactory;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -211,7 +212,7 @@ public class SearchFactoryBuilder {
 		//update backend
 		final BackendQueueProcessorFactory backend = factoryState.getBackendQueueProcessorFactory();
 		if ( backend instanceof UpdatableBackendQueueProcessorFactory ) {
-			final UpdatableBackendQueueProcessorFactory updatableBackend = (UpdatableBackendQueueProcessorFactory) backend;
+			final UpdatableBackendQueueProcessorFactory updatableBackend = (UpdatableBackendQueueProcessorFactory ) backend;
 			updatableBackend.updateDirectoryProviders( factoryState.getDirectoryProviderData().keySet(), buildContext );
 		}
 		//safe for incremental init at least the ShredBufferReaderProvider
@@ -678,7 +679,7 @@ public class SearchFactoryBuilder {
 
 		@SuppressWarnings("unchecked")
 		public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-			return (DocumentBuilderIndexedEntity<T>) factoryState.getDocumentBuildersIndexedEntities()
+			return (DocumentBuilderIndexedEntity<T> ) factoryState.getDocumentBuildersIndexedEntities()
 					.get( entityType );
 		}
 

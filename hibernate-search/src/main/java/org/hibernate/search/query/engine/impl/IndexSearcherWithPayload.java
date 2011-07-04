@@ -24,14 +24,15 @@ import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
+
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
+import static org.hibernate.search.reader.impl.ReaderProviderHelper.getIndexReaders;
 
 /**
 * @author Emmanuel Bernard

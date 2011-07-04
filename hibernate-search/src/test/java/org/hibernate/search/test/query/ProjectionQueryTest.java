@@ -46,7 +46,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.bridge.util.NumericFieldUtils;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -497,7 +497,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.clear();
 		tx = s.beginTransaction();
 
-		Query query = NumericFieldUtils.createNumericRangeQuery("debtInMillions", 600d, 800d, true, true);
+		Query query = NumericFieldUtils.createNumericRangeQuery( "debtInMillions", 600d, 800d, true, true );
 
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, FootballTeam.class );
 		hibQuery.setProjection("nrTitles", "name", "debtInMillions");

@@ -34,6 +34,18 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
+
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.stat.impl.StatisticsImpl;
+import org.hibernate.search.stat.spi.StatisticsImplementor;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -41,24 +53,16 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
-import org.hibernate.search.backend.BackendQueueProcessorFactory;
-import org.hibernate.search.backend.LuceneIndexingParameters;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
-import org.hibernate.search.backend.Worker;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
-import org.hibernate.search.backend.configuration.MaskedProperty;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.FilterDef;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.jmx.JMXRegistrar;
 import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
@@ -73,11 +77,8 @@ import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
-import org.hibernate.search.stat.StatisticsImpl;
-import org.hibernate.search.stat.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

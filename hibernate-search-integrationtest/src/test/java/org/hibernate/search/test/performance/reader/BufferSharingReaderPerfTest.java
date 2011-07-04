@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.test.performance.reader;
 
-import org.hibernate.search.reader.SharingBufferReaderProvider;
+import org.hibernate.search.reader.impl.SharingBufferReaderProvider;
 
 /**
  * @author Sanne Grinovero

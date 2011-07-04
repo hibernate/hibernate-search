@@ -35,8 +35,8 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.util.NumericFieldUtils;
-import org.hibernate.search.engine.DocumentBuilderIndexedEntity;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**
@@ -101,7 +101,13 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		final Object toObject = rangeContext.getTo();
 
 		if (fieldBridge!=null && NumericFieldBridge.class.isAssignableFrom(fieldBridge.getClass())) {
-			perFieldQuery = NumericFieldUtils.createNumericRangeQuery(fieldName, fromObject, toObject, !rangeContext.isExcludeTo(), !rangeContext.isExcludeFrom() );
+			perFieldQuery = NumericFieldUtils.createNumericRangeQuery(
+					fieldName,
+					fromObject,
+					toObject,
+					!rangeContext.isExcludeTo(),
+					!rangeContext.isExcludeFrom()
+			);
 		} else {
 
 			final String fromString  = fieldContext.isIgnoreFieldBridge() ?

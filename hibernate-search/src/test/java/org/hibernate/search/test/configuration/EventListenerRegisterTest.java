@@ -40,7 +40,7 @@ import org.hibernate.event.PostUpdateEvent;
 import org.hibernate.event.PostUpdateEventListener;
 import org.hibernate.search.Environment;
 import org.hibernate.search.event.EventListenerRegister;
-import org.hibernate.search.event.FullTextIndexEventListener;
+import org.hibernate.search.event.impl.FullTextIndexEventListener;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

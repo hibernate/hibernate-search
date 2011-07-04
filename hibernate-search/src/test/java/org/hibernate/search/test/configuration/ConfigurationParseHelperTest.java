@@ -26,7 +26,8 @@ package org.hibernate.search.test.configuration;
 import java.util.Properties;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 /**

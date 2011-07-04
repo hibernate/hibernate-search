@@ -33,7 +33,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.util.JNDIHelper;
+import org.hibernate.search.util.impl.JNDIHelper;
 
 
 /**

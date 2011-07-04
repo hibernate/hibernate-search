@@ -23,12 +23,12 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

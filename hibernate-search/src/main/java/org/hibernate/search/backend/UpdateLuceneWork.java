@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.apache.lucene.document.Document;
 
+import org.hibernate.search.backend.impl.WorkVisitor;
+
 /**
  * Carries a Lucene update operation from the engine to the backend
  * 

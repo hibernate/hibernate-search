@@ -65,9 +65,8 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.sourceBase", getBaseIndexDir().getAbsolutePath() + masterCopy );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() + masterMain );
 		cfg.setProperty( "hibernate.search.default.refresh", "1" );
-		//keep the fqcn to make sure they still work after the introduction of shortcuts
 		cfg.setProperty(
-				"hibernate.search.default.directory_provider", "org.hibernate.search.store.FSMasterDirectoryProvider"
+				"hibernate.search.default.directory_provider", "filesystem-master"
 		);
 	}
 

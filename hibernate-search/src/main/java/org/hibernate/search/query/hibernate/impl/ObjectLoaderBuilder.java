@@ -31,7 +31,7 @@ import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.TimeoutManager;

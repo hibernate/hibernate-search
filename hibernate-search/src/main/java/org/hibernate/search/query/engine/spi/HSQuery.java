@@ -30,7 +30,7 @@ import org.apache.lucene.search.Sort;
 
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
-import org.hibernate.search.engine.SearchFactoryImplementor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).

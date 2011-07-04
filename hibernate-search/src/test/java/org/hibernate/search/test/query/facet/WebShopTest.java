@@ -42,8 +42,8 @@ import org.hibernate.search.query.facet.RangeFacet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.util.CollectionHelper.newArrayList;
-import static org.hibernate.search.util.CollectionHelper.newHashMap;
+import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
+import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 /**
  * Simulate a web-shop with basic search which can be refined by facet requests.

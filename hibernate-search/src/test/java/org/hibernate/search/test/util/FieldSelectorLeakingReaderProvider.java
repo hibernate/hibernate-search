@@ -41,10 +41,10 @@ import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.reader.NotSharedReaderProvider;
+import org.hibernate.search.reader.impl.NotSharedReaderProvider;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.ReflectionHelper;
+import org.hibernate.search.util.impl.ReflectionHelper;
 
 import static junit.framework.Assert.*;
 
