@@ -17,7 +17,7 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.query.fieldcache;
+package org.hibernate.search.query.fieldcache.impl;
 
 import java.io.IOException;
 

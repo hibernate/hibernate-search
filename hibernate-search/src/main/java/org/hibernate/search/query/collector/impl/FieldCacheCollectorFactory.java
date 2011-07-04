@@ -24,8 +24,8 @@ import org.apache.lucene.search.Collector;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.StringBridge;
-import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
-import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
+import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
+import org.hibernate.search.query.fieldcache.impl.FieldLoadingStrategy;
 
 /**
  * Every search needs a fresh instance of a Collector, still for

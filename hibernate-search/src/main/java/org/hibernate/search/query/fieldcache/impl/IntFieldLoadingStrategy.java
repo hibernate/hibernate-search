@@ -17,7 +17,7 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.query.fieldcache;
+package org.hibernate.search.query.fieldcache.impl;
 
 import java.io.IOException;
 
@@ -31,19 +31,19 @@ import org.apache.lucene.search.FieldCache;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @see FieldLoadingStrategy
  */
-public final class DoubleFieldLoadingStrategy implements FieldLoadingStrategy {
+public final class IntFieldLoadingStrategy implements FieldLoadingStrategy {
 	private final String fieldName;
-	private double[] currentCache;
+	private int[] currentCache;
 
-	public DoubleFieldLoadingStrategy(String fieldName) {
+	public IntFieldLoadingStrategy(String fieldName) {
 		this.fieldName = fieldName;
 	}
 
 	public void loadNewCacheValues(IndexReader reader) throws IOException {
-		currentCache = FieldCache.DEFAULT.getDoubles( reader, fieldName );
+		currentCache = FieldCache.DEFAULT.getInts( reader, fieldName );
 	}
 
-	public Double collect(int relativeDocId) {
+	public Integer collect(int relativeDocId) {
 		return currentCache[relativeDocId];
 	}
 }

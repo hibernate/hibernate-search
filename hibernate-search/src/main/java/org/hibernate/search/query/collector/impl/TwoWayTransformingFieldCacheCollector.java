@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.query.collector.FieldCacheCollector;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 

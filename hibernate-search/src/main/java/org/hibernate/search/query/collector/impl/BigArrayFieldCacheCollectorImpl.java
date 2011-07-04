@@ -24,8 +24,7 @@ import java.io.IOException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 
-import org.hibernate.search.query.collector.FieldCacheCollector;
-import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
+import org.hibernate.search.query.fieldcache.impl.FieldLoadingStrategy;
 
 /**
  * {@code FieldCacheCollector} using an internal array to collect extracted values

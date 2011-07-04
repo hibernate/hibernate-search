@@ -43,8 +43,8 @@ import org.hibernate.search.query.dsl.impl.RangeFacetImpl;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
-import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
-import org.hibernate.search.query.fieldcache.FieldLoadingStrategy;
+import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
+import org.hibernate.search.query.fieldcache.impl.FieldLoadingStrategy;
 
 import static org.hibernate.search.util.CollectionHelper.newArrayList;
 import static org.hibernate.search.util.CollectionHelper.newHashMap;
