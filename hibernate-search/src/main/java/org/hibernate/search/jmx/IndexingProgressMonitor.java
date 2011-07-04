@@ -25,6 +25,7 @@ package org.hibernate.search.jmx;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
