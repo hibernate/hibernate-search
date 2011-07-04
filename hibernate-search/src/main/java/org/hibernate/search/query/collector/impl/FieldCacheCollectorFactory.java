@@ -17,7 +17,7 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.query.collector;
+package org.hibernate.search.query.collector.impl;
 
 import org.apache.lucene.search.Collector;
 

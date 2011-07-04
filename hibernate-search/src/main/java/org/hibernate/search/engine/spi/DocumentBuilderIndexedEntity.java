@@ -74,7 +74,7 @@ import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridge;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.search.impl.ConfigContext;
-import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
+import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.ClassLoadingStrategySelector;
 import org.hibernate.search.query.fieldcache.FieldCacheLoadingType;
 import org.hibernate.search.store.DirectoryProvider;

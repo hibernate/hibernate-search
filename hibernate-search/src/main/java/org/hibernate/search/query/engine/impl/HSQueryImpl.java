@@ -56,7 +56,7 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
-import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
+import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
