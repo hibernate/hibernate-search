@@ -37,7 +37,7 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
-import org.hibernate.search.stat.StatisticsImplementor;
+import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 

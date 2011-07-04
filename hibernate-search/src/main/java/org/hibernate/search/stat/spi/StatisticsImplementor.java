@@ -23,7 +23,7 @@
  */
 
 // $Id:$
-package org.hibernate.search.stat;
+package org.hibernate.search.stat.spi;
 
 /**
  * Statistics SPI for the Search. This is essentially the "statistic collector" API.
