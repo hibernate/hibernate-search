@@ -29,10 +29,10 @@ import org.infinispan.Cache;
 import org.infinispan.lucene.InfinispanDirectory;
 import org.infinispan.manager.EmbeddedCacheManager;
 
+import org.hibernate.search.store.impl.DirectoryProviderHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.DirectoryProviderHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

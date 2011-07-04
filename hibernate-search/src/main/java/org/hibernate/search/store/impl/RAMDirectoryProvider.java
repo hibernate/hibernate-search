@@ -21,16 +21,15 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.store;
+package org.hibernate.search.store.impl;
 
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Use a Lucene RAMDirectory

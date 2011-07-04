@@ -27,7 +27,7 @@ import java.io.File;
 import java.util.Properties;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.DirectoryProviderHelper;
+import org.hibernate.search.store.impl.DirectoryProviderHelper;
 import org.hibernate.search.util.FileHelper;
 
 import org.junit.Test;
