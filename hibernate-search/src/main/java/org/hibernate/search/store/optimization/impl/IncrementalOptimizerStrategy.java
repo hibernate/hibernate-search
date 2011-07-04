@@ -21,13 +21,14 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.store.optimization;
+package org.hibernate.search.store.optimization.impl;
 
 import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
 
+import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;

@@ -21,13 +21,14 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.store.optimization;
+package org.hibernate.search.store.optimization.impl;
 
 import java.util.Properties;
 
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * @author Emmanuel Bernard

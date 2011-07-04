@@ -40,13 +40,13 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
+import org.hibernate.search.store.optimization.impl.NoOpOptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.WritableBuildContext;
-import org.hibernate.search.store.optimization.IncrementalOptimizerStrategy;
-import org.hibernate.search.store.optimization.NoOpOptimizerStrategy;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.ClassLoaderHelper;
 
