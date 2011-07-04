@@ -40,7 +40,7 @@ import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
-import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.impl.FileHelper;
 
 /**
  * @author Gavin King

@@ -75,10 +75,10 @@ import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
-import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.PassThroughAnalyzer;
-import org.hibernate.search.util.ReflectionHelper;
-import org.hibernate.search.util.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.PassThroughAnalyzer;
+import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

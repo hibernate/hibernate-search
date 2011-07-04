@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.util.StringHelper;
@@ -43,7 +44,6 @@ import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcess
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -100,8 +100,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 				backendQueueProcessorFactory = new SlaveJGroupsBackendQueueProcessorFactory();
 		}
 		else {
-			backendQueueProcessorFactory = ClassLoaderHelper.instanceFromName( BackendQueueProcessorFactory.class,
-					backend, BatchedQueueingProcessor.class, "processor" );
+			backendQueueProcessorFactory = ClassLoaderHelper.instanceFromName(
+					BackendQueueProcessorFactory.class,
+					backend, BatchedQueueingProcessor.class, "processor"
+			);
 		}
 		backendQueueProcessorFactory.initialize( properties, context );
 		context.setBackendQueueProcessorFactory( backendQueueProcessorFactory );

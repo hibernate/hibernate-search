@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.engine.spi.EntityInitializer;
-import org.hibernate.search.util.HibernateHelper;
+import org.hibernate.search.util.impl.HibernateHelper;
 
 /**
  * To be used for Hibernate initializations which don't need a specific Session.

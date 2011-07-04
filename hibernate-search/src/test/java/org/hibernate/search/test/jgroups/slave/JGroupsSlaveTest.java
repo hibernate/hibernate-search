@@ -35,7 +35,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
-import org.hibernate.search.util.XMLHelper;
+import org.hibernate.search.util.impl.XMLHelper;
 
 /**
  * Tests that the Slave node in a JGroups cluster can properly send messages to the channel.

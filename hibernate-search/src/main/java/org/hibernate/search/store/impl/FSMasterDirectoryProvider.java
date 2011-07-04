@@ -37,11 +37,11 @@ import java.util.concurrent.locks.Lock;
 import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.util.FileHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

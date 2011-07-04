@@ -17,7 +17,7 @@
  * MA  02110-1301, USA.
  */
 
-package org.hibernate.search.util;
+package org.hibernate.search.util.impl;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;

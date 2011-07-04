@@ -35,7 +35,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.ServiceProvider;
-import org.hibernate.search.util.JGroupsHelper;
+import org.hibernate.search.util.impl.JGroupsHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.util.NamingHelper;
 import org.hibernate.util.PropertiesHelper;

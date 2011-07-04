@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

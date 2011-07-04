@@ -66,9 +66,9 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
-import static org.hibernate.search.util.CollectionHelper.newHashMap;
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheInstance;
-import static org.hibernate.search.util.FilterCacheModeTypeHelper.cacheResults;
+import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
+import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInstance;
+import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResults;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>

@@ -21,40 +21,38 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.util;
+package org.hibernate.search.util.impl;
 
-import org.hibernate.search.annotations.FilterCacheModeType;
-import org.hibernate.annotations.common.AssertionFailure;
+import java.io.Reader;
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharTokenizer;
+import org.apache.lucene.analysis.TokenStream;
 
 /**
+ * Analyzer that applies no operation whatsoever to the flux
+ * This is useful for queries operating on non tokenized fields.
+ * <p/>
+ * TODO there is probably a way to make that much more efficient by
+ * reimplementing TokenStream to take the Reader and pass through the flux as a single token
+ *
  * @author Emmanuel Bernard
  */
-public class FilterCacheModeTypeHelper {
-	private FilterCacheModeTypeHelper() {}
+public final class PassThroughAnalyzer extends Analyzer {
 
-	public static boolean cacheInstance(FilterCacheModeType type) {
-		switch ( type ) {
-			case NONE:
-				return false;
-			case INSTANCE_AND_DOCIDSETRESULTS:
-				return true;
-			case INSTANCE_ONLY:
-				return true;
-			default:
-				throw new AssertionFailure("Unknwn FilterCacheModeType:" + type);
-		}
+	@Override
+	public TokenStream tokenStream(String fieldName, Reader reader) {
+		return new PassThroughTokenizer( reader );
 	}
 
-	public static boolean cacheResults(FilterCacheModeType type) {
-		switch ( type ) {
-			case NONE:
-				return false;
-			case INSTANCE_AND_DOCIDSETRESULTS:
-				return true;
-			case INSTANCE_ONLY:
-				return false;
-			default:
-				throw new AssertionFailure("Unknwn FilterCacheModeType:" + type);
+	private static class PassThroughTokenizer extends CharTokenizer {
+		public PassThroughTokenizer(Reader input) {
+			super( input );
+		}
+
+		@Override
+		protected boolean isTokenChar(char c) {
+			return true;
 		}
 	}
 }

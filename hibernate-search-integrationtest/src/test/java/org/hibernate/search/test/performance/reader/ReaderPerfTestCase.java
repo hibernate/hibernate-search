@@ -44,7 +44,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

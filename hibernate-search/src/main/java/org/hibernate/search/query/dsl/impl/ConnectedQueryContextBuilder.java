@@ -28,7 +28,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
-import org.hibernate.search.util.ScopedAnalyzer;
+import org.hibernate.search.util.impl.ScopedAnalyzer;
 
 /**
  * Assuming connection with the search factory
