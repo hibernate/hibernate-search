@@ -48,9 +48,9 @@ import org.apache.lucene.search.Weight;
 
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.query.collector.FacetCollector;
-import org.hibernate.search.query.collector.FieldCacheCollector;
-import org.hibernate.search.query.collector.FieldCacheCollectorFactory;
+import org.hibernate.search.query.collector.impl.FacetCollector;
+import org.hibernate.search.query.collector.impl.FieldCacheCollector;
+import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;

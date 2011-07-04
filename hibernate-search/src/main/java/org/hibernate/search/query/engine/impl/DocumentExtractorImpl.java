@@ -38,7 +38,7 @@ import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.collector.FieldCacheCollector;
+import org.hibernate.search.query.collector.impl.FieldCacheCollector;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 

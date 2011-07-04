@@ -25,4 +25,4 @@
 /**
  * This package contains custom Lucene Collector implementations.
  */
-package org.hibernate.search.query.collector;
+package org.hibernate.search.query.collector.impl;
