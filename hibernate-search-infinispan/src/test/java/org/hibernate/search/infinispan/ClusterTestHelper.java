@@ -25,6 +25,7 @@ import junit.framework.AssertionFailedError;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;

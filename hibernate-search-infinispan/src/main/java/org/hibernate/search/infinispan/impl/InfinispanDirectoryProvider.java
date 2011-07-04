@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.infinispan;
+package org.hibernate.search.infinispan.impl;
 
 import java.util.Properties;
 
@@ -29,6 +29,7 @@ import org.infinispan.Cache;
 import org.infinispan.lucene.InfinispanDirectory;
 import org.infinispan.manager.EmbeddedCacheManager;
 
+import org.hibernate.search.infinispan.CacheManagerServiceProvider;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.infinispan.logging.impl.Log;
