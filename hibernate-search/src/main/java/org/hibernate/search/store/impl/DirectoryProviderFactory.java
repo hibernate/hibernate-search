@@ -83,7 +83,7 @@ public class DirectoryProviderFactory {
 		defaultProviderClasses.put( "filesystem-master", FSMasterDirectoryProvider.class.getName() );
 		defaultProviderClasses.put( "filesystem-slave", FSSlaveDirectoryProvider.class.getName() );
 		defaultProviderClasses.put( "ram", RAMDirectoryProvider.class.getName() );
-		defaultProviderClasses.put( "infinispan", "org.hibernate.search.infinispan.InfinispanDirectoryProvider" );
+		defaultProviderClasses.put( "infinispan", "org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider" );
 	}
 
 	public DirectoryProviders createDirectoryProviders(XClass entity, SearchConfiguration cfg,
