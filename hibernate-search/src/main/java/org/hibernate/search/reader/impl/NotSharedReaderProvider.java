@@ -21,18 +21,16 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.reader;
+package org.hibernate.search.reader.impl;
 
 import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexReader;
 
+import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-
-import static org.hibernate.search.reader.ReaderProviderHelper.buildMultiReader;
-import static org.hibernate.search.reader.ReaderProviderHelper.clean;
 
 import org.hibernate.search.store.DirectoryProvider;
 
@@ -53,9 +51,9 @@ public class NotSharedReaderProvider implements ReaderProvider {
 		}
 		catch (IOException e) {
 			//TODO more contextual info
-			clean( new SearchException( "Unable to open one of the Lucene indexes", e ), readers );
+			ReaderProviderHelper.clean( new SearchException( "Unable to open one of the Lucene indexes", e ), readers );
 		}
-		return buildMultiReader( length, readers );
+		return ReaderProviderHelper.buildMultiReader( length, readers );
 	}
 
 
@@ -66,7 +64,7 @@ public class NotSharedReaderProvider implements ReaderProvider {
 		}
 		catch (IOException e) {
 			//TODO extract subReaders and close each one individually
-			clean( new SearchException( "Unable to close multiReader" ), reader );
+			ReaderProviderHelper.clean( new SearchException( "Unable to close multiReader" ), reader );
 		}
 	}
 

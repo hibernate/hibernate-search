@@ -33,7 +33,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.reader.SharingBufferReaderProvider;
+import org.hibernate.search.reader.impl.SharingBufferReaderProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.reader.Detective;
 import org.hibernate.search.test.reader.Suspect;

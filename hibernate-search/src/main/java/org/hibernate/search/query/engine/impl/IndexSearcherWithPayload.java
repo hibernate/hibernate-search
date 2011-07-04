@@ -32,7 +32,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.reader.ReaderProviderHelper.getIndexReaders;
+import static org.hibernate.search.reader.impl.ReaderProviderHelper.getIndexReaders;
 
 /**
 * @author Emmanuel Bernard

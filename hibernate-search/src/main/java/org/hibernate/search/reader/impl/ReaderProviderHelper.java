@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.reader;
+package org.hibernate.search.reader.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

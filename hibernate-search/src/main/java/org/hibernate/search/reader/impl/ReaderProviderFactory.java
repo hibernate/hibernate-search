@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.reader;
+package org.hibernate.search.reader.impl;
 
 import java.util.Map;
 import java.util.Properties;
@@ -29,6 +29,7 @@ import java.util.Properties;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.ClassLoaderHelper;
 

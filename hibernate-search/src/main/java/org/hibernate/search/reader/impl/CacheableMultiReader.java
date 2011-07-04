@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.reader;
+package org.hibernate.search.reader.impl;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;

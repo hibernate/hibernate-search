@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.reader;
+package org.hibernate.search.reader.impl;
 
 import java.io.IOException;
 import java.util.Map;
@@ -35,6 +35,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.store.Directory;
+
+import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
