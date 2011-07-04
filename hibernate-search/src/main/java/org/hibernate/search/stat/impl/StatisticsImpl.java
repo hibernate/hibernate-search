@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.stat;
+package org.hibernate.search.stat.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,6 +47,8 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Version;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.reader.ReaderProvider;
+import org.hibernate.search.stat.Statistics;
+import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**

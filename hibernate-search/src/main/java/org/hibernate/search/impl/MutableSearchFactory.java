@@ -52,7 +52,7 @@ import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.stat.Statistics;
-import org.hibernate.search.stat.StatisticsImplementor;
+import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
