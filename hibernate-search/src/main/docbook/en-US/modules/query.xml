@@ -506,6 +506,7 @@ Query luceneQuery = mythQB
 
         <para>The subqueries can be any Lucene query including a boolean query
         itself. Let's look at a few examples:</para>
+
         <programlisting language="JAVA" role="JAVA">//look for popular modern myths that are not urban
 Date twentiethCentury = ...;
 Query luceneQuery = mythQB
@@ -1530,12 +1531,10 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
     <literal>FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS</literal> which
     will automatically cache the filter instance as well as wrap the specified
     filter around a Hibernate specific implementation of
-    <classname>CachingWrapperFilter</classname>
-    (<classname>org.hibernate.search.filter.CachingWrapperFilter</classname>).
-    In contrast to Lucene's version of this class
-    <classname>SoftReference</classname>s are used together with a hard
-    reference count (see discussion about filter cache). The hard reference
-    count can be adjusted using
+    <classname>CachingWrapperFilter</classname>. In contrast to Lucene's
+    version of this class <classname>SoftReference</classname>s are used
+    together with a hard reference count (see discussion about filter cache).
+    The hard reference count can be adjusted using
     <literal>hibernate.search.filter.cache_docidresults.size</literal>
     (defaults to 5). The wrapping behaviour can be controlled using the
     <literal>@FullTextFilterDef.cache</literal> parameter. There are three
@@ -1786,11 +1785,12 @@ public class Cd {
 
       <para>The first step towards a faceted search is to create the
       <classname>FacetingRequest</classname>. Currently two types of faceting
-      requests are supported. The first type is called <emphasis>discrete faceting</emphasis> and
-      the second type <emphasis>range faceting</emphasis> request. In the case of a discrete
-      faceting request you specify on which index field you want to facet
-      (categorize) and which faceting options to apply. An example for a
-      discrete faceting request can be seen in <xref
+      requests are supported. The first type is called <emphasis>discrete
+      faceting</emphasis> and the second type <emphasis>range
+      faceting</emphasis> request. In the case of a discrete faceting request
+      you specify on which index field you want to facet (categorize) and
+      which faceting options to apply. An example for a discrete faceting
+      request can be seen in <xref
       linkend="example-discrete-faceting" />:</para>
 
       <example id="example-discrete-faceting">
@@ -1847,11 +1847,11 @@ FacetingRequest labelFacetingRequest = builder.facet()
       <methodname>to</methodname> ranges as you want. For each range boundary
       you can also specify via <methodname>excludeLimit</methodname> whether
       it is included into the range or not.</para>
-      
-      <example id="example-range-faceting">
-          <title>Creating a range faceting request</title>
 
-          <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
+      <example id="example-range-faceting">
+        <title>Creating a range faceting request</title>
+
+        <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
     .buildQueryBuilder()
         .forEntity( Cd.class )
             .get();
@@ -1863,7 +1863,7 @@ FacetingRequest priceacetingRequest = queryBuilder( Cd.class ).facet()
     .from( 1001 ).to( 1500 )
     .above( 1500 ).excludeLimit()
     .createFacetingRequest();</programlisting>
-        </example>
+      </example>
     </section>
 
     <section id="section-applying-faceting-request">

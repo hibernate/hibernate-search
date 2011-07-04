@@ -21,12 +21,14 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.filter;
+package org.hibernate.search.filter.impl;
 
 import java.util.Properties;
 
 import org.apache.lucene.search.Filter;
 import org.hibernate.search.Environment;
+import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.SoftLimitMRUCache;
 
