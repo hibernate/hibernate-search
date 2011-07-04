@@ -78,8 +78,8 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
-import org.hibernate.search.util.ContextHelper;
-import org.hibernate.search.util.HibernateHelper;
+import org.hibernate.search.util.impl.ContextHelper;
+import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.stat.SessionStatistics;
 import org.hibernate.type.Type;
 

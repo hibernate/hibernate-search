@@ -45,6 +45,7 @@ import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -78,7 +79,6 @@ import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

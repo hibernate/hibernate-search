@@ -48,7 +48,7 @@ import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.ClassLoaderHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * Create a Lucene directory provider which can be configured

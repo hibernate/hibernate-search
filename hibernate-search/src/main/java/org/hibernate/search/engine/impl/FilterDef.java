@@ -31,7 +31,7 @@ import java.util.Map;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
-import org.hibernate.search.util.ReflectionHelper;
+import org.hibernate.search.util.impl.ReflectionHelper;
 
 /**
  * A wrapper class which encapsulates all required information to create a defined filter.

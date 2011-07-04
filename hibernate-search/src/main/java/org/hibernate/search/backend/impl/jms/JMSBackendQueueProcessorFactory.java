@@ -37,7 +37,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.JNDIHelper;
+import org.hibernate.search.util.impl.JNDIHelper;
 
 /**
  * @author Emmanuel Bernard

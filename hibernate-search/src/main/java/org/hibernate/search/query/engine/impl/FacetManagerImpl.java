@@ -41,8 +41,8 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSelection;
 import org.hibernate.search.query.facet.FacetingRequest;
 
-import static org.hibernate.search.util.CollectionHelper.newArrayList;
-import static org.hibernate.search.util.CollectionHelper.newHashMap;
+import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
+import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 /**
  * Default implementation of the {@link FacetManager} implementation.

@@ -21,46 +21,40 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+package org.hibernate.search.util.impl;
 
-package org.hibernate.search.util;
-
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
-import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.annotations.FilterCacheModeType;
+import org.hibernate.annotations.common.AssertionFailure;
 
 /**
  * @author Emmanuel Bernard
  */
-public final class HibernateHelper {
-	private HibernateHelper() {
-	}
+public class FilterCacheModeTypeHelper {
+	private FilterCacheModeTypeHelper() {}
 
-	/**
-	 * Get the real class type.
-	 * In case of Hibernate proxies, return the entity type rather than the proxy's
-	 */
-	public static <T> Class<T> getClass(T entity) {
-		return ( Class<T> ) Hibernate.getClass( entity );
-	}
-
-	public static void initialize(Object entity) {
-		Hibernate.initialize( entity );
-	}
-
-	public static boolean isInitialized(Object entity) {
-		return Hibernate.isInitialized( entity );
-	}
-
-	public static <T> Class<T> getClassFromWork(Work<T> work) {
-		return work.getEntityClass() != null ?
-				work.getEntityClass() :
-				getClass( work.getEntity() );
-	}
-
-	public static Object unproxy(Object value) {
-		if ( value instanceof HibernateProxy ) {
-			value = ( ( HibernateProxy ) value ).getHibernateLazyInitializer().getImplementation();
+	public static boolean cacheInstance(FilterCacheModeType type) {
+		switch ( type ) {
+			case NONE:
+				return false;
+			case INSTANCE_AND_DOCIDSETRESULTS:
+				return true;
+			case INSTANCE_ONLY:
+				return true;
+			default:
+				throw new AssertionFailure("Unknwn FilterCacheModeType:" + type);
 		}
-		return value;
+	}
+
+	public static boolean cacheResults(FilterCacheModeType type) {
+		switch ( type ) {
+			case NONE:
+				return false;
+			case INSTANCE_AND_DOCIDSETRESULTS:
+				return true;
+			case INSTANCE_ONLY:
+				return false;
+			default:
+				throw new AssertionFailure("Unknwn FilterCacheModeType:" + type);
+		}
 	}
 }

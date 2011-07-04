@@ -29,7 +29,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTSStandaloneTransactionManagerLookup;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;
-import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.impl.FileHelper;
 
 /**
  * @author Emmanuel Bernard

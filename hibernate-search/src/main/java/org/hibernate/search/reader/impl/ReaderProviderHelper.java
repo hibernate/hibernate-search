@@ -32,7 +32,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.util.ReflectionHelper;
+import org.hibernate.search.util.impl.ReflectionHelper;
 
 /**
  * @author Emmanuel Bernard

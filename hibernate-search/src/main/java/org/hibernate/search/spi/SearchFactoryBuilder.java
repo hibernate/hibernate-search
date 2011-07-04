@@ -55,6 +55,8 @@ import org.hibernate.search.reader.impl.ReaderProviderFactory;
 import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.reflection.MetadataProvider;
@@ -93,8 +95,6 @@ import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableS
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

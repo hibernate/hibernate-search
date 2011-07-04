@@ -30,7 +30,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.SoftLimitMRUCache;
+import org.hibernate.search.util.impl.SoftLimitMRUCache;
 
 /**
  * Keep the most recently used Filters in the cache

@@ -12,11 +12,11 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.spi.ServiceProvider;
-import org.hibernate.search.util.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

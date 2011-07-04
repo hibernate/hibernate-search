@@ -28,9 +28,10 @@ import java.io.IOException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
+
+import org.hibernate.search.util.impl.SoftLimitMRUCache;
 import org.hibernate.search.util.logging.impl.Log;
 
-import org.hibernate.search.util.SoftLimitMRUCache;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

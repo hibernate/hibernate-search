@@ -27,7 +27,7 @@ import org.apache.lucene.search.Collector;
 
 import org.hibernate.search.query.fieldcache.impl.FieldLoadingStrategy;
 
-import static org.hibernate.search.util.CollectionHelper.newHashMap;
+import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 /**
  * This Collector uses an internal Map to store collected values from the FieldCache.

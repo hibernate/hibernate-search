@@ -49,8 +49,8 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.LockFactoryFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.ClassLoaderHelper;
-import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

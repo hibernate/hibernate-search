@@ -32,11 +32,11 @@ import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Session;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.util.ContextHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

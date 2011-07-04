@@ -31,7 +31,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.ClassLoaderHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * @author Emmanuel Bernard

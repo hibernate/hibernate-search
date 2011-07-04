@@ -57,7 +57,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.engine.spi.FacetManager;
-import org.hibernate.search.util.ContextHelper;
+import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.transform.ResultTransformer;
 
 /**

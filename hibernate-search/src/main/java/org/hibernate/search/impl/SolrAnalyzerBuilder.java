@@ -42,9 +42,9 @@ import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.util.HibernateSearchResourceLoader;
+import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
 
-import static org.hibernate.search.util.ClassLoaderHelper.instanceFromClass;
+import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass;
 
 /**
  * Instances of this class are used to build Lucene analyzers which are defined using the solr <code>TokenFilterFactory</code>.

@@ -36,6 +36,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Session;
@@ -66,8 +67,7 @@ import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.util.ReflectionHelper;
-import org.hibernate.search.util.WeakIdentityHashMap;
+import org.hibernate.search.util.impl.WeakIdentityHashMap;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.event.impl.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;

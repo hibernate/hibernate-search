@@ -40,7 +40,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
+import org.hibernate.search.util.impl.FileHelper;
 
 /**
  * @author Emmanuel Bernard

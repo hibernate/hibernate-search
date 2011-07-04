@@ -21,48 +21,38 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.util;
+package org.hibernate.search.util.impl;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.io.ByteArrayInputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
- * Delegate to a named analyzer. Delegated Analyzers are lazily configured.
+ * A utility class to help with xml parsing
  *
- * @author Emmanuel Bernard
- * @author Hardy Ferentschik
+ * @author Lukasz Moren
  */
-public final class DelegateNamedAnalyzer extends Analyzer {
-	private String name;
-	private Analyzer delegate;
+public class XMLHelper {
 
-	public DelegateNamedAnalyzer(String name) {
-		this.name = name;
-	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setDelegate(Analyzer delegate) {
-		this.delegate = delegate;
-		this.name = null; //unique init
-	}
-
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		return delegate.tokenStream( fieldName, reader );
-	}
-
-	@Override
-	public TokenStream reusableTokenStream(String fieldName, Reader reader) throws IOException {
-		return delegate.reusableTokenStream( fieldName, reader );
-	}
-
-	@Override
-	public int getPositionIncrementGap(String fieldName) {
-		return delegate.getPositionIncrementGap( fieldName );
+	/**
+	 * Converts a String representing an XML snippet into an {@link org.w3c.dom.Element}.
+	 *
+	 * @param xml snippet as a string
+	 *
+	 * @return a DOM Element
+	 *
+	 * @throws Exception if unable to parse the String or if it doesn't contain valid XML.
+	 */
+	public static Element elementFromString(String xml) throws Exception {
+		ByteArrayInputStream bais = new ByteArrayInputStream( xml.getBytes( "UTF-8" ) );
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.parse( bais );
+		bais.close();
+		return document.getDocumentElement();
 	}
 }

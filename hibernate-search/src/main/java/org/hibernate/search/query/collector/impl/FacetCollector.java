@@ -46,8 +46,8 @@ import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 import org.hibernate.search.query.fieldcache.impl.FieldLoadingStrategy;
 
-import static org.hibernate.search.util.CollectionHelper.newArrayList;
-import static org.hibernate.search.util.CollectionHelper.newHashMap;
+import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
+import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 /**
  * A custom {@code Collector} used for handling facet requests.

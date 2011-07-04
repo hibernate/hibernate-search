@@ -21,38 +21,46 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.util;
 
-import java.io.Reader;
+package org.hibernate.search.util.impl;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharTokenizer;
-import org.apache.lucene.analysis.TokenStream;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.search.backend.spi.Work;
 
 /**
- * Analyzer that applies no operation whatsoever to the flux
- * This is useful for queries operating on non tokenized fields.
- * <p/>
- * TODO there is probably a way to make that much more efficient by
- * reimplementing TokenStream to take the Reader and pass through the flux as a single token
- *
  * @author Emmanuel Bernard
  */
-public final class PassThroughAnalyzer extends Analyzer {
-
-	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		return new PassThroughTokenizer( reader );
+public final class HibernateHelper {
+	private HibernateHelper() {
 	}
 
-	private static class PassThroughTokenizer extends CharTokenizer {
-		public PassThroughTokenizer(Reader input) {
-			super( input );
-		}
+	/**
+	 * Get the real class type.
+	 * In case of Hibernate proxies, return the entity type rather than the proxy's
+	 */
+	public static <T> Class<T> getClass(T entity) {
+		return ( Class<T> ) Hibernate.getClass( entity );
+	}
 
-		@Override
-		protected boolean isTokenChar(char c) {
-			return true;
+	public static void initialize(Object entity) {
+		Hibernate.initialize( entity );
+	}
+
+	public static boolean isInitialized(Object entity) {
+		return Hibernate.isInitialized( entity );
+	}
+
+	public static <T> Class<T> getClassFromWork(Work<T> work) {
+		return work.getEntityClass() != null ?
+				work.getEntityClass() :
+				getClass( work.getEntity() );
+	}
+
+	public static Object unproxy(Object value) {
+		if ( value instanceof HibernateProxy ) {
+			value = ( ( HibernateProxy ) value ).getHibernateLazyInitializer().getImplementation();
 		}
+		return value;
 	}
 }

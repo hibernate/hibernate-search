@@ -38,7 +38,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.HibernateHelper;
+import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
