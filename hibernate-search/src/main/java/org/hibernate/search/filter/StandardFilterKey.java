@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Implements a filter key usign all injected parameters to compute
+ * Implements a filter key using all injected parameters to compute
  * equals and hashCode
  * the order the parameters are added is significant
  *
