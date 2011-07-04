@@ -32,14 +32,14 @@ import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.OpenBitSet;
-import org.hibernate.search.filter.FilterOptimizationHelper;
+import org.hibernate.search.filter.impl.FilterOptimizationHelper;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
  * Used to test org.hibernate.search.filter.FiltersOptimizationHelper
- * @see org.hibernate.search.filter.FilterOptimizationHelper
+ * @see org.hibernate.search.filter.impl.FilterOptimizationHelper
  * @author Sanne Grinovero
  */
 public class FiltersOptimizationTest {

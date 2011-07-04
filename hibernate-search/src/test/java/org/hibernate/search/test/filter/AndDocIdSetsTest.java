@@ -38,7 +38,8 @@ import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.SortedVIntList;
 
-import org.hibernate.search.filter.AndDocIdSet;
+import org.hibernate.search.filter.impl.AndDocIdSet;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
