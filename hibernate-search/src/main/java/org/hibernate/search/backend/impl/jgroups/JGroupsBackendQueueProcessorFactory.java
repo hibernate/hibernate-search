@@ -40,11 +40,11 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.JGroupsHelper;
 import org.hibernate.search.util.impl.XMLHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.util.ConfigHelper;
 
 
 /**
@@ -114,7 +114,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 			if ( props.containsKey( CONFIGURATION_FILE ) ) {
 				cfg = props.getProperty( CONFIGURATION_FILE );
 				try {
-					channel = new JChannel( ConfigHelper.locateConfig( cfg ) );
+					channel = new JChannel( ConfigurationParseHelper.locateConfig(cfg) );
 				}
 				catch ( Exception e ) {
 					log.jGroupsChannelCreationUsingFileError( cfg );
@@ -148,7 +148,7 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 		if ( channel == null ) {
 			log.jGroupsConfigurationNotFoundInProperties( props );
 			try {
-				URL fileUrl = ConfigHelper.locateConfig( DEFAULT_JGROUPS_CONFIGURATION_FILE );
+				URL fileUrl = ConfigurationParseHelper.locateConfig( DEFAULT_JGROUPS_CONFIGURATION_FILE );
 				if ( fileUrl != null ) {
 					channel = new JChannel( fileUrl );
 				}
