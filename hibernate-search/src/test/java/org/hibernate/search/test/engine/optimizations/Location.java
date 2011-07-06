@@ -33,21 +33,33 @@ import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 import org.hibernate.annotations.Proxy;
 
+/**
+ * Related to test case of HSEARCH-782; indexed properties are defined
+ * via a programmatic configuration.
+ * 
+ * @author Adam Harris
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ */
 @Entity
 @Proxy(lazy = false)
 @Table(name = "location")
+//indexed
 public class Location {
 
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	//indexed & documentId
 	private Long locationId;
 
 	@Column(length = 255)
+	//indexed
 	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = LocationGroup.class)
 	@JoinColumn(name = "location_group_id")
 	@LazyToOne(LazyToOneOption.PROXY)
+	//indexed
+	//indexedEmbedded(depth=1)
 	private LocationGroup locationGroup;
 
 	public Location() {

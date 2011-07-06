@@ -34,18 +34,28 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Proxy;
 
+/**
+ * Related to test case of HSEARCH-782; indexed properties are defined
+ * via a programmatic configuration.
+ * 
+ * @author Adam Harris
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ */
 @Entity
 @Proxy(lazy = false)
 @Table(name = "location_group")
+//not indexed
 public class LocationGroup {
 
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long groupId;
 
+	//indexed
 	@Column(length = 255)
 	private String name;
 
+	//contained-in Location
 	@OneToMany(mappedBy = "locationGroup", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
 	Collection<Location> locations = new ArrayList<Location>();
 
