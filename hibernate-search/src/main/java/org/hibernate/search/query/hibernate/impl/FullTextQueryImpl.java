@@ -331,7 +331,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private SearchFactoryImplementor getSearchFactoryImplementor() {
-		return ContextHelper.getSearchFactoryBySFI( session );
+		return ContextHelper.getSearchFactoryBySessionImplementor( session );
 	}
 
 	private static final Loader noLoader = new Loader() {
