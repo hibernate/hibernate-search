@@ -27,9 +27,14 @@ import java.lang.reflect.Proxy;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.context.ThreadLocalSessionContext;
+import org.hibernate.SharedSessionContract;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.context.internal.ThreadLocalSessionContext;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.engine.jdbc.LobCreationContext;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.transaction.spi.TransactionContext;
+import org.hibernate.event.spi.EventSource;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
@@ -39,18 +44,21 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class SessionTest extends SearchTestCase {
 
+	//EventSource, org.hibernate.Session, TransactionContext, LobCreationContext
 	private static final Class[] SESS_PROXY_INTERFACES = new Class[] {
-			org.hibernate.classic.Session.class,
-			org.hibernate.engine.SessionImplementor.class,
-			org.hibernate.jdbc.JDBCContext.Context.class,
-			org.hibernate.event.EventSource.class
+			org.hibernate.Session.class,
+			TransactionContext.class,
+			LobCreationContext.class,
+			EventSource.class,
+			SessionImplementor.class,
+			SharedSessionContract.class
 	};
 
 	public void testSessionWrapper() throws Exception {
 		Session s = openSession();
 		DelegationWrapper wrapper = new DelegationWrapper( s );
 		Session wrapped = ( Session ) Proxy.newProxyInstance(
-				org.hibernate.classic.Session.class.getClassLoader(),
+				org.hibernate.Session.class.getClassLoader(),
 				SESS_PROXY_INTERFACES,
 				wrapper
 		);
