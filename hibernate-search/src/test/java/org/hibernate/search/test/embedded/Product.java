@@ -33,13 +33,13 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Column;
 import javax.persistence.CascadeType;
+import javax.persistence.MapKeyColumn;
 
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.annotations.MapKey;
 
 /**
  * @author Emmanuel Bernard
@@ -59,7 +59,7 @@ public class Product {
 	private Set<Author> authors = new HashSet<Author>();
 
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense
-	@MapKey(columns = @Column(name="CUST_NAME",nullable=false) )
+	@MapKeyColumn(name="CUST_NAME",nullable=false)
 	@IndexedEmbedded
 	private Map<String, Order> orders = new HashMap<String, Order>();
 

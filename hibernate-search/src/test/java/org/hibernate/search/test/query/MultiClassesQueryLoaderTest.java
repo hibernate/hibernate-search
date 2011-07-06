@@ -23,9 +23,12 @@
  */
 package org.hibernate.search.test.query;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import org.hibernate.jdbc.Work;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -50,9 +53,14 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 
 		tx.commit();
 		sess.clear();
-		Statement statement = sess.connection().createStatement();
-		statement.executeUpdate( "DELETE FROM Author" );
-		statement.close();
+		sess.doWork( new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				Statement statement = connection.createStatement();
+				statement.executeUpdate( "DELETE FROM Author" );
+				statement.close();
+			}
+		} );
 		FullTextSession s = Search.getFullTextSession( sess );
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.keywordAnalyzer );

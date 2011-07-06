@@ -29,7 +29,6 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.testing.junit.FailureExpected;
 
 
 /**

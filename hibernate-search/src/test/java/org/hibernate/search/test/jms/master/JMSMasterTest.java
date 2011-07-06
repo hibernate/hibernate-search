@@ -24,6 +24,7 @@
 package org.hibernate.search.test.jms.master;
 
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.jdbc.ReturningWork;
+import org.hibernate.jdbc.Work;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -179,11 +182,16 @@ public class JMSMasterTest extends SearchTestCase {
 	private TShirt createObjectWithSQL() throws SQLException {
 		Session s = openSession();
 		s.getTransaction().begin();
-		Statement statement = s.connection().createStatement();
-		statement.executeUpdate(
-				"insert into TShirt_Master(id, logo, size_) values( 1, 'JBoss balls', 'large')"
-		);
-		statement.close();
+		s.doWork( new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				final Statement statement = connection.createStatement();
+				statement.executeUpdate(
+						"insert into TShirt_Master(id, logo, size_) values( 1, 'JBoss balls', 'large')"
+				);
+				statement.close();
+			}
+		} );
 		TShirt ts = ( TShirt ) s.get( TShirt.class, 1 );
 		s.getTransaction().commit();
 		s.close();

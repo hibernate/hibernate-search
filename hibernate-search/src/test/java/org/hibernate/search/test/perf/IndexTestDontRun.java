@@ -100,7 +100,7 @@ public class IndexTestDontRun extends SearchTestCase {
 	}
 
 	private IndexSearcher getNewSearcher() throws IOException {
-		final org.hibernate.classic.Session session = getSessions().openSession();
+		final org.hibernate.Session session = getSessions().openSession();
 		Directory d = Search.getFullTextSession( session ).getSearchFactory().getDirectoryProviders( Boat.class )[0].getDirectory();
 		IndexSearcher indexsearcher = new IndexSearcher( d, true );
 		return indexsearcher;

@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.session;
 
+import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.jdbc.Work;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -51,15 +53,20 @@ public class MassIndexTest extends SearchTestCase {
 	public void testBatchSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		int loop = 14;
-		for (int i = 0; i < loop; i++) {
-			Statement statmt = s.connection().createStatement();
-			statmt.executeUpdate( "insert into Domain(id, name) values( + "
-					+ ( i + 1 ) + ", 'sponge" + i + "')" );
-			statmt.executeUpdate( "insert into Email(id, title, body, header, domain_id) values( + "
-					+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope', " + ( i + 1 ) +")" );
-			statmt.close();
-		}
+		final int loop = 14;
+		s.doWork( new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				for (int i = 0; i < loop; i++) {
+					Statement statmt = connection.createStatement();
+						statmt.executeUpdate( "insert into Domain(id, name) values( + "
+								+ ( i + 1 ) + ", 'sponge" + i + "')" );
+						statmt.executeUpdate( "insert into Email(id, title, body, header, domain_id) values( + "
+								+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope', " + ( i + 1 ) +")" );
+						statmt.close();
+					}
+				}
+			});
 		tx.commit();
 		s.close();
 
@@ -90,7 +97,7 @@ public class MassIndexTest extends SearchTestCase {
 	public void testTransactional() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		int loop = 4;
+		final int loop = 4;
 		for (int i = 0; i < loop; i++) {
 			Email email = new Email();
 			email.setId( (long) i + 1 );
@@ -112,14 +119,25 @@ public class MassIndexTest extends SearchTestCase {
 
 		s = new FullTextSessionImpl( openSession() );
 		s.getTransaction().begin();
-		Statement stmt = s.connection().createStatement();
-		stmt.executeUpdate( "update Email set body='Meet the guys who write the software'" );
-		stmt.close();
-		//insert an object never indexed
-		stmt = s.connection().createStatement();
-		stmt.executeUpdate( "insert into Email(id, title, body, header) values( + "
-				+ ( loop + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope')" );
-		stmt.close();
+		s.doWork( new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				Statement stmt = connection.createStatement();
+				stmt.executeUpdate( "update Email set body='Meet the guys who write the software'" );
+				stmt.close();
+			}
+		} );
+		s.doWork( new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				//insert an object never indexed
+				Statement stmt = connection.createStatement();
+				stmt.executeUpdate( "insert into Email(id, title, body, header) values( + "
+						+ ( loop + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope')" );
+				stmt.close();
+			}
+		} );
+
 		s.getTransaction().commit();
 		s.close();
 
@@ -206,7 +224,12 @@ public class MassIndexTest extends SearchTestCase {
 	private Session getSessionWithAutoCommit() throws SQLException {
 		Session s;
 		s = openSession();
-		s.connection().setAutoCommit( true );
+		s.doWork( new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				connection.setAutoCommit( true );
+			}
+		} );
 		return s;
 	}
 
