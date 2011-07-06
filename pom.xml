@@ -222,6 +222,12 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-testing</artifactId>
                 <version>${hibernateVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.logging</groupId>
+                        <artifactId>jboss-logging-spi</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
