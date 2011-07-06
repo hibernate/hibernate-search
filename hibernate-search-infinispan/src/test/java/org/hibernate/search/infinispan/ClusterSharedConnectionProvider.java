@@ -25,7 +25,7 @@ import java.util.Properties;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
-import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -45,10 +45,6 @@ public class ClusterSharedConnectionProvider implements ConnectionProvider {
 		}
 	}
 
-	@Override
-	public void configure(Properties props) throws HibernateException {
-		// ignored
-	}
 
 	@Override
 	public Connection getConnection() throws SQLException {
@@ -61,13 +57,17 @@ public class ClusterSharedConnectionProvider implements ConnectionProvider {
 	}
 
 	@Override
-	public void close() throws HibernateException {
-		// ignored
-	}
-
-	@Override
 	public boolean supportsAggressiveRelease() {
 		return false;
 	}
 
+	@Override
+	public boolean isUnwrappableAs(Class unwrapType) {
+		return false;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> unwrapType) {
+		return null;
+	}
 }

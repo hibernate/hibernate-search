@@ -42,7 +42,6 @@ import org.hibernate.search.util.impl.JNDIHelper;
  * @author Hardy Ferentschik
  */
 public class IndexControl implements IndexControlMBean {
-	private static final String HIBERNATE_JNDI_PREFIX = "hibernate.jndi.";
 
 	private final Properties jndiProperties;
 	private final String sessionFactoryJndiName;
@@ -53,7 +52,7 @@ public class IndexControl implements IndexControlMBean {
 
 	public IndexControl(Properties props) {
 		this.sessionFactoryJndiName = props.getProperty( "hibernate.session_factory_name" );
-		this.jndiProperties = JNDIHelper.getJndiProperties( props, HIBERNATE_JNDI_PREFIX );
+		this.jndiProperties = JNDIHelper.getJndiProperties( props, JNDIHelper.HIBERNATE_JNDI_PREFIX );
 	}
 
 	public void setBatchSize(int batchSize) {

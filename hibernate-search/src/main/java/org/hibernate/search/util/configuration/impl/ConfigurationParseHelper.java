@@ -184,4 +184,12 @@ public abstract class ConfigurationParseHelper {
 			return parseBoolean( propValue, "Property '" + key + "' needs to be either literal 'true' or 'false'" );
 		}
 	}
+
+	/**
+	 * Get the string property or defaults if not present
+	 */
+	public static final String getString(Properties cfg, String key, String defaultValue) {
+		String propValue = cfg.getProperty( key );
+		return propValue == null ? defaultValue : propValue;
+	}
 }
