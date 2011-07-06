@@ -34,7 +34,7 @@ import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
