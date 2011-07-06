@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
@@ -94,7 +95,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	protected boolean used;
 	protected boolean skipDirtyChecks = true;
 	protected SearchFactoryImplementor searchFactoryImplementor;
-	private final DirtyStrategy dirtyStrategy;
 
 	static {
 		Version.touch();
@@ -111,16 +111,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	public FullTextIndexEventListener(Installation installation) {
 		this.installation = installation;
-		//TODO remove this code when moving to Core 4 (HSEARCH-660)
-		DirtyStrategy dirtyStrategy;
-		try {
-			PostUpdateEvent.class.getMethod( "getDirtyProperties" );
-			dirtyStrategy = new CoreComputedDirtyStrategy();
-		}
-		catch ( NoSuchMethodException e ) {
-			dirtyStrategy = new HSearchComputedDirtyStrategy();
-		}
-		this.dirtyStrategy = dirtyStrategy;
 	}
 
 	/**
@@ -184,12 +174,29 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Object entity = event.getEntity();
 			final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
-			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( dirtyStrategy.getDirtyPropertyNames(
+			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( getDirtyPropertyNames(
 					event
 			) ) ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
 			}
+		}
+	}
+
+    public String[] getDirtyPropertyNames(PostUpdateEvent event) {
+		EntityPersister persister = event.getPersister();
+		final int[] dirtyProperties = event.getDirtyProperties();
+		if ( dirtyProperties != null && dirtyProperties.length > 0 ) {
+			String[] propertyNames = persister.getPropertyNames();
+			int length = dirtyProperties.length;
+			String[] dirtyPropertyNames = new String[length];
+			for ( int i = 0; i < length; i++ ) {
+				dirtyPropertyNames[i] = propertyNames[dirtyProperties[i]];
+			}
+			return dirtyPropertyNames;
+		}
+		else {
+			return null;
 		}
 	}
 
