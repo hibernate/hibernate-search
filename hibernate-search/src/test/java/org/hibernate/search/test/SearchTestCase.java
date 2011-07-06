@@ -116,9 +116,6 @@ public abstract class SearchTestCase extends TestCase {
 			buildConfiguration();
 			lastTestClass = getClass();
 		}
-		else {
-			runSchemaGeneration();
-		}
 	}
 
 	protected void handleUnclosedResources() {
@@ -181,7 +178,7 @@ public abstract class SearchTestCase extends TestCase {
 
 	@After
 	protected void tearDown() throws Exception {
-		runSchemaDrop();
+		//runSchemaDrop();
 		handleUnclosedResources();
 		closeResources();
 
