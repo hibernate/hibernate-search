@@ -25,6 +25,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.HibernateException;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
@@ -67,7 +68,7 @@ public class RetryInitializeTest {
 		slave = createSlaveNode( false );
 	}
 	
-	@Test(expected=HibernateException.class)
+	@Test(expected=SearchException.class)
 	public void testInitiallyFailing() {
 		slave = createSlaveNode( false );
 	}

@@ -53,11 +53,8 @@ public class ResourceNotFoundMessageTest {
 					.build();
 			Assert.fail( "should not reach this" );
 		}
-		catch ( org.hibernate.HibernateException initException ) {
-			Throwable causeException = initException.getCause();
-			Assert.assertTrue( causeException instanceof SearchException );
-			SearchException searchException = (SearchException) causeException;
-			String message = searchException.getMessage();
+		catch ( SearchException initException ) {
+			String message = initException.getMessage();
 			Assert.assertEquals( "Resource not found: non-existent-resourcename.file", message );
 		}
 	}

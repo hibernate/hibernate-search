@@ -254,8 +254,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		try {
 			cfg.buildSessionFactory();
 		}
-		catch ( HibernateException e ) {
-			assertTrue( "expected configuration failure", e.getCause() instanceof SearchException );
+		catch ( SearchException e ) {
 			final long elapsedTime = TimeUnit.NANOSECONDS.toSeconds( System.nanoTime() - start );
 			assertTrue( "Should be around 10 seconds: " + elapsedTime, elapsedTime > retries*5 - 1 ); // -1 for safety
 		}
