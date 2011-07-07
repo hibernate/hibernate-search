@@ -30,9 +30,12 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
+import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.testing.cache.CachingRegionFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -139,7 +142,10 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 		fts.close();
 	}
 
-
+	@Override
+	protected void configure(Configuration cfg) {
+		cfg.setProperty( AvailableSettings.CACHE_REGION_FACTORY, CachingRegionFactory.class.getName() );
+	}
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
