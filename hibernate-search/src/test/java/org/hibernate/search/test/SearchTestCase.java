@@ -250,9 +250,13 @@ public abstract class SearchTestCase extends TestCase {
 			e.printStackTrace();
 			throw e;
 		}
+		catch ( SearchException e ) {
+			e.printStackTrace();
+			throw e;
+		}
 		catch ( Exception e ) {
 			e.printStackTrace();
-			throw new SearchException( e );
+			throw new RuntimeException(  e );
 		}
 	}
 
