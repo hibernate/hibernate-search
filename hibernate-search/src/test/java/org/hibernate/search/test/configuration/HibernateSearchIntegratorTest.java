@@ -110,8 +110,8 @@ public class HibernateSearchIntegratorTest {
 	private void helperOnAlreadyRegistered(FullTextIndexEventListener listenerFullText) {
 		SimpleSessionFactoryServiceRegistry serviceRegistry = new SimpleSessionFactoryServiceRegistry();
 
-		AnotherListener listenerA = new AnotherListener();
-		AnotherListener listenerB = new AnotherListener();
+		AnotherListener listenerA = new AnotherListenerA();
+		AnotherListener listenerB = new AnotherListenerB();
 		final EventListenerRegistry service = serviceRegistry.getService( EventListenerRegistry.class );
 		service.getEventListenerGroup( EventType.POST_INSERT )
 				.appendListeners( listenerA, listenerB, listenerFullText );
@@ -134,9 +134,9 @@ public class HibernateSearchIntegratorTest {
 	}
 
 	private void makeSomeEventListeners(ServiceRegistry serviceRegistry) {
-		AnotherListener listenerA = new AnotherListener();
-		AnotherListener listenerB = new AnotherListener();
-		AnotherListener listenerC = new AnotherListener();
+		AnotherListener listenerA = new AnotherListenerA();
+		AnotherListener listenerB = new AnotherListenerB();
+		AnotherListener listenerC = new AnotherListenerC();
 		final EventListenerRegistry service = serviceRegistry.getService( EventListenerRegistry.class );
 		service.getEventListenerGroup( EventType.POST_INSERT ).appendListeners( listenerA, listenerB, listenerC );
 		service.getEventListenerGroup( EventType.POST_UPDATE ).appendListeners( listenerA, listenerB, listenerC );
@@ -221,7 +221,13 @@ public class HibernateSearchIntegratorTest {
 		}
 	}
 
+	private static class AnotherListenerA extends AnotherListener{}
+	private static class AnotherListenerB extends AnotherListener{}
+	private static class AnotherListenerC extends AnotherListener{}
+
 	private static class SimpleSessionFactoryServiceRegistry implements SessionFactoryServiceRegistry {
+
+		private final EventListenerRegistryImpl eventListenerRegistry = new EventListenerRegistryImpl();
 
 		@Override
 		public <R extends Service> ServiceBinding<R> locateServiceBinding(Class<R> serviceRole) {
@@ -241,7 +247,8 @@ public class HibernateSearchIntegratorTest {
 		@Override
 		public <R extends Service> R getService(Class<R> serviceRole) {
 			if ( EventListenerRegistry.class.equals( serviceRole ) ) {
-				return ( R ) new EventListenerRegistryImpl();
+
+				return ( R ) eventListenerRegistry;
 			}
 			else {
 				return null;
