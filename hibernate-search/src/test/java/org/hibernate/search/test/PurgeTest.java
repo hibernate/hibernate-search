@@ -103,9 +103,7 @@ public class PurgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "brand", SearchTestCase.stopAnalyzer );
-		tx = s.beginTransaction();
 		s.purgeAll( Clock.class);
-
 		tx.commit();
 
 		tx = s.beginTransaction();
