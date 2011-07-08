@@ -84,7 +84,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 		}
 	}
 
-	@FailureExpected( jiraKey = "HSEARCH-802")
+	@FailureExpected( jiraKey = "HSEARCH-802" )
 	public void testIndexAndPurge() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();

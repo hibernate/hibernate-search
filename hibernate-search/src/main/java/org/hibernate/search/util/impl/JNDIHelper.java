@@ -37,6 +37,7 @@ import javax.naming.NamingException;
 public class JNDIHelper {
 
 	public static final String HIBERNATE_JNDI_PREFIX = "hibernate.jndi.";
+
 	private JNDIHelper() {
 	}
 

@@ -62,7 +62,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
 		}
-		catch ( SearchException e ) { // the SearchException will be wrapped in a HibernateException
+		catch ( SearchException e ) {
 			assertTrue(
 					e.getMessage().equals(
 							"Multiple analyzer definitions with the same name: my-analyzer"
@@ -79,7 +79,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
 		}
-		catch ( SearchException e ) { // the SearchException will be wrapped in a HibernateException
+		catch ( SearchException e ) {
 			assertTrue(
 					e	.getMessage().equals( "Multiple analyzer definitions with the same name: english" )
 			);

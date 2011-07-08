@@ -23,27 +23,16 @@
  */
 package org.hibernate.search.hcore.impl;
 
-import org.jboss.logging.Logger;
-
-import org.hibernate.AnnotationException;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.event.spi.EventType;
-import org.hibernate.event.spi.PostCollectionRemoveEventListener;
-import org.hibernate.event.spi.PostCollectionUpdateEventListener;
-import org.hibernate.event.spi.PostDeleteEventListener;
-import org.hibernate.event.spi.PostInsertEventListener;
-import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.event.spi.PostCollectionRecreateEventListener;
-import org.hibernate.event.spi.PostUpdateEventListener;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.event.service.spi.DuplicationStrategy;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.internal.util.config.ConfigurationHelper;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.service.classloading.spi.ClassLoaderService;
-import org.hibernate.event.service.spi.DuplicationStrategy;
-import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
 /**
@@ -54,10 +43,11 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
  * @author Steve Ebersole
  */
 public class HibernateSearchIntegrator implements Integrator {
-    private static final Log log = LoggerFactory.make();
-    public static final String AUTO_REGISTER = "hibernate.search.autoregister_listeners";
 
-    private FullTextIndexEventListener listener;
+	private static final Log log = LoggerFactory.make();
+	public static final String AUTO_REGISTER = "hibernate.search.autoregister_listeners";
+
+	private FullTextIndexEventListener listener;
 
 	@Override
 	public void integrate(
@@ -70,10 +60,10 @@ public class HibernateSearchIntegrator implements Integrator {
 			return;
 		}
 
-        listener = new FullTextIndexEventListener(FullTextIndexEventListener.Installation.SINGLE_INSTANCE);
+		listener = new FullTextIndexEventListener(FullTextIndexEventListener.Installation.SINGLE_INSTANCE);
 
 		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
-        //TODO if the event is duplicated, do not initialize the newly created listener
+		//TODO if the event is duplicated, do not initialize the newly created listener
 		listenerRegistry.addDuplicationStrategy( new DuplicationStrategyImpl( FullTextIndexEventListener.class ) );
 
 		listenerRegistry.getEventListenerGroup( EventType.POST_INSERT ).appendListener( listener );
@@ -82,9 +72,9 @@ public class HibernateSearchIntegrator implements Integrator {
 		listenerRegistry.getEventListenerGroup( EventType.POST_COLLECTION_RECREATE ).appendListener( listener );
 		listenerRegistry.getEventListenerGroup( EventType.POST_COLLECTION_REMOVE ).appendListener( listener );
 		listenerRegistry.getEventListenerGroup( EventType.POST_COLLECTION_UPDATE ).appendListener( listener );
-        listenerRegistry.getEventListenerGroup( EventType.FLUSH ).appendListener( listener );
+		listenerRegistry.getEventListenerGroup( EventType.FLUSH ).appendListener( listener );
 
-        listener.initialize(configuration);
+		listener.initialize(configuration);
 	}
 
 	public static class DuplicationStrategyImpl implements DuplicationStrategy {

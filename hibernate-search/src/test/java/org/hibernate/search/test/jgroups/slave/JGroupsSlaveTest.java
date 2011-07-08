@@ -56,7 +56,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	/** makes sure that different tests don't join **/
 	private final String CHANNEL_NAME = UUID.randomUUID().toString();
 
-	@FailureExpected( jiraKey = "HSEARCH-803")
+	@FailureExpected( jiraKey = "HSEARCH-803" )
 	public void testMessageSend() throws Exception {
 
 		JGroupsReceiver.reset();
