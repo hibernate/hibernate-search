@@ -14,7 +14,21 @@ public class NumericFieldUtils {
 
 	public static Query createNumericRangeQuery(String fieldName, Object from, Object to,
 												boolean includeLower, boolean includeUpper) {
-		Class numericClass = from.getClass();
+
+		Class numericClass;
+
+		if ( from != null ) {
+			numericClass = from.getClass();
+		}
+		else if ( to != null ) {
+			numericClass = to.getClass();
+		}
+		else {
+			throw new SearchException(
+				"Cannot create numeric range query for field " + fieldName + ", since from and to values are " +
+						"null");
+		}
+
 		if ( numericClass.isAssignableFrom( Double.class ) ) {
 			return NumericRangeQuery.newDoubleRange( fieldName, (Double) from, (Double) to, includeLower, includeUpper );
 		}
