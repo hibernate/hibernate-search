@@ -44,6 +44,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.fwk.FailureExpected;
 
 /**
  * @author Hardy Ferentschik
@@ -83,6 +84,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 		}
 	}
 
+	@FailureExpected( jiraKey = "HSEARCH-802")
 	public void testIndexAndPurge() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
