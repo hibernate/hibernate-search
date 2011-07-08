@@ -25,7 +25,7 @@ package org.hibernate.search;
 
 import java.io.Serializable;
 
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 
 /**
  * Extends the Hibernate {@link Session} with fulltext search and indexing capabilities.

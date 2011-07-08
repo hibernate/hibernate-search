@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
@@ -41,27 +42,25 @@ import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.engine.EntityEntry;
-import org.hibernate.event.AbstractCollectionEvent;
-import org.hibernate.event.AbstractEvent;
-import org.hibernate.event.Destructible;
-import org.hibernate.event.EventSource;
-import org.hibernate.event.FlushEvent;
-import org.hibernate.event.FlushEventListener;
-import org.hibernate.event.Initializable;
-import org.hibernate.event.PostCollectionRecreateEvent;
-import org.hibernate.event.PostCollectionRecreateEventListener;
-import org.hibernate.event.PostCollectionRemoveEvent;
-import org.hibernate.event.PostCollectionRemoveEventListener;
-import org.hibernate.event.PostCollectionUpdateEvent;
-import org.hibernate.event.PostCollectionUpdateEventListener;
-import org.hibernate.event.PostDeleteEvent;
-import org.hibernate.event.PostDeleteEventListener;
-import org.hibernate.event.PostInsertEvent;
-import org.hibernate.event.PostInsertEventListener;
-import org.hibernate.event.PostUpdateEvent;
-import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.EntityEntry;
+import org.hibernate.event.spi.AbstractCollectionEvent;
+import org.hibernate.event.spi.AbstractEvent;
+import org.hibernate.event.spi.EventSource;
+import org.hibernate.event.spi.FlushEvent;
+import org.hibernate.event.spi.FlushEventListener;
+import org.hibernate.event.spi.PostCollectionRecreateEvent;
+import org.hibernate.event.spi.PostCollectionRecreateEventListener;
+import org.hibernate.event.spi.PostCollectionRemoveEvent;
+import org.hibernate.event.spi.PostCollectionRemoveEventListener;
+import org.hibernate.event.spi.PostCollectionUpdateEvent;
+import org.hibernate.event.spi.PostCollectionUpdateEventListener;
+import org.hibernate.event.spi.PostDeleteEvent;
+import org.hibernate.event.spi.PostDeleteEventListener;
+import org.hibernate.event.spi.PostInsertEvent;
+import org.hibernate.event.spi.PostInsertEventListener;
+import org.hibernate.event.spi.PostUpdateEvent;
+import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
@@ -88,7 +87,7 @@ import static org.hibernate.search.event.impl.FullTextIndexEventListener.Install
 public class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
-		PostCollectionUpdateEventListener, FlushEventListener, Initializable, Destructible {
+		PostCollectionUpdateEventListener, FlushEventListener {
 
 	private static final Log log = LoggerFactory.make();
 	private final Installation installation;
@@ -96,7 +95,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	protected boolean used;
 	protected boolean skipDirtyChecks = true;
 	protected SearchFactoryImplementor searchFactoryImplementor;
-	private final DirtyStrategy dirtyStrategy;
 
 	static {
 		Version.touch();
@@ -113,16 +111,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	public FullTextIndexEventListener(Installation installation) {
 		this.installation = installation;
-		//TODO remove this code when moving to Core 4 (HSEARCH-660)
-		DirtyStrategy dirtyStrategy;
-		try {
-			PostUpdateEvent.class.getMethod( "getDirtyProperties" );
-			dirtyStrategy = new CoreComputedDirtyStrategy();
-		}
-		catch ( NoSuchMethodException e ) {
-			dirtyStrategy = new HSearchComputedDirtyStrategy();
-		}
-		this.dirtyStrategy = dirtyStrategy;
 	}
 
 	/**
@@ -186,12 +174,29 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Object entity = event.getEntity();
 			final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
-			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( dirtyStrategy.getDirtyPropertyNames(
+			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( getDirtyPropertyNames(
 					event
 			) ) ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
 			}
+		}
+	}
+
+    public String[] getDirtyPropertyNames(PostUpdateEvent event) {
+		EntityPersister persister = event.getPersister();
+		final int[] dirtyProperties = event.getDirtyProperties();
+		if ( dirtyProperties != null && dirtyProperties.length > 0 ) {
+			String[] propertyNames = persister.getPropertyNames();
+			int length = dirtyProperties.length;
+			String[] dirtyPropertyNames = new String[length];
+			for ( int i = 0; i < length; i++ ) {
+				dirtyPropertyNames[i] = propertyNames[dirtyProperties[i]];
+			}
+			return dirtyPropertyNames;
+		}
+		else {
+			return null;
 		}
 	}
 

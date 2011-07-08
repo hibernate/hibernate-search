@@ -38,6 +38,8 @@ import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.stat.Statistics;
+import org.hibernate.testing.cache.CachingRegionFactory;
+
 import static org.fest.assertions.Assertions.*;
 
 /**
@@ -271,7 +273,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
-		cfg.setProperty( Environment.CACHE_PROVIDER, "org.hibernate.cache.HashtableCacheProvider" );
+		cfg.setProperty( Environment.CACHE_REGION_FACTORY, CachingRegionFactory.class.getCanonicalName() );
 	}
 
 	@Override

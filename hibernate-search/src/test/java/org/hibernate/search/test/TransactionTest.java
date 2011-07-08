@@ -24,10 +24,13 @@
 package org.hibernate.search.test;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.Session;
+import org.hibernate.jdbc.Work;
 
 /**
  * @author Emmanuel Bernard
@@ -65,7 +68,12 @@ public class TransactionTest extends SearchTestCase {
 		assertEquals( "rollback() should not index", 3, getDocumentNumber() );
 
 		s = getSessions().openSession();
-		s.connection().setAutoCommit( true );  // www.hibernate.org/403.html
+		s.doWork( new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				connection.setAutoCommit( true );  // www.hibernate.org/403.html
+			}
+		} );
 		s.persist(
 				new Document(
 						"Java Persistence with Hibernate", "Object/relational mapping with Hibernate", "blah blah blah"

@@ -43,9 +43,9 @@ import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.query.ParameterMetadata;
-import org.hibernate.impl.AbstractQueryImpl;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.query.spi.ParameterMetadata;
+import org.hibernate.internal.AbstractQueryImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -331,7 +331,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private SearchFactoryImplementor getSearchFactoryImplementor() {
-		return ContextHelper.getSearchFactoryBySFI( session );
+		return ContextHelper.getSearchFactoryBySessionImplementor( session );
 	}
 
 	private static final Loader noLoader = new Loader() {

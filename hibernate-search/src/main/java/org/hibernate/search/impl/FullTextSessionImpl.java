@@ -47,25 +47,28 @@ import org.hibernate.SQLQuery;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
+import org.hibernate.SharedSessionBuilder;
 import org.hibernate.Transaction;
 import org.hibernate.TypeHelper;
 import org.hibernate.UnknownProfileException;
-import org.hibernate.classic.Session;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.engine.EntityKey;
-import org.hibernate.engine.LoadQueryInfluencers;
-import org.hibernate.engine.NonFlushedChanges;
-import org.hibernate.engine.PersistenceContext;
-import org.hibernate.engine.QueryParameters;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.engine.query.ParameterMetadata;
-import org.hibernate.engine.query.sql.NativeSQLQuerySpecification;
-import org.hibernate.event.EventListeners;
-import org.hibernate.event.EventSource;
-import org.hibernate.impl.CriteriaImpl;
-import org.hibernate.jdbc.Batcher;
-import org.hibernate.jdbc.JDBCContext;
+import org.hibernate.Session;
+import org.hibernate.cache.spi.CacheKey;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.jdbc.LobCreationContext;
+import org.hibernate.engine.jdbc.spi.JdbcConnectionAccess;
+import org.hibernate.engine.query.spi.sql.NativeSQLQuerySpecification;
+import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.NonFlushedChanges;
+import org.hibernate.engine.spi.PersistenceContext;
+import org.hibernate.engine.spi.QueryParameters;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.query.spi.ParameterMetadata;
+import org.hibernate.engine.transaction.spi.TransactionCoordinator;
+import org.hibernate.event.spi.EventSource;
+import org.hibernate.internal.CriteriaImpl;
+import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
@@ -221,93 +224,9 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return searchFactory;
 	}
 
-	public Query createSQLQuery(String sql, String returnAlias, Class returnClass) {
-		return session.createSQLQuery( sql, returnAlias, returnClass );
-	}
-
-	public Query createSQLQuery(String sql, String[] returnAliases, Class[] returnClasses) {
-		return session.createSQLQuery( sql, returnAliases, returnClasses );
-	}
-
-	public int delete(String query) throws HibernateException {
-		return session.delete( query );
-	}
-
-	public int delete(String query, Object value, Type type) throws HibernateException {
-		return session.delete( query, value, type );
-	}
-
-	public int delete(String query, Object[] values, Type[] types) throws HibernateException {
-		return session.delete( query, values, types );
-	}
-
-	public Collection filter(Object collection, String filter) throws HibernateException {
-		return session.filter( collection, filter );
-	}
-
-	public Collection filter(Object collection, String filter, Object value, Type type) throws HibernateException {
-		return session.filter( collection, filter, value, type );
-	}
-
-	public Collection filter(Object collection, String filter, Object[] values, Type[] types)
-			throws HibernateException {
-		return session.filter( collection, filter, values, types );
-	}
-
-	public List find(String query) throws HibernateException {
-		return session.find( query );
-	}
-
-	public List find(String query, Object value, Type type) throws HibernateException {
-		return session.find( query, value, type );
-	}
-
-	public List find(String query, Object[] values, Type[] types) throws HibernateException {
-		return session.find( query, values, types );
-	}
-
-	public Iterator iterate(String query) throws HibernateException {
-		return session.iterate( query );
-	}
-
-	public Iterator iterate(String query, Object value, Type type) throws HibernateException {
-		return session.iterate( query, value, type );
-	}
-
-	public Iterator iterate(String query, Object[] values, Type[] types) throws HibernateException {
-		return session.iterate( query, values, types );
-	}
-
-	public void save(String entityName, Object object, Serializable id) throws HibernateException {
-		session.save( entityName, object, id );
-	}
-
-	public void save(Object object, Serializable id) throws HibernateException {
-		session.save( object, id );
-	}
-
-	public Object saveOrUpdateCopy(String entityName, Object object) throws HibernateException {
-		return session.saveOrUpdateCopy( entityName, object );
-	}
-
-	public Object saveOrUpdateCopy(String entityName, Object object, Serializable id) throws HibernateException {
-		return session.saveOrUpdateCopy( entityName, object, id );
-	}
-
-	public Object saveOrUpdateCopy(Object object) throws HibernateException {
-		return session.saveOrUpdateCopy( object );
-	}
-
-	public Object saveOrUpdateCopy(Object object, Serializable id) throws HibernateException {
-		return session.saveOrUpdateCopy( object, id );
-	}
-
-	public void update(String entityName, Object object, Serializable id) throws HibernateException {
-		session.update( entityName, object, id );
-	}
-
-	public void update(Object object, Serializable id) throws HibernateException {
-		session.update( object, id );
+	@Override
+	public String getTenantIdentifier() {
+		return session.getTenantIdentifier();
 	}
 
 	public Transaction beginTransaction() throws HibernateException {
@@ -325,10 +244,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public Connection close() throws HibernateException {
 		return session.close();
-	}
-
-	public Connection connection() throws HibernateException {
-		return session.connection();
 	}
 
 	public boolean contains(Object object) {
@@ -387,6 +302,11 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		session.evict( object );
 	}
 
+	@Override
+	public SharedSessionBuilder sessionWithOptions() {
+		return new FullTextSharedSessionBuilderDelegator( session.sessionWithOptions() );
+	}
+
 	public void flush() throws HibernateException {
 		session.flush();
 	}
@@ -427,12 +347,32 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.getEnabledFilter( filterName );
 	}
 
+	@Override
+	public JdbcConnectionAccess getJdbcConnectionAccess() {
+		return sessionImplementor.getJdbcConnectionAccess();
+	}
+
+	@Override
+	public EntityKey generateEntityKey(Serializable id, EntityPersister persister) {
+		return sessionImplementor.generateEntityKey( id, persister );
+	}
+
+	@Override
+	public CacheKey generateCacheKey(Serializable id, Type type, String entityOrRoleName) {
+		return sessionImplementor.generateCacheKey( id, type, entityOrRoleName );
+	}
+
 	public Interceptor getInterceptor() {
 		return sessionImplementor.getInterceptor();
 	}
 
 	public void setAutoClear(boolean enabled) {
 		sessionImplementor.setAutoClear( enabled );
+	}
+
+	@Override
+	public void disableTransactionAutoJoin() {
+		sessionImplementor.disableTransactionAutoJoin();
 	}
 
 	public boolean isTransactionInProgress() {
@@ -460,10 +400,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.getFactory();
 	}
 
-	public Batcher getBatcher() {
-		return sessionImplementor.getBatcher();
-	}
-
 	public List list(String query, QueryParameters queryParameters) throws HibernateException {
 		return sessionImplementor.list( query, queryParameters );
 	}
@@ -476,10 +412,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.scroll( query, queryParameters );
 	}
 
+	@Override
 	public ScrollableResults scroll(CriteriaImpl criteria, ScrollMode scrollMode) {
 		return sessionImplementor.scroll( criteria, scrollMode );
 	}
 
+	@Override
 	public List list(CriteriaImpl criteria) {
 		return sessionImplementor.list( criteria );
 	}
@@ -500,14 +438,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public Object getEntityUsingInterceptor(EntityKey key) throws HibernateException {
 		return sessionImplementor.getEntityUsingInterceptor( key );
-	}
-
-	public void afterTransactionCompletion(boolean successful, Transaction tx) {
-		sessionImplementor.afterTransactionCompletion( successful, tx );
-	}
-
-	public void beforeTransactionCompletion(Transaction tx) {
-		sessionImplementor.beforeTransactionCompletion( tx );
 	}
 
 	public Serializable getContextEntityIdentifier(Object object) {
@@ -535,10 +465,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.scrollCustomQuery( customQuery, queryParameters );
 	}
 
+	@Override
 	public List list(NativeSQLQuerySpecification spec, QueryParameters queryParameters) throws HibernateException {
 		return sessionImplementor.list( spec, queryParameters );
 	}
 
+	@Override
 	public ScrollableResults scroll(NativeSQLQuerySpecification spec, QueryParameters queryParameters)
 			throws HibernateException {
 		return sessionImplementor.scroll( spec, queryParameters );
@@ -560,10 +492,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.getDontFlushFromFind();
 	}
 
-	public EventListeners getListeners() {
-		return sessionImplementor.getListeners();
-	}
-
 	public PersistenceContext getPersistenceContext() {
 		return sessionImplementor.getPersistenceContext();
 	}
@@ -572,6 +500,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.executeUpdate( query, queryParameters );
 	}
 
+	@Override
 	public int executeNativeUpdate(NativeSQLQuerySpecification specification, QueryParameters queryParameters)
 			throws HibernateException {
 		return sessionImplementor.executeNativeUpdate( specification, queryParameters );
@@ -583,10 +512,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public void applyNonFlushedChanges(NonFlushedChanges nonFlushedChanges) throws HibernateException {
 		sessionImplementor.applyNonFlushedChanges( nonFlushedChanges );
-	}
-
-	public EntityMode getEntityMode() {
-		return session.getEntityMode();
 	}
 
 	public String getEntityName(Object object) throws HibernateException {
@@ -621,12 +546,13 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		sessionImplementor.setFetchProfile( name );
 	}
 
-	public String getFetchProfile() {
-		return sessionImplementor.getFetchProfile();
+	@Override
+	public TransactionCoordinator getTransactionCoordinator() {
+		return sessionImplementor.getTransactionCoordinator();
 	}
 
-	public JDBCContext getJDBCContext() {
-		return sessionImplementor.getJDBCContext();
+	public String getFetchProfile() {
+		return sessionImplementor.getFetchProfile();
 	}
 
 	public boolean isClosed() {
@@ -635,10 +561,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public LoadQueryInfluencers getLoadQueryInfluencers() {
 		return sessionImplementor.getLoadQueryInfluencers();
-	}
-
-	public org.hibernate.Session getSession(EntityMode entityMode) {
-		return session.getSession( entityMode );
 	}
 
 	public SessionFactory getSessionFactory() {
@@ -729,10 +651,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		session.persist( object );
 	}
 
-	public void reconnect() throws HibernateException {
-		session.reconnect();
-	}
-
 	public void reconnect(Connection connection) throws HibernateException {
 		session.reconnect( connection );
 	}
@@ -741,12 +659,22 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		session.refresh( object );
 	}
 
+	@Override
+	public void refresh(String entityName, Object object) throws HibernateException {
+		session.refresh( entityName, object );
+	}
+
 	public void refresh(Object object, LockMode lockMode) throws HibernateException {
 		session.refresh( object, lockMode );
 	}
 
 	public void refresh(Object object, LockOptions lockOptions) throws HibernateException {
 		session.refresh( object, lockOptions );
+	}
+
+	@Override
+	public void refresh(String entityName, Object object, LockOptions lockOptions) throws HibernateException {
+		session.refresh( entityName, object, lockOptions );
 	}
 
 	public void replicate(String entityName, Object object, ReplicationMode replicationMode) throws HibernateException {
@@ -785,12 +713,22 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		session.setFlushMode( flushMode );
 	}
 
+	@Override
+	public Connection connection() {
+		return sessionImplementor.connection();
+	}
+
 	public void setReadOnly(Object entity, boolean readOnly) {
 		session.setReadOnly( entity, readOnly );
 	}
 
 	public void doWork(org.hibernate.jdbc.Work work) throws HibernateException {
 		session.doWork( work );
+	}
+
+	@Override
+	public <T> T doReturningWork(ReturningWork<T> work) throws HibernateException {
+		return session.doReturningWork( work );
 	}
 
 	public void update(String entityName, Object object) throws HibernateException {
@@ -819,5 +757,10 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public LobHelper getLobHelper() {
 		return session.getLobHelper();
+	}
+
+	@Override
+	public <T> T execute(Callback<T> callback) {
+		return sessionImplementor.execute( callback );
 	}
 }

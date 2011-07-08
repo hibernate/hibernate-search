@@ -27,7 +27,7 @@ import java.io.InputStream;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.hibernate.search.test.SearchTestCase;
 
 /**

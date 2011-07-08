@@ -22,8 +22,8 @@ package org.hibernate.search.engine.impl;
 import java.util.Collection;
 import java.util.Map;
 
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.search.engine.spi.EntityInitializer;
 

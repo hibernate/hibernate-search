@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,18 +23,73 @@
  */
 package org.hibernate.search.util.configuration.impl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 
 /**
- * Helper class to avoid managing NumberFormatException and similar code
- * and ensure consistent error messages across Configuration parsing problems.
+ * Helper class:
+ * - to avoid managing NumberFormatException and similar code
+ * - ensure consistent error messages across Configuration parsing problems
+ * - locate resources
  * 
  * @author Sanne Grinovero
+ * @author Steve Ebersole
+ * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public abstract class ConfigurationParseHelper {
+
+    /** Try to locate a local URL representing the incoming path.  The first attempt
+	 * assumes that the incoming path is an actual URL string (file://, etc).  If this
+	 * does not work, then the next attempts try to locate this UURL as a java system
+	 * resource.
+	 *
+	 * @param path The path representing the config location.
+	 * @return An appropriate URL or null.
+	 */
+	public static URL locateConfig(final String path) {
+		try {
+			return new URL(path);
+		}
+		catch(MalformedURLException e) {
+			return findAsResource(path);
+		}
+	}
+
+    /**
+	 * Try to locate a local URL representing the incoming path.
+	 * This method <b>only</b> attempts to locate this URL as a
+	 * java system resource.
+	 *
+	 * @param path The path representing the config location.
+	 * @return An appropriate URL or null.
+	 */
+	public static URL findAsResource(final String path) {
+		URL url = null;
+
+		// First, try to locate this resource through the current
+		// context classloader.
+		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		if (contextClassLoader!=null) {
+			url = contextClassLoader.getResource(path);
+		}
+		if (url != null)
+			return url;
+
+		// Next, try to locate this resource through this class's classloader
+		url = ConfigurationParseHelper.class.getClassLoader().getResource(path);
+		if (url != null)
+			return url;
+
+		// Next, try to locate this resource through the system classloader
+		url = ClassLoader.getSystemClassLoader().getResource(path);
+
+		// Anywhere else we should look?
+		return url;
+	}
 	
 	/**
 	 * Parses a String to get an int value.
@@ -128,5 +183,13 @@ public abstract class ConfigurationParseHelper {
 		else {
 			return parseBoolean( propValue, "Property '" + key + "' needs to be either literal 'true' or 'false'" );
 		}
+	}
+
+	/**
+	 * Get the string property or defaults if not present
+	 */
+	public static final String getString(Properties cfg, String key, String defaultValue) {
+		String propValue = cfg.getProperty( key );
+		return propValue == null ? defaultValue : propValue;
 	}
 }

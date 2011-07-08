@@ -23,9 +23,12 @@
  */
 package org.hibernate.search.test.session;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.Environment;
@@ -44,15 +47,21 @@ public class MassIndexUsingManualFlushTest extends SearchTestCase {
 	public void testManualIndexFlush() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		int loop = 14;
-		for (int i = 0; i < loop; i++) {
-			Statement statmt = s.connection().createStatement();
-			statmt.executeUpdate( "insert into Domain(id, name) values( + "
-					+ ( i + 1 ) + ", 'sponge" + i + "')" );
-			statmt.executeUpdate( "insert into Email(id, title, body, header, domain_id) values( + "
-					+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope', " + ( i + 1 ) +")" );
-			statmt.close();
-		}
+		final int loop = 14;
+		s.doWork( new Work() {
+			@Override
+			public void execute(Connection connection) throws SQLException {
+				for (int i = 0; i < loop; i++) {
+					Statement statmt = connection.createStatement();
+					statmt.executeUpdate( "insert into Domain(id, name) values( + "
+							+ ( i + 1 ) + ", 'sponge" + i + "')" );
+					statmt.executeUpdate( "insert into Email(id, title, body, header, domain_id) values( + "
+							+ ( i + 1 ) + ", 'Bob Sponge', 'Meet the guys who create the software', 'nope', " + ( i + 1 ) +")" );
+					statmt.close();
+				}
+			}
+		} );
+
 		tx.commit();
 		s.close();
 

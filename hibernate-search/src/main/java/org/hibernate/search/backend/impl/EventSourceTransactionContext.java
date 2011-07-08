@@ -28,19 +28,24 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.TransactionManager;
 
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.event.spi.FlushEvent;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.HibernateException;
-import org.hibernate.action.AfterTransactionCompletionProcess;
-import org.hibernate.action.BeforeTransactionCompletionProcess;
-import org.hibernate.engine.ActionQueue;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.event.EventSource;
-import org.hibernate.event.FlushEventListener;
+import org.hibernate.action.spi.AfterTransactionCompletionProcess;
+import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
+import org.hibernate.engine.spi.ActionQueue;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.event.spi.EventSource;
+import org.hibernate.event.spi.FlushEventListener;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.service.Service;
+import org.hibernate.service.jta.platform.spi.JtaPlatform;
 
 /**
  * Implementation of the transactional context on top of an EventSource (Session)
@@ -126,17 +131,22 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 
 	private boolean isLocalTransaction() {
 		//TODO make it better but I don't know how we can optimize it.
-		final TransactionManager transactionManager = eventSource.getFactory().getTransactionManager();
+		final TransactionManager transactionManager = getService(JtaPlatform.class).retrieveTransactionManager();
 		return transactionManager == null;
 	}
 
-	private FullTextIndexEventListener getIndexWorkFlushEventListener() {
+    private <T extends Service> T getService(Class<T> serviceClass) {
+        return eventSource.getFactory().getServiceRegistry().getService(serviceClass);
+    }
+
+    private FullTextIndexEventListener getIndexWorkFlushEventListener() {
 		if ( this.flushListener != null) {
 			//for the "transient" case: might have been nullified.
 			return flushListener;
 		}
-		FlushEventListener[] flushEventListeners = eventSource.getListeners().getFlushEventListeners();
-		for (FlushEventListener listener : flushEventListeners) {
+        final Iterable<FlushEventListener> listeners = getService(EventListenerRegistry.class)
+                .getEventListenerGroup(EventType.FLUSH).listeners();
+		for (FlushEventListener listener : listeners) {
 			if ( listener.getClass().equals( FullTextIndexEventListener.class ) ) {
 				return (FullTextIndexEventListener) listener;
 			}

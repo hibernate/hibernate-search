@@ -25,8 +25,11 @@ package org.hibernate.search.util.impl;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.event.PostInsertEventListener;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 
@@ -37,11 +40,19 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
 public abstract class ContextHelper {
 
 	public static SearchFactoryImplementor getSearchFactory(Session session) {
-		return getSearchFactoryBySFI( (SessionImplementor) session );
+		return getSearchFactoryBySessionImplementor( ( SessionImplementor ) session );
 	}
 
-	public static SearchFactoryImplementor getSearchFactoryBySFI(SessionImplementor session) {
-		PostInsertEventListener[] listeners = session.getListeners().getPostInsertEventListeners();
+	public static SearchFactoryImplementor getSearchFactoryBySessionImplementor(SessionImplementor session) {
+		return getSearchFactoryBySFI( session.getFactory() );
+	}
+
+	public static SearchFactoryImplementor getSearchFactoryBySFI(SessionFactoryImplementor sfi) {
+		final EventListenerRegistry service = sfi
+				.getServiceRegistry()
+				.getService( EventListenerRegistry.class );
+		final Iterable<PostInsertEventListener> listeners = service.getEventListenerGroup( EventType.POST_INSERT )
+				.listeners();
 		FullTextIndexEventListener listener = null;
 		//FIXME this sucks since we mandate the event listener use
 		for ( PostInsertEventListener candidate : listeners ) {

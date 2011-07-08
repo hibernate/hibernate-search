@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -31,7 +32,7 @@ import static org.junit.Assert.*;
  * @author Sanne Grinovero
  */
 public class CustomLockProviderTest {
-	
+
 	@Test
 	public void testUseOfCustomLockingFactory() {
 		assertNull( CustomLockFactoryFactory.optionValue );
@@ -57,11 +58,8 @@ public class CustomLockProviderTest {
 			builder.close();
 			fail();
 		}
-		catch (org.hibernate.HibernateException e) {
-			Throwable causeSearch = e.getCause();
-			assertNotNull( causeSearch );
-			assertTrue( causeSearch instanceof org.hibernate.search.SearchException );
-			assertEquals( "Unable to find locking_strategy implementation class: org.hibernate.NotExistingFactory", causeSearch.getMessage() );
+		catch (SearchException e) {
+			assertEquals( "Unable to find locking_strategy implementation class: org.hibernate.NotExistingFactory", e.getMessage() );
 		}
 	}
 

@@ -24,6 +24,7 @@
 package org.hibernate.search.test.id;
 
 import org.hibernate.HibernateException;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -45,10 +46,10 @@ public class DuplicateDocumentIdTest extends SearchTestCase {
 			buildConfiguration();
 			fail( "Building of configuration should fail, because Foo defines multiple document ids." );
 		}
-		catch ( HibernateException e ) { // getting a HibernateException here, because the listener registration fails
+		catch ( SearchException e ) { // getting a HibernateException here, because the listener registration fails
 			assertEquals(
 					"More than one @DocumentId specified on entity org.hibernate.search.test.id.Foo",
-					e.getCause().getMessage()
+					e.getMessage()
 			);
 		}
 	}

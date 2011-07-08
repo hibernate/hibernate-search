@@ -25,8 +25,15 @@ package org.hibernate.search.test;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 
+import junit.framework.TestCase;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
@@ -34,24 +41,31 @@ import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
+import org.junit.After;
+import org.junit.Before;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Interceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.event.PostInsertEventListener;
-import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
+import org.hibernate.search.test.fwk.FailureExpected;
+import org.hibernate.search.test.fwk.SkipForDialect;
+import org.hibernate.search.test.fwk.SkipLog;
+import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 /**
  * Base class for Hibernate Search unit tests.
@@ -59,7 +73,7 @@ import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public abstract class SearchTestCase extends HibernateTestCase {
+public abstract class SearchTestCase extends TestCase {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -74,6 +88,9 @@ public abstract class SearchTestCase extends HibernateTestCase {
 
 	private static File targetDir;
 	private SearchFactoryImplementor searchFactory;
+
+	protected static Configuration cfg;
+	private static Class<?> lastTestClass;
 
 	static {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -93,15 +110,14 @@ public abstract class SearchTestCase extends HibernateTestCase {
 		log.debugf( "Using %s as index directory.", indexDir.getAbsolutePath() );
 	}
 
-	public SearchTestCase() {
-		super();
+	@Before
+	protected void setUp() throws Exception {
+		if ( cfg == null || lastTestClass != getClass() ) {
+			buildConfiguration();
+			lastTestClass = getClass();
+		}
 	}
 
-	public SearchTestCase(String x) {
-		super( x );
-	}
-
-	@Override
 	protected void handleUnclosedResources() {
 		if ( session != null && session.isOpen() ) {
 			if ( session.isConnected() ) {
@@ -116,17 +132,23 @@ public abstract class SearchTestCase extends HibernateTestCase {
 		}
 	}
 
-	@Override
 	protected void closeResources() {
+	}
+
+	protected String[] getXmlFiles() {
+		return new String[] { };
+	}
+
+	protected static void setCfg(Configuration cfg) {
+		SearchTestCase.cfg = cfg;
+	}
+
+	protected static Configuration getCfg() {
+		return cfg;
 	}
 
 	public Session openSession() throws HibernateException {
 		session = getSessions().openSession();
-		return session;
-	}
-
-	public Session openSession(Interceptor interceptor) throws HibernateException {
-		session = getSessions().openSession( interceptor );
 		return session;
 	}
 
@@ -142,8 +164,6 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	}
 
 	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
@@ -153,34 +173,36 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	}
 
 	protected Directory getDirectory(Class<?> clazz) {
-		return getLuceneEventListener().getSearchFactoryImplementor().getDirectoryProviders( clazz )[0].getDirectory();
+		return ContextHelper.getSearchFactoryBySFI( ( SessionFactoryImplementor ) sessions ).getDirectoryProviders( clazz )[0].getDirectory();
 	}
 
-	private FullTextIndexEventListener getLuceneEventListener() {
-		PostInsertEventListener[] listeners = ( ( SessionFactoryImpl ) getSessions() ).getEventListeners()
-				.getPostInsertEventListeners();
-		FullTextIndexEventListener listener = null;
-		//FIXME this sucks since we mandate the event listener use
-		for ( PostInsertEventListener candidate : listeners ) {
-			if ( candidate instanceof FullTextIndexEventListener ) {
-				listener = ( FullTextIndexEventListener ) candidate;
-				break;
-			}
-		}
-		if ( listener == null ) {
-			throw new HibernateException( "Lucene event listener not initialized" );
-		}
-		return listener;
-	}
-
-	@Override
+	@After
 	protected void tearDown() throws Exception {
-		super.tearDown();
+		//runSchemaDrop();
+		handleUnclosedResources();
+		closeResources();
+
 		if ( sessions != null ) {
 			sessions.close();
 			sessions = null;
 		}
 		ensureIndexesAreEmpty();
+	}
+
+	protected abstract Class<?>[] getAnnotatedClasses();
+
+	protected boolean recreateSchema() {
+		return true;
+	}
+
+	protected void runSchemaGeneration() {
+		SchemaExport export = new SchemaExport( cfg );
+		export.create( true, true );
+	}
+
+	protected void runSchemaDrop() {
+		SchemaExport export = new SchemaExport( cfg );
+		export.drop( true, true );
 	}
 
 	protected void ensureIndexesAreEmpty() {
@@ -228,9 +250,13 @@ public abstract class SearchTestCase extends HibernateTestCase {
 			e.printStackTrace();
 			throw e;
 		}
+		catch ( SearchException e ) {
+			e.printStackTrace();
+			throw e;
+		}
 		catch ( Exception e ) {
 			e.printStackTrace();
-			throw new SearchException( e );
+			throw new RuntimeException(  e );
 		}
 	}
 
@@ -256,5 +282,177 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	 */
 	public static File getTargetDir() {
 		return targetDir;
+	}
+
+	public class RollbackWork implements Work {
+
+		public void execute(Connection connection) throws SQLException {
+			connection.rollback();
+		}
+	}
+
+	private void reportSkip(Skip skip) {
+		reportSkip( skip.reason, skip.testDescription );
+	}
+
+	protected void reportSkip(String reason, String testDescription) {
+		StringBuilder builder = new StringBuilder();
+		builder.append( "*** skipping test [" );
+		builder.append( fullTestName() );
+		builder.append( "] - " );
+		builder.append( testDescription );
+		builder.append( " : " );
+		builder.append( reason );
+		SkipLog.LOG.warn( builder.toString() );
+	}
+
+	protected Dialect getDialect() {
+		return Dialect.getDialect();
+	}
+
+	protected Skip buildSkip(Dialect dialect, String comment, String jiraKey) {
+		StringBuilder buffer = new StringBuilder();
+		buffer.append( "skipping database-specific test [" );
+		buffer.append( fullTestName() );
+		buffer.append( "] for dialect [" );
+		buffer.append( dialect.getClass().getName() );
+		buffer.append( ']' );
+
+		if ( StringHelper.isNotEmpty( comment ) ) {
+			buffer.append( "; " ).append( comment );
+		}
+
+		if ( StringHelper.isNotEmpty( jiraKey ) ) {
+			buffer.append( " (" ).append( jiraKey ).append( ')' );
+		}
+
+		return new Skip( buffer.toString(), null );
+	}
+
+	protected <T extends Annotation> T locateAnnotation(Class<T> annotationClass, Method runMethod) {
+		T annotation = runMethod.getAnnotation( annotationClass );
+		if ( annotation == null ) {
+			annotation = getClass().getAnnotation( annotationClass );
+		}
+		if ( annotation == null ) {
+			annotation = runMethod.getDeclaringClass().getAnnotation( annotationClass );
+		}
+		return annotation;
+	}
+
+	protected final Skip determineSkipByDialect(Dialect dialect, Method runMethod) throws Exception {
+		// skips have precedence, so check them first
+		SkipForDialect skipForDialectAnn = locateAnnotation( SkipForDialect.class, runMethod );
+		if ( skipForDialectAnn != null ) {
+			for ( Class<? extends Dialect> dialectClass : skipForDialectAnn.value() ) {
+				if ( skipForDialectAnn.strictMatching() ) {
+					if ( dialectClass.equals( dialect.getClass() ) ) {
+						return buildSkip( dialect, skipForDialectAnn.comment(), skipForDialectAnn.jiraKey() );
+					}
+				}
+				else {
+					if ( dialectClass.isInstance( dialect ) ) {
+						return buildSkip( dialect, skipForDialectAnn.comment(), skipForDialectAnn.jiraKey() );
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	protected static class Skip {
+		private final String reason;
+		private final String testDescription;
+
+		public Skip(String reason, String testDescription) {
+			this.reason = reason;
+			this.testDescription = testDescription;
+		}
+	}
+
+	@Override
+	protected void runTest() throws Throwable {
+		Method runMethod = findTestMethod();
+		FailureExpected failureExpected = locateAnnotation( FailureExpected.class, runMethod );
+		try {
+			super.runTest();
+			if ( failureExpected != null ) {
+				throw new FailureExpectedTestPassedException();
+			}
+		}
+		catch ( FailureExpectedTestPassedException t ) {
+			closeResources();
+			throw t;
+		}
+		catch ( Throwable t ) {
+			if ( t instanceof InvocationTargetException ) {
+				t = ( ( InvocationTargetException ) t ).getTargetException();
+			}
+			if ( t instanceof IllegalAccessException ) {
+				t.fillInStackTrace();
+			}
+			closeResources();
+			if ( failureExpected != null ) {
+				StringBuilder builder = new StringBuilder();
+				if ( StringHelper.isNotEmpty( failureExpected.message() ) ) {
+					builder.append( failureExpected.message() );
+				}
+				else {
+					builder.append( "ignoring @FailureExpected test" );
+				}
+				builder.append( " (" )
+						.append( failureExpected.jiraKey() )
+						.append( ")" );
+				SkipLog.LOG.warn( builder.toString(), t );
+			}
+			else {
+				throw t;
+			}
+		}
+	}
+
+	@Override
+	public void runBare() throws Throwable {
+		Method runMethod = findTestMethod();
+
+		final Skip skip = determineSkipByDialect( Dialect.getDialect(), runMethod );
+		if ( skip != null ) {
+			reportSkip( skip );
+			return;
+		}
+
+		setUp();
+		try {
+			runTest();
+		}
+		finally {
+			tearDown();
+		}
+	}
+
+		public String fullTestName() {
+		return this.getClass().getName() + "#" + this.getName();
+	}
+
+	private Method findTestMethod() {
+		String fName = getName();
+		assertNotNull( fName );
+		Method runMethod = null;
+		try {
+			runMethod = getClass().getMethod( fName );
+		}
+		catch ( NoSuchMethodException e ) {
+			fail( "Method \"" + fName + "\" not found" );
+		}
+		if ( !Modifier.isPublic( runMethod.getModifiers() ) ) {
+			fail( "Method \"" + fName + "\" should be public" );
+		}
+		return runMethod;
+	}
+
+	private static class FailureExpectedTestPassedException extends Exception {
+		public FailureExpectedTestPassedException() {
+			super( "Test marked as @FailureExpected, but did not fail!" );
+		}
 	}
 }

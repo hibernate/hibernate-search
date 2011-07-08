@@ -22,8 +22,8 @@ package org.hibernate.search.test.engine.optimizations;
 import java.lang.annotation.ElementType;
 
 import org.hibernate.Transaction;
-import org.hibernate.collection.PersistentBag;
-import org.hibernate.collection.PersistentSet;
+import org.hibernate.collection.internal.PersistentBag;
+import org.hibernate.collection.internal.PersistentSet;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.cfg.EntityMapping;
 import org.hibernate.search.cfg.SearchMapping;

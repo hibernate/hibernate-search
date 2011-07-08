@@ -34,6 +34,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.fwk.FailureExpected;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.impl.XMLHelper;
 
@@ -55,6 +56,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	/** makes sure that different tests don't join **/
 	private final String CHANNEL_NAME = UUID.randomUUID().toString();
 
+	@FailureExpected( jiraKey = "HSEARCH-803")
 	public void testMessageSend() throws Exception {
 
 		JGroupsReceiver.reset();
@@ -111,13 +113,15 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	}
 
 	protected void setUp() throws Exception {
-		super.setUp();
-		prepareJGroupsChannel();
+		//FIXME HSEARCH-803
+		//super.setUp();
+		//prepareJGroupsChannel();
 	}
 
 	protected void tearDown() throws Exception {
-		channel.close();
-		super.tearDown();
+		//FIXME HSEARCH-803
+		//channel.close();
+		//super.tearDown();
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {

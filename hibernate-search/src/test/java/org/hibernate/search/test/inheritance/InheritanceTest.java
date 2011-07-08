@@ -66,6 +66,7 @@ public class InheritanceTest extends SearchTestCase {
 		}
 		catch ( IllegalArgumentException iae ) {
 			log.debug( "success" );
+			tx.rollback();
 		}
 
 		tx = s.beginTransaction();

@@ -8,10 +8,11 @@ import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.hibernate.classic.Session;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.transaction.TransactionFactory;
+import org.hibernate.engine.transaction.spi.TransactionFactory;
+import org.hibernate.service.jta.platform.spi.JtaPlatform;
 
 /**
  * Wrap the subsequent Runnable in a JTA Transaction if necessary:
@@ -59,7 +60,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 	public void run() {
 		final boolean wrapInTransaction = wrapInTransaction();
 		if ( wrapInTransaction ) {
-			TransactionManager transactionManager = factory.getTransactionManager();
+			TransactionManager transactionManager = getTransactionManager();
 			try {
 				final Session session;
 				final StatelessSession statelessSession;
@@ -94,7 +95,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 				//TODO exception handling seems messy-ish
 				log.errorExecutingRunnableInTransaction( e );
 				try {
-					factory.getTransactionManager().rollback();
+					transactionManager.rollback();
 				}
 				catch ( SystemException e1 ) {
 					// we already have an exception, don't propagate this one
@@ -112,14 +113,18 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 		}
 	}
 
-	boolean wrapInTransaction() {
-		final TransactionFactory transactionFactory = factory.getSettings().getTransactionFactory();
-		if ( !transactionFactory.isTransactionManagerRequired() ) {
+    private TransactionManager getTransactionManager() {
+        return factory.getServiceRegistry().getService(JtaPlatform.class).retrieveTransactionManager();
+    }
+
+    boolean wrapInTransaction() {
+		final TransactionFactory transactionFactory = factory.getServiceRegistry().getService(TransactionFactory.class);
+		if ( !transactionFactory.compatibleWithJtaSynchronization() ) {
 			//Today we only require a TransactionManager on JTA based transaction factories
 			log.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );
 			return false;
 		}
-		final TransactionManager transactionManager = factory.getTransactionManager();
+		final TransactionManager transactionManager = getTransactionManager();
 		if ( transactionManager == null ) {
 			//no TM, nothing to do OR configuration mistake
 			log.trace( "No TransactionManager found, do not start a surrounding JTA transaction" );

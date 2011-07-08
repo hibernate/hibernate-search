@@ -39,6 +39,7 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.testing.cache.CachingRegionFactory;
 
 /**
  * Use the builder pattern to provide a SessionFactory.
@@ -74,8 +75,8 @@ public class FullTextSessionBuilder {
 		
 		//cache:
 		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
-		cfg.setProperty( Environment.CACHE_PROVIDER,
-				org.hibernate.cache.HashtableCacheProvider.class.getCanonicalName() );
+		cfg.setProperty( Environment.CACHE_REGION_FACTORY,
+				CachingRegionFactory.class.getCanonicalName() );
 		cfg.setProperty( Environment.USE_QUERY_CACHE, "true" );
 		
 		//search specific:

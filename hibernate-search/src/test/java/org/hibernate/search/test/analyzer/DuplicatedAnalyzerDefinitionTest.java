@@ -34,6 +34,7 @@ import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.logging.impl.Log;
@@ -61,9 +62,9 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
 		}
-		catch ( HibernateException e ) { // the SearchException will be wrapped in a HibernateException
+		catch ( SearchException e ) { // the SearchException will be wrapped in a HibernateException
 			assertTrue(
-					e.getCause().getMessage().equals(
+					e.getMessage().equals(
 							"Multiple analyzer definitions with the same name: my-analyzer"
 					)
 			);
@@ -78,9 +79,9 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate analyzer definition" );
 		}
-		catch ( HibernateException e ) { // the SearchException will be wrapped in a HibernateException
+		catch ( SearchException e ) { // the SearchException will be wrapped in a HibernateException
 			assertTrue(
-					e.getCause().getMessage().equals( "Multiple analyzer definitions with the same name: english" )
+					e	.getMessage().equals( "Multiple analyzer definitions with the same name: english" )
 			);
 		}
 	}
