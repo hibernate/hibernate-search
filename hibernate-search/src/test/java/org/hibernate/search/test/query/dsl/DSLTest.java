@@ -364,6 +364,18 @@ public class DSLTest extends SearchTestCase {
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "February", ( ( Month ) hibQuery.list().get( 0 ) ).getName() );
 
+		query = monthQb.range()
+				.onField( "raindropInMm" )
+				.below( 0.24d )
+				.createQuery();
+
+		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
+
+		List results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+
+		assertEquals( "test range numeric ", 1, results.size() );
+		assertEquals( "test range numeric ", "January", ( (Month) results.get( 0 ) ).getName() );
+
 		transaction.commit();
 	}
 
