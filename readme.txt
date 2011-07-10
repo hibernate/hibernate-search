@@ -15,8 +15,8 @@ queries.
 Hibernate Search is using Apache Lucene(tm) under the cover.
 
 This version of Hibernate Search requires:
- - Hibernate Core 3.6 and above
- - Apache Lucene 3.1
+ - Hibernate Core 4.0 and above
+ - Apache Lucene 3.3
 
 Instructions
 ------------
