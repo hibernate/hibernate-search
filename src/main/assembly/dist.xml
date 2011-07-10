@@ -58,7 +58,6 @@
                         <outputDirectory>/dist/lib/required</outputDirectory>
                         <scope>runtime</scope>
                         <excludes>
-                            <exclude>jgroups:jgroups</exclude>
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>org.infinispan:infinispan-core</exclude>
                             <exclude>org.infinispan:infinispan-lucene-directory</exclude>
@@ -88,7 +87,6 @@
                     <dependencySet>
                         <outputDirectory>/dist/lib/optional</outputDirectory>
                         <includes>
-                            <include>jgroups:jgroups</include>
                             <include>org.infinispan:infinispan-core</include>
                             <include>org.infinispan:infinispan-lucene-directory</include>
                             <include>org.apache.lucene:lucene-analyzers</include>
