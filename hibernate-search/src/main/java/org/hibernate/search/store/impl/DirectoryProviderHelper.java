@@ -47,7 +47,7 @@ import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.LockFactoryFactory;
+import org.hibernate.search.store.LockFactoryProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.FileHelper;
@@ -216,8 +216,8 @@ public final class DirectoryProviderHelper {
 			return NoLockFactory.getNoLockFactory();
 		}
 		else {
-			LockFactoryFactory lockFactoryFactory = ClassLoaderHelper.instanceFromName(
-					LockFactoryFactory.class,
+			LockFactoryProvider lockFactoryFactory = ClassLoaderHelper.instanceFromName(
+					LockFactoryProvider.class,
 					lockFactoryName, DirectoryProviderHelper.class, LOCKING_STRATEGY_PROP_NAME
 			);
 			return lockFactoryFactory.createLockFactory( indexDir, dirConfiguration );

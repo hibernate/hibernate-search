@@ -1643,7 +1643,7 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
     to one of <literal>simple</literal>, <literal>native</literal>,
     <literal>single</literal> or <literal>none</literal>. Alternatively set it
     to the fully qualified name of an implementation of
-    <literal>org.hibernate.search.store.LockFactoryFactory</literal>.</para>
+    <literal>org.hibernate.search.store.LockFactoryProvider</literal>.</para>
 
     <table id="search-configuration-directory-lockfactories-table">
       <title>List of available LockFactory implementations</title>
