@@ -29,6 +29,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 
 import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
@@ -36,6 +37,10 @@ import org.hibernate.search.test.util.AnalyzerUtils;
 
 /**
  * Tests the Solr analyzer creation framework.
+ * This test might be affected by the version of the Analyzers being used. If it was to fail
+ * after an upgrade of a Lucene or Solr version, make sure the new dependency still respects
+ * the value Version.LUCENE_30, or update the test (older enum values are eventually deprecated
+ * and not enforced anymore).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -44,7 +49,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 
 	/**
 	 * Tests that the token filters applied to <code>Team</code> are successfully created and used. Refer to
-	 * <code>Team</code> to see the exat definitions.
+	 * <code>Team</code> to see the exact definitions.
 	 *
 	 * @throws Exception in case the test fails
 	 */
@@ -186,5 +191,10 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		return new Class[] {
 				Team.class
 		};
+	}
+
+	protected void configure(Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( "hibernate.search.lucene_version", org.apache.lucene.util.Version.LUCENE_30.name() );
 	}
 }

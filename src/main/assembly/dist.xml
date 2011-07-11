@@ -23,6 +23,13 @@
   ~ Boston, MA  02110-1301  USA
   -->
 
+<!--
+  When updating this file, make sure we don't include duplicate jars in different subdirectories.
+  Generate the distribution preview to see how it looks like:
+   mvn clean package assembly:assembly -DskipTests=true
+  To inspect which jars are being distributed and look for duplicates this might be handy:
+   tar -ztvf target/*-dist.tar.gz  | grep .jar | sed -e "s/.*\/dist//" -e "s/\(\/lib\/[^\/]*\)\/\(.*\)/\2 \t\t\t\1/" | sort
+ -->
 <assembly>
     <id>dist</id>
     <formats>
@@ -58,69 +65,67 @@
                         <outputDirectory>/dist/lib/required</outputDirectory>
                         <scope>runtime</scope>
                         <excludes>
-                            <exclude>jgroups:jgroups</exclude>
-                            <exclude>org.jgroups:jgroups</exclude>
-                            <exclude>org.infinispan:infinispan-core</exclude>
-                            <exclude>org.infinispan:infinispan-lucene-directory</exclude>
+                            <exclude>org.slf4j:slf4j-api</exclude>
                             <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
-                            <exclude>org.apache.lucene:lucene-analyzers</exclude>
+                            <exclude>org.jgroups:jgroups</exclude>
+                            <exclude>commons-lang:commons-lang</exclude>
                             <exclude>org.hibernate:hibernate-search</exclude>
                             <exclude>org.hibernate:hibernate-search-analyzers</exclude>
-                            <exclude>org.rhq.helpers:rhq-pluginAnnotations</exclude>
-                            <exclude>i18nlog:i18nlog</exclude>
-                            <exclude>org.jboss.marshalling:river</exclude>
+                            <exclude>org.apache.lucene:lucene-grouping</exclude>
+                            <exclude>org.apache.lucene:lucene-analyzers</exclude>
                             <exclude>org.apache.lucene:lucene-highlighter</exclude>
                             <exclude>org.apache.lucene:lucene-memory</exclude>
                             <exclude>org.apache.lucene:lucene-misc</exclude>
                             <exclude>org.apache.lucene:lucene-spatial</exclude>
                             <exclude>org.apache.lucene:lucene-spellchecker</exclude>
                             <exclude>org.apache.lucene:lucene-smartcn</exclude>
-                            <exclude>org.jboss.marshalling:marshalling-api</exclude>
-                            <exclude>org.apache.solr:solr-analysis-extras</exclude>
-                            <exclude>org.apache.solr:solr-solrj</exclude>
-                            <exclude>org.apache.solr:solr-commons-csv</exclude>
-                            <exclude>org.apache.solr:solr-core</exclude>
                             <exclude>org.apache.lucene:lucene-stempel</exclude>
+                            <exclude>org.apache.solr:*</exclude>
+                            <exclude>org.infinispan:*</exclude>
+                            <exclude>org.jboss.marshalling:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.jboss.logging:jboss-logging-processor</exclude>
+                            <exclude>org.jboss.logging:jboss-logging-generator</exclude>
+                            <exclude>org.rhq.helpers:*</exclude>
+                            <exclude>i18nlog:i18nlog</exclude>
                         </excludes>
                     </dependencySet>
 
                     <dependencySet>
                         <outputDirectory>/dist/lib/optional</outputDirectory>
-                        <includes>
-                            <include>jgroups:jgroups</include>
-                            <include>org.infinispan:infinispan-core</include>
-                            <include>org.infinispan:infinispan-lucene-directory</include>
-                            <include>org.apache.lucene:lucene-analyzers</include>
-                            <include>org.apache.solr:solr-analysis-extras</include>
-                            <include>org.apache.solr:solr-core</include>
-                            <include>org.jgroups:jgroups</include>
-                            <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
-                            <include>org.hibernate:hibernate-search-analyzers</include>
-                            <include>org.rhq.helpers:rhq-pluginAnnotations</include>
-                        </includes>
-                    </dependencySet>
-
-                    <!--
-                            Need to manually put the optional analyzer dependencies into their place.
-                            The maven-assembly-plugin does not have any options to handle <optional/> dependencies
-                            They are added as test dependencies in the pom.
-                            -->
-                    <dependencySet>
-                        <outputDirectory>/dist/lib/optional</outputDirectory>
-                        <scope>test</scope>
-                        <includes>
-                            <include>commons-codec:commons-codec</include>
-                            <include>commons-io:commons-io</include>
-                            <include>org.slf4j:slf4j-log4j12</include>
-                            <include>log4j:log4j</include>
-                        </includes>
+                        <scope>runtime</scope>
+                        <excludes>
+                            <exclude>org.slf4j:slf4j-api</exclude>
+                            <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
+                            <exclude>org.jboss:jandex</exclude>
+                            <exclude>org.jboss.logging:*</exclude>
+                            <exclude>com.fasterxml:classmate</exclude>
+                            <exclude>org.apache.lucene:lucene-core</exclude>
+                            <exclude>antlr:antlr</exclude>
+                            <exclude>commons-collections:commons-collections</exclude>
+                            <exclude>dom4j:dom4j</exclude>
+                            <exclude>org.hibernate:hibernate-commons-annotations</exclude>
+                            <exclude>org.hibernate:hibernate-core</exclude>
+                            <exclude>org.hibernate:hibernate-search</exclude>
+                            <exclude>org.infinispan:*</exclude>
+                            <exclude>org.jgroups:jgroups</exclude>
+                            <exclude>xml-apis:xml-apis</exclude>
+                            <exclude>org.jboss.marshalling:jboss-marshalling-river</exclude>
+                            <exclude>org.jboss.marshalling:jboss-marshalling</exclude>
+                            <exclude>org.rhq.helpers:*</exclude>
+                            <exclude>i18nlog:i18nlog</exclude>
+                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                        </excludes>
                     </dependencySet>
 
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>/dist/lib/provided</outputDirectory>
-                        <scope>provided</scope>
+                        <includes>
+                            <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
+                            <include>org.slf4j:slf4j-api</include>
+                            <include>org.jboss.javaee:jboss-transaction-api</include>
+                        </includes>
                     </dependencySet>
                 </dependencySets>
             </binaries>
@@ -130,20 +135,30 @@
                 <include>org.hibernate:hibernate-search-infinispan</include>
             </includes>
             <binaries>
-                <outputDirectory>dist</outputDirectory>
+                <outputDirectory>/dist/lib/clustering</outputDirectory>
                 <unpack>false</unpack>
                 <dependencySets>
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>/dist/lib/optional</outputDirectory>
+                        <outputDirectory>/dist/lib/clustering</outputDirectory>
                         <scope>runtime</scope>
                         <excludes>
                             <exclude>org.hibernate:*</exclude>
                             <exclude>org.apache.lucene:*</exclude>
+                            <exclude>org.apache.solr:*</exclude>
                             <exclude>antlr:antlr</exclude>
-                            <exclude>commons-collections:commons-collections</exclude>
-                            <exclude>org.slf4j:slf4j-api</exclude>
-                            <exclude>dom4j:dom4j</exclude>
+                            <exclude>commons-collections:*</exclude>
+                            <exclude>dom4j:*</exclude>
+                            <exclude>org.rhq.helpers:*</exclude>
+                            <exclude>com.fasterxml:*</exclude>
+                            <exclude>org.jboss.logging:*</exclude>
+                            <exclude>org.jboss:jandex</exclude>
+                            <exclude>org.slf4j:*</exclude>
+                            <exclude>commons-lang:*</exclude>
+                            <exclude>i18nlog:*</exclude>
+                            <exclude>xml-apis:*</exclude>
+                            <exclude>org.hibernate.javax.persistence:*</exclude>
+                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
                         </excludes>
                     </dependencySet>
                 </dependencySets>
@@ -178,6 +193,8 @@
                 <exclude>lgpl.txt</exclude>
                 <exclude>changelog.txt</exclude>
                 <exclude>.git</exclude>
+                <exclude>*.log</exclude>
+                <exclude>*.sh</exclude>
                 <exclude>**/.gitignore</exclude>
                 <exclude>**/.settings/**</exclude>
                 <exclude>**/.project</exclude>

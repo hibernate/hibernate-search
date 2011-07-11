@@ -57,7 +57,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.test.fwk.FailureExpected;
 import org.hibernate.search.test.fwk.SkipForDialect;
 import org.hibernate.search.test.fwk.SkipLog;
@@ -164,6 +163,7 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	protected void configure(Configuration cfg) {
+		cfg.setProperty( "hibernate.search.lucene_version", getTargetLuceneVersion().name() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
@@ -265,7 +265,7 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	public static Version getTargetLuceneVersion() {
-		return Version.LUCENE_31;
+		return Version.LUCENE_CURRENT;
 	}
 	
 	protected SearchFactoryImplementor getSearchFactoryImpl() {

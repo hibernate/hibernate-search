@@ -346,4 +346,9 @@ public interface Log extends BasicLogger
    @Message(id = 74, value = "Unexpected error in Lucene Backend:")
    void unexpectedErrorInLuceneBackend(@Cause Throwable tw);
 
+   @LogMessage(level = WARN)
+   @Message(id = 75, value = "Configuration setting " + org.hibernate.search.Environment.LUCENE_MATCH_VERSION
+      + " was not specified, using LUCENE_CURRENT.")
+   void recommendConfiguringLuceneVersion();
+
 }

@@ -34,7 +34,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.fwk.FailureExpected;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.impl.XMLHelper;
 
@@ -56,7 +55,6 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	/** makes sure that different tests don't join **/
 	private final String CHANNEL_NAME = UUID.randomUUID().toString();
 
-	@FailureExpected( jiraKey = "HSEARCH-803" )
 	public void testMessageSend() throws Exception {
 
 		JGroupsReceiver.reset();
@@ -113,15 +111,13 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	}
 
 	protected void setUp() throws Exception {
-		//FIXME HSEARCH-803
-		//super.setUp();
-		//prepareJGroupsChannel();
+		super.setUp();
+		prepareJGroupsChannel();
 	}
 
 	protected void tearDown() throws Exception {
-		//FIXME HSEARCH-803
-		//channel.close();
-		//super.tearDown();
+		channel.close();
+		super.tearDown();
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {
@@ -140,8 +136,8 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	private String prepareXmlJGroupsConfiguration() {
 		return "<config>" +
 				"<UDP" +
-				"     mcast_addr=\"${jgroups.udp.mcast_addr:228.10.10.10}\"" +
-				"     mcast_port=\"${jgroups.udp.mcast_port:45588}\"" +
+				"     mcast_addr=\"228.10.10.10\"" +
+				"     mcast_port=\"45588\"" +
 				"     tos=\"8\"" +
 				"     ucast_recv_buf_size=\"20000000\"" +
 				"     ucast_send_buf_size=\"640000\"" +
@@ -152,7 +148,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				"     max_bundle_size=\"64000\"" +
 				"     max_bundle_timeout=\"30\"" +
 				"     use_incoming_packet_handler=\"true\"" +
-				"     ip_ttl=\"${jgroups.udp.ip_ttl:2}\"" +
+				"     ip_ttl=\"2\"" +
 				"     enable_bundling=\"true\"" +
 				"     enable_diagnostics=\"true\"" +
 				"     use_concurrent_stack=\"true\"" +

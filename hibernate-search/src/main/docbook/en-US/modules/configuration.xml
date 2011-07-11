@@ -1755,4 +1755,43 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
 
     <para><programlisting>hibernate.search.error_handler CustomerErrorHandler</programlisting></para>
   </section>
+  
+    <section>
+    <title>Index format compatibility</title>
+
+    <para>While Hibernate Search strives to offer a backwards compatible API to
+    make it easy to port your application to newer versions, it delegates to
+    Apache Lucene to handle the index writing and searching. The Lucene developers too attempt
+    to keep a stable index format, but sometimes an update in the index format
+    can not be avoided; in those rare cases you either have to reindex all your
+    data, or use an index upgrade tool, or sometimes Lucene is able to read the old
+    format so you don't need to take specific actions (besides making backup of your index).</para>
+
+    <para>While an index format incompatibility is an exceptional event, more often
+    when upgrading Lucene the Analyzer implementations might slightly change behaviour, and
+    this could lead to a poor recall score, possibly missing many hits from the results.</para>
+
+    <para>Hibernate Search exposes a configuration property <literal>hibernate.search.lucene_version</literal>
+    which instructs the Analyzers and other Lucene classes to conform to their behaviour
+    as defined in an (older) specific version of Lucene.
+    See also <classname>org.apache.lucene.util.Version</classname> contained in the lucene-core.jar,
+    depending on the specific version of Lucene you're using you might have different options available.
+    When this option is not specified, Hibernate Search will instruct Lucene to use the default
+    of it's current version, which is usually the best option for new projects.
+    Still it's recommended to define the version you're using explicitly in the configuration so
+    that when you happen to upgrade Lucene the Analyzers will not change behaviour;
+    you can then choose to update this value in a second time, maybe
+    when you have the chance to rebuild the index from scratch.
+    </para>
+
+    <example>
+      <title>Force Analyzers to be compatible with a Lucene 3.0 created index</title>
+      <programlisting>hibernate.search.lucene_version LUCENE_30</programlisting>
+    </example>
+
+    <para>This option is global for the configured <classname>SearchFactory</classname> and affects all Lucene APIs
+    having such a parameter, as this should be applied consistently. So if you are also making use of Lucene
+    bypassing Hibernate Search, make sure to apply the same value too.</para>
+
+  </section>
 </chapter>
