@@ -59,6 +59,8 @@ public class TransactionalWorker implements Worker {
 	private QueueingProcessor queueingProcessor;
 	private SearchFactoryImplementor factory;
 
+	private boolean transactionExpected;
+
 	public void performWork(Work<?> work, TransactionContext transactionContext) {
 		final Class<?> entityType = HibernateHelper.getClassFromWork( work );
 		if ( factory.getDocumentBuilderIndexedEntity( entityType ) == null
@@ -79,9 +81,11 @@ public class TransactionalWorker implements Worker {
 			txSync.add( work );
 		}
 		else {
-			// this is a workaround: isTransactionInProgress should return "true"
-			// for correct configurations.
-			log.pushedChangesOutOfTransaction();
+			if ( transactionExpected ) {
+				// this is a workaround: isTransactionInProgress should return "true"
+				// for correct configurations.
+				log.pushedChangesOutOfTransaction();
+			}
 			WorkQueue queue = new WorkQueue( factory );
 			queueingProcessor.add( work, queue );
 			queueingProcessor.prepareWorks( queue );
@@ -92,6 +96,7 @@ public class TransactionalWorker implements Worker {
 	public void initialize(Properties props, WorkerBuildContext context) {
 		this.queueingProcessor = new BatchedQueueingProcessor( context, props );
 		this.factory = context.getUninitializedSearchFactory();
+		this.transactionExpected = context.isTransactionManagerExpected();
 	}
 
 	public void close() {

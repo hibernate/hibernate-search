@@ -258,5 +258,10 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	public boolean isStopped() {
 		return delegate.isStopped();
 	}
+
+	@Override
+	public boolean isTransactionManagerExpected() {
+		return delegate.isTransactionManagerExpected();
+	}
 	
 }

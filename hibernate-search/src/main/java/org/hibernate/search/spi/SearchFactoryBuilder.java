@@ -683,5 +683,10 @@ public class SearchFactoryBuilder {
 					.get( entityType );
 		}
 
+		@Override
+		public boolean isTransactionManagerExpected() {
+			return cfg.isTransactionManagerExpected();
+		}
+
 	}
 }

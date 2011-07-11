@@ -61,4 +61,9 @@ public interface WorkerBuildContext extends BuildContext {
 	ErrorHandler getErrorHandler();
 
 	<T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> managedType);
+	
+	/**
+	 * @see org.hibernate.search.cfg.spi.SearchConfiguration#isTransactionManagerExpected
+	 */
+	boolean isTransactionManagerExpected();
 }

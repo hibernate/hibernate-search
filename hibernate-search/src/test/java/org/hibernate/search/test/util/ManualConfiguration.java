@@ -87,4 +87,9 @@ public class ManualConfiguration implements SearchConfiguration {
 	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
 		return providedServices;
 	}
+
+	@Override
+	public boolean isTransactionManagerExpected() {
+		return true;
+	}
 }

@@ -126,4 +126,10 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 			throw new UnsupportedOperationException( "Cannot modify Hibernate Core metadata" );
 		}
 	}
+
+	@Override
+	public boolean isTransactionManagerExpected() {
+		return true;
+	}
+
 }

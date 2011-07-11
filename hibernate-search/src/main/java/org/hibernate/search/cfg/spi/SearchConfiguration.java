@@ -99,4 +99,12 @@ public interface SearchConfiguration {
 	 * over managed services (ie the ones using the service locator pattern).
 	 */
 	Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices();
+
+	/**
+	 * By default Hibernate Search expects to execute in the context of a transaction,
+	 * and will log warning when certain operations are executed out of such a scope.
+	 * 
+	 * @return when returning {@code false} Search will avoid logging such warnings.
+	 */
+	boolean isTransactionManagerExpected();
 }
