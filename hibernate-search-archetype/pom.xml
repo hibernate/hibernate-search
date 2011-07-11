@@ -90,15 +90,6 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- When removing the <parent> you will have to add a slf4j logging binding. Within Hibernate we are using
-             slf4j-log4j12, but it is up to you to chose your own binding. See also http://www.slf4j.org/codes.html
-         -->
-        <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>slf4j-log4j12</artifactId>-->
-            <!--<version></version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>
