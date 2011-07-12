@@ -35,15 +35,16 @@ public class CustomLockProviderTest {
 
 	@Test
 	public void testUseOfCustomLockingFactory() {
-		assertNull( CustomLockFactoryFactory.optionValue );
+		assertNull( CustomLockFactoryProvider.optionValue );
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		builder
 			.addAnnotatedClass( SnowStorm.class )
 			.setProperty( "hibernate.search.default.locking_option", "somethingHere" )
-			.setProperty( "hibernate.search.default.locking_strategy", "org.hibernate.search.test.directoryProvider.CustomLockFactoryFactory")
+			.setProperty( "hibernate.search.default.locking_strategy",
+					"org.hibernate.search.test.directoryProvider.CustomLockFactoryProvider" )
 			.build();
 		builder.close();
-		assertEquals( "somethingHere", CustomLockFactoryFactory.optionValue );
+		assertEquals( "somethingHere", CustomLockFactoryProvider.optionValue );
 	}
 
 	@Test

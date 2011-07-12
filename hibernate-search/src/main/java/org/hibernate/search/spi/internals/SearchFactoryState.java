@@ -79,4 +79,6 @@ public interface SearchFactoryState {
 	Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams();
 
 	ServiceManager getServiceManager();
+	
+	boolean isTransactionManagerExpected();
 }

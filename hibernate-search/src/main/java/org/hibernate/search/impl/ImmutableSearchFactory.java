@@ -110,6 +110,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final ErrorHandler errorHandler;
 	private final PolymorphicIndexHierarchy indexHierarchy;
 	private final StatisticsImpl statistics;
+	private final boolean transactionManagerExpected;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -136,6 +137,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.readerProvider = state.getReaderProvider();
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
+		this.transactionManagerExpected = state.isTransactionManagerExpected();
 
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
@@ -421,5 +423,10 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	public boolean isStopped() {
 		return stopped.get();
+	}
+
+	@Override
+	public boolean isTransactionManagerExpected() {
+		return this.transactionManagerExpected;
 	}
 }

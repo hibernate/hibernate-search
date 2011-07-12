@@ -21,12 +21,23 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.store;
+package org.hibernate.search.test.directoryProvider;
 
-/**
- * Old interface replaced by the better named LockFactoryProvider.
- */
-@Deprecated
-public interface LockFactoryFactory extends LockFactoryProvider {
+import java.io.File;
+import java.util.Properties;
+
+import org.apache.lucene.store.LockFactory;
+import org.apache.lucene.store.SingleInstanceLockFactory;
+import org.hibernate.search.store.LockFactoryProvider;
+
+public class CustomLockFactoryProvider implements LockFactoryProvider {
+
+	// A real implementation would probably not use a static field; useful to keep the test simple.
+	static String optionValue;
+
+	public LockFactory createLockFactory(File indexDir, Properties dirConfiguration) {
+		optionValue = dirConfiguration.getProperty( "locking_option" );
+		return new SingleInstanceLockFactory();
+	}
 
 }

@@ -65,6 +65,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private PolymorphicIndexHierarchy indexHierarchy;
 	private Map<DirectoryProvider, LuceneIndexingParameters> directoryProviderIndexingParams;
 	private ServiceManager serviceManager;
+	private boolean transactionManagerExpected = true;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -83,6 +84,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		indexHierarchy = oldFactoryState.getIndexHierarchy();
 		directoryProviderIndexingParams = oldFactoryState.getDirectoryProviderIndexingParams();
 		serviceManager = oldFactoryState.getServiceManager();
+		transactionManagerExpected = oldFactoryState.isTransactionManagerExpected();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -212,4 +214,13 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	public void setDirectoryProviderIndexingParams(Map<DirectoryProvider, LuceneIndexingParameters> directoryProviderIndexingParams) {
 		this.directoryProviderIndexingParams = directoryProviderIndexingParams;
 	}
+
+	public boolean isTransactionManagerExpected() {
+		return transactionManagerExpected;
+	}
+
+	public void setTransactionManagerExpected(boolean transactionManagerExpected) {
+		this.transactionManagerExpected = transactionManagerExpected;
+	}
+
 }
