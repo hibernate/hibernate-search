@@ -27,13 +27,13 @@ import java.util.Properties;
 
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * @author Emmanuel Bernard
  */
 public interface OptimizerStrategy {
-	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, BuildContext initContext);
 
 	/**
 	 * has to be called in a thread safe way
@@ -54,5 +54,11 @@ public interface OptimizerStrategy {
 	 * has to be called in a thread safe way
 	 */
 	void optimize(Workspace workspace);
+
+	/**
+	 * @param callback
+	 * @param indexProps
+	 */
+	public void initialize(IndexManager callback, Properties indexProps);
 
 }

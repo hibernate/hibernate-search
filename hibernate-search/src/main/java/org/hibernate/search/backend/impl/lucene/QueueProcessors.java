@@ -24,9 +24,7 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -35,29 +33,26 @@ import java.util.concurrent.FutureTask;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.IndexManager;
 
 /**
- * Container used to split work by DirectoryProviders and execute
- * them concurrently.
+ * This WAS a container used to split work by DirectoryProviders and execute
+ * them concurrently - the work is now split before reaching the backend, so this
+ * is temporarily used as an adaptor.
+ * 
  * @author Sanne Grinovero
  */
+@Deprecated
 class QueueProcessors implements PerDirectoryWorkProcessor {
 	
-	private final Map<DirectoryProvider<?>, PerDPResources> resourcesMap;
-	private final Map<DirectoryProvider<?>, PerDPQueueProcessor> dpProcessors
-			= new HashMap<DirectoryProvider<?>, PerDPQueueProcessor>();
+	private final PerDPQueueProcessor dpProcessors;
 	
-	QueueProcessors(Map<DirectoryProvider<?>, PerDPResources> resourcesMap) {
-		this.resourcesMap = resourcesMap;
+	QueueProcessors(PerDPResources resourcesMap) {
+		dpProcessors = new PerDPQueueProcessor( resourcesMap );
 	}
 
-	public void addWorkToDpProcessor(DirectoryProvider dp, LuceneWork work) {
-		if ( ! dpProcessors.containsKey( dp ) ) {
-			dpProcessors.put( dp, new PerDPQueueProcessor( resourcesMap.get( dp ) ) );
-		}
-		PerDPQueueProcessor processor = dpProcessors.get( dp );
-		processor.addWork ( work );
+	public void addWorkToDpProcessor(IndexManager dp, LuceneWork work) {
+		dpProcessors.addWork ( work );
 	}
 	
 	/**
@@ -78,12 +73,8 @@ class QueueProcessors implements PerDirectoryWorkProcessor {
 	 * Runs all PerDPQueueProcessor and don't wait for them to finish.
 	 */
 	private void runAllAsync() {
-		// execute all work in parallel on each DirectoryProvider;
-		// each DP has it's own ExecutorService.
-		for ( PerDPQueueProcessor process : dpProcessors.values() ) {
-			ExecutorService executor = process.getOwningExecutor();
-			executor.execute( process );
-		}
+		ExecutorService executor = dpProcessors.getOwningExecutor();
+		executor.execute( dpProcessors );
 	}
 
 	/**
@@ -91,31 +82,27 @@ class QueueProcessors implements PerDirectoryWorkProcessor {
 	 * @throws InterruptedException
 	 */
 	private void runAllWaiting() throws InterruptedException {
-		List<Future<Object>> futures = new ArrayList<Future<Object>>( dpProcessors.size() );
+		List<Future<Object>> futures = new ArrayList<Future<Object>>( 1 );
 		// execute all work in parallel on each DirectoryProvider;
 		// each DP has it's own ExecutorService.
-		for ( PerDPQueueProcessor process : dpProcessors.values() ) {
-			ExecutorService executor = process.getOwningExecutor();
-			//wrap each Runnable in a Future
-			FutureTask<Object> f = new FutureTask<Object>( process, null );
-			futures.add( f );
-			executor.execute( f );
-		}
-		// and then wait for all tasks to be finished:
-		for ( Future<Object> f : futures ) {
-			if ( !f.isDone() ) {
-				try {
-					f.get();
-				}
-				catch (CancellationException ignore) {
-					// ignored, as in java.util.concurrent.AbstractExecutorService.invokeAll(Collection<Callable<T>>
-					// tasks)
-				}
-				catch (ExecutionException error) {
-					// rethrow cause to serviced thread - this could hide more exception:
-					Throwable cause = error.getCause();
-					throw new SearchException( cause );
-				}
+		ExecutorService executor = dpProcessors.getOwningExecutor();
+		//wrap each Runnable in a Future
+		FutureTask<Object> f = new FutureTask<Object>( dpProcessors, null );
+		futures.add( f );
+		executor.execute( f );
+		// and then wait for the task to be finished:
+		if ( !f.isDone() ) {
+			try {
+				f.get();
+			}
+			catch (CancellationException ignore) {
+				// ignored, as in java.util.concurrent.AbstractExecutorService.invokeAll(Collection<Callable<T>>
+				// tasks)
+			}
+			catch (ExecutionException error) {
+				// rethrow cause to serviced thread - this could hide more exception:
+				Throwable cause = error.getCause();
+				throw new SearchException( cause );
 			}
 		}
 	}

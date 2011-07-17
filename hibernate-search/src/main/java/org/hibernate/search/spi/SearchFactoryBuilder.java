@@ -102,6 +102,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class SearchFactoryBuilder {
 
@@ -591,33 +592,6 @@ public class SearchFactoryBuilder {
 	 */
 	private class BuildContext implements WritableBuildContext, WorkerBuildContext {
 		private final SearchFactoryState factoryState = SearchFactoryBuilder.this.factoryState;
-
-		public void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy) {
-			final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData = factoryState.getDirectoryProviderData();
-			DirectoryProviderData data = dirProviderData.get( provider );
-			if ( data == null ) {
-				data = new DirectoryProviderData();
-				dirProviderData.put( provider, data );
-			}
-			data.setOptimizerStrategy( optimizerStrategy );
-		}
-
-		public void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
-			factoryState.getDirectoryProviderIndexingParams().put( provider, indexingParams );
-		}
-
-		public void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider,
-				boolean exclusiveIndexUsage, int maximumQueueSize) {
-			final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData = factoryState.getDirectoryProviderData();
-			DirectoryProviderData data = dirProviderData.get( directoryProvider );
-			if ( data == null ) {
-				data = new DirectoryProviderData();
-				dirProviderData.put( directoryProvider, data );
-			}
-			data.getClasses().add( entity );
-			data.setExclusiveIndexUsage( exclusiveIndexUsage );
-			data.setMaxQueueLength( maximumQueueSize );
-		}
 
 		public SearchFactoryImplementor getUninitializedSearchFactory() {
 			return rootFactory;

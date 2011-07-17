@@ -27,8 +27,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.impl.RAMDirectoryProvider;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.RamIndexManager;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,17 +46,17 @@ public class CustomerShardingStrategyTest {
 		shardStrategy = new CustomerShardingStrategy();
 		
 		// initialize w/ 10 shards
-		shardStrategy.initialize( null, new DirectoryProvider[] {
-				new RAMDirectoryProvider(), 
-				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider(),
-				new RAMDirectoryProvider()
+		shardStrategy.initialize( null, new IndexManager[] {
+				new RamIndexManager(), 
+				new RamIndexManager(),
+				new RamIndexManager(),
+				new RamIndexManager(),
+				new RamIndexManager(),
+				new RamIndexManager(),
+				new RamIndexManager(),
+				new RamIndexManager(),
+				new RamIndexManager(),
+				new RamIndexManager()
 		} );
 	}
 
@@ -68,7 +68,7 @@ public class CustomerShardingStrategyTest {
 		filter.setParameter("customerID", 5);
 		
 		// customerID == 5 should correspond to just a single shard instance
-		DirectoryProvider[] providers = shardStrategy.getDirectoryProvidersForQuery(new FullTextFilterImpl[] { filter });
+		IndexManager[] providers = shardStrategy.getDirectoryProvidersForQuery(new FullTextFilterImpl[] { filter });
 		assertTrue(providers.length == 1);
 		
 		// create a dummy document for the same customerID, and make sure the shard it would be

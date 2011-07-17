@@ -23,9 +23,9 @@
  */
 package org.hibernate.search.test.shards;
 
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.RamIndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
-import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,8 +41,8 @@ public class IdShardingStrategyTest {
 	@Before
 	public void setUp() throws Exception {
 		shardStrategy = new IdHashShardingStrategy();
-		shardStrategy.initialize( null, new DirectoryProvider[] {
-				new RAMDirectoryProvider(), new RAMDirectoryProvider() } );
+		shardStrategy.initialize( null, new IndexManager[] {
+				new RamIndexManager(), new RamIndexManager() } );
 	}
 
 	@Test

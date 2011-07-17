@@ -39,6 +39,7 @@ import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.PerDirectoryWorkProcessor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -124,7 +125,7 @@ public class LuceneBatchBackend implements BatchBackend {
 	 */
 	private class AsyncBatchPerDirectoryWorkProcessor implements PerDirectoryWorkProcessor {
 
-		public void addWorkToDpProcessor(DirectoryProvider<?> dp, LuceneWork work) throws InterruptedException {
+		public void addWorkToDpProcessor(IndexManager dp, LuceneWork work) throws InterruptedException {
 			resourcesMap.get( dp ).enqueueAsyncWork( work );
 		}
 		
@@ -135,7 +136,7 @@ public class LuceneBatchBackend implements BatchBackend {
 	 */
 	private class SyncBatchPerDirectoryWorkProcessor implements PerDirectoryWorkProcessor {
 
-		public void addWorkToDpProcessor(DirectoryProvider<?> dp, LuceneWork work) {
+		public void addWorkToDpProcessor(IndexManager dp, LuceneWork work) {
 			resourcesMap.get( dp ).doWorkInSync( work );
 		}
 		

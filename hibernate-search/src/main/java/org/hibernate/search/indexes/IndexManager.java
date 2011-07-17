@@ -22,8 +22,10 @@ package org.hibernate.search.indexes;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.spi.BuildContext;
 
@@ -68,12 +70,27 @@ public interface IndexManager {
 	/**
 	 * Initialize the reader provider before its use.
 	 */
-	void initialize(Properties props, BuildContext context);
+	void initialize(String indexName, Properties props, BuildContext context);
 
 	/**
 	 * Called when a <code>SearchFactory</code> is destroyed. This method typically releases resources.
 	 * It is guaranteed to be executed after readers are released by queries (assuming no user error). 
 	 */
 	void destroy();
+
+	/**
+	 * @return the set of classes being indexed in this Index
+	 */
+	Set<Class<?>> getContainedTypes();
+
+	/**
+	 * 
+	 */
+	Similarity getSimilarity();
+
+	/**
+	 * @param newSimilarity
+	 */
+	void setSimilarity(Similarity newSimilarity);
 
 }

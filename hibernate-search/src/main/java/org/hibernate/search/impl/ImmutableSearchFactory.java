@@ -40,6 +40,7 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
@@ -428,5 +429,10 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public boolean isTransactionManagerExpected() {
 		return this.transactionManagerExpected;
+	}
+
+	@Override
+	public IndexManager getIndexManager(String providerName) {
+		return null;
 	}
 }

@@ -22,20 +22,33 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.store.DirectoryProvider;
 
 /**
+ * First implementation will use the "legacy" DirectoryProvider which served us so well.
+ * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class DefaultIndexManager implements IndexManager {
+public class DirectoryBasedIndexManager implements IndexManager {
+	
+	private String indexName;
+	private final DirectoryProvider directoryProvider;
+	private Similarity similarity;
+	
+	public DirectoryBasedIndexManager(DirectoryProvider directoryProvider) {
+		this.directoryProvider = directoryProvider;
+	}
 
 	@Override
 	public String getIndexName() {
-		return null;
+		return indexName;
 	}
 
 	@Override
@@ -52,11 +65,27 @@ public class DefaultIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void initialize(Properties props, BuildContext context) {
+	public void destroy() {
 	}
 
 	@Override
-	public void destroy() {
+	public void initialize(String indexName, Properties props, BuildContext context) {
+		this.indexName = indexName;
+	}
+
+	@Override
+	public Set<Class<?>> getContainedTypes() {
+		return null;
+	}
+
+	@Override
+	public Similarity getSimilarity() {
+		return similarity;
+	}
+
+	@Override
+	public void setSimilarity(Similarity newSimilarity) {
+		this.similarity = newSimilarity;
 	}
 
 }

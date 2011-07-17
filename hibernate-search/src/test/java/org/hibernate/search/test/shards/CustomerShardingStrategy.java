@@ -30,7 +30,7 @@ import org.apache.lucene.document.Document;
 
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -44,22 +44,23 @@ import org.hibernate.search.store.IndexShardingStrategy;
 public class CustomerShardingStrategy implements IndexShardingStrategy {
 
 	// stored DirectoryProviders in a array indexed by customerID
-	private DirectoryProvider<?>[] providers;
+	private IndexManager[] providers;
 	
-	public void initialize(Properties properties, DirectoryProvider<?>[] providers) {
+	@Override
+	public void initialize(Properties properties, IndexManager[] providers) {
 		this.providers = providers;
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForAllShards() {
+	public IndexManager[] getDirectoryProvidersForAllShards() {
 		return providers;
 	}
 
-	public DirectoryProvider<?> getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		Integer customerID = Integer.parseInt(document.getField("customerID").stringValue());
 		return providers[customerID];
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+	public IndexManager[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return getDirectoryProvidersForAllShards();
 	}
 
@@ -68,13 +69,13 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 	 * can be certain that all the data for a particular customer Filter is in a single
 	 * shard; simply return that shard by customerID.
 	 */
-	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
+	public IndexManager[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
 		FullTextFilter filter = getCustomerFilter(filters, "customer");
 		if (filter == null) {
 			return getDirectoryProvidersForAllShards();
 		}
 		else {
-			return new DirectoryProvider[] { providers[Integer.parseInt(filter.getParameter("customerID").toString())] };
+			return new IndexManager[] { providers[Integer.parseInt(filter.getParameter("customerID").toString())] };
 		}
 	}
 

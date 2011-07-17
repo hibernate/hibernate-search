@@ -23,9 +23,9 @@
  */
 package org.hibernate.search.spi;
 
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * Build context where new built element can be registered.
@@ -33,10 +33,9 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Emmanuel Bernard
  */
 public interface WritableBuildContext extends BuildContext {
-	void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy);
 
-	void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams);
+	void registerIndexManager(String indexName, IndexManager indexManager);
 
-	void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider,
-			boolean exclusiveIndexUsage, int maximumQueueSize);
+	void registerShardingStrategy(XClass entity, IndexShardingStrategy shardingStrategy);
+
 }

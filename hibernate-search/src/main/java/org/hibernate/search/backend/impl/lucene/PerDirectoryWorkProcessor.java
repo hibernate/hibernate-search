@@ -24,7 +24,7 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.IndexManager;
 
 /**
  * Interface to implement visitor pattern in combination
@@ -36,6 +36,6 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 public interface PerDirectoryWorkProcessor {
 	
-	public void addWorkToDpProcessor(DirectoryProvider<?> dp, LuceneWork work) throws InterruptedException;
+	public void addWorkToDpProcessor(IndexManager index, LuceneWork work) throws InterruptedException;
 
 }

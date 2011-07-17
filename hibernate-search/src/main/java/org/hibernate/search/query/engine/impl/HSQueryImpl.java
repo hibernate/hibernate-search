@@ -56,6 +56,7 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -487,7 +488,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 */
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
 		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
-		List<DirectoryProvider> targetedDirectories = new ArrayList<DirectoryProvider>();
+		List<IndexManager> targetedDirectories = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 
 		Similarity searcherSimilarity = null;
@@ -545,10 +546,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		//compute optimization needClassFilterClause
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
 		if ( classesAndSubclasses != null ) {
-			for ( DirectoryProvider dp : targetedDirectories ) {
-				final Set<Class<?>> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider(
-						dp
-				);
+			for ( IndexManager dp : targetedDirectories ) {
+				final Set<Class<?>> classesInDirectoryProvider = dp.getContainedTypes();
 				// if a DP contains only one class, we know for sure it's part of classesAndSubclasses
 				if ( classesInDirectoryProvider.size() > 1 ) {
 					//risk of needClassFilterClause
@@ -618,9 +617,9 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return similarity;
 	}
 
-	private void populateDirectories(List<DirectoryProvider> directories, DocumentBuilderIndexedEntity builder) {
+	private void populateDirectories(List<IndexManager> directories, DocumentBuilderIndexedEntity builder) {
 		final IndexShardingStrategy indexShardingStrategy = builder.getDirectoryProviderSelectionStrategy();
-		final DirectoryProvider[] directoryProviders;
+		final IndexManager[] directoryProviders;
 		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
 			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery(
 					filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] )
@@ -631,7 +630,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery( EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR );
 		}
 
-		for ( DirectoryProvider provider : directoryProviders ) {
+		for ( IndexManager provider : directoryProviders ) {
 			if ( !directories.contains( provider ) ) {
 				directories.add( provider );
 			}

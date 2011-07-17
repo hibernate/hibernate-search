@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
@@ -60,6 +61,8 @@ public interface BuildContext {
 	String getIndexingStrategy();
 
 	Set<DirectoryProvider<?>> getDirectoryProviders();
+	
+	IndexManager getIndexManager(String providerName);
 
 	/**
 	 * This method cannot be used in initialize methods. start methods can use it though.

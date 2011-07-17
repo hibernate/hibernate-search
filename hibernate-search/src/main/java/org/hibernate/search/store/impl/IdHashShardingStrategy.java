@@ -29,7 +29,7 @@ import java.io.Serializable;
 import org.apache.lucene.document.Document;
 
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -39,25 +39,25 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class IdHashShardingStrategy implements IndexShardingStrategy {
 	
-	private DirectoryProvider<?>[] providers;
-	public void initialize(Properties properties, DirectoryProvider<?>[] providers) {
+	private IndexManager[] providers;
+	public void initialize(Properties properties, IndexManager[] providers) {
 		this.providers = providers;
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForAllShards() {
+	public IndexManager[] getDirectoryProvidersForAllShards() {
 		return providers;
 	}
 
-	public DirectoryProvider<?> getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return providers[ hashKey(idInString) ];
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+	public IndexManager[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		if ( idInString == null ) return providers;
-		return new DirectoryProvider[] { providers[hashKey( idInString )] };
+		return new IndexManager[] { providers[hashKey( idInString )] };
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+	public IndexManager[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return getDirectoryProvidersForAllShards();
 	}
 

@@ -39,9 +39,9 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.RamIndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
-import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -62,7 +62,7 @@ public class ShardsTest extends SearchTestCase {
 	}
 
 	public void testIdShardingStrategy() {
-		DirectoryProvider[] dps = new DirectoryProvider[] { new RAMDirectoryProvider(), new RAMDirectoryProvider() };
+		IndexManager[] dps = new IndexManager[] { new RamIndexManager(), new RamIndexManager() };
 		IdHashShardingStrategy shardingStrategy = new IdHashShardingStrategy();
 		shardingStrategy.initialize( null, dps );
 		assertTrue( dps[1] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 1, "1", null ) );

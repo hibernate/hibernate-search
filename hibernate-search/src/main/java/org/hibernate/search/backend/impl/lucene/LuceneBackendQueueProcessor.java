@@ -24,12 +24,10 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
@@ -48,7 +46,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 	
 	private final List<LuceneWork> queue;
 	private final SearchFactoryImplementor searchFactoryImplementor;
-	private final Map<DirectoryProvider<?>,PerDPResources> resourcesMap;
+	private final PerDPResources resources;
 	private final boolean sync;
 	private final ErrorHandler errorHandler;
 	
@@ -57,17 +55,17 @@ class LuceneBackendQueueProcessor implements Runnable {
 
 	LuceneBackendQueueProcessor(List<LuceneWork> queue,
 			SearchFactoryImplementor searchFactoryImplementor,
-			Map<DirectoryProvider<?>,PerDPResources> resourcesMap,
+			PerDPResources resourcesMap,
 			boolean syncMode) {
 		this.sync = syncMode;
 		this.queue = queue;
 		this.searchFactoryImplementor = searchFactoryImplementor;
-		this.resourcesMap = resourcesMap;
+		this.resources = resourcesMap;
 		this.errorHandler = searchFactoryImplementor.getErrorHandler();
 	}
 
 	public void run() {
-		QueueProcessors processors = new QueueProcessors( resourcesMap );
+		QueueProcessors processors = new QueueProcessors( resources );
 		// divide the queue in tasks, adding to QueueProcessors by affected Directory.
 		try {
 			for ( LuceneWork work : queue ) {
@@ -79,7 +77,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 			//this Runnable splits tasks in more runnables and then runs them:
 			processors.runAll( sync );
 		} catch ( Exception e ) {
-			log.backendError( e );	
+			log.backendError( e );
 			ErrorContextBuilder builder = new ErrorContextBuilder();
 			builder.errorThatOccurred( e );
 			errorHandler.handle( builder.createErrorContext() );
