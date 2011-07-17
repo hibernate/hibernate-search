@@ -18,12 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.impl;
+package org.hibernate.search.test.util;
 
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 /**
- * At this point mainly used for tests: TODO review file position and usefulness
+ * At this point mainly used for tests
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class RamIndexManager extends DirectoryBasedIndexManager {

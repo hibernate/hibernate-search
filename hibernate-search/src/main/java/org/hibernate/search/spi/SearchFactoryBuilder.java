@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -44,8 +45,10 @@ import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.impl.MutableEntityIndexMapping;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
@@ -88,12 +91,15 @@ import org.hibernate.search.impl.MappingModelMetadataProvider;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -345,10 +351,8 @@ public class SearchFactoryBuilder {
 	 * Initialize the document builder
 	 * This algorithm seems to be safe for incremental search factories.
 	 */
-
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager, BuildContext buildContext) {
 		ConfigContext context = new ConfigContext( cfg );
-		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
 		initProgrammaticAnalyzers( context, reflectionManager );
 		initProgrammaticallyDefinedFilterDef( reflectionManager );
@@ -357,6 +361,10 @@ public class SearchFactoryBuilder {
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
 		final Map<XClass, Class> classMappings = initializeClassMappings( cfg, reflectionManager );
+		
+		//we process the @Indexed classes last, so we first start all IndexManager(s).
+		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
+		
 		for ( Map.Entry<XClass, Class> mapping : classMappings.entrySet() ) {
 
 			XClass mappedXClass = mapping.getKey();
@@ -369,22 +377,8 @@ public class SearchFactoryBuilder {
 					continue;
 				}
 
-				DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders(
-						mappedXClass, cfg, buildContext, reflectionManager
-				);
-				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
-				//XClass unfortunately is not (yet) genericized: TODO?
-				final DocumentBuilderIndexedEntity<?> documentBuilder =
-						new DocumentBuilderIndexedEntity(
-								mappedXClass,
-								context,
-								providers,
-								reflectionManager,
-								optimizationBlackListedTypes
-						);
-
+				rootIndexedEntities.add( mappedXClass );
 				indexingHierarchy.addIndexedClass( mappedClass );
-				documentBuildersIndexedEntities.put( mappedClass, documentBuilder );
 			}
 			else {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
@@ -400,9 +394,31 @@ public class SearchFactoryBuilder {
 			bindFilterDefs( mappedXClass );
 			//TODO should analyzer def for classes at their same level???
 		}
+		
+		IndexManagerFactory factory = new IndexManagerFactory();
+		// Create all IndexManagers, configure and start them:
+		for ( XClass mappedXClass : rootIndexedEntities ) {
+			MutableEntityIndexMapping mappedEntity = factory.createIndexManagers( mappedXClass, cfg, buildContext, reflectionManager );
+			Class mappedClass = classMappings.get( mappedXClass );
+		
+			// Create all DocumentBuilderIndexedEntity
+			//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
+			//XClass unfortunately is not (yet) genericized: TODO?
+			final DocumentBuilderIndexedEntity<?> documentBuilder =
+					new DocumentBuilderIndexedEntity(
+							mappedXClass,
+							context,
+							mappedEntity,
+							reflectionManager,
+							optimizationBlackListedTypes
+					);
+			mappedEntity.setDocumentBuilderIndexedEntity( documentBuilder );
+
+			documentBuildersIndexedEntities.put( mappedClass, documentBuilder );
+		}
+		
 		disableBlackListedTypesOptimization( classMappings, optimizationBlackListedTypes, documentBuildersIndexedEntities, documentBuildersContainedEntities );
 		factoryState.setAnalyzers( context.initLazyAnalyzers() );
-		factory.startDirectoryProviders();
 	}
 
 	/**
@@ -660,6 +676,22 @@ public class SearchFactoryBuilder {
 		@Override
 		public boolean isTransactionManagerExpected() {
 			return cfg.isTransactionManagerExpected();
+		}
+
+		@Override
+		public IndexManager getIndexManager(String providerName) {
+			//FIXME
+			return null;
+		}
+
+		@Override
+		public void registerIndexManager(String indexName, IndexManager indexManager) {
+			//FIXME
+		}
+
+		@Override
+		public void registerShardingStrategy(XClass entity, IndexShardingStrategy shardingStrategy) {
+			//FIXME
 		}
 
 	}

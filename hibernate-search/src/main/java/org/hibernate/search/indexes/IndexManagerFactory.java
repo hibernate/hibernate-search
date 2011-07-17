@@ -64,7 +64,7 @@ public class IndexManagerFactory {
 	//#getReader() will always return a single "naive" IndexReader.
 	//So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
 	//(for both fieldCaches and cached filters)
-	public void createIndexManagers(XClass entity, SearchConfiguration cfg,
+	public MutableEntityIndexMapping createIndexManagers(XClass entity, SearchConfiguration cfg,
 				WritableBuildContext context,
 				ReflectionManager reflectionManager) {
 		// read the properties
@@ -128,6 +128,8 @@ public class IndexManagerFactory {
 				setSimilarity( similarityInstance, manager );
 			}
 		}
+		
+		return new MutableEntityIndexMapping( shardingStrategy, similarityInstance, providers );
 	}
 	
 	/**

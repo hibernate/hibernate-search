@@ -28,7 +28,7 @@ import org.apache.lucene.document.Field;
 
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.indexes.impl.RamIndexManager;
+import org.hibernate.search.test.util.RamIndexManager;
 
 import org.junit.Before;
 import org.junit.Test;

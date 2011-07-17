@@ -27,11 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.lucene.search.Similarity;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
@@ -90,30 +87,6 @@ public class DirectoryProviderFactory {
 			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
 		}
 		return provider;
-	}
-
-	public static class DirectoryProviders {
-		private final IndexShardingStrategy shardingStrategy;
-		private final DirectoryProvider[] providers;
-		private final Similarity similarity;
-
-		public DirectoryProviders(IndexShardingStrategy shardingStrategy, DirectoryProvider[] providers, Similarity similarity) {
-			this.shardingStrategy = shardingStrategy;
-			this.providers = providers;
-			this.similarity = similarity;
-		}
-
-		public IndexShardingStrategy getSelectionStrategy() {
-			return shardingStrategy;
-		}
-
-		public DirectoryProvider[] getProviders() {
-			return providers;
-		}
-
-		public Similarity getSimilarity() {
-			return similarity;
-		}
 	}
 
 }
