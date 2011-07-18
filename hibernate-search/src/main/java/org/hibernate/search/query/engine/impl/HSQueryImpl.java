@@ -489,7 +489,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 */
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
 		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
-		List<IndexManager> targetedDirectories = new ArrayList<IndexManager>();
+		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 
 		Similarity searcherSimilarity = null;
@@ -512,7 +512,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				}
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateDirectories( targetedDirectories, builder );
+				populateIndexManagers( targetedIndexes, builder );
 			}
 			classesAndSubclasses = null;
 		}
@@ -541,7 +541,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateDirectories( targetedDirectories, builder );
+				populateIndexManagers( targetedIndexes, builder );
 			}
 			this.classesAndSubclasses = involvedClasses;
 		}
@@ -550,12 +550,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		//compute optimization needClassFilterClause
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
 		if ( classesAndSubclasses != null ) {
-			for ( IndexManager dp : targetedDirectories ) {
-				final Set<Class<?>> classesInDirectoryProvider = dp.getContainedTypes();
-				// if a DP contains only one class, we know for sure it's part of classesAndSubclasses
-				if ( classesInDirectoryProvider.size() > 1 ) {
+			for ( IndexManager indexManager : targetedIndexes ) {
+				final Set<Class<?>> classesInIndexManager = indexManager.getContainedTypes();
+				// if an IndexManager contains only one class, we know for sure it's part of classesAndSubclasses
+				if ( classesInIndexManager.size() > 1 ) {
 					//risk of needClassFilterClause
-					for ( Class clazz : classesInDirectoryProvider ) {
+					for ( Class clazz : classesInIndexManager ) {
 						if ( !classesAndSubclasses.contains( clazz ) ) {
 							this.needClassFilterClause = true;
 							break;
@@ -573,8 +573,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		}
 
 		//set up the searcher
-		final DirectoryProvider[] directoryProviders = targetedDirectories.toArray(
-				new DirectoryProvider[targetedDirectories.size()]
+		final DirectoryProvider[] directoryProviders = targetedIndexes.toArray(
+				new DirectoryProvider[targetedIndexes.size()]
 		);
 		IndexSearcher is = new IndexSearcher(
 				searchFactoryImplementor.getReaderProvider().openReader(
@@ -621,22 +621,22 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return similarity;
 	}
 
-	private void populateDirectories(List<IndexManager> directories, DocumentBuilderIndexedEntity builder) {
+	private void populateIndexManagers(List<IndexManager> indexManagersTarget, DocumentBuilderIndexedEntity builder) {
 		final IndexShardingStrategy indexShardingStrategy = builder.getDirectoryProviderSelectionStrategy();
-		final IndexManager[] directoryProviders;
+		final IndexManager[] indexManagersForQuery;
 		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
-			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery(
+			indexManagersForQuery = indexShardingStrategy.getIndexManagersForQuery(
 					filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] )
 			);
 		}
 		else {
 			//no filter get all shards
-			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery( EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR );
+			indexManagersForQuery = indexShardingStrategy.getIndexManagersForQuery( EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR );
 		}
 
-		for ( IndexManager provider : directoryProviders ) {
-			if ( !directories.contains( provider ) ) {
-				directories.add( provider );
+		for ( IndexManager indexManager : indexManagersForQuery ) {
+			if ( !indexManagersTarget.contains( indexManager ) ) {
+				indexManagersTarget.add( indexManager );
 			}
 		}
 	}

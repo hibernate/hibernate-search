@@ -65,8 +65,8 @@ public class ShardsTest extends SearchTestCase {
 		IndexManager[] dps = new IndexManager[] { new RamIndexManager(), new RamIndexManager() };
 		IdHashShardingStrategy shardingStrategy = new IdHashShardingStrategy();
 		shardingStrategy.initialize( null, dps );
-		assertTrue( dps[1] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 1, "1", null ) );
-		assertTrue( dps[0] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 2, "2", null ) );
+		assertTrue( dps[1] == shardingStrategy.getIndexManagersForAddition( Animal.class, 1, "1", null ) );
+		assertTrue( dps[0] == shardingStrategy.getIndexManagersForAddition( Animal.class, 2, "2", null ) );
 	}
 
 	public void testBehavior() throws Exception {

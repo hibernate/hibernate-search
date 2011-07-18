@@ -44,21 +44,21 @@ public class IdHashShardingStrategy implements IndexShardingStrategy {
 		this.providers = providers;
 	}
 
-	public IndexManager[] getDirectoryProvidersForAllShards() {
+	public IndexManager[] getIndexManagersForAllShards() {
 		return providers;
 	}
 
-	public IndexManager getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return providers[ hashKey(idInString) ];
 	}
 
-	public IndexManager[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		if ( idInString == null ) return providers;
 		return new IndexManager[] { providers[hashKey( idInString )] };
 	}
 
-	public IndexManager[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-		return getDirectoryProvidersForAllShards();
+	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+		return getIndexManagersForAllShards();
 	}
 
 	private int hashKey(String key) {

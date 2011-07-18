@@ -54,8 +54,8 @@ public class IdShardingStrategyTest {
 	}
 
 	private void assertAcceptableId(String id) {
-		shardStrategy.getDirectoryProviderForAddition( null, id, id, null );
-		shardStrategy.getDirectoryProvidersForDeletion( null, id, id );
+		shardStrategy.getIndexManagersForAddition( null, id, id, null );
+		shardStrategy.getIndexManagersForDeletion( null, id, id );
 	}
 
 }

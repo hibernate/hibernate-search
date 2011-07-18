@@ -38,19 +38,19 @@ import org.hibernate.search.indexes.IndexManager;
  */
 public class UselessShardingStrategy implements IndexShardingStrategy {
 	
-	public IndexManager getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return null;
 	}
 
-	public IndexManager[] getDirectoryProvidersForAllShards() {
+	public IndexManager[] getIndexManagersForAllShards() {
 		return null;
 	}
 
-	public IndexManager[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return null;
 	}
 
-	public IndexManager[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return null;
 	}
 

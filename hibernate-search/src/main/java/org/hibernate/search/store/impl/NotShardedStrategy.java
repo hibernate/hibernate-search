@@ -46,19 +46,19 @@ public class NotShardedStrategy implements IndexShardingStrategy {
 		}
 	}
 
-	public IndexManager[] getDirectoryProvidersForAllShards() {
+	public IndexManager[] getIndexManagersForAllShards() {
 		return directoryProvider;
 	}
 
-	public IndexManager getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return directoryProvider[0];
 	}
 
-	public IndexManager[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return directoryProvider;
 	}
 
-	public IndexManager[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return directoryProvider;
 	}
 

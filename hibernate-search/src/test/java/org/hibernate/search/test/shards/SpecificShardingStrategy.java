@@ -31,14 +31,14 @@ import org.hibernate.search.store.impl.IdHashShardingStrategy;
 public class SpecificShardingStrategy extends IdHashShardingStrategy {
 
 	@Override
-	public IndexManager[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
+	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] filters) {
 				
 		FullTextFilter filter = getFilter(filters, "shard");
 		if (filter == null) {
-			return getDirectoryProvidersForAllShards();
+			return getIndexManagersForAllShards();
 		}
 		else {
-			return new IndexManager[] { getDirectoryProvidersForAllShards()[Integer.parseInt(filter.getParameter("index").toString())] };
+			return new IndexManager[] { getIndexManagersForAllShards()[Integer.parseInt(filter.getParameter("index").toString())] };
 		}
 	}
 

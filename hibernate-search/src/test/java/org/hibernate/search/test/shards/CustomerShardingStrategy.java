@@ -51,17 +51,17 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 		this.providers = providers;
 	}
 
-	public IndexManager[] getDirectoryProvidersForAllShards() {
+	public IndexManager[] getIndexManagersForAllShards() {
 		return providers;
 	}
 
-	public IndexManager getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		Integer customerID = Integer.parseInt(document.getField("customerID").stringValue());
 		return providers[customerID];
 	}
 
-	public IndexManager[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		return getDirectoryProvidersForAllShards();
+	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
+		return getIndexManagersForAllShards();
 	}
 
 	/**
@@ -69,10 +69,10 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 	 * can be certain that all the data for a particular customer Filter is in a single
 	 * shard; simply return that shard by customerID.
 	 */
-	public IndexManager[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
+	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] filters) {
 		FullTextFilter filter = getCustomerFilter(filters, "customer");
 		if (filter == null) {
-			return getDirectoryProvidersForAllShards();
+			return getIndexManagersForAllShards();
 		}
 		else {
 			return new IndexManager[] { providers[Integer.parseInt(filter.getParameter("customerID").toString())] };

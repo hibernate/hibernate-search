@@ -68,7 +68,7 @@ public class CustomerShardingStrategyTest {
 		filter.setParameter("customerID", 5);
 		
 		// customerID == 5 should correspond to just a single shard instance
-		IndexManager[] providers = shardStrategy.getDirectoryProvidersForQuery(new FullTextFilterImpl[] { filter });
+		IndexManager[] providers = shardStrategy.getIndexManagersForQuery(new FullTextFilterImpl[] { filter });
 		assertTrue(providers.length == 1);
 		
 		// create a dummy document for the same customerID, and make sure the shard it would be
@@ -77,7 +77,7 @@ public class CustomerShardingStrategyTest {
 		document.add(new Field("customerID", "5", Field.Store.NO, Field.Index.NOT_ANALYZED));
 		
 		assertTrue(providers[0].equals(
-			shardStrategy.getDirectoryProviderForAddition(null, null, null, document)
+			shardStrategy.getIndexManagersForAddition(null, null, null, document)
 			));
 	}
 	
