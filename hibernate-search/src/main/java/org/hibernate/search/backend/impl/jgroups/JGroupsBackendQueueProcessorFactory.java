@@ -35,6 +35,7 @@ import org.jgroups.JChannel;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -67,7 +68,8 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 	protected Channel channel = null;
 	protected Address address;
 
-	public void initialize(Properties props, WorkerBuildContext context) {
+	@Override
+	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		JGroupsHelper.verifyIPv4IsPreferred();
 		this.searchFactory = context.getUninitializedSearchFactory();
 

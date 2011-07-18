@@ -31,6 +31,7 @@ import org.jgroups.Receiver;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.indexes.IndexManager;
 
 /**
  * Backend factory used in JGroups clustering mode in master node.
@@ -45,10 +46,12 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 
 	private LuceneBackendQueueProcessorFactory luceneBackendQueueProcessorFactory;
 	private Receiver masterListener;
+	private IndexManager indexManager;
 
 	@Override
-	public void initialize(Properties props, WorkerBuildContext context) {
-		super.initialize( props, context );
+	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+		super.initialize( props, context, indexManager );
+		this.indexManager = indexManager;
 		initLuceneBackendQueueProcessorFactory( props, context );
 		registerMasterListener();
 	}
@@ -65,7 +68,7 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 
 	private void initLuceneBackendQueueProcessorFactory(Properties props, WorkerBuildContext context) {
 		luceneBackendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
-		luceneBackendQueueProcessorFactory.initialize( props, context );
+		luceneBackendQueueProcessorFactory.initialize( props, context, indexManager );
 	}
 
 	public Receiver getMasterListener() {

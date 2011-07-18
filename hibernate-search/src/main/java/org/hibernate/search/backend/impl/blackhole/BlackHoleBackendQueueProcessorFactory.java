@@ -29,6 +29,7 @@ import java.util.Properties;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProces
 		return noOp;
 	}
 
-	public void initialize(Properties props, WorkerBuildContext context) {
+	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		// no-op
 		log.initializedBlackholeBackend();
 	}

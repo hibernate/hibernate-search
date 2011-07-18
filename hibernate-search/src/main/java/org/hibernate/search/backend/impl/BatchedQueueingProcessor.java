@@ -44,6 +44,7 @@ import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcess
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -61,8 +62,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private final int batchSize;
 	private final ExecutorService executorService;
 	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
+	private final IndexManager indexManager;
 
-	public BatchedQueueingProcessor(WorkerBuildContext context, Properties properties) {
+	public BatchedQueueingProcessor(IndexManager indexManager, WorkerBuildContext context, Properties properties) {
+		this.indexManager = indexManager;
 		this.sync = isConfiguredAsSync( properties );
 
 		//default to a simple asynchronous operation
@@ -105,7 +108,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 					backend, BatchedQueueingProcessor.class, "processor"
 			);
 		}
-		backendQueueProcessorFactory.initialize( properties, context );
+		backendQueueProcessorFactory.initialize( properties, context, indexManager );
 		context.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
 	}
 

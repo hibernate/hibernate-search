@@ -23,15 +23,12 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.List;
-import java.util.Set;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
@@ -50,43 +47,27 @@ import org.hibernate.search.store.DirectoryProvider;
 public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 
 	private SearchFactoryImplementor searchFactoryImp;
-	
-	/**
-	 * Contains the Workspace and LuceneWork visitor implementation,
-	 * reused per-DirectoryProvider.
-	 * Both Workspace(s) and LuceneWorkVisitor(s) lifecycle are linked to the backend
-	 * lifecycle (reused and shared by all transactions);
-	 * the LuceneWorkVisitor(s) are stateless, the Workspace(s) are threadsafe.
-	 *
-	 * This read only structure is guarded by a volatile: upon updates of the backend,
-	 * changes should be synchronized in a multithreaded way.
-	 */
-	private volatile Map<DirectoryProvider<?>,PerDPResources> resourcesMap =
-			new HashMap<DirectoryProvider<?>,PerDPResources>();
+	private PerDPResources resources;
 
 	/**
 	 * copy of BatchedQueueingProcessor.sync
 	 */
 	private boolean sync;
 
-	public void initialize(Properties props, WorkerBuildContext context) {
+	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.searchFactoryImp = context.getUninitializedSearchFactory();
 		this.sync = BatchedQueueingProcessor.isConfiguredAsSync( props );
-		for (DirectoryProvider dp : context.getDirectoryProviders() ) {
-			PerDPResources resources = new PerDPResources( context, dp );
-			resourcesMap.put( dp, resources );
-		}
+		//FIXME temporary solution to keep this refactoring "manageable", we now only support DirectoryBasedIndexManager
+		DirectoryProvider directoryProvider = ((org.hibernate.search.indexes.impl.DirectoryBasedIndexManager)indexManager).getDirectoryProvider();
+		resources = new PerDPResources( context, directoryProvider );
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new LuceneBackendQueueProcessor( queue, searchFactoryImp, resourcesMap, sync );
+		return new LuceneBackendQueueProcessor( queue, searchFactoryImp, resources, sync );
 	}
 
 	public void close() {
-		// needs to stop all used ThreadPools and cleanup locks
-		for (PerDPResources res : resourcesMap.values() ) {
-			res.shutdown();
-		}
+		resources.shutdown();
 	}
 	
 }
