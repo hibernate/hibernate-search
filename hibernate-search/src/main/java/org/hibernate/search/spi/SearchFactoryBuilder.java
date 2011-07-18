@@ -43,7 +43,6 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexMapping;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -216,11 +215,13 @@ public class SearchFactoryBuilder {
 		fillSimilarityMapping();
 
 		//update backend
+		/*
+		TODO make sure the backends are properly updated (new instances are started and old ones are disposed)
 		final BackendQueueProcessorFactory backend = factoryState.getBackendQueueProcessorFactory();
 		if ( backend instanceof UpdatableBackendQueueProcessorFactory ) {
 			final UpdatableBackendQueueProcessorFactory updatableBackend = (UpdatableBackendQueueProcessorFactory) backend;
 			updatableBackend.updateDirectoryProviders( factoryState.getDirectoryProviderData().keySet(), buildContext );
-		}
+		}*/
 		//safe for incremental init at least the ShredBufferReaderProvider
 		//this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );

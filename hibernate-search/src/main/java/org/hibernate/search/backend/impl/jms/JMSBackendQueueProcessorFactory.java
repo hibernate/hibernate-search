@@ -25,7 +25,6 @@ package org.hibernate.search.backend.impl.jms;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
 import javax.naming.InitialContext;
@@ -34,16 +33,15 @@ import javax.naming.NamingException;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.impl.JNDIHelper;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class JMSBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
+public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 	private String jmsQueueName;
 	private String jmsConnectionFactoryName;
 	private static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
@@ -61,14 +59,9 @@ public class JMSBackendQueueProcessorFactory implements UpdatableBackendQueuePro
 		prepareJMSTools();
 	}
 
-	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context) {
-		//nothing to do here, this backend is not sensible to directory providers
-	}
-
 	public Runnable getProcessor(List<LuceneWork> queue) {
 		return new JMSBackendQueueProcessor( queue, this );
 	}
-
 
 	public QueueConnectionFactory getJMSFactory() {
 		return factory;
@@ -77,7 +70,6 @@ public class JMSBackendQueueProcessorFactory implements UpdatableBackendQueuePro
 	public Queue getJmsQueue() {
 		return jmsQueue;
 	}
-
 
 	public String getJmsQueueName() {
 		return jmsQueueName;

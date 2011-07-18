@@ -25,12 +25,10 @@ package org.hibernate.search.backend.impl.blackhole;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
-import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -43,7 +41,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class BlackHoleBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
+public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 	
 	private static final Log log = LoggerFactory.make();
 	
@@ -61,11 +59,6 @@ public class BlackHoleBackendQueueProcessorFactory implements UpdatableBackendQu
 	public void close() {
 		// no-op
 		log.closedBlackholeBackend();
-	}
-
-	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context) {
-		//no-op
-		log.updatedDirectoryProviders();
 	}
 
 	private static class NoOp implements Runnable {

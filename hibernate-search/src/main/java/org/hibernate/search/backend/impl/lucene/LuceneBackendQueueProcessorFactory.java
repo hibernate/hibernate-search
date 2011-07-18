@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
@@ -47,7 +47,7 @@ import org.hibernate.search.store.DirectoryProvider;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class LuceneBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
+public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 
 	private SearchFactoryImplementor searchFactoryImp;
 	
@@ -76,24 +76,6 @@ public class LuceneBackendQueueProcessorFactory implements UpdatableBackendQueue
 			PerDPResources resources = new PerDPResources( context, dp );
 			resourcesMap.put( dp, resources );
 		}
-	}
-
-	public void updateDirectoryProviders( Set<DirectoryProvider<?>> providers, WorkerBuildContext context ) {
-		Map<DirectoryProvider<?>,PerDPResources> newResourceMap =
-				new HashMap<DirectoryProvider<?>, PerDPResources>(resourcesMap);
-		for ( DirectoryProvider<?> provider : providers ) {
-			if ( ! resourcesMap.containsKey( provider ) ) {
-				PerDPResources resources = new PerDPResources( context, provider );
-				newResourceMap.put( provider, resources );
-			}
-		}
-		//TODO we could shut them down
-		for ( DirectoryProvider<?> provider : resourcesMap.keySet() ) {
-			if ( ! newResourceMap.containsKey( provider ) ) {
-				throw new SearchException("DirectoryProvider no longer present during SearchFactory update" );
-			}
-		}
-		this.resourcesMap = newResourceMap;
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
