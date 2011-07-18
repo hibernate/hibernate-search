@@ -50,7 +50,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
 
-	Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities();
+	Map<Class<?>, EntityIndexMapping<?>> getDocumentBuildersIndexedEntities();
 
 	<T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType);
 

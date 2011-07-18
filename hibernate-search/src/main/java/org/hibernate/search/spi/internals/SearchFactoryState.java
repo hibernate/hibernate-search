@@ -29,7 +29,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
@@ -50,7 +50,7 @@ public interface SearchFactoryState {
 
 	Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData();
 
-	Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities();
+	Map<Class<?>, EntityIndexMapping<?>> getDocumentBuildersIndexedEntities();
 
 	String getIndexingStrategy();
 

@@ -175,7 +175,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
 	 */
-	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, DirectoryProviderFactory.DirectoryProviders providerWrapper,
+	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, EntityIndexMapping providerWrapper,
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList) {
 		super( clazz, context, providerWrapper.getSimilarity(), reflectionManager, optimizationBlackList );
 		// special case @ProvidedId

@@ -41,6 +41,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.engine.spi.EntityInitializer;
@@ -62,7 +63,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 	
 	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
-	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuilders;
+	private final Map<Class<?>, EntityIndexMapping<?>> documentBuilders;
 	private final MassIndexerProgressMonitor monitor;
 	
 	private final CacheMode cacheMode;
@@ -143,13 +144,14 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 	private void index( Object entity, Session session, EntityInitializer sessionInitializer ) throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
-		DocumentBuilderIndexedEntity docBuilder = documentBuilders.get( clazz );
-		if ( docBuilder == null ) {
+		EntityIndexMapping indexMapping = documentBuilders.get( clazz );
+		if ( indexMapping == null ) {
 			// it might be possible to receive not-indexes subclasses of the currently indexed type;
 			// being not-indexed, we skip them.
 			// FIXME for improved performance: avoid loading them in an early phase.
 			return;
 		}
+		DocumentBuilderIndexedEntity docBuilder = indexMapping.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
 				.setClass(clazz)

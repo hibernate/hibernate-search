@@ -61,6 +61,7 @@ import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -95,7 +96,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities;
+	private final Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
 	private final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData;
@@ -219,7 +220,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return dirProviderData;
 	}
 
-	public Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities() {
+	public Map<Class<?>, EntityIndexMapping<?>> getDocumentBuildersIndexedEntities() {
 		return documentBuildersIndexedEntities;
 	}
 
@@ -294,8 +295,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		if ( clazz == null ) {
 			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
 		}
-
-		DocumentBuilderIndexedEntity<?> builder = documentBuildersIndexedEntities.get( clazz );
+		EntityIndexMapping entityMapping = documentBuildersIndexedEntities.get( clazz );
+		DocumentBuilderIndexedEntity<?> builder = entityMapping.getDocumentBuilder();
 		if ( builder == null ) {
 			throw new IllegalArgumentException(
 					"Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName()

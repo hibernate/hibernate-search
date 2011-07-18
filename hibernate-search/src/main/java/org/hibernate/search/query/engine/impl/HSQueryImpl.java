@@ -47,6 +47,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.StandardFilterKey;
@@ -487,7 +488,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
-		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
 		List<IndexManager> targetedDirectories = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 
@@ -502,7 +503,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				);
 			}
 
-			for ( DocumentBuilderIndexedEntity builder : builders.values() ) {
+			for ( EntityIndexMapping indexMapper : builders.values() ) {
+				DocumentBuilderIndexedEntity<?> builder = indexMapper.getDocumentBuilder();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
@@ -518,18 +520,20 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities.size() );
 			involvedClasses.addAll( indexedTargetedEntities );
 			for ( Class<?> clazz : indexedTargetedEntities ) {
-				DocumentBuilderIndexedEntity<?> builder = builders.get( clazz );
-				if ( builder != null ) {
+				EntityIndexMapping<?> indexMapper = builders.get( clazz );
+				if ( indexMapper != null ) {
+					DocumentBuilderIndexedEntity<?> builder = indexMapper.getDocumentBuilder();
 					involvedClasses.addAll( builder.getMappedSubclasses() );
 				}
 			}
 
 			for ( Class clazz : involvedClasses ) {
-				DocumentBuilderIndexedEntity builder = builders.get( clazz );
+				EntityIndexMapping indexMapper = builders.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
-				if ( builder == null ) {
+				if ( indexMapper == null ) {
 					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
 				}
+				DocumentBuilderIndexedEntity<?> builder = indexMapper.getDocumentBuilder();
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
@@ -564,7 +568,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 		}
 		else {
-			Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+			Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
 			this.classesAndSubclasses = documentBuildersIndexedEntities.keySet();
 		}
 
@@ -892,12 +896,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
 	 */
 	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
-		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
 		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
 		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
 		FieldCacheCollectorFactory anyImplementation = null;
 		for ( Class<?> clazz : classesAndSubclasses ) {
-			DocumentBuilderIndexedEntity<?> docBuilder = builders.get( clazz );
+			EntityIndexMapping<?> docBuilder = builders.get( clazz );
 			FieldCacheCollectorFactory fieldCacheCollectionFactory = docBuilder.getIdFieldCacheCollectionFactory();
 			if ( fieldCacheCollectionFactory == null ) {
 				// some implementation disable it, so we won't use it
