@@ -40,6 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
@@ -279,8 +280,9 @@ public class SearchFactoryBuilder {
 		}
 		fillSimilarityMapping();
 
-		//build back end
-		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext ) );
+		QueueingProcessor queueingProcessor = ;
+		//build worker and back end components
+		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
 		factoryState.setReaderProvider( ReaderProviderFactory.createReaderProvider( cfg, buildContext ) );
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg.getProperties() ) );
 		factoryState.setCacheBitResultsSize(
@@ -686,11 +688,6 @@ public class SearchFactoryBuilder {
 
 		@Override
 		public void registerIndexManager(String indexName, IndexManager indexManager) {
-			//FIXME
-		}
-
-		@Override
-		public void registerShardingStrategy(XClass entity, IndexShardingStrategy shardingStrategy) {
 			//FIXME
 		}
 

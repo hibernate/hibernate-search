@@ -23,9 +23,7 @@
  */
 package org.hibernate.search.spi;
 
-import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * Build context where new built element can be registered.
@@ -35,7 +33,5 @@ import org.hibernate.search.store.IndexShardingStrategy;
 public interface WritableBuildContext extends BuildContext {
 
 	void registerIndexManager(String indexName, IndexManager indexManager);
-
-	void registerShardingStrategy(XClass entity, IndexShardingStrategy shardingStrategy);
 
 }

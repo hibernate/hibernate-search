@@ -50,7 +50,7 @@ public abstract class WorkerFactory {
 		return workerProperties;
 	}
 
-	public static Worker createWorker(SearchConfiguration cfg, WorkerBuildContext context) {
+	public static Worker createWorker(SearchConfiguration cfg, WorkerBuildContext context, QueueingProcessor queueingProcessor) {
 		Properties props = getProperties( cfg );
 		String impl = props.getProperty( Environment.WORKER_SCOPE );
 		Worker worker;
@@ -66,7 +66,7 @@ public abstract class WorkerFactory {
 					impl, WorkerFactory.class, "worker"
 			);
 		}
-		worker.initialize( props, context );
+		worker.initialize( props, context, queueingProcessor );
 		return worker;
 	}
 }

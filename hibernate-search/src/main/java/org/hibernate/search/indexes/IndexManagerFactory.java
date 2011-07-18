@@ -112,7 +112,6 @@ public class IndexManagerFactory {
 		shardingStrategy.initialize(
 				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers
 		);
-		context.registerShardingStrategy( entity, shardingStrategy );
 		
 		//define the Similarity implementation:
 		// warning: it can also be set by an annotation at class level

@@ -26,6 +26,7 @@ package org.hibernate.search.backend.spi;
 import java.util.Properties;
 
 import org.hibernate.search.backend.TransactionContext;
+import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -42,7 +43,7 @@ public interface Worker {
 	 */
 	void performWork(Work<?> work, TransactionContext transactionContext);
 
-	void initialize(Properties props, WorkerBuildContext context);
+	void initialize(Properties props, WorkerBuildContext context, QueueingProcessor queueingProcessor);
 
 	/**
 	 * clean resources

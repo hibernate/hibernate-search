@@ -24,27 +24,12 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
-
-import org.hibernate.annotations.common.util.StringHelper;
-import org.hibernate.search.Environment;
-import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
-import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -58,59 +43,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final boolean sync;
-	private final int batchSize;
-	private final ExecutorService executorService;
-	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
-	private final IndexManager indexManager;
-
-	public BatchedQueueingProcessor(IndexManager indexManager, WorkerBuildContext context, Properties properties) {
-		this.indexManager = indexManager;
-		this.sync = isConfiguredAsSync( properties );
-
-		//default to a simple asynchronous operation
-		int threadPoolSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
-		//no queue limit
-		int queueSize = ConfigurationParseHelper.getIntValue(
-				properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE
-		);
-
-		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_BATCHSIZE, 0 );
-
-		if ( !sync ) {
-			/**
-			 * If the queue limit is reached, the operation is executed by the main thread
-			 */
-			executorService =  Executors.newFixedThreadPool( threadPoolSize, "backend queueing processor", queueSize );
-		}
-		else {
-			executorService = null;
-		}
-		String backend = properties.getProperty( Environment.WORKER_BACKEND );
-		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
-		}
-		else if ( "jms".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new JMSBackendQueueProcessorFactory();
-		}
-		else if ( "blackhole".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new BlackHoleBackendQueueProcessorFactory();
-		}
-		else if ( "jgroupsMaster".equals( backend ) ) {
-				backendQueueProcessorFactory = new MasterJGroupsBackendQueueProcessorFactory();
-		}
-		else if ( "jgroupsSlave".equals( backend ) ) {
-				backendQueueProcessorFactory = new SlaveJGroupsBackendQueueProcessorFactory();
-		}
-		else {
-			backendQueueProcessorFactory = ClassLoaderHelper.instanceFromName(
-					BackendQueueProcessorFactory.class,
-					backend, BatchedQueueingProcessor.class, "processor"
-			);
-		}
-		backendQueueProcessorFactory.initialize( properties, context, indexManager );
-		context.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
-	}
+	private final int batchSize = 0;
+	private final ExecutorService executorService = null;
+	private final BackendQueueProcessorFactory backendQueueProcessorFactory = null;
 
 	public void add(Work work, WorkQueue workQueue) {
 		//don't check for builder it's done in prepareWork
@@ -142,40 +77,11 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			log.trace( sb.toString() );
 		}
 		Runnable processor = backendQueueProcessorFactory.getProcessor( sealedQueue );
-		if ( sync ) {
-			processor.run();
-		}
-		else {
-			executorService.execute( processor );
-		}
+		executorService.execute( processor );
 	}
 
 	public void cancelWorks(WorkQueue workQueue) {
 		workQueue.clear();
-	}
-
-	public void close() {
-		//gracefully stop
-		if ( executorService != null && !executorService.isShutdown() ) {
-			executorService.shutdown();
-			try {
-				executorService.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
-			}
-			catch ( InterruptedException e ) {
-				log.unableToShutdownAsyncronousIndexing( e );
-			}
-		}
-		//and stop the backend
-		backendQueueProcessorFactory.close();
-	}
-
-	/**
-	 * @param properties the configuration to parse
-	 * @return true if the configuration uses sync indexing
-	 */
-	public static boolean isConfiguredAsSync(Properties properties) {
-		// default to sync if none defined
-		return !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
 	}
 
 }

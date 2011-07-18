@@ -30,8 +30,8 @@ import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
@@ -56,7 +56,7 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.searchFactoryImp = context.getUninitializedSearchFactory();
-		this.sync = BatchedQueueingProcessor.isConfiguredAsSync( props );
+		this.sync = BackendFactory.isConfiguredAsSync( props );
 		//FIXME temporary solution to keep this refactoring "manageable", we now only support DirectoryBasedIndexManager
 		DirectoryProvider directoryProvider = ((org.hibernate.search.indexes.impl.DirectoryBasedIndexManager)indexManager).getDirectoryProvider();
 		resources = new PerDPResources( context, directoryProvider );

@@ -93,14 +93,13 @@ public class TransactionalWorker implements Worker {
 		}
 	}
 
-	public void initialize(Properties props, WorkerBuildContext context) {
-		this.queueingProcessor = new BatchedQueueingProcessor( context, props );
+	public void initialize(Properties props, WorkerBuildContext context, QueueingProcessor queueingProcessor) {
+		this.queueingProcessor = queueingProcessor;
 		this.factory = context.getUninitializedSearchFactory();
 		this.transactionExpected = context.isTransactionManagerExpected();
 	}
 
 	public void close() {
-		queueingProcessor.close();
 	}
 
 	public void flushWorks(TransactionContext transactionContext) {
