@@ -26,7 +26,9 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -37,16 +39,17 @@ public class MutableEntityIndexMapping<T> implements EntityIndexMapping<T> {
 	private final IndexShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
 	private DocumentBuilderIndexedEntity<T> documentBuilder;
+	private final IndexManager[] providers;
 
 	/**
 	 * @param shardingStrategy
 	 * @param similarityInstance
 	 * @param providers
 	 */
-	public MutableEntityIndexMapping(IndexShardingStrategy shardingStrategy, Similarity similarityInstance,
-			IndexManager[] providers) {
+	public MutableEntityIndexMapping(IndexShardingStrategy shardingStrategy, Similarity similarityInstance, IndexManager[] providers) {
 				this.shardingStrategy = shardingStrategy;
 				this.similarityInstance = similarityInstance;
+				this.providers = providers;
 	}
 
 	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder) {
@@ -77,6 +80,16 @@ public class MutableEntityIndexMapping<T> implements EntityIndexMapping<T> {
 	@Override
 	public void postInitialize(Set<Class<?>> indexedClasses) {
 		documentBuilder.postInitialize( indexedClasses );
+	}
+
+	@Override
+	public DirectoryProvider[] getDirectoryProviders() {
+		DirectoryProvider[] dps = new DirectoryProvider[providers.length];
+		for ( int i = 0; i < providers.length; i++ ) {
+			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) providers[i];
+			dps[i] = indexManager.getDirectoryProvider();
+		}
+		return null;
 	}
 
 }

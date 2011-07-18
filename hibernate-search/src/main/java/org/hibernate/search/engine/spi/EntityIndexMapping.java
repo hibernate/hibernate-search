@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -59,6 +60,10 @@ public interface EntityIndexMapping<T> {
 	 */
 	void postInitialize(Set<Class<?>> indexedClasses);
 
-	
+	/**
+	 * TO BE REMOVED after succesfull refactoring
+	 * @return
+	 */
+	DirectoryProvider[] getDirectoryProviders();
 
 }

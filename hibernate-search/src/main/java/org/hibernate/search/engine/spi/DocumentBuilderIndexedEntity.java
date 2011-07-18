@@ -97,11 +97,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	private static final Log log = LoggerFactory.make();
 
 	/**
-	 * Arrays of directory providers for the underlying Lucene indexes of the indexed entity.
-	 */
-	private final DirectoryProvider[] directoryProviders;
-
-	/**
 	 * The sharding strategy used for the indexed entity.
 	 */
 	private final IndexShardingStrategy shardingStrategy;
@@ -213,7 +208,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			);
 		}
 		this.entityState = EntityState.INDEXED;
-		this.directoryProviders = providerWrapper.getProviders();
 		this.shardingStrategy = providerWrapper.getSelectionStrategy();
 		this.identifierName = idProvided ? null : idGetter.getName();
 	}
@@ -625,13 +619,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return identifierName;
 	}
 	
-	public DirectoryProvider[] getDirectoryProviders() {
-		if ( getEntityState() != EntityState.INDEXED ) {
-			throw new AssertionFailure( "Contained in only entity: getDirectoryProvider should not have been called." );
-		}
-		return directoryProviders;
-	}
-
 	public IndexShardingStrategy getDirectoryProviderSelectionStrategy() {
 		if ( getEntityState() != EntityState.INDEXED ) {
 			throw new AssertionFailure(

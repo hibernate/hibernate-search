@@ -88,4 +88,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.similarity = newSimilarity;
 	}
 
+	public DirectoryProvider getDirectoryProvider() {
+		return directoryProvider;
+	}
+
 }

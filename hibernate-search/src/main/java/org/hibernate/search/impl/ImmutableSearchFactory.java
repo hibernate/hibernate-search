@@ -263,8 +263,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
-		DocumentBuilderIndexedEntity<?> documentBuilder = getDocumentBuilderIndexedEntity( entity );
-		return documentBuilder == null ? null : documentBuilder.getDirectoryProviders();
+		EntityIndexMapping<?> entityIndexMapping = this.documentBuildersIndexedEntities.get( entity );
+		return entityIndexMapping == null ? null : entityIndexMapping.getDirectoryProviders();
 	}
 
 	public void optimize() {
