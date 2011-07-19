@@ -29,7 +29,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -62,8 +62,11 @@ public class LuceneBatchBackend implements BatchBackend {
 	private final PerDirectoryWorkProcessor asyncWorker = new AsyncBatchPerDirectoryWorkProcessor();
 	private final PerDirectoryWorkProcessor syncWorker = new SyncBatchPerDirectoryWorkProcessor();
 
+	private Map<Class<?>, EntityIndexMapping<?>> indexMappers;
+
 	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, WorkerBuildContext context) {
 		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
+		indexMappers = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
 		final int maxThreadsPerIndex = definedIndexWriters( cfg );
 		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
 		for ( DirectoryProvider<?> dp : context.getDirectoryProviders() ) {
@@ -77,13 +80,7 @@ public class LuceneBatchBackend implements BatchBackend {
 	}
 
 	public void doWorkInSync(LuceneWork work) {
-		try {
-			sendWorkToShards( work, syncWorker );
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			//doesn't happen, see SyncBatchPerDirectoryWorkProcessor below: is missing the throws.
-			throw new SearchException( "AssertionFailure" );
-		}
+		sendWorkToShards( work, syncWorker );
 	}
 
 	/**
@@ -113,11 +110,11 @@ public class LuceneBatchBackend implements BatchBackend {
 		}
 	}
 	
-	private void sendWorkToShards(LuceneWork work, PerDirectoryWorkProcessor worker) throws InterruptedException {
+	private void sendWorkToShards(LuceneWork work, PerDirectoryWorkProcessor worker) {
 		final Class<?> entityType = work.getEntityClass();
-		DocumentBuilderIndexedEntity<?> documentBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityType );
-		IndexShardingStrategy shardingStrategy = documentBuilder.getDirectoryProviderSelectionStrategy();
-		work.getWorkDelegate( providerSelectionVisitor ).addAsPayLoadsToQueue( work, shardingStrategy, worker );
+		EntityIndexMapping<?> entityIndexMapping = indexMappers.get( entityType );
+		IndexShardingStrategy shardingStrategy = entityIndexMapping.getSelectionStrategy();
+		work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy );
 	}
 
 	/**

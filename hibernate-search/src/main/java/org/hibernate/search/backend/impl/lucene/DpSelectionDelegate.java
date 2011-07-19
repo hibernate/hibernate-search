@@ -38,7 +38,6 @@ public interface DpSelectionDelegate {
 	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories. 
 	 * @throws InterruptedException 
 	 */
-	void addAsPayLoadsToQueue(LuceneWork work,
-			IndexShardingStrategy shardingStrategy, PerDirectoryWorkProcessor queues) throws InterruptedException;
+	public void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy);
 
 }

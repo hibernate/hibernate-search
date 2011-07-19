@@ -24,11 +24,13 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.Map;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
 import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -44,8 +46,15 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private static final Log log = LoggerFactory.make();
 
 	private final int batchSize = 0;
-	private final ExecutorService executorService = null;
-	private final BackendQueueProcessorFactory backendQueueProcessorFactory = null;
+//	private final ExecutorService executorService = null;
+//	private final BackendQueueProcessorFactory backendQueueProcessorFactory = null;
+	private static final DpSelectionVisitor providerSelectionVisitor = new DpSelectionVisitor();
+
+	private final Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
+
+	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities) {
+		this.documentBuildersIndexedEntities = documentBuildersIndexedEntities;
+	}
 
 	public void add(Work work, WorkQueue workQueue) {
 		//don't check for builder it's done in prepareWork
@@ -65,7 +74,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	public void performWorks(WorkQueue workQueue) {
 		List<LuceneWork> sealedQueue = workQueue.getSealedQueue();
 		if ( log.isTraceEnabled() ) {
-			StringBuilder sb = new StringBuilder( "Lucene WorkQueue to send to backend:[ \n\t" );
+			StringBuilder sb = new StringBuilder( "Lucene WorkQueue to send to backends:[ \n\t" );
 			for ( LuceneWork lw : sealedQueue ) {
 				sb.append( lw.toString() );
 				sb.append( "\n\t" );
@@ -76,8 +85,12 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			sb.append( "]" );
 			log.trace( sb.toString() );
 		}
-		Runnable processor = backendQueueProcessorFactory.getProcessor( sealedQueue );
-		executorService.execute( processor );
+		for ( LuceneWork work : sealedQueue ) {
+			final Class<?> entityType = work.getEntityClass();
+			EntityIndexMapping<?> entityIndexMapping = documentBuildersIndexedEntities.get( entityType );
+			IndexShardingStrategy shardingStrategy = entityIndexMapping.getSelectionStrategy();
+			work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy );
+		}
 	}
 
 	public void cancelWorks(WorkQueue workQueue) {

@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.indexes.impl;
 
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -61,10 +60,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void applyIndexOperations(List<LuceneWork> queue) {
-	}
-
-	@Override
 	public void destroy() {
 	}
 
@@ -90,6 +85,10 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	public DirectoryProvider getDirectoryProvider() {
 		return directoryProvider;
+	}
+
+	@Override
+	public void performOperation(LuceneWork work) {
 	}
 
 }

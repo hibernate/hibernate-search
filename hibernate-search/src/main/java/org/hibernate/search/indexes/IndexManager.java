@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.indexes;
 
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -65,7 +64,7 @@ public interface IndexManager {
 	 * Operations can be applied in sync or async, depending on the IndexManager implementation and configuration.
 	 * @param queue the list of write operations to apply.
 	 */
-	void applyIndexOperations(List<LuceneWork> queue);
+	void performOperation(LuceneWork work);
 	
 	/**
 	 * Initialize the reader provider before its use.

@@ -40,6 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
@@ -98,7 +99,6 @@ import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -280,7 +280,7 @@ public class SearchFactoryBuilder {
 		}
 		fillSimilarityMapping();
 
-		QueueingProcessor queueingProcessor = ;
+		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities );
 		//build worker and back end components
 		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
 		factoryState.setReaderProvider( ReaderProviderFactory.createReaderProvider( cfg, buildContext ) );
