@@ -66,7 +66,7 @@ public class LuceneBatchBackend implements BatchBackend {
 
 	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, WorkerBuildContext context) {
 		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
-		indexMappers = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+		indexMappers = searchFactoryImplementor.getIndexMappingForEntity();
 		final int maxThreadsPerIndex = definedIndexWriters( cfg );
 		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
 		for ( DirectoryProvider<?> dp : context.getDirectoryProviders() ) {

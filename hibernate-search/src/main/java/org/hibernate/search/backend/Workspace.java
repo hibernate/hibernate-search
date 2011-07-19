@@ -115,7 +115,7 @@ public class Workspace {
 	}
 
 	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {
-		return searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity ).getDocumentBuilder();
+		return searchFactoryImplementor.getIndexMappingForEntity( entity ).getDocumentBuilder();
 	}
 
 	public Analyzer getAnalyzer(String name) {

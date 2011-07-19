@@ -466,7 +466,7 @@ public class WorkPlan {
 	 * @return the DocumentBuilder for this type
 	 */
 	private static <T> AbstractDocumentBuilder<T> getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor, Class entityClass) {
-		EntityIndexMapping indexMapping = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
+		EntityIndexMapping indexMapping = searchFactoryImplementor.getIndexMappingForEntity( entityClass );
 		if ( indexMapping == null ) {
 			DocumentBuilderContainedEntity entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity( entityClass );
 			if ( entityBuilder == null ) {

@@ -176,7 +176,7 @@ class FacetBuildingContext<T> {
 			throw new IllegalArgumentException( "null is an invalid field name" );
 		}
 
-		EntityIndexMapping<?> indexMapping = factory.getDocumentBuilderIndexedEntity( entityType );
+		EntityIndexMapping<?> indexMapping = factory.getIndexMappingForEntity( entityType );
 		if ( indexMapping == null ) {
 			throw new SearchException(
 					"Entity " + entityType.getName()

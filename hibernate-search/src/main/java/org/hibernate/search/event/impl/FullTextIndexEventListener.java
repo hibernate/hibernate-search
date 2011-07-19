@@ -130,7 +130,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
 		if ( "event".equals( indexingStrategy ) ) {
-			used = searchFactoryImplementor.getDocumentBuildersIndexedEntities().size() != 0;
+			used = searchFactoryImplementor.getIndexMappingForEntity().size() != 0;
 		}
 		else if ( "manual".equals( indexingStrategy ) ) {
 			used = false;
@@ -315,7 +315,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	private AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
 		Class<?> clazz = entity.getClass();
-		EntityIndexMapping<?> indexMapping = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
+		EntityIndexMapping<?> indexMapping = searchFactoryImplementor.getIndexMappingForEntity( clazz );
 		if ( indexMapping != null ) {
 			return indexMapping.getDocumentBuilder();
 		}

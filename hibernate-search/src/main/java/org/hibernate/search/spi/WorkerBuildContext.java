@@ -60,7 +60,7 @@ public interface WorkerBuildContext extends BuildContext {
 
 	ErrorHandler getErrorHandler();
 
-	<T> EntityIndexMapping<T> getDocumentBuilderIndexedEntity(Class<T> managedType);
+	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> managedType);
 	
 	/**
 	 * @see org.hibernate.search.cfg.spi.SearchConfiguration#isTransactionManagerExpected

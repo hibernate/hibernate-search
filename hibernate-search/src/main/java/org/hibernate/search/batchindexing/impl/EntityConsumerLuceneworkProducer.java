@@ -84,7 +84,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 		this.producerEndSignal = producerEndSignal;
 		this.cacheMode = cacheMode;
 		this.backend = backend;
-		this.documentBuilders = searchFactory.getDocumentBuildersIndexedEntities();
+		this.documentBuilders = searchFactory.getIndexMappingForEntity();
 	}
 
 	public void run(Session upperSession) {

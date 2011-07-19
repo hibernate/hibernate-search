@@ -190,7 +190,7 @@ public final class DocumentBuilderHelper {
 	}
 	
 	private static DocumentBuilderIndexedEntity<?> getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		EntityIndexMapping<?> indexMapping = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
+		EntityIndexMapping<?> indexMapping = searchFactoryImplementor.getIndexMappingForEntity(
 				clazz
 		);
 		if ( indexMapping == null ) {

@@ -50,7 +50,7 @@ public interface SearchFactoryState {
 
 	Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData();
 
-	Map<Class<?>, EntityIndexMapping<?>> getDocumentBuildersIndexedEntities();
+	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
 
 	String getIndexingStrategy();
 

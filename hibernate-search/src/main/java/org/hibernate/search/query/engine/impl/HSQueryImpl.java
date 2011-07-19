@@ -488,7 +488,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
-		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getIndexMappingForEntity();
 		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 
@@ -568,7 +568,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 		}
 		else {
-			Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+			Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getIndexMappingForEntity();
 			this.classesAndSubclasses = documentBuildersIndexedEntities.keySet();
 		}
 
@@ -896,7 +896,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
 	 */
 	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
-		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getIndexMappingForEntity();
 		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
 		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
 		FieldCacheCollectorFactory anyImplementation = null;

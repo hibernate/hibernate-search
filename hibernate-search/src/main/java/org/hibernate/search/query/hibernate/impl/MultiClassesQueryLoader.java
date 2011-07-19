@@ -67,7 +67,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		//     root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.size() == 0 ) {
 			//support all classes
-			for( Map.Entry<Class<?>, EntityIndexMapping<?>> entry : searchFactoryImplementor.getDocumentBuildersIndexedEntities().entrySet() ) {
+			for( Map.Entry<Class<?>, EntityIndexMapping<?>> entry : searchFactoryImplementor.getIndexMappingForEntity().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().getDocumentBuilder().isRoot() ) {
 					safeEntityTypes.add( entry.getKey() );
@@ -152,7 +152,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 
 		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor) {
 			this.rootEntity = rootEntity;
-			EntityIndexMapping<?> provider = searchFactoryImplementor.getDocumentBuilderIndexedEntity( rootEntity );
+			EntityIndexMapping<?> provider = searchFactoryImplementor.getIndexMappingForEntity( rootEntity );
 			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
 			this.mappedSubclasses = provider.getDocumentBuilder().getMappedSubclasses();
 			this.criteria = null; //default

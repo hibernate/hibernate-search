@@ -69,7 +69,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
-		documentBuildersIndexedEntities = oldFactoryState.getDocumentBuildersIndexedEntities();
+		documentBuildersIndexedEntities = oldFactoryState.getIndexMappingForEntity();
 		documentBuildersContainedEntities = oldFactoryState.getDocumentBuildersContainedEntities();
 		directoryProviderData = oldFactoryState.getDirectoryProviderData();
 		worker = oldFactoryState.getWorker();
@@ -103,7 +103,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return directoryProviderData;
 	}
 
-	public Map<Class<?>, EntityIndexMapping<?>> getDocumentBuildersIndexedEntities() {
+	public Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity() {
 		return documentBuildersIndexedEntities;
 	}
 

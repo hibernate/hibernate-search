@@ -96,7 +96,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
+	private final Map<Class<?>, EntityIndexMapping<?>> indexMappingsForEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
 	private final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData;
@@ -129,7 +129,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.configurationProperties = state.getConfigurationProperties();
 		this.dirProviderData = state.getDirectoryProviderData();
 		this.dirProviderIndexingParams = state.getDirectoryProviderIndexingParams();
-		this.documentBuildersIndexedEntities = state.getDocumentBuildersIndexedEntities();
+		this.indexMappingsForEntities = state.getIndexMappingForEntity();
 		this.documentBuildersContainedEntities = state.getDocumentBuildersContainedEntities();
 		this.errorHandler = state.getErrorHandler();
 		this.filterCachingStrategy = state.getFilterCachingStrategy();
@@ -220,13 +220,13 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return dirProviderData;
 	}
 
-	public Map<Class<?>, EntityIndexMapping<?>> getDocumentBuildersIndexedEntities() {
-		return documentBuildersIndexedEntities;
+	public Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity() {
+		return indexMappingsForEntities;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> EntityIndexMapping<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-		return (EntityIndexMapping<T>) documentBuildersIndexedEntities.get( entityType );
+	public <T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType) {
+		return (EntityIndexMapping<T>) indexMappingsForEntities.get( entityType );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -263,19 +263,19 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
-		EntityIndexMapping<?> entityIndexMapping = this.documentBuildersIndexedEntities.get( entity );
+		EntityIndexMapping<?> entityIndexMapping = this.indexMappingsForEntities.get( entity );
 		return entityIndexMapping == null ? null : entityIndexMapping.getDirectoryProviders();
 	}
 
 	public void optimize() {
-		Set<Class<?>> clazzs = getDocumentBuildersIndexedEntities().keySet();
+		Set<Class<?>> clazzs = getIndexMappingForEntity().keySet();
 		for ( Class clazz : clazzs ) {
 			optimize( clazz );
 		}
 	}
 
 	public void optimize(Class entityType) {
-		if ( !getDocumentBuildersIndexedEntities().containsKey( entityType ) ) {
+		if ( !getIndexMappingForEntity().containsKey( entityType ) ) {
 			throw new SearchException( "Entity not indexed: " + entityType );
 		}
 		List<LuceneWork> queue = new ArrayList<LuceneWork>( 1 );
@@ -295,7 +295,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		if ( clazz == null ) {
 			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
 		}
-		EntityIndexMapping entityMapping = documentBuildersIndexedEntities.get( clazz );
+		EntityIndexMapping entityMapping = indexMappingsForEntities.get( clazz );
 		DocumentBuilderIndexedEntity<?> builder = entityMapping.getDocumentBuilder();
 		if ( builder == null ) {
 			throw new IllegalArgumentException(

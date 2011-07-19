@@ -54,7 +54,7 @@ public class LuceneFullTextManager implements FullTextManager {
 	}
 
 	public <T> T get(Class<T> entityType, Serializable id) {
-		final EntityIndexMapping<?> indexMapping = searchFactory.getDocumentBuilderIndexedEntity( entityType );
+		final EntityIndexMapping<?> indexMapping = searchFactory.getIndexMappingForEntity( entityType );
 		if ( indexMapping == null ) {
 			String msg = "Entity to retrueve is not an @Indexed entity: " + entityType.getClass().getName();
 			throw new IllegalArgumentException( msg );
@@ -97,7 +97,7 @@ public class LuceneFullTextManager implements FullTextManager {
 		Class<?> clazz = getClass( entity );
 		//TODO cache that at the FTSession level
 		//not strictly necessary but a small optimization
-		final EntityIndexMapping<?> indexMapping = searchFactory.getDocumentBuilderIndexedEntity( clazz );
+		final EntityIndexMapping<?> indexMapping = searchFactory.getIndexMappingForEntity( clazz );
 		if ( indexMapping == null ) {
 			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
 			throw new IllegalArgumentException( msg );
