@@ -30,6 +30,7 @@ import org.apache.lucene.document.Document;
 
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -61,14 +62,7 @@ public final class DocumentBuilderHelper {
 	}
 
 	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document) {
-		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				clazz
-		);
-		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz );
-		}
-
-
+		final DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder( searchFactoryImplementor, clazz );
 		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
 		final String fieldName = builderIndexedEntity.getIdKeywordName();
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
@@ -81,22 +75,12 @@ public final class DocumentBuilderHelper {
 	}
 
 	public static String getDocumentIdName(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				clazz
-		);
-		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz );
-		}
-		return builderIndexedEntity.getIdentifierName();
+		DocumentBuilderIndexedEntity<?> documentBuilder = getDocumentBuilder( searchFactoryImplementor, clazz );
+		return documentBuilder.getIdentifierName();
 	}
 
 	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields) {
-		DocumentBuilderIndexedEntity<?> builderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				clazz
-		);
-		if ( builderIndexedEntity == null ) {
-			throw new SearchException( "No Lucene configuration set up for: " + clazz );
-		}
+		DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder( searchFactoryImplementor, clazz );
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
@@ -203,6 +187,16 @@ public final class DocumentBuilderHelper {
 			}
 		}
 		return -1;
+	}
+	
+	private static DocumentBuilderIndexedEntity<?> getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
+		EntityIndexMapping<?> indexMapping = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
+				clazz
+		);
+		if ( indexMapping == null ) {
+			throw new SearchException( "No Lucene configuration set up for: " + clazz );
+		}
+		return indexMapping.getDocumentBuilder();
 	}
 }
 

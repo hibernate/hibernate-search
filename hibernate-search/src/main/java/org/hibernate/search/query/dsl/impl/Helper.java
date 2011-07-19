@@ -37,6 +37,7 @@ import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 /**
@@ -99,10 +100,10 @@ class Helper {
 	static DocumentBuilderIndexedEntity<?> getDocumentBuilder(QueryBuildingContext queryContext) {
 		final SearchFactoryImplementor factory = queryContext.getFactory();
 		final Class<?> type = queryContext.getEntityType();
-		DocumentBuilderIndexedEntity<?> builder = factory.getDocumentBuilderIndexedEntity( type );
-		if ( builder == null ) {
+		EntityIndexMapping<?> indexMapping = factory.getDocumentBuilderIndexedEntity( type );
+		if ( indexMapping == null ) {
 			throw new AssertionFailure( "Class in not indexed: " + type );
 		}
-		return builder;
+		return indexMapping.getDocumentBuilder();
 	}
 }

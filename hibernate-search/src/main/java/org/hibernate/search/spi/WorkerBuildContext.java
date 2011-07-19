@@ -29,7 +29,7 @@ import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.DirectoryProvider;
@@ -60,7 +60,7 @@ public interface WorkerBuildContext extends BuildContext {
 
 	ErrorHandler getErrorHandler();
 
-	<T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> managedType);
+	<T> EntityIndexMapping<T> getDocumentBuilderIndexedEntity(Class<T> managedType);
 	
 	/**
 	 * @see org.hibernate.search.cfg.spi.SearchConfiguration#isTransactionManagerExpected

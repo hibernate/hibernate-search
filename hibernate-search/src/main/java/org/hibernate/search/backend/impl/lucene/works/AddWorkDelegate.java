@@ -30,6 +30,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -61,10 +62,9 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		final Class<?> entityType = work.getEntityClass();
-		@SuppressWarnings("unchecked")
-		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( entityType );
+		DocumentBuilderIndexedEntity<?> indexMapping = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
-		ScopedAnalyzer analyzer = documentBuilder.getAnalyzer();
+		ScopedAnalyzer analyzer = indexMapping.getAnalyzer();
 		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap );
 		if ( log.isTraceEnabled() ) {
 			log.trace(

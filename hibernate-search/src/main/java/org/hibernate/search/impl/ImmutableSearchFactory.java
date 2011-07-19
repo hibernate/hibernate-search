@@ -225,8 +225,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-		return (DocumentBuilderIndexedEntity<T>) documentBuildersIndexedEntities.get( entityType );
+	public <T> EntityIndexMapping<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
+		return (EntityIndexMapping<T>) documentBuildersIndexedEntities.get( entityType );
 	}
 
 	@SuppressWarnings("unchecked")

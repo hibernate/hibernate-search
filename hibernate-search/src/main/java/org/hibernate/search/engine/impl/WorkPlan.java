@@ -37,6 +37,8 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
+import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -464,15 +466,20 @@ public class WorkPlan {
 	 * @return the DocumentBuilder for this type
 	 */
 	private static <T> AbstractDocumentBuilder<T> getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor, Class entityClass) {
-		AbstractDocumentBuilder<T> entityBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
-		if ( entityBuilder == null ) {
-			entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity( entityClass );
+		EntityIndexMapping indexMapping = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityClass );
+		if ( indexMapping == null ) {
+			DocumentBuilderContainedEntity entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity( entityClass );
 			if ( entityBuilder == null ) {
 				// should never happen but better be safe than sorry
 				throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass );
 			}
+			else {
+				return entityBuilder;
+			}
 		}
-		return entityBuilder;
+		else {
+			return indexMapping.getDocumentBuilder();
+		}
 	}
 
 }

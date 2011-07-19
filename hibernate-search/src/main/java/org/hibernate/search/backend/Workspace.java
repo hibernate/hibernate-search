@@ -39,6 +39,7 @@ import org.apache.lucene.util.Version;
 
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -113,8 +114,8 @@ public class Workspace {
 		writerConfig.setSimilarity( similarity );
 	}
 
-	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilder(Class<T> entity) {
-		return searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity );
+	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {
+		return searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity ).getDocumentBuilder();
 	}
 
 	public Analyzer getAnalyzer(String name) {

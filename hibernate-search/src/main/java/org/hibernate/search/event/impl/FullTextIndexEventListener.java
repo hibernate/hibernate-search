@@ -36,6 +36,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -314,11 +315,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	private AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
 		Class<?> clazz = entity.getClass();
-		AbstractDocumentBuilder documentBuilderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				clazz
-		);
-		if ( documentBuilderIndexedEntity != null ) {
-			return documentBuilderIndexedEntity;
+		EntityIndexMapping<?> indexMapping = searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz );
+		if ( indexMapping != null ) {
+			return indexMapping.getDocumentBuilder();
 		}
 		else {
 			return searchFactoryImplementor.getDocumentBuilderContainedEntity( clazz );

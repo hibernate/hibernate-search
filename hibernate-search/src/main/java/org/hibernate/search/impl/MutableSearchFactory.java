@@ -93,7 +93,7 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getDocumentBuildersIndexedEntities();
 	}
 
-	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
+	public <T> EntityIndexMapping<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
 		return delegate.getDocumentBuilderIndexedEntity( entityType );
 	}
 

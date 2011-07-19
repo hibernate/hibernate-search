@@ -33,7 +33,6 @@ import java.util.Set;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -153,9 +152,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 
 		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor) {
 			this.rootEntity = rootEntity;
-			DocumentBuilderIndexedEntity<?> provider = searchFactoryImplementor.getDocumentBuilderIndexedEntity( rootEntity );
+			EntityIndexMapping<?> provider = searchFactoryImplementor.getDocumentBuilderIndexedEntity( rootEntity );
 			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
-			this.mappedSubclasses = provider.getMappedSubclasses();
+			this.mappedSubclasses = provider.getDocumentBuilder().getMappedSubclasses();
 			this.criteria = null; //default
 		}
 	}

@@ -670,9 +670,8 @@ public class SearchFactoryBuilder {
 		}
 
 		@SuppressWarnings("unchecked")
-		public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-			return (DocumentBuilderIndexedEntity<T>) factoryState.getDocumentBuildersIndexedEntities()
-					.get( entityType );
+		public <T> EntityIndexMapping<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
+			return (EntityIndexMapping<T>) factoryState.getDocumentBuildersIndexedEntities().get( entityType );
 		}
 
 		@Override

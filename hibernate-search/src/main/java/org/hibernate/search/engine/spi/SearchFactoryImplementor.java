@@ -52,7 +52,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 
 	Map<Class<?>, EntityIndexMapping<?>> getDocumentBuildersIndexedEntities();
 
-	<T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType);
+	<T> EntityIndexMapping<T> getDocumentBuilderIndexedEntity(Class<T> entityType);
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
 
