@@ -20,14 +20,19 @@
  */
 package org.hibernate.search.indexes.impl;
 
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
+import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
@@ -40,6 +45,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private String indexName;
 	private final DirectoryProvider directoryProvider;
 	private Similarity similarity;
+	private ExecutorService backendExecutor;
+	private BackendQueueProcessorFactory backend;
 	
 	public DirectoryBasedIndexManager(DirectoryProvider directoryProvider) {
 		this.directoryProvider = directoryProvider;
@@ -64,8 +71,10 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void initialize(String indexName, Properties props, BuildContext context) {
+	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
+		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
+		backend = BackendFactory.createBackend( this, buildContext, cfg );
 	}
 
 	@Override
@@ -89,6 +98,15 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void performOperation(LuceneWork work) {
+		ArrayList<LuceneWork> list = new ArrayList<LuceneWork>(1);
+		list.add( work );
+		Runnable runnable = backend.getProcessor( list );
+		backendExecutor.execute( runnable );
+	}
+
+	@Override
+	public DirectoryProviderData getDirectoryProviderData() {
+		return null;
 	}
 
 }

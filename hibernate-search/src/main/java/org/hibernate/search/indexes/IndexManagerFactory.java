@@ -20,6 +20,8 @@
  */
 package org.hibernate.search.indexes;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.lucene.search.Similarity;
@@ -32,7 +34,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexMapping;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.WritableBuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.impl.DirectoryProviderFactory;
@@ -53,6 +55,12 @@ public class IndexManagerFactory {
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 	
+	private final Map<String, IndexManager> indexManagersRegistry;
+	
+	public IndexManagerFactory() {
+		this.indexManagersRegistry = new HashMap<String, IndexManager>();
+	}
+	
 	/**
 	 * Multiple IndexManager might be built for the same entity to implement Sharding.
 	 * @return a map of created IndexManagers, having as key the names of each index.
@@ -66,7 +74,7 @@ public class IndexManagerFactory {
 	//So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
 	//(for both fieldCaches and cached filters)
 	public MutableEntityIndexMapping createIndexManagers(XClass entity, SearchConfiguration cfg,
-				WritableBuildContext context,
+				WorkerBuildContext context,
 				ReflectionManager reflectionManager) {
 		// read the properties
 		String directoryProviderName = getDirectoryProviderName( entity, cfg );
@@ -79,14 +87,14 @@ public class IndexManagerFactory {
 			String providerName = nbrOfProviders > 1 ?
 					directoryProviderName + "." + index :
 					directoryProviderName;
-			IndexManager indexManager = context.getIndexManager(providerName);
+			IndexManager indexManager = indexManagersRegistry.get( providerName );
 			if ( indexManager == null ) {
 				indexManager = createDirectoryManager(
 					providerName, indexProps[index],
 					reflectionManager.toClass( entity ),
 					context
 						);
-				context.registerIndexManager( providerName, indexManager );
+				indexManagersRegistry.put( providerName, indexManager );
 			}
 			providers[index] = indexManager;
 		}
@@ -150,7 +158,7 @@ public class IndexManagerFactory {
 	}
 
 	//FIXME for now we only build "legacy" DirectoryBasedIndexManager
-	private IndexManager createDirectoryManager(String indexName, Properties indexProps, Class<?> entity, WritableBuildContext context) {
+	private IndexManager createDirectoryManager(String indexName, Properties indexProps, Class<?> entity, WorkerBuildContext context) {
 		DirectoryProvider<?> provider = DirectoryProviderFactory.createDirectoryProvider ( indexName, indexProps, context );
 		
 		DirectoryBasedIndexManager manager = new DirectoryBasedIndexManager( provider );

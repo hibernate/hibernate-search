@@ -23,8 +23,6 @@
  */
 package org.hibernate.search.spi;
 
-import org.hibernate.search.indexes.IndexManager;
-
 /**
  * Build context where new built element can be registered.
  * 
@@ -32,6 +30,5 @@ import org.hibernate.search.indexes.IndexManager;
  */
 public interface WritableBuildContext extends BuildContext {
 
-	void registerIndexManager(String indexName, IndexManager indexManager);
 
 }

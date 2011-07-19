@@ -66,7 +66,7 @@ class DirectoryProviderWorkspace {
 			throw new IllegalArgumentException( "maxThreads needs to be at least 1" );
 		}
 		this.monitor = monitor;
-		workspace = new Workspace( context, dp, errorHandler );
+		workspace = null;//FIXME//new Workspace( context, dp, errorHandler );
 		visitor = new LuceneWorkVisitor( workspace, context );
 		executor = Executors.newFixedThreadPool( maxThreads, "indexwriter" );
 	}

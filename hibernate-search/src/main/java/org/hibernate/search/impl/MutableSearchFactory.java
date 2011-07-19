@@ -43,6 +43,7 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.reader.ReaderProvider;
@@ -262,6 +263,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public boolean isTransactionManagerExpected() {
 		return delegate.isTransactionManagerExpected();
+	}
+
+	@Override
+	public IndexManagerFactory getAllIndexesManager() {
+		return delegate.getAllIndexesManager();
 	}
 	
 }

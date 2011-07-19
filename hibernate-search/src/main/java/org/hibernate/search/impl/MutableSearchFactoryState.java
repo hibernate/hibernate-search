@@ -34,6 +34,7 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -66,6 +67,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<DirectoryProvider, LuceneIndexingParameters> directoryProviderIndexingParams;
 	private ServiceManager serviceManager;
 	private boolean transactionManagerExpected = true;
+	private IndexManagerFactory allIndexesManager;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -85,6 +87,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		directoryProviderIndexingParams = oldFactoryState.getDirectoryProviderIndexingParams();
 		serviceManager = oldFactoryState.getServiceManager();
 		transactionManagerExpected = oldFactoryState.isTransactionManagerExpected();
+		allIndexesManager = oldFactoryState.getAllIndexesManager();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -221,6 +224,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setTransactionManagerExpected(boolean transactionManagerExpected) {
 		this.transactionManagerExpected = transactionManagerExpected;
+	}
+
+	public void setAllIndexesManager(IndexManagerFactory indexesFactory) {
+		this.allIndexesManager = indexesFactory;
+	}
+
+	@Override
+	public IndexManagerFactory getAllIndexesManager() {
+		return allIndexesManager;
 	}
 
 }

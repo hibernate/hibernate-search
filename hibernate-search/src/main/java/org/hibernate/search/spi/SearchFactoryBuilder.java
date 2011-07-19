@@ -91,7 +91,6 @@ import org.hibernate.search.impl.MappingModelMetadataProvider;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
@@ -345,6 +344,7 @@ public class SearchFactoryBuilder {
 			factoryState.setConfigurationProperties( cfg.getProperties() );
 			factoryState.setErrorHandler( createErrorHandler( factoryState.getConfigurationProperties() ) );
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
+			factoryState.setAllIndexesManager( new IndexManagerFactory() );
 		}
 	}
 
@@ -396,10 +396,11 @@ public class SearchFactoryBuilder {
 			//TODO should analyzer def for classes at their same level???
 		}
 		
-		IndexManagerFactory factory = new IndexManagerFactory();
+		IndexManagerFactory indexesFactory = factoryState.getAllIndexesManager();
+		
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
-			MutableEntityIndexMapping mappedEntity = factory.createIndexManagers( mappedXClass, cfg, buildContext, reflectionManager );
+			MutableEntityIndexMapping mappedEntity = indexesFactory.createIndexManagers( mappedXClass, cfg, buildContext, reflectionManager );
 			Class mappedClass = classMappings.get( mappedXClass );
 		
 			// Create all DocumentBuilderIndexedEntity
@@ -677,17 +678,6 @@ public class SearchFactoryBuilder {
 		@Override
 		public boolean isTransactionManagerExpected() {
 			return cfg.isTransactionManagerExpected();
-		}
-
-		@Override
-		public IndexManager getIndexManager(String providerName) {
-			//FIXME
-			return null;
-		}
-
-		@Override
-		public void registerIndexManager(String indexName, IndexManager indexManager) {
-			//FIXME
 		}
 
 	}

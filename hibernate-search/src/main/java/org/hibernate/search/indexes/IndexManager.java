@@ -26,7 +26,8 @@ import java.util.Set;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.internals.DirectoryProviderData;
 
 /**
  * An IndexManager abstracts the specific configuration and implementations being used on a single Index.
@@ -69,7 +70,7 @@ public interface IndexManager {
 	/**
 	 * Initialize the reader provider before its use.
 	 */
-	void initialize(String indexName, Properties props, BuildContext context);
+	void initialize(String indexName, Properties props, WorkerBuildContext context);
 
 	/**
 	 * Called when a <code>SearchFactory</code> is destroyed. This method typically releases resources.
@@ -91,5 +92,10 @@ public interface IndexManager {
 	 * @param newSimilarity
 	 */
 	void setSimilarity(Similarity newSimilarity);
+
+	/**
+	 * @return
+	 */
+	DirectoryProviderData getDirectoryProviderData();
 
 }

@@ -29,7 +29,7 @@ import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -52,10 +52,10 @@ class PerDPResources {
 	private final boolean exclusiveIndexUsage;
 	private final ErrorHandler errorHandler;
 	
-	PerDPResources(WorkerBuildContext context, DirectoryProvider<?> dp) {
-		DirectoryProviderData directoryProviderData = context.getDirectoryProviderData( dp );
+	PerDPResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
+		DirectoryProviderData directoryProviderData = indexManager.getDirectoryProviderData();
 		errorHandler = context.getErrorHandler();
-		workspace = new Workspace( context, dp, errorHandler );
+		workspace = new Workspace( context, indexManager, errorHandler );
 		visitor = new LuceneWorkVisitor( workspace, context );
 		int maxQueueLength = directoryProviderData.getMaxQueueLength();
 		executor = Executors.newFixedThreadPool( 1, "Directory writer", maxQueueLength );

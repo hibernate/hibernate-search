@@ -51,6 +51,8 @@ import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.exception.impl.SingleErrorContext;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -81,7 +83,6 @@ public class Workspace {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final DirectoryProvider<?> directoryProvider;
 	private final OptimizerStrategy optimizerStrategy;
-	private final ReentrantLock lock;
 	private final Set<Class<?>> entitiesInDirectory;
 	private final LuceneIndexingParameters indexingParams;
 	private final ErrorHandler errorHandler;
@@ -100,12 +101,11 @@ public class Workspace {
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 	
-	public Workspace(WorkerBuildContext context, DirectoryProvider<?> provider, ErrorHandler errorHandler) {
+	public Workspace(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
 		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
-		this.directoryProvider = provider;
-		this.optimizerStrategy = context.getOptimizerStrategy( directoryProvider );
-		this.entitiesInDirectory = context.getClassesInDirectoryProvider( provider );
-		this.lock = context.getDirectoryProviderLock( provider );
+		this.directoryProvider = indexManager.getDirectoryProvider();
+		this.optimizerStrategy = indexManager.ge
+		this.entitiesInDirectory = indexManager.getContainedTypes();
 		this.indexingParams = context.getIndexingParameters( directoryProvider );
 		this.errorHandler = errorHandler;
 		LuceneIndexingParameters indexingParams = context.getIndexingParameters( directoryProvider );
@@ -127,16 +127,10 @@ public class Workspace {
 	 * to optimize the index.
 	 */
 	public void optimizerPhase() {
-		lock.lock();
-		try {
-			// used getAndSet(0) because Workspace is going to be reused by next transaction.
-			synchronized ( optimizerStrategy ) {
-				optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
-				optimizerStrategy.optimize( this );
-			}
-		}
-		finally {
-			lock.unlock();
+		// used getAndSet(0) because Workspace is going to be reused by next transaction.
+		synchronized ( optimizerStrategy ) {
+			optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
+			optimizerStrategy.optimize( this );
 		}
 	}
 	
@@ -148,15 +142,9 @@ public class Workspace {
 	 * @see SearchFactory#optimize(Class)
 	 */
 	public void optimize() {
-		lock.lock();
-		try {
-			//Needs to ensure the optimizerStrategy is accessed in threadsafe way
-			synchronized ( optimizerStrategy ) {
-				optimizerStrategy.optimizationForced();
-			}
-		}
-		finally {
-			lock.unlock();
+		//Needs to ensure the optimizerStrategy is accessed in threadsafe way
+		synchronized ( optimizerStrategy ) {
+			optimizerStrategy.optimizationForced();
 		}
 	}
 

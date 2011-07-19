@@ -34,6 +34,7 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 
@@ -81,4 +82,7 @@ public interface SearchFactoryState {
 	ServiceManager getServiceManager();
 	
 	boolean isTransactionManagerExpected();
+
+	IndexManagerFactory getAllIndexesManager();
+
 }

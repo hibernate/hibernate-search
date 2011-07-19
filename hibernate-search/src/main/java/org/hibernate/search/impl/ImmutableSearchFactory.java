@@ -40,7 +40,7 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
@@ -113,6 +113,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final PolymorphicIndexHierarchy indexHierarchy;
 	private final StatisticsImpl statistics;
 	private final boolean transactionManagerExpected;
+	private final IndexManagerFactory allIndexesManager;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -140,6 +141,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
+		this.allIndexesManager = state.getAllIndexesManager();
 
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
@@ -433,7 +435,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	@Override
-	public IndexManager getIndexManager(String providerName) {
-		return null;
+	public IndexManagerFactory getAllIndexesManager() {
+		return this.allIndexesManager;
 	}
+
 }
