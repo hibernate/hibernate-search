@@ -26,7 +26,6 @@ package org.hibernate.search.backend;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
@@ -39,7 +38,6 @@ import org.apache.lucene.util.Version;
 
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -51,7 +49,6 @@ import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.exception.impl.SingleErrorContext;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -106,12 +103,13 @@ public class Workspace {
 		this.directoryProvider = indexManager.getDirectoryProvider();
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
 		this.entitiesInDirectory = indexManager.getContainedTypes();
-		this.indexingParams = context.getIndexingParameters( directoryProvider );
+		this.indexingParams = indexManager.getIndexingParameters();
 		this.errorHandler = errorHandler;
-		LuceneIndexingParameters indexingParams = context.getIndexingParameters( directoryProvider );
 		indexingParams.applyToWriter( writerConfig );
-		Similarity similarity = context.getSimilarity( directoryProvider );
-		writerConfig.setSimilarity( similarity );
+		Similarity similarity = indexManager.getSimilarity();
+		if ( similarity != null ) {
+			writerConfig.setSimilarity( similarity );
+		}
 	}
 
 	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {

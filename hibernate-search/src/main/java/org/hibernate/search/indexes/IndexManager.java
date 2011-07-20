@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -103,5 +104,10 @@ public interface IndexManager {
 	 * @return
 	 */
 	OptimizerStrategy getOptimizerStrategy();
+
+	/**
+	 * @return
+	 */
+	LuceneIndexingParameters getIndexingParameters();
 
 }

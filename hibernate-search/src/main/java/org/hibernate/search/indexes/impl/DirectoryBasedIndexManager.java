@@ -21,6 +21,7 @@
 package org.hibernate.search.indexes.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -30,6 +31,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.indexes.CommonPropertiesParse;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -50,6 +52,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private ExecutorService backendExecutor;
 	private BackendQueueProcessorFactory backend;
 	private OptimizerStrategy optimizer;
+	private LuceneIndexingParameters inexingParameters;
+	private Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
+	private final DirectoryProviderData directoryOptions = new DirectoryProviderData(); //TODO read these options out of properties
 	
 	public DirectoryBasedIndexManager(DirectoryProvider directoryProvider) {
 		this.directoryProvider = directoryProvider;
@@ -77,13 +82,14 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
 		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
-		backend = BackendFactory.createBackend( this, buildContext, cfg );
+		inexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, buildContext, cfg );
+		backend = BackendFactory.createBackend( this, buildContext, cfg );
 	}
 
 	@Override
 	public Set<Class<?>> getContainedTypes() {
-		return null;
+		return containedEntityTypes;
 	}
 
 	@Override
@@ -105,17 +111,27 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		ArrayList<LuceneWork> list = new ArrayList<LuceneWork>(1);
 		list.add( work );
 		Runnable runnable = backend.getProcessor( list );
-		backendExecutor.execute( runnable );
+		if ( backendExecutor != null ) {
+			backendExecutor.execute( runnable );
+		}
+		else {
+			runnable.run();
+		}
 	}
 
 	@Override
 	public DirectoryProviderData getDirectoryProviderData() {
-		return null;
+		return directoryOptions;
 	}
 
 	@Override
 	public OptimizerStrategy getOptimizerStrategy() {
 		return optimizer;
+	}
+
+	@Override
+	public LuceneIndexingParameters getIndexingParameters() {
+		return inexingParameters;
 	}
 
 }

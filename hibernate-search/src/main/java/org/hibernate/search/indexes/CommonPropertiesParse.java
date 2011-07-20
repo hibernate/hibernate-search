@@ -27,7 +27,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.NoOpOptimizerStrategy;
