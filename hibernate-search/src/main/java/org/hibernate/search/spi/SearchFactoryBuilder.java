@@ -680,5 +680,10 @@ public class SearchFactoryBuilder {
 			return cfg.isTransactionManagerExpected();
 		}
 
+		@Override
+		public IndexManagerFactory getAllIndexesManager() {
+			return factoryState.getAllIndexesManager();
+		}
+
 	}
 }

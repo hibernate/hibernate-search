@@ -30,6 +30,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
@@ -268,6 +269,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public IndexManagerFactory getAllIndexesManager() {
 		return delegate.getAllIndexesManager();
+	}
+
+	@Override
+	public IndexReader openIndexReader(Class<?>... entities) {
+		return delegate.openIndexReader( entities );
 	}
 	
 }

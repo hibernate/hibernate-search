@@ -26,7 +26,6 @@ package org.hibernate.search.reader.impl;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -34,15 +33,15 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
-import org.apache.lucene.store.Directory;
 
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -65,7 +64,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	/**
 	 * contains last updated Reader; protected by lockOnOpenLatest (in the values)
 	 */
-	protected final Map<Directory, PerDirectoryLatestReader> currentReaders = new ConcurrentHashMap<Directory, PerDirectoryLatestReader>();
+	protected final Map<IndexManager, PerDirectoryLatestReader> currentReaders = new ConcurrentHashMap<IndexManager, PerDirectoryLatestReader>();
 
 	public void closeReader(IndexReader multiReader) {
 		if ( multiReader == null ) {
@@ -87,13 +86,13 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	}
 
 	public void initialize(Properties props, BuildContext context) {
-		Set<DirectoryProvider<?>> providers = context.getDirectoryProviders();
+		IndexManagerFactory indexManagers = context.getAllIndexesManager();
 
 		// create the readers for the known providers. Unfortunately, it is not possible to
 		// create all readers in initialize since some providers have more than one directory (eg
 		// FSSlaveDirectoryProvider). See also HSEARCH-250.
-		for ( DirectoryProvider provider : providers ) {
-			createReader( provider.getDirectory() );
+		for ( IndexManager indexManager : indexManagers.getIndexManagers() ) {
+			createReader( indexManager );
 		}
 	}
 
@@ -104,7 +103,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	 * @return either the cached instance for the specified <code>Directory</code> or a newly created one.
 	 * @see <a href="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-250">HSEARCH-250</a>
 	 */
-	private synchronized PerDirectoryLatestReader createReader(Directory directory) {
+	private synchronized PerDirectoryLatestReader createReader(IndexManager directory) {
 		PerDirectoryLatestReader reader = currentReaders.get( directory );
 		if ( reader != null ) {
 			return reader;
@@ -132,17 +131,17 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		}
 	}
 
-	public IndexReader openReader(DirectoryProvider... directoryProviders) {
-		int length = directoryProviders.length;
+	public IndexReader openReader(IndexManager... indexManagers) {
+		int length = indexManagers.length;
 		IndexReader[] readers = new IndexReader[length];
 		log.debugf( "Opening IndexReader for directoryProviders: %d", length );
 		for ( int index = 0; index < length; index++ ) {
-			Directory directory = directoryProviders[index].getDirectory();
-			log.tracef( "Opening IndexReader from %s", directory );
-			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directory );
+			IndexManager indexManager = indexManagers[index];
+			log.tracef( "Opening IndexReader from %s", indexManager );
+			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( indexManager );
 			// might eg happen for FSSlaveDirectoryProvider or for mutable SearchFactory
 			if ( directoryLatestReader == null ) {
-				directoryLatestReader = createReader( directory );
+				directoryLatestReader = createReader( indexManager );
 			}
 			readers[index] = directoryLatestReader.refreshAndGet();
 		}
@@ -166,8 +165,8 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	}
 
 	//overridable method for testability:
-	protected IndexReader readerFactory(final Directory directory) throws IOException {
-		return IndexReader.open( directory, true );
+	protected IndexReader readerFactory(final IndexManager indexManager) {
+		return indexManager.openReader();
 	}
 
 	/**
@@ -240,7 +239,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		 *
 		 * @throws IOException when the index initialization fails.
 		 */
-		public PerDirectoryLatestReader(Directory directory) throws IOException {
+		public PerDirectoryLatestReader(IndexManager directory) throws IOException {
 			IndexReader reader = readerFactory( directory );
 			ReaderUsagePair initialPair = new ReaderUsagePair( reader );
 			initialPair.usageCounter.set( 1 );//a token to mark as active (preventing real close).

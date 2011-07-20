@@ -28,11 +28,10 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexReader;
 
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Open a reader each time
@@ -40,24 +39,16 @@ import org.hibernate.search.store.DirectoryProvider;
  * @author Emmanuel Bernard
  */
 public class NotSharedReaderProvider implements ReaderProvider {
-	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
-	public IndexReader openReader(DirectoryProvider... directoryProviders) {
+
+	public IndexReader openReader(IndexManager... directoryProviders) {
 		final int length = directoryProviders.length;
 		IndexReader[] readers = new IndexReader[length];
-		try {
-			for (int index = 0; index < length; index++) {
-				readers[index] = IndexReader.open( directoryProviders[index].getDirectory(), true );
-			}
-		}
-		catch (IOException e) {
-			//TODO more contextual info
-			ReaderProviderHelper.clean( new SearchException( "Unable to open one of the Lucene indexes", e ), readers );
+		for (int index = 0; index < length; index++) {
+			readers[index] = directoryProviders[index].openReader();
 		}
 		return ReaderProviderHelper.buildMultiReader( length, readers );
 	}
 
-
-	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
 	public void closeReader(IndexReader reader) {
 		try {
 			reader.close();

@@ -20,7 +20,9 @@
  */
 package org.hibernate.search.indexes;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -231,6 +233,10 @@ public class IndexManagerFactory {
 			}
 			return shardLocalProperties;
 		}
+	}
+
+	public Collection<IndexManager> getIndexManagers() {
+		return indexManagersRegistry.values();
 	}
 
 }

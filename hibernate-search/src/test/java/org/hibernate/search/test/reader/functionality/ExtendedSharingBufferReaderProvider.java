@@ -44,14 +44,13 @@ import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.index.TermFreqVector;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
-import org.apache.lucene.store.Directory;
 
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.reader.impl.ReaderProviderHelper;
 import org.hibernate.search.reader.impl.SharingBufferReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.impl.RAMDirectoryProvider;
+import org.hibernate.search.test.util.RamIndexManager;
 
 /**
  * @author Sanne Grinovero
@@ -60,13 +59,13 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 
 	private static final int NUM_DIRECTORY_PROVIDERS = 4;
 	private final Vector<MockIndexReader> createdReadersHistory = new Vector<MockIndexReader>( 500 );
-	final Map<Directory, TestManipulatorPerDP> manipulators = new ConcurrentHashMap<Directory, TestManipulatorPerDP>();
-	final List<DirectoryProvider> directoryProviders = Collections.synchronizedList(new ArrayList<DirectoryProvider>());
+	final Map<IndexManager, TestManipulatorPerDP> manipulators = new ConcurrentHashMap<IndexManager, TestManipulatorPerDP>();
+	final List<IndexManager> directoryProviders = Collections.synchronizedList(new ArrayList<IndexManager>());
 	
 	public ExtendedSharingBufferReaderProvider() {
 		for ( int i = 0; i < NUM_DIRECTORY_PROVIDERS; i++ ) {
 			TestManipulatorPerDP tm = new TestManipulatorPerDP( i );
-			manipulators.put( tm.dp.getDirectory(), tm );
+			manipulators.put( tm.dp, tm );
 			directoryProviders.add( tm.dp );
 		}
 	}
@@ -74,11 +73,10 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	public static class TestManipulatorPerDP {
 		private final AtomicBoolean isIndexReaderCurrent = new AtomicBoolean( false );//starts at true, see MockIndexReader constructor
 		private final AtomicBoolean isReaderCreated = new AtomicBoolean( false );
-		private final DirectoryProvider dp = new RAMDirectoryProvider();
+		private final IndexManager dp = new RamIndexManager();
 
 		public TestManipulatorPerDP(int seed) {
 			dp.initialize( "dp" + seed, new Properties(), null );
-			dp.start();
 		}
 
 		public void setIndexChanged() {
@@ -99,7 +97,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	}
 
 	@Override
-	protected IndexReader readerFactory(Directory directory) {
+	protected IndexReader readerFactory(IndexManager directory) {
 		TestManipulatorPerDP manipulatorPerDP = manipulators.get( directory );
 		if ( !manipulatorPerDP.isReaderCreated.compareAndSet( false, true ) ) {
 			throw new IllegalStateException( "IndexReader1 created twice" );
@@ -112,7 +110,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	@Override
 	public void initialize(Properties props, BuildContext context) {
 		try {
-			for ( Directory directory : manipulators.keySet() ) {
+			for ( IndexManager directory : manipulators.keySet() ) {
 				currentReaders.put( directory, new PerDirectoryLatestReader( directory ) );
 			}
 		}
@@ -131,10 +129,10 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		return createdReadersHistory;
 	}
 
-	public MockIndexReader getCurrentMockReaderPerDP(DirectoryProvider dp) {
+	public MockIndexReader getCurrentMockReaderPerDP(IndexManager index) {
 		IndexReader[] indexReaders = ReaderProviderHelper.getSubReadersFromMultiReader(
 				( MultiReader ) super.openReader(
-						new DirectoryProvider[] { dp }
+						new IndexManager[] { index }
 				)
 		);
 		if ( indexReaders.length != 1 ) {

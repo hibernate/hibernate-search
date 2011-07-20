@@ -27,6 +27,8 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
@@ -87,4 +89,9 @@ public interface BuildContext {
 	 * @param provider of the service
 	 */
 	void releaseService(Class<? extends ServiceProvider<?>> provider);
+
+	/**
+	 * @return
+	 */
+	IndexManagerFactory getAllIndexesManager();
 }

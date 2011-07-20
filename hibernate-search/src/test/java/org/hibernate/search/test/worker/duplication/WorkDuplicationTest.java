@@ -40,8 +40,6 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.impl.WorkQueue;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.reader.ReaderProvider;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -95,19 +93,16 @@ public class WorkDuplicationTest extends SearchTestCase {
 		// Search and the record via Lucene directly
 		tx = s.beginTransaction();
 
-		DirectoryProvider directoryProvider = s.getSearchFactory().getDirectoryProviders( SpecialPerson.class )[0];
-		ReaderProvider readerProvider = s.getSearchFactory().getReaderProvider();
-		IndexReader reader = readerProvider.openReader( directoryProvider );
-		IndexSearcher searcher = new IndexSearcher( reader );
-
+		IndexReader indexReader = s.getSearchFactory().openIndexReader( SpecialPerson.class );
 		try {
+			IndexSearcher searcher = new IndexSearcher( indexReader );
 			// we have to test using Lucene directly since query loaders will ignore hits for which there is no
 			// database entry
 			TopDocs topDocs = searcher.search( luceneQuery, null, 1 );
 			assertTrue( "We should have no hit", topDocs.totalHits == 0 );
 		}
 		finally {
-			readerProvider.closeReader( reader );
+			indexReader.close();
 		}
 		tx.commit();
 		s.close();

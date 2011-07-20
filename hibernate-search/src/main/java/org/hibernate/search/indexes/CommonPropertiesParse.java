@@ -77,7 +77,7 @@ public class CommonPropertiesParse {
 		}
 	}
 
-	public static OptimizerStrategy getOptimizerStrategy(IndexManager callback, WorkerBuildContext context, Properties indexProps) {
+	public static OptimizerStrategy getOptimizerStrategy(IndexManager callback, Properties indexProps) {
 		boolean incremental = indexProps.containsKey( "optimizer.operation_limit.max" )
 				|| indexProps.containsKey( "optimizer.transaction_limit.max" );
 		OptimizerStrategy optimizerStrategy;

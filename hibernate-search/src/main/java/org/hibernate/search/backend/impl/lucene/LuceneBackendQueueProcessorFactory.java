@@ -27,13 +27,11 @@ import java.util.Properties;
 import java.util.List;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * This will actually contain the Workspace and LuceneWork visitor implementation,
@@ -47,22 +45,23 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 
-	private SearchFactoryImplementor searchFactoryImp;
 	private PerDPResources resources;
+	private IndexManager indexManager;
 
 	/**
 	 * copy of BatchedQueueingProcessor.sync
 	 */
 	private boolean sync;
 
+
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
-		this.searchFactoryImp = context.getUninitializedSearchFactory();
+		this.indexManager = indexManager;
 		this.sync = BackendFactory.isConfiguredAsSync( props );
 		resources = new PerDPResources( context, (DirectoryBasedIndexManager) indexManager );
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new LuceneBackendQueueProcessor( queue, searchFactoryImp, resources, sync );
+		return new LuceneBackendQueueProcessor( queue, indexManager, resources, sync );
 	}
 
 	public void close() {

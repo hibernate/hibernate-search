@@ -28,11 +28,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
+import org.hibernate.search.indexes.IndexManager;
 
 /**
  * Apply the operations to Lucene directories.
@@ -51,11 +51,11 @@ class LuceneBackendQueueProcessor implements Runnable {
 	private static final Log log = LoggerFactory.make();
 
 	LuceneBackendQueueProcessor(List<LuceneWork> queue,
-			SearchFactoryImplementor searchFactoryImplementor,
+			IndexManager indexManager,
 			PerDPResources resourcesMap,
 			boolean syncMode) {
 		this.sync = syncMode;
-		this.errorHandler = searchFactoryImplementor.getErrorHandler();
+		this.errorHandler = indexManager.getErrorHandler();
 		this.dpProcessors = new PerDPQueueProcessor( resourcesMap, queue );
 	}
 

@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.index.IndexReader;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.test.reader.functionality.ExtendedSharingBufferReaderProvider.MockIndexReader;
 import org.hibernate.search.test.reader.functionality.ExtendedSharingBufferReaderProvider.TestManipulatorPerDP;
 
@@ -86,11 +86,11 @@ public class SharingBufferIndexProviderTest {
 		}
 	}
 	
-	private DirectoryProvider[] getRandomAvailableDPs() {
+	private IndexManager[] getRandomAvailableDPs() {
 		int arraySize = random.nextInt( readerProvider.manipulators.size() - 1 ) + 1;
-		DirectoryProvider[] array = new DirectoryProvider[arraySize];
-		List<DirectoryProvider> availableDPs = new ArrayList<DirectoryProvider>( readerProvider.directoryProviders );
-		for (int i=0; i<arraySize; i++){
+		IndexManager[] array = new IndexManager[arraySize];
+		List<IndexManager> availableDPs = new ArrayList<IndexManager>( readerProvider.directoryProviders );
+		for ( int i = 0; i < arraySize; i++ ) {
 			int chosenDpIndex = random.nextInt( availableDPs.size() );
 			array[i] = availableDPs.get( chosenDpIndex );
 			availableDPs.remove( array[i] );
@@ -117,9 +117,9 @@ public class SharingBufferIndexProviderTest {
 		public void run() {
 			super.run();
 			Thread.yield();
-			DirectoryProvider[] randomEvailableDPs = getRandomAvailableDPs();
-			for ( DirectoryProvider dp : randomEvailableDPs ) {
-				TestManipulatorPerDP testManipulatorPerDP = readerProvider.manipulators.get( dp.getDirectory() );
+			IndexManager[] randomEvailableDPs = getRandomAvailableDPs();
+			for ( IndexManager dp : randomEvailableDPs ) {
+				TestManipulatorPerDP testManipulatorPerDP = readerProvider.manipulators.get( dp );
 				testManipulatorPerDP.setIndexChanged();
 			}
 			countDoneIndexmods.incrementAndGet();

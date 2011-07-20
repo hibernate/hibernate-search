@@ -23,10 +23,14 @@ package org.hibernate.search.indexes;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -51,16 +55,10 @@ public interface IndexManager {
 	
 	/**
 	 * Provides an IndexReader instance which is guaranteed to provide a fresh read view
-	 * on the index. All opened instances must be closed by invoking {@link #closeReader(IndexReader)}.
-	 * @return an IndexReader instance.
+	 * on the index.
+	 * @return a read-only IndexReader instance.
 	 */
 	IndexReader openReader();
-	
-	/**
-	 * Closes resources associated with the IndexReader.
-	 * @param indexReader
-	 */
-	void closeReader(IndexReader indexReader);
 	
 	/**
 	 * Used to apply update operations to the index.
@@ -109,5 +107,19 @@ public interface IndexManager {
 	 * @return
 	 */
 	LuceneIndexingParameters getIndexingParameters();
+
+	/**
+	 * @return
+	 */
+	ErrorHandler getErrorHandler();
+	
+	EntityIndexMapping<?> getIndexMappingForEntity(Class<?> type);
+	
+	Analyzer getAnalyzer(String name);
+
+	/**
+	 * @param boundSearchFactory
+	 */
+	void setBoundSearchFactory(SearchFactoryImplementor boundSearchFactory);
 
 }

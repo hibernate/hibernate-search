@@ -77,7 +77,6 @@ public class Workspace {
 	
 	// invariant state:
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final DirectoryProvider<?> directoryProvider;
 	private final OptimizerStrategy optimizerStrategy;
 	private final Set<Class<?>> entitiesInDirectory;
@@ -97,9 +96,11 @@ public class Workspace {
 	 * Keeps a count of modification operations done on the index.
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
+
+	private final DirectoryBasedIndexManager indexManager;
 	
-	public Workspace(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
-		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
+	public Workspace(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
+		this.indexManager = indexManager;
 		this.directoryProvider = indexManager.getDirectoryProvider();
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
 		this.entitiesInDirectory = indexManager.getContainedTypes();
@@ -113,11 +114,11 @@ public class Workspace {
 	}
 
 	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {
-		return searchFactoryImplementor.getIndexMappingForEntity( entity ).getDocumentBuilder();
+		return indexManager.getIndexMappingForEntity( entity ).getDocumentBuilder();
 	}
 
 	public Analyzer getAnalyzer(String name) {
-		return searchFactoryImplementor.getAnalyzer( name );
+		return indexManager.getAnalyzer( name );
 	}
 
 	/**

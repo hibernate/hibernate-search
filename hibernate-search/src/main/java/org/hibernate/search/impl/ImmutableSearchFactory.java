@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
@@ -437,6 +438,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public IndexManagerFactory getAllIndexesManager() {
 		return this.allIndexesManager;
+	}
+
+	@Override
+	public IndexReader openIndexReader(Class<?>... entities) {
+		//TODO
+		return null;
 	}
 
 }

@@ -23,7 +23,9 @@
  */
 package org.hibernate.search;
 
+
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
@@ -35,6 +37,7 @@ import org.hibernate.search.store.DirectoryProvider;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public interface SearchFactory {
 	/**
@@ -51,8 +54,9 @@ public interface SearchFactory {
 	 * @param entity the entity for which to return the directory providers
 	 * @return array of  {@code DirectoryProvider}s for the specified entity
 	 */
+	@Deprecated
 	DirectoryProvider[] getDirectoryProviders(Class<?> entity);
-
+	
 	/**
 	 * Optimize all indexes
 	 */
@@ -96,5 +100,12 @@ public interface SearchFactory {
 	 *
 	 * @return The statistics.
 	 */
-	public Statistics getStatistics();
+	Statistics getStatistics();
+
+	/**
+	 * Opens an IndexReader on all indexes matching these types
+	 * @param entities
+	 * @return
+	 */
+	IndexReader openIndexReader(Class<?>... entities);
 }

@@ -50,8 +50,6 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
 
-	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
-
 	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType);
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
@@ -97,5 +95,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * Can be disabled to get pre-3.4 behavior (always rebuild document)
 	 */
 	boolean isDirtyChecksEnabled();
+	
+	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
 
 }

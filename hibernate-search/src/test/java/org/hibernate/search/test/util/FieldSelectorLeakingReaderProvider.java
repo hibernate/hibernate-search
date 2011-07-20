@@ -41,6 +41,7 @@ import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.reader.impl.NotSharedReaderProvider;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
@@ -98,7 +99,7 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 	}
 	
 	@Override
-	public IndexReader openReader(DirectoryProvider... directoryProviders) {
+	public IndexReader openReader(IndexManager... directoryProviders) {
 		IndexReader indexReader = super.openReader( directoryProviders );
 		IndexReader leakingReader = new LeakingIndexReader( indexReader );
 		return leakingReader;

@@ -35,6 +35,7 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
@@ -128,13 +129,15 @@ public class WorkSequencesTest extends SearchTestCase {
 	//helper method to verify how many instances are found in the index by doing a simple FT query
 	private int countDomainsByFullText(String name) throws IOException {
 		Query luceneQuery = new TermQuery( new Term( "name", name ) );
-		DirectoryProvider<?> directoryProvider = searchFactory.getDirectoryProviders( Domain.class )[0];
-		ReaderProvider readerProvider = searchFactory.getReaderProvider();
-		IndexReader reader = readerProvider.openReader( directoryProvider );
-		IndexSearcher searcher = new IndexSearcher( reader );
-		TopDocs topDocs = searcher.search( luceneQuery, null, 100 );
-		readerProvider.closeReader( reader );
-		return topDocs.totalHits;
+		IndexReader indexReader = searchFactory.openIndexReader( Domain.class );
+		try {
+			IndexSearcher searcher = new IndexSearcher( indexReader );
+			TopDocs topDocs = searcher.search( luceneQuery, null, 100 );
+			return topDocs.totalHits;
+		}
+		finally {
+			indexReader.close();
+		}
 	}
 	
 	@Override

@@ -43,9 +43,9 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	private final OptimizeWorkDelegate optimizeDelegate;
 	private final PurgeAllWorkDelegate purgeAllDelegate;
 	
-	public LuceneWorkVisitor(Workspace workspace, WorkerBuildContext context) {
+	public LuceneWorkVisitor(Workspace workspace) {
 		if ( workspace.getEntitiesInDirectory().size() == 1 ) {
-			this.deleteDelegate = new DeleteExtWorkDelegate( workspace, context );
+			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
 		}
 		else {
 			this.deleteDelegate = new DeleteWorkDelegate( workspace );

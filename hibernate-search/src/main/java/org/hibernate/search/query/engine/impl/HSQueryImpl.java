@@ -573,8 +573,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		}
 
 		//set up the searcher
-		final DirectoryProvider[] directoryProviders = targetedIndexes.toArray(
-				new DirectoryProvider[targetedIndexes.size()]
+		final IndexManager[] directoryProviders = targetedIndexes.toArray(
+				new IndexManager[targetedIndexes.size()]
 		);
 		IndexSearcher is = new IndexSearcher(
 				searchFactoryImplementor.getReaderProvider().openReader(

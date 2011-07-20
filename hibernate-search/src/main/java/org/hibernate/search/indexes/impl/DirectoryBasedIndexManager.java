@@ -26,12 +26,17 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.CommonPropertiesParse;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -55,6 +60,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private LuceneIndexingParameters inexingParameters;
 	private Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
 	private final DirectoryProviderData directoryOptions = new DirectoryProviderData(); //TODO read these options out of properties
+	private ErrorHandler errorHandler = new LogErrorHandler(); //TODO use the configurable factory
+	
+	private SearchFactoryImplementor boundSearchFactory = null;
 	
 	public DirectoryBasedIndexManager(DirectoryProvider directoryProvider) {
 		this.directoryProvider = directoryProvider;
@@ -71,10 +79,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void closeReader(IndexReader indexReader) {
-	}
-
-	@Override
 	public void destroy() {
 	}
 
@@ -83,7 +87,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.indexName = indexName;
 		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
 		inexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
-		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, buildContext, cfg );
+		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
 		backend = BackendFactory.createBackend( this, buildContext, cfg );
 	}
 
@@ -132,6 +136,34 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public LuceneIndexingParameters getIndexingParameters() {
 		return inexingParameters;
+	}
+
+	@Override
+	public String toString() {
+		return "DirectoryBasedIndexManager [indexName=" + indexName + "]";
+	}
+
+	@Override
+	public ErrorHandler getErrorHandler() {
+		return errorHandler;
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public Analyzer getAnalyzer(String name) {
+		return null;
+	}
+
+	@Override
+	public EntityIndexMapping<?> getIndexMappingForEntity(Class<?> entityType) {
+		return boundSearchFactory.getIndexMappingForEntity( entityType );
+	}
+
+	@Override
+	public void setBoundSearchFactory(SearchFactoryImplementor boundSearchFactory) {
+		this.boundSearchFactory = boundSearchFactory;
 	}
 
 }

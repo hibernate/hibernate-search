@@ -54,9 +54,9 @@ class PerDPResources {
 	
 	PerDPResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		DirectoryProviderData directoryProviderData = indexManager.getDirectoryProviderData();
-		errorHandler = context.getErrorHandler();
-		workspace = new Workspace( context, indexManager, errorHandler );
-		visitor = new LuceneWorkVisitor( workspace, context );
+		errorHandler = indexManager.getErrorHandler();
+		workspace = new Workspace( indexManager, errorHandler );
+		visitor = new LuceneWorkVisitor( workspace );
 		int maxQueueLength = directoryProviderData.getMaxQueueLength();
 		executor = Executors.newFixedThreadPool( 1, "Directory writer", maxQueueLength );
 		exclusiveIndexUsage = directoryProviderData.isExclusiveIndexUsage();

@@ -67,7 +67,7 @@ class DirectoryProviderWorkspace {
 		}
 		this.monitor = monitor;
 		workspace = null;//FIXME//new Workspace( context, dp, errorHandler );
-		visitor = new LuceneWorkVisitor( workspace, context );
+		visitor = new LuceneWorkVisitor( workspace );
 		executor = Executors.newFixedThreadPool( maxThreads, "indexwriter" );
 	}
 

@@ -27,8 +27,8 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexReader;
 
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Responsible for providing and managing the lifecycle of a read only reader. The implementation must have a
@@ -44,7 +44,7 @@ public interface ReaderProvider {
 	 * The opened reader has to be closed through {@link #closeReader(IndexReader)}.
 	 * The opening can be virtual.
 	 */
-	IndexReader openReader(DirectoryProvider... directoryProviders);
+	IndexReader openReader(IndexManager... indexManagers);
 
 	/**
 	 * Close a reader previously opened by {@link #openReader}.
