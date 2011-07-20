@@ -26,6 +26,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
@@ -77,7 +78,7 @@ public class CommonPropertiesParse {
 		}
 	}
 
-	public static OptimizerStrategy getOptimizerStrategy(WritableBuildContext context, Properties indexProps, IndexManager callback) {
+	public static OptimizerStrategy getOptimizerStrategy(IndexManager callback, WorkerBuildContext context, Properties indexProps) {
 		boolean incremental = indexProps.containsKey( "optimizer.operation_limit.max" )
 				|| indexProps.containsKey( "optimizer.transaction_limit.max" );
 		OptimizerStrategy optimizerStrategy;

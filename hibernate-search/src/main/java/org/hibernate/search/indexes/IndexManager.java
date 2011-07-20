@@ -28,6 +28,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
+import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * An IndexManager abstracts the specific configuration and implementations being used on a single Index.
@@ -97,5 +98,10 @@ public interface IndexManager {
 	 * @return
 	 */
 	DirectoryProviderData getDirectoryProviderData();
+
+	/**
+	 * @return
+	 */
+	OptimizerStrategy getOptimizerStrategy();
 
 }

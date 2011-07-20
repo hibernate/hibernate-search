@@ -104,7 +104,7 @@ public class Workspace {
 	public Workspace(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
 		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
 		this.directoryProvider = indexManager.getDirectoryProvider();
-		this.optimizerStrategy = indexManager.ge
+		this.optimizerStrategy = indexManager.getOptimizerStrategy();
 		this.entitiesInDirectory = indexManager.getContainedTypes();
 		this.indexingParams = context.getIndexingParameters( directoryProvider );
 		this.errorHandler = errorHandler;

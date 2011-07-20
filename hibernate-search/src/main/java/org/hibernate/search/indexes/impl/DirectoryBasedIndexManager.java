@@ -30,10 +30,12 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.indexes.CommonPropertiesParse;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * First implementation will use the "legacy" DirectoryProvider which served us so well.
@@ -47,6 +49,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private Similarity similarity;
 	private ExecutorService backendExecutor;
 	private BackendQueueProcessorFactory backend;
+	private OptimizerStrategy optimizer;
 	
 	public DirectoryBasedIndexManager(DirectoryProvider directoryProvider) {
 		this.directoryProvider = directoryProvider;
@@ -75,6 +78,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.indexName = indexName;
 		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
 		backend = BackendFactory.createBackend( this, buildContext, cfg );
+		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, buildContext, cfg );
 	}
 
 	@Override
@@ -107,6 +111,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public DirectoryProviderData getDirectoryProviderData() {
 		return null;
+	}
+
+	@Override
+	public OptimizerStrategy getOptimizerStrategy() {
+		return optimizer;
 	}
 
 }
