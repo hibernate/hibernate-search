@@ -90,7 +90,7 @@ public class MutableEntityIndexMapping<T> implements EntityIndexMapping<T> {
 			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) providers[i];
 			dps[i] = indexManager.getDirectoryProvider();
 		}
-		return null;
+		return dps;
 	}
 
 }

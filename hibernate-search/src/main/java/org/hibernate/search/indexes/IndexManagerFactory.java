@@ -37,6 +37,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexMapping;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.impl.DirectoryProviderFactory;
@@ -237,6 +238,15 @@ public class IndexManagerFactory {
 
 	public Collection<IndexManager> getIndexManagers() {
 		return indexManagersRegistry.values();
+	}
+
+	/**
+	 * @param factory
+	 */
+	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
+		for ( IndexManager indexManager : getIndexManagers() ) {
+			indexManager.setBoundSearchFactory( factory );
+		}
 	}
 
 }

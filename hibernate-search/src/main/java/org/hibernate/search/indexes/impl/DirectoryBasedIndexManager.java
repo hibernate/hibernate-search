@@ -98,11 +98,14 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void destroy() {
+		directoryProvider.stop();
 	}
 
 	@Override
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
+		directoryProvider.initialize( indexName, cfg, buildContext );
+		directoryProvider.start();
 		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
 		inexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );

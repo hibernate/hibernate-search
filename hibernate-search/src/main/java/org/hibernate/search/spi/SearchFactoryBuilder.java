@@ -290,6 +290,7 @@ public class SearchFactoryBuilder {
 				)
 		);
 		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );
+		factoryState.setActiveSearchFactory( factory );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
 	}

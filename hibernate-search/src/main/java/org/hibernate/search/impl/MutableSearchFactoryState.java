@@ -38,6 +38,7 @@ import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.store.DirectoryProvider;
 
@@ -233,6 +234,13 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	@Override
 	public IndexManagerFactory getAllIndexesManager() {
 		return allIndexesManager;
+	}
+
+	/**
+	 * @param factory
+	 */
+	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
+		allIndexesManager.setActiveSearchFactory( factory );
 	}
 
 }
