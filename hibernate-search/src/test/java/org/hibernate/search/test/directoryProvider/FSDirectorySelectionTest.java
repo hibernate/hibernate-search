@@ -29,14 +29,15 @@ import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.SimpleFSDirectory;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -74,11 +75,14 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		Session session = factory.openSession();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		DirectoryProvider[] providers = fullTextSession.getSearchFactory().getDirectoryProviders( SnowStorm.class );
-		assertTrue( "Wrong number of directory providers", providers.length == 1 );
-
-		Directory directory = providers[0].getDirectory();
+		EntityIndexMapping<?> entityIndexMapping = fullTextSession.getSearchFactory().getIndexMappingForEntity().get( SnowStorm.class );
+		IndexManager[] indexManagers = entityIndexMapping.getIndexManagers();
+		assertTrue( "Wrong number of directory providers", indexManagers.length == 1 );
+		
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+		Directory directory = indexManager.getDirectoryProvider().getDirectory();
 		assertEquals( "Wrong directory provider type", className, directory.getClass().getName() );
+		session.close();
 	}
 
 	private SessionFactory createSessionFactoryUsingDirectoryType(String directoryType) {

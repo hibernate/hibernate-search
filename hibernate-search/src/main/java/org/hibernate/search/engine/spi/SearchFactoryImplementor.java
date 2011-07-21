@@ -23,19 +23,15 @@
  */
 package org.hibernate.search.engine.spi;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Interface which gives access to the metadata. Intended to be used by Search components
@@ -53,8 +49,6 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	FilterCachingStrategy getFilterCachingStrategy();
 
 	FilterDef getFilterDefinition(String name);
-
-	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider);
 
 	String getIndexingStrategy();
 

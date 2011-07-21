@@ -123,10 +123,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getFilterDefinition( name );
 	}
 
-	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
-		return delegate.getIndexingParameters( provider );
-	}
-
 	public String getIndexingStrategy() {
 		return delegate.getIndexingStrategy();
 	}
@@ -177,10 +173,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public ReaderProvider getReaderProvider() {
 		return delegate.getReaderProvider();
-	}
-
-	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
-		return delegate.getDirectoryProviders( entity );
 	}
 
 	public void optimize() {

@@ -23,7 +23,6 @@
  */
 package org.hibernate.search;
 
-
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -33,7 +32,6 @@ import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.stat.Statistics;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Provide application wide operations as well as access to the underlying Lucene resources.
@@ -48,18 +46,6 @@ public interface SearchFactory {
 	 */
 	ReaderProvider getReaderProvider();
 
-	/**
-	 * Provide access to the DirectoryProviders for a given entity.
-	 * In most cases, the returned type will be a one element array.
-	 * But if the given entity is configured to use sharded indexes, then multiple
-	 * elements will be returned. In this case all of them should be considered.
-	 *
-	 * @param entity the entity for which to return the directory providers
-	 * @return array of  {@code DirectoryProvider}s for the specified entity
-	 */
-	@Deprecated
-	DirectoryProvider[] getDirectoryProviders(Class<?> entity);
-	
 	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
 	
 	/**

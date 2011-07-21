@@ -27,6 +27,10 @@ import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_MERGE_DOCS;
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MERGE_FACTOR;
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.RAM_BUFFER_SIZE;
+
+import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -66,14 +70,14 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 
 	public void testCorrectNumberOfShardsDetected() {
-		DirectoryProvider[] docDirProviders = getSearchFactory()
-			.getDirectoryProviders( Document.class );
-		assertNotNull( docDirProviders);
-		assertEquals( 4, docDirProviders.length );
-		DirectoryProvider[] bookDirProviders = getSearchFactory()
-			.getDirectoryProviders( Book.class );
-		assertNotNull( bookDirProviders );
-		assertEquals( 2, bookDirProviders.length );
+		EntityIndexMapping<Document> indexMappingForDocument = getSearchFactory().getIndexMappingForEntity( Document.class );
+		IndexManager[] documentManagers = indexMappingForDocument.getIndexManagers();
+		assertNotNull( documentManagers);
+		assertEquals( 4, documentManagers.length );
+		EntityIndexMapping<Book> indexMappingForBooks = getSearchFactory().getIndexMappingForEntity( Book.class );
+		IndexManager[] bookManagers = indexMappingForBooks.getIndexManagers();
+		assertNotNull( bookManagers );
+		assertEquals( 2, bookManagers.length );
 	}
 
 	public void testSelectionOfShardingStrategy() {
@@ -83,12 +87,17 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 
 	public void testShardingSettingsInherited() {
-		DirectoryProvider[] docDirProviders = getSearchFactory().getDirectoryProviders( Document.class );
-		assertTrue( docDirProviders[0] instanceof RAMDirectoryProvider );
-		assertTrue( docDirProviders[1] instanceof FSDirectoryProvider );
-		assertTrue( docDirProviders[2] instanceof RAMDirectoryProvider );
+		IndexManager[] indexManagers = getSearchFactory().getIndexMappingForEntity().get( Document.class ).getIndexManagers();
+		assertTrue( getDirectoryProvider( indexManagers[0] ) instanceof RAMDirectoryProvider );
+		assertTrue( getDirectoryProvider( indexManagers[1] ) instanceof FSDirectoryProvider );
+		assertTrue( getDirectoryProvider( indexManagers[2] ) instanceof RAMDirectoryProvider );
 		assertValueIsSet( Document.class, 0, MAX_BUFFERED_DOCS, 58 );
 		assertValueIsSet( Document.class, 1, MAX_BUFFERED_DOCS, 12 );
+	}
+	
+	private static DirectoryProvider getDirectoryProvider(IndexManager indexManager) {
+		DirectoryBasedIndexManager dpBasedManager = (DirectoryBasedIndexManager) indexManager;
+		return dpBasedManager.getDirectoryProvider();
 	}
 
 	public void testShardN2UsesDefaults() {

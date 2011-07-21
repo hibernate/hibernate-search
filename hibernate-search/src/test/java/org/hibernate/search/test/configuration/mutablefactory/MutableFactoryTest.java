@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -37,12 +38,15 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.impl.MutableSearchFactory;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
@@ -91,13 +95,13 @@ public class MutableFactoryTest {
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
 		//we know there is only one DP
-		DirectoryProvider<?> provider = sf
-				.getDirectoryProviders( A.class )[0];
-		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+		IndexReader indexReader = sf.openIndexReader( A.class );
+		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
+		indexReader.close();
 
 		sf = (MutableSearchFactory) builder.currentFactory( sf )
 				.addClass( B.class )
@@ -111,13 +115,13 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		//we know there is only one DP
-		provider = sf.getDirectoryProviders( B.class )[0];
-		searcher = new IndexSearcher( provider.getDirectory(), true );
+		indexReader = sf.openIndexReader( B.class );
+		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
+		indexReader.close();
 
 		sf.close();
 	}
@@ -139,14 +143,13 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		//we know there is only one DP
-		DirectoryProvider<?> provider = sf
-				.getDirectoryProviders( A.class )[0];
-		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+		IndexReader indexReader = sf.openIndexReader( A.class );
+		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
+		indexReader.close();
 
 		sf.addClasses( B.class, C.class );
 
@@ -159,20 +162,22 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		//we know there is only one DP
-		provider = sf.getDirectoryProviders( B.class )[0];
-		searcher = new IndexSearcher( provider.getDirectory(), true );
+		indexReader = sf.openIndexReader( B.class );
+		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
+		searcher.close();
+		indexReader.close();
 
 		luceneQuery = parser.parse( "Vincent" );
 		
-		provider = sf.getDirectoryProviders( C.class )[0];
-		searcher = new IndexSearcher( provider.getDirectory(), true );
+		indexReader = sf.openIndexReader( C.class );
+		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
+		indexReader.close();
 
 		sf.close();
 	}
@@ -221,12 +226,12 @@ public class MutableFactoryTest {
 		for (int i = 0 ; i < nbrOfThread*nbrOfClassesPerThread ; i++) {
 			Query luceneQuery = parser.parse( "Emmanuel" + i);
 			final Class<?> classByNumber = getClassAByNumber( i );
-			DirectoryProvider<?>[] directoryProviders = sf.getDirectoryProviders( classByNumber );
-			assertNotNull( directoryProviders );
-			DirectoryProvider<?> provider = sf.getDirectoryProviders( classByNumber )[0];
-			IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+			IndexReader indexReader = sf.openIndexReader( classByNumber );
+			IndexSearcher searcher = new IndexSearcher( indexReader );
 			TopDocs hits = searcher.search( luceneQuery, 1000 );
 			assertEquals( 1, hits.totalHits );
+			searcher.close();
+			indexReader.close();
 		}
 	}
 
@@ -278,18 +283,25 @@ public class MutableFactoryTest {
 					MutableFactoryTest.doIndexWork(entity, i, factory, context );
 					context.end();
 					
-					DirectoryProvider<?>[] directoryProviders = factory.getDirectoryProviders( aClass );
-					Assert.assertTrue( "Configuration lost: expected RAM directory", directoryProviders[0] instanceof RAMDirectoryProvider );
+					EntityIndexMapping<?> entityIndexMapping = factory.getIndexMappingForEntity().get( aClass );
+					assertNotNull( entityIndexMapping );
+					IndexManager[] indexManagers = entityIndexMapping.getIndexManagers();
+					assertEquals( 1, indexManagers.length );
+					DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+					DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();
+					Assert.assertTrue( "Configuration lost: expected RAM directory", directoryProvider instanceof RAMDirectoryProvider );
 
 					Query luceneQuery = parser.parse( "Emmanuel" + i);
-					DirectoryProvider<?> provider = factory.getDirectoryProviders( aClass )[0];
-					IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+					IndexReader indexReader = factory.openIndexReader( aClass );
+					IndexSearcher searcher = new IndexSearcher( indexReader );
 					TopDocs hits = searcher.search( luceneQuery, 1000 );
 					if ( hits.totalHits != 1 ) {
 						failure = true;
 						failureInfo = "failure: Emmanuel" + i + " for " + aClass.getName();
 						return;
 					}
+					searcher.close();
+					indexReader.close();
 				}
 			}
 			catch ( Exception e ) {

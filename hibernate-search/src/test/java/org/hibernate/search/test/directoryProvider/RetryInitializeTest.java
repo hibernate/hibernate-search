@@ -24,9 +24,10 @@ import java.io.File;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
-import org.hibernate.HibernateException;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 import org.junit.After;
@@ -82,9 +83,11 @@ public class RetryInitializeTest {
 		assertNotNull( scheduledPeriod );
 		assertEquals( Long.valueOf( 12000L ), scheduledPeriod );
 		
-		DirectoryProvider[] directoryProviders = slave.getSearchFactory().getDirectoryProviders( SnowStorm.class );
-		assertEquals( 1, directoryProviders.length );
-		FSSlaveDirectoryProviderTestingExtension dp = (FSSlaveDirectoryProviderTestingExtension) directoryProviders[0];
+		EntityIndexMapping<?> entityIndexMapping = slave.getSearchFactory().getIndexMappingForEntity().get( SnowStorm.class );
+		IndexManager[] indexManagers = entityIndexMapping.getIndexManagers();
+		assertEquals( 1, indexManagers.length );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+		FSSlaveDirectoryProviderTestingExtension dp = (FSSlaveDirectoryProviderTestingExtension) indexManager.getDirectoryProvider();
 		// now as master wasn't started yet, it should return a "dummy" index a RAMDirectory
 		Directory directory = dp.getDirectory();
 		assertTrue( directory instanceof RAMDirectory );
