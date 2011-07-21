@@ -31,7 +31,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
@@ -50,13 +49,11 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * Factory delegating to a concrete implementation of another factory,
@@ -106,10 +103,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getWorker();
 	}
 
-	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-		return delegate.getOptimizerStrategy( provider );
-	}
-
 	public FilterCachingStrategy getFilterCachingStrategy() {
 		return delegate.getFilterCachingStrategy();
 	}
@@ -146,18 +139,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.createHSQuery();
 	}
 
-	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-		return delegate.getClassesInDirectoryProvider( directoryProvider );
-	}
-
-	public Set<DirectoryProvider<?>> getDirectoryProviders() {
-		return delegate.getDirectoryProviders();
-	}
-
-	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
-		return delegate.getDirectoryProviderLock( dp );
-	}
-
 	public int getFilterCacheBitResultsSize() {
 		return delegate.getFilterCacheBitResultsSize();
 	}
@@ -168,10 +149,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer writerThreads) {
 		return delegate.makeBatchBackend( progressMonitor, writerThreads );
-	}
-
-	public Similarity getSimilarity(DirectoryProvider<?> directoryProvider) {
-		return delegate.getSimilarity( directoryProvider );
 	}
 
 	public ErrorHandler getErrorHandler() {
@@ -232,10 +209,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
 		return delegate.getDocumentBuildersContainedEntities();
-	}
-
-	public Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData() {
-		return delegate.getDirectoryProviderData();
 	}
 
 	public void addClasses(Class<?>... classes) {

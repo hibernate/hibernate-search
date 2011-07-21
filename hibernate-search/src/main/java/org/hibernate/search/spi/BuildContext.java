@@ -23,13 +23,8 @@
  */
 package org.hibernate.search.spi;
 
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.IndexManagerFactory;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Build context that can be used by some services at initialization
@@ -60,15 +55,6 @@ public interface BuildContext {
 	SearchFactoryImplementor getUninitializedSearchFactory();
 
 	String getIndexingStrategy();
-
-	Set<DirectoryProvider<?>> getDirectoryProviders();
-	
-	/**
-	 * This method cannot be used in initialize methods. start methods can use it though.
-	 * @param provider
-	 * @return
-	 */
-	ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> provider);
 
 	/**
 	 * Declare the use of a service.

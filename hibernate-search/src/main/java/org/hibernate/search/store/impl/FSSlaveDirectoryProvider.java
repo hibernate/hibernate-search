@@ -37,6 +37,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.FileHelper;
@@ -44,7 +46,6 @@ import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -85,6 +86,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	private Properties properties;
 	private UpdateTask updateTask;
 
+	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.properties = properties;
 		this.directoryProviderName = directoryProviderName;
@@ -130,7 +132,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		return currentMarkerInSource;
 	}
 
-	public void start() {
+	@Override
+	public void start(DirectoryBasedIndexManager indexManager) {
 		if ( ! attemptInitializeAndStart() ) {
 			// if we failed to initialize and/or start, we'll try again later: setup a timer
 			long period = DirectoryProviderHelper.getRetryInitializePeriod( properties, directoryProviderName );

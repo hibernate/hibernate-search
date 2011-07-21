@@ -24,9 +24,12 @@
 package org.hibernate.search;
 
 
+import java.util.Map;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.stat.Statistics;
@@ -56,6 +59,8 @@ public interface SearchFactory {
 	 */
 	@Deprecated
 	DirectoryProvider[] getDirectoryProviders(Class<?> entity);
+	
+	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
 	
 	/**
 	 * Optimize all indexes

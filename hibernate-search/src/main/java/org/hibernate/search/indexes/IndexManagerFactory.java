@@ -22,7 +22,6 @@ package org.hibernate.search.indexes;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -240,12 +239,15 @@ public class IndexManagerFactory {
 		return indexManagersRegistry.values();
 	}
 
-	/**
-	 * @param factory
-	 */
 	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
 		for ( IndexManager indexManager : getIndexManagers() ) {
 			indexManager.setBoundSearchFactory( factory );
+		}
+	}
+
+	public void stop() {
+		for ( IndexManager indexManager : getIndexManagers() ) {
+			indexManager.destroy();
 		}
 	}
 

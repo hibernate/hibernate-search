@@ -25,15 +25,11 @@ package org.hibernate.search.spi;
 
 import java.util.Set;
 
-import org.apache.lucene.search.Similarity;
-
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * Build context for the worker and other backend
@@ -48,15 +44,7 @@ public interface WorkerBuildContext extends BuildContext {
 	 */
 	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 
-	OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider);
-
-	Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> provider);
-
 	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> directoryProvider);
-
-	Similarity getSimilarity(DirectoryProvider<?> directoryProvider);
-
-	DirectoryProviderData getDirectoryProviderData(DirectoryProvider<?> provider);
 
 	ErrorHandler getErrorHandler();
 

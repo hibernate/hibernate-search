@@ -32,6 +32,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -40,6 +41,7 @@ import org.hibernate.search.backend.impl.lucene.PerDirectoryWorkProcessor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -57,22 +59,24 @@ public class LuceneBatchBackend implements BatchBackend {
 
 	private static final DpSelectionVisitor providerSelectionVisitor = new DpSelectionVisitor();
 
-	private SearchFactoryImplementor searchFactoryImplementor;
+	private SearchFactoryIntegrator searchFactoryImplementor;
 	private final Map<DirectoryProvider<?>,DirectoryProviderWorkspace> resourcesMap = new HashMap<DirectoryProvider<?>,DirectoryProviderWorkspace>();
 	private final PerDirectoryWorkProcessor asyncWorker = new AsyncBatchPerDirectoryWorkProcessor();
 	private final PerDirectoryWorkProcessor syncWorker = new SyncBatchPerDirectoryWorkProcessor();
 
 	private Map<Class<?>, EntityIndexMapping<?>> indexMappers;
 
-	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, WorkerBuildContext context) {
-		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
+	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, SearchFactoryIntegrator searchFactory) {
+		this.searchFactoryImplementor = searchFactory;
 		indexMappers = searchFactoryImplementor.getIndexMappingForEntity();
 		final int maxThreadsPerIndex = definedIndexWriters( cfg );
+		/*
 		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
+		searchFactoryImplementor.
 		for ( DirectoryProvider<?> dp : context.getDirectoryProviders() ) {
 			DirectoryProviderWorkspace resources = new DirectoryProviderWorkspace( context, dp, monitor, maxThreadsPerIndex, errorHandler );
 			resourcesMap.put( dp, resources );
-		}
+		}*/
 	}
 
 	public void enqueueAsyncWork(LuceneWork work) throws InterruptedException {

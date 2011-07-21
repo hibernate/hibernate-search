@@ -19,9 +19,10 @@
 
 package org.hibernate.search.test.backend;
 
+import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.impl.MutableSearchFactory;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.Clock;
 import org.hibernate.search.test.SearchTestCase;
 import org.junit.Test;
@@ -42,10 +43,10 @@ public class WorkQueueLengthConfiguredTest extends SearchTestCase {
 	@Test
 	public void testNothingTest() {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		DirectoryProvider[] directoryProviders = searchFactory.getDirectoryProviders( Clock.class );
-		assertEquals( 1, directoryProviders.length );
-		DirectoryProviderData directoryProviderData = searchFactory.getDirectoryProviderData()
-			.get( directoryProviders[0] );
+		EntityIndexMapping<Clock> indexMappingForEntity = searchFactory.getIndexMappingForEntity( Clock.class );
+		IndexManager[] indexManagers = indexMappingForEntity.getIndexManagers();
+		assertEquals( 1, indexManagers.length );
+		DirectoryProviderData directoryProviderData = indexManagers[0].getDirectoryProviderData();
 		assertEquals( 5, directoryProviderData.getMaxQueueLength() );
 	}
 

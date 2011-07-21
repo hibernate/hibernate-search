@@ -297,6 +297,7 @@ public class SearchFactoryBuilder {
 
 	//TODO review this check - I don't think it still works.
 	private void fillSimilarityMapping() {
+		/*
 		final Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities = factoryState.getIndexMappingForEntity();
 		for ( DirectoryProviderData directoryConfiguration : factoryState.getDirectoryProviderData().values() ) {
 			for ( Class<?> indexedType : directoryConfiguration.getClasses() ) {
@@ -315,6 +316,7 @@ public class SearchFactoryBuilder {
 				}
 			}
 		}
+		*/
 	}
 
 	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {
@@ -339,7 +341,6 @@ public class SearchFactoryBuilder {
 			rootFactory = new MutableSearchFactory();
 			factoryState.setDocumentBuildersIndexedEntities( new HashMap<Class<?>, EntityIndexMapping<?>>() );
 			factoryState.setDocumentBuildersContainedEntities( new HashMap<Class<?>, DocumentBuilderContainedEntity<?>>() );
-			factoryState.setDirectoryProviderData( new HashMap<DirectoryProvider<?>, DirectoryProviderData>() );
 			factoryState.setFilterDefinitions( new HashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
@@ -621,30 +622,12 @@ public class SearchFactoryBuilder {
 			return factoryState.getIndexingStrategy();
 		}
 
-		public Set<DirectoryProvider<?>> getDirectoryProviders() {
-			return factoryState.getDirectoryProviderData().keySet();
-		}
-
 		public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
 			factoryState.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
 		}
 
-		public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-			return factoryState.getDirectoryProviderData().get( provider ).getOptimizerStrategy();
-		}
-
-		public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-			return Collections.unmodifiableSet(
-					factoryState.getDirectoryProviderData().get( directoryProvider ).getClasses()
-			);
-		}
-
 		public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
 			return factoryState.getDirectoryProviderIndexingParams().get( provider );
-		}
-
-		public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
-			return factoryState.getDirectoryProviderData().get( dp ).getDirLock();
 		}
 
 		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
@@ -653,18 +636,6 @@ public class SearchFactoryBuilder {
 
 		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
 			factoryState.getServiceManager().releaseService( provider );
-		}
-
-		public Similarity getSimilarity(DirectoryProvider<?> provider) {
-			Similarity similarity = factoryState.getDirectoryProviderData().get( provider ).getSimilarity();
-			if ( similarity == null ) {
-				throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
-			}
-			return similarity;
-		}
-
-		public DirectoryProviderData getDirectoryProviderData(DirectoryProvider<?> provider) {
-			return factoryState.getDirectoryProviderData().get( provider );
 		}
 
 		public ErrorHandler getErrorHandler() {

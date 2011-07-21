@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.CorruptIndexException;
@@ -104,8 +105,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
-		directoryProvider.initialize( indexName, cfg, buildContext );
-		directoryProvider.start();
+		directoryProvider.start( this );
 		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
 		inexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
@@ -185,6 +185,13 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void setBoundSearchFactory(SearchFactoryImplementor boundSearchFactory) {
 		this.boundSearchFactory = boundSearchFactory;
+	}
+	
+	/**
+	 * @return
+	 */
+	public Lock getDirectoryModificationLock() {
+		return null;
 	}
 
 }

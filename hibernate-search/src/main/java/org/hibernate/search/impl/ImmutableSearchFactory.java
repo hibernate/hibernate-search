@@ -100,7 +100,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final Map<Class<?>, EntityIndexMapping<?>> indexMappingsForEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
-	private final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData;
 	private final Worker worker;
 	private final ReaderProvider readerProvider;
 	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
@@ -129,7 +128,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.backendQueueProcessorFactory = state.getBackendQueueProcessorFactory();
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
-		this.dirProviderData = state.getDirectoryProviderData();
 		this.dirProviderIndexingParams = state.getDirectoryProviderIndexingParams();
 		this.indexMappingsForEntities = state.getIndexMappingForEntity();
 		this.documentBuildersContainedEntities = state.getDocumentBuildersContainedEntities();
@@ -193,15 +191,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 				log.readerProviderExceptionOnDestroy( e );
 			}
 
-			//TODO move directory provider cleaning to DirectoryProviderFactory
-			for ( DirectoryProvider dp : getDirectoryProviders() ) {
-				try {
-					dp.stop();
-				}
-				catch ( Exception e ) {
-					log.directoryProviderExceptionOnStop( e );
-				}
-			}
+			this.allIndexesManager.stop();
 
 			serviceManager.stopServices();
 		}
@@ -211,16 +201,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return new HSQueryImpl( this );
 	}
 
-	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-		return Collections.unmodifiableSet( dirProviderData.get( directoryProvider ).getClasses() );
-	}
-
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
-	}
-
-	public Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData() {
-		return dirProviderData;
 	}
 
 	public Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity() {
@@ -237,10 +219,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return (DocumentBuilderContainedEntity<T>) documentBuildersContainedEntities.get( entityType );
 	}
 
-	public Set<DirectoryProvider<?>> getDirectoryProviders() {
-		return this.dirProviderData.keySet();
-	}
-
 	public void addClasses(Class<?>... classes) {
 		throw new AssertionFailure( "Cannot add classes to an " + ImmutableSearchFactory.class.getName() );
 	}
@@ -251,10 +229,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
 		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called" );
-	}
-
-	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-		return dirProviderData.get( provider ).getOptimizerStrategy();
 	}
 
 	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
@@ -341,10 +315,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return filterDefinitions.get( name );
 	}
 
-	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
-		return this.dirProviderData.get( dp ).getDirLock();
-	}
-
 	public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
 		return serviceManager.requestService( provider );
 	}
@@ -383,18 +353,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		);
 		batchBackend.initialize( batchBackendConfiguration, progressMonitor, this );
 		return batchBackend;
-	}
-
-	public Similarity getSimilarity(DirectoryProvider<?> provider) {
-		Similarity similarity = dirProviderData.get( provider ).getSimilarity();
-		if ( similarity == null ) {
-			throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
-		}
-		return similarity;
-	}
-
-	public DirectoryProviderData getDirectoryProviderData(DirectoryProvider<?> provider) {
-		return dirProviderData.get( provider );
 	}
 
 	public ErrorHandler getErrorHandler() {

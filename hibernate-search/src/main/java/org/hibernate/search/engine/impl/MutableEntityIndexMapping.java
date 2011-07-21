@@ -30,7 +30,6 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -40,7 +39,7 @@ public class MutableEntityIndexMapping<T> implements EntityIndexMapping<T> {
 	private final IndexShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
 	private DocumentBuilderIndexedEntity<T> documentBuilder;
-	private final IndexManager[] providers;
+	private final IndexManager[] indexManagers;
 
 	/**
 	 * @param shardingStrategy
@@ -50,7 +49,7 @@ public class MutableEntityIndexMapping<T> implements EntityIndexMapping<T> {
 	public MutableEntityIndexMapping(IndexShardingStrategy shardingStrategy, Similarity similarityInstance, IndexManager[] providers) {
 				this.shardingStrategy = shardingStrategy;
 				this.similarityInstance = similarityInstance;
-				this.providers = providers;
+				this.indexManagers = providers;
 	}
 
 	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder) {
@@ -85,12 +84,17 @@ public class MutableEntityIndexMapping<T> implements EntityIndexMapping<T> {
 
 	@Override
 	public DirectoryProvider[] getDirectoryProviders() {
-		DirectoryProvider[] dps = new DirectoryProvider[providers.length];
-		for ( int i = 0; i < providers.length; i++ ) {
-			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) providers[i];
+		DirectoryProvider[] dps = new DirectoryProvider[indexManagers.length];
+		for ( int i = 0; i < indexManagers.length; i++ ) {
+			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[i];
 			dps[i] = indexManager.getDirectoryProvider();
 		}
 		return dps;
+	}
+
+	@Override
+	public IndexManager[] getIndexManagers() {
+		return indexManagers;
 	}
 
 }

@@ -23,6 +23,7 @@ package org.hibernate.search.engine.spi;
 import java.util.Set;
 
 import org.apache.lucene.search.Similarity;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -65,5 +66,10 @@ public interface EntityIndexMapping<T> {
 	 * @return
 	 */
 	DirectoryProvider[] getDirectoryProviders();
+
+	/**
+	 * @return
+	 */
+	IndexManager[] getIndexManagers();
 
 }

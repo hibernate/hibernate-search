@@ -49,8 +49,6 @@ import java.util.Properties;
 public interface SearchFactoryState {
 	Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities();
 
-	Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData();
-
 	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
 
 	String getIndexingStrategy();

@@ -25,6 +25,7 @@ package org.hibernate.search.spi;
 
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.query.engine.spi.HSQuery;
 
 /**
@@ -68,5 +69,7 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	 * @return true if the SearchFactory was stopped
 	 */
 	boolean isStopped();
+	
+	ErrorHandler getErrorHandler();
 	
 }

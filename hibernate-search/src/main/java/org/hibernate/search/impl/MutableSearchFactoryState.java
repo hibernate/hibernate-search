@@ -52,7 +52,6 @@ import java.util.Properties;
  */
 public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
-	private Map<DirectoryProvider<?>, DirectoryProviderData> directoryProviderData;
 	private Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
 	private String indexingStrategy;
 	private Worker worker;
@@ -74,7 +73,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
 		documentBuildersIndexedEntities = oldFactoryState.getIndexMappingForEntity();
 		documentBuildersContainedEntities = oldFactoryState.getDocumentBuildersContainedEntities();
-		directoryProviderData = oldFactoryState.getDirectoryProviderData();
 		worker = oldFactoryState.getWorker();
 		readerProvider = oldFactoryState.getReaderProvider();
 		backendQueueProcessorFactory = oldFactoryState.getBackendQueueProcessorFactory();
@@ -101,10 +99,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
-	}
-
-	public Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData() {
-		return directoryProviderData;
 	}
 
 	public Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity() {
@@ -161,10 +155,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setDocumentBuildersContainedEntities(Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities) {
 		this.documentBuildersContainedEntities = documentBuildersContainedEntities;
-	}
-
-	public void setDirectoryProviderData(Map<DirectoryProvider<?>, DirectoryProviderData> directoryProviderData) {
-		this.directoryProviderData = directoryProviderData;
 	}
 
 	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities) {

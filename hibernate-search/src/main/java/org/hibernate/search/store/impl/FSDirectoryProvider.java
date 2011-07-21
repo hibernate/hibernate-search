@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
 
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -58,6 +59,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	private FSDirectory directory;
 	private String indexName;
 
+	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		// on "manual" indexing skip read-write check on index directory
 		boolean manual = context.getIndexingStrategy().equals( "manual" );
@@ -72,7 +74,8 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 		}
 	}
 
-	public void start() {
+	@Override
+	public void start(DirectoryBasedIndexManager indexManager) {
 		//all the process is done in initialize
 	}
 
