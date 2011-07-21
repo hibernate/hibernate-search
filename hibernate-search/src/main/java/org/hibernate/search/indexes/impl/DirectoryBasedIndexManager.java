@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.indexes.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Properties;
@@ -27,8 +28,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
+import org.apache.lucene.store.Directory;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
@@ -43,6 +47,8 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * First implementation will use the "legacy" DirectoryProvider which served us so well.
@@ -50,6 +56,8 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class DirectoryBasedIndexManager implements IndexManager {
+	
+	private static final Log log = LoggerFactory.make();
 	
 	private String indexName;
 	private final DirectoryProvider directoryProvider;
@@ -75,7 +83,17 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public IndexReader openReader() {
-		return null;
+		Directory directory = directoryProvider.getDirectory();
+		try {
+			return IndexReader.open( directory, true );
+		}
+		catch ( CorruptIndexException e ) {
+			log.cantOpenCorruptedIndex( e );
+		}
+		catch ( IOException e ) {
+			log.ioExceptionOnIndex( e );
+		}
+		throw new SearchException( "Could not open index" );
 	}
 
 	@Override

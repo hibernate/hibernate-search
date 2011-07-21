@@ -27,8 +27,10 @@ import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.lucene.index.CorruptIndexException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -350,5 +352,13 @@ public interface Log extends BasicLogger
    @Message(id = 75, value = "Configuration setting " + org.hibernate.search.Environment.LUCENE_MATCH_VERSION
       + " was not specified, using LUCENE_CURRENT.")
    void recommendConfiguringLuceneVersion();
+
+   @LogMessage(level = ERROR)
+   @Message(id = 76, value = "Could not open Lucene index: data is corrupted")
+   void cantOpenCorruptedIndex(@Cause CorruptIndexException e);
+   
+   @LogMessage(level = ERROR)
+   @Message(id = 77, value = "An IOException happened while accessing the Lucene index")
+   void ioExceptionOnIndex(@Cause IOException e);
 
 }
