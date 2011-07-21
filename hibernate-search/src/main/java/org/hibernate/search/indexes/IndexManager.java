@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
+import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
@@ -122,4 +123,9 @@ public interface IndexManager {
 	 */
 	void setBoundSearchFactory(SearchFactoryImplementor boundSearchFactory);
 
+	/**
+	 * @param entity
+	 */
+	void addContainedEntity(Class<?> entity);
+	
 }

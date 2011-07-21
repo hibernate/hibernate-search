@@ -114,7 +114,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public Set<Class<?>> getContainedTypes() {
-		return containedEntityTypes;
+		return containedEntityTypes;//FIXME
 	}
 
 	@Override
@@ -192,6 +192,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	 */
 	public Lock getDirectoryModificationLock() {
 		return null;
+	}
+
+	@Override
+	public void addContainedEntity(Class<?> entity) {
+		containedEntityTypes.add( entity );
 	}
 
 }

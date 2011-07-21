@@ -75,7 +75,7 @@ public class IndexManagerFactory {
 	//#getReader() will always return a single "naive" IndexReader.
 	//So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
 	//(for both fieldCaches and cached filters)
-	public MutableEntityIndexMapping createIndexManagers(XClass entity, SearchConfiguration cfg,
+	public MutableEntityIndexMapping createIndexManagers(XClass entity, Class mappedClass, SearchConfiguration cfg,
 				WorkerBuildContext context,
 				ReflectionManager reflectionManager) {
 		// read the properties
@@ -98,6 +98,7 @@ public class IndexManagerFactory {
 						);
 				indexManagersRegistry.put( providerName, indexManager );
 			}
+			indexManager.addContainedEntity( mappedClass );
 			providers[index] = indexManager;
 		}
 		
