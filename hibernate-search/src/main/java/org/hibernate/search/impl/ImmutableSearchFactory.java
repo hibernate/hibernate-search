@@ -109,7 +109,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
-	private final ErrorHandler errorHandler;
 	private final PolymorphicIndexHierarchy indexHierarchy;
 	private final StatisticsImpl statistics;
 	private final boolean transactionManagerExpected;
@@ -131,7 +130,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.dirProviderIndexingParams = state.getDirectoryProviderIndexingParams();
 		this.indexMappingsForEntities = state.getIndexMappingForEntity();
 		this.documentBuildersContainedEntities = state.getDocumentBuildersContainedEntities();
-		this.errorHandler = state.getErrorHandler();
 		this.filterCachingStrategy = state.getFilterCachingStrategy();
 		this.filterDefinitions = state.getFilterDefinitions();
 		this.indexHierarchy = state.getIndexHierarchy();
@@ -353,10 +351,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		);
 		batchBackend.initialize( batchBackendConfiguration, progressMonitor, this );
 		return batchBackend;
-	}
-
-	public ErrorHandler getErrorHandler() {
-		return errorHandler;
 	}
 
 	public PolymorphicIndexHierarchy getIndexHierarchy() {

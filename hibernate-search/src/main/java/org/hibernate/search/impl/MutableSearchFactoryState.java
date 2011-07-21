@@ -32,11 +32,9 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.reader.ReaderProvider;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
@@ -62,7 +60,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<String, Analyzer> analyzers;
 	private int cacheBitResultsSize;
 	private Properties configurationProperties;
-	private ErrorHandler errorHandler;
 	private PolymorphicIndexHierarchy indexHierarchy;
 	private Map<DirectoryProvider, LuceneIndexingParameters> directoryProviderIndexingParams;
 	private ServiceManager serviceManager;
@@ -81,7 +78,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		analyzers = oldFactoryState.getAnalyzers();
 		cacheBitResultsSize = oldFactoryState.getCacheBitResultsSize();
 		configurationProperties = oldFactoryState.getConfigurationProperties();
-		errorHandler = oldFactoryState.getErrorHandler();
 		indexHierarchy = oldFactoryState.getIndexHierarchy();
 		directoryProviderIndexingParams = oldFactoryState.getDirectoryProviderIndexingParams();
 		serviceManager = oldFactoryState.getServiceManager();
@@ -141,10 +137,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return configurationProperties;
 	}
 
-	public ErrorHandler getErrorHandler() {
-		return errorHandler;
-	}
-
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
 		return indexHierarchy;
 	}
@@ -195,10 +187,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setConfigurationProperties(Properties configurationProperties) {
 		this.configurationProperties = configurationProperties;
-	}
-
-	public void setErrorHandler(ErrorHandler errorHandler) {
-		this.errorHandler = errorHandler;
 	}
 
 	public void setIndexHierarchy(PolymorphicIndexHierarchy indexHierarchy) {

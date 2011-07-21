@@ -41,7 +41,6 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.CommonPropertiesParse;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -69,7 +68,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private LuceneIndexingParameters inexingParameters;
 	private Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
 	private final DirectoryProviderData directoryOptions = new DirectoryProviderData(); //TODO read these options out of properties
-	private ErrorHandler errorHandler = new LogErrorHandler(); //TODO use the configurable factory
+	private ErrorHandler errorHandler;
 	
 	private SearchFactoryImplementor boundSearchFactory = null;
 	
@@ -106,6 +105,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
 		directoryProvider.start( this );
+		errorHandler = CommonPropertiesParse.createErrorHandler( cfg );
 		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
 		inexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );

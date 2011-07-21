@@ -22,15 +22,19 @@ package org.hibernate.search.indexes;
 
 import java.util.Properties;
 
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.LogErrorHandler;
+import org.hibernate.search.impl.ImmutableSearchFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.NoOpOptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * Contains helper to parse properties which should be read by the majority
@@ -110,6 +114,22 @@ public class CommonPropertiesParse {
 	public static LuceneIndexingParameters extractIndexingPerformanceOptions(Properties indexProps) {
 		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters( indexProps );
 		return indexingParams;
+	}
+	
+	public static ErrorHandler createErrorHandler(Properties configuration) {
+		String errorHandlerClassName = configuration.getProperty( Environment.ERROR_HANDLER );
+		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
+			return new LogErrorHandler();
+		}
+		else if ( errorHandlerClassName.trim().equals( "log" ) ) {
+			return new LogErrorHandler();
+		}
+		else {
+			return ClassLoaderHelper.instanceFromName(
+					ErrorHandler.class, errorHandlerClassName,
+					ImmutableSearchFactory.class, "Error Handler"
+			);
+		}
 	}
 
 }

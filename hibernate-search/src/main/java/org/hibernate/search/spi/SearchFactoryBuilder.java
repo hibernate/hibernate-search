@@ -27,7 +27,6 @@ package org.hibernate.search.spi;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,9 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
@@ -80,8 +76,6 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.impl.ConfigContext;
@@ -93,12 +87,10 @@ import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.jmx.IndexControl;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -344,7 +336,6 @@ public class SearchFactoryBuilder {
 			factoryState.setFilterDefinitions( new HashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
-			factoryState.setErrorHandler( createErrorHandler( factoryState.getConfigurationProperties() ) );
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
 			factoryState.setAllIndexesManager( new IndexManagerFactory() );
 		}
@@ -571,22 +562,6 @@ public class SearchFactoryBuilder {
 		}
 	}
 
-	private static ErrorHandler createErrorHandler(Properties configuration) {
-		String errorHandlerClassName = configuration.getProperty( Environment.ERROR_HANDLER );
-		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
-			return new LogErrorHandler();
-		}
-		else if ( errorHandlerClassName.trim().equals( "log" ) ) {
-			return new LogErrorHandler();
-		}
-		else {
-			return ClassLoaderHelper.instanceFromName(
-					ErrorHandler.class, errorHandlerClassName,
-					ImmutableSearchFactory.class, "Error Handler"
-			);
-		}
-	}
-
 	private ReflectionManager getReflectionManager(SearchConfiguration cfg) {
 		ReflectionManager reflectionManager = cfg.getReflectionManager();
 		return geReflectionManager( reflectionManager );
@@ -636,10 +611,6 @@ public class SearchFactoryBuilder {
 
 		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
 			factoryState.getServiceManager().releaseService( provider );
-		}
-
-		public ErrorHandler getErrorHandler() {
-			return factoryState.getErrorHandler();
 		}
 
 		@SuppressWarnings("unchecked")

@@ -70,6 +70,4 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	 */
 	boolean isStopped();
 	
-	ErrorHandler getErrorHandler();
-	
 }

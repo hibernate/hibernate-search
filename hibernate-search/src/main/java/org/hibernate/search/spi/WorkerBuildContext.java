@@ -23,12 +23,9 @@
  */
 package org.hibernate.search.spi;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.store.DirectoryProvider;
 
 /**
@@ -45,8 +42,6 @@ public interface WorkerBuildContext extends BuildContext {
 	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 
 	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> directoryProvider);
-
-	ErrorHandler getErrorHandler();
 
 	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> managedType);
 	

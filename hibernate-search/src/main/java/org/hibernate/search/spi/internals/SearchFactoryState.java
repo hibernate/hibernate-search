@@ -32,7 +32,6 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.reader.ReaderProvider;
@@ -70,8 +69,6 @@ public interface SearchFactoryState {
 	int getCacheBitResultsSize();
 
 	Properties getConfigurationProperties();
-
-	ErrorHandler getErrorHandler();
 
 	PolymorphicIndexHierarchy getIndexHierarchy();
 

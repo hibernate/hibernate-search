@@ -147,10 +147,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.makeBatchBackend( progressMonitor, writerThreads );
 	}
 
-	public ErrorHandler getErrorHandler() {
-		return delegate.getErrorHandler();
-	}
-
 	public boolean isJMXEnabled() {
 		return delegate.isJMXEnabled();
 	}
