@@ -23,6 +23,7 @@ package org.hibernate.search.indexes.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +37,7 @@ import org.apache.lucene.store.Directory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
@@ -130,12 +132,17 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	public DirectoryProvider getDirectoryProvider() {
 		return directoryProvider;
 	}
+	
+	@Override
+	public void performOperation(LuceneWork singleOperation) {
+		ArrayList<LuceneWork> list = new ArrayList<LuceneWork>(1);
+		list.add( singleOperation );
+		performOperation( list );
+	}
 
 	@Override
-	public void performOperation(LuceneWork work) {
-		ArrayList<LuceneWork> list = new ArrayList<LuceneWork>(1);
-		list.add( work );
-		Runnable runnable = backend.getProcessor( list );
+	public void performOperation(List<LuceneWork> workList) {
+		Runnable runnable = backend.getProcessor( workList );
 		if ( backendExecutor != null ) {
 			backendExecutor.execute( runnable );
 		}
@@ -197,6 +204,16 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void addContainedEntity(Class<?> entity) {
 		containedEntityTypes.add( entity );
+	}
+
+	@Override
+	public void optimize() {
+		performOperation( new OptimizeLuceneWork() );
+	}
+
+	//Not exposed on the interface
+	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
+		return backend;
 	}
 
 }

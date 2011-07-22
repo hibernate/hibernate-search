@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.spi;
 
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.store.DirectoryProvider;
@@ -35,11 +34,6 @@ import org.hibernate.search.store.DirectoryProvider;
  * @author Emmanuel Bernard
  */
 public interface WorkerBuildContext extends BuildContext {
-	/**
-	 * Register the backend queue processor factory. Should only be called by the Worker implementation.
-	 * TODO should we move it to a different interface
-	 */
-	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 
 	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> directoryProvider);
 

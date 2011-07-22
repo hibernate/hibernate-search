@@ -23,24 +23,20 @@
  */
 package org.hibernate.search.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.stat.impl.StatisticsImpl;
@@ -55,8 +51,6 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
-import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
 import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -64,7 +58,6 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
@@ -75,13 +68,11 @@ import org.hibernate.search.query.engine.impl.HSQueryImpl;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -102,7 +93,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
 	private final Worker worker;
 	private final ReaderProvider readerProvider;
-	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
 	private final Map<String, Analyzer> analyzers;
@@ -124,7 +114,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
-		this.backendQueueProcessorFactory = state.getBackendQueueProcessorFactory();
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
 		this.dirProviderIndexingParams = state.getDirectoryProviderIndexingParams();
@@ -159,10 +148,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 					new StatisticsInfo( statistics ), StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME
 			);
 		}
-	}
-
-	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
-		return backendQueueProcessorFactory;
 	}
 
 	public Map<String, FilterDef> getFilterDefinitions() {
@@ -250,12 +235,13 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public void optimize(Class entityType) {
-		if ( !getIndexMappingForEntity().containsKey( entityType ) ) {
+		EntityIndexMapping indexMapping = getIndexMappingForEntity( entityType );
+		if ( indexMapping == null ) {
 			throw new SearchException( "Entity not indexed: " + entityType );
 		}
-		List<LuceneWork> queue = new ArrayList<LuceneWork>( 1 );
-		queue.add( new OptimizeLuceneWork( entityType ) );
-		getBackendQueueProcessorFactory().getProcessor( queue ).run();
+		for ( IndexManager im: indexMapping.getIndexManagers() ) {
+			im.optimize();
+		}
 	}
 
 	public Analyzer getAnalyzer(String name) {

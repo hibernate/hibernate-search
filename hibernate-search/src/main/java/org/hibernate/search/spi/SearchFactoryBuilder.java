@@ -39,7 +39,6 @@ import java.util.Set;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexMapping;
@@ -596,10 +595,6 @@ public class SearchFactoryBuilder {
 
 		public String getIndexingStrategy() {
 			return factoryState.getIndexingStrategy();
-		}
-
-		public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
-			factoryState.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
 		}
 
 		public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {

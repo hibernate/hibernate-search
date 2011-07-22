@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.jgroups.master;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +42,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.jgroups.BackendMessage;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.test.SearchTestCase;
@@ -59,6 +59,7 @@ import org.hibernate.search.test.jms.master.TShirt;
  * </code>
  *
  * @author Lukasz Moren
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class JGroupsMasterTest extends SearchTestCase {
 
@@ -97,7 +98,8 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		//send message to all listeners
-		Message message = new Message( null, null, ( Serializable ) queue );
+		BackendMessage wrapper = new BackendMessage( "org.hibernate.search.test.jms.master.TShirt", queue);
+		Message message = new Message( null, null, wrapper );
 		channel.send( message );
 	}
 
@@ -165,9 +167,9 @@ public class JGroupsMasterTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		// JGroups configuration for master node
-		cfg.setProperty( Environment.WORKER_BACKEND, "jgroupsMaster" );
-		cfg.setProperty( JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty(
+		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
+		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( "hibernate.search.default." + 
 				JGroupsBackendQueueProcessorFactory.CONFIGURATION_STRING, prepareJGroupsConfigurationString()
 		);
 	}

@@ -72,7 +72,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		documentBuildersContainedEntities = oldFactoryState.getDocumentBuildersContainedEntities();
 		worker = oldFactoryState.getWorker();
 		readerProvider = oldFactoryState.getReaderProvider();
-		backendQueueProcessorFactory = oldFactoryState.getBackendQueueProcessorFactory();
 		filterDefinitions = oldFactoryState.getFilterDefinitions();
 		filterCachingStrategy = oldFactoryState.getFilterCachingStrategy();
 		analyzers = oldFactoryState.getAnalyzers();

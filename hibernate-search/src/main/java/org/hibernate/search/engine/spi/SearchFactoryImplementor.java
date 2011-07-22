@@ -26,10 +26,10 @@ package org.hibernate.search.engine.spi;
 import java.util.Set;
 
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
@@ -40,7 +40,6 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  * @author Hardy Ferentschik
  */
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
-	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
 
 	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType);
 
@@ -73,5 +72,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * Can be disabled to get pre-3.4 behavior (always rebuild document)
 	 */
 	boolean isDirtyChecksEnabled();
+	
+	IndexManagerFactory getAllIndexesManager();
 	
 }

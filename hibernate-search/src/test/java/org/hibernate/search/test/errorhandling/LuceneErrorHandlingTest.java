@@ -32,7 +32,6 @@ import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.WorkVisitor;
@@ -67,25 +66,23 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		ErrorHandler errorHandler = indexManager.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
-		BackendQueueProcessorFactory queueProcessorFactory = searchFactory.getBackendQueueProcessorFactory();
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( new HarmlessWork( "firstWork" ) );
 		queue.add( new HarmlessWork( "secondWork" ) );
-		Runnable processor = queueProcessorFactory.getProcessor( queue );
 		workcounter.set( 0 ); // reset work counter
-		processor.run();
+		indexManager.performOperation( queue );
 		Assert.assertEquals( 2, workcounter.get() );
 		
 		workcounter.set( 0 ); // reset work counter
-		final FailingWork firstFailure = new FailingWork("firstFailure");
-		queue.add(firstFailure);
-		final HarmlessWork thirdWork = new HarmlessWork("thirdWork");
-		queue.add(thirdWork);
-		final HarmlessWork fourthWork = new HarmlessWork("fourthWork");
-		queue.add(fourthWork);
-		processor = queueProcessorFactory.getProcessor( queue );
-		processor.run();
+		final FailingWork firstFailure = new FailingWork( "firstFailure" );
+		queue.add( firstFailure );
+		final HarmlessWork thirdWork = new HarmlessWork( "thirdWork" );
+		queue.add( thirdWork );
+		final HarmlessWork fourthWork = new HarmlessWork( "fourthWork" );
+		queue.add( fourthWork );
+		indexManager.performOperation( queue );
 		Assert.assertEquals( 2, workcounter.get() );
+
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Throwable exception = mockErrorHandler.getLastException();
 		
@@ -111,7 +108,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
+		cfg.setProperty( "hibernate.search.default." + Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
 	
 	/**

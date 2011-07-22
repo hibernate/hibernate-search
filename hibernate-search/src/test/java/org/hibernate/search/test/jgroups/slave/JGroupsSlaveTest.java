@@ -47,6 +47,7 @@ import org.hibernate.search.util.impl.XMLHelper;
  * </code>
  *
  * @author Lukasz Moren
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class JGroupsSlaveTest extends SearchTestCase {
 
@@ -128,9 +129,9 @@ public class JGroupsSlaveTest extends SearchTestCase {
 
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.setProperty( JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( JGroupsBackendQueueProcessorFactory.CONFIGURATION_XML, prepareXmlJGroupsConfiguration() );
+		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
+		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessorFactory.CONFIGURATION_XML, prepareXmlJGroupsConfiguration() );
 	}
 
 	private String prepareXmlJGroupsConfiguration() {

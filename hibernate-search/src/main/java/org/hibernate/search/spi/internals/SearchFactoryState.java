@@ -25,7 +25,6 @@
 package org.hibernate.search.spi.internals;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -55,10 +54,6 @@ public interface SearchFactoryState {
 	Worker getWorker();
 
 	ReaderProvider getReaderProvider();
-
-	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
-
-	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 
 	Map<String, FilterDef> getFilterDefinitions();
 

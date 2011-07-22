@@ -20,13 +20,13 @@
  */
 package org.hibernate.search.indexes;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
-import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
@@ -66,7 +66,10 @@ public interface IndexManager {
 	 * Operations can be applied in sync or async, depending on the IndexManager implementation and configuration.
 	 * @param queue the list of write operations to apply.
 	 */
-	void performOperation(LuceneWork work);
+	void performOperation(List<LuceneWork> work);
+	
+	@Deprecated //REMOVE THIS!
+	void performOperation(LuceneWork singleOperation);
 	
 	/**
 	 * Initialize the reader provider before its use.
@@ -127,5 +130,10 @@ public interface IndexManager {
 	 * @param entity
 	 */
 	void addContainedEntity(Class<?> entity);
+
+	/**
+	 * 
+	 */
+	void optimize();
 	
 }

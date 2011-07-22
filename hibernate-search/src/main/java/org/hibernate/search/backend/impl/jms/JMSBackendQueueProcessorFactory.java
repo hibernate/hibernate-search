@@ -41,6 +41,7 @@ import org.hibernate.search.util.impl.JNDIHelper;
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 	private String jmsQueueName;
@@ -49,6 +50,7 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 	private Properties properties;
 	private Queue jmsQueue;
 	private QueueConnectionFactory factory;
+	private String indexName;
 	public static final String JMS_CONNECTION_FACTORY = Environment.WORKER_PREFIX + "jms.connection_factory";
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
 
@@ -57,11 +59,12 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 		this.properties = props;
 		this.jmsConnectionFactoryName = props.getProperty( JMS_CONNECTION_FACTORY );
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
+		this.indexName = indexManager.getIndexName();
 		prepareJMSTools();
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new JMSBackendQueueProcessor( queue, this );
+		return new JMSBackendQueueProcessor( indexName, queue, this );
 	}
 
 	public QueueConnectionFactory getJMSFactory() {

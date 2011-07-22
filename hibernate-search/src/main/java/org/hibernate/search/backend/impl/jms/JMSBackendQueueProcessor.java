@@ -41,15 +41,19 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class JMSBackendQueueProcessor implements Runnable {
+
 	private static final Log log = LoggerFactory.make();
 
-	private List<LuceneWork> queue;
-	private JMSBackendQueueProcessorFactory factory;
+	private final List<LuceneWork> queue;
+	private final JMSBackendQueueProcessorFactory factory;
+	private final String indexName;
 
-	public JMSBackendQueueProcessor(List<LuceneWork> queue,
-									JMSBackendQueueProcessorFactory jmsBackendQueueProcessorFactory) {
+	public JMSBackendQueueProcessor(String indexName, List<LuceneWork> queue,
+					JMSBackendQueueProcessorFactory jmsBackendQueueProcessorFactory) {
+		this.indexName = indexName;
 		this.queue = queue;
 		this.factory = jmsBackendQueueProcessorFactory;
 	}
@@ -74,6 +78,8 @@ public class JMSBackendQueueProcessor implements Runnable {
 
 			ObjectMessage message = session.createObjectMessage();
 			message.setObject( (Serializable) filteredQueue );
+			message.setStringProperty( AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY,
+					indexName );
 
 			sender = session.createSender( factory.getJmsQueue() );
 			sender.send( message );

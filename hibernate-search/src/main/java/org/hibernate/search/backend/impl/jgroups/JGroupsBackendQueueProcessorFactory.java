@@ -67,11 +67,13 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 	protected SearchFactoryImplementor searchFactory;
 	protected Channel channel = null;
 	protected Address address;
+	protected String indexName;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		JGroupsHelper.verifyIPv4IsPreferred();
 		this.searchFactory = context.getUninitializedSearchFactory();
+		indexName = indexManager.getIndexName();
 
 		if ( props.containsKey( JG_CLUSTER_NAME ) ) {
 			setClusterName( props.getProperty( JG_CLUSTER_NAME ) );

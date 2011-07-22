@@ -252,4 +252,8 @@ public class IndexManagerFactory {
 		}
 	}
 
+	public IndexManager getIndexManager(String targetIndexName) {
+		return indexManagersRegistry.get( targetIndexName );
+	}
+
 }
