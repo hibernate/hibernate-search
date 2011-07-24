@@ -25,24 +25,29 @@ package org.hibernate.search.test.filter;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.DocIdSet;
+import org.hornetq.utils.ConcurrentHashSet;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class InstanceBasedExcludeAllFilter extends Filter implements Serializable {
 	
-	private volatile boolean done = false;
+	// ugly but useful for test purposes
+	private final Set<IndexReader> invokedOnReaders = new ConcurrentHashSet<IndexReader>();
 
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
-		if ( done ) {
+		ExcludeAllFilter.verifyItsAReadOnlySegmentReader( reader );
+		if ( invokedOnReaders.contains( reader ) ) {
 			throw new IllegalStateException( "Called twice" );
 		}
-		done = true;
+		invokedOnReaders.add( reader );
 		return DocIdSet.EMPTY_DOCIDSET;
 	}
 	

@@ -25,26 +25,38 @@ package org.hibernate.search.test.filter;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Set;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.index.IndexReader;
+import org.hibernate.search.SearchException;
+import org.hornetq.utils.ConcurrentHashSet;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class ExcludeAllFilter extends Filter implements Serializable {
 
 	// ugly but useful for test purposes
-	private static volatile boolean done = false;
+	private static final Set<IndexReader> invokedOnReaders = new ConcurrentHashSet<IndexReader>();
 
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
-		if ( done ) {
+		verifyItsAReadOnlySegmentReader( reader );
+		if ( invokedOnReaders.contains( reader ) ) {
 			throw new IllegalStateException( "Called twice" );
 		}
-		done = true;
+		invokedOnReaders.add( reader );
 		return DocIdSet.EMPTY_DOCIDSET;
+	}
+	
+	public static void verifyItsAReadOnlySegmentReader(IndexReader reader) {
+		String implementationName = reader.getClass().getName();
+		if (! "org.apache.lucene.index.ReadOnlySegmentReader".equals( implementationName ) ) {
+			throw new SearchException( "test failed: we should receive subreaders" );
+		}
 	}
 	
 }
