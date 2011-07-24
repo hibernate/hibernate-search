@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -230,10 +231,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public void optimize(Class entityType) {
-		EntityIndexMapping indexMapping = getIndexMappingForEntity( entityType );
-		if ( indexMapping == null ) {
-			throw new SearchException( "Entity not indexed: " + entityType );
-		}
+		EntityIndexMapping indexMapping = getSafeIndexMappingForEntity( entityType );
 		for ( IndexManager im: indexMapping.getIndexManagers() ) {
 			im.optimize();
 		}
@@ -248,17 +246,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public Analyzer getAnalyzer(Class<?> clazz) {
-		if ( clazz == null ) {
-			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
-		}
-		EntityIndexMapping entityMapping = indexMappingsForEntities.get( clazz );
-		if ( entityMapping == null ) {
-			throw new IllegalArgumentException(
-					"Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName()
-			);
-		}
+		EntityIndexMapping entityMapping = getSafeIndexMappingForEntity( clazz );
 		DocumentBuilderIndexedEntity<?> builder = entityMapping.getDocumentBuilder();
-
 		return builder.getAnalyzer();
 	}
 
@@ -375,8 +364,24 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@Override
 	public IndexReader openIndexReader(Class<?>... entities) {
-		//TODO
-		return null;
+		HashMap<String,IndexManager> indexManagers = new HashMap<String,IndexManager>();
+		for ( Class<?> type : entities ) {
+			EntityIndexMapping mappingForEntity = getSafeIndexMappingForEntity( type );
+			IndexManager[] indexManagersForAllShards = mappingForEntity.getSelectionStrategy().getIndexManagersForAllShards();
+			for (IndexManager im : indexManagersForAllShards) {
+				indexManagers.put( im.getIndexName(), im );
+			}
+		}
+		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()]);
+		return getReaderProvider().openReader( uniqueIndexManagers );
+	}
+
+	private EntityIndexMapping getSafeIndexMappingForEntity(Class entityType) {
+		EntityIndexMapping indexMapping = getIndexMappingForEntity( entityType );
+		if ( indexMapping == null ) {
+			throw new IllegalArgumentException( "Entity is not an indexed type: " + entityType );
+		}
+		return indexMapping;
 	}
 
 }
