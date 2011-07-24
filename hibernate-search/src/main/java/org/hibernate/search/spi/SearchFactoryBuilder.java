@@ -33,9 +33,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
@@ -84,6 +86,7 @@ import org.hibernate.search.impl.MappingModelMetadataProvider;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
+import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -286,28 +289,38 @@ public class SearchFactoryBuilder {
 		return rootFactory;
 	}
 
-	//TODO review this check - I don't think it still works.
 	private void fillSimilarityMapping() {
-		/*
+		//TODO cleanup: this logic to select the Similarity is too complex, should likely be done in a previous phase
 		final Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities = factoryState.getIndexMappingForEntity();
-		for ( DirectoryProviderData directoryConfiguration : factoryState.getDirectoryProviderData().values() ) {
-			for ( Class<?> indexedType : directoryConfiguration.getClasses() ) {
-				EntityIndexMapping<?> documentBuilder = documentBuildersIndexedEntities.get( indexedType );
-				Similarity similarity = documentBuilder.getSimilarity();
-				Similarity prevSimilarity = directoryConfiguration.getSimilarity();
-				if ( prevSimilarity != null && !prevSimilarity.getClass().equals( similarity.getClass() ) ) {
+		for ( Entry<Class<?>, EntityIndexMapping<?>> entry : documentBuildersIndexedEntities.entrySet() ) {
+			Class<?> clazz = entry.getKey();
+			EntityIndexMapping<?> entityMapping = entry.getValue();
+			Similarity entitySimilarity = entityMapping.getSimilarity();
+			if ( entitySimilarity == null ) {
+				//might have been read from annotations, fill the missing information in the EntityIndexMapping:
+				entitySimilarity = entityMapping.getDocumentBuilder().getSimilarity();
+				if ( entitySimilarity != null ) {
+					MutableEntityIndexMapping newMapping = new MutableEntityIndexMapping( entityMapping.getSelectionStrategy(), entitySimilarity, entityMapping.getIndexManagers() );
+					newMapping.setDocumentBuilderIndexedEntity( entityMapping.getDocumentBuilder() );
+					entityMapping = newMapping;
+					documentBuildersIndexedEntities.put( clazz, entityMapping );
+				}
+			}
+			IndexManager[] indexManagers = entityMapping.getIndexManagers();
+			for ( IndexManager indexManager : indexManagers ) {
+				Similarity indexSimilarity = indexManager.getSimilarity();
+				if ( entitySimilarity != null && indexSimilarity == null ) {
+					indexManager.setSimilarity( entitySimilarity );
+				}
+				else if ( entitySimilarity != null && ! entitySimilarity.getClass().equals( indexSimilarity.getClass() ) ) {
 					throw new SearchException(
 							"Multiple entities are sharing the same index but are declaring an " +
 									"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
 									"declare the same Similarity implementation."
 					);
 				}
-				else {
-					directoryConfiguration.setSimilarity( similarity );
-				}
 			}
 		}
-		*/
 	}
 
 	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {
