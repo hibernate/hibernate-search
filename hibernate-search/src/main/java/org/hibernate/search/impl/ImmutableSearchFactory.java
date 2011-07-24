@@ -252,12 +252,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
 		}
 		EntityIndexMapping entityMapping = indexMappingsForEntities.get( clazz );
-		DocumentBuilderIndexedEntity<?> builder = entityMapping.getDocumentBuilder();
-		if ( builder == null ) {
+		if ( entityMapping == null ) {
 			throw new IllegalArgumentException(
 					"Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName()
 			);
 		}
+		DocumentBuilderIndexedEntity<?> builder = entityMapping.getDocumentBuilder();
 
 		return builder.getAnalyzer();
 	}

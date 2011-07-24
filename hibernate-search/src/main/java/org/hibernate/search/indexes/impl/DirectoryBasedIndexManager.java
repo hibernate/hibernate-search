@@ -68,7 +68,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private BackendQueueProcessorFactory backend;
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters inexingParameters;
-	private Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
+	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
 	private final DirectoryProviderData directoryOptions = new DirectoryProviderData(); //TODO read these options out of properties
 	private ErrorHandler errorHandler;
 	
@@ -129,6 +129,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.similarity = newSimilarity;
 	}
 
+	//Not exposed on the interface
 	public DirectoryProvider getDirectoryProvider() {
 		return directoryProvider;
 	}
@@ -176,12 +177,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		return errorHandler;
 	}
 
-	/**
-	 * @param name
-	 * @return
-	 */
+	@Override
 	public Analyzer getAnalyzer(String name) {
-		return null;
+		return boundSearchFactory.getAnalyzer( name );
 	}
 
 	@Override
@@ -197,6 +195,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	/**
 	 * @return
 	 */
+	//Not exposed on the interface
 	public Lock getDirectoryModificationLock() {
 		return null;
 	}
