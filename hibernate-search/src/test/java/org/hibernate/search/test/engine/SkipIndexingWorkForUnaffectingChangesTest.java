@@ -107,7 +107,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		super.configure( configuration );
 		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 		cfg.setProperty(
-				"hibernate.search.worker.backend",
+				"hibernate.search.default.worker.backend",
 				org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName()
 		);
 	}
