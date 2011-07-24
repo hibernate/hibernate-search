@@ -111,6 +111,7 @@ public class Workspace {
 		if ( similarity != null ) {
 			writerConfig.setSimilarity( similarity );
 		}
+		indexManager.setIndexWriterConfig( writerConfig );
 	}
 
 	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {

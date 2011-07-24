@@ -33,6 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.SearchException;
@@ -76,6 +77,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private boolean exclusiveIndexUsage;
 	
 	private SearchFactoryImplementor boundSearchFactory = null;
+
+	private IndexWriterConfig writerConfig;
 	
 	public DirectoryBasedIndexManager(DirectoryProvider directoryProvider) {
 		this.directoryProvider = directoryProvider;
@@ -132,6 +135,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void setSimilarity(Similarity newSimilarity) {
 		this.similarity = newSimilarity;
+		//TODO fix similarity: it's currently being set multiple times before reaching the final
+		// configuration, possibly *after* the backend was created, so we have to fix the backend too.
+		if ( writerConfig != null ) {
+			writerConfig.setSimilarity( similarity );
+		}
 	}
 
 	//Not exposed on the interface
@@ -226,6 +234,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	//Not exposed on the IndexManager interface
 	public boolean isExclusiveIndexUsage() {
 		return this.exclusiveIndexUsage;
+	}
+
+	//Not exposed on the IndexManager interface
+	public void setIndexWriterConfig(IndexWriterConfig writerConfig) {
+		this.writerConfig = writerConfig;
 	}
 
 }
