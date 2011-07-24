@@ -33,7 +33,6 @@ import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
@@ -96,11 +95,6 @@ public interface IndexManager {
 	 * @param newSimilarity
 	 */
 	void setSimilarity(Similarity newSimilarity);
-
-	/**
-	 * @return
-	 */
-	DirectoryProviderData getDirectoryProviderData();
 
 	/**
 	 * @return

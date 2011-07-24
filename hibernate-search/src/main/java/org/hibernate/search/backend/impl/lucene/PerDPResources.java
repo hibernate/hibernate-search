@@ -25,7 +25,6 @@ package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
@@ -53,13 +52,12 @@ class PerDPResources {
 	private final ErrorHandler errorHandler;
 	
 	PerDPResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
-		DirectoryProviderData directoryProviderData = indexManager.getDirectoryProviderData();
 		errorHandler = indexManager.getErrorHandler();
 		workspace = new Workspace( indexManager, errorHandler );
 		visitor = new LuceneWorkVisitor( workspace );
-		int maxQueueLength = directoryProviderData.getMaxQueueLength();
+		int maxQueueLength = indexManager.getMaxQueueLength();
 		executor = Executors.newFixedThreadPool( 1, "Directory writer", maxQueueLength );
-		exclusiveIndexUsage = directoryProviderData.isExclusiveIndexUsage();
+		exclusiveIndexUsage = indexManager.isExclusiveIndexUsage();
 	}
 
 	public ExecutorService getExecutor() {

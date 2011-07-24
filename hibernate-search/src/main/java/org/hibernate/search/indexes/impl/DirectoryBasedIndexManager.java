@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.CorruptIndexException;
@@ -40,13 +41,13 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.CommonPropertiesParse;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.Log;
@@ -69,8 +70,10 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters inexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
-	private final DirectoryProviderData directoryOptions = new DirectoryProviderData(); //TODO read these options out of properties
 	private ErrorHandler errorHandler;
+	private final ReentrantLock dirLock = new ReentrantLock();
+	private int maxQueueLength = Executors.QUEUE_MAX_LENGTH;
+	private boolean exclusiveIndexUsage;
 	
 	private SearchFactoryImplementor boundSearchFactory = null;
 	
@@ -112,6 +115,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		inexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
 		backend = BackendFactory.createBackend( this, buildContext, cfg );
+		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, cfg );
+		exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
 	}
 
 	@Override
@@ -153,11 +158,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public DirectoryProviderData getDirectoryProviderData() {
-		return directoryOptions;
-	}
-
-	@Override
 	public OptimizerStrategy getOptimizerStrategy() {
 		return optimizer;
 	}
@@ -192,12 +192,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.boundSearchFactory = boundSearchFactory;
 	}
 	
-	/**
-	 * @return
-	 */
-	//Not exposed on the interface
+	//Not exposed on the IndexManager interface
 	public Lock getDirectoryModificationLock() {
-		return null;
+		return dirLock;
 	}
 
 	@Override
@@ -210,9 +207,25 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		performOperation( new OptimizeLuceneWork() );
 	}
 
-	//Not exposed on the interface
+	//Not exposed on the IndexManager interface
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
 		return backend;
+	}
+
+	/**
+	 * @return
+	 */
+	//Not exposed on the IndexManager interface
+	public int getMaxQueueLength() {
+		return maxQueueLength;
+	}
+
+	/**
+	 * @return
+	 */
+	//Not exposed on the IndexManager interface
+	public boolean isExclusiveIndexUsage() {
+		return this.exclusiveIndexUsage;
 	}
 
 }
