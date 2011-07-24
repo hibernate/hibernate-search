@@ -222,11 +222,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return readerProvider;
 	}
 
-	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
-		EntityIndexMapping<?> entityIndexMapping = this.indexMappingsForEntities.get( entity );
-		return entityIndexMapping == null ? null : entityIndexMapping.getDirectoryProviders();
-	}
-
 	public void optimize() {
 		Set<Class<?>> clazzs = getIndexMappingForEntity().keySet();
 		for ( Class clazz : clazzs ) {

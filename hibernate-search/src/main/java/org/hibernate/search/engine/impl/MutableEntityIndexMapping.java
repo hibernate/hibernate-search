@@ -26,9 +26,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -80,16 +78,6 @@ public class MutableEntityIndexMapping<T> implements EntityIndexMapping<T> {
 	@Override
 	public void postInitialize(Set<Class<?>> indexedClasses) {
 		documentBuilder.postInitialize( indexedClasses );
-	}
-
-	@Override
-	public DirectoryProvider[] getDirectoryProviders() {
-		DirectoryProvider[] dps = new DirectoryProvider[indexManagers.length];
-		for ( int i = 0; i < indexManagers.length; i++ ) {
-			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[i];
-			dps[i] = indexManager.getDirectoryProvider();
-		}
-		return dps;
 	}
 
 	@Override
