@@ -23,6 +23,10 @@
  */
 package org.hibernate.search.test.id.providedId;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,12 +49,10 @@ import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.configuration.ProvidedIdEntry;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Navin Surtani
@@ -100,7 +102,7 @@ public class ProvidedIdTest {
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Search Query extension
 		//needs it. So we use plain Lucene
 
-		IndexReader indexReader = sf.openIndexReader( ProvidedIdEntry.class );
+		IndexReader indexReader = sf.openIndexReader( ProvidedIdPerson.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 3, hits.totalHits );
