@@ -511,7 +511,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				}
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateIndexManagers( targetedIndexes, builder );
+				populateIndexManagers( targetedIndexes, indexMapper.getSelectionStrategy() );
 			}
 			classesAndSubclasses = null;
 		}
@@ -540,7 +540,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateIndexManagers( targetedIndexes, builder );
+				populateIndexManagers( targetedIndexes, indexMapper.getSelectionStrategy() );
 			}
 			this.classesAndSubclasses = involvedClasses;
 		}
@@ -620,8 +620,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return similarity;
 	}
 
-	private void populateIndexManagers(List<IndexManager> indexManagersTarget, DocumentBuilderIndexedEntity builder) {
-		final IndexShardingStrategy indexShardingStrategy = builder.getDirectoryProviderSelectionStrategy();
+	private void populateIndexManagers(List<IndexManager> indexManagersTarget, final IndexShardingStrategy indexShardingStrategy) {
 		final IndexManager[] indexManagersForQuery;
 		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
 			indexManagersForQuery = indexShardingStrategy.getIndexManagersForQuery(

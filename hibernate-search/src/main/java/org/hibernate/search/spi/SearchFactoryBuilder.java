@@ -403,7 +403,7 @@ public class SearchFactoryBuilder {
 					new DocumentBuilderIndexedEntity(
 							mappedXClass,
 							context,
-							mappedEntity,
+							mappedEntity.getSimilarity(),
 							reflectionManager,
 							optimizationBlackListedTypes
 					);
