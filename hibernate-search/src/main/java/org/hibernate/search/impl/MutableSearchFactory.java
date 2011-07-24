@@ -226,5 +226,10 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	public IndexReader openIndexReader(Class<?>... entities) {
 		return delegate.openIndexReader( entities );
 	}
+
+	@Override
+	public void closeIndexReader(IndexReader indexReader) {
+		delegate.closeIndexReader( indexReader );
+	}
 	
 }

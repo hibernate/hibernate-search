@@ -41,10 +41,6 @@ import org.hibernate.search.stat.Statistics;
  * @author Sanne Grinovero
  */
 public interface SearchFactory {
-	/**
-	 * @return Return the configured reader provider.
-	 */
-	ReaderProvider getReaderProvider();
 
 	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
 	
@@ -99,4 +95,9 @@ public interface SearchFactory {
 	 * @return
 	 */
 	IndexReader openIndexReader(Class<?>... entities);
+
+	/**
+	 * @param indexReader
+	 */
+	void closeIndexReader(IndexReader indexReader);
 }

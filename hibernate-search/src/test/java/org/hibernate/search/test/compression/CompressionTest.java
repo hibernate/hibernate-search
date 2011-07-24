@@ -97,7 +97,7 @@ public class CompressionTest extends SearchTestCase {
 			}
 		}
 		finally {
-			getSearchFactory().getReaderProvider().closeReader( indexReader );
+			getSearchFactory().closeIndexReader( indexReader );
 		}
 	}
 

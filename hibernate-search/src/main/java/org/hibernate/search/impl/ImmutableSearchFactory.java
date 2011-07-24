@@ -219,6 +219,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return dirProviderIndexingParams.get( provider );
 	}
 
+	@Override
 	public ReaderProvider getReaderProvider() {
 		return readerProvider;
 	}
@@ -373,7 +374,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			}
 		}
 		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()]);
-		return getReaderProvider().openReader( uniqueIndexManagers );
+		return readerProvider.openReader( uniqueIndexManagers );
+	}
+
+	@Override
+	public void closeIndexReader(IndexReader indexReader) {
+		readerProvider.closeReader( indexReader );
 	}
 
 	private EntityIndexMapping getSafeIndexMappingForEntity(Class entityType) {

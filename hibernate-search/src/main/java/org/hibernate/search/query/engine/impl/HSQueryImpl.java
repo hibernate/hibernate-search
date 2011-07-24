@@ -65,7 +65,6 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;

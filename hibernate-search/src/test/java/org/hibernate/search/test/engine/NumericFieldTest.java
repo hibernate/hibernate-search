@@ -12,7 +12,6 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.test.SearchTestCase;
 
-import java.io.IOException;
 import java.util.List;
 
 public class NumericFieldTest extends SearchTestCase {
@@ -97,11 +96,7 @@ public class NumericFieldTest extends SearchTestCase {
 			numDocs = locationIndexReader.numDocs();
 		}
 		finally {
-			try {
-				locationIndexReader.close();
-			}
-			catch ( IOException e ) {
-			}
+			searchFactory.closeIndexReader( locationIndexReader );
 		}
 		return numDocs;
 	}
