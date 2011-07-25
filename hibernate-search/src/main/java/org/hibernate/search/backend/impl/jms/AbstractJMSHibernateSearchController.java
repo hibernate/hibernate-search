@@ -52,7 +52,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
 	
 	private static final Log log = LoggerFactory.make();
-	static final String INDEX_NAME_JMS_PROPERTY = "hibernate.search.jms.indexNameProperty";
+	public static final String INDEX_NAME_JMS_PROPERTY = "hibernate.search.jms.indexNameProperty";
 
 	/**
 	 * Return the current or give a new session

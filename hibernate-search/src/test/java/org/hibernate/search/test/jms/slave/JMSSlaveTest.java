@@ -154,18 +154,18 @@ public class JMSSlaveTest extends SearchTestCase {
 
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( Environment.WORKER_BACKEND, "jms" );
-		cfg.setProperty( JMSBackendQueueProcessorFactory.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
-		cfg.setProperty( JMSBackendQueueProcessorFactory.JMS_QUEUE, QUEUE_NAME );
+		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jms" );
+		cfg.setProperty( "hibernate.search.default." +JMSBackendQueueProcessorFactory.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
+		cfg.setProperty( "hibernate.search.default." +JMSBackendQueueProcessorFactory.JMS_QUEUE, QUEUE_NAME );
 
 		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of jndi properties to create the InitialContext
 		// for the queue processor
 		cfg.setProperty(
-				"hibernate.search.worker.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+				"hibernate.search.default.worker.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
 		);
-		cfg.setProperty( "hibernate.search.worker.jndi.url", "vm://localhost" );
-		cfg.setProperty( "hibernate.search.worker.jndi.connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
-		cfg.setProperty( "hibernate.search.worker.jndi.queue.queue/searchtest", "searchQueue" );
+		cfg.setProperty( "hibernate.search.default.worker.jndi.url", "vm://localhost" );
+		cfg.setProperty( "hibernate.search.default.worker.jndi.connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
+		cfg.setProperty( "hibernate.search.default.worker.jndi.queue.queue/searchtest", "searchQueue" );
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {

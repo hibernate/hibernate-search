@@ -48,7 +48,6 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -63,6 +62,7 @@ import org.hibernate.search.test.SearchTestCase;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class JMSMasterTest extends SearchTestCase {
 
@@ -72,7 +72,7 @@ public class JMSMasterTest extends SearchTestCase {
 	private static final String QUEUE_NAME = "queue/searchtest";
 
 	/**
-	 * Name of the connection factort as found in JNDI (see jndi.properties).
+	 * Name of the connection factory as found in JNDI (see jndi.properties).
 	 */
 	private static final String CONNECTION_FACTORY_NAME = "java:/ConnectionFactory";
 
@@ -113,6 +113,9 @@ public class JMSMasterTest extends SearchTestCase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		ObjectMessage message = getQueueSession().createObjectMessage();
+		message.setStringProperty(
+				org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY,
+				org.hibernate.search.test.jms.master.TShirt.class.getName() ); //index name for this test
 		message.setObject( ( Serializable ) queue );
 		QueueSender sender = getQueueSession().createSender( getMessageQueue() );
 		sender.send( message );
@@ -228,7 +231,7 @@ public class JMSMasterTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		// explicitly set the backend even though lucene is default.
-		cfg.setProperty( Environment.WORKER_BACKEND, "lucene" );
+		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "lucene" );
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {
