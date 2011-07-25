@@ -34,7 +34,7 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
+import org.hibernate.search.backend.impl.lucene.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.PerDirectoryWorkProcessor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.indexes.IndexManager;
@@ -53,7 +53,7 @@ public class LuceneBatchBackend implements BatchBackend {
 	
 	public static final String CONCURRENT_WRITERS = Environment.BATCH_BACKEND + ".concurrent_writers";
 
-	private static final DpSelectionVisitor providerSelectionVisitor = new DpSelectionVisitor();
+	private static final StreamingSelectionVisitor providerSelectionVisitor = new StreamingSelectionVisitor();
 
 	private SearchFactoryIntegrator searchFactoryImplementor;
 	private final Map<DirectoryProvider<?>,DirectoryProviderWorkspace> resourcesMap = new HashMap<DirectoryProvider<?>,DirectoryProviderWorkspace>();

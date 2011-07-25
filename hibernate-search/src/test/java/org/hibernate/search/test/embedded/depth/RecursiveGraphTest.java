@@ -192,7 +192,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 	
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
+		cfg.setProperty( "hibernate.search.default.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
 	}
 	
 }

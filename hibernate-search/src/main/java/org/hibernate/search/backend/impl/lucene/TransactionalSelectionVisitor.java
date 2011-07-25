@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -29,95 +29,108 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.backend.WorkQueuePerIndexSplitter;
+import org.hibernate.search.backend.impl.ContextAwareSelectionDelegate;
 import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * This is the main client for IndexShardingStrategies.
- * Only implementation of WorkVisitor<DpSelectionDelegate>,
- * using a visitor/selector pattern for different implementations of addAsPayLoadsToQueue
- * depending on the type of LuceneWork.
+ * This visitor applies the selection logic from the plugged IndexShardingStrategies to
+ * transactional operations, so similar to StreamingSelectionVisitor but preparing a
+ * context bound list of operations instead of sending all changes directly to the backend.
  * 
- * @author Sanne Grinovero
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class DpSelectionVisitor implements WorkVisitor<DpSelectionDelegate> {
+public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {
 	
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
 
-	public DpSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
+	public ContextAwareSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 	
-	public DpSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
+	public ContextAwareSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 
-	public DpSelectionDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
+	public ContextAwareSelectionDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
 		return deleteDelegate;
 	}
 
-	public DpSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
+	public ContextAwareSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
 		return optimizeDelegate;
 	}
 
-	public DpSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
+	public ContextAwareSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
 		return purgeDelegate;
 	}
 	
-	private static class AddSelectionDelegate implements DpSelectionDelegate {
+	private static class AddSelectionDelegate implements ContextAwareSelectionDelegate {
 
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy) {
+		@Override
+		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+				WorkQueuePerIndexSplitter context) {
 			IndexManager indexManager = shardingStrategy.getIndexManagersForAddition(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString(),
 					work.getDocument()
 			);
-			indexManager.performOperation( work );
+			context.getIndexManagerQueue( indexManager ).add( work );
 		}
 
 	}
 	
-	private static class DeleteSelectionDelegate implements DpSelectionDelegate {
+	private static class DeleteSelectionDelegate implements ContextAwareSelectionDelegate {
 
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy) {
+		@Override
+		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString()
 			);
 			for (IndexManager indexManager : indexManagers) {
-				indexManager.performOperation( work );
+				context.getIndexManagerQueue( indexManager ).add( work );
 			}
 		}
 
 	}
-	
-	private static class OptimizeSelectionDelegate implements DpSelectionDelegate {
 
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy) {
+	/**
+	 * In this exceptional case we still delegate to a streaming operation instead:
+	 * no need for transactions as optimizing doesn't affect index-encoded state.
+	 */
+	private static class OptimizeSelectionDelegate implements ContextAwareSelectionDelegate {
+
+		@Override
+		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
 			for (IndexManager indexManager : indexManagers) {
-				indexManager.performOperation( work );
+				indexManager.performStreamOperation( work );
 			}
 		}
 
 	}
 	
-	private static class PurgeAllSelectionDelegate implements DpSelectionDelegate {
+	private static class PurgeAllSelectionDelegate implements ContextAwareSelectionDelegate {
 
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy) {
+		@Override
+		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString()
 			);
 			for (IndexManager indexManager : indexManagers) {
-				indexManager.performOperation( work );
+				context.getIndexManagerQueue( indexManager ).add( work );
 			}
 		}
 

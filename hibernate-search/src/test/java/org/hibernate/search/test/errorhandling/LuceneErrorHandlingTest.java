@@ -35,7 +35,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.WorkVisitor;
-import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
+import org.hibernate.search.backend.impl.lucene.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
@@ -123,7 +123,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 
 		@Override
 		public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
-			if ( visitor instanceof DpSelectionVisitor ) {
+			if ( visitor instanceof StreamingSelectionVisitor ) {
 				//during shard-selection visitor this work is applied to
 				//all DirectoryProviders as this extends DeleteLuceneWork
 				return visitor.getDelegate( this );
@@ -163,7 +163,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 
 		@Override
 		public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
-			if ( visitor instanceof DpSelectionVisitor ) {
+			if ( visitor instanceof StreamingSelectionVisitor ) {
 				//during shard-selection visitor this work is applied to
 				//all DirectoryProviders as this extends DeleteLuceneWork
 				return visitor.getDelegate( this );

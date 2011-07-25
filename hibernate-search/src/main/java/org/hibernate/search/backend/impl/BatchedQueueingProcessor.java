@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
+import org.hibernate.search.backend.WorkQueuePerIndexSplitter;
+import org.hibernate.search.backend.impl.lucene.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -48,7 +49,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private final int batchSize = 0;
 //	private final ExecutorService executorService = null;
 //	private final BackendQueueProcessorFactory backendQueueProcessorFactory = null;
-	private static final DpSelectionVisitor providerSelectionVisitor = new DpSelectionVisitor();
+	private static final TransactionalSelectionVisitor providerSelectionVisitor = new TransactionalSelectionVisitor();
 
 	private final Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
 
@@ -85,12 +86,14 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			sb.append( "]" );
 			log.trace( sb.toString() );
 		}
+		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter();
 		for ( LuceneWork work : sealedQueue ) {
 			final Class<?> entityType = work.getEntityClass();
 			EntityIndexMapping<?> entityIndexMapping = documentBuildersIndexedEntities.get( entityType );
 			IndexShardingStrategy shardingStrategy = entityIndexMapping.getSelectionStrategy();
-			work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy );
+			work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy, context );
 		}
+		context.commitOperations();
 	}
 
 	public void cancelWorks(WorkQueue workQueue) {

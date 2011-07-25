@@ -67,8 +67,14 @@ public interface IndexManager {
 	 */
 	void performOperation(List<LuceneWork> work);
 	
-	@Deprecated //REMOVE THIS!
-	void performOperation(LuceneWork singleOperation);
+	/**
+	 * Perform a single non-transactional operation, best to stream large amounts of operations.
+	 * Operations might be applied out-of-order! To mark two series of operations which need to be applied
+	 * in order, use a transactional operation between them: a transactional operation will always flush
+	 * all streaming operations first, and be applied before subsequent streaming operations.
+	 * @param singleOperation
+	 */
+	void performStreamOperation(LuceneWork singleOperation);
 	
 	/**
 	 * Initialize the reader provider before its use.

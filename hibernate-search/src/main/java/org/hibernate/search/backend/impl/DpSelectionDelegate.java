@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.impl.lucene;
+package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -34,9 +34,7 @@ public interface DpSelectionDelegate {
 	/**
 	 * The LuceneWork must be applied to different indexes.
 	 * @param work the work to split.
-	 * @param queues the target queue to add work to.
 	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories. 
-	 * @throws InterruptedException 
 	 */
 	public void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy);
 
