@@ -20,7 +20,10 @@
  */
 package org.hibernate.search.test.util;
 
+import java.util.Properties;
+
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 /**
@@ -30,7 +33,13 @@ import org.hibernate.search.store.impl.RAMDirectoryProvider;
 public class RamIndexManager extends DirectoryBasedIndexManager {
 
 	public RamIndexManager() {
-		super( new RAMDirectoryProvider() );
+		super( makeRamDirectory() );
+	}
+
+	private static DirectoryProvider makeRamDirectory() {
+		RAMDirectoryProvider ramDirectoryProvider = new RAMDirectoryProvider();
+		ramDirectoryProvider.initialize( "testIndex", new Properties(), null );
+		return ramDirectoryProvider;
 	}
 
 }
