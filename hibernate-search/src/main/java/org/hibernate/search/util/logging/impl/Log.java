@@ -361,4 +361,8 @@ public interface Log extends BasicLogger
    @Message(id = 77, value = "An IOException happened while accessing the Lucene index")
    void ioExceptionOnIndex(@Cause IOException e);
 
+   @LogMessage(level = ERROR)
+   @Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %s")
+   void unableToShutdownAsyncronousIndexingByTimeout(String indexName);
+
 }

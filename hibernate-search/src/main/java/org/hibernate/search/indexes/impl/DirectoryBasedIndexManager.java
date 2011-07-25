@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -106,6 +107,17 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void destroy() {
+		if ( backendExecutor != null ) {
+			backendExecutor.shutdown();
+			try {
+				backendExecutor.awaitTermination( 20, TimeUnit.SECONDS );
+			}
+			catch ( InterruptedException e ) {
+			}
+			if ( backendExecutor.isTerminated() ) {
+				log.unableToShutdownAsyncronousIndexingByTimeout( this.indexName );
+			}
+		}
 		directoryProvider.stop();
 	}
 
@@ -142,11 +154,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		}
 	}
 
-	//Not exposed on the interface
-	public DirectoryProvider getDirectoryProvider() {
-		return directoryProvider;
-	}
-	
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation) {
 		ArrayList<LuceneWork> list = new ArrayList<LuceneWork>(1);
@@ -191,20 +198,10 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public EntityIndexMapping<?> getIndexMappingForEntity(Class<?> entityType) {
-		return boundSearchFactory.getIndexMappingForEntity( entityType );
-	}
-
-	@Override
 	public void setBoundSearchFactory(SearchFactoryImplementor boundSearchFactory) {
 		this.boundSearchFactory = boundSearchFactory;
 	}
 	
-	//Not exposed on the IndexManager interface
-	public Lock getDirectoryModificationLock() {
-		return dirLock;
-	}
-
 	@Override
 	public void addContainedEntity(Class<?> entity) {
 		containedEntityTypes.add( entity );
@@ -220,17 +217,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		return backend;
 	}
 
-	/**
-	 * @return
-	 */
 	//Not exposed on the IndexManager interface
 	public int getMaxQueueLength() {
 		return maxQueueLength;
 	}
 
-	/**
-	 * @return
-	 */
 	//Not exposed on the IndexManager interface
 	public boolean isExclusiveIndexUsage() {
 		return this.exclusiveIndexUsage;
@@ -239,6 +230,21 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	//Not exposed on the IndexManager interface
 	public void setIndexWriterConfig(IndexWriterConfig writerConfig) {
 		this.writerConfig = writerConfig;
+	}
+	
+	//Not exposed on the IndexManager interface
+	public EntityIndexMapping<?> getIndexMappingForEntity(Class<?> entityType) {
+		return boundSearchFactory.getIndexMappingForEntity( entityType );
+	}
+	
+	//Not exposed on the IndexManager interface
+	public Lock getDirectoryModificationLock() {
+		return dirLock;
+	}
+
+	//Not exposed on the interface
+	public DirectoryProvider getDirectoryProvider() {
+		return directoryProvider;
 	}
 
 }

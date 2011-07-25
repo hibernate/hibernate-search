@@ -29,7 +29,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -65,7 +64,7 @@ public interface IndexManager {
 	 * Operations can be applied in sync or async, depending on the IndexManager implementation and configuration.
 	 * @param queue the list of write operations to apply.
 	 */
-	void performOperation(List<LuceneWork> work);
+	void performOperation(List<LuceneWork> queue);
 	
 	/**
 	 * Perform a single non-transactional operation, best to stream large amounts of operations.
@@ -116,8 +115,6 @@ public interface IndexManager {
 	 * @return
 	 */
 	ErrorHandler getErrorHandler();
-	
-	EntityIndexMapping<?> getIndexMappingForEntity(Class<?> type);
 	
 	Analyzer getAnalyzer(String name);
 
