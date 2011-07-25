@@ -85,7 +85,7 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
+		cfg.setProperty( "hibernate.search.default." + Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
 	
 }
