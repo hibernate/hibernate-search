@@ -96,7 +96,7 @@ public class WorkPlan {
 	 * {@link #getPlannedLuceneWork(SearchFactoryImplementor)} would return.
 	 * This is meant for resource control for auto flushing of large pending batches.
 	 * 
-	 * @see Environment#WORKER_BATCHSIZE
+	 * @see Environment#QUEUEINGPROCESSOR_BATCHSIZE
 	 * @return the approximation
 	 */
 	public int size() {

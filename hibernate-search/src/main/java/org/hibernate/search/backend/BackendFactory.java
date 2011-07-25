@@ -113,7 +113,7 @@ public class BackendFactory {
 	}
 	
 	public static int getWorkerBatchSize(Properties properties) {
-		return ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_BATCHSIZE, 0 );
+		return ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
 	}
 
 }

@@ -273,7 +273,7 @@ public class SearchFactoryBuilder {
 		}
 		fillSimilarityMapping();
 
-		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities );
+		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities, cfg.getProperties() );
 		//build worker and back end components
 		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
 		factoryState.setReaderProvider( ReaderProviderFactory.createReaderProvider( cfg, buildContext ) );

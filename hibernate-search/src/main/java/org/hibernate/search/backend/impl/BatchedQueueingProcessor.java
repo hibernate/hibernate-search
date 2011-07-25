@@ -25,13 +25,16 @@ package org.hibernate.search.backend.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.WorkQueuePerIndexSplitter;
 import org.hibernate.search.backend.impl.lucene.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -46,15 +49,14 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final int batchSize = 0;
-//	private final ExecutorService executorService = null;
-//	private final BackendQueueProcessorFactory backendQueueProcessorFactory = null;
+	private final int batchSize;
 	private static final TransactionalSelectionVisitor providerSelectionVisitor = new TransactionalSelectionVisitor();
 
 	private final Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
 
-	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities) {
+	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities, Properties properties) {
 		this.documentBuildersIndexedEntities = documentBuildersIndexedEntities;
+		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
 	}
 
 	public void add(Work work, WorkQueue workQueue) {

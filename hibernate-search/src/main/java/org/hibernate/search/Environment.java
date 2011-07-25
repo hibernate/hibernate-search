@@ -61,7 +61,7 @@ public final class Environment {
 	/**
 	 * Defines the maximum number of indexing operation batched per transaction
 	 */
-	public static final String WORKER_BATCHSIZE = WORKER_PREFIX + "batch_size";
+	public static final String QUEUEINGPROCESSOR_BATCHSIZE = "hibernate.search.batch_size";
 
 	/**
 	 * only used then execution is async
