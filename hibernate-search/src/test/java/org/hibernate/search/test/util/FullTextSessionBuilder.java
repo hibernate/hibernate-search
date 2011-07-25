@@ -37,6 +37,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.testing.cache.CachingRegionFactory;
@@ -71,6 +72,7 @@ public class FullTextSessionBuilder {
 	}
 	
 	public FullTextSessionBuilder() {
+		cfg.setProperty( "hibernate.search.lucene_version", SearchTestCase.getTargetLuceneVersion().name() );
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
 		
 		//cache:
