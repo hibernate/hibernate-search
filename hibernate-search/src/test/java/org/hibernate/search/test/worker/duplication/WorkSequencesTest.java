@@ -35,9 +35,6 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
-import org.hibernate.search.reader.ReaderProvider;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.session.Domain;
 
@@ -136,7 +133,7 @@ public class WorkSequencesTest extends SearchTestCase {
 			return topDocs.totalHits;
 		}
 		finally {
-			indexReader.close();
+			searchFactory.closeIndexReader( indexReader );
 		}
 	}
 	
