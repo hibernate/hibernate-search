@@ -52,7 +52,7 @@ public class DirectoryLifecycleTest {
 		CloseCheckingDirectoryProvider directoryProvider;
 		try {
 			SearchFactory searchFactory = builder.getSearchFactory();
-			EntityIndexMapping<?> indexMapping = searchFactory.getIndexMappingForEntity().get( SnowStorm.class );
+			EntityIndexMapping<?> indexMapping = searchFactory.getIndexMappingForEntity( SnowStorm.class );
 			IndexManager[] indexManagers = indexMapping.getIndexManagers();
 			assertThat( indexManagers.length ).isEqualTo( 1 );
 			assertThat( indexManagers[0] ).isInstanceOf( DirectoryBasedIndexManager.class );

@@ -30,18 +30,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
-import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.PerDirectoryWorkProcessor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -64,11 +60,8 @@ public class LuceneBatchBackend implements BatchBackend {
 	private final PerDirectoryWorkProcessor asyncWorker = new AsyncBatchPerDirectoryWorkProcessor();
 	private final PerDirectoryWorkProcessor syncWorker = new SyncBatchPerDirectoryWorkProcessor();
 
-	private Map<Class<?>, EntityIndexMapping<?>> indexMappers;
-
 	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, SearchFactoryIntegrator searchFactory) {
 		this.searchFactoryImplementor = searchFactory;
-		indexMappers = searchFactoryImplementor.getIndexMappingForEntity();
 		final int maxThreadsPerIndex = definedIndexWriters( cfg );
 		/*
 		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
@@ -116,7 +109,7 @@ public class LuceneBatchBackend implements BatchBackend {
 	
 	private void sendWorkToShards(LuceneWork work, PerDirectoryWorkProcessor worker) {
 		final Class<?> entityType = work.getEntityClass();
-		EntityIndexMapping<?> entityIndexMapping = indexMappers.get( entityType );
+		EntityIndexMapping<?> entityIndexMapping = searchFactoryImplementor.getIndexMappingForEntity( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexMapping.getSelectionStrategy();
 		work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy );
 	}

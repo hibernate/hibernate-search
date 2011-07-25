@@ -283,7 +283,7 @@ public class MutableFactoryTest {
 					MutableFactoryTest.doIndexWork(entity, i, factory, context );
 					context.end();
 					
-					EntityIndexMapping<?> entityIndexMapping = factory.getIndexMappingForEntity().get( aClass );
+					EntityIndexMapping<?> entityIndexMapping = factory.getIndexMappingForEntity( aClass );
 					assertNotNull( entityIndexMapping );
 					IndexManager[] indexManagers = entityIndexMapping.getIndexManagers();
 					assertEquals( 1, indexManagers.length );

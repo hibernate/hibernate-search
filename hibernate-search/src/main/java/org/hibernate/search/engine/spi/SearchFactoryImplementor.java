@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.engine.spi;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
@@ -43,8 +44,8 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	
 	ReaderProvider getReaderProvider();
-
-	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType);
+	
+	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
 

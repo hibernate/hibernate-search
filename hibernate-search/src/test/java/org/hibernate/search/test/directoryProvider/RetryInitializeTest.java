@@ -83,7 +83,7 @@ public class RetryInitializeTest {
 		assertNotNull( scheduledPeriod );
 		assertEquals( Long.valueOf( 12000L ), scheduledPeriod );
 		
-		EntityIndexMapping<?> entityIndexMapping = slave.getSearchFactory().getIndexMappingForEntity().get( SnowStorm.class );
+		EntityIndexMapping<?> entityIndexMapping = slave.getSearchFactory().getIndexMappingForEntity( SnowStorm.class );
 		IndexManager[] indexManagers = entityIndexMapping.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
