@@ -38,10 +38,8 @@ import org.apache.lucene.util.Version;
 
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
-import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters.ParameterSet;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;

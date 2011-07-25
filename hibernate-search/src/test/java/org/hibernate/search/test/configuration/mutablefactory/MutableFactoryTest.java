@@ -44,7 +44,6 @@ import org.hibernate.search.spi.SearchFactoryBuilder;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
@@ -101,9 +100,9 @@ public class MutableFactoryTest {
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
-		indexReader.close();
+		sf.closeIndexReader( indexReader );
 
-		sf = (MutableSearchFactory) builder.currentFactory( sf )
+		sf = builder.currentFactory( sf )
 				.addClass( B.class )
 				.buildSearchFactory();
 
@@ -121,7 +120,7 @@ public class MutableFactoryTest {
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
-		indexReader.close();
+		sf.closeIndexReader( indexReader );
 
 		sf.close();
 	}
@@ -149,7 +148,7 @@ public class MutableFactoryTest {
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
-		indexReader.close();
+		sf.closeIndexReader( indexReader );
 
 		sf.addClasses( B.class, C.class );
 
@@ -167,7 +166,7 @@ public class MutableFactoryTest {
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 		searcher.close();
-		indexReader.close();
+		sf.closeIndexReader( indexReader );
 
 		luceneQuery = parser.parse( "Vincent" );
 		
@@ -177,7 +176,7 @@ public class MutableFactoryTest {
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
-		indexReader.close();
+		sf.closeIndexReader( indexReader );
 
 		sf.close();
 	}
@@ -231,7 +230,7 @@ public class MutableFactoryTest {
 			TopDocs hits = searcher.search( luceneQuery, 1000 );
 			assertEquals( 1, hits.totalHits );
 			searcher.close();
-			indexReader.close();
+			sf.closeIndexReader( indexReader );
 		}
 	}
 
@@ -301,7 +300,7 @@ public class MutableFactoryTest {
 						return;
 					}
 					searcher.close();
-					indexReader.close();
+					factory.closeIndexReader( indexReader );
 				}
 			}
 			catch ( Exception e ) {

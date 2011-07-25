@@ -240,10 +240,10 @@ public abstract class SearchTestCase extends TestCase {
 				cfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 			}
 			for ( String aPackage : getAnnotatedPackages() ) {
-				( ( Configuration ) getCfg() ).addPackage( aPackage );
+				getCfg().addPackage( aPackage );
 			}
 			for ( Class<?> aClass : getAnnotatedClasses() ) {
-				( ( Configuration ) getCfg() ).addAnnotatedClass( aClass );
+				getCfg().addAnnotatedClass( aClass );
 			}
 			for ( String xmlFile : getXmlFiles() ) {
 				InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );

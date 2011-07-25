@@ -23,8 +23,6 @@
  */
 package org.hibernate.search;
 
-import java.util.Map;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 

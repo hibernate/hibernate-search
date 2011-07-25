@@ -293,7 +293,7 @@ public class AndDocIdSetsTest {
 
 	// HSEARCH-610
 	@Test
-	public void testWithOpenBitSet() throws IOException {
+	public void testWithOpenBitSet() {
 		DocIdSet idSet1 = new OpenBitSet( new long[] { 1121 }, 1 );  // bits 0, 5, 6, 10
 		DocIdSet idSet2 = new OpenBitSet( new long[] { 64 }, 1 ); // bit 6
 		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
@@ -304,7 +304,7 @@ public class AndDocIdSetsTest {
 
 	// HSEARCH-610
 	@Test
-	public void testWithDocIdBitSet() throws IOException {
+	public void testWithDocIdBitSet() {
 		DocIdSet idSet1 = integersToDocIdSet( 0, 5, 6, 10 );
 		DocIdSet idSet2 = integersToDocIdSet( 6 );
 		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
@@ -315,7 +315,7 @@ public class AndDocIdSetsTest {
 
 	// HSEARCH-610
 	@Test
-	public void testWithSortedVIntList() throws IOException {
+	public void testWithSortedVIntList() {
 		SortedVIntList idSet1 = new SortedVIntList( 0, 5, 6, 10 );
 		SortedVIntList idSet2 = new SortedVIntList( 6 );
 		AndDocIdSet actual = createAndDocIdSet( idSet1, idSet2 );

@@ -34,6 +34,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.Work;
@@ -93,7 +94,8 @@ public class WorkDuplicationTest extends SearchTestCase {
 		// Search and the record via Lucene directly
 		tx = s.beginTransaction();
 
-		IndexReader indexReader = s.getSearchFactory().openIndexReader( SpecialPerson.class );
+		SearchFactory searchFactory = s.getSearchFactory();
+		IndexReader indexReader = searchFactory.openIndexReader( SpecialPerson.class );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			// we have to test using Lucene directly since query loaders will ignore hits for which there is no
@@ -102,7 +104,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 			assertTrue( "We should have no hit", topDocs.totalHits == 0 );
 		}
 		finally {
-			indexReader.close();
+			searchFactory.closeIndexReader( indexReader );
 		}
 		tx.commit();
 		s.close();

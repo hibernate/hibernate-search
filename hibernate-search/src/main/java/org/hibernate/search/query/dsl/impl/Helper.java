@@ -83,7 +83,7 @@ class Helper {
 		}
 		Reader reader = new StringReader(localText);
 		TokenStream stream = analyzer.reusableTokenStream( fieldName, reader);
-		TermAttribute attribute = (TermAttribute) stream.addAttribute( TermAttribute.class );
+		TermAttribute attribute = stream.addAttribute( TermAttribute.class );
 		stream.reset();
 
 		while ( stream.incrementToken() ) {

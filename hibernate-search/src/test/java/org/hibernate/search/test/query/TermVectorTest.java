@@ -71,7 +71,7 @@ public class TermVectorTest extends SearchTestCase {
 
       //cleanup
       for (Object element : s.createQuery("from " + Employee.class.getName()).list()) s.delete(element);
-	  reader.close();
+      searchFactory.closeIndexReader( reader );
       tx.commit();
       s.close();
    }
@@ -98,7 +98,7 @@ public class TermVectorTest extends SearchTestCase {
       //cleanup
       for (Object element : s.createQuery("from " + ElectricalProperties.class.getName()).list())
          s.delete(element);
-      reader.close();
+      searchFactory.closeIndexReader( reader );
       tx.commit();
       s.close();
    }

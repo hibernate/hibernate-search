@@ -33,11 +33,15 @@ import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public abstract class ReaderProviderHelper {
+	
+	private static final Log log = LoggerFactory.make();
 	
 	private static final Field subReadersField = getSubReadersField();
 	
@@ -96,7 +100,7 @@ public abstract class ReaderProviderHelper {
 					reader.close();
 				}
 				catch (IOException ee) {
-					//swallow
+					log.unableToCLoseLuceneIndexReader( e );
 				}
 			}
 		}

@@ -227,12 +227,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 			}
 		}
 		finally {
-			try {
-				indexReader.close();
-			}
-			catch ( IOException e ) {
-				log.unableToCLoseLuceneIndexReader( e );
-			}
+			searchFactoryImplementor.closeIndexReader( indexReader );
 		}
 	}
 

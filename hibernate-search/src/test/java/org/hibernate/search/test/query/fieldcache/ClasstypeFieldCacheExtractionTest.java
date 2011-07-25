@@ -23,8 +23,6 @@ import java.lang.annotation.ElementType;
 import java.util.List;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;

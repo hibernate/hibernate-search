@@ -28,10 +28,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.WritableBuildContext;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**

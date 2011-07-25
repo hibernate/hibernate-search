@@ -140,6 +140,6 @@ public class ProvidedIdTest {
 		assertTrue( titles.contains( "Mini Goat" ) );
 		assertTrue( titles.contains( "Big Goat" ) );
 		searcher.close();
-		indexReader.close();
+		sf.closeIndexReader( indexReader );
 	}
 }

@@ -221,7 +221,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.close();
 	}
 
-	private Session getSessionWithAutoCommit() throws SQLException {
+	private Session getSessionWithAutoCommit() {
 		Session s;
 		s = openSession();
 		s.doWork( new Work() {

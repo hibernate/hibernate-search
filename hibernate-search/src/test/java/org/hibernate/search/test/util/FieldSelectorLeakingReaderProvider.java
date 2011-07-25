@@ -44,7 +44,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.reader.impl.NotSharedReaderProvider;
 import org.hibernate.search.reader.ReaderProvider;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.impl.ReflectionHelper;
 
 import static junit.framework.Assert.*;

@@ -36,7 +36,6 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.store.FSDirectory;
 
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.impl.FileHelper;

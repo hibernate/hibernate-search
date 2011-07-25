@@ -25,7 +25,6 @@
 package org.hibernate.search.query.dsl;
 
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.query.facet.FacetingRequest;
 
 /**
  * @author Hardy Ferentschik

@@ -25,10 +25,8 @@ package org.hibernate.search.store.optimization;
 
 import java.util.Properties;
 
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * @author Emmanuel Bernard

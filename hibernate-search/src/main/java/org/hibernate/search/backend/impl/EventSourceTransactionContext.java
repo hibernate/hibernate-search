@@ -30,7 +30,6 @@ import javax.transaction.TransactionManager;
 
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
-import org.hibernate.event.spi.FlushEvent;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.util.logging.impl.Log;
 

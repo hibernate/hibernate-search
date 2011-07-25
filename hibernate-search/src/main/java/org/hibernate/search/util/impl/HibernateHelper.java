@@ -40,7 +40,7 @@ public final class HibernateHelper {
 	 * In case of Hibernate proxies, return the entity type rather than the proxy's
 	 */
 	public static <T> Class<T> getClass(T entity) {
-		return ( Class<T> ) Hibernate.getClass( entity );
+		return Hibernate.getClass( entity );
 	}
 
 	public static void initialize(Object entity) {
