@@ -121,18 +121,20 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	protected void configure(Configuration cfg) {
 		//master jgroups configuration
 		super.configure( cfg );
-		cfg.setProperty( Environment.WORKER_BACKEND, "jgroupsMaster" );
+		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
 		forceChannelName( cfg );
-		cfg.setProperty( JGroupsBackendQueueProcessorFactory.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
+		cfg.setProperty( "hibernate.search.default." +
+				JGroupsBackendQueueProcessorFactory.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
 	}
 
 	@Override
 	protected void commonConfigure(Configuration cfg) {
 		//slave jgroups configuration
 		super.commonConfigure( cfg );
-		cfg.setProperty( Environment.WORKER_BACKEND, "jgroupsSlave" );
+		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
 		forceChannelName( cfg );
-		cfg.setProperty( JGroupsBackendQueueProcessorFactory.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
+		cfg.setProperty( "hibernate.search.default." +
+				JGroupsBackendQueueProcessorFactory.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
 	}
 	
 	/**
@@ -140,7 +142,8 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	 * @param cfg the configuration to isolate
 	 */
 	private static void forceChannelName(Configuration cfg) {
-		cfg.setProperty( JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( "hibernate.search.default." +
+				JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
 	}
 
 	@Override
