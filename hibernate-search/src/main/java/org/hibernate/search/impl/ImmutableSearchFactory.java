@@ -225,9 +225,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public void optimize() {
-		Set<Class<?>> clazzs = getIndexMappingForEntity().keySet();
-		for ( Class clazz : clazzs ) {
-			optimize( clazz );
+		for ( IndexManager im : this.allIndexesManager.getIndexManagers() ) {
+			im.optimize();
 		}
 	}
 
