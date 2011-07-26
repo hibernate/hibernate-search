@@ -57,7 +57,10 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.hibernate.search.test.SearchTestCase.getTargetLuceneVersion;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Emmanuel Bernard
@@ -68,15 +71,14 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testCreateEmptyFactory() throws Exception {
-		final ManualConfiguration configuration = new ManualConfiguration();
+		final ManualConfiguration configuration = getTestConfiguration();
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		sf.close();
 	}
 
 	@Test
 	public void testAddingClassFullModel() throws Exception {
-		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		ManualConfiguration configuration = getTestConfiguration();
 		//FIXME downcasting of MSF. create a getDelegate() ?
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
@@ -93,7 +95,6 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		//we know there is only one DP
 		IndexReader indexReader = sf.openIndexReader( A.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
@@ -127,8 +128,7 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testAddingClassSimpleAPI() throws Exception {
-		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		ManualConfiguration configuration = getTestConfiguration();
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 
 		sf.addClasses( A.class );
@@ -189,9 +189,7 @@ public class MutableFactoryTest {
 	@Test
 	public void testMultiThreadedAddClasses() throws Exception {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
-		ManualConfiguration configuration = new ManualConfiguration()
-				//We need to check that properties aren't lost: avoid fs as it's the default configuration
-				.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		ManualConfiguration configuration = getTestConfiguration();
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		List<DoAddClasses> runnables = new ArrayList<DoAddClasses>(10);
 		final int nbrOfThread = 10;
@@ -310,4 +308,11 @@ public class MutableFactoryTest {
 			}
 		}
 	}
+
+	private static ManualConfiguration getTestConfiguration() {
+		return new ManualConfiguration()
+			.addProperty( "hibernate.search.default.directory_provider", "ram" )
+			.addProperty( "hibernate.search.lucene_version", getTargetLuceneVersion().name() );
+	}
+
 }

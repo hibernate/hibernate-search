@@ -219,6 +219,7 @@ public class SearchFactoryBuilder {
 		//safe for incremental init at least the ShredBufferReaderProvider
 		//this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
 		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );
+		factoryState.setActiveSearchFactory( factory );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
 	}
