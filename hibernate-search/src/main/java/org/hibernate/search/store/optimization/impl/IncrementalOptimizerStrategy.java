@@ -68,8 +68,9 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 
 	public void optimize(Workspace workspace) {
 		if ( needOptimization() ) {
-			log.debug( "Optimize {} after {} operations and {} transactions",
-				new Object[] { indexManager.getIndexName(), operations, transactions });
+			if ( log.isDebugEnabled() )
+				log.debugv( "Optimize {0} after {1} operations and {2} transactions",
+						indexManager.getIndexName(), operations, transactions );
 			IndexWriter writer = workspace.getIndexWriter();
 			try {
 				writer.optimize();
