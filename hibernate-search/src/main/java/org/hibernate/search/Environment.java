@@ -82,12 +82,12 @@ public final class Environment {
 	/**
 	 * define the reader prefix
 	 */
-	public static final String READER_PREFIX = "hibernate.search.reader.";
+	public static final String READER_PREFIX = "hibernate.search.reader";
 
 	/**
 	 * define the reader strategy used
 	 */
-	public static final String READER_STRATEGY = READER_PREFIX + "strategy";
+	public static final String READER_STRATEGY = READER_PREFIX + "." + "strategy";
 
 	/**
 	 * filter caching strategy class (must have a no-arg constructor and implement FilterCachingStrategy)

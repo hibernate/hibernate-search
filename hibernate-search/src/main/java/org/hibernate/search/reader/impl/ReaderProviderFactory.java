@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.reader.impl;
 
-import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.annotations.common.util.StringHelper;
@@ -31,6 +30,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
@@ -38,21 +38,9 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  */
 public abstract class ReaderProviderFactory {
 
-	private static Properties getProperties(SearchConfiguration cfg) {
-		Properties props = cfg.getProperties();
-		Properties workerProperties = new Properties();
-		for ( Map.Entry entry : props.entrySet() ) {
-			String key = (String) entry.getKey();
-			if ( key.startsWith( Environment.READER_PREFIX ) ) {
-				workerProperties.put( key, entry.getValue() );
-			}
-		}
-		return workerProperties;
-	}
-
 	public static ReaderProvider createReaderProvider(SearchConfiguration cfg, BuildContext context) {
-		Properties props = getProperties( cfg );
-		String impl = props.getProperty( Environment.READER_STRATEGY );
+		Properties props = new MaskedProperty( cfg.getProperties(), Environment.READER_PREFIX );
+		String impl = props.getProperty( "strategy" );
 		ReaderProvider readerProvider;
 		if ( StringHelper.isEmpty( impl ) ) {
 			//put another one
