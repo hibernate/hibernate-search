@@ -209,15 +209,7 @@ public class SearchFactoryBuilder {
 		fillSimilarityMapping();
 
 		//update backend
-		/*
-		TODO make sure the backends are properly updated (new instances are started and old ones are disposed)
-		final BackendQueueProcessorFactory backend = factoryState.getBackendQueueProcessorFactory();
-		if ( backend instanceof UpdatableBackendQueueProcessorFactory ) {
-			final UpdatableBackendQueueProcessorFactory updatableBackend = (UpdatableBackendQueueProcessorFactory) backend;
-			updatableBackend.updateDirectoryProviders( factoryState.getDirectoryProviderData().keySet(), buildContext );
-		}*/
-		//safe for incremental init at least the ShredBufferReaderProvider
-		//this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
+		//TODO make sure the old IndexManagers and backends are disposed - not currently a problem as we only support adding entities incrementally
 		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );
 		factoryState.setActiveSearchFactory( factory );
 		rootFactory.setDelegate( factory );

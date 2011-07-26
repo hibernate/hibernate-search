@@ -34,15 +34,19 @@ import org.hibernate.search.spi.BuildContext;
  * Responsible for providing and managing the lifecycle of a read only reader. The implementation must have a
  * no-arg constructor.
  * <p/>
- * Note that the reader must be closed once opened.
+ * Note that the reader must be closed once opened using this same service.
  *
  * @author Emmanuel Bernard
  */
 public interface ReaderProvider {
+
 	/**
 	 * Open a read-only reader on all the listed directory providers.
 	 * The opened reader has to be closed through {@link #closeReader(IndexReader)}.
 	 * The opening can be virtual.
+	 * Warning for implementors: when adding dynamically new types/indexes to a
+	 * MutableSearchFactory, invocations to {@link #openReader(IndexManager...)} might happen
+	 * using indexManagers not available when this service was initialized.
 	 */
 	IndexReader openReader(IndexManager... indexManagers);
 
