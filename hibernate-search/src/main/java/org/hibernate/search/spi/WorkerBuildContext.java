@@ -23,10 +23,6 @@
  */
 package org.hibernate.search.spi;
 
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
-import org.hibernate.search.store.DirectoryProvider;
-
 /**
  * Build context for the worker and other backend
  * Available after all index, entity metadata are built.
@@ -35,10 +31,6 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 public interface WorkerBuildContext extends BuildContext {
 
-	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> directoryProvider);
-
-	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> managedType);
-	
 	/**
 	 * @see org.hibernate.search.cfg.spi.SearchConfiguration#isTransactionManagerExpected
 	 */

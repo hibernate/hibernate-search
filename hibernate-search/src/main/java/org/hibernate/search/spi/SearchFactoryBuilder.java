@@ -603,21 +603,12 @@ public class SearchFactoryBuilder {
 			return factoryState.getIndexingStrategy();
 		}
 
-		public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
-			return factoryState.getDirectoryProviderIndexingParams().get( provider );
-		}
-
 		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
 			return factoryState.getServiceManager().requestService( provider );
 		}
 
 		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
 			factoryState.getServiceManager().releaseService( provider );
-		}
-
-		@SuppressWarnings("unchecked")
-		public <T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType) {
-			return (EntityIndexMapping<T>) factoryState.getIndexMappingForEntity().get( entityType );
 		}
 
 		@Override
