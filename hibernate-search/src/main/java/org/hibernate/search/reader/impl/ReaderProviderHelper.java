@@ -71,14 +71,7 @@ public abstract class ReaderProviderHelper {
 		}
 		else {
 			//everything should be the same so wrap in an MultiReader
-			try {
-				return new CacheableMultiReader( readers, managers );
-			}
-			catch (Exception e) {
-				//Lucene 2.2 used to through IOExceptions here
-				clean( new SearchException( "Unable to open a MultiReader", e ), readers );
-				return null; //never happens, but please the compiler
-			}
+			return new CacheableMultiReader( readers, managers );
 		}
 	}
 
