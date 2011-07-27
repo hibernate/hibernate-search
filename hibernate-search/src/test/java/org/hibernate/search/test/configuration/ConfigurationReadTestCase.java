@@ -32,7 +32,7 @@ import org.hibernate.search.backend.configuration.impl.IndexWriterSetting;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -83,7 +83,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 
 	private Integer getParameter(int shard, IndexWriterSetting setting, Class testEntity) {
 		EntityIndexMapping mappingForEntity = searchFactory.getIndexMappingForEntity( testEntity );
-		IndexManager indexManager = mappingForEntity.getIndexManagers()[shard];
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) mappingForEntity.getIndexManagers()[shard];
 		LuceneIndexingParameters luceneIndexingParameters = indexManager.getIndexingParameters();
 		return luceneIndexingParameters.getIndexParameters().getCurrentValueFor( setting );
 	}

@@ -47,7 +47,8 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType);
 
 	/**
-	 * Add the following classes to the SearchFactory
+	 * Add the following classes to the SearchFactory. If these classes are new to the SearchFactory this
+	 * will trigger a reconfiguration.
 	 */
 	void addClasses(Class<?>... classes);
 

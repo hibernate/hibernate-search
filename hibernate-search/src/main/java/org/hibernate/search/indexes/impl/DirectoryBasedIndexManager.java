@@ -52,7 +52,8 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * First implementation will use the "legacy" DirectoryProvider which served us so well.
+ * This implementation of IndexManager is coupled to a
+ * DirectoryProvider and a DirectoryBasedReaderManager
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -66,7 +67,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private ExecutorService backendExecutor;
 	private BackendQueueProcessorFactory backend;
 	private OptimizerStrategy optimizer;
-	private LuceneIndexingParameters inexingParameters;
+	private LuceneIndexingParameters indexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
 	private ErrorHandler errorHandler;
 	private final ReentrantLock dirLock = new ReentrantLock();
@@ -101,7 +102,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 			}
 			catch ( InterruptedException e ) {
 			}
-			if ( backendExecutor.isTerminated() ) {
+			if ( ! backendExecutor.isTerminated() ) {
 				log.unableToShutdownAsyncronousIndexingByTimeout( this.indexName );
 			}
 		}
@@ -115,7 +116,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		directoryProvider.start( this );
 		errorHandler = CommonPropertiesParse.createErrorHandler( cfg );
 		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
-		inexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
+		indexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
 		backend = BackendFactory.createBackend( this, buildContext, cfg );
 		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, cfg );
@@ -125,7 +126,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public Set<Class<?>> getContainedTypes() {
-		return containedEntityTypes;//FIXME
+		return containedEntityTypes;
 	}
 
 	@Override
@@ -159,16 +160,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		else {
 			runnable.run();
 		}
-	}
-
-	@Override
-	public OptimizerStrategy getOptimizerStrategy() {
-		return optimizer;
-	}
-
-	@Override
-	public LuceneIndexingParameters getIndexingParameters() {
-		return inexingParameters;
 	}
 
 	@Override
@@ -234,6 +225,16 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	//Not exposed on the interface
 	public DirectoryProvider getDirectoryProvider() {
 		return directoryProvider;
+	}
+
+	//Not exposed on the interface
+	public OptimizerStrategy getOptimizerStrategy() {
+		return optimizer;
+	}
+
+	//Not exposed on the interface
+	public LuceneIndexingParameters getIndexingParameters() {
+		return indexingParameters;
 	}
 
 }

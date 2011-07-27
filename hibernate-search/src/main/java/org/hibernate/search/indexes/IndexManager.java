@@ -27,11 +27,9 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * An IndexManager abstracts the specific configuration and implementations being used on a single Index.
@@ -39,7 +37,8 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * 
  * While in previous versions of Hibernate Search the backend could be sync or async, this is now
  * considered a detail of different IndexManager implementations, making it possible for them to be configured
- * in different ways, or to support only some modes of operation.
+ * in different ways, or to support only some modes of operation: configuration properties might be ignored
+ * by some implementations, or look for additional properties.
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -52,6 +51,7 @@ public interface IndexManager {
 	String getIndexName();
 	
 	/**
+	 * Exposes a service to provide IndexReaders and close them
 	 */
 	ReaderProvider getIndexReaderManager();
 	
@@ -72,13 +72,12 @@ public interface IndexManager {
 	void performStreamOperation(LuceneWork singleOperation);
 	
 	/**
-	 * Initialize the reader provider before its use.
+	 * Initialize the IndexManager before its use.
 	 */
 	void initialize(String indexName, Properties props, WorkerBuildContext context);
 
 	/**
-	 * Called when a <code>SearchFactory</code> is destroyed. This method typically releases resources.
-	 * It is guaranteed to be executed after readers are released by queries (assuming no user error). 
+	 * Called when a <code>SearchFactory</code> is stopped. This method typically releases resources.
 	 */
 	void destroy();
 
@@ -88,34 +87,30 @@ public interface IndexManager {
 	Set<Class<?>> getContainedTypes();
 
 	/**
-	 * 
+	 * Only a single Similarity can be applied to the same index, so this Similarity is applied to this index.
 	 */
 	Similarity getSimilarity();
 
 	/**
+	 * Not intended to be a mutable option, but the Similarity might be defined later in the boot lifecycle.
 	 * @param newSimilarity
 	 */
 	void setSimilarity(Similarity newSimilarity);
 
 	/**
-	 * @return
-	 */
-	OptimizerStrategy getOptimizerStrategy();
-
-	/**
-	 * @return
-	 */
-	LuceneIndexingParameters getIndexingParameters();
-
-	/**
+	 * For backends processing work asynchronously, they should catch all eventual errors in the ErrorHandler
+	 * to avoid losing information about the lost updates.
 	 * @return
 	 */
 	ErrorHandler getErrorHandler();
 	
+	/**
+	 * Returns the default Analyzer configured for this index.
+	 */
 	Analyzer getAnalyzer(String name);
 
 	/**
-	 * @param boundSearchFactory
+	 * Connects this IndexManager to a new SearchFactory.
 	 */
 	void setBoundSearchFactory(SearchFactoryImplementor boundSearchFactory);
 
@@ -125,8 +120,8 @@ public interface IndexManager {
 	void addContainedEntity(Class<?> entity);
 
 	/**
-	 * 
+	 * To optimize the underlying index. Some implementations might ignore the request, if it doesn't apply to them.
 	 */
 	void optimize();
-	
+
 }

@@ -24,13 +24,10 @@ import java.util.List;
 import junit.framework.AssertionFailedError;
 
 import org.hibernate.cfg.Environment;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
