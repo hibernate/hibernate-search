@@ -25,6 +25,7 @@ package org.hibernate.search.reader.impl;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.ReaderProvider;
 
 /**
@@ -32,6 +33,7 @@ import org.hibernate.search.indexes.ReaderProvider;
  * Especially useful when using {@link org.apache.lucene.search.CachingWrapperFilter}
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class CacheableMultiReader extends MultiReader {
 
@@ -41,22 +43,31 @@ public class CacheableMultiReader extends MultiReader {
 	final ReaderProvider[] managers;
 
 	public CacheableMultiReader(IndexReader[] subReaders, ReaderProvider[] managers) {
-		super( subReaders );
+		// don't allow sub readers to be closed:
+		super( subReaders, false );
 		this.subReaders = subReaders;
 		this.managers = managers;
 	}
 
-	/**
-	 * only available since 2.3
-	 */
-	/*
-	public CacheableMultiReader(IndexReader[] subReaders, boolean closeSubReaders) {
-		super( subReaders, closeSubReaders );
-		this.subReaders = subReaders;
+	@Override
+	public final void decRef() {
+		avoidUsingThis();
 	}
-	 */
+
+	@Override
+	public final synchronized IndexReader reopen() {
+		avoidUsingThis();
+		return null; //never reached, make compiler happy
+	}
+
+	@Override
+	public final void incRef() {
+		avoidUsingThis();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
+		// Equality only checks for subReaders as an equal sub-IndexReader is certainly coming from the same ReaderProvider.
 		if ( this == obj ) return true;
 		if ( !( obj instanceof CacheableMultiReader ) ) return false;
 		CacheableMultiReader that = (CacheableMultiReader) obj;
@@ -76,4 +87,10 @@ public class CacheableMultiReader extends MultiReader {
 		}
 		return result;
 	}
+
+	private void avoidUsingThis() {
+		throw new SearchException( "IndexReader lifecycle should not be managed, please use "
+				+ "org.hibernate.search.SearchFactory.closeIndexReader(IndexReader) to close IndexReader instances or pool them." );
+	}
+
 }
