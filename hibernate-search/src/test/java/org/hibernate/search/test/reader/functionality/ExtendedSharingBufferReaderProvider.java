@@ -47,7 +47,7 @@ import org.apache.lucene.index.TermVectorMapper;
 
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.reader.impl.ReaderProviderHelper;
-import org.hibernate.search.reader.impl.SharingBufferReaderProvider;
+import org.hibernate.search.reader.impl.OldBrokenSharingBufferReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.test.util.RamIndexManager;
@@ -55,7 +55,7 @@ import org.hibernate.search.test.util.RamIndexManager;
 /**
  * @author Sanne Grinovero
  */
-public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProvider {
+public class ExtendedSharingBufferReaderProvider extends OldBrokenSharingBufferReaderProvider {
 
 	private static final int NUM_DIRECTORY_PROVIDERS = 4;
 	private final Vector<MockIndexReader> createdReadersHistory = new Vector<MockIndexReader>( 500 );

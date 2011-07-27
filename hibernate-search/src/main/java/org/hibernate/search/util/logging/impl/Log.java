@@ -354,8 +354,8 @@ public interface Log extends BasicLogger
    void recommendConfiguringLuceneVersion();
 
    @LogMessage(level = ERROR)
-   @Message(id = 76, value = "Could not open Lucene index: data is corrupted")
-   void cantOpenCorruptedIndex(@Cause CorruptIndexException e);
+   @Message(id = 76, value = "Could not open Lucene index: data is corrupted. index name: \"%s\"")
+   void cantOpenCorruptedIndex(@Cause CorruptIndexException e, String indexName);
    
    @LogMessage(level = ERROR)
    @Message(id = 77, value = "An IOException happened while accessing the Lucene index")

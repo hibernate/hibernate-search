@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.indexes.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,12 +31,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.Similarity;
-import org.apache.lucene.store.Directory;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
@@ -49,6 +44,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.CommonPropertiesParse;
 import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -78,6 +74,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private boolean exclusiveIndexUsage;
 	
 	private SearchFactoryImplementor boundSearchFactory = null;
+	private DirectoryBasedReaderManager readers = null;
 
 	private IndexWriterConfig writerConfig;
 	
@@ -91,18 +88,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public IndexReader openReader() {
-		Directory directory = directoryProvider.getDirectory();
-		try {
-			return IndexReader.open( directory, true );
-		}
-		catch ( CorruptIndexException e ) {
-			log.cantOpenCorruptedIndex( e );
-		}
-		catch ( IOException e ) {
-			log.ioExceptionOnIndex( e );
-		}
-		throw new SearchException( "Could not open index" );
+	public DirectoryBasedReaderManager getIndexReaderManager() {
+		return readers;
 	}
 
 	@Override
@@ -118,6 +105,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 				log.unableToShutdownAsyncronousIndexingByTimeout( this.indexName );
 			}
 		}
+		readers.stop();
 		directoryProvider.stop();
 	}
 
@@ -132,6 +120,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		backend = BackendFactory.createBackend( this, buildContext, cfg );
 		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, cfg );
 		exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
+		readers = CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
 	}
 
 	@Override

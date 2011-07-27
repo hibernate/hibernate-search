@@ -82,7 +82,7 @@ public final class Environment {
 	/**
 	 * define the reader prefix
 	 */
-	public static final String READER_PREFIX = "hibernate.search.reader";
+	public static final String READER_PREFIX = "reader";
 
 	/**
 	 * define the reader strategy used

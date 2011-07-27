@@ -36,7 +36,6 @@ import org.apache.lucene.index.MultiReader;
 
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.IndexManagerFactory;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
@@ -51,7 +50,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class SharingBufferReaderProvider implements ReaderProvider {
+public class OldBrokenSharingBufferReaderProvider {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -132,6 +131,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	}
 
 	public IndexReader openReader(IndexManager... indexManagers) {
+		return null;/*
 		int length = indexManagers.length;
 		IndexReader[] readers = new IndexReader[length];
 		log.debugf( "Opening IndexReader for directoryProviders: %d", length );
@@ -151,7 +151,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		}
 		else {
 			try {
-				return new CacheableMultiReader( readers );
+//				return new CacheableMultiReader( readers );
 			}
 			catch ( Exception e ) {
 				//Lucene 2.2 used to throw IOExceptions here
@@ -161,12 +161,13 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 				}
 				throw new SearchException( "Unable to open a MultiReader", e );
 			}
-		}
+		}*/
 	}
 
 	//overridable method for testability:
 	protected IndexReader readerFactory(final IndexManager indexManager) {
-		return indexManager.openReader();
+//		return indexManager.openReader();
+		return null;
 	}
 
 	/**

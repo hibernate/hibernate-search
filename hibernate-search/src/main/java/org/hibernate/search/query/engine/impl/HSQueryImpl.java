@@ -65,6 +65,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
@@ -576,9 +577,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				new IndexManager[targetedIndexes.size()]
 		);
 		IndexSearcher is = new IndexSearcher(
-				searchFactoryImplementor.getReaderProvider().openReader(
-						directoryProviders
-				)
+				MultiReaderFactory.openReader( directoryProviders )
 		);
 		is.setSimilarity( searcherSimilarity );
 

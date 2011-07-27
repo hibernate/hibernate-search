@@ -34,7 +34,6 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexManagerFactory;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
@@ -53,7 +52,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
 	private String indexingStrategy;
 	private Worker worker;
-	private ReaderProvider readerProvider;
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
 	private Map<String, FilterDef> filterDefinitions;
 	private FilterCachingStrategy filterCachingStrategy;
@@ -71,7 +69,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		documentBuildersIndexedEntities = oldFactoryState.getIndexMappingForEntity();
 		documentBuildersContainedEntities = oldFactoryState.getDocumentBuildersContainedEntities();
 		worker = oldFactoryState.getWorker();
-		readerProvider = oldFactoryState.getReaderProvider();
 		filterDefinitions = oldFactoryState.getFilterDefinitions();
 		filterCachingStrategy = oldFactoryState.getFilterCachingStrategy();
 		analyzers = oldFactoryState.getAnalyzers();
@@ -106,10 +103,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public Worker getWorker() {
 		return worker;
-	}
-
-	public ReaderProvider getReaderProvider() {
-		return readerProvider;
 	}
 
 	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
@@ -158,10 +151,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setWorker(Worker worker) {
 		this.worker = worker;
-	}
-
-	public void setReaderProvider(ReaderProvider readerProvider) {
-		this.readerProvider = readerProvider;
 	}
 
 	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {

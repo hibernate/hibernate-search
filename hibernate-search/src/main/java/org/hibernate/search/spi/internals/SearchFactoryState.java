@@ -33,7 +33,6 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexManagerFactory;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 
 import java.util.Map;
@@ -52,8 +51,6 @@ public interface SearchFactoryState {
 	String getIndexingStrategy();
 
 	Worker getWorker();
-
-	ReaderProvider getReaderProvider();
 
 	Map<String, FilterDef> getFilterDefinitions();
 

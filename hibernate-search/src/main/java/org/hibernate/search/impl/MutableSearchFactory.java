@@ -44,7 +44,6 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -155,10 +154,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public ServiceManager getServiceManager() {
 		return delegate.getServiceManager();
-	}
-
-	public ReaderProvider getReaderProvider() {
-		return delegate.getReaderProvider();
 	}
 
 	public void optimize() {

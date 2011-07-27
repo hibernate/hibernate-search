@@ -30,10 +30,15 @@ import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.impl.ImmutableSearchFactory;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.impl.NotSharedReaderProvider;
+import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.NoOpOptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
@@ -130,6 +135,34 @@ public class CommonPropertiesParse {
 					ImmutableSearchFactory.class, "Error Handler"
 			);
 		}
+	}
+
+	/**
+	 * @param directoryBasedIndexManager
+	 * @param cfg
+	 * @return
+	 */
+	public static DirectoryBasedReaderManager createDirectoryBasedReaderManager(DirectoryBasedIndexManager indexManager, Properties cfg) {
+		Properties props = new MaskedProperty( cfg, Environment.READER_PREFIX );
+		String impl = props.getProperty( "strategy" );
+		DirectoryBasedReaderManager readerProvider;
+		if ( StringHelper.isEmpty( impl ) ) {
+			readerProvider = new SharingBufferReaderProvider();
+		}
+		else if ( "not-shared".equalsIgnoreCase( impl ) ) {
+			readerProvider = new NotSharedReaderProvider();
+		}
+		else if ( "shared".equalsIgnoreCase( impl ) ) {
+			readerProvider = new SharingBufferReaderProvider();
+		}
+		else {
+			readerProvider = ClassLoaderHelper.instanceFromName(
+					DirectoryBasedReaderManager.class, impl,
+					CommonPropertiesParse.class, "readerProvider"
+			);
+		}
+		readerProvider.initialize( indexManager, props );
+		return readerProvider;
 	}
 
 }

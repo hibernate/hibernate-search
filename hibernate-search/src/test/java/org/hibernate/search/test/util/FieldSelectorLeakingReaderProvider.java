@@ -41,9 +41,8 @@ import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.reader.impl.NotSharedReaderProvider;
-import org.hibernate.search.reader.ReaderProvider;
+import org.hibernate.search.indexes.ReaderProvider;
+import org.hibernate.search.indexes.impl.NotSharedReaderProvider;
 import org.hibernate.search.util.impl.ReflectionHelper;
 
 import static junit.framework.Assert.*;
@@ -98,12 +97,12 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 	}
 	
 	@Override
-	public IndexReader openReader(IndexManager... directoryProviders) {
-		IndexReader indexReader = super.openReader( directoryProviders );
+	public IndexReader openIndexReader() {
+		IndexReader indexReader = super.openIndexReader();
 		IndexReader leakingReader = new LeakingIndexReader( indexReader );
 		return leakingReader;
 	}
-	
+
 	/**
 	 * Delegates are created via IDE code generation with some changes:
 	 * - the method {@link #document(int, FieldSelector)}

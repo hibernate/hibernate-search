@@ -33,7 +33,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.reader.impl.SharingBufferReaderProvider;
+import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.reader.Detective;
 import org.hibernate.search.test.reader.Suspect;
@@ -80,7 +80,7 @@ public class FilterOnDirectoryTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() );
-		cfg.setProperty( Environment.READER_STRATEGY,  SharingBufferReaderProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getName() );
 	}
 	
 	protected Class<?>[] getAnnotatedClasses() {

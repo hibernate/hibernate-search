@@ -25,6 +25,7 @@ package org.hibernate.search.reader.impl;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
+import org.hibernate.search.indexes.ReaderProvider;
 
 /**
  * MultiReader ensuring equals returns true if the underlying readers are the same (and in the same order)
@@ -37,10 +38,12 @@ public class CacheableMultiReader extends MultiReader {
 	// This is package private as the intention of the Lucene team seems to be to not 
 	// expose this publically (it's a protected member in Lucene 2.3)
 	final IndexReader[] subReaders;
+	final ReaderProvider[] managers;
 
-	public CacheableMultiReader(IndexReader[] subReaders) {
+	public CacheableMultiReader(IndexReader[] subReaders, ReaderProvider[] managers) {
 		super( subReaders );
 		this.subReaders = subReaders;
+		this.managers = managers;
 	}
 
 	/**

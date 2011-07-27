@@ -40,6 +40,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.IndexManagerFactory;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -66,7 +67,6 @@ import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.impl.HSQueryImpl;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -93,7 +93,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
 	private final Worker worker;
-	private final ReaderProvider readerProvider;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
 	private final Map<String, Analyzer> analyzers;
@@ -124,7 +123,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.filterDefinitions = state.getFilterDefinitions();
 		this.indexHierarchy = state.getIndexHierarchy();
 		this.indexingStrategy = state.getIndexingStrategy();
-		this.readerProvider = state.getReaderProvider();
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
@@ -166,13 +164,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			}
 			catch ( Exception e ) {
 				log.workerException( e );
-			}
-
-			try {
-				readerProvider.destroy();
-			}
-			catch ( Exception e ) {
-				log.readerProviderExceptionOnDestroy( e );
 			}
 
 			this.allIndexesManager.stop();
@@ -217,11 +208,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
 		return dirProviderIndexingParams.get( provider );
-	}
-
-	@Override
-	public ReaderProvider getReaderProvider() {
-		return readerProvider;
 	}
 
 	public void optimize() {
@@ -373,12 +359,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			}
 		}
 		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()]);
-		return readerProvider.openReader( uniqueIndexManagers );
+		return MultiReaderFactory.openReader( uniqueIndexManagers );
 	}
 
 	@Override
 	public void closeIndexReader(IndexReader indexReader) {
-		readerProvider.closeReader( indexReader );
+		MultiReaderFactory.closeReader( indexReader );
 	}
 
 	private EntityIndexMapping getSafeIndexMappingForEntity(Class entityType) {

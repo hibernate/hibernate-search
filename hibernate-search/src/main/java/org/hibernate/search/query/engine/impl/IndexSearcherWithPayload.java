@@ -26,10 +26,10 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.reader.impl.ReaderProviderHelper.getIndexReaders;
@@ -68,10 +68,9 @@ public class IndexSearcherWithPayload {
 	 */
 	public void closeSearcher(Object query, SearchFactoryImplementor searchFactoryImplementor) {
 		Set<IndexReader> indexReaders = getIndexReaders( getSearcher() );
-		ReaderProvider readerProvider = searchFactoryImplementor.getReaderProvider();
 		for ( IndexReader indexReader : indexReaders ) {
 			try {
-				readerProvider.closeReader( indexReader );
+				MultiReaderFactory.closeReader( indexReader );
 			}
 			catch (SearchException e) {
 				//catch is inside the for loop to make sure we try to close all of them

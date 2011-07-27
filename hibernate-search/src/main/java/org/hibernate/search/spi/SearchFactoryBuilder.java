@@ -52,7 +52,6 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.reader.impl.ReaderProviderFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -269,7 +268,6 @@ public class SearchFactoryBuilder {
 		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities, cfg.getProperties() );
 		//build worker and back end components
 		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
-		factoryState.setReaderProvider( ReaderProviderFactory.createReaderProvider( cfg, buildContext ) );
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg.getProperties() ) );
 		factoryState.setCacheBitResultsSize(
 				ConfigurationParseHelper.getIntValue(

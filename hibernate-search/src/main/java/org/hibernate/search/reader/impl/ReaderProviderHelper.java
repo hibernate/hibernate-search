@@ -32,6 +32,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.indexes.ReaderProvider;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -64,26 +65,14 @@ public abstract class ReaderProviderHelper {
 		}
 	}
 	
-	@SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
-	public static IndexReader buildMultiReader(int length, IndexReader[] readers) {
+	public static IndexReader buildMultiReader(int length, IndexReader[] readers, ReaderProvider[] managers) {
 		if ( length == 0 ) {
 			return null;
 		}
-		else if ( length == 1 ) {
-			//everything should be the same so wrap in an MultiReader
-			//return readers[0];
-			try {
-				return new CacheableMultiReader( readers );
-			}
-			catch (Exception e) {
-				//Lucene 2.2 used to through IOExceptions here
-				clean( new SearchException( "Unable to open a MultiReader", e ), readers );
-				return null; //never happens, but please the compiler
-			}
-		}
 		else {
+			//everything should be the same so wrap in an MultiReader
 			try {
-				return new CacheableMultiReader( readers );
+				return new CacheableMultiReader( readers, managers );
 			}
 			catch (Exception e) {
 				//Lucene 2.2 used to through IOExceptions here
@@ -145,4 +134,5 @@ public abstract class ReaderProviderHelper {
 			readers.add( (IndexReader) obj );
 		}
 	}
+
 }

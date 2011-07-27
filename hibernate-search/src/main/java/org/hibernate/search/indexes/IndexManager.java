@@ -25,7 +25,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
@@ -53,11 +52,8 @@ public interface IndexManager {
 	String getIndexName();
 	
 	/**
-	 * Provides an IndexReader instance which is guaranteed to provide a fresh read view
-	 * on the index.
-	 * @return a read-only IndexReader instance.
 	 */
-	IndexReader openReader();
+	ReaderProvider getIndexReaderManager();
 	
 	/**
 	 * Used to apply update operations to the index.

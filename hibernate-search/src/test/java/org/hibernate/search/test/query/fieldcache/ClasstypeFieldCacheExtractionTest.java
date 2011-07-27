@@ -99,7 +99,7 @@ public class ClasstypeFieldCacheExtractionTest {
 		}
 		builder.addAnnotatedClass( Item.class )
 			.addAnnotatedClass( ProductCatalog.class )
-			.setProperty( Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() )
+			.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() )
 			.setProperty( Environment.MODEL_MAPPING, Mapping.class.getName() )
 			.build();
 		try {
