@@ -90,7 +90,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	 */
 	public void testProperCopy() throws Exception {
 
-		// assert that the salve index is empty
+		// assert that the slave index is empty
 		FullTextSession fullTextSession = Search.getFullTextSession( getSlaveSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
@@ -113,7 +113,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		int waitPeriodMilli = 2010; // wait  a bit more than 2 refresh periods (one master / one slave)  -  2 * 1 * 1000 + 10
 		Thread.sleep( waitPeriodMilli );
 
-		// assert that the master hass indexed the snowstorm
+		// assert that the master has indexed the snowstorm
 		log.debug( "Searching master" );
 		fullTextSession = Search.getFullTextSession( getMasterSession() );
 		tx = fullTextSession.beginTransaction();

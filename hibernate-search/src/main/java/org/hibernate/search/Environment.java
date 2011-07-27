@@ -135,7 +135,7 @@ public final class Environment {
 	 * Accepts a fully populated SearchMapping object or a fully qualified
 	 * class name of a SearchMapping factory. Such a factory must have:
 	 *  - a no-arg constructor
-	 *  - a methid returning SearchMapping and annotated with @Factory
+	 *  - a method returning SearchMapping and annotated with @Factory
 	 */
 	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
 

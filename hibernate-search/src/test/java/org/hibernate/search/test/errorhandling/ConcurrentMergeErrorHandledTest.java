@@ -46,7 +46,7 @@ import org.hibernate.search.test.SearchTestCase;
  * The Byteman rules are defined in a resources file ConcurrentMergeErrorTest.bytemanrules
  * 
  * The goal of the test is to make sure we can catch and report the errors
- * thrown by the merger via wathever is configured as Environment.ERROR_HANDLER.
+ * thrown by the merger via whatever is configured as Environment.ERROR_HANDLER.
  * 
  * @see Environment#ERROR_HANDLER
  * @author Sanne Grinovero
