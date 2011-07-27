@@ -25,30 +25,38 @@ package org.hibernate.search.test.filter;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.DocIdSet;
-import org.hornetq.utils.ConcurrentHashSet;
+import org.hibernate.search.SearchException;
 
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
 public class InstanceBasedExcludeAllFilter extends Filter implements Serializable {
-	
-	// ugly but useful for test purposes
-	private final Set<IndexReader> invokedOnReaders = new ConcurrentHashSet<IndexReader>();
+
+	private static volatile int constructorCount = 0;
+
+	public InstanceBasedExcludeAllFilter() {
+		constructorCount++;
+	}
 
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 		ExcludeAllFilter.verifyItsAReadOnlySegmentReader( reader );
-		if ( invokedOnReaders.contains( reader ) ) {
-			throw new IllegalStateException( "Called twice" );
-		}
-		invokedOnReaders.add( reader );
 		return DocIdSet.EMPTY_DOCIDSET;
 	}
+
+	public static void reset() {
+		constructorCount = 0;
+	}
 	
+	public static void assertConstructorInvoked(int times) {
+		if ( constructorCount != times ) {
+			throw new SearchException( "test failed, constructor invoked " + constructorCount + ", expected " + times );
+		}
+	}
+
 }
