@@ -24,65 +24,90 @@
 package org.hibernate.search.test.reader.functionality;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.index.TermFreqVector;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
 
-import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.reader.impl.ReaderProviderHelper;
-import org.hibernate.search.reader.impl.OldBrokenSharingBufferReaderProvider;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.test.util.RamIndexManager;
+import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
 /**
+ * Testable extension of SharingBufferReaderProvider to make sure IndexReaders
+ * are only opened when needed, and always correctly closed.
+ * 
+ * @see SharingBufferIndexProviderTest
  * @author Sanne Grinovero
  */
-public class ExtendedSharingBufferReaderProvider extends OldBrokenSharingBufferReaderProvider {
+public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProvider {
 
-	private static final int NUM_DIRECTORY_PROVIDERS = 4;
+	private static final int NUM_DIRECTORY_PROVIDERS = 3;
 	private final Vector<MockIndexReader> createdReadersHistory = new Vector<MockIndexReader>( 500 );
-	final Map<IndexManager, TestManipulatorPerDP> manipulators = new ConcurrentHashMap<IndexManager, TestManipulatorPerDP>();
-	final List<IndexManager> directoryProviders = Collections.synchronizedList(new ArrayList<IndexManager>());
+	final Map<Directory, TestManipulatorPerDP> manipulators = new ConcurrentHashMap<Directory, TestManipulatorPerDP>();
+	private final RAMDirectoryProvider[] directories = new RAMDirectoryProvider[ NUM_DIRECTORY_PROVIDERS ];
+	private final AtomicInteger currentDirectoryIndex = new AtomicInteger();
+	private volatile RAMDirectoryProvider currentDirectory;
 	
 	public ExtendedSharingBufferReaderProvider() {
 		for ( int i = 0; i < NUM_DIRECTORY_PROVIDERS; i++ ) {
 			TestManipulatorPerDP tm = new TestManipulatorPerDP( i );
-			manipulators.put( tm.dp, tm );
-			directoryProviders.add( tm.dp );
+			manipulators.put( tm.dp.getDirectory(), tm );
+			directories[i] = tm.dp;
 		}
+		currentDirectory = directories[0];
 	}
 
+	/**
+	 * Contains mutable state related to a specific index
+	 */
 	public static class TestManipulatorPerDP {
 		private final AtomicBoolean isIndexReaderCurrent = new AtomicBoolean( false );//starts at true, see MockIndexReader constructor
 		private final AtomicBoolean isReaderCreated = new AtomicBoolean( false );
-		private final IndexManager dp = new RamIndexManager();
-
-		public TestManipulatorPerDP(int seed) {
-			dp.initialize( "dp" + seed, new Properties(), null );
+		private final RAMDirectoryProvider dp = new RAMDirectoryProvider();
+		
+		TestManipulatorPerDP(int seed) {
+			dp.initialize( String.valueOf( seed ), null, null );
 		}
 
 		public void setIndexChanged() {
 			isIndexReaderCurrent.set( false );
 		}
+	}
 
+	/**
+	 * Make the last IndexReader opened on the current Directory dirty
+	 */
+	public void currentDPWasWritten() {
+		for ( TestManipulatorPerDP manipulator : manipulators.values() ) {
+			manipulator.setIndexChanged();
+		}
+	}
+
+	/**
+	 * Switches the current Directory, what is going to be returned by the mock DirectoryProvider
+	 */
+	public void swithDirectory() {
+		int index = currentDirectoryIndex.incrementAndGet();
+		currentDirectory = directories[ index % NUM_DIRECTORY_PROVIDERS ];
 	}
 
 	public boolean isReaderCurrent(MockIndexReader reader) {
@@ -97,10 +122,10 @@ public class ExtendedSharingBufferReaderProvider extends OldBrokenSharingBufferR
 	}
 
 	@Override
-	protected IndexReader readerFactory(IndexManager directory) {
+	protected IndexReader readerFactory(Directory directory) {
 		TestManipulatorPerDP manipulatorPerDP = manipulators.get( directory );
 		if ( !manipulatorPerDP.isReaderCreated.compareAndSet( false, true ) ) {
-			throw new IllegalStateException( "IndexReader1 created twice" );
+			throw new IllegalStateException( "IndexReader created twice" );
 		}
 		else {
 			return new MockIndexReader( manipulatorPerDP.isIndexReaderCurrent );
@@ -108,15 +133,8 @@ public class ExtendedSharingBufferReaderProvider extends OldBrokenSharingBufferR
 	}
 
 	@Override
-	public void initialize(Properties props, BuildContext context) {
-		try {
-			for ( IndexManager directory : manipulators.keySet() ) {
-				currentReaders.put( directory, new PerDirectoryLatestReader( directory ) );
-			}
-		}
-		catch ( IOException e ) {
-			throw new SearchException( "Unable to open Lucene IndexReader", e );
-		}
+	public void initialize(DirectoryBasedIndexManager indexManager, Properties props) {
+		super.initialize( new MockDirectoryBasedIndexManager(), null );
 	}
 
 	public boolean areAllOldReferencesGone() {
@@ -129,16 +147,35 @@ public class ExtendedSharingBufferReaderProvider extends OldBrokenSharingBufferR
 		return createdReadersHistory;
 	}
 
-	public MockIndexReader getCurrentMockReaderPerDP(IndexManager index) {
-		IndexReader[] indexReaders = ReaderProviderHelper.getSubReadersFromMultiReader(
-				( MultiReader ) super.openReader(
-						new IndexManager[] { index }
-				)
-		);
-		if ( indexReaders.length != 1 ) {
-			throw new IllegalStateException( "Expecting one reader" );
+	/**
+	 * Use our special DirectoryProvider to emulate index switching and dirtyness.
+	 */
+	public class MockDirectoryBasedIndexManager extends DirectoryBasedIndexManager {
+
+		public MockDirectoryBasedIndexManager() {
+			super( new MockDirectoryProvider() );
 		}
-		return ( MockIndexReader ) indexReaders[0];
+		
+	}
+
+	public class MockDirectoryProvider implements DirectoryProvider<RAMDirectory> {
+
+		@Override
+		public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
+		}
+
+		@Override
+		public void start(DirectoryBasedIndexManager indexManager) {
+		}
+
+		@Override
+		public void stop() {
+		}
+
+		@Override
+		public RAMDirectory getDirectory() {
+			return currentDirectory.getDirectory();
+		}
 	}
 
 	public class MockIndexReader extends IndexReader {
@@ -149,7 +186,7 @@ public class ExtendedSharingBufferReaderProvider extends OldBrokenSharingBufferR
 
 		MockIndexReader(AtomicBoolean isIndexReaderCurrent) {
 			this.isIndexReaderCurrent = isIndexReaderCurrent;
-			if ( !isIndexReaderCurrent.compareAndSet( false, true ) ) {
+			if ( ! isIndexReaderCurrent.compareAndSet( false, true ) ) {
 				throw new IllegalStateException( "Unnecessarily reopened" );
 			}
 			createdReadersHistory.add( this );
