@@ -26,7 +26,6 @@ package org.hibernate.search;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 
-import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.stat.Statistics;
 
@@ -39,8 +38,6 @@ import org.hibernate.search.stat.Statistics;
  */
 public interface SearchFactory {
 
-	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType);
-	
 	/**
 	 * Optimize all indexes
 	 */

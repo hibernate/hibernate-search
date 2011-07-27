@@ -29,6 +29,7 @@ import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -98,7 +99,7 @@ public class ClusterTestHelper {
 	 * @return the number of nodes as seen by the current node
 	 */
 	public static int clusterSize(FullTextSessionBuilder node) {
-		SearchFactory searchFactory = node.getSearchFactory();
+		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
 		EntityIndexMapping<SimpleEmail> indexMappingForEntity = searchFactory.getIndexMappingForEntity( SimpleEmail.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexMappingForEntity.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();

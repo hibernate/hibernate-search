@@ -38,6 +38,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -46,22 +47,22 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class FSDirectorySelectionTest extends SearchTestCase {
 
-	public void testMMapDirectoryType() throws Exception {
+	public void testMMapDirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "mmap" );
 		assertCorrectDirectoryType( factory, MMapDirectory.class.getName() );
 	}
 
-	public void testNIODirectoryType() throws Exception {
+	public void testNIODirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "nio" );
 		assertCorrectDirectoryType( factory, NIOFSDirectory.class.getName() );
 	}
 
-	public void testSimpleDirectoryType() throws Exception {
+	public void testSimpleDirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "simple" );
 		assertCorrectDirectoryType( factory, SimpleFSDirectory.class.getName() );
 	}
 
-	public void testInvalidDirectoryType() throws Exception {
+	public void testInvalidDirectoryType() {
 		try {
 			createSessionFactoryUsingDirectoryType( "foobar" );
 			fail( "Factory creation should fail with invalid 'hibernate.search.default.filesystem_access_type' parameter " );
@@ -75,7 +76,8 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		Session session = factory.openSession();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		EntityIndexMapping<?> entityIndexMapping = fullTextSession.getSearchFactory().getIndexMappingForEntity( SnowStorm.class );
+		SearchFactoryIntegrator searchFactoryIntegrator = (SearchFactoryIntegrator) fullTextSession.getSearchFactory();
+		EntityIndexMapping<?> entityIndexMapping = searchFactoryIntegrator.getIndexMappingForEntity( SnowStorm.class );
 		IndexManager[] indexManagers = entityIndexMapping.getIndexManagers();
 		assertTrue( "Wrong number of directory providers", indexManagers.length == 1 );
 		
@@ -98,5 +100,4 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		return new Class[] { };
 	}
 }
-
 
