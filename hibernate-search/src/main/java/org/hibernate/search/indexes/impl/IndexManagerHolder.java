@@ -242,7 +242,7 @@ public class IndexManagerHolder {
 
 	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
 		for ( IndexManager indexManager : getIndexManagers() ) {
-			indexManager.setBoundSearchFactory( factory );
+			indexManager.setSearchFactory( factory );
 		}
 	}
 

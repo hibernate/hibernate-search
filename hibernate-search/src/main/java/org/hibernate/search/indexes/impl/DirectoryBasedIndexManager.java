@@ -178,7 +178,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void setBoundSearchFactory(SearchFactoryImplementor boundSearchFactory) {
+	public void setSearchFactory(SearchFactoryImplementor boundSearchFactory) {
 		this.boundSearchFactory = boundSearchFactory;
 	}
 	

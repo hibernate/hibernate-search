@@ -115,7 +115,7 @@ public interface IndexManager {
 	/**
 	 * Connects this IndexManager to a new SearchFactory.
 	 */
-	void setBoundSearchFactory(SearchFactoryImplementor boundSearchFactory);
+	void setSearchFactory(SearchFactoryImplementor boundSearchFactory);
 
 	/**
 	 * @param entity
