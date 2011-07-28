@@ -18,13 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.backend;
+package org.hibernate.search.backend.impl;
 
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
 
 /**

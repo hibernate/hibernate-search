@@ -29,7 +29,6 @@ import java.util.Properties;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.WorkQueuePerIndexSplitter;
 import org.hibernate.search.backend.impl.lucene.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.spi.EntityIndexBinder;

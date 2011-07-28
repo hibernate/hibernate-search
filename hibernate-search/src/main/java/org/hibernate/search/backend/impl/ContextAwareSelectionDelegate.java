@@ -24,7 +24,6 @@
 package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.WorkQueuePerIndexSplitter;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
