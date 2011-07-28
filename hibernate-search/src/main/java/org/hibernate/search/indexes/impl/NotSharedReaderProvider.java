@@ -23,7 +23,6 @@ package org.hibernate.search.indexes.impl;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.SearchException;
@@ -53,13 +52,9 @@ public class NotSharedReaderProvider implements DirectoryBasedReaderManager {
 		try {
 			return IndexReader.open( directory, true );
 		}
-		catch ( CorruptIndexException e ) {
-			log.cantOpenCorruptedIndex( e, indexName );
-		}
 		catch ( IOException e ) {
-			log.ioExceptionOnIndex( e );
+			throw new SearchException( "Could not open index \"" + indexName + "\"", e );
 		}
-		throw new SearchException( "Could not open index \"" + indexName + "\"");
 	}
 
 	@Override
