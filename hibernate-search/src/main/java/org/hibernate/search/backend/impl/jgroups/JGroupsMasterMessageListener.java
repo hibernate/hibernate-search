@@ -33,7 +33,7 @@ import org.jgroups.View;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.indexes.IndexManagerFactory;
+import org.hibernate.search.indexes.IndexManagerHolder;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -87,7 +87,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 	}
 
 	private void perform(String indexName, List<LuceneWork> queue) {
-		IndexManagerFactory allIndexesManager = searchFactory.getAllIndexesManager();
+		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
 		IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
 		indexManager.performOperation( queue );
 	}

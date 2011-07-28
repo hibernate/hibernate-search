@@ -38,7 +38,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.indexes.IndexManagerFactory;
+import org.hibernate.search.indexes.IndexManagerHolder;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.stat.impl.StatisticsImpl;
@@ -102,7 +102,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final PolymorphicIndexHierarchy indexHierarchy;
 	private final StatisticsImpl statistics;
 	private final boolean transactionManagerExpected;
-	private final IndexManagerFactory allIndexesManager;
+	private final IndexManagerHolder allIndexesManager;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -344,7 +344,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	@Override
-	public IndexManagerFactory getAllIndexesManager() {
+	public IndexManagerHolder getAllIndexesManager() {
 		return this.allIndexesManager;
 	}
 

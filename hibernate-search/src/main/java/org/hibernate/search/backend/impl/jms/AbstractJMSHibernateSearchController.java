@@ -35,7 +35,7 @@ import javax.jms.ObjectMessage;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.indexes.IndexManagerFactory;
+import org.hibernate.search.indexes.IndexManagerHolder;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -117,7 +117,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 
 		try {
 			SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
-			IndexManagerFactory allIndexesManager = factory.getAllIndexesManager();
+			IndexManagerHolder allIndexesManager = factory.getAllIndexesManager();
 			IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
 			indexManager.performOperation( queue );
 		}

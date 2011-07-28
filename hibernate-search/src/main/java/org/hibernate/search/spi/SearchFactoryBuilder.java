@@ -86,7 +86,7 @@ import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.indexes.IndexManagerFactory;
+import org.hibernate.search.indexes.IndexManagerHolder;
 import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
@@ -340,7 +340,7 @@ public class SearchFactoryBuilder {
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
-			factoryState.setAllIndexesManager( new IndexManagerFactory() );
+			factoryState.setAllIndexesManager( new IndexManagerHolder() );
 		}
 	}
 
@@ -392,7 +392,7 @@ public class SearchFactoryBuilder {
 			//TODO should analyzer def for classes at their same level???
 		}
 		
-		IndexManagerFactory indexesFactory = factoryState.getAllIndexesManager();
+		IndexManagerHolder indexesFactory = factoryState.getAllIndexesManager();
 		
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
@@ -615,7 +615,7 @@ public class SearchFactoryBuilder {
 		}
 
 		@Override
-		public IndexManagerFactory getAllIndexesManager() {
+		public IndexManagerHolder getAllIndexesManager() {
 			return factoryState.getAllIndexesManager();
 		}
 

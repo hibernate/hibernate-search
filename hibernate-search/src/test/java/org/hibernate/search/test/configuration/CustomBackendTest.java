@@ -28,7 +28,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.IndexManagerFactory;
+import org.hibernate.search.indexes.IndexManagerHolder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
@@ -56,7 +56,7 @@ public class CustomBackendTest {
 			.openFullTextSession();
 		SearchFactoryImplementor searchFactory = ( SearchFactoryImplementor ) ftSession.getSearchFactory();
 		ftSession.close();
-		IndexManagerFactory allIndexesManager = searchFactory.getAllIndexesManager();
+		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( "org.hibernate.search.test.configuration.BlogEntry" );
 		BackendQueueProcessorFactory backendQueueProcessorFactory = indexManager.getBackendQueueProcessorFactory();
 		assertEquals( backendType, backendQueueProcessorFactory.getClass() );

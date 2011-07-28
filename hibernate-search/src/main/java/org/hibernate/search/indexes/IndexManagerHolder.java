@@ -52,14 +52,14 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class IndexManagerFactory {
+public class IndexManagerHolder {
 	
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 	
 	private final Map<String, IndexManager> indexManagersRegistry;
 	
-	public IndexManagerFactory() {
+	public IndexManagerHolder() {
 		this.indexManagersRegistry = new HashMap<String, IndexManager>();
 	}
 	

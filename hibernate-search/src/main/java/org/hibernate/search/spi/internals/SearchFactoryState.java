@@ -32,7 +32,7 @@ import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.indexes.IndexManagerFactory;
+import org.hibernate.search.indexes.IndexManagerHolder;
 import org.hibernate.search.store.DirectoryProvider;
 
 import java.util.Map;
@@ -70,6 +70,6 @@ public interface SearchFactoryState {
 	
 	boolean isTransactionManagerExpected();
 
-	IndexManagerFactory getAllIndexesManager();
+	IndexManagerHolder getAllIndexesManager();
 
 }
