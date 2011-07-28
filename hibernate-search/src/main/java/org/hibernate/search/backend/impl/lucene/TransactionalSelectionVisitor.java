@@ -32,7 +32,7 @@ import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.WorkQueuePerIndexSplitter;
 import org.hibernate.search.backend.impl.ContextAwareSelectionDelegate;
 import org.hibernate.search.backend.impl.WorkVisitor;
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**

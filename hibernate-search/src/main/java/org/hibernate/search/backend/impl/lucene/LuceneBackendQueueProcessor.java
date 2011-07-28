@@ -32,7 +32,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * Apply the operations to Lucene directories.

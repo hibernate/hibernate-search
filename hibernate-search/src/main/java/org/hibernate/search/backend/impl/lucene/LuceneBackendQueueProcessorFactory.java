@@ -27,8 +27,8 @@ import java.util.Properties;
 import java.util.List;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;

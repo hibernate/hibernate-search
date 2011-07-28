@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.test.shards;
 
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.test.util.RamIndexManager;
 

@@ -31,7 +31,7 @@ import org.jgroups.Receiver;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * Backend factory used in JGroups clustering mode in master node.

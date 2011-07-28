@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes;
+package org.hibernate.search.indexes.spi;
 
 import java.util.List;
 import java.util.Properties;
@@ -29,6 +29,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**

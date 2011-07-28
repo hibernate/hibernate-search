@@ -30,7 +30,7 @@ import java.util.Enumeration;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * Used to test the configuration of a third-party strategy

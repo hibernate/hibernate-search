@@ -22,8 +22,8 @@ package org.hibernate.search.test.directoryProvider;
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.hibernate.search.engine.spi.EntityIndexMapping;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;

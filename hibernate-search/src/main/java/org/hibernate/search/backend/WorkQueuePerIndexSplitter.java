@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -51,6 +51,7 @@ public class WorkQueuePerIndexSplitter {
 	 * if supported/enabled by each specific backend.
 	 */
 	public void commitOperations() {
+		// move executor here to // work - optionally?
 		for ( Entry<IndexManager,List<LuceneWork>> entry : queues.entrySet() ) {
 			entry.getKey().performOperation( entry.getValue() );
 		}

@@ -29,8 +29,8 @@ import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.RAM_BUFFER_SIZE;
 
 import org.hibernate.search.engine.spi.EntityIndexMapping;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;

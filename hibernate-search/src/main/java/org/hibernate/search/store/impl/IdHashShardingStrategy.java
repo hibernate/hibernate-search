@@ -29,7 +29,7 @@ import java.io.Serializable;
 import org.apache.lucene.document.Document;
 
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**

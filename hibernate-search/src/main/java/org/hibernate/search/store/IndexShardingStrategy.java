@@ -29,7 +29,7 @@ import java.util.Properties;
 import org.apache.lucene.document.Document;
 
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.indexes.IndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * Defines how a given virtual index shards data into different IndexManager(s).

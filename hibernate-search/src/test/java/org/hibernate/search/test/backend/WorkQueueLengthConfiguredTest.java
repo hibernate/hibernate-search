@@ -21,8 +21,8 @@ package org.hibernate.search.test.backend;
 
 import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.impl.MutableSearchFactory;
-import org.hibernate.search.indexes.IndexManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.Clock;
 import org.hibernate.search.test.SearchTestCase;
 import org.junit.Test;

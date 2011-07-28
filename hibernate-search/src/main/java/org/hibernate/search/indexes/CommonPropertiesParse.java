@@ -34,6 +34,7 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.NotSharedReaderProvider;
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.NoOpOptimizerStrategy;
