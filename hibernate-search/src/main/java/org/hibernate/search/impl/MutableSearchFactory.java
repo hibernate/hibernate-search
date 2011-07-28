@@ -41,7 +41,7 @@ import org.hibernate.search.engine.spi.EntityIndexMapping;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.indexes.IndexManagerHolder;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchFactoryBuilder;

@@ -28,8 +28,8 @@ import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.IndexManagerHolder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 import org.junit.Test;

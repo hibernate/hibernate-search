@@ -85,7 +85,7 @@ import org.hibernate.search.impl.MappingModelMetadataProvider;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
-import org.hibernate.search.indexes.IndexManagerHolder;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;

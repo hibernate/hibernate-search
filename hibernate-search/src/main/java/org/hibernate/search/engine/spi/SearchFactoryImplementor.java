@@ -30,7 +30,7 @@ import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.indexes.IndexManagerHolder;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 

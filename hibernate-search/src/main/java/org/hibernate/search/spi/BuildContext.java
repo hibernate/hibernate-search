@@ -24,7 +24,7 @@
 package org.hibernate.search.spi;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.IndexManagerHolder;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 
 /**
  * Build context that can be used by some services at initialization
