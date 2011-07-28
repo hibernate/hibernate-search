@@ -34,7 +34,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
-import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
+import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

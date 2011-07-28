@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.impl.batchlucene;
+package org.hibernate.search.backend.impl.batch;
 
 import java.util.Properties;
 
@@ -41,7 +41,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Sanne Grinovero
  * @experimental First {@code BatchBackend}
  */
-public class LuceneBatchBackend implements BatchBackend {
+public class DefaultBatchBackend implements BatchBackend {
 	
 	public static final String CONCURRENT_WRITERS = Environment.BATCH_BACKEND + ".concurrent_writers";
 

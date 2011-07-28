@@ -34,7 +34,7 @@ import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
+import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexMapping;

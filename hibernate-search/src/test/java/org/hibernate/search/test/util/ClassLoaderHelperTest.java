@@ -32,8 +32,8 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
-import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
+import org.hibernate.search.backend.impl.batch.BatchBackend;
+import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
@@ -51,10 +51,10 @@ public class ClassLoaderHelperTest {
 	@Test
 	public void testInstanceFromName() {
 		BatchBackend batchBackend = ClassLoaderHelper.instanceFromName(
-				BatchBackend.class, LuceneBatchBackend.class.getName(), getClass(), "Lucene batch backend"
+				BatchBackend.class, DefaultBatchBackend.class.getName(), getClass(), "Lucene batch backend"
 		);
 		assertNotNull( batchBackend );
-		assertTrue( batchBackend.getClass().equals( LuceneBatchBackend.class ) );
+		assertTrue( batchBackend.getClass().equals( DefaultBatchBackend.class ) );
 
 		try {
 			ClassLoaderHelper.instanceFromName(
@@ -72,10 +72,10 @@ public class ClassLoaderHelperTest {
 	public void testInstanceFromClass() {
 		//testing for interface implementation:
 		BatchBackend batchBackend = ClassLoaderHelper.instanceFromClass(
-				BatchBackend.class, LuceneBatchBackend.class, "Lucene batch backend"
+				BatchBackend.class, DefaultBatchBackend.class, "Lucene batch backend"
 		);
 		assertNotNull( batchBackend );
-		assertTrue( batchBackend.getClass().equals( LuceneBatchBackend.class ) );
+		assertTrue( batchBackend.getClass().equals( DefaultBatchBackend.class ) );
 
 		//testing for subclasses:
 		Similarity sim = ClassLoaderHelper.instanceFromClass(
@@ -88,7 +88,7 @@ public class ClassLoaderHelperTest {
 		wrappingTestFromClass(
 				"Wrong configuration of Lucene batch backend: class " +
 						"org.hibernate.search.test.util.ClassLoaderHelperTest does not implement " +
-						"interface org.hibernate.search.backend.impl.batchlucene.BatchBackend",
+						"interface org.hibernate.search.backend.impl.batch.BatchBackend",
 				BatchBackend.class, ClassLoaderHelperTest.class, "Lucene batch backend"
 		);
 		wrappingTestFromClass(
@@ -102,9 +102,9 @@ public class ClassLoaderHelperTest {
 		);
 		wrappingTestFromClass(
 				"Wrong configuration of default similarity: " +
-						"class org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend " +
+						"class org.hibernate.search.backend.impl.batch.DefaultBatchBackend " +
 						"is not a subtype of org.apache.lucene.search.Similarity",
-				Similarity.class, LuceneBatchBackend.class, "default similarity"
+				Similarity.class, DefaultBatchBackend.class, "default similarity"
 		);
 		wrappingTestFromClass(
 				"Unable to instantiate default similarity class: org.apache.lucene.search.Similarity. " +

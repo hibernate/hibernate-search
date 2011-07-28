@@ -67,7 +67,7 @@ public interface MassIndexer {
 	 * <tt>hibernate.search.batchbackend.concurrent_writers</tt>.</p><p>
 	 * Might be ignored by <code>BatchBackend</code> implementations other
 	 * than <code>org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend</code></p>
-	 * @see org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend
+	 * @see org.hibernate.search.backend.impl.batch.DefaultBatchBackend
 	 * @param numberOfThreads
 	 * @return <tt>this</tt> for method chaining
 	 */

@@ -26,7 +26,7 @@ package org.hibernate.search.engine.spi;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
+import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.filter.FilterCachingStrategy;
