@@ -21,9 +21,9 @@
 package org.hibernate.search.indexes.impl;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -60,7 +60,7 @@ public class IndexManagerHolder {
 	private final Map<String, IndexManager> indexManagersRegistry;
 	
 	public IndexManagerHolder() {
-		this.indexManagersRegistry = new HashMap<String, IndexManager>();
+		this.indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 	}
 	
 	/**
