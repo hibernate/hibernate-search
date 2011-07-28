@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes;
+package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
@@ -30,9 +30,6 @@ import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.impl.ImmutableSearchFactory;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.impl.NotSharedReaderProvider;
-import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
