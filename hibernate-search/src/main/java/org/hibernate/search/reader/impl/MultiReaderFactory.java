@@ -60,9 +60,9 @@ public class MultiReaderFactory {
 		IndexReader[] readers;
 		ReaderProvider[] managers;
 		if ( multiReader instanceof CacheableMultiReader ) {
-			CacheableMultiReader castedMultiReader = ( CacheableMultiReader ) multiReader;
-			readers = ReaderProviderHelper.getSubReadersFromMultiReader( castedMultiReader );
-			managers = castedMultiReader.managers;
+			CacheableMultiReader castMultiReader = ( CacheableMultiReader ) multiReader;
+			readers = ReaderProviderHelper.getSubReadersFromMultiReader( castMultiReader );
+			managers = castMultiReader.managers;
 		}
 		else {
 			throw new AssertionFailure( "Everything should be wrapped in a CacheableMultiReader" );
