@@ -148,11 +148,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		//TODO implement async
 		ArrayList<LuceneWork> list = new ArrayList<LuceneWork>(1);
 		list.add( singleOperation );
-		performOperation( list );
+		performOperations( list );
 	}
 
 	@Override
-	public void performOperation(List<LuceneWork> workList) {
+	public void performOperations(List<LuceneWork> workList) {
 		Runnable runnable = backend.getProcessor( workList );
 		if ( backendExecutor != null ) {
 			backendExecutor.execute( runnable );

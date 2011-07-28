@@ -119,7 +119,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 			SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
 			IndexManagerHolder allIndexesManager = factory.getAllIndexesManager();
 			IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
-			indexManager.performOperation( queue );
+			indexManager.performOperations( queue );
 		}
 		finally {
 			cleanSessionIfNeeded(session);

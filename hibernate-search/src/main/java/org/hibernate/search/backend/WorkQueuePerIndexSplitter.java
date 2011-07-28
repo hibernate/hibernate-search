@@ -53,7 +53,7 @@ public class WorkQueuePerIndexSplitter {
 	public void commitOperations() {
 		// move executor here to // work - optionally?
 		for ( Entry<IndexManager,List<LuceneWork>> entry : queues.entrySet() ) {
-			entry.getKey().performOperation( entry.getValue() );
+			entry.getKey().performOperations( entry.getValue() );
 		}
 	}
 

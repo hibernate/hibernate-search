@@ -70,7 +70,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		queue.add( new HarmlessWork( "firstWork" ) );
 		queue.add( new HarmlessWork( "secondWork" ) );
 		workcounter.set( 0 ); // reset work counter
-		indexManager.performOperation( queue );
+		indexManager.performOperations( queue );
 		Assert.assertEquals( 2, workcounter.get() );
 		
 		workcounter.set( 0 ); // reset work counter
@@ -80,7 +80,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		queue.add( thirdWork );
 		final HarmlessWork fourthWork = new HarmlessWork( "fourthWork" );
 		queue.add( fourthWork );
-		indexManager.performOperation( queue );
+		indexManager.performOperations( queue );
 		Assert.assertEquals( 2, workcounter.get() );
 
 		String errorMessage = mockErrorHandler.getErrorMessage();

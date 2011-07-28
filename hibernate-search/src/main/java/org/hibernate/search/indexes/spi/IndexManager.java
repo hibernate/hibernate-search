@@ -60,7 +60,7 @@ public interface IndexManager {
 	 * Operations can be applied in sync or async, depending on the IndexManager implementation and configuration.
 	 * @param queue the list of write operations to apply.
 	 */
-	void performOperation(List<LuceneWork> queue);
+	void performOperations(List<LuceneWork> queue);
 	
 	/**
 	 * Perform a single non-transactional operation, best to stream large amounts of operations.
