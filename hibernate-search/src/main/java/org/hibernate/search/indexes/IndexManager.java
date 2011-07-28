@@ -68,8 +68,10 @@ public interface IndexManager {
 	 * in order, use a transactional operation between them: a transactional operation will always flush
 	 * all streaming operations first, and be applied before subsequent streaming operations.
 	 * @param singleOperation
+	 * @param forceAsync if true, the invocation will not block to wait for it being applied.
+	 *  When false this will depend on the backend configuration.
 	 */
-	void performStreamOperation(LuceneWork singleOperation);
+	void performStreamOperation(LuceneWork singleOperation, boolean forceAsync);
 	
 	/**
 	 * Initialize the IndexManager before its use.

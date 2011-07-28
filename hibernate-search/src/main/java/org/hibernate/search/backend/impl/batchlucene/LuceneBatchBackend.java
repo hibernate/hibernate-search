@@ -23,22 +23,14 @@
  */
 package org.hibernate.search.backend.impl.batchlucene;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.engine.spi.EntityIndexMapping;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.StreamingSelectionVisitor;
-import org.hibernate.search.backend.impl.lucene.PerDirectoryWorkProcessor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.indexes.IndexManager;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -56,96 +48,24 @@ public class LuceneBatchBackend implements BatchBackend {
 	private static final StreamingSelectionVisitor providerSelectionVisitor = new StreamingSelectionVisitor();
 
 	private SearchFactoryIntegrator searchFactoryImplementor;
-	private final Map<DirectoryProvider<?>,DirectoryProviderWorkspace> resourcesMap = new HashMap<DirectoryProvider<?>,DirectoryProviderWorkspace>();
-	private final PerDirectoryWorkProcessor asyncWorker = new AsyncBatchPerDirectoryWorkProcessor();
-	private final PerDirectoryWorkProcessor syncWorker = new SyncBatchPerDirectoryWorkProcessor();
 
 	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, SearchFactoryIntegrator searchFactory) {
 		this.searchFactoryImplementor = searchFactory;
-		final int maxThreadsPerIndex = definedIndexWriters( cfg );
-		/*
-		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
-		searchFactoryImplementor.
-		for ( DirectoryProvider<?> dp : context.getDirectoryProviders() ) {
-			DirectoryProviderWorkspace resources = new DirectoryProviderWorkspace( context, dp, monitor, maxThreadsPerIndex, errorHandler );
-			resourcesMap.put( dp, resources );
-		}*/
 	}
 
 	public void enqueueAsyncWork(LuceneWork work) throws InterruptedException {
-		sendWorkToShards( work, asyncWorker );
+		sendWorkToShards( work, true );
 	}
 
 	public void doWorkInSync(LuceneWork work) {
-		sendWorkToShards( work, syncWorker );
-	}
-
-	/**
-	 * Stops the background threads and flushes changes;
-	 * Please note the timeout is applied to each index in
-	 * sequence, so it might take as much time as timeout*directoryproviders
-	 */
-	public void stopAndFlush(long timeout, TimeUnit unit) throws InterruptedException {
-		for ( DirectoryProviderWorkspace res : resourcesMap.values() ) {
-			res.stopAndFlush( timeout, unit );
-		}
+		sendWorkToShards( work, false );
 	}
 	
-	public void close() {
-		Throwable error = null;
-		for ( DirectoryProviderWorkspace res : resourcesMap.values() ) {
-			try {
-				res.close();
-			}
-			catch (Throwable t) {
-				//make sure to try closing all IndexWriters
-				error = t;
-			}
-		}
-		if ( error != null ) {
-			throw new SearchException( "Error while closing massindexer", error );
-		}
-	}
-	
-	private void sendWorkToShards(LuceneWork work, PerDirectoryWorkProcessor worker) {
+	private void sendWorkToShards(LuceneWork work, boolean forceAsync) {
 		final Class<?> entityType = work.getEntityClass();
 		EntityIndexMapping<?> entityIndexMapping = searchFactoryImplementor.getIndexMappingForEntity( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexMapping.getSelectionStrategy();
-		work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy );
-	}
-
-	/**
-	 * Implements a PerDirectoryWorkProcessor to enqueue work Asynchronously.
-	 */
-	private class AsyncBatchPerDirectoryWorkProcessor implements PerDirectoryWorkProcessor {
-
-		public void addWorkToDpProcessor(IndexManager dp, LuceneWork work) throws InterruptedException {
-			resourcesMap.get( dp ).enqueueAsyncWork( work );
-		}
-		
-	}
-	
-	/**
-	 * Implements a PerDirectoryWorkProcessor to enqueue work Synchronously.
-	 */
-	private class SyncBatchPerDirectoryWorkProcessor implements PerDirectoryWorkProcessor {
-
-		public void addWorkToDpProcessor(IndexManager dp, LuceneWork work) {
-			resourcesMap.get( dp ).doWorkInSync( work );
-		}
-		
-	}
-	
-	/**
-	 * @param cfg Configuration properties
-	 * @return the number of threads to be writing on the shared IndexWriter
-	 */
-	private static int definedIndexWriters(Properties cfg) {
-		final int indexWriters = ConfigurationParseHelper.getIntValue( cfg, "concurrent_writers", 2 );
-		if ( indexWriters < 1 ) {
-			throw new SearchException( "concurrent_writers for batch backend must be at least 1." );
-		}
-		return indexWriters;
+		work.getWorkDelegate( providerSelectionVisitor ).performStreamOperation( work, shardingStrategy, forceAsync );
 	}
 
 }

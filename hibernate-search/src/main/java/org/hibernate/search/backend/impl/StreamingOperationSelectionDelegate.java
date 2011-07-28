@@ -29,13 +29,15 @@ import org.hibernate.search.store.IndexShardingStrategy;
 /**
  * @author Sanne Grinovero
  */
-public interface DpSelectionDelegate {
+public interface StreamingOperationSelectionDelegate {
 	
 	/**
 	 * The LuceneWork must be applied to different indexes.
 	 * @param work the work to split.
 	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories. 
+	 * @param forceAsync if true, the invocation will not block to wait for it being applied.
+	 *  When false this will depend on the backend configuration.
 	 */
-	public void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy);
+	public void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, boolean forceAsync);
 
 }

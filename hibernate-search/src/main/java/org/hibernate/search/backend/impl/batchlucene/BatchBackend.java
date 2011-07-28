@@ -24,7 +24,6 @@
 package org.hibernate.search.backend.impl.batchlucene;
 
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -68,18 +67,4 @@ public interface BatchBackend {
 	 */
 	void doWorkInSync(LuceneWork work);
 
-	/**
-	 * Waits until all work is done and terminates the executors.
-	 * IndexWriter is not closed yet: work in sync can still be processed.
-	 *
-	 * @throws InterruptedException if the current thread is interrupted
-	 *                              while waiting for the enqueued tasks to be finished.
-	 */
-	void stopAndFlush(long timeout, TimeUnit unit) throws InterruptedException;
-
-	/**
-	 * Used to shutdown and release resources.
-	 * No other method should be used after this one.
-	 */
-	void close();
 }

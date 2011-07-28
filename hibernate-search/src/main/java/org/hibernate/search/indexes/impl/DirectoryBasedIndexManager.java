@@ -145,7 +145,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void performStreamOperation(LuceneWork singleOperation) {
+	public void performStreamOperation(LuceneWork singleOperation, boolean forceAsync) {
+		//TODO implement async
 		ArrayList<LuceneWork> list = new ArrayList<LuceneWork>(1);
 		list.add( singleOperation );
 		performOperation( list );
@@ -189,7 +190,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void optimize() {
-		performStreamOperation( new OptimizeLuceneWork() );
+		performStreamOperation( new OptimizeLuceneWork(), false );
 	}
 
 	//Not exposed on the IndexManager interface

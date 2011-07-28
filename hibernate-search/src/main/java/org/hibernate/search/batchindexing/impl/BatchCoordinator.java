@@ -26,7 +26,6 @@ package org.hibernate.search.batchindexing.impl;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
@@ -96,8 +95,6 @@ public class BatchCoordinator implements Runnable {
 		try {
 			beforeBatch(); // purgeAll and pre-optimize activities
 			doBatchWork();
-			backend.stopAndFlush( 60L * 60 * 24, TimeUnit.SECONDS ); //1 day : enough to flush to indexes?
-//			backend.stopAndFlush( 10, TimeUnit.SECONDS );
 			afterBatch();
 		}
 		catch ( InterruptedException e ) {
@@ -105,7 +102,6 @@ public class BatchCoordinator implements Runnable {
 			Thread.currentThread().interrupt();
 		}
 		finally {
-			backend.close();
 			monitor.indexingCompleted();
 		}
 	}
