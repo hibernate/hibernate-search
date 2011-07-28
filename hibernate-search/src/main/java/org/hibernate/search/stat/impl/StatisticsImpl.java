@@ -202,7 +202,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
 	public Set<String> getIndexedClassNames() {
 		Set<String> indexedClasses = new HashSet<String>();
-		for ( Class clazz : searchFactoryImplementor.getIndexMappingForEntity().keySet() ) {
+		for ( Class clazz : searchFactoryImplementor.getIndexBindingForEntity().keySet() ) {
 			indexedClasses.add( clazz.getName() );
 		}
 		return indexedClasses;

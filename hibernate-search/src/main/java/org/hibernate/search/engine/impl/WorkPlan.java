@@ -38,7 +38,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -466,8 +466,8 @@ public class WorkPlan {
 	 * @return the DocumentBuilder for this type
 	 */
 	private static <T> AbstractDocumentBuilder<T> getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor, Class entityClass) {
-		EntityIndexMapping indexMapping = searchFactoryImplementor.getIndexMappingForEntity( entityClass );
-		if ( indexMapping == null ) {
+		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityClass );
+		if ( entityIndexBinding == null ) {
 			DocumentBuilderContainedEntity entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity( entityClass );
 			if ( entityBuilder == null ) {
 				// should never happen but better be safe than sorry
@@ -478,7 +478,7 @@ public class WorkPlan {
 			}
 		}
 		else {
-			return indexMapping.getDocumentBuilder();
+			return entityIndexBinding.getDocumentBuilder();
 		}
 	}
 

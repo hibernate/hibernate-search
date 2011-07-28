@@ -32,7 +32,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.WorkQueuePerIndexSplitter;
 import org.hibernate.search.backend.impl.lucene.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -52,10 +52,10 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private final int batchSize;
 	private static final TransactionalSelectionVisitor providerSelectionVisitor = new TransactionalSelectionVisitor();
 
-	private final Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
+	private final Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders;
 
-	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities, Properties properties) {
-		this.documentBuildersIndexedEntities = documentBuildersIndexedEntities;
+	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders, Properties properties) {
+		this.entityIndexBinders = entityIndexBinders;
 		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
 	}
 
@@ -91,8 +91,8 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter();
 		for ( LuceneWork work : sealedQueue ) {
 			final Class<?> entityType = work.getEntityClass();
-			EntityIndexMapping<?> entityIndexMapping = documentBuildersIndexedEntities.get( entityType );
-			IndexShardingStrategy shardingStrategy = entityIndexMapping.getSelectionStrategy();
+			EntityIndexBinder<?> entityIndexBinding = entityIndexBinders.get( entityType );
+			IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 			work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy, context );
 		}
 		context.commitOperations();

@@ -38,7 +38,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.backend.impl.lucene.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
@@ -61,7 +61,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	
 	public void testErrorHandling() {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		EntityIndexMapping<Document> mappingForEntity = searchFactory.getIndexMappingForEntity( Document.class );
+		EntityIndexBinder<Document> mappingForEntity = searchFactory.getIndexBindingForEntity( Document.class );
 		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
 		ErrorHandler errorHandler = indexManager.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );

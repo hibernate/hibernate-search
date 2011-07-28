@@ -21,7 +21,7 @@ package org.hibernate.search.test.directoryProvider;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
@@ -52,8 +52,8 @@ public class DirectoryLifecycleTest {
 		CloseCheckingDirectoryProvider directoryProvider;
 		try {
 			SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) builder.getSearchFactory();
-			EntityIndexMapping<?> indexMapping = searchFactory.getIndexMappingForEntity( SnowStorm.class );
-			IndexManager[] indexManagers = indexMapping.getIndexManagers();
+			EntityIndexBinder<?> snowIndexBinder = searchFactory.getIndexBindingForEntity( SnowStorm.class );
+			IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 			assertThat( indexManagers.length ).isEqualTo( 1 );
 			assertThat( indexManagers[0] ).isInstanceOf( DirectoryBasedIndexManager.class );
 			DirectoryBasedIndexManager dbBasedManager = (DirectoryBasedIndexManager)indexManagers[0];

@@ -31,7 +31,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -57,7 +57,7 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 	
 	public void testLuceneMergerErrorHandling() {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		EntityIndexMapping<Document> mappingForEntity = searchFactory.getIndexMappingForEntity( Document.class );
+		EntityIndexBinder<Document> mappingForEntity = searchFactory.getIndexBindingForEntity( Document.class );
 		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
 		ErrorHandler errorHandler = indexManager.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );

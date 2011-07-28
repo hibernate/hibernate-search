@@ -30,7 +30,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 import java.io.Serializable;
@@ -54,15 +54,15 @@ public class LuceneFullTextManager implements FullTextManager {
 	}
 
 	public <T> T get(Class<T> entityType, Serializable id) {
-		final EntityIndexMapping<?> indexMapping = searchFactory.getIndexMappingForEntity( entityType );
-		if ( indexMapping == null ) {
+		final EntityIndexBinder<?> entityIndexBinding = searchFactory.getIndexBindingForEntity( entityType );
+		if ( entityIndexBinding == null ) {
 			String msg = "Entity to retrueve is not an @Indexed entity: " + entityType.getClass().getName();
 			throw new IllegalArgumentException( msg );
 		}
 		if (id == null) {
 			throw new IllegalArgumentException( "Identifier cannot be null" );
 		}
-		DocumentBuilderIndexedEntity<?> docBuilder = indexMapping.getDocumentBuilder();
+		DocumentBuilderIndexedEntity<?> docBuilder = entityIndexBinding.getDocumentBuilder();
 		Query luceneQuery = new TermQuery( docBuilder.getTerm( id ) );
 		FullTextQuery searchQuery = createFullTextQuery( luceneQuery, entityType );
 		List<?> results = searchQuery.list();
@@ -97,12 +97,12 @@ public class LuceneFullTextManager implements FullTextManager {
 		Class<?> clazz = getClass( entity );
 		//TODO cache that at the FTSession level
 		//not strictly necessary but a small optimization
-		final EntityIndexMapping<?> indexMapping = searchFactory.getIndexMappingForEntity( clazz );
-		if ( indexMapping == null ) {
+		final EntityIndexBinder<?> entityIndexBinding = searchFactory.getIndexBindingForEntity( clazz );
+		if ( entityIndexBinding == null ) {
 			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
 			throw new IllegalArgumentException( msg );
 		}
-		Serializable id = indexMapping.getDocumentBuilder().getId( entity );
+		Serializable id = entityIndexBinding.getDocumentBuilder().getId( entity );
 		Work<T> work = new Work<T>( entity, id, WorkType.INDEX );
 		searchFactory.getWorker().performWork( work, transactionContext );
 

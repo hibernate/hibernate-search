@@ -29,7 +29,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -49,7 +49,7 @@ import java.util.Properties;
  */
 public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
-	private Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities;
+	private Map<Class<?>, EntityIndexBinder<?>> indexBindingsPerEntity;
 	private String indexingStrategy;
 	private Worker worker;
 	private BackendQueueProcessorFactory backendQueueProcessorFactory;
@@ -66,7 +66,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
-		documentBuildersIndexedEntities = oldFactoryState.getIndexMappingForEntity();
+		indexBindingsPerEntity = oldFactoryState.getIndexBindingForEntity();
 		documentBuildersContainedEntities = oldFactoryState.getDocumentBuildersContainedEntities();
 		worker = oldFactoryState.getWorker();
 		filterDefinitions = oldFactoryState.getFilterDefinitions();
@@ -93,8 +93,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return documentBuildersContainedEntities;
 	}
 
-	public Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity() {
-		return documentBuildersIndexedEntities;
+	public Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity() {
+		return indexBindingsPerEntity;
 	}
 
 	public String getIndexingStrategy() {
@@ -141,8 +141,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.documentBuildersContainedEntities = documentBuildersContainedEntities;
 	}
 
-	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities) {
-		this.documentBuildersIndexedEntities = documentBuildersIndexedEntities;
+	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities) {
+		this.indexBindingsPerEntity = documentBuildersIndexedEntities;
 	}
 
 	public void setIndexingStrategy(String indexingStrategy) {

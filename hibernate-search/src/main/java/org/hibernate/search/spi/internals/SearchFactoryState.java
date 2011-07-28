@@ -28,7 +28,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -46,7 +46,7 @@ import java.util.Properties;
 public interface SearchFactoryState {
 	Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities();
 
-	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
+	Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity();
 
 	String getIndexingStrategy();
 

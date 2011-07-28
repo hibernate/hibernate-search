@@ -24,7 +24,7 @@ import java.util.List;
 import junit.framework.AssertionFailedError;
 
 import org.hibernate.cfg.Environment;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
@@ -97,8 +97,8 @@ public class ClusterTestHelper {
 	 */
 	public static int clusterSize(FullTextSessionBuilder node) {
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
-		EntityIndexMapping<SimpleEmail> indexMappingForEntity = searchFactory.getIndexMappingForEntity( SimpleEmail.class );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexMappingForEntity.getIndexManagers()[0];
+		EntityIndexBinder<SimpleEmail> mailIndexBinding = searchFactory.getIndexBindingForEntity( SimpleEmail.class );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) mailIndexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();
 		List<Address> members = cacheManager.getMembers();

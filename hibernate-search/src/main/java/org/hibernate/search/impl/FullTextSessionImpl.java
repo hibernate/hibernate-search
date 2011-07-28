@@ -184,7 +184,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//not strictly necessary but a small optimization
-		if ( searchFactoryImplementor.getIndexMappingForEntity( clazz ) == null ) {
+		if ( searchFactoryImplementor.getIndexBindingForEntity( clazz ) == null ) {
 			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
 			throw new IllegalArgumentException( msg );
 		}

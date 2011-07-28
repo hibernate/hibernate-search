@@ -38,7 +38,7 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 
@@ -280,9 +280,9 @@ public class MutableFactoryTest {
 					MutableFactoryTest.doIndexWork(entity, i, factory, context );
 					context.end();
 					
-					EntityIndexMapping<?> entityIndexMapping = factory.getIndexMappingForEntity( aClass );
-					assertNotNull( entityIndexMapping );
-					IndexManager[] indexManagers = entityIndexMapping.getIndexManagers();
+					EntityIndexBinder<?> indexBindingForEntity = factory.getIndexBindingForEntity( aClass );
+					assertNotNull( indexBindingForEntity );
+					IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 					assertEquals( 1, indexManagers.length );
 					DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 					DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();

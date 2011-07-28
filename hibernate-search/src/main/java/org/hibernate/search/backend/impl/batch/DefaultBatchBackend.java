@@ -26,7 +26,7 @@ package org.hibernate.search.backend.impl.batch;
 import java.util.Properties;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.StreamingSelectionVisitor;
@@ -63,8 +63,8 @@ public class DefaultBatchBackend implements BatchBackend {
 	
 	private void sendWorkToShards(LuceneWork work, boolean forceAsync) {
 		final Class<?> entityType = work.getEntityClass();
-		EntityIndexMapping<?> entityIndexMapping = searchFactoryImplementor.getIndexMappingForEntity( entityType );
-		IndexShardingStrategy shardingStrategy = entityIndexMapping.getSelectionStrategy();
+		EntityIndexBinder<?> entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
+		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		work.getWorkDelegate( providerSelectionVisitor ).performStreamOperation( work, shardingStrategy, forceAsync );
 	}
 

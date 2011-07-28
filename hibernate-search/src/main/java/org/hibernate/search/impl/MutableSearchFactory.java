@@ -37,7 +37,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -76,12 +76,12 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getFilterDefinitions();
 	}
 
-	public Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity() {
-		return delegate.getIndexMappingForEntity();
+	public Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity() {
+		return delegate.getIndexBindingForEntity();
 	}
 
-	public <T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType) {
-		return delegate.getIndexMappingForEntity( entityType );
+	public <T> EntityIndexBinder<T> getIndexBindingForEntity(Class<T> entityType) {
+		return delegate.getIndexBindingForEntity( entityType );
 	}
 
 	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {

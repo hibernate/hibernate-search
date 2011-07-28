@@ -35,7 +35,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
@@ -77,8 +77,8 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		SearchFactoryIntegrator searchFactoryIntegrator = (SearchFactoryIntegrator) fullTextSession.getSearchFactory();
-		EntityIndexMapping<?> entityIndexMapping = searchFactoryIntegrator.getIndexMappingForEntity( SnowStorm.class );
-		IndexManager[] indexManagers = entityIndexMapping.getIndexManagers();
+		EntityIndexBinder<?> snowIndexBinder = searchFactoryIntegrator.getIndexBindingForEntity( SnowStorm.class );
+		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertTrue( "Wrong number of directory providers", indexManagers.length == 1 );
 		
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];

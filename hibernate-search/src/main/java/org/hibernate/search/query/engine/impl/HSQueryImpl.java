@@ -47,7 +47,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.StandardFilterKey;
@@ -488,7 +488,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
-		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getIndexMappingForEntity();
+		Map<Class<?>, EntityIndexBinder<?>> builders = searchFactoryImplementor.getIndexBindingForEntity();
 		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 
@@ -503,8 +503,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				);
 			}
 
-			for ( EntityIndexMapping indexMapper : builders.values() ) {
-				DocumentBuilderIndexedEntity<?> builder = indexMapper.getDocumentBuilder();
+			for ( EntityIndexBinder indexBinder : builders.values() ) {
+				DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
@@ -512,7 +512,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				}
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateIndexManagers( targetedIndexes, indexMapper.getSelectionStrategy() );
+				populateIndexManagers( targetedIndexes, indexBinder.getSelectionStrategy() );
 			}
 			classesAndSubclasses = null;
 		}
@@ -520,20 +520,20 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities.size() );
 			involvedClasses.addAll( indexedTargetedEntities );
 			for ( Class<?> clazz : indexedTargetedEntities ) {
-				EntityIndexMapping<?> indexMapper = builders.get( clazz );
-				if ( indexMapper != null ) {
-					DocumentBuilderIndexedEntity<?> builder = indexMapper.getDocumentBuilder();
+				EntityIndexBinder<?> indexBinder = builders.get( clazz );
+				if ( indexBinder != null ) {
+					DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 					involvedClasses.addAll( builder.getMappedSubclasses() );
 				}
 			}
 
 			for ( Class clazz : involvedClasses ) {
-				EntityIndexMapping indexMapper = builders.get( clazz );
+				EntityIndexBinder indexBinder = builders.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
-				if ( indexMapper == null ) {
+				if ( indexBinder == null ) {
 					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
 				}
-				DocumentBuilderIndexedEntity<?> builder = indexMapper.getDocumentBuilder();
+				DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
@@ -541,7 +541,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateIndexManagers( targetedIndexes, indexMapper.getSelectionStrategy() );
+				populateIndexManagers( targetedIndexes, indexBinder.getSelectionStrategy() );
 			}
 			this.classesAndSubclasses = involvedClasses;
 		}
@@ -568,7 +568,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 		}
 		else {
-			Map<Class<?>, EntityIndexMapping<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getIndexMappingForEntity();
+			Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getIndexBindingForEntity();
 			this.classesAndSubclasses = documentBuildersIndexedEntities.keySet();
 		}
 
@@ -893,12 +893,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
 	 */
 	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
-		Map<Class<?>, EntityIndexMapping<?>> builders = searchFactoryImplementor.getIndexMappingForEntity();
+		Map<Class<?>, EntityIndexBinder<?>> builders = searchFactoryImplementor.getIndexBindingForEntity();
 		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
 		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
 		FieldCacheCollectorFactory anyImplementation = null;
 		for ( Class<?> clazz : classesAndSubclasses ) {
-			EntityIndexMapping<?> docBuilder = builders.get( clazz );
+			EntityIndexBinder<?> docBuilder = builders.get( clazz );
 			FieldCacheCollectorFactory fieldCacheCollectionFactory = docBuilder.getIdFieldCacheCollectionFactory();
 			if ( fieldCacheCollectionFactory == null ) {
 				// some implementation disable it, so we won't use it

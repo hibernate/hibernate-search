@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -176,14 +176,14 @@ class FacetBuildingContext<T> {
 			throw new IllegalArgumentException( "null is an invalid field name" );
 		}
 
-		EntityIndexMapping<?> indexMapping = factory.getIndexMappingForEntity( entityType );
-		if ( indexMapping == null ) {
+		EntityIndexBinder<?> indexBinding = factory.getIndexBindingForEntity( entityType );
+		if ( indexBinding == null ) {
 			throw new SearchException(
 					"Entity " + entityType.getName()
 							+ " is not an indexed entity. Unable to create faceting request"
 			);
 		}
-		documentBuilder = indexMapping.getDocumentBuilder();
+		documentBuilder = indexBinding.getDocumentBuilder();
 	}
 
 	@Override

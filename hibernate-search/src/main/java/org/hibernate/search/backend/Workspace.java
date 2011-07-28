@@ -113,7 +113,7 @@ public class Workspace {
 	}
 
 	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {
-		return indexManager.getIndexMappingForEntity( entity ).getDocumentBuilder();
+		return indexManager.getIndexBindingForEntity( entity ).getDocumentBuilder();
 	}
 
 	public Analyzer getAnalyzer(String name) {

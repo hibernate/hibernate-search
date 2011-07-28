@@ -33,7 +33,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @since 4.0
  */
-public interface EntityIndexMapping<T> {
+public interface EntityIndexBinder<T> {
 
 	/**
 	 * @return

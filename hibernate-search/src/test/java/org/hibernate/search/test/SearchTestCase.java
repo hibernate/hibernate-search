@@ -176,7 +176,7 @@ public abstract class SearchTestCase extends TestCase {
 
 	protected Directory getDirectory(Class<?> clazz) {
 		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( ( SessionFactoryImplementor ) sessions );
-		IndexManager[] indexManagers = searchFactoryBySFI.getIndexMappingForEntity( clazz ).getIndexManagers();
+		IndexManager[] indexManagers = searchFactoryBySFI.getIndexBindingForEntity( clazz ).getIndexManagers();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 		return indexManager.getDirectoryProvider().getDirectory();
 	}

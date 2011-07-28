@@ -58,7 +58,7 @@ import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.jmx.StatisticsInfo;
@@ -89,7 +89,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Map<Class<?>, EntityIndexMapping<?>> indexMappingsForEntities;
+	private final Map<Class<?>, EntityIndexBinder<?>> indexBindingForEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
 	private final Worker worker;
@@ -117,7 +117,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
 		this.dirProviderIndexingParams = state.getDirectoryProviderIndexingParams();
-		this.indexMappingsForEntities = state.getIndexMappingForEntity();
+		this.indexBindingForEntities = state.getIndexBindingForEntity();
 		this.documentBuildersContainedEntities = state.getDocumentBuildersContainedEntities();
 		this.filterCachingStrategy = state.getFilterCachingStrategy();
 		this.filterDefinitions = state.getFilterDefinitions();
@@ -180,13 +180,13 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return documentBuildersContainedEntities;
 	}
 
-	public Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity() {
-		return indexMappingsForEntities;
+	public Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity() {
+		return indexBindingForEntities;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType) {
-		return (EntityIndexMapping<T>) indexMappingsForEntities.get( entityType );
+	public <T> EntityIndexBinder<T> getIndexBindingForEntity(Class<T> entityType) {
+		return (EntityIndexBinder<T>) indexBindingForEntities.get( entityType );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -217,8 +217,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public void optimize(Class entityType) {
-		EntityIndexMapping indexMapping = getSafeIndexMappingForEntity( entityType );
-		for ( IndexManager im: indexMapping.getIndexManagers() ) {
+		EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( entityType );
+		for ( IndexManager im: entityIndexBinding.getIndexManagers() ) {
 			im.optimize();
 		}
 	}
@@ -232,8 +232,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public Analyzer getAnalyzer(Class<?> clazz) {
-		EntityIndexMapping entityMapping = getSafeIndexMappingForEntity( clazz );
-		DocumentBuilderIndexedEntity<?> builder = entityMapping.getDocumentBuilder();
+		EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( clazz );
+		DocumentBuilderIndexedEntity<?> builder = entityIndexBinding.getDocumentBuilder();
 		return builder.getAnalyzer();
 	}
 
@@ -352,8 +352,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	public IndexReader openIndexReader(Class<?>... entities) {
 		HashMap<String,IndexManager> indexManagers = new HashMap<String,IndexManager>();
 		for ( Class<?> type : entities ) {
-			EntityIndexMapping mappingForEntity = getSafeIndexMappingForEntity( type );
-			IndexManager[] indexManagersForAllShards = mappingForEntity.getSelectionStrategy().getIndexManagersForAllShards();
+			EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( type );
+			IndexManager[] indexManagersForAllShards = entityIndexBinding.getSelectionStrategy().getIndexManagersForAllShards();
 			for (IndexManager im : indexManagersForAllShards) {
 				indexManagers.put( im.getIndexName(), im );
 			}
@@ -367,12 +367,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		MultiReaderFactory.closeReader( indexReader );
 	}
 
-	private EntityIndexMapping getSafeIndexMappingForEntity(Class entityType) {
-		EntityIndexMapping indexMapping = getIndexMappingForEntity( entityType );
-		if ( indexMapping == null ) {
+	private EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
+		EntityIndexBinder entityIndexBinding = getIndexBindingForEntity( entityType );
+		if ( entityIndexBinding == null ) {
 			throw new IllegalArgumentException( "Entity is not an indexed type: " + entityType );
 		}
-		return indexMapping;
+		return entityIndexBinding;
 	}
 
 }

@@ -33,7 +33,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.impl.MutableEntityIndexMapping;
+import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
@@ -75,7 +75,7 @@ public class IndexManagerHolder {
 	//#getReader() will always return a single "naive" IndexReader.
 	//So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
 	//(for both fieldCaches and cached filters)
-	public MutableEntityIndexMapping createIndexManagers(XClass entity, Class mappedClass, SearchConfiguration cfg,
+	public MutableEntityIndexBinding createIndexManagers(XClass entity, Class mappedClass, SearchConfiguration cfg,
 				WorkerBuildContext context,
 				ReflectionManager reflectionManager) {
 		// read the properties
@@ -140,7 +140,7 @@ public class IndexManagerHolder {
 			}
 		}
 		
-		return new MutableEntityIndexMapping( shardingStrategy, similarityInstance, providers );
+		return new MutableEntityIndexBinding( shardingStrategy, similarityInstance, providers );
 	}
 	
 	/**

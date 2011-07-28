@@ -25,7 +25,7 @@ package org.hibernate.search.spi;
 
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 
 /**
@@ -44,7 +44,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
  */
 public interface SearchFactoryIntegrator extends SearchFactory {
 	
-	<T> EntityIndexMapping<T> getIndexMappingForEntity(Class<T> entityType);
+	<T> EntityIndexBinder<T> getIndexBindingForEntity(Class<T> entityType);
 
 	/**
 	 * Add the following classes to the SearchFactory. If these classes are new to the SearchFactory this

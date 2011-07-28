@@ -61,9 +61,9 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		final Class<?> entityType = work.getEntityClass();
-		DocumentBuilderIndexedEntity<?> indexMapping = workspace.getDocumentBuilder( entityType );
+		DocumentBuilderIndexedEntity<?> documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
-		ScopedAnalyzer analyzer = indexMapping.getAnalyzer();
+		ScopedAnalyzer analyzer = documentBuilder.getAnalyzer();
 		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap );
 		if ( log.isTraceEnabled() ) {
 			log.trace(

@@ -42,7 +42,7 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  */
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	
-	Map<Class<?>, EntityIndexMapping<?>> getIndexMappingForEntity();
+	Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity();
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
 

@@ -30,7 +30,7 @@ import junit.framework.Assert;
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
@@ -49,9 +49,9 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 
 	public void testEntityDeletionWithoutIdentifier() {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
-		EntityIndexMapping<Document> indexMappingForEntity = searchFactoryImpl
-				.getIndexMappingForEntity( Document.class );
-		MockErrorHandler errorHandler = (MockErrorHandler) indexMappingForEntity.getIndexManagers()[0].getErrorHandler();
+		EntityIndexBinder<Document> documentIndexBinder = searchFactoryImpl
+				.getIndexBindingForEntity( Document.class );
+		MockErrorHandler errorHandler = (MockErrorHandler) documentIndexBinder.getIndexManagers()[0].getErrorHandler();
 		
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
@@ -71,9 +71,9 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 
 	public void testRolledBackIdentifiersOnUnusualDocumentId() {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
-		EntityIndexMapping<PersonWithBrokenSocialSecurityNumber> indexMappingForEntity = searchFactoryImpl
-				.getIndexMappingForEntity( PersonWithBrokenSocialSecurityNumber.class );
-		MockErrorHandler errorHandler = (MockErrorHandler) indexMappingForEntity.getIndexManagers()[0].getErrorHandler();
+		EntityIndexBinder<PersonWithBrokenSocialSecurityNumber> personIndexBinder = searchFactoryImpl
+				.getIndexBindingForEntity( PersonWithBrokenSocialSecurityNumber.class );
+		MockErrorHandler errorHandler = (MockErrorHandler) personIndexBinder.getIndexManagers()[0].getErrorHandler();
 		
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();

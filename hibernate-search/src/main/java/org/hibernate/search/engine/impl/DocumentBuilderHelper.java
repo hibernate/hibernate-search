@@ -30,7 +30,7 @@ import org.apache.lucene.document.Document;
 
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -190,13 +190,13 @@ public final class DocumentBuilderHelper {
 	}
 	
 	private static DocumentBuilderIndexedEntity<?> getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		EntityIndexMapping<?> indexMapping = searchFactoryImplementor.getIndexMappingForEntity(
+		EntityIndexBinder<?> entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity(
 				clazz
 		);
-		if ( indexMapping == null ) {
+		if ( entityIndexBinding == null ) {
 			throw new SearchException( "No Lucene configuration set up for: " + clazz );
 		}
-		return indexMapping.getDocumentBuilder();
+		return entityIndexBinding.getDocumentBuilder();
 	}
 }
 
