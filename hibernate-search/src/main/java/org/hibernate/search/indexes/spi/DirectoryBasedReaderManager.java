@@ -22,7 +22,6 @@ package org.hibernate.search.indexes.spi;
 
 import java.util.Properties;
 
-import org.hibernate.search.indexes.ReaderProvider;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 
 /**

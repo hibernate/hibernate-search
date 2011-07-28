@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes;
+package org.hibernate.search.indexes.spi;
 
 import org.apache.lucene.index.IndexReader;
 

@@ -29,7 +29,6 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.indexes.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**

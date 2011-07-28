@@ -41,8 +41,8 @@ import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.ReaderProvider;
 import org.hibernate.search.indexes.impl.NotSharedReaderProvider;
+import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.util.impl.ReflectionHelper;
 
 import static junit.framework.Assert.*;

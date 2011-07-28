@@ -26,8 +26,8 @@ package org.hibernate.search.reader.impl;
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.indexes.ReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
