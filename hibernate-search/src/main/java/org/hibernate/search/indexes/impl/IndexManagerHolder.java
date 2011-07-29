@@ -75,7 +75,7 @@ public class IndexManagerHolder {
 	//#getReader() will always return a single "naive" IndexReader.
 	//So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
 	//(for both fieldCaches and cached filters)
-	public MutableEntityIndexBinding createIndexManagers(XClass entity, Class mappedClass, SearchConfiguration cfg,
+	public MutableEntityIndexBinding buildEntityIndexBinding(XClass entity, Class mappedClass, SearchConfiguration cfg,
 				WorkerBuildContext context,
 				ReflectionManager reflectionManager) {
 		// read the properties
