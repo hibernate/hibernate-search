@@ -27,32 +27,32 @@ package org.hibernate.search.spi;
 import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.Similarity;
-
+import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
+import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.reader.impl.ReaderProviderFactory;
-import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -88,13 +88,13 @@ import org.hibernate.search.impl.MappingModelMetadataProvider;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.IndexControl;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -102,6 +102,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class SearchFactoryBuilder {
 
@@ -195,9 +196,9 @@ public class SearchFactoryBuilder {
 		//TODO programmatic mapping support
 		//FIXME The current initDocumentBuilders
 		initDocumentBuilders( cfg, reflectionManager, buildContext );
-		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = factoryState.getDocumentBuildersIndexedEntities();
+		final Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
-		for ( DocumentBuilderIndexedEntity builder : documentBuildersIndexedEntities.values() ) {
+		for ( EntityIndexBinder builder : documentBuildersIndexedEntities.values() ) {
 			//FIXME improve this algorithm to deal with adding new classes to the class hierarchy.
 			//Today it seems only safe when a class outside the hierarchy is incrementally added.
 			builder.postInitialize( indexedClasses );
@@ -210,24 +211,17 @@ public class SearchFactoryBuilder {
 		fillSimilarityMapping();
 
 		//update backend
-		final BackendQueueProcessorFactory backend = factoryState.getBackendQueueProcessorFactory();
-		if ( backend instanceof UpdatableBackendQueueProcessorFactory ) {
-			final UpdatableBackendQueueProcessorFactory updatableBackend = (UpdatableBackendQueueProcessorFactory) backend;
-			updatableBackend.updateDirectoryProviders( factoryState.getDirectoryProviderData().keySet(), buildContext );
-		}
-		//safe for incremental init at least the ShredBufferReaderProvider
-		//this.readerProvider = ReaderProviderFactory.createReaderProvider( cfg, this );
+		//TODO make sure the old IndexManagers and backends are disposed - not currently a problem as we only support adding entities incrementally
 		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );
+		factoryState.setActiveSearchFactory( factory );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
-
-
 	}
 
 	private void removeClassesAlreadyManaged() {
 		Set<Class<?>> remove = new HashSet<Class<?>>();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> containedEntities = rootFactory.getDocumentBuildersContainedEntities();
-		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> indexedEntities = rootFactory.getDocumentBuildersIndexedEntities();
+		final Map<Class<?>, EntityIndexBinder<?>> indexedEntities = rootFactory.getIndexBindingForEntity();
 		for ( Class<?> entity : classes ) {
 			if ( indexedEntities.containsKey( entity ) || containedEntities.containsKey( entity ) ) {
 				remove.add( entity );
@@ -262,9 +256,9 @@ public class SearchFactoryBuilder {
 		factoryState.setDirectoryProviderIndexingParams( new HashMap<DirectoryProvider, LuceneIndexingParameters>() );
 		initDocumentBuilders( cfg, reflectionManager, buildContext );
 
-		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = factoryState.getDocumentBuildersIndexedEntities();
+		final Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
-		for ( DocumentBuilderIndexedEntity builder : documentBuildersIndexedEntities.values() ) {
+		for ( EntityIndexBinder builder : documentBuildersIndexedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 		//not really necessary today
@@ -274,9 +268,9 @@ public class SearchFactoryBuilder {
 		}
 		fillSimilarityMapping();
 
-		//build back end
-		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext ) );
-		factoryState.setReaderProvider( ReaderProviderFactory.createReaderProvider( cfg, buildContext ) );
+		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities, cfg.getProperties() );
+		//build worker and back end components
+		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg.getProperties() ) );
 		factoryState.setCacheBitResultsSize(
 				ConfigurationParseHelper.getIntValue(
@@ -284,26 +278,40 @@ public class SearchFactoryBuilder {
 				)
 		);
 		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );
+		factoryState.setActiveSearchFactory( factory );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
 	}
 
 	private void fillSimilarityMapping() {
-		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = factoryState.getDocumentBuildersIndexedEntities();
-		for ( DirectoryProviderData directoryConfiguration : factoryState.getDirectoryProviderData().values() ) {
-			for ( Class<?> indexedType : directoryConfiguration.getClasses() ) {
-				DocumentBuilderIndexedEntity<?> documentBuilder = documentBuildersIndexedEntities.get( indexedType );
-				Similarity similarity = documentBuilder.getSimilarity();
-				Similarity prevSimilarity = directoryConfiguration.getSimilarity();
-				if ( prevSimilarity != null && !prevSimilarity.getClass().equals( similarity.getClass() ) ) {
+		//TODO cleanup: this logic to select the Similarity is too complex, should likely be done in a previous phase
+		final Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
+		for ( Entry<Class<?>, EntityIndexBinder<?>> entry : documentBuildersIndexedEntities.entrySet() ) {
+			Class<?> clazz = entry.getKey();
+			EntityIndexBinder<?> entityMapping = entry.getValue();
+			Similarity entitySimilarity = entityMapping.getSimilarity();
+			if ( entitySimilarity == null ) {
+				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
+				entitySimilarity = entityMapping.getDocumentBuilder().getSimilarity();
+				if ( entitySimilarity != null ) {
+					MutableEntityIndexBinding newMapping = new MutableEntityIndexBinding( entityMapping.getSelectionStrategy(), entitySimilarity, entityMapping.getIndexManagers() );
+					newMapping.setDocumentBuilderIndexedEntity( entityMapping.getDocumentBuilder() );
+					entityMapping = newMapping;
+					documentBuildersIndexedEntities.put( clazz, entityMapping );
+				}
+			}
+			IndexManager[] indexManagers = entityMapping.getIndexManagers();
+			for ( IndexManager indexManager : indexManagers ) {
+				Similarity indexSimilarity = indexManager.getSimilarity();
+				if ( entitySimilarity != null && indexSimilarity == null ) {
+					indexManager.setSimilarity( entitySimilarity );
+				}
+				else if ( entitySimilarity != null && ! entitySimilarity.getClass().equals( indexSimilarity.getClass() ) ) {
 					throw new SearchException(
 							"Multiple entities are sharing the same index but are declaring an " +
 									"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
 									"declare the same Similarity implementation."
 					);
-				}
-				else {
-					directoryConfiguration.setSimilarity( similarity );
 				}
 			}
 		}
@@ -329,14 +337,14 @@ public class SearchFactoryBuilder {
 		if ( rootFactory == null ) {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
-			factoryState.setDocumentBuildersIndexedEntities( new HashMap<Class<?>, DocumentBuilderIndexedEntity<?>>() );
-			factoryState.setDocumentBuildersContainedEntities( new HashMap<Class<?>, DocumentBuilderContainedEntity<?>>() );
-			factoryState.setDirectoryProviderData( new HashMap<DirectoryProvider<?>, DirectoryProviderData>() );
-			factoryState.setFilterDefinitions( new HashMap<String, FilterDef>() );
+			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinder<?>>() );
+			factoryState.setDocumentBuildersContainedEntities( new ConcurrentHashMap<Class<?>, DocumentBuilderContainedEntity<?>>() );
+			factoryState.setFilterDefinitions( new ConcurrentHashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
-			factoryState.setErrorHandler( createErrorHandler( factoryState.getConfigurationProperties() ) );
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
+			factoryState.setAllIndexesManager( new IndexManagerHolder() );
+			factoryState.setErrorHandler( createErrorHandler( cfg ) );
 		}
 	}
 
@@ -344,18 +352,20 @@ public class SearchFactoryBuilder {
 	 * Initialize the document builder
 	 * This algorithm seems to be safe for incremental search factories.
 	 */
-
 	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager, BuildContext buildContext) {
 		ConfigContext context = new ConfigContext( cfg );
-		DirectoryProviderFactory factory = new DirectoryProviderFactory();
 
 		initProgrammaticAnalyzers( context, reflectionManager );
 		initProgrammaticallyDefinedFilterDef( reflectionManager );
 		final PolymorphicIndexHierarchy indexingHierarchy = factoryState.getIndexHierarchy();
-		final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = factoryState.getDocumentBuildersIndexedEntities();
+		final Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
 		final Map<XClass, Class> classMappings = initializeClassMappings( cfg, reflectionManager );
+		
+		//we process the @Indexed classes last, so we first start all IndexManager(s).
+		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
+		
 		for ( Map.Entry<XClass, Class> mapping : classMappings.entrySet() ) {
 
 			XClass mappedXClass = mapping.getKey();
@@ -368,22 +378,8 @@ public class SearchFactoryBuilder {
 					continue;
 				}
 
-				DirectoryProviderFactory.DirectoryProviders providers = factory.createDirectoryProviders(
-						mappedXClass, cfg, buildContext, reflectionManager
-				);
-				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
-				//XClass unfortunately is not (yet) genericized: TODO?
-				final DocumentBuilderIndexedEntity<?> documentBuilder =
-						new DocumentBuilderIndexedEntity(
-								mappedXClass,
-								context,
-								providers,
-								reflectionManager,
-								optimizationBlackListedTypes
-						);
-
+				rootIndexedEntities.add( mappedXClass );
 				indexingHierarchy.addIndexedClass( mappedClass );
-				documentBuildersIndexedEntities.put( mappedClass, documentBuilder );
 			}
 			else {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
@@ -399,9 +395,33 @@ public class SearchFactoryBuilder {
 			bindFilterDefs( mappedXClass );
 			//TODO should analyzer def for classes at their same level???
 		}
+		
+		IndexManagerHolder indexesFactory = factoryState.getAllIndexesManager();
+		
+		// Create all IndexManagers, configure and start them:
+		for ( XClass mappedXClass : rootIndexedEntities ) {
+			
+			Class mappedClass = classMappings.get( mappedXClass );
+			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext, reflectionManager );
+		
+			// Create all DocumentBuilderIndexedEntity
+			//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
+			//XClass unfortunately is not (yet) genericized: TODO?
+			final DocumentBuilderIndexedEntity<?> documentBuilder =
+					new DocumentBuilderIndexedEntity(
+							mappedXClass,
+							context,
+							mappedEntity.getSimilarity(),
+							reflectionManager,
+							optimizationBlackListedTypes
+					);
+			mappedEntity.setDocumentBuilderIndexedEntity( documentBuilder );
+
+			documentBuildersIndexedEntities.put( mappedClass, mappedEntity );
+		}
+		
 		disableBlackListedTypesOptimization( classMappings, optimizationBlackListedTypes, documentBuildersIndexedEntities, documentBuildersContainedEntities );
 		factoryState.setAnalyzers( context.initLazyAnalyzers() );
-		factory.startDirectoryProviders();
 	}
 
 	/**
@@ -412,18 +432,19 @@ public class SearchFactoryBuilder {
 	 */
 	private void disableBlackListedTypesOptimization(Map<XClass, Class> classMappings,
 			Set<XClass> optimizationBlackListX,
-			Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities,
+			Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities,
 			Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities) {
 		for ( XClass xClass : optimizationBlackListX ) {
 			Class type = classMappings.get( xClass );
 			if ( type != null ) {
-				log.tracef( "Dirty checking optimizations disabled for class %s", type );
-				DocumentBuilderIndexedEntity<?> documentBuilderIndexedEntity = documentBuildersIndexedEntities.get( type );
-				if ( documentBuilderIndexedEntity != null ) {
-					documentBuilderIndexedEntity.forceStateInspectionOptimizationsDisabled();
+				EntityIndexBinder<?> entityIndexBinding = documentBuildersIndexedEntities.get( type );
+				if ( entityIndexBinding != null ) {
+					log.tracef( "Dirty checking optimizations disabled for class %s", type );
+					entityIndexBinding.getDocumentBuilder().forceStateInspectionOptimizationsDisabled();
 				}
 				DocumentBuilderContainedEntity<?> documentBuilderContainedEntity = documentBuildersContainedEntities.get( type );
 				if ( documentBuilderContainedEntity != null ) {
+					log.tracef( "Dirty checking optimizations disabled for class %s", type );
 					documentBuilderContainedEntity.forceStateInspectionOptimizationsDisabled();
 				}
 			}
@@ -549,22 +570,6 @@ public class SearchFactoryBuilder {
 		}
 	}
 
-	private static ErrorHandler createErrorHandler(Properties configuration) {
-		String errorHandlerClassName = configuration.getProperty( Environment.ERROR_HANDLER );
-		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
-			return new LogErrorHandler();
-		}
-		else if ( errorHandlerClassName.trim().equals( "log" ) ) {
-			return new LogErrorHandler();
-		}
-		else {
-			return ClassLoaderHelper.instanceFromName(
-					ErrorHandler.class, errorHandlerClassName,
-					ImmutableSearchFactory.class, "Error Handler"
-			);
-		}
-	}
-
 	private ReflectionManager getReflectionManager(SearchConfiguration cfg) {
 		ReflectionManager reflectionManager = cfg.getReflectionManager();
 		return geReflectionManager( reflectionManager );
@@ -585,6 +590,22 @@ public class SearchFactoryBuilder {
 		return indexingStrategy;
 	}
 
+	public static ErrorHandler createErrorHandler(SearchConfiguration searchCfg) {
+		String errorHandlerClassName = searchCfg.getProperty( Environment.ERROR_HANDLER );
+		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
+			return new LogErrorHandler();
+		}
+		else if ( errorHandlerClassName.trim().equals( "log" ) ) {
+			return new LogErrorHandler();
+		}
+		else {
+			return ClassLoaderHelper.instanceFromName(
+					ErrorHandler.class, errorHandlerClassName,
+					ImmutableSearchFactory.class, "Error Handler"
+			);
+		}
+	}
+
 	/**
 	 * Implementation of the Hibernate Search SPI WritableBuildContext and WorkerBuildContext
 	 * The data is provided by the SearchFactoryState object associated to SearchFactoryBuilder.
@@ -592,65 +613,12 @@ public class SearchFactoryBuilder {
 	private class BuildContext implements WritableBuildContext, WorkerBuildContext {
 		private final SearchFactoryState factoryState = SearchFactoryBuilder.this.factoryState;
 
-		public void addOptimizerStrategy(DirectoryProvider<?> provider, OptimizerStrategy optimizerStrategy) {
-			final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData = factoryState.getDirectoryProviderData();
-			DirectoryProviderData data = dirProviderData.get( provider );
-			if ( data == null ) {
-				data = new DirectoryProviderData();
-				dirProviderData.put( provider, data );
-			}
-			data.setOptimizerStrategy( optimizerStrategy );
-		}
-
-		public void addIndexingParameters(DirectoryProvider<?> provider, LuceneIndexingParameters indexingParams) {
-			factoryState.getDirectoryProviderIndexingParams().put( provider, indexingParams );
-		}
-
-		public void addClassToDirectoryProvider(Class<?> entity, DirectoryProvider<?> directoryProvider,
-				boolean exclusiveIndexUsage, int maximumQueueSize) {
-			final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData = factoryState.getDirectoryProviderData();
-			DirectoryProviderData data = dirProviderData.get( directoryProvider );
-			if ( data == null ) {
-				data = new DirectoryProviderData();
-				dirProviderData.put( directoryProvider, data );
-			}
-			data.getClasses().add( entity );
-			data.setExclusiveIndexUsage( exclusiveIndexUsage );
-			data.setMaxQueueLength( maximumQueueSize );
-		}
-
 		public SearchFactoryImplementor getUninitializedSearchFactory() {
 			return rootFactory;
 		}
 
 		public String getIndexingStrategy() {
 			return factoryState.getIndexingStrategy();
-		}
-
-		public Set<DirectoryProvider<?>> getDirectoryProviders() {
-			return factoryState.getDirectoryProviderData().keySet();
-		}
-
-		public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
-			factoryState.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
-		}
-
-		public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-			return factoryState.getDirectoryProviderData().get( provider ).getOptimizerStrategy();
-		}
-
-		public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-			return Collections.unmodifiableSet(
-					factoryState.getDirectoryProviderData().get( directoryProvider ).getClasses()
-			);
-		}
-
-		public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
-			return factoryState.getDirectoryProviderIndexingParams().get( provider );
-		}
-
-		public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
-			return factoryState.getDirectoryProviderData().get( dp ).getDirLock();
 		}
 
 		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
@@ -661,31 +629,19 @@ public class SearchFactoryBuilder {
 			factoryState.getServiceManager().releaseService( provider );
 		}
 
-		public Similarity getSimilarity(DirectoryProvider<?> provider) {
-			Similarity similarity = factoryState.getDirectoryProviderData().get( provider ).getSimilarity();
-			if ( similarity == null ) {
-				throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
-			}
-			return similarity;
-		}
-
-		public DirectoryProviderData getDirectoryProviderData(DirectoryProvider<?> provider) {
-			return factoryState.getDirectoryProviderData().get( provider );
-		}
-
-		public ErrorHandler getErrorHandler() {
-			return factoryState.getErrorHandler();
-		}
-
-		@SuppressWarnings("unchecked")
-		public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-			return (DocumentBuilderIndexedEntity<T>) factoryState.getDocumentBuildersIndexedEntities()
-					.get( entityType );
-		}
-
 		@Override
 		public boolean isTransactionManagerExpected() {
 			return cfg.isTransactionManagerExpected();
+		}
+
+		@Override
+		public IndexManagerHolder getAllIndexesManager() {
+			return factoryState.getAllIndexesManager();
+		}
+
+		@Override
+		public ErrorHandler getErrorHandler() {
+			return factoryState.getErrorHandler();
 		}
 
 	}

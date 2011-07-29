@@ -40,9 +40,9 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
-import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -80,8 +80,6 @@ import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
 import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -95,16 +93,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> {
 	private static final Log log = LoggerFactory.make();
-
-	/**
-	 * Arrays of directory providers for the underlying Lucene indexes of the indexed entity.
-	 */
-	private final DirectoryProvider[] directoryProviders;
-
-	/**
-	 * The sharding strategy used for the indexed entity.
-	 */
-	private final IndexShardingStrategy shardingStrategy;
 
 	/**
 	 * Flag indicating whether <code>@DocumentId</code> was explicitly specified.
@@ -171,13 +159,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 *
 	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>
 	 * @param context Handle to default configuration settings
-	 * @param providerWrapper wrapper for access to directory providers for the underlying Lucene indexes
+	 * @param similarity the Similarity implementation set at the related index level
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
 	 */
-	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, DirectoryProviderFactory.DirectoryProviders providerWrapper,
+	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, Similarity similarity,
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList) {
-		super( clazz, context, providerWrapper.getSimilarity(), reflectionManager, optimizationBlackList );
+		super( clazz, context, similarity, reflectionManager, optimizationBlackList );
 		// special case @ProvidedId
 		ProvidedId provided = findProvidedId( clazz, reflectionManager );
 		if ( provided != null ) {
@@ -213,8 +201,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			);
 		}
 		this.entityState = EntityState.INDEXED;
-		this.directoryProviders = providerWrapper.getProviders();
-		this.shardingStrategy = providerWrapper.getSelectionStrategy();
 		this.identifierName = idProvided ? null : idGetter.getName();
 	}
 
@@ -623,22 +609,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	public String getIdentifierName() {
 		return identifierName;
-	}
-	
-	public DirectoryProvider[] getDirectoryProviders() {
-		if ( getEntityState() != EntityState.INDEXED ) {
-			throw new AssertionFailure( "Contained in only entity: getDirectoryProvider should not have been called." );
-		}
-		return directoryProviders;
-	}
-
-	public IndexShardingStrategy getDirectoryProviderSelectionStrategy() {
-		if ( getEntityState() != EntityState.INDEXED ) {
-			throw new AssertionFailure(
-					"Contained in only entity: getDirectoryProviderSelectionStrategy should not have been called."
-			);
-		}
-		return shardingStrategy;
 	}
 
 	public boolean allowFieldSelectionInProjection() {

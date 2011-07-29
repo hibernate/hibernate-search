@@ -25,7 +25,6 @@ package org.hibernate.search.impl;
 
 import java.io.Serializable;
 import java.sql.Connection;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import java.util.Set;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
-import org.hibernate.EntityMode;
 import org.hibernate.Filter;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -54,7 +52,6 @@ import org.hibernate.UnknownProfileException;
 import org.hibernate.Session;
 import org.hibernate.cache.spi.CacheKey;
 import org.hibernate.collection.spi.PersistentCollection;
-import org.hibernate.engine.jdbc.LobCreationContext;
 import org.hibernate.engine.jdbc.spi.JdbcConnectionAccess;
 import org.hibernate.engine.query.spi.sql.NativeSQLQuerySpecification;
 import org.hibernate.engine.spi.EntityKey;
@@ -104,7 +101,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		if ( session == null ) {
 			throw new IllegalArgumentException( "Unable to create a FullTextSession from an null Session object" );
 		}
-		this.session = (Session) session;
+		this.session = session;
 		this.transactionContext = new EventSourceTransactionContext( (EventSource) session );
 		this.sessionImplementor = (SessionImplementor) session;
 	}
@@ -187,7 +184,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		//TODO cache that at the FTSession level
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		//not strictly necessary but a small optimization
-		if ( searchFactoryImplementor.getDocumentBuilderIndexedEntity( clazz ) == null ) {
+		if ( searchFactoryImplementor.getIndexBindingForEntity( clazz ) == null ) {
 			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
 			throw new IllegalArgumentException( msg );
 		}

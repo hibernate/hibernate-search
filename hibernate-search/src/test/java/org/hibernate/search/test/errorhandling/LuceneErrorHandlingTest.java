@@ -32,16 +32,17 @@ import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.WorkVisitor;
-import org.hibernate.search.backend.impl.lucene.DpSelectionVisitor;
+import org.hibernate.search.backend.impl.lucene.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -60,28 +61,28 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	
 	public void testErrorHandling() {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
+		EntityIndexBinder<Document> mappingForEntity = searchFactory.getIndexBindingForEntity( Document.class );
+		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
-		BackendQueueProcessorFactory queueProcessorFactory = searchFactory.getBackendQueueProcessorFactory();
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( new HarmlessWork( "firstWork" ) );
 		queue.add( new HarmlessWork( "secondWork" ) );
-		Runnable processor = queueProcessorFactory.getProcessor( queue );
 		workcounter.set( 0 ); // reset work counter
-		processor.run();
+		indexManager.performOperations( queue );
 		Assert.assertEquals( 2, workcounter.get() );
 		
 		workcounter.set( 0 ); // reset work counter
-		final FailingWork firstFailure = new FailingWork("firstFailure");
-		queue.add(firstFailure);
-		final HarmlessWork thirdWork = new HarmlessWork("thirdWork");
-		queue.add(thirdWork);
-		final HarmlessWork fourthWork = new HarmlessWork("fourthWork");
-		queue.add(fourthWork);
-		processor = queueProcessorFactory.getProcessor( queue );
-		processor.run();
+		final FailingWork firstFailure = new FailingWork( "firstFailure" );
+		queue.add( firstFailure );
+		final HarmlessWork thirdWork = new HarmlessWork( "thirdWork" );
+		queue.add( thirdWork );
+		final HarmlessWork fourthWork = new HarmlessWork( "fourthWork" );
+		queue.add( fourthWork );
+		indexManager.performOperations( queue );
 		Assert.assertEquals( 2, workcounter.get() );
+
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Throwable exception = mockErrorHandler.getLastException();
 		
@@ -122,7 +123,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 
 		@Override
 		public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
-			if ( visitor instanceof DpSelectionVisitor ) {
+			if ( visitor instanceof StreamingSelectionVisitor ) {
 				//during shard-selection visitor this work is applied to
 				//all DirectoryProviders as this extends DeleteLuceneWork
 				return visitor.getDelegate( this );
@@ -162,7 +163,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 
 		@Override
 		public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
-			if ( visitor instanceof DpSelectionVisitor ) {
+			if ( visitor instanceof StreamingSelectionVisitor ) {
 				//during shard-selection visitor this work is applied to
 				//all DirectoryProviders as this extends DeleteLuceneWork
 				return visitor.getDelegate( this );

@@ -36,11 +36,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.backend.AddLuceneWork;
-import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
+import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.engine.spi.EntityInitializer;
@@ -62,7 +63,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 	
 	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
-	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuilders;
+	private final Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders;
 	private final MassIndexerProgressMonitor monitor;
 	
 	private final CacheMode cacheMode;
@@ -83,7 +84,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 		this.producerEndSignal = producerEndSignal;
 		this.cacheMode = cacheMode;
 		this.backend = backend;
-		this.documentBuilders = searchFactory.getDocumentBuildersIndexedEntities();
+		this.entityIndexBinders = searchFactory.getIndexBindingForEntity();
 	}
 
 	public void run(Session upperSession) {
@@ -143,13 +144,14 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 	private void index( Object entity, Session session, EntityInitializer sessionInitializer ) throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
-		DocumentBuilderIndexedEntity docBuilder = documentBuilders.get( clazz );
-		if ( docBuilder == null ) {
+		EntityIndexBinder entityIndexBinding = entityIndexBinders.get( clazz );
+		if ( entityIndexBinding == null ) {
 			// it might be possible to receive not-indexes subclasses of the currently indexed type;
 			// being not-indexed, we skip them.
 			// FIXME for improved performance: avoid loading them in an early phase.
 			return;
 		}
+		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
 				.setClass(clazz)

@@ -23,12 +23,11 @@
  */
 package org.hibernate.search.test.jgroups.slave;
 
-import java.util.List;
-
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 
-import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.impl.jgroups.BackendMessage;
 
 /**
  * @author Lukasz Moren
@@ -47,15 +46,14 @@ public class JGroupsReceiver extends ReceiverAdapter {
 	@SuppressWarnings("unchecked")
 	public void receive(Message message) {
 
-		List<LuceneWork> queue;
+		final BackendMessage received;
 		try {
-			queue = ( List<LuceneWork> ) message.getObject();
+			received = ( BackendMessage ) message.getObject();
+			queues++;
+			works += received.queue.size();
 		}
-
 		catch ( ClassCastException e ) {
-			return;
+			throw new SearchException( e );
 		}
-		queues++;
-		works += queue.size();
 	}
 }

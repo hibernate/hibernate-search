@@ -79,6 +79,7 @@ public class FilterTest extends SearchTestCase {
 
 	public void testCache() {
 		createData();
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 ); // SearchFactory tests filter construction once
 		FullTextSession s = Search.getFullTextSession( openSession( ) );
 		s.getTransaction().begin();
 		BooleanQuery query = new BooleanQuery();
@@ -108,17 +109,14 @@ public class FilterTest extends SearchTestCase {
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cacheinstancetest");
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 );
 		assertEquals("Should filter out all", 0, ftQuery.getResultSize() );
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 ); // HSEARCH-818 : would be even better if it was still at 1 here, reusing what was created at SearchFactory build time
 
 		ftQuery = s.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cacheinstancetest");
-		try {
-			ftQuery.getResultSize();
-			fail("Cache instance does not work");
-		}
-		catch (IllegalStateException e) {
-			//success
-		}
+		ftQuery.getResultSize();
+//		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 ); //uncomment this when solving HSEARCH-818
 
 		s.getTransaction().commit();
 		s.close();
@@ -214,9 +212,11 @@ public class FilterTest extends SearchTestCase {
 				Soap.class
 		};
 	}
-	
+
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure(cfg);
 		cfg.setProperty( "hibernate.search.filter.cache_docidresults.size", "10" );
-	}	
+		InstanceBasedExcludeAllFilter.reset();
+	}
+
 }

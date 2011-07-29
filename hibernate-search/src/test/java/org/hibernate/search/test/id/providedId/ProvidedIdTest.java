@@ -23,10 +23,15 @@
  */
 package org.hibernate.search.test.id.providedId;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -43,13 +48,11 @@ import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Navin Surtani
@@ -99,10 +102,8 @@ public class ProvidedIdTest {
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Search Query extension
 		//needs it. So we use plain Lucene
 
-		//we know there is only one DP
-		DirectoryProvider provider = sf
-				.getDirectoryProviders( ProvidedIdPerson.class )[0];
-		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+		IndexReader indexReader = sf.openIndexReader( ProvidedIdPerson.class );
+		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 3, hits.totalHits );
 
@@ -139,5 +140,6 @@ public class ProvidedIdTest {
 		assertTrue( titles.contains( "Mini Goat" ) );
 		assertTrue( titles.contains( "Big Goat" ) );
 		searcher.close();
+		sf.closeIndexReader( indexReader );
 	}
 }

@@ -779,7 +779,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 * @param member The member instance
 	 * @param value The value
 	 *
-	 * @return The {@code value} casted to collection or in case of {@code value} being a map the map values as collection.
+	 * @return The {@code value} cast to collection or in case of {@code value} being a map the map values as collection.
 	 */
 	private <T> Collection<T> getActualCollection(XMember member, Object value) {
 		Collection<T> collection;

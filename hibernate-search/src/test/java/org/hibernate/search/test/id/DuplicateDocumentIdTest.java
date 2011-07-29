@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.id;
 
-import org.hibernate.HibernateException;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
 

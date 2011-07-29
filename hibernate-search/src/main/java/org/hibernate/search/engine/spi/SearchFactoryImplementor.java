@@ -25,21 +25,14 @@ package org.hibernate.search.engine.spi;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.lucene.search.Similarity;
-
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
+import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * Interface which gives access to the metadata. Intended to be used by Search components
@@ -48,39 +41,22 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Hardy Ferentschik
  */
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
-	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
-
-	Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities();
-
-	<T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType);
+	
+	Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity();
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
-
-	OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider);
 
 	FilterCachingStrategy getFilterCachingStrategy();
 
 	FilterDef getFilterDefinition(String name);
 
-	LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider);
-
 	String getIndexingStrategy();
-
-	Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider);
-
-	Set<DirectoryProvider<?>> getDirectoryProviders();
-
-	ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp);
 
 	int getFilterCacheBitResultsSize();
 
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
 
 	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer writerThreads);
-
-	Similarity getSimilarity(DirectoryProvider<?> directoryProvider);
-
-	ErrorHandler getErrorHandler();
 
 	boolean isJMXEnabled();
 
@@ -97,5 +73,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * Can be disabled to get pre-3.4 behavior (always rebuild document)
 	 */
 	boolean isDirtyChecksEnabled();
-
+	
+	IndexManagerHolder getAllIndexesManager();
+	
 }

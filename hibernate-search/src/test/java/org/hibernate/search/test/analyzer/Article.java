@@ -58,8 +58,8 @@ import org.hibernate.search.annotations.TokenizerDef;
 				filters = {
 						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 						@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params =   {
-                          @Parameter(name = "language", value = "English")
-                        })
+							@Parameter(name = "language", value = "English")
+						})
 				}),
 		@AnalyzerDef(name = "de",
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),

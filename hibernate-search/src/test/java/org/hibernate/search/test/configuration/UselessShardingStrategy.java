@@ -28,9 +28,9 @@ import java.util.Properties;
 import java.util.Enumeration;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.filter.FullTextFilterImplementor;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * Used to test the configuration of a third-party strategy
@@ -38,23 +38,23 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
  */
 public class UselessShardingStrategy implements IndexShardingStrategy {
 	
-	public DirectoryProvider<?> getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return null;
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForAllShards() {
+	public IndexManager[] getIndexManagersForAllShards() {
 		return null;
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return null;
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return null;
 	}
 
-	public void initialize(Properties properties, DirectoryProvider<?>[] providers) {
+	public void initialize(Properties properties, IndexManager[] providers) {
 		Enumeration<?> propertyNames = properties.propertyNames();
 		int counter;
 		counter = checkEnumeration( propertyNames );

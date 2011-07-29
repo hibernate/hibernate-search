@@ -26,7 +26,6 @@ package org.hibernate.search.backend;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
@@ -39,10 +38,8 @@ import org.apache.lucene.util.Version;
 
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
 
-import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters.ParameterSet;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
@@ -50,6 +47,7 @@ import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.exception.impl.SingleErrorContext;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -77,10 +75,8 @@ public class Workspace {
 	
 	// invariant state:
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final DirectoryProvider<?> directoryProvider;
 	private final OptimizerStrategy optimizerStrategy;
-	private final ReentrantLock lock;
 	private final Set<Class<?>> entitiesInDirectory;
 	private final LuceneIndexingParameters indexingParams;
 	private final ErrorHandler errorHandler;
@@ -98,27 +94,30 @@ public class Workspace {
 	 * Keeps a count of modification operations done on the index.
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
+
+	private final DirectoryBasedIndexManager indexManager;
 	
-	public Workspace(WorkerBuildContext context, DirectoryProvider<?> provider, ErrorHandler errorHandler) {
-		this.searchFactoryImplementor = context.getUninitializedSearchFactory();
-		this.directoryProvider = provider;
-		this.optimizerStrategy = context.getOptimizerStrategy( directoryProvider );
-		this.entitiesInDirectory = context.getClassesInDirectoryProvider( provider );
-		this.lock = context.getDirectoryProviderLock( provider );
-		this.indexingParams = context.getIndexingParameters( directoryProvider );
+	public Workspace(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
+		this.indexManager = indexManager;
+		this.directoryProvider = indexManager.getDirectoryProvider();
+		this.optimizerStrategy = indexManager.getOptimizerStrategy();
+		this.entitiesInDirectory = indexManager.getContainedTypes();
+		this.indexingParams = indexManager.getIndexingParameters();
 		this.errorHandler = errorHandler;
-		LuceneIndexingParameters indexingParams = context.getIndexingParameters( directoryProvider );
 		indexingParams.applyToWriter( writerConfig );
-		Similarity similarity = context.getSimilarity( directoryProvider );
-		writerConfig.setSimilarity( similarity );
+		Similarity similarity = indexManager.getSimilarity();
+		if ( similarity != null ) {
+			writerConfig.setSimilarity( similarity );
+		}
+		indexManager.setIndexWriterConfig( writerConfig );
 	}
 
-	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilder(Class<T> entity) {
-		return searchFactoryImplementor.getDocumentBuilderIndexedEntity( entity );
+	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {
+		return indexManager.getIndexBindingForEntity( entity ).getDocumentBuilder();
 	}
 
 	public Analyzer getAnalyzer(String name) {
-		return searchFactoryImplementor.getAnalyzer( name );
+		return indexManager.getAnalyzer( name );
 	}
 
 	/**
@@ -126,16 +125,10 @@ public class Workspace {
 	 * to optimize the index.
 	 */
 	public void optimizerPhase() {
-		lock.lock();
-		try {
-			// used getAndSet(0) because Workspace is going to be reused by next transaction.
-			synchronized ( optimizerStrategy ) {
-				optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
-				optimizerStrategy.optimize( this );
-			}
-		}
-		finally {
-			lock.unlock();
+		// used getAndSet(0) because Workspace is going to be reused by next transaction.
+		synchronized ( optimizerStrategy ) {
+			optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
+			optimizerStrategy.optimize( this );
 		}
 	}
 	
@@ -147,15 +140,9 @@ public class Workspace {
 	 * @see SearchFactory#optimize(Class)
 	 */
 	public void optimize() {
-		lock.lock();
-		try {
-			//Needs to ensure the optimizerStrategy is accessed in threadsafe way
-			synchronized ( optimizerStrategy ) {
-				optimizerStrategy.optimizationForced();
-			}
-		}
-		finally {
-			lock.unlock();
+		//Needs to ensure the optimizerStrategy is accessed in threadsafe way
+		synchronized ( optimizerStrategy ) {
+			optimizerStrategy.optimizationForced();
 		}
 	}
 

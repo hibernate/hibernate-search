@@ -36,6 +36,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.store.FSDirectory;
 
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -71,8 +72,6 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	//variables having visibility granted by a read of "current"
 	private FSDirectory directory;
 	private String indexName;
-	//get rid of it after start()
-	private BuildContext context;
 	private long copyChunkSize;
 
 	//variables needed between initialize and start (used by same thread: no special care needed)
@@ -83,6 +82,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 	private TriggerTask task;
 	private Lock directoryProviderLock;
 
+	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.properties = properties;
 		this.directoryProviderName = directoryProviderName;
@@ -99,14 +99,13 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
-		this.context = context;
 		current = 0; //write to volatile to publish all state
 	}
 
-	public void start() {
+	@Override
+	public void start(DirectoryBasedIndexManager indexManager) {
 		int currentLocal = 0;
-		this.directoryProviderLock = this.context.getDirectoryProviderLock( this );
-		this.context = null;
+		this.directoryProviderLock = indexManager.getDirectoryModificationLock();
 		try {
 			//copy to source
 			if ( new File( sourceDir, CURRENT1 ).exists() ) {

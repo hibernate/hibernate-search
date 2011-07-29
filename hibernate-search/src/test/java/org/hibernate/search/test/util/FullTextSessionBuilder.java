@@ -37,6 +37,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.testing.cache.CachingRegionFactory;
@@ -53,7 +54,7 @@ public class FullTextSessionBuilder {
 	
 	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 
-	private static final File indexDir;
+	public static final File indexRootDirectory;
 
 	private final Properties cfg = new Properties();
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
@@ -66,11 +67,12 @@ public class FullTextSessionBuilder {
 			buildDir = ".";
 		}
 		File current = new File( buildDir );
-		indexDir = new File( current, "indextemp" );
-		log.debugf( "Using %s as index directory.", indexDir.getAbsolutePath() );
+		indexRootDirectory = new File( current, "indextemp" );
+		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
 	}
 	
 	public FullTextSessionBuilder() {
+		cfg.setProperty( "hibernate.search.lucene_version", SearchTestCase.getTargetLuceneVersion().name() );
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
 		
 		//cache:
@@ -141,9 +143,13 @@ public class FullTextSessionBuilder {
 		if ( sessionFactory == null ) {
 			throw new java.lang.IllegalStateException( "sessionFactory not yet built" );
 		}
-		sessionFactory.close();
-		if ( usingFileSystem ) {
-			FileHelper.delete( indexDir );
+		try {
+			sessionFactory.close();
+		}
+		finally {
+			if ( usingFileSystem ) {
+				cleanupFilesystem();
+			}
 		}
 		sessionFactory = null;
 	}
@@ -186,5 +192,9 @@ public class FullTextSessionBuilder {
 		}
 		return mapping;
 	}
-	
+
+	public static void cleanupFilesystem() {
+		FileHelper.delete( indexRootDirectory );
+	}
+
 }

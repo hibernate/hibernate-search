@@ -25,20 +25,20 @@ package org.hibernate.search.test.shards;
 
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 
 public class SpecificShardingStrategy extends IdHashShardingStrategy {
 
 	@Override
-	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] filters) {
+	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] filters) {
 				
 		FullTextFilter filter = getFilter(filters, "shard");
 		if (filter == null) {
-			return getDirectoryProvidersForAllShards();
+			return getIndexManagersForAllShards();
 		}
 		else {
-			return new DirectoryProvider[] { getDirectoryProvidersForAllShards()[Integer.parseInt(filter.getParameter("index").toString())] };
+			return new IndexManager[] { getIndexManagersForAllShards()[Integer.parseInt(filter.getParameter("index").toString())] };
 		}
 	}
 

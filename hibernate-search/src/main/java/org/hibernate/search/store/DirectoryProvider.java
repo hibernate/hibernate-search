@@ -27,8 +27,8 @@ import java.util.Properties;
 
 import org.apache.lucene.store.Directory;
 
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
-
 
 /**
  * Set up and provide a Lucene <code>Directory</code>
@@ -42,6 +42,7 @@ import org.hibernate.search.spi.BuildContext;
  * @author Sylvain Vieujot
  */
 public interface DirectoryProvider<TDirectory extends Directory> {
+
 	/**
 	 * get the information to initialize the directory and build its hashCode/equals method
 	 */
@@ -52,7 +53,7 @@ public interface DirectoryProvider<TDirectory extends Directory> {
 	 * IO processing as well as background processing are expected to be set up here
 	 *
 	 */
-	void start();
+	void start(DirectoryBasedIndexManager indexManager);
 
 	/**
 	 * Executed when the search factory is closed. This method should stop any background process as well as

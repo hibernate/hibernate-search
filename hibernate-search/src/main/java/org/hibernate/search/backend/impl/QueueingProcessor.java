@@ -56,9 +56,4 @@ public interface QueueingProcessor {
 	 */
 	void cancelWorks(WorkQueue workQueue);
 
-	/**
-	 * clean resources
-	 * This method should log errors rather than raise an exception
-	 */
-	void close();
 }

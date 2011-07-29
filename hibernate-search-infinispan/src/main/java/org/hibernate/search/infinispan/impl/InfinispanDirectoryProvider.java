@@ -29,6 +29,7 @@ import org.infinispan.Cache;
 import org.infinispan.lucene.InfinispanDirectory;
 import org.infinispan.manager.EmbeddedCacheManager;
 
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.CacheManagerServiceProvider;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -77,7 +78,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	}
 
 	@Override
-	public void start() {
+	public void start(DirectoryBasedIndexManager indexManager) {
 		log.debug( "Starting InfinispanDirectory" );
 		cacheManager = context.requestService( CacheManagerServiceProvider.class );
 		Cache metadataCache = cacheManager.getCache( metadataCacheName );

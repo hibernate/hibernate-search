@@ -24,26 +24,17 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.logging.impl.Log;
-
-import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
-import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
-import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.backend.impl.lucene.TransactionalSelectionVisitor;
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -57,56 +48,14 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final boolean sync;
 	private final int batchSize;
-	private final ExecutorService executorService;
-	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
+	private static final TransactionalSelectionVisitor providerSelectionVisitor = new TransactionalSelectionVisitor();
 
-	public BatchedQueueingProcessor(WorkerBuildContext context, Properties properties) {
-		this.sync = isConfiguredAsSync( properties );
+	private final Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders;
 
-		//default to a simple asynchronous operation
-		int threadPoolSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
-		//no queue limit
-		int queueSize = ConfigurationParseHelper.getIntValue(
-				properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE
-		);
-
-		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_BATCHSIZE, 0 );
-
-		if ( !sync ) {
-			/**
-			 * If the queue limit is reached, the operation is executed by the main thread
-			 */
-			executorService =  Executors.newFixedThreadPool( threadPoolSize, "backend queueing processor", queueSize );
-		}
-		else {
-			executorService = null;
-		}
-		String backend = properties.getProperty( Environment.WORKER_BACKEND );
-		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
-		}
-		else if ( "jms".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new JMSBackendQueueProcessorFactory();
-		}
-		else if ( "blackhole".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new BlackHoleBackendQueueProcessorFactory();
-		}
-		else if ( "jgroupsMaster".equals( backend ) ) {
-				backendQueueProcessorFactory = new MasterJGroupsBackendQueueProcessorFactory();
-		}
-		else if ( "jgroupsSlave".equals( backend ) ) {
-				backendQueueProcessorFactory = new SlaveJGroupsBackendQueueProcessorFactory();
-		}
-		else {
-			backendQueueProcessorFactory = ClassLoaderHelper.instanceFromName(
-					BackendQueueProcessorFactory.class,
-					backend, BatchedQueueingProcessor.class, "processor"
-			);
-		}
-		backendQueueProcessorFactory.initialize( properties, context );
-		context.setBackendQueueProcessorFactory( backendQueueProcessorFactory );
+	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders, Properties properties) {
+		this.entityIndexBinders = entityIndexBinders;
+		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
 	}
 
 	public void add(Work work, WorkQueue workQueue) {
@@ -127,7 +76,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	public void performWorks(WorkQueue workQueue) {
 		List<LuceneWork> sealedQueue = workQueue.getSealedQueue();
 		if ( log.isTraceEnabled() ) {
-			StringBuilder sb = new StringBuilder( "Lucene WorkQueue to send to backend:[ \n\t" );
+			StringBuilder sb = new StringBuilder( "Lucene WorkQueue to send to backends:[ \n\t" );
 			for ( LuceneWork lw : sealedQueue ) {
 				sb.append( lw.toString() );
 				sb.append( "\n\t" );
@@ -138,41 +87,18 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			sb.append( "]" );
 			log.trace( sb.toString() );
 		}
-		Runnable processor = backendQueueProcessorFactory.getProcessor( sealedQueue );
-		if ( sync ) {
-			processor.run();
+		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter();
+		for ( LuceneWork work : sealedQueue ) {
+			final Class<?> entityType = work.getEntityClass();
+			EntityIndexBinder<?> entityIndexBinding = entityIndexBinders.get( entityType );
+			IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
+			work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy, context );
 		}
-		else {
-			executorService.execute( processor );
-		}
+		context.commitOperations();
 	}
 
 	public void cancelWorks(WorkQueue workQueue) {
 		workQueue.clear();
-	}
-
-	public void close() {
-		//gracefully stop
-		if ( executorService != null && !executorService.isShutdown() ) {
-			executorService.shutdown();
-			try {
-				executorService.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
-			}
-			catch ( InterruptedException e ) {
-				log.unableToShutdownAsyncronousIndexing( e );
-			}
-		}
-		//and stop the backend
-		backendQueueProcessorFactory.close();
-	}
-
-	/**
-	 * @param properties the configuration to parse
-	 * @return true if the configuration uses sync indexing
-	 */
-	public static boolean isConfiguredAsSync(Properties properties) {
-		// default to sync if none defined
-		return !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
 	}
 
 }

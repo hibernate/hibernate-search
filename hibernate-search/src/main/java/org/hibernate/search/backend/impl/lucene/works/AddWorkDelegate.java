@@ -61,8 +61,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 
 	public void performWork(LuceneWork work, IndexWriter writer) {
 		final Class<?> entityType = work.getEntityClass();
-		@SuppressWarnings("unchecked")
-		DocumentBuilderIndexedEntity documentBuilder = workspace.getDocumentBuilder( entityType );
+		DocumentBuilderIndexedEntity<?> documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
 		ScopedAnalyzer analyzer = documentBuilder.getAnalyzer();
 		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap );

@@ -32,6 +32,8 @@ import org.jgroups.View;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -40,6 +42,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Listen for messages from slave nodes and apply them into <code>LuceneBackendQueueProcessor</code>
  *
  * @author Lukasz Moren
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
  * @see org.jgroups.Receiver
@@ -56,9 +59,12 @@ public class JGroupsMasterMessageListener implements Receiver {
 
 	@SuppressWarnings("unchecked")
 	public void receive(Message message) {
-		List<LuceneWork> queue;
+		final List<LuceneWork> queue;
+		final String indexName;
 		try {
-			queue = ( List<LuceneWork> ) message.getObject();
+			BackendMessage decoded = ( BackendMessage ) message.getObject();
+			queue = decoded.queue;
+			indexName = decoded.indexName;
 		}
 		catch ( ClassCastException e ) {
 			log.illegalObjectRetrievedFromMessage( e );
@@ -73,18 +79,17 @@ public class JGroupsMasterMessageListener implements Receiver {
 					message.getSrc()
 				);
 			}
-			Runnable worker = getWorker( queue );
-			worker.run();
+			perform( indexName, queue );
 		}
 		else {
 			log.receivedEmptyLuceneWOrksInMessage();
 		}
 	}
 
-	private Runnable getWorker(List<LuceneWork> queue) {
-		Runnable processor;
-		processor = searchFactory.getBackendQueueProcessorFactory().getProcessor( queue );
-		return processor;
+	private void perform(String indexName, List<LuceneWork> queue) {
+		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
+		IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
+		indexManager.performOperations( queue );
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------

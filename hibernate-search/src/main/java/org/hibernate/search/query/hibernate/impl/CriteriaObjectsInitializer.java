@@ -72,9 +72,9 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 		}
 
 		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
-		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
+		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getIndexBindingForEntity(
 				indexedEntities.iterator().next()
-		);
+		).getDocumentBuilder();
 		String idName = builder.getIdentifierName();
 		Disjunction disjunction = Restrictions.disjunction();
 

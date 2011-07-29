@@ -33,7 +33,6 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -52,10 +51,10 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 	private final Log log = LoggerFactory.make();
 	private final boolean idIsNumeric;
 
-	DeleteExtWorkDelegate(Workspace workspace, WorkerBuildContext context) {
+	DeleteExtWorkDelegate(Workspace workspace) {
 		super( workspace );
 		managedType = workspace.getEntitiesInDirectory().iterator().next();
-		builder = context.getDocumentBuilderIndexedEntity( managedType );
+		builder = workspace.getDocumentBuilder( managedType );
 		idIsNumeric = isIdNumeric( managedType, builder );
 	}
 

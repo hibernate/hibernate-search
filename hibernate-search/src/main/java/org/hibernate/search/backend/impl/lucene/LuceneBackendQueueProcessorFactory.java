@@ -23,19 +23,15 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.List;
-import java.util.Set;
 
-import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * This will actually contain the Workspace and LuceneWork visitor implementation,
@@ -47,64 +43,29 @@ import org.hibernate.search.store.DirectoryProvider;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class LuceneBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
+public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 
-	private SearchFactoryImplementor searchFactoryImp;
-	
-	/**
-	 * Contains the Workspace and LuceneWork visitor implementation,
-	 * reused per-DirectoryProvider.
-	 * Both Workspace(s) and LuceneWorkVisitor(s) lifecycle are linked to the backend
-	 * lifecycle (reused and shared by all transactions);
-	 * the LuceneWorkVisitor(s) are stateless, the Workspace(s) are threadsafe.
-	 *
-	 * This read only structure is guarded by a volatile: upon updates of the backend,
-	 * changes should be synchronized in a multithreaded way.
-	 */
-	private volatile Map<DirectoryProvider<?>,PerDPResources> resourcesMap =
-			new HashMap<DirectoryProvider<?>,PerDPResources>();
+	private PerDPResources resources;
+	private IndexManager indexManager;
 
 	/**
 	 * copy of BatchedQueueingProcessor.sync
 	 */
 	private boolean sync;
 
-	public void initialize(Properties props, WorkerBuildContext context) {
-		this.searchFactoryImp = context.getUninitializedSearchFactory();
-		this.sync = BatchedQueueingProcessor.isConfiguredAsSync( props );
-		for (DirectoryProvider dp : context.getDirectoryProviders() ) {
-			PerDPResources resources = new PerDPResources( context, dp );
-			resourcesMap.put( dp, resources );
-		}
-	}
 
-	public void updateDirectoryProviders( Set<DirectoryProvider<?>> providers, WorkerBuildContext context ) {
-		Map<DirectoryProvider<?>,PerDPResources> newResourceMap =
-				new HashMap<DirectoryProvider<?>, PerDPResources>(resourcesMap);
-		for ( DirectoryProvider<?> provider : providers ) {
-			if ( ! resourcesMap.containsKey( provider ) ) {
-				PerDPResources resources = new PerDPResources( context, provider );
-				newResourceMap.put( provider, resources );
-			}
-		}
-		//TODO we could shut them down
-		for ( DirectoryProvider<?> provider : resourcesMap.keySet() ) {
-			if ( ! newResourceMap.containsKey( provider ) ) {
-				throw new SearchException("DirectoryProvider no longer present during SearchFactory update" );
-			}
-		}
-		this.resourcesMap = newResourceMap;
+	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+		this.indexManager = indexManager;
+		this.sync = BackendFactory.isConfiguredAsSync( props );
+		resources = new PerDPResources( context, (DirectoryBasedIndexManager) indexManager );
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new LuceneBackendQueueProcessor( queue, searchFactoryImp, resourcesMap, sync );
+		return new LuceneBackendQueueProcessor( queue, indexManager, resources, sync );
 	}
 
 	public void close() {
-		// needs to stop all used ThreadPools and cleanup locks
-		for (PerDPResources res : resourcesMap.values() ) {
-			res.shutdown();
-		}
+		resources.shutdown();
 	}
 	
 }

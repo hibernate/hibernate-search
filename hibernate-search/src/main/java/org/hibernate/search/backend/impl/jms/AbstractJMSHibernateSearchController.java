@@ -24,6 +24,7 @@
 package org.hibernate.search.backend.impl.jms;
 
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.JMSException;
@@ -31,12 +32,14 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Session;
-import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -44,9 +47,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * work send through JMS by the slave nodes.
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
+	
 	private static final Log log = LoggerFactory.make();
+	public static final String INDEX_NAME_JMS_PROPERTY = "hibernate.search.jms.indexNameProperty";
 
 	/**
 	 * Return the current or give a new session
@@ -88,10 +94,12 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 			log.incorrectMessageType( message.getClass() );
 			return;
 		}
-		ObjectMessage objectMessage = (ObjectMessage) message;
-		List<LuceneWork> queue;
+		final ObjectMessage objectMessage = (ObjectMessage) message;
+		final String indexName;
+		final List<LuceneWork> queue;
 		try {
 			queue = (List<LuceneWork>) objectMessage.getObject();
+			indexName = objectMessage.getStringProperty( INDEX_NAME_JMS_PROPERTY );
 		}
 		catch (JMSException e) {
 			log.unableToRetrieveObjectFromMessage( message.getClass(), e );
@@ -101,23 +109,21 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 			log.illegalObjectRetrievedFromMessage( e );
 			return;
 		}
-		Runnable worker = getWorker( queue );
-		worker.run();
+		perform( indexName, queue );
 	}
 
-	private Runnable getWorker(List<LuceneWork> queue) {
-		//FIXME casting sucks because we do not control what get session from
+	private void perform(String indexName, List<LuceneWork> queue) {
 		Session session = getSession();
-		Runnable processor = null;
 
 		try {
 			SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
-			processor = factory.getBackendQueueProcessorFactory().getProcessor( queue );
+			IndexManagerHolder allIndexesManager = factory.getAllIndexesManager();
+			IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
+			indexManager.performOperations( queue );
 		}
 		finally {
 			cleanSessionIfNeeded(session);
 		}
-		return processor;
 	}
 
 	@PostConstruct

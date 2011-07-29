@@ -30,8 +30,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.reader.ReaderProvider;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -48,9 +46,7 @@ public class TermVectorTest extends SearchTestCase {
 
       // Here's how to get a reader from a FullTextSession
       SearchFactory searchFactory = s.getSearchFactory();
-      DirectoryProvider provider = searchFactory.getDirectoryProviders(ElectricalProperties.class)[0];
-      ReaderProvider readerProvider = searchFactory.getReaderProvider();
-      IndexReader reader = readerProvider.openReader(provider);
+      IndexReader reader = searchFactory.openIndexReader( ElectricalProperties.class );
 
       /**
        * Since there are so many combinations of results here, we are only going
@@ -75,6 +71,7 @@ public class TermVectorTest extends SearchTestCase {
 
       //cleanup
       for (Object element : s.createQuery("from " + Employee.class.getName()).list()) s.delete(element);
+      searchFactory.closeIndexReader( reader );
       tx.commit();
       s.close();
    }
@@ -93,9 +90,7 @@ public class TermVectorTest extends SearchTestCase {
 
       // Here's how to get a reader from a FullTextSession
       SearchFactory searchFactory = s.getSearchFactory();
-      DirectoryProvider provider = searchFactory.getDirectoryProviders(Employee.class)[0];
-      ReaderProvider readerProvider = searchFactory.getReaderProvider();
-      IndexReader reader = readerProvider.openReader(provider);
+      IndexReader reader = searchFactory.openIndexReader( Employee.class );
 
       TermPositionVector vector = (TermPositionVector) reader.getTermFreqVector(0, "dept");
       assertNull("should not find a term position vector", vector);
@@ -103,6 +98,7 @@ public class TermVectorTest extends SearchTestCase {
       //cleanup
       for (Object element : s.createQuery("from " + ElectricalProperties.class.getName()).list())
          s.delete(element);
+      searchFactory.closeIndexReader( reader );
       tx.commit();
       s.close();
    }

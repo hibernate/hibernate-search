@@ -24,34 +24,19 @@
 package org.hibernate.search;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.query.dsl.QueryContextBuilder;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.stat.Statistics;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Provide application wide operations as well as access to the underlying Lucene resources.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public interface SearchFactory {
-	/**
-	 * @return Return the configured reader provider.
-	 */
-	ReaderProvider getReaderProvider();
-
-	/**
-	 * Provide access to the DirectoryProviders for a given entity.
-	 * In most cases, the returned type will be a one element array.
-	 * But if the given entity is configured to use sharded indexes, then multiple
-	 * elements will be returned. In this case all of them should be considered.
-	 *
-	 * @param entity the entity for which to return the directory providers
-	 * @return array of  {@code DirectoryProvider}s for the specified entity
-	 */
-	DirectoryProvider[] getDirectoryProviders(Class<?> entity);
 
 	/**
 	 * Optimize all indexes
@@ -96,5 +81,28 @@ public interface SearchFactory {
 	 *
 	 * @return The statistics.
 	 */
-	public Statistics getStatistics();
+	Statistics getStatistics();
+
+	/**
+	 * Opens an IndexReader on all indexes containing the entities passed as parameter.
+	 * In the simplest case passing a single entity will map to a single index; if the entity
+	 * uses a sharding strategy or if multiple entities using different index names are selected,
+	 * the single IndexReader will act as a MultiReader on the aggregate of these indexes.
+	 * This MultiReader is not filtered by Hibernate Search, so it might contain information
+	 * relevant to different types as well.
+	 * <p>The returned IndexReader is read only; writing directly to the index is discouraged, in need use the
+	 * {@link org.hibernate.search.spi.SearchFactoryIntegrator#getWorker()} to queue change operations to the backend.</p>
+	 * <p>The IndexReader should not be closed in other ways, but must be returned to this instance to
+	 * {@link #closeIndexReader(IndexReader)}.</p>
+	 * 
+	 * @param entities
+	 * @return an IndexReader containing at least all listed entities
+	 */
+	IndexReader openIndexReader(Class<?>... entities);
+
+	/**
+	 * Closes IndexReader instances obtained using {@link #openIndexReader(Class...)}
+	 * @param indexReader the IndexReader to be closed
+	 */
+	void closeIndexReader(IndexReader indexReader);
 }

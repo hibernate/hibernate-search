@@ -98,7 +98,7 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.use_identifier_rollback", "true" );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
-		cfg.setProperty( "hibernate.search.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
+		cfg.setProperty( "hibernate.search.default.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
 	}
 
 	@Override

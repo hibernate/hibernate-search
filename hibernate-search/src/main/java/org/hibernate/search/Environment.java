@@ -53,7 +53,7 @@ public final class Environment {
 	 */
 	public static final String SIMILARITY_CLASS = "hibernate.search.similarity";
 
-	public static final String WORKER_PREFIX = "hibernate.search.worker.";
+	public static final String WORKER_PREFIX = "worker.";
 	public static final String WORKER_SCOPE = WORKER_PREFIX + "scope";
 	public static final String WORKER_BACKEND = WORKER_PREFIX + "backend";
 	public static final String WORKER_EXECUTION = WORKER_PREFIX + "execution";
@@ -61,7 +61,7 @@ public final class Environment {
 	/**
 	 * Defines the maximum number of indexing operation batched per transaction
 	 */
-	public static final String WORKER_BATCHSIZE = WORKER_PREFIX + "batch_size";
+	public static final String QUEUEINGPROCESSOR_BATCHSIZE = "hibernate.search.batch_size";
 
 	/**
 	 * only used then execution is async
@@ -82,12 +82,12 @@ public final class Environment {
 	/**
 	 * define the reader prefix
 	 */
-	public static final String READER_PREFIX = "hibernate.search.reader.";
+	public static final String READER_PREFIX = "reader";
 
 	/**
 	 * define the reader strategy used
 	 */
-	public static final String READER_STRATEGY = READER_PREFIX + "strategy";
+	public static final String READER_STRATEGY = READER_PREFIX + "." + "strategy";
 
 	/**
 	 * filter caching strategy class (must have a no-arg constructor and implement FilterCachingStrategy)
@@ -135,7 +135,7 @@ public final class Environment {
 	 * Accepts a fully populated SearchMapping object or a fully qualified
 	 * class name of a SearchMapping factory. Such a factory must have:
 	 *  - a no-arg constructor
-	 *  - a methid returning SearchMapping and annotated with @Factory
+	 *  - a method returning SearchMapping and annotated with @Factory
 	 */
 	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
 

@@ -231,7 +231,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		return parser.parse( "*" );
 	}
 
-	private Query createDSLQuery() throws ParseException {
+	private Query createDSLQuery() {
 		QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
 		return queryBuilder.keyword().onField( "value" ).matching( null ).createQuery();
 	}

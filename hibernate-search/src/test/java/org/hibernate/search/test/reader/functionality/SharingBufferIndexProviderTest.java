@@ -23,9 +23,9 @@
  */
 package org.hibernate.search.test.reader.functionality;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,31 +33,30 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.index.IndexReader;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.reader.functionality.ExtendedSharingBufferReaderProvider.MockIndexReader;
-import org.hibernate.search.test.reader.functionality.ExtendedSharingBufferReaderProvider.TestManipulatorPerDP;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
+ * Emulates a stress condition on the SharingBufferReaderProvider, to make sure index lifecycle is properly managed.
+ * 
  * @author Sanne Grinovero
  */
 public class SharingBufferIndexProviderTest {
-	
+
 	private final ExtendedSharingBufferReaderProvider readerProvider = new ExtendedSharingBufferReaderProvider();
 	private final CountDownLatch startSignal = new CountDownLatch(1);
 	private final Runnable searchTask = new SearchTask();
 	private final Runnable changeTask = new ChangeTask();
+	private final Runnable directorySwitchTask = new DirectorySwitchTask();
 	private final AtomicInteger countDoneSearches = new AtomicInteger();
 	private final AtomicInteger countDoneIndexmods = new AtomicInteger();
-	private static final int SEARCHES_NUM = 50000;
-	private static final Random random = new Random();
+	private static final int SEARCHES_NUM = 10000;
 	
 	@Test
 	public void testStressingMock() throws InterruptedException {
 		readerProvider.initialize(null, null);
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( 200 );//much chaos
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( 50 ); //much chaos
 		for ( int i = 0; i < SEARCHES_NUM; i++ ) {
 			executor.execute( makeTask( i ) );
 		}
@@ -78,26 +77,17 @@ public class SharingBufferIndexProviderTest {
 	}
 
 	private Runnable makeTask(int i) {
-		if ( i % 10 == 0) {
+		if ( i % 100 == 0 ) {
+			return directorySwitchTask;
+		}
+		if ( i % 10 == 0 ) {
 			return changeTask;
 		}
 		else {
 			return searchTask;
 		}
 	}
-	
-	private DirectoryProvider[] getRandomAvailableDPs() {
-		int arraySize = random.nextInt( readerProvider.manipulators.size() - 1 ) + 1;
-		DirectoryProvider[] array = new DirectoryProvider[arraySize];
-		List<DirectoryProvider> availableDPs = new ArrayList<DirectoryProvider>( readerProvider.directoryProviders );
-		for (int i=0; i<arraySize; i++){
-			int chosenDpIndex = random.nextInt( availableDPs.size() );
-			array[i] = availableDPs.get( chosenDpIndex );
-			availableDPs.remove( array[i] );
-		}
-		return array;
-	}
-	
+
 	private class SearchTask implements Runnable {
 		public void run() {
 			try {
@@ -106,9 +96,9 @@ public class SharingBufferIndexProviderTest {
 				//manage termination:
 				return;
 			}
-			IndexReader fakeOpenReader = readerProvider.openReader( getRandomAvailableDPs() );
+			IndexReader fakeOpenReader = readerProvider.openIndexReader();
 			Thread.yield();
-			readerProvider.closeReader( fakeOpenReader );
+			readerProvider.closeIndexReader( fakeOpenReader );
 			countDoneSearches.incrementAndGet();
 		}
 	}
@@ -117,12 +107,16 @@ public class SharingBufferIndexProviderTest {
 		public void run() {
 			super.run();
 			Thread.yield();
-			DirectoryProvider[] randomEvailableDPs = getRandomAvailableDPs();
-			for ( DirectoryProvider dp : randomEvailableDPs ) {
-				TestManipulatorPerDP testManipulatorPerDP = readerProvider.manipulators.get( dp.getDirectory() );
-				testManipulatorPerDP.setIndexChanged();
-			}
+			readerProvider.currentDPWasWritten();
 			countDoneIndexmods.incrementAndGet();
+		}
+	}
+	
+	private class DirectorySwitchTask extends ChangeTask {
+		public void run() {
+			super.run();
+			Thread.yield();
+			readerProvider.swithDirectory();
 		}
 	}
 

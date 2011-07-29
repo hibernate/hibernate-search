@@ -39,10 +39,10 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
-import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.RamIndexManager;
 
 /**
  * @author Emmanuel Bernard
@@ -62,11 +62,11 @@ public class ShardsTest extends SearchTestCase {
 	}
 
 	public void testIdShardingStrategy() {
-		DirectoryProvider[] dps = new DirectoryProvider[] { new RAMDirectoryProvider(), new RAMDirectoryProvider() };
+		IndexManager[] dps = new IndexManager[] { new RamIndexManager(), new RamIndexManager() };
 		IdHashShardingStrategy shardingStrategy = new IdHashShardingStrategy();
 		shardingStrategy.initialize( null, dps );
-		assertTrue( dps[1] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 1, "1", null ) );
-		assertTrue( dps[0] == shardingStrategy.getDirectoryProviderForAddition( Animal.class, 2, "2", null ) );
+		assertTrue( dps[1] == shardingStrategy.getIndexManagersForAddition( Animal.class, 1, "1", null ) );
+		assertTrue( dps[0] == shardingStrategy.getIndexManagersForAddition( Animal.class, 2, "2", null ) );
 	}
 
 	public void testBehavior() throws Exception {

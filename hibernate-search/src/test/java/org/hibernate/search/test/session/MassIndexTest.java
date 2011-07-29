@@ -80,7 +80,7 @@ public class MassIndexTest extends SearchTestCase {
 			s.index( results.get( 0 ) );
 			if ( index % 5 == 0 ) s.clear();
 		}
-		tx.commit();
+		tx.commit(); // if you get a LazyInitializationException, that's because we clear() the session in the loop.. it only works with a batch size of 5 (the point of the test)
 		s.clear();
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
@@ -221,7 +221,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.close();
 	}
 
-	private Session getSessionWithAutoCommit() throws SQLException {
+	private Session getSessionWithAutoCommit() {
 		Session s;
 		s = openSession();
 		s.doWork( new Work() {
@@ -235,7 +235,7 @@ public class MassIndexTest extends SearchTestCase {
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.worker.batch_size", "5" );
+		cfg.setProperty( Environment.QUEUEINGPROCESSOR_BATCHSIZE, "5" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 

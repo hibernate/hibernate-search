@@ -24,17 +24,15 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * Apply the operations to Lucene directories.
@@ -46,40 +44,35 @@ import org.hibernate.search.exception.impl.ErrorContextBuilder;
  */
 class LuceneBackendQueueProcessor implements Runnable {
 	
-	private final List<LuceneWork> queue;
-	private final SearchFactoryImplementor searchFactoryImplementor;
-	private final Map<DirectoryProvider<?>,PerDPResources> resourcesMap;
 	private final boolean sync;
 	private final ErrorHandler errorHandler;
+	private final PerDPQueueProcessor dpProcessors;
 	
-	private static final DpSelectionVisitor providerSelectionVisitor = new DpSelectionVisitor();
 	private static final Log log = LoggerFactory.make();
 
 	LuceneBackendQueueProcessor(List<LuceneWork> queue,
-			SearchFactoryImplementor searchFactoryImplementor,
-			Map<DirectoryProvider<?>,PerDPResources> resourcesMap,
+			IndexManager indexManager,
+			PerDPResources resourcesMap,
 			boolean syncMode) {
 		this.sync = syncMode;
-		this.queue = queue;
-		this.searchFactoryImplementor = searchFactoryImplementor;
-		this.resourcesMap = resourcesMap;
-		this.errorHandler = searchFactoryImplementor.getErrorHandler();
+		this.errorHandler = resourcesMap.getErrorHandler();
+		this.dpProcessors = new PerDPQueueProcessor( resourcesMap, queue );
 	}
 
 	public void run() {
-		QueueProcessors processors = new QueueProcessors( resourcesMap );
-		// divide the queue in tasks, adding to QueueProcessors by affected Directory.
+		ExecutorService executor = dpProcessors.getOwningExecutor();
 		try {
-			for ( LuceneWork work : queue ) {
-				final Class<?> entityType = work.getEntityClass();
-				DocumentBuilderIndexedEntity<?> documentBuilder = searchFactoryImplementor.getDocumentBuilderIndexedEntity( entityType );
-				IndexShardingStrategy shardingStrategy = documentBuilder.getDirectoryProviderSelectionStrategy();
-				work.getWorkDelegate( providerSelectionVisitor ).addAsPayLoadsToQueue( work, shardingStrategy, processors );
+			if ( sync ) {
+				//even in sync operations we always delegate to a single thread,
+				//to make sure all index operations are applied in sequence.
+				Future<?> future = executor.submit( dpProcessors );
+				future.get();
 			}
-			//this Runnable splits tasks in more runnables and then runs them:
-			processors.runAll( sync );
+			else {
+				executor.execute( dpProcessors );	
+			}
 		} catch ( Exception e ) {
-			log.backendError( e );	
+			log.backendError( e );
 			ErrorContextBuilder builder = new ErrorContextBuilder();
 			builder.errorThatOccurred( e );
 			errorHandler.handle( builder.createErrorContext() );

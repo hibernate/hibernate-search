@@ -21,23 +21,27 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.spi;
+package org.hibernate.search.backend.impl;
 
-import java.util.Set;
-
-import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * Allow a BackendQueueProcessorFactory to be notified of {@code DirectoryProvider} changes.
- *
- * @author Emmanuel Bernard
- * @experimental This API is experimental
+ * Sends a single operation to the related backends, considering the sharding strategy.
+ * This delegates to {@link org.hibernate.search.indexes.spi.IndexManager#performStreamOperation(LuceneWork, boolean)}
+ * so it's suited for streams of many LuceneWork operations which don't need strict ordering.
+ * 
+ * @author Sanne Grinovero
  */
-public interface UpdatableBackendQueueProcessorFactory extends BackendQueueProcessorFactory {
+public interface StreamingOperationSelectionDelegate {
+	
 	/**
-	 * Update the list of <code>DirectoryProvider</code>s in case the SearchFactory is updated.
-	 * The processor factory should react and update its state accordingly.
+	 * The LuceneWork must be applied to different indexes.
+	 * @param work the work to split.
+	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories. 
+	 * @param forceAsync if true, the invocation will not block to wait for it being applied.
+	 *  When false this will depend on the backend configuration.
 	 */
-	void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context);
+	public void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, boolean forceAsync);
+
 }

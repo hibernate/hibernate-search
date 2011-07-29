@@ -24,9 +24,10 @@ import java.util.List;
 import junit.framework.AssertionFailedError;
 
 import org.hibernate.cfg.Environment;
-import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
@@ -95,9 +96,10 @@ public class ClusterTestHelper {
 	 * @return the number of nodes as seen by the current node
 	 */
 	public static int clusterSize(FullTextSessionBuilder node) {
-		SearchFactory searchFactory = node.getSearchFactory();
-		DirectoryProvider[] directoryProviders = searchFactory.getDirectoryProviders( SimpleEmail.class );
-		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) directoryProviders[0];
+		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
+		EntityIndexBinder<SimpleEmail> mailIndexBinding = searchFactory.getIndexBindingForEntity( SimpleEmail.class );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) mailIndexBinding.getIndexManagers()[0];
+		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();
 		List<Address> members = cacheManager.getMembers();
 		return members.size();

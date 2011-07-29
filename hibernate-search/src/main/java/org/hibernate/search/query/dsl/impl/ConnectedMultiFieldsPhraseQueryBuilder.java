@@ -93,8 +93,8 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			Reader reader = new StringReader( sentence );
 			stream = queryContext.getQueryAnalyzer().reusableTokenStream( fieldName, reader);
 
-			TermAttribute termAttribute = (TermAttribute) stream.addAttribute( TermAttribute.class );
-			PositionIncrementAttribute positionAttribute = (PositionIncrementAttribute) stream.addAttribute( PositionIncrementAttribute.class );
+			TermAttribute termAttribute = stream.addAttribute( TermAttribute.class );
+			PositionIncrementAttribute positionAttribute = stream.addAttribute( PositionIncrementAttribute.class );
 
 			stream.reset();
 			int position = -1; //start at -1 since we apply at least one increment

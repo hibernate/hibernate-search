@@ -63,7 +63,7 @@ public class TransactionalWorker implements Worker {
 
 	public void performWork(Work<?> work, TransactionContext transactionContext) {
 		final Class<?> entityType = HibernateHelper.getClassFromWork( work );
-		if ( factory.getDocumentBuilderIndexedEntity( entityType ) == null
+		if ( factory.getIndexBindingForEntity( entityType ) == null
 				&& factory.getDocumentBuilderContainedEntity( entityType ) == null ) {
 			throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityType );
 		}
@@ -93,14 +93,13 @@ public class TransactionalWorker implements Worker {
 		}
 	}
 
-	public void initialize(Properties props, WorkerBuildContext context) {
-		this.queueingProcessor = new BatchedQueueingProcessor( context, props );
+	public void initialize(Properties props, WorkerBuildContext context, QueueingProcessor queueingProcessor) {
+		this.queueingProcessor = queueingProcessor;
 		this.factory = context.getUninitializedSearchFactory();
 		this.transactionExpected = context.isTransactionManagerExpected();
 	}
 
 	public void close() {
-		queueingProcessor.close();
 	}
 
 	public void flushWorks(TransactionContext transactionContext) {

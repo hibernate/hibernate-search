@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -37,12 +38,14 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.impl.MutableSearchFactory;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
@@ -54,7 +57,10 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.hibernate.search.test.SearchTestCase.getTargetLuceneVersion;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Emmanuel Bernard
@@ -65,15 +71,14 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testCreateEmptyFactory() throws Exception {
-		final ManualConfiguration configuration = new ManualConfiguration();
+		final ManualConfiguration configuration = getTestConfiguration();
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		sf.close();
 	}
 
 	@Test
 	public void testAddingClassFullModel() throws Exception {
-		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		ManualConfiguration configuration = getTestConfiguration();
 		//FIXME downcasting of MSF. create a getDelegate() ?
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
@@ -90,16 +95,15 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		//we know there is only one DP
-		DirectoryProvider<?> provider = sf
-				.getDirectoryProviders( A.class )[0];
-		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+		IndexReader indexReader = sf.openIndexReader( A.class );
+		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
+		sf.closeIndexReader( indexReader );
 
-		sf = (MutableSearchFactory) builder.currentFactory( sf )
+		sf = builder.currentFactory( sf )
 				.addClass( B.class )
 				.buildSearchFactory();
 
@@ -111,21 +115,20 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		//we know there is only one DP
-		provider = sf.getDirectoryProviders( B.class )[0];
-		searcher = new IndexSearcher( provider.getDirectory(), true );
+		indexReader = sf.openIndexReader( B.class );
+		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
+		sf.closeIndexReader( indexReader );
 
 		sf.close();
 	}
 
 	@Test
 	public void testAddingClassSimpleAPI() throws Exception {
-		ManualConfiguration configuration = new ManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		ManualConfiguration configuration = getTestConfiguration();
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 
 		sf.addClasses( A.class );
@@ -139,14 +142,13 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		//we know there is only one DP
-		DirectoryProvider<?> provider = sf
-				.getDirectoryProviders( A.class )[0];
-		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+		IndexReader indexReader = sf.openIndexReader( A.class );
+		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
+		sf.closeIndexReader( indexReader );
 
 		sf.addClasses( B.class, C.class );
 
@@ -159,20 +161,22 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		//we know there is only one DP
-		provider = sf.getDirectoryProviders( B.class )[0];
-		searcher = new IndexSearcher( provider.getDirectory(), true );
+		indexReader = sf.openIndexReader( B.class );
+		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
+		searcher.close();
+		sf.closeIndexReader( indexReader );
 
 		luceneQuery = parser.parse( "Vincent" );
 		
-		provider = sf.getDirectoryProviders( C.class )[0];
-		searcher = new IndexSearcher( provider.getDirectory(), true );
+		indexReader = sf.openIndexReader( C.class );
+		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
+		sf.closeIndexReader( indexReader );
 
 		sf.close();
 	}
@@ -185,9 +189,7 @@ public class MutableFactoryTest {
 	@Test
 	public void testMultiThreadedAddClasses() throws Exception {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
-		ManualConfiguration configuration = new ManualConfiguration()
-				//We need to check that properties aren't lost: avoid fs as it's the default configuration
-				.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		ManualConfiguration configuration = getTestConfiguration();
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		List<DoAddClasses> runnables = new ArrayList<DoAddClasses>(10);
 		final int nbrOfThread = 10;
@@ -221,12 +223,12 @@ public class MutableFactoryTest {
 		for (int i = 0 ; i < nbrOfThread*nbrOfClassesPerThread ; i++) {
 			Query luceneQuery = parser.parse( "Emmanuel" + i);
 			final Class<?> classByNumber = getClassAByNumber( i );
-			DirectoryProvider<?>[] directoryProviders = sf.getDirectoryProviders( classByNumber );
-			assertNotNull( directoryProviders );
-			DirectoryProvider<?> provider = sf.getDirectoryProviders( classByNumber )[0];
-			IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+			IndexReader indexReader = sf.openIndexReader( classByNumber );
+			IndexSearcher searcher = new IndexSearcher( indexReader );
 			TopDocs hits = searcher.search( luceneQuery, 1000 );
 			assertEquals( 1, hits.totalHits );
+			searcher.close();
+			sf.closeIndexReader( indexReader );
 		}
 	}
 
@@ -278,18 +280,25 @@ public class MutableFactoryTest {
 					MutableFactoryTest.doIndexWork(entity, i, factory, context );
 					context.end();
 					
-					DirectoryProvider<?>[] directoryProviders = factory.getDirectoryProviders( aClass );
-					Assert.assertTrue( "Configuration lost: expected RAM directory", directoryProviders[0] instanceof RAMDirectoryProvider );
+					EntityIndexBinder<?> indexBindingForEntity = factory.getIndexBindingForEntity( aClass );
+					assertNotNull( indexBindingForEntity );
+					IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
+					assertEquals( 1, indexManagers.length );
+					DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+					DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();
+					Assert.assertTrue( "Configuration lost: expected RAM directory", directoryProvider instanceof RAMDirectoryProvider );
 
 					Query luceneQuery = parser.parse( "Emmanuel" + i);
-					DirectoryProvider<?> provider = factory.getDirectoryProviders( aClass )[0];
-					IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+					IndexReader indexReader = factory.openIndexReader( aClass );
+					IndexSearcher searcher = new IndexSearcher( indexReader );
 					TopDocs hits = searcher.search( luceneQuery, 1000 );
 					if ( hits.totalHits != 1 ) {
 						failure = true;
 						failureInfo = "failure: Emmanuel" + i + " for " + aClass.getName();
 						return;
 					}
+					searcher.close();
+					factory.closeIndexReader( indexReader );
 				}
 			}
 			catch ( Exception e ) {
@@ -299,4 +308,11 @@ public class MutableFactoryTest {
 			}
 		}
 	}
+
+	private static ManualConfiguration getTestConfiguration() {
+		return new ManualConfiguration()
+			.addProperty( "hibernate.search.default.directory_provider", "ram" )
+			.addProperty( "hibernate.search.lucene_version", getTargetLuceneVersion().name() );
+	}
+
 }

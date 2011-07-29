@@ -21,24 +21,25 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.impl.lucene;
+package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
+ * Visitor interface to apply the configured sharding strategy to a list of LuceneWork;
+ * this list is usually the set of operations to be applied in a transactional context.
+ * 
  * @author Sanne Grinovero
  */
-public interface DpSelectionDelegate {
+public interface ContextAwareSelectionDelegate {
 	
 	/**
 	 * The LuceneWork must be applied to different indexes.
 	 * @param work the work to split.
-	 * @param queues the target queue to add work to.
 	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories. 
-	 * @throws InterruptedException 
+	 * @param context the transactional context where the pending changes are stored
 	 */
-	void addAsPayLoadsToQueue(LuceneWork work,
-			IndexShardingStrategy shardingStrategy, PerDirectoryWorkProcessor queues) throws InterruptedException;
+	public void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, WorkQueuePerIndexSplitter context);
 
 }

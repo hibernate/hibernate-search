@@ -108,10 +108,10 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 			commonCfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 		}
 		for ( String aPackage : getCommonAnnotatedPackages() ) {
-			( ( Configuration ) getCommonConfiguration() ).addPackage( aPackage );
+			getCommonConfiguration().addPackage( aPackage );
 		}
 		for ( Class<?> aClass : getCommonAnnotatedClasses() ) {
-			( ( Configuration ) getCommonConfiguration() ).addAnnotatedClass( aClass );
+			getCommonConfiguration().addAnnotatedClass( aClass );
 		}
 		for ( String xmlFile : getCommonXmlFiles() ) {
 			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );

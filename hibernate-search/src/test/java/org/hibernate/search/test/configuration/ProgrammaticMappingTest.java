@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -50,7 +51,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.util.logging.impl.Log;
@@ -371,12 +371,11 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
 		//needs it. So we use plain Lucene 
 
-		//we know there is only one DP
-		DirectoryProvider<?> provider = fullTextSession.getSearchFactory()
-				.getDirectoryProviders( ProvidedIdEntry.class )[0];
-		IndexSearcher searcher = new IndexSearcher( provider.getDirectory(), true );
+		IndexReader indexReader = fullTextSession.getSearchFactory().openIndexReader( ProvidedIdEntry.class );
+		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		searcher.close();
+		fullTextSession.getSearchFactory().closeIndexReader( indexReader );
 		transaction.commit();
 		session.close();
 

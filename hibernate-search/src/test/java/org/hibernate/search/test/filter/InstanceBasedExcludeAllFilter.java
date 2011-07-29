@@ -29,21 +29,34 @@ import java.io.Serializable;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.DocIdSet;
+import org.hibernate.search.SearchException;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class InstanceBasedExcludeAllFilter extends Filter implements Serializable {
-	
-	private volatile boolean done = false;
+
+	private static volatile int constructorCount = 0;
+
+	public InstanceBasedExcludeAllFilter() {
+		constructorCount++;
+	}
 
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
-		if ( done ) {
-			throw new IllegalStateException( "Called twice" );
-		}
-		done = true;
+		ExcludeAllFilter.verifyItsAReadOnlySegmentReader( reader );
 		return DocIdSet.EMPTY_DOCIDSET;
 	}
+
+	public static void reset() {
+		constructorCount = 0;
+	}
 	
+	public static void assertConstructorInvoked(int times) {
+		if ( constructorCount != times ) {
+			throw new SearchException( "test failed, constructor invoked " + constructorCount + ", expected " + times );
+		}
+	}
+
 }

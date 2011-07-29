@@ -25,7 +25,6 @@ package org.hibernate.search.test.similarity;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.Search;

@@ -23,11 +23,9 @@
  */
 package org.hibernate.search.spi;
 
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 
 /**
  * Build context that can be used by some services at initialization
@@ -59,15 +57,6 @@ public interface BuildContext {
 
 	String getIndexingStrategy();
 
-	Set<DirectoryProvider<?>> getDirectoryProviders();
-
-	/**
-	 * This method cannot be used in initialize methods. start methods can use it though.
-	 * @param provider
-	 * @return
-	 */
-	ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> provider);
-
 	/**
 	 * Declare the use of a service.
 	 * All callers of this method must call
@@ -87,4 +76,16 @@ public interface BuildContext {
 	 * @param provider of the service
 	 */
 	void releaseService(Class<? extends ServiceProvider<?>> provider);
+
+	/**
+	 * @return
+	 */
+	IndexManagerHolder getAllIndexesManager();
+
+	/**
+	 * For backends processing work asynchronously, they should catch all eventual errors in the ErrorHandler
+	 * to avoid losing information about the lost updates.
+	 * @return
+	 */
+	ErrorHandler getErrorHandler();
 }

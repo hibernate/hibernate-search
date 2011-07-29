@@ -637,7 +637,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.setProperty( Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
 	}
 	
 }

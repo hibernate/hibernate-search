@@ -37,8 +37,19 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  */
 public class OptimizeLuceneWork extends LuceneWork implements Serializable {
 	
+	/**
+	 * Optimizes the index(es) of a specific entity
+	 * @param entity
+	 */
 	public OptimizeLuceneWork(Class entity) {
 		super( null, null, entity );
+	}
+
+	/**
+	 * Optimizes any index
+	 */
+	public OptimizeLuceneWork() {
+		super( null, null, null );
 	}
 
 	@Override
@@ -48,7 +59,13 @@ public class OptimizeLuceneWork extends LuceneWork implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "OptimizeLuceneWork: " + this.getEntityClass().getName();
+		Class entityClass = this.getEntityClass();
+		if ( entityClass == null ) {
+			return "OptimizeLuceneWork: global";
+		}
+		else {
+			return "OptimizeLuceneWork: " + this.getEntityClass().getName();
+		}
 	}
 	
 }

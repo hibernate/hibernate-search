@@ -21,14 +21,13 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.impl.batchlucene;
+package org.hibernate.search.backend.impl.batch;
 
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 
 /**
  * Implementations of this interface are not drop-in replacements for the standard BackendQueueProcessorFactory,
@@ -45,9 +44,9 @@ public interface BatchBackend {
 	 *
 	 * @param props all configuration properties
 	 * @param monitor the indexing progress monitor
-	 * @param context the build context for the workers
+	 * @param searchFactory the running SearchFactory
 	 */
-	void initialize(Properties props, MassIndexerProgressMonitor monitor, WorkerBuildContext context);
+	void initialize(Properties props, MassIndexerProgressMonitor monitor, SearchFactoryIntegrator searchFactory);
 
 	/**
 	 * Enqueues one work to be processed asynchronously
@@ -68,18 +67,4 @@ public interface BatchBackend {
 	 */
 	void doWorkInSync(LuceneWork work);
 
-	/**
-	 * Waits until all work is done and terminates the executors.
-	 * IndexWriter is not closed yet: work in sync can still be processed.
-	 *
-	 * @throws InterruptedException if the current thread is interrupted
-	 *                              while waiting for the enqueued tasks to be finished.
-	 */
-	void stopAndFlush(long timeout, TimeUnit unit) throws InterruptedException;
-
-	/**
-	 * Used to shutdown and release resources.
-	 * No other method should be used after this one.
-	 */
-	void close();
 }

@@ -44,7 +44,6 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -59,8 +58,7 @@ public class CompressionTest extends SearchTestCase {
 	 * @throws Exception in case the test fails
 	 */
 	public void testFieldWasCompressed() throws Exception {
-		DirectoryProvider[] directoryProviders = getSearchFactory().getDirectoryProviders( LargeDocument.class );
-		IndexReader indexReader = getSearchFactory().getReaderProvider().openReader( directoryProviders );
+		IndexReader indexReader = getSearchFactory().openIndexReader( LargeDocument.class );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), null, 10 );
@@ -99,7 +97,7 @@ public class CompressionTest extends SearchTestCase {
 			}
 		}
 		finally {
-			getSearchFactory().getReaderProvider().closeReader( indexReader );
+			getSearchFactory().closeIndexReader( indexReader );
 		}
 	}
 

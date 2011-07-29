@@ -25,16 +25,15 @@
 package org.hibernate.search.spi.internals;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.reader.ReaderProvider;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.store.DirectoryProvider;
 
 import java.util.Map;
@@ -48,19 +47,11 @@ import java.util.Properties;
 public interface SearchFactoryState {
 	Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities();
 
-	Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData();
-
-	Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities();
+	Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity();
 
 	String getIndexingStrategy();
 
 	Worker getWorker();
-
-	ReaderProvider getReaderProvider();
-
-	BackendQueueProcessorFactory getBackendQueueProcessorFactory();
-
-	void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory);
 
 	Map<String, FilterDef> getFilterDefinitions();
 
@@ -72,8 +63,6 @@ public interface SearchFactoryState {
 
 	Properties getConfigurationProperties();
 
-	ErrorHandler getErrorHandler();
-
 	PolymorphicIndexHierarchy getIndexHierarchy();
 
 	Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams();
@@ -81,4 +70,9 @@ public interface SearchFactoryState {
 	ServiceManager getServiceManager();
 	
 	boolean isTransactionManagerExpected();
+
+	IndexManagerHolder getAllIndexesManager();
+
+	ErrorHandler getErrorHandler();
+
 }

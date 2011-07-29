@@ -26,7 +26,6 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import org.jgroups.Address;
 import org.jgroups.Channel;
@@ -34,25 +33,24 @@ import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.spi.UpdatableBackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.JGroupsHelper;
 import org.hibernate.search.util.impl.XMLHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-
 /**
  * Common base class for Master and Slave BackendQueueProcessorFactories
  *
  * @author Lukasz Moren
  */
-public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBackendQueueProcessorFactory {
+public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -69,19 +67,18 @@ public abstract class JGroupsBackendQueueProcessorFactory implements UpdatableBa
 	protected SearchFactoryImplementor searchFactory;
 	protected Channel channel = null;
 	protected Address address;
+	protected String indexName;
 
-	public void initialize(Properties props, WorkerBuildContext context) {
+	@Override
+	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		JGroupsHelper.verifyIPv4IsPreferred();
 		this.searchFactory = context.getUninitializedSearchFactory();
+		indexName = indexManager.getIndexName();
 
 		if ( props.containsKey( JG_CLUSTER_NAME ) ) {
 			setClusterName( props.getProperty( JG_CLUSTER_NAME ) );
 		}
 		prepareJGroupsChannel( props );
-	}
-
-	public void updateDirectoryProviders(Set<DirectoryProvider<?>> providers, WorkerBuildContext context) {
-		//nothing to do here. The DirectoryProviders are not used
 	}
 
 	private void prepareJGroupsChannel(Properties props) {

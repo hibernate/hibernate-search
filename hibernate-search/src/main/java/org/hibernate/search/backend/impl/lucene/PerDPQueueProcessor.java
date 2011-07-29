@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -59,27 +58,21 @@ class PerDPQueueProcessor implements Runnable {
 	private final LuceneWorkVisitor worker;
 	private final ExecutorService executor;
 	private final boolean exclusiveIndexUsage;
-	private final List<LuceneWork> workOnWriter = new ArrayList<LuceneWork>();
+	private final List<LuceneWork> workOnWriter;
 	private final ErrorHandler handler;
 	
 	/**
 	 * @param resources All resources for the given DirectoryProvider are collected
 	 *  from this wrapping object.
+	 * @param queue 
 	 */
-	public PerDPQueueProcessor(PerDPResources resources) {
+	public PerDPQueueProcessor(PerDPResources resources, List<LuceneWork> queue) {
 		this.worker = resources.getVisitor();
 		this.workspace = resources.getWorkspace();
 		this.executor = resources.getExecutor();
 		this.exclusiveIndexUsage = resources.isExclusiveIndexUsageEnabled();
 		this.handler = resources.getErrorHandler();
-	}
-
-	/**
-	 * adds a LuceneWork to the internal queue. Can't remove them.
-	 * @param work
-	 */
-	public void addWork(LuceneWork work) {
-		workOnWriter.add( work );
+		this.workOnWriter = queue;
 	}
 
 	/**

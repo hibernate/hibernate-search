@@ -29,14 +29,16 @@ import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.SimpleFSDirectory;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -45,22 +47,22 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class FSDirectorySelectionTest extends SearchTestCase {
 
-	public void testMMapDirectoryType() throws Exception {
+	public void testMMapDirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "mmap" );
 		assertCorrectDirectoryType( factory, MMapDirectory.class.getName() );
 	}
 
-	public void testNIODirectoryType() throws Exception {
+	public void testNIODirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "nio" );
 		assertCorrectDirectoryType( factory, NIOFSDirectory.class.getName() );
 	}
 
-	public void testSimpleDirectoryType() throws Exception {
+	public void testSimpleDirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "simple" );
 		assertCorrectDirectoryType( factory, SimpleFSDirectory.class.getName() );
 	}
 
-	public void testInvalidDirectoryType() throws Exception {
+	public void testInvalidDirectoryType() {
 		try {
 			createSessionFactoryUsingDirectoryType( "foobar" );
 			fail( "Factory creation should fail with invalid 'hibernate.search.default.filesystem_access_type' parameter " );
@@ -74,11 +76,15 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		Session session = factory.openSession();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		DirectoryProvider[] providers = fullTextSession.getSearchFactory().getDirectoryProviders( SnowStorm.class );
-		assertTrue( "Wrong number of directory providers", providers.length == 1 );
-
-		Directory directory = providers[0].getDirectory();
+		SearchFactoryIntegrator searchFactoryIntegrator = (SearchFactoryIntegrator) fullTextSession.getSearchFactory();
+		EntityIndexBinder<?> snowIndexBinder = searchFactoryIntegrator.getIndexBindingForEntity( SnowStorm.class );
+		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
+		assertTrue( "Wrong number of directory providers", indexManagers.length == 1 );
+		
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+		Directory directory = indexManager.getDirectoryProvider().getDirectory();
 		assertEquals( "Wrong directory provider type", className, directory.getClass().getName() );
+		session.close();
 	}
 
 	private SessionFactory createSessionFactoryUsingDirectoryType(String directoryType) {
@@ -94,5 +100,4 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		return new Class[] { };
 	}
 }
-
 

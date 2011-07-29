@@ -30,10 +30,9 @@ import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.Workspace;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -50,13 +49,7 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 	private int transactionMax = -1;
 	private long operations = 0;
 	private long transactions = 0;
-	private DirectoryProvider directoryProvider;
-
-	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, BuildContext context) {
-		this.directoryProvider = directoryProvider;
-		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
-		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );
-	}
+	private IndexManager indexManager;
 
 	public void optimizationForced() {
 		operations = 0;
@@ -75,17 +68,25 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 
 	public void optimize(Workspace workspace) {
 		if ( needOptimization() ) {
-			log.debug( "Optimize {} after {} operations and {} transactions",
-				new Object[] { directoryProvider.getDirectory(), operations, transactions });
+			if ( log.isDebugEnabled() )
+				log.debugv( "Optimize {0} after {1} operations and {2} transactions",
+						indexManager.getIndexName(), operations, transactions );
 			IndexWriter writer = workspace.getIndexWriter();
 			try {
 				writer.optimize();
 			}
 			catch (IOException e) {
 				throw new SearchException( "Unable to optimize directoryProvider: "
-						+ directoryProvider.getDirectory().toString(), e );
+						+ indexManager.getIndexName(), e );
 			}
 			optimizationForced();
 		}
+	}
+
+	@Override
+	public void initialize(IndexManager indexManager, Properties indexProperties) {
+		this.indexManager = indexManager;
+		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
+		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );
 	}
 }

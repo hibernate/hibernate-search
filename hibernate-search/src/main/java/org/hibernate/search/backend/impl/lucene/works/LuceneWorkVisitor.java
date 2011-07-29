@@ -30,7 +30,6 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.backend.Workspace;
-import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
  * @author Sanne Grinovero
@@ -43,9 +42,9 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	private final OptimizeWorkDelegate optimizeDelegate;
 	private final PurgeAllWorkDelegate purgeAllDelegate;
 	
-	public LuceneWorkVisitor(Workspace workspace, WorkerBuildContext context) {
+	public LuceneWorkVisitor(Workspace workspace) {
 		if ( workspace.getEntitiesInDirectory().size() == 1 ) {
-			this.deleteDelegate = new DeleteExtWorkDelegate( workspace, context );
+			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
 		}
 		else {
 			this.deleteDelegate = new DeleteWorkDelegate( workspace );

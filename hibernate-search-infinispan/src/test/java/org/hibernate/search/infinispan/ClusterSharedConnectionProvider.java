@@ -21,10 +21,7 @@ package org.hibernate.search.infinispan;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
-
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.hibernate.HibernateException;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 
 /**

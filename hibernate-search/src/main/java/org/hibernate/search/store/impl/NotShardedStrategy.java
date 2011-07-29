@@ -29,34 +29,36 @@ import java.io.Serializable;
 import org.apache.lucene.document.Document;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * @author Emmanuel Bernard
  */
 public class NotShardedStrategy implements IndexShardingStrategy {
-	private DirectoryProvider<?>[] directoryProvider;
-	public void initialize(Properties properties, DirectoryProvider<?>[] providers) {
+
+	private IndexManager[] directoryProvider;
+
+	public void initialize(Properties properties, IndexManager[] providers) {
 		this.directoryProvider = providers;
 		if ( directoryProvider.length > 1) {
 			throw new AssertionFailure("Using SingleDirectoryProviderSelectionStrategy with multiple DirectryProviders");
 		}
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForAllShards() {
+	public IndexManager[] getIndexManagersForAllShards() {
 		return directoryProvider;
 	}
 
-	public DirectoryProvider<?> getDirectoryProviderForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return directoryProvider[0];
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForDeletion(Class<?> entity, Serializable id, String idInString) {
+	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return directoryProvider;
 	}
 
-	public DirectoryProvider<?>[] getDirectoryProvidersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return directoryProvider;
 	}
 

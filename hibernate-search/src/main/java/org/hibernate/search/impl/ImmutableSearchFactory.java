@@ -23,24 +23,24 @@
  */
 package org.hibernate.search.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.Similarity;
+import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -53,13 +53,12 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
-import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.OptimizeLuceneWork;
-import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
-import org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend;
+import org.hibernate.search.backend.impl.batch.BatchBackend;
+import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -69,16 +68,13 @@ import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.impl.HSQueryImpl;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -94,23 +90,21 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities;
+	private final Map<Class<?>, EntityIndexBinder<?>> indexBindingForEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
 	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
-	private final Map<DirectoryProvider<?>, DirectoryProviderData> dirProviderData;
 	private final Worker worker;
-	private final ReaderProvider readerProvider;
-	private final BackendQueueProcessorFactory backendQueueProcessorFactory;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
 	private final Map<String, Analyzer> analyzers;
 	private final AtomicBoolean stopped = new AtomicBoolean( false );
 	private final int cacheBitResultsSize;
 	private final Properties configurationProperties;
-	private final ErrorHandler errorHandler;
 	private final PolymorphicIndexHierarchy indexHierarchy;
 	private final StatisticsImpl statistics;
 	private final boolean transactionManagerExpected;
+	private final IndexManagerHolder allIndexesManager;
+	private final ErrorHandler errorHandler;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -122,22 +116,20 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
-		this.backendQueueProcessorFactory = state.getBackendQueueProcessorFactory();
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
-		this.dirProviderData = state.getDirectoryProviderData();
 		this.dirProviderIndexingParams = state.getDirectoryProviderIndexingParams();
-		this.documentBuildersIndexedEntities = state.getDocumentBuildersIndexedEntities();
+		this.indexBindingForEntities = state.getIndexBindingForEntity();
 		this.documentBuildersContainedEntities = state.getDocumentBuildersContainedEntities();
-		this.errorHandler = state.getErrorHandler();
 		this.filterCachingStrategy = state.getFilterCachingStrategy();
 		this.filterDefinitions = state.getFilterDefinitions();
 		this.indexHierarchy = state.getIndexHierarchy();
 		this.indexingStrategy = state.getIndexingStrategy();
-		this.readerProvider = state.getReaderProvider();
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
+		this.allIndexesManager = state.getAllIndexesManager();
+		this.errorHandler = state.getErrorHandler();
 
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
@@ -160,10 +152,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		}
 	}
 
-	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
-		return backendQueueProcessorFactory;
-	}
-
 	public Map<String, FilterDef> getFilterDefinitions() {
 		return filterDefinitions;
 	}
@@ -181,22 +169,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 				log.workerException( e );
 			}
 
-			try {
-				readerProvider.destroy();
-			}
-			catch ( Exception e ) {
-				log.readerProviderExceptionOnDestroy( e );
-			}
-
-			//TODO move directory provider cleaning to DirectoryProviderFactory
-			for ( DirectoryProvider dp : getDirectoryProviders() ) {
-				try {
-					dp.stop();
-				}
-				catch ( Exception e ) {
-					log.directoryProviderExceptionOnStop( e );
-				}
-			}
+			this.allIndexesManager.stop();
 
 			serviceManager.stopServices();
 		}
@@ -206,34 +179,22 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return new HSQueryImpl( this );
 	}
 
-	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-		return Collections.unmodifiableSet( dirProviderData.get( directoryProvider ).getClasses() );
-	}
-
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
 	}
 
-	public Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData() {
-		return dirProviderData;
-	}
-
-	public Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities() {
-		return documentBuildersIndexedEntities;
+	public Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity() {
+		return indexBindingForEntities;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-		return (DocumentBuilderIndexedEntity<T>) documentBuildersIndexedEntities.get( entityType );
+	public <T> EntityIndexBinder<T> getIndexBindingForEntity(Class<T> entityType) {
+		return (EntityIndexBinder<T>) indexBindingForEntities.get( entityType );
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {
 		return (DocumentBuilderContainedEntity<T>) documentBuildersContainedEntities.get( entityType );
-	}
-
-	public Set<DirectoryProvider<?>> getDirectoryProviders() {
-		return this.dirProviderData.keySet();
 	}
 
 	public void addClasses(Class<?>... classes) {
@@ -248,37 +209,21 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called" );
 	}
 
-	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-		return dirProviderData.get( provider ).getOptimizerStrategy();
-	}
-
 	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
 		return dirProviderIndexingParams.get( provider );
 	}
 
-	public ReaderProvider getReaderProvider() {
-		return readerProvider;
-	}
-
-	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
-		DocumentBuilderIndexedEntity<?> documentBuilder = getDocumentBuilderIndexedEntity( entity );
-		return documentBuilder == null ? null : documentBuilder.getDirectoryProviders();
-	}
-
 	public void optimize() {
-		Set<Class<?>> clazzs = getDocumentBuildersIndexedEntities().keySet();
-		for ( Class clazz : clazzs ) {
-			optimize( clazz );
+		for ( IndexManager im : this.allIndexesManager.getIndexManagers() ) {
+			im.optimize();
 		}
 	}
 
 	public void optimize(Class entityType) {
-		if ( !getDocumentBuildersIndexedEntities().containsKey( entityType ) ) {
-			throw new SearchException( "Entity not indexed: " + entityType );
+		EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( entityType );
+		for ( IndexManager im: entityIndexBinding.getIndexManagers() ) {
+			im.optimize();
 		}
-		List<LuceneWork> queue = new ArrayList<LuceneWork>( 1 );
-		queue.add( new OptimizeLuceneWork( entityType ) );
-		getBackendQueueProcessorFactory().getProcessor( queue ).run();
 	}
 
 	public Analyzer getAnalyzer(String name) {
@@ -290,17 +235,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public Analyzer getAnalyzer(Class<?> clazz) {
-		if ( clazz == null ) {
-			throw new IllegalArgumentException( "A class has to be specified for retrieving a scoped analyzer" );
-		}
-
-		DocumentBuilderIndexedEntity<?> builder = documentBuildersIndexedEntities.get( clazz );
-		if ( builder == null ) {
-			throw new IllegalArgumentException(
-					"Entity for which to retrieve the scoped analyzer is not an @Indexed entity: " + clazz.getName()
-			);
-		}
-
+		EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( clazz );
+		DocumentBuilderIndexedEntity<?> builder = entityIndexBinding.getDocumentBuilder();
 		return builder.getAnalyzer();
 	}
 
@@ -336,10 +272,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return filterDefinitions.get( name );
 	}
 
-	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
-		return this.dirProviderData.get( dp ).getDirLock();
-	}
-
 	public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
 		return serviceManager.requestService( provider );
 	}
@@ -360,7 +292,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		final BatchBackend batchBackend;
 		String impl = configurationProperties.getProperty( Environment.BATCH_BACKEND );
 		if ( StringHelper.isEmpty( impl ) || "LuceneBatch".equalsIgnoreCase( impl ) ) {
-			batchBackend = new LuceneBatchBackend();
+			batchBackend = new DefaultBatchBackend();
 		}
 		else {
 			batchBackend = ClassLoaderHelper.instanceFromName(
@@ -371,29 +303,13 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		Properties cfg = this.configurationProperties;
 		if ( forceToNumWriterThreads != null ) {
 			cfg = new Properties( cfg );
-			cfg.put( LuceneBatchBackend.CONCURRENT_WRITERS, forceToNumWriterThreads.toString() );
+			cfg.put( DefaultBatchBackend.CONCURRENT_WRITERS, forceToNumWriterThreads.toString() );
 		}
 		Properties batchBackendConfiguration = new MaskedProperty(
 				cfg, Environment.BATCH_BACKEND
 		);
 		batchBackend.initialize( batchBackendConfiguration, progressMonitor, this );
 		return batchBackend;
-	}
-
-	public Similarity getSimilarity(DirectoryProvider<?> provider) {
-		Similarity similarity = dirProviderData.get( provider ).getSimilarity();
-		if ( similarity == null ) {
-			throw new SearchException( "Assertion error: a similarity should be defined for each provider" );
-		}
-		return similarity;
-	}
-
-	public DirectoryProviderData getDirectoryProviderData(DirectoryProvider<?> provider) {
-		return dirProviderData.get( provider );
-	}
-
-	public ErrorHandler getErrorHandler() {
-		return errorHandler;
 	}
 
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
@@ -429,4 +345,45 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	public boolean isTransactionManagerExpected() {
 		return this.transactionManagerExpected;
 	}
+
+	@Override
+	public IndexManagerHolder getAllIndexesManager() {
+		return this.allIndexesManager;
+	}
+
+	@Override
+	public IndexReader openIndexReader(Class<?>... entities) {
+		HashMap<String,IndexManager> indexManagers = new HashMap<String,IndexManager>();
+		for ( Class<?> type : entities ) {
+			EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( type );
+			IndexManager[] indexManagersForAllShards = entityIndexBinding.getSelectionStrategy().getIndexManagersForAllShards();
+			for (IndexManager im : indexManagersForAllShards) {
+				indexManagers.put( im.getIndexName(), im );
+			}
+		}
+		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()]);
+		return MultiReaderFactory.openReader( uniqueIndexManagers );
+	}
+
+	@Override
+	public void closeIndexReader(IndexReader indexReader) {
+		MultiReaderFactory.closeReader( indexReader );
+	}
+
+	private EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
+		if ( entityType == null ) {
+			throw new IllegalArgumentException( "Null is not a valid indexed entity type" );
+		}
+		EntityIndexBinder entityIndexBinding = getIndexBindingForEntity( entityType );
+		if ( entityIndexBinding == null ) {
+			throw new IllegalArgumentException( "Entity is not an indexed type: " + entityType );
+		}
+		return entityIndexBinding;
+	}
+
+	@Override
+	public ErrorHandler getErrorHandler() {
+		return this.errorHandler;
+	}
+
 }

@@ -1,48 +1,40 @@
-/*
+/* 
  * Hibernate, Relational Persistence for Idiomatic Java
+ * 
+ * JBoss, Home of Professional Open Source
+ * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+ * as indicated by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
- * indicated by the @author tags or express copyright attribution
- * statements applied by the authors.  All third-party contributions are
- * distributed under license by Red Hat, Inc.
- *
- * This copyrighted material is made available to anyone wishing to use, modify,
- * copy, or redistribute it subject to the terms and conditions of the GNU
- * Lesser General Public License, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this distribution; if not, write to:
- * Free Software Foundation, Inc.
- * 51 Franklin Street, Fifth Floor
- * Boston, MA  02110-1301  USA
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
  */
-package org.hibernate.search.reader.impl;
+package org.hibernate.search.indexes.impl;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.store.Directory;
-
-import org.hibernate.search.reader.ReaderProvider;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -50,16 +42,15 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * It uses IndexReader.reopen() which should improve performance on larger indexes
  * as it shares buffers with previous IndexReader generation for the segments which didn't change.
  *
- * @author Sanne Grinovero
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class SharingBufferReaderProvider implements ReaderProvider {
+public class SharingBufferReaderProvider implements DirectoryBasedReaderManager {
 
 	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * contains all Readers (most current per Directory and all unclosed old readers)
 	 */
-	//TODO ConcurrentHashMap's constructor could benefit from some hints as arguments.
 	protected final Map<IndexReader, ReaderUsagePair> allReaders = new ConcurrentHashMap<IndexReader, ReaderUsagePair>();
 
 	/**
@@ -67,34 +58,36 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 	 */
 	protected final Map<Directory, PerDirectoryLatestReader> currentReaders = new ConcurrentHashMap<Directory, PerDirectoryLatestReader>();
 
-	public void closeReader(IndexReader multiReader) {
-		if ( multiReader == null ) {
-			return;
+	private DirectoryProvider directoryProvider;
+	private String indexName;
+	
+	@Override
+	public IndexReader openIndexReader() {
+		log.debugf( "Opening IndexReader for directoryProvider %s", indexName );
+		Directory directory = directoryProvider.getDirectory();
+		PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directory );
+		// might eg happen for FSSlaveDirectoryProvider or for mutable SearchFactory
+		if ( directoryLatestReader == null ) {
+			directoryLatestReader = createReader( directory );
 		}
-		IndexReader[] readers;
-		if ( multiReader instanceof MultiReader ) {
-			readers = ReaderProviderHelper.getSubReadersFromMultiReader( ( MultiReader ) multiReader );
-		}
-		else {
-			throw new AssertionFailure( "Everything should be wrapped in a MultiReader" );
-		}
-		log.debugf( "Closing MultiReader: %s", multiReader );
-		for ( IndexReader reader : readers ) {
-			ReaderUsagePair container = allReaders.get( reader );
-			container.close(); //virtual
-		}
-		log.trace( "IndexReader closed." );
+		return directoryLatestReader.refreshAndGet();
 	}
 
-	public void initialize(Properties props, BuildContext context) {
-		Set<DirectoryProvider<?>> providers = context.getDirectoryProviders();
-
-		// create the readers for the known providers. Unfortunately, it is not possible to
-		// create all readers in initialize since some providers have more than one directory (eg
-		// FSSlaveDirectoryProvider). See also HSEARCH-250.
-		for ( DirectoryProvider provider : providers ) {
-			createReader( provider.getDirectory() );
+	@Override
+	public void closeIndexReader(IndexReader reader) {
+		if ( reader == null ) {
+			return;
 		}
+		log.debugf( "Closing IndexReader: %s", reader );
+		ReaderUsagePair container = allReaders.get( reader );
+		container.close(); //virtual
+	}
+
+	@Override
+	public void initialize(DirectoryBasedIndexManager indexManager, Properties props) {
+		this.directoryProvider = indexManager.getDirectoryProvider();
+		// Initialize at least one, don't forget directoryProvider might return different Directory later
+		createReader( directoryProvider.getDirectory() );
 	}
 
 	/**
@@ -116,52 +109,19 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 			return reader;
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to open Lucene IndexReader", e );
+			throw new SearchException( "Unable to open Lucene IndexReader for IndexManager " + this.indexName, e );
 		}
 	}
 
-	public void destroy() {
-		IndexReader[] readers = allReaders.keySet().toArray( new IndexReader[allReaders.size()] );
-		for ( IndexReader reader : readers ) {
+	@Override
+	public void stop() {
+		for ( IndexReader reader : allReaders.keySet() ) {
 			ReaderUsagePair usage = allReaders.get( reader );
 			usage.close();
 		}
 
 		if ( allReaders.size() != 0 ) {
 			log.readersNotProperlyClosedinReaderProvider();
-		}
-	}
-
-	public IndexReader openReader(DirectoryProvider... directoryProviders) {
-		int length = directoryProviders.length;
-		IndexReader[] readers = new IndexReader[length];
-		log.debugf( "Opening IndexReader for directoryProviders: %d", length );
-		for ( int index = 0; index < length; index++ ) {
-			Directory directory = directoryProviders[index].getDirectory();
-			log.tracef( "Opening IndexReader from %s", directory );
-			PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directory );
-			// might eg happen for FSSlaveDirectoryProvider or for mutable SearchFactory
-			if ( directoryLatestReader == null ) {
-				directoryLatestReader = createReader( directory );
-			}
-			readers[index] = directoryLatestReader.refreshAndGet();
-		}
-		// don't use ReaderProviderHelper.buildMultiReader as we need our own cleanup.
-		if ( length == 0 ) {
-			return null;
-		}
-		else {
-			try {
-				return new CacheableMultiReader( readers );
-			}
-			catch ( Exception e ) {
-				//Lucene 2.2 used to throw IOExceptions here
-				for ( IndexReader ir : readers ) {
-					ReaderUsagePair readerUsagePair = allReaders.get( ir );
-					readerUsagePair.close();
-				}
-				throw new SearchException( "Unable to open a MultiReader", e );
-			}
 		}
 	}
 
@@ -232,7 +192,7 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		 * Reference to the most current IndexReader for a DirectoryProvider;
 		 * guarded by lockOnReplaceCurrent;
 		 */
-		public ReaderUsagePair current; //guarded by lockOnReplaceCurrent 
+		public ReaderUsagePair current; //guarded by lockOnReplaceCurrent
 		private final Lock lockOnReplaceCurrent = new ReentrantLock();
 
 		/**
@@ -243,8 +203,8 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 		public PerDirectoryLatestReader(Directory directory) throws IOException {
 			IndexReader reader = readerFactory( directory );
 			ReaderUsagePair initialPair = new ReaderUsagePair( reader );
-			initialPair.usageCounter.set( 1 );//a token to mark as active (preventing real close).
-			lockOnReplaceCurrent.lock();//no harm, just ensuring safe publishing.
+			initialPair.usageCounter.set( 1 ); //a token to mark as active (preventing real close).
+			lockOnReplaceCurrent.lock(); //no harm, just ensuring safe publishing.
 			current = initialPair;
 			lockOnReplaceCurrent.unlock();
 			allReaders.put( reader, initialPair );
@@ -291,4 +251,5 @@ public class SharingBufferReaderProvider implements ReaderProvider {
 			return updatedReader;
 		}
 	}
+
 }

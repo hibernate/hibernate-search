@@ -25,17 +25,14 @@ package org.hibernate.search.store.optimization.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * @author Emmanuel Bernard
  */
 public class NoOpOptimizerStrategy implements OptimizerStrategy {
-	public void initialize(DirectoryProvider directoryProvider, Properties indexProperties, BuildContext context) {
-	}
 
 	public void optimizationForced() {
 	}
@@ -48,5 +45,8 @@ public class NoOpOptimizerStrategy implements OptimizerStrategy {
 	}
 
 	public void optimize(Workspace workspace) {
+	}
+
+	public void initialize(IndexManager callback, Properties indexProps) {
 	}
 }

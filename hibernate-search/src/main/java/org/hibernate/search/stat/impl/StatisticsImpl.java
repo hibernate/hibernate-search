@@ -44,12 +44,13 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A concurrent implementation of the {@code Statistics} interface.
@@ -57,6 +58,9 @@ import org.hibernate.search.store.DirectoryProvider;
  * @author Hardy Ferentschik
  */
 public class StatisticsImpl implements Statistics, StatisticsImplementor {
+	
+	private static final Log log = LoggerFactory.make();
+	
 	private AtomicLong searchQueryCount = new AtomicLong();
 	private AtomicLong searchExecutionTotalTime = new AtomicLong();
 	private AtomicLong searchExecutionMaxTime = new AtomicLong();
@@ -198,7 +202,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
 	public Set<String> getIndexedClassNames() {
 		Set<String> indexedClasses = new HashSet<String>();
-		for ( Class clazz : searchFactoryImplementor.getDocumentBuildersIndexedEntities().keySet() ) {
+		for ( Class clazz : searchFactoryImplementor.getIndexBindingForEntity().keySet() ) {
 			indexedClasses.add( clazz.getName() );
 		}
 		return indexedClasses;
@@ -206,13 +210,9 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
 	public int getNumberOfIndexedEntities(String entity) {
 		Class<?> clazz = getEntityClass( entity );
-		DirectoryProvider[] directoryProviders = searchFactoryImplementor.getDirectoryProviders( clazz );
-		ReaderProvider readerProvider = searchFactoryImplementor.getReaderProvider();
-
-		int count = 0;
-		for ( DirectoryProvider directoryProvider : directoryProviders ) {
-			IndexReader reader = readerProvider.openReader( directoryProvider );
-			IndexSearcher searcher = new IndexSearcher( reader );
+		IndexReader indexReader = searchFactoryImplementor.openIndexReader( clazz );
+		try {
+			IndexSearcher searcher = new IndexSearcher( indexReader );
 			BooleanQuery boolQuery = new BooleanQuery();
 			boolQuery.add( new MatchAllDocsQuery(), BooleanClause.Occur.MUST );
 			boolQuery.add(
@@ -220,16 +220,15 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 			);
 			try {
 				TopDocs topdocs = searcher.search( boolQuery, 1 );
-				count += topdocs.totalHits;
+				return topdocs.totalHits;
 			}
 			catch ( IOException e ) {
-				throw new RuntimeException( "Unable to execute count query for entity " + entity, e );
-			}
-			finally {
-				readerProvider.closeReader( reader );
+				throw new SearchException( "Unable to execute count query for entity " + entity, e );
 			}
 		}
-		return count;
+		finally {
+			searchFactoryImplementor.closeIndexReader( indexReader );
+		}
 	}
 
 	public Map<String, Integer> indexedEntitiesCount() {

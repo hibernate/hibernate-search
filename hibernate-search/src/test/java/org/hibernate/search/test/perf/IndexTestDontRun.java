@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.perf;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -32,8 +31,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import junit.textui.TestRunner;
+
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -99,10 +99,10 @@ public class IndexTestDontRun extends SearchTestCase {
 		return totalTime;
 	}
 
-	private IndexSearcher getNewSearcher() throws IOException {
+	private IndexSearcher getNewSearcher() {
 		final org.hibernate.Session session = getSessions().openSession();
-		Directory d = Search.getFullTextSession( session ).getSearchFactory().getDirectoryProviders( Boat.class )[0].getDirectory();
-		IndexSearcher indexsearcher = new IndexSearcher( d, true );
+		IndexReader indexReader = Search.getFullTextSession( session ).getSearchFactory().openIndexReader( Boat.class );
+		IndexSearcher indexsearcher = new IndexSearcher( indexReader );
 		return indexsearcher;
 	}
 

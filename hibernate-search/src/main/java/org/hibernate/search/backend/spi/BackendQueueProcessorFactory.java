@@ -27,6 +27,7 @@ import java.util.Properties;
 import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -41,8 +42,9 @@ public interface BackendQueueProcessorFactory {
 	 * Used at startup, called once as first method.
 	 * @param props all configuration properties
 	 * @param context context giving access to required meta data
+	 * @param indexManager the index it is related to.
 	 */
-	void initialize(Properties props, WorkerBuildContext context);
+	void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager);
 
 	/**
 	 * Return a runnable implementation responsible for processing the queue to a given backend.

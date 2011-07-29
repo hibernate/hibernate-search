@@ -47,6 +47,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.StandardFilterKey;
@@ -56,6 +57,7 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -63,7 +65,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
@@ -486,8 +488,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
-		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
-		List<DirectoryProvider> targetedDirectories = new ArrayList<DirectoryProvider>();
+		Map<Class<?>, EntityIndexBinder<?>> builders = searchFactoryImplementor.getIndexBindingForEntity();
+		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 
 		Similarity searcherSimilarity = null;
@@ -501,7 +503,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				);
 			}
 
-			for ( DocumentBuilderIndexedEntity builder : builders.values() ) {
+			for ( EntityIndexBinder indexBinder : builders.values() ) {
+				DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
@@ -509,7 +512,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				}
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateDirectories( targetedDirectories, builder );
+				populateIndexManagers( targetedIndexes, indexBinder.getSelectionStrategy() );
 			}
 			classesAndSubclasses = null;
 		}
@@ -517,18 +520,20 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities.size() );
 			involvedClasses.addAll( indexedTargetedEntities );
 			for ( Class<?> clazz : indexedTargetedEntities ) {
-				DocumentBuilderIndexedEntity<?> builder = builders.get( clazz );
-				if ( builder != null ) {
+				EntityIndexBinder<?> indexBinder = builders.get( clazz );
+				if ( indexBinder != null ) {
+					DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 					involvedClasses.addAll( builder.getMappedSubclasses() );
 				}
 			}
 
 			for ( Class clazz : involvedClasses ) {
-				DocumentBuilderIndexedEntity builder = builders.get( clazz );
+				EntityIndexBinder indexBinder = builders.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
-				if ( builder == null ) {
+				if ( indexBinder == null ) {
 					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
 				}
+				DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
@@ -536,7 +541,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateDirectories( targetedDirectories, builder );
+				populateIndexManagers( targetedIndexes, indexBinder.getSelectionStrategy() );
 			}
 			this.classesAndSubclasses = involvedClasses;
 		}
@@ -545,14 +550,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		//compute optimization needClassFilterClause
 		//if at least one DP contains one class that is not part of the targeted classesAndSubclasses we can't optimize
 		if ( classesAndSubclasses != null ) {
-			for ( DirectoryProvider dp : targetedDirectories ) {
-				final Set<Class<?>> classesInDirectoryProvider = searchFactoryImplementor.getClassesInDirectoryProvider(
-						dp
-				);
-				// if a DP contains only one class, we know for sure it's part of classesAndSubclasses
-				if ( classesInDirectoryProvider.size() > 1 ) {
+			for ( IndexManager indexManager : targetedIndexes ) {
+				final Set<Class<?>> classesInIndexManager = indexManager.getContainedTypes();
+				// if an IndexManager contains only one class, we know for sure it's part of classesAndSubclasses
+				if ( classesInIndexManager.size() > 1 ) {
 					//risk of needClassFilterClause
-					for ( Class clazz : classesInDirectoryProvider ) {
+					for ( Class clazz : classesInIndexManager ) {
 						if ( !classesAndSubclasses.contains( clazz ) ) {
 							this.needClassFilterClause = true;
 							break;
@@ -565,18 +568,16 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 		}
 		else {
-			Map<Class<?>, DocumentBuilderIndexedEntity<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+			Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getIndexBindingForEntity();
 			this.classesAndSubclasses = documentBuildersIndexedEntities.keySet();
 		}
 
 		//set up the searcher
-		final DirectoryProvider[] directoryProviders = targetedDirectories.toArray(
-				new DirectoryProvider[targetedDirectories.size()]
+		final IndexManager[] directoryProviders = targetedIndexes.toArray(
+				new IndexManager[targetedIndexes.size()]
 		);
 		IndexSearcher is = new IndexSearcher(
-				searchFactoryImplementor.getReaderProvider().openReader(
-						directoryProviders
-				)
+				MultiReaderFactory.openReader( directoryProviders )
 		);
 		is.setSimilarity( searcherSimilarity );
 
@@ -618,22 +619,21 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return similarity;
 	}
 
-	private void populateDirectories(List<DirectoryProvider> directories, DocumentBuilderIndexedEntity builder) {
-		final IndexShardingStrategy indexShardingStrategy = builder.getDirectoryProviderSelectionStrategy();
-		final DirectoryProvider[] directoryProviders;
+	private void populateIndexManagers(List<IndexManager> indexManagersTarget, final IndexShardingStrategy indexShardingStrategy) {
+		final IndexManager[] indexManagersForQuery;
 		if ( filterDefinitions != null && !filterDefinitions.isEmpty() ) {
-			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery(
+			indexManagersForQuery = indexShardingStrategy.getIndexManagersForQuery(
 					filterDefinitions.values().toArray( new FullTextFilterImplementor[filterDefinitions.size()] )
 			);
 		}
 		else {
 			//no filter get all shards
-			directoryProviders = indexShardingStrategy.getDirectoryProvidersForQuery( EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR );
+			indexManagersForQuery = indexShardingStrategy.getIndexManagersForQuery( EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR );
 		}
 
-		for ( DirectoryProvider provider : directoryProviders ) {
-			if ( !directories.contains( provider ) ) {
-				directories.add( provider );
+		for ( IndexManager indexManager : indexManagersForQuery ) {
+			if ( !indexManagersTarget.contains( indexManager ) ) {
+				indexManagersTarget.add( indexManager );
 			}
 		}
 	}
@@ -893,12 +893,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
 	 */
 	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
-		Map<Class<?>, DocumentBuilderIndexedEntity<?>> builders = searchFactoryImplementor.getDocumentBuildersIndexedEntities();
+		Map<Class<?>, EntityIndexBinder<?>> builders = searchFactoryImplementor.getIndexBindingForEntity();
 		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
 		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
 		FieldCacheCollectorFactory anyImplementation = null;
 		for ( Class<?> clazz : classesAndSubclasses ) {
-			DocumentBuilderIndexedEntity<?> docBuilder = builders.get( clazz );
+			EntityIndexBinder<?> docBuilder = builders.get( clazz );
 			FieldCacheCollectorFactory fieldCacheCollectionFactory = docBuilder.getIdFieldCacheCollectionFactory();
 			if ( fieldCacheCollectionFactory == null ) {
 				// some implementation disable it, so we won't use it

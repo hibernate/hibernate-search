@@ -106,7 +106,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		super.configure( cfg );
 		// force multiple segments to also verify the docId transformations
 		cfg.setProperty( "hibernate.search.default.indexwriter.transaction.max_merge_docs" , "10" );
-		cfg.setProperty( Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
 	}
 
 }

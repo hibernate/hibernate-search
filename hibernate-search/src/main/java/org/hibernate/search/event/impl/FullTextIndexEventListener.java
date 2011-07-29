@@ -36,6 +36,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -129,7 +130,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
 		if ( "event".equals( indexingStrategy ) ) {
-			used = searchFactoryImplementor.getDocumentBuildersIndexedEntities().size() != 0;
+			used = searchFactoryImplementor.getIndexBindingForEntity().size() != 0;
 		}
 		else if ( "manual".equals( indexingStrategy ) ) {
 			used = false;
@@ -314,11 +315,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	private AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
 		Class<?> clazz = entity.getClass();
-		AbstractDocumentBuilder documentBuilderIndexedEntity = searchFactoryImplementor.getDocumentBuilderIndexedEntity(
-				clazz
-		);
-		if ( documentBuilderIndexedEntity != null ) {
-			return documentBuilderIndexedEntity;
+		EntityIndexBinder<?> entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( clazz );
+		if ( entityIndexBinding != null ) {
+			return entityIndexBinding.getDocumentBuilder();
 		}
 		else {
 			return searchFactoryImplementor.getDocumentBuilderContainedEntity( clazz );

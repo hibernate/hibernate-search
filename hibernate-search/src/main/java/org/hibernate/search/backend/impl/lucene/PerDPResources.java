@@ -25,11 +25,10 @@ package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -52,14 +51,13 @@ class PerDPResources {
 	private final boolean exclusiveIndexUsage;
 	private final ErrorHandler errorHandler;
 	
-	PerDPResources(WorkerBuildContext context, DirectoryProvider<?> dp) {
-		DirectoryProviderData directoryProviderData = context.getDirectoryProviderData( dp );
+	PerDPResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		errorHandler = context.getErrorHandler();
-		workspace = new Workspace( context, dp, errorHandler );
-		visitor = new LuceneWorkVisitor( workspace, context );
-		int maxQueueLength = directoryProviderData.getMaxQueueLength();
+		workspace = new Workspace( indexManager, errorHandler );
+		visitor = new LuceneWorkVisitor( workspace );
+		int maxQueueLength = indexManager.getMaxQueueLength();
 		executor = Executors.newFixedThreadPool( 1, "Directory writer", maxQueueLength );
-		exclusiveIndexUsage = directoryProviderData.isExclusiveIndexUsage();
+		exclusiveIndexUsage = indexManager.isExclusiveIndexUsage();
 	}
 
 	public ExecutorService getExecutor() {

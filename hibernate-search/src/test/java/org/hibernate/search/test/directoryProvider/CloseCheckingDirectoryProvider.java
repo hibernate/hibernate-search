@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
@@ -54,8 +55,8 @@ public class CloseCheckingDirectoryProvider extends RAMDirectoryProvider {
 	}
 
 	@Override
-	public void start() {
-		super.start();
+	public void start(DirectoryBasedIndexManager indexManager) {
+		super.start( indexManager );
 		if ( ! initialized ) {
 			throw new SearchException( "Started without being initialized" );
 		}

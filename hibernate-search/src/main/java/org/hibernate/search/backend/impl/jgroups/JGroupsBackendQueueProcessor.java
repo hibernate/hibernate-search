@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.backend.impl.jgroups;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +40,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Responsible for sending Lucene works from slave nodes to master node
  *
  * @author Lukasz Moren
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class JGroupsBackendQueueProcessor implements Runnable {
 
@@ -48,10 +48,12 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 
 	private final JGroupsBackendQueueProcessorFactory factory;
 	private final List<LuceneWork> queue;
+	private final String indexName;
 
-	public JGroupsBackendQueueProcessor(List<LuceneWork> queue, JGroupsBackendQueueProcessorFactory factory) {
+	public JGroupsBackendQueueProcessor(String indexName, List<LuceneWork> queue, JGroupsBackendQueueProcessorFactory factory) {
 		this.factory = factory;
 		this.queue = queue;
+		this.indexName = indexName;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -64,6 +66,7 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 
 		for ( LuceneWork work : queue ) {
 			if ( work instanceof OptimizeLuceneWork ) {
+				//TODO might be correct to do, but should be filtered earlier, and skipped server-side.
 				//we don't want optimization to be propagated
 				filteredQueue.remove( work );
 			}
@@ -80,12 +83,14 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 			}
 			return;
 		}
+		
+		BackendMessage toSend = new BackendMessage( indexName, queue );
 
 		/* Creates and send message with lucene works to master.
 		 * As long as message destination address is null, Lucene works will be received by all listeners that implements
 		 * org.jgroups.MessageListener interface, multiple master nodes in cluster are allowed. */
 		try {
-			Message message = new Message( null, factory.getAddress(), ( Serializable ) filteredQueue );
+			Message message = new Message( null, factory.getAddress(), toSend );
 			factory.getChannel().send( message );
 			if ( trace ) {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );

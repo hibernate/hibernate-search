@@ -30,31 +30,28 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.Similarity;
+import org.apache.lucene.index.IndexReader;
 
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.backend.impl.batchlucene.BatchBackend;
+import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.reader.ReaderProvider;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
-import org.hibernate.search.spi.internals.DirectoryProviderData;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * Factory delegating to a concrete implementation of another factory,
@@ -76,24 +73,16 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		this.delegate = delegate;
 	}
 
-	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
-		return delegate.getBackendQueueProcessorFactory();
-	}
-
-	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
-		delegate.setBackendQueueProcessorFactory(backendQueueProcessorFactory);
-	}
-
 	public Map<String, FilterDef> getFilterDefinitions() {
 		return delegate.getFilterDefinitions();
 	}
 
-	public Map<Class<?>, DocumentBuilderIndexedEntity<?>> getDocumentBuildersIndexedEntities() {
-		return delegate.getDocumentBuildersIndexedEntities();
+	public Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity() {
+		return delegate.getIndexBindingForEntity();
 	}
 
-	public <T> DocumentBuilderIndexedEntity<T> getDocumentBuilderIndexedEntity(Class<T> entityType) {
-		return delegate.getDocumentBuilderIndexedEntity( entityType );
+	public <T> EntityIndexBinder<T> getIndexBindingForEntity(Class<T> entityType) {
+		return delegate.getIndexBindingForEntity( entityType );
 	}
 
 	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {
@@ -102,10 +91,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public Worker getWorker() {
 		return delegate.getWorker();
-	}
-
-	public OptimizerStrategy getOptimizerStrategy(DirectoryProvider<?> provider) {
-		return delegate.getOptimizerStrategy( provider );
 	}
 
 	public FilterCachingStrategy getFilterCachingStrategy() {
@@ -128,10 +113,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getFilterDefinition( name );
 	}
 
-	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
-		return delegate.getIndexingParameters( provider );
-	}
-
 	public String getIndexingStrategy() {
 		return delegate.getIndexingStrategy();
 	}
@@ -144,18 +125,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.createHSQuery();
 	}
 
-	public Set<Class<?>> getClassesInDirectoryProvider(DirectoryProvider<?> directoryProvider) {
-		return delegate.getClassesInDirectoryProvider( directoryProvider );
-	}
-
-	public Set<DirectoryProvider<?>> getDirectoryProviders() {
-		return delegate.getDirectoryProviders();
-	}
-
-	public ReentrantLock getDirectoryProviderLock(DirectoryProvider<?> dp) {
-		return delegate.getDirectoryProviderLock( dp );
-	}
-
 	public int getFilterCacheBitResultsSize() {
 		return delegate.getFilterCacheBitResultsSize();
 	}
@@ -166,14 +135,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer writerThreads) {
 		return delegate.makeBatchBackend( progressMonitor, writerThreads );
-	}
-
-	public Similarity getSimilarity(DirectoryProvider<?> directoryProvider) {
-		return delegate.getSimilarity( directoryProvider );
-	}
-
-	public ErrorHandler getErrorHandler() {
-		return delegate.getErrorHandler();
 	}
 
 	public boolean isJMXEnabled() {
@@ -194,14 +155,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public ServiceManager getServiceManager() {
 		return delegate.getServiceManager();
-	}
-
-	public ReaderProvider getReaderProvider() {
-		return delegate.getReaderProvider();
-	}
-
-	public DirectoryProvider[] getDirectoryProviders(Class<?> entity) {
-		return delegate.getDirectoryProviders( entity );
 	}
 
 	public void optimize() {
@@ -232,10 +185,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getDocumentBuildersContainedEntities();
 	}
 
-	public Map<DirectoryProvider<?>, DirectoryProviderData> getDirectoryProviderData() {
-		return delegate.getDirectoryProviderData();
-	}
-
 	public void addClasses(Class<?>... classes) {
 		//todo optimize the list of
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder().currentFactory( this );
@@ -263,5 +212,25 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	public boolean isTransactionManagerExpected() {
 		return delegate.isTransactionManagerExpected();
 	}
-	
+
+	@Override
+	public IndexManagerHolder getAllIndexesManager() {
+		return delegate.getAllIndexesManager();
+	}
+
+	@Override
+	public IndexReader openIndexReader(Class<?>... entities) {
+		return delegate.openIndexReader( entities );
+	}
+
+	@Override
+	public void closeIndexReader(IndexReader indexReader) {
+		delegate.closeIndexReader( indexReader );
+	}
+
+	@Override
+	public ErrorHandler getErrorHandler() {
+		return delegate.getErrorHandler();
+	}
+
 }

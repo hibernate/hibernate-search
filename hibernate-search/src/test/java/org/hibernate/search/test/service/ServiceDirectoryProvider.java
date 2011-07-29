@@ -2,6 +2,7 @@ package org.hibernate.search.test.service;
 
 import java.util.Properties;
 
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
@@ -20,10 +21,10 @@ public class ServiceDirectoryProvider extends RAMDirectoryProvider {
 	}
 
 	@Override
-	public void start() {
+	public void start(DirectoryBasedIndexManager indexManager) {
 		final MyService foo = context.requestService( MyServiceProvider.class );
 		if (foo == null) throw new RuntimeException( "service should be started" );
-		super.start();
+		super.start( indexManager );
 	}
 
 	@Override

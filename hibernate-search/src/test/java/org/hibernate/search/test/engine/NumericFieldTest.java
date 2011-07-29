@@ -2,17 +2,16 @@ package org.hibernate.search.test.engine;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.test.SearchTestCase;
 
-import java.io.IOException;
 import java.util.List;
 
 public class NumericFieldTest extends SearchTestCase {
@@ -84,17 +83,22 @@ public class NumericFieldTest extends SearchTestCase {
 	}
 
 	private boolean indexIsEmpty() {
-		Directory locationdirectory = fullTextSession.getSearchFactory().getDirectoryProviders(
-				Location.class)[0].getDirectory();
-		Directory pinPointDirectory = fullTextSession.getSearchFactory().getDirectoryProviders(
-				PinPoint.class)[0].getDirectory();
+		int numDocsLocation = countSizeForType( Location.class );
+		int numDocsPinPoint = countSizeForType( PinPoint.class );
+		return numDocsLocation==0 && numDocsPinPoint==0;
+	}
+
+	private int countSizeForType(Class<?> type) {
+		SearchFactory searchFactory = fullTextSession.getSearchFactory();
+		int numDocs = -1; //to have it fail in case of errors
+		IndexReader locationIndexReader = searchFactory.openIndexReader( type );
 		try {
-			int numDocsLocation = IndexReader.open(pinPointDirectory).numDocs();
-			int numDocsPinPoint = IndexReader.open(locationdirectory).numDocs();
-			return numDocsLocation==0 && numDocsPinPoint==0;
-		} catch (IOException e) {
-			return false;
+			numDocs = locationIndexReader.numDocs();
 		}
+		finally {
+			searchFactory.closeIndexReader( locationIndexReader );
+		}
+		return numDocs;
 	}
 
 	@Override
