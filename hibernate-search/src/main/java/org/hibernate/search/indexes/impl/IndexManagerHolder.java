@@ -64,12 +64,8 @@ public class IndexManagerHolder {
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 	
-	private final Map<String, IndexManager> indexManagersRegistry;
-	
-	public IndexManagerHolder() {
-		this.indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
-	}
-	
+	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
+
 	/**
 	 * Multiple IndexManager might be built for the same entity to implement Sharding.
 	 * @return a map of created IndexManagers, having as key the names of each index.
@@ -82,7 +78,7 @@ public class IndexManagerHolder {
 	//#getReader() will always return a single "naive" IndexReader.
 	//So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
 	//(for both fieldCaches and cached filters)
-	public MutableEntityIndexBinding buildEntityIndexBinding(XClass entity, Class mappedClass, SearchConfiguration cfg,
+	public synchronized MutableEntityIndexBinding buildEntityIndexBinding(XClass entity, Class mappedClass, SearchConfiguration cfg,
 				WorkerBuildContext context,
 				ReflectionManager reflectionManager) {
 		// read the properties
@@ -269,10 +265,11 @@ public class IndexManagerHolder {
 	/**
 	 * Stops all IndexManager instances
 	 */
-	public void stop() {
+	public synchronized void stop() {
 		for ( IndexManager indexManager : getIndexManagers() ) {
 			indexManager.destroy();
 		}
+		indexManagersRegistry.clear();
 	}
 
 	/**
