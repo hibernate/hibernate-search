@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
@@ -336,9 +337,9 @@ public class SearchFactoryBuilder {
 		if ( rootFactory == null ) {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
-			factoryState.setDocumentBuildersIndexedEntities( new HashMap<Class<?>, EntityIndexBinder<?>>() );
-			factoryState.setDocumentBuildersContainedEntities( new HashMap<Class<?>, DocumentBuilderContainedEntity<?>>() );
-			factoryState.setFilterDefinitions( new HashMap<String, FilterDef>() );
+			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinder<?>>() );
+			factoryState.setDocumentBuildersContainedEntities( new ConcurrentHashMap<Class<?>, DocumentBuilderContainedEntity<?>>() );
+			factoryState.setFilterDefinitions( new ConcurrentHashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
 			factoryState.setServiceManager( new ServiceManager( cfg ) );

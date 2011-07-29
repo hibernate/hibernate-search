@@ -371,6 +371,9 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	private EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
+		if ( entityType == null ) {
+			throw new IllegalArgumentException( "Null is not a valid indexed entity type" );
+		}
 		EntityIndexBinder entityIndexBinding = getIndexBindingForEntity( entityType );
 		if ( entityIndexBinding == null ) {
 			throw new IllegalArgumentException( "Entity is not an indexed type: " + entityType );
