@@ -23,8 +23,6 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import junit.framework.Assert;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchException;

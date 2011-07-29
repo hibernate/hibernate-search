@@ -31,10 +31,8 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -57,9 +55,7 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 	
 	public void testLuceneMergerErrorHandling() {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		EntityIndexBinder<Document> mappingForEntity = searchFactory.getIndexBindingForEntity( Document.class );
-		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
-		ErrorHandler errorHandler = indexManager.getErrorHandler();
+		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
 		Session session = openSession();
@@ -85,7 +81,7 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 	
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default." + Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
+		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
 	
 }

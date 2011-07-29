@@ -40,6 +40,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
@@ -226,5 +227,10 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	public void closeIndexReader(IndexReader indexReader) {
 		delegate.closeIndexReader( indexReader );
 	}
-	
+
+	@Override
+	public ErrorHandler getErrorHandler() {
+		return delegate.getErrorHandler();
+	}
+
 }

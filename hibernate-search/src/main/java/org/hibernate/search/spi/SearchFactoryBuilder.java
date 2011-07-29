@@ -76,6 +76,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Key;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.impl.ConfigContext;
@@ -341,6 +343,7 @@ public class SearchFactoryBuilder {
 			factoryState.setConfigurationProperties( cfg.getProperties() );
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
+			factoryState.setErrorHandler( createErrorHandler( cfg ) );
 		}
 	}
 
@@ -586,6 +589,22 @@ public class SearchFactoryBuilder {
 		return indexingStrategy;
 	}
 
+	public static ErrorHandler createErrorHandler(SearchConfiguration searchCfg) {
+		String errorHandlerClassName = searchCfg.getProperty( Environment.ERROR_HANDLER );
+		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
+			return new LogErrorHandler();
+		}
+		else if ( errorHandlerClassName.trim().equals( "log" ) ) {
+			return new LogErrorHandler();
+		}
+		else {
+			return ClassLoaderHelper.instanceFromName(
+					ErrorHandler.class, errorHandlerClassName,
+					ImmutableSearchFactory.class, "Error Handler"
+			);
+		}
+	}
+
 	/**
 	 * Implementation of the Hibernate Search SPI WritableBuildContext and WorkerBuildContext
 	 * The data is provided by the SearchFactoryState object associated to SearchFactoryBuilder.
@@ -617,6 +636,11 @@ public class SearchFactoryBuilder {
 		@Override
 		public IndexManagerHolder getAllIndexesManager() {
 			return factoryState.getAllIndexesManager();
+		}
+
+		@Override
+		public ErrorHandler getErrorHandler() {
+			return factoryState.getErrorHandler();
 		}
 
 	}

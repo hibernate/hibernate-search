@@ -41,7 +41,6 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -68,7 +67,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters indexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
-	private ErrorHandler errorHandler;
 	private final ReentrantLock dirLock = new ReentrantLock();
 	private int maxQueueLength = Executors.QUEUE_MAX_LENGTH;
 	private boolean exclusiveIndexUsage;
@@ -113,7 +111,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
 		directoryProvider.start( this );
-		errorHandler = CommonPropertiesParse.createErrorHandler( cfg );
 		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
 		indexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
@@ -165,11 +162,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public String toString() {
 		return "DirectoryBasedIndexManager [indexName=" + indexName + "]";
-	}
-
-	@Override
-	public ErrorHandler getErrorHandler() {
-		return errorHandler;
 	}
 
 	@Override

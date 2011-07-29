@@ -24,6 +24,7 @@
 package org.hibernate.search.spi;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 
 /**
@@ -80,4 +81,11 @@ public interface BuildContext {
 	 * @return
 	 */
 	IndexManagerHolder getAllIndexesManager();
+
+	/**
+	 * For backends processing work asynchronously, they should catch all eventual errors in the ErrorHandler
+	 * to avoid losing information about the lost updates.
+	 * @return
+	 */
+	ErrorHandler getErrorHandler();
 }

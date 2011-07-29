@@ -32,6 +32,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -63,6 +64,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private ServiceManager serviceManager;
 	private boolean transactionManagerExpected = true;
 	private IndexManagerHolder allIndexesManager;
+	private ErrorHandler errorHandler;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -79,6 +81,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		serviceManager = oldFactoryState.getServiceManager();
 		transactionManagerExpected = oldFactoryState.isTransactionManagerExpected();
 		allIndexesManager = oldFactoryState.getAllIndexesManager();
+		errorHandler = oldFactoryState.getErrorHandler();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -207,6 +210,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	 */
 	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
 		allIndexesManager.setActiveSearchFactory( factory );
+	}
+
+	@Override
+	public ErrorHandler getErrorHandler() {
+		return this.errorHandler;
+	}
+
+	public void setErrorHandler(ErrorHandler errorHandler) {
+		this.errorHandler = errorHandler;
 	}
 
 }

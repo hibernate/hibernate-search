@@ -144,7 +144,7 @@ public final class Environment {
 	 * to override the error strategy used during processing of the Lucene updates.
 	 * Default is to log errors.
 	 */
-	public static final String ERROR_HANDLER = "error_handler";
+	public static final String ERROR_HANDLER = "hibernate.search.error_handler";
 
 	/**
 	 * If set to {@code true} JMX beans get enabled. For all other values the beans do not.

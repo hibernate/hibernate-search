@@ -52,7 +52,7 @@ class PerDPResources {
 	private final ErrorHandler errorHandler;
 	
 	PerDPResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
-		errorHandler = indexManager.getErrorHandler();
+		errorHandler = context.getErrorHandler();
 		workspace = new Workspace( indexManager, errorHandler );
 		visitor = new LuceneWorkVisitor( workspace );
 		int maxQueueLength = indexManager.getMaxQueueLength();

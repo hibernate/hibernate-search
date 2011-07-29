@@ -30,7 +30,6 @@ import junit.framework.Assert;
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
@@ -49,9 +48,7 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 
 	public void testEntityDeletionWithoutIdentifier() {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
-		EntityIndexBinder<Document> documentIndexBinder = searchFactoryImpl
-				.getIndexBindingForEntity( Document.class );
-		MockErrorHandler errorHandler = (MockErrorHandler) documentIndexBinder.getIndexManagers()[0].getErrorHandler();
+		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
 		
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
@@ -71,9 +68,7 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 
 	public void testRolledBackIdentifiersOnUnusualDocumentId() {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
-		EntityIndexBinder<PersonWithBrokenSocialSecurityNumber> personIndexBinder = searchFactoryImpl
-				.getIndexBindingForEntity( PersonWithBrokenSocialSecurityNumber.class );
-		MockErrorHandler errorHandler = (MockErrorHandler) personIndexBinder.getIndexManagers()[0].getErrorHandler();
+		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
 		
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
@@ -102,7 +97,7 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.use_identifier_rollback", "true" );
-		cfg.setProperty( "hibernate.search.default." + Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
+		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 		cfg.setProperty( "hibernate.search.default.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
 	}
 

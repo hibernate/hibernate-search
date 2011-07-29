@@ -55,7 +55,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 			PerDPResources resourcesMap,
 			boolean syncMode) {
 		this.sync = syncMode;
-		this.errorHandler = indexManager.getErrorHandler();
+		this.errorHandler = resourcesMap.getErrorHandler();
 		this.dpProcessors = new PerDPQueueProcessor( resourcesMap, queue );
 	}
 

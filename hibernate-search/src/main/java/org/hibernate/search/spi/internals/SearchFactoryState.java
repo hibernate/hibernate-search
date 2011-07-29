@@ -31,6 +31,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.store.DirectoryProvider;
@@ -71,5 +72,7 @@ public interface SearchFactoryState {
 	boolean isTransactionManagerExpected();
 
 	IndexManagerHolder getAllIndexesManager();
+
+	ErrorHandler getErrorHandler();
 
 }

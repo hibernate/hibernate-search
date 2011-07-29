@@ -60,6 +60,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
@@ -103,6 +104,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final StatisticsImpl statistics;
 	private final boolean transactionManagerExpected;
 	private final IndexManagerHolder allIndexesManager;
+	private final ErrorHandler errorHandler;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -127,6 +129,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.serviceManager = state.getServiceManager();
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
 		this.allIndexesManager = state.getAllIndexesManager();
+		this.errorHandler = state.getErrorHandler();
 
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
@@ -373,6 +376,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			throw new IllegalArgumentException( "Entity is not an indexed type: " + entityType );
 		}
 		return entityIndexBinding;
+	}
+
+	@Override
+	public ErrorHandler getErrorHandler() {
+		return this.errorHandler;
 	}
 
 }

@@ -28,7 +28,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -99,12 +98,6 @@ public interface IndexManager {
 	 */
 	void setSimilarity(Similarity newSimilarity);
 
-	/**
-	 * For backends processing work asynchronously, they should catch all eventual errors in the ErrorHandler
-	 * to avoid losing information about the lost updates.
-	 * @return
-	 */
-	ErrorHandler getErrorHandler();
 	
 	/**
 	 * Returns the default Analyzer configured for this index.
