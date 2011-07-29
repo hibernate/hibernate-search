@@ -27,6 +27,9 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
+ * Visitor interface to apply the configured sharding strategy to a list of LuceneWork;
+ * this list is usually the set of operations to be applied in a transactional context.
+ * 
  * @author Sanne Grinovero
  */
 public interface ContextAwareSelectionDelegate {

@@ -47,6 +47,13 @@ import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
+ * Stores references to IndexManager instances, and starts/stops them.
+ * Starting IndexManagers happens by creating new EntityIndexBinder instances, while creating the binders
+ * if we hit the need for a new IndexManager, or several according to a sharding strategy, the new
+ * IndexManagers are started incrementally.
+ * Stopping IndexManager can not currently happen decrementally: to stop the IndexManagers all of them
+ * are stopped.
+ * 
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
  * @author Hardy Ferentschik
@@ -161,6 +168,7 @@ public class IndexManagerHolder {
 	}
 
 	//FIXME for now we only build "legacy" DirectoryBasedIndexManager
+	// we should support replacing the IndexManager type with other types: HSEARCH-823
 	private IndexManager createDirectoryManager(String indexName, Properties indexProps, Class<?> entity, WorkerBuildContext context) {
 		DirectoryProvider<?> provider = DirectoryProviderFactory.createDirectoryProvider ( indexName, indexProps, context );
 		
@@ -169,6 +177,10 @@ public class IndexManagerHolder {
 		return manager;
 	}
 
+	/**
+	 * Extracts the index name used for the entity from it's annotations
+	 * @return the index name
+	 */
 	private static String getDirectoryProviderName(XClass clazz, SearchConfiguration cfg) {
 		ReflectionManager reflectionManager = cfg.getReflectionManager();
 		if ( reflectionManager == null ) {
@@ -236,22 +248,37 @@ public class IndexManagerHolder {
 		}
 	}
 
+	/**
+	 * @return all IndexManager instances
+	 */
 	public Collection<IndexManager> getIndexManagers() {
 		return indexManagersRegistry.values();
 	}
 
+	/**
+	 * Useful for MutableSearchFactory, this haves all managed IndexManagers
+	 * switch over to the new SearchFactory.
+	 * @param factory the new SearchFactory to set on each IndexManager.
+	 */
 	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
 		for ( IndexManager indexManager : getIndexManagers() ) {
 			indexManager.setSearchFactory( factory );
 		}
 	}
 
+	/**
+	 * Stops all IndexManager instances
+	 */
 	public void stop() {
 		for ( IndexManager indexManager : getIndexManagers() ) {
 			indexManager.destroy();
 		}
 	}
 
+	/**
+	 * @param targetIndexName the name of the IndexManager to look up
+	 * @return the IndexManager, or null if it doesn't exist
+	 */
 	public IndexManager getIndexManager(String targetIndexName) {
 		return indexManagersRegistry.get( targetIndexName );
 	}

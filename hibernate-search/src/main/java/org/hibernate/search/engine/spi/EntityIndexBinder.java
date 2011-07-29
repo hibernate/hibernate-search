@@ -36,12 +36,12 @@ import org.hibernate.search.store.IndexShardingStrategy;
 public interface EntityIndexBinder<T> {
 
 	/**
-	 * @return
+	 * @return the Similarity used to search and index this entity
 	 */
 	Similarity getSimilarity();
 
 	/**
-	 * @return
+	 * @return the sharding strategy
 	 */
 	IndexShardingStrategy getSelectionStrategy();
 
