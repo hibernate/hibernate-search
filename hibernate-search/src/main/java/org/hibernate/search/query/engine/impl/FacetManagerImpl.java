@@ -109,7 +109,17 @@ public class FacetManagerImpl implements FacetManager {
 		}
 		DocumentExtractor queryDocumentExtractor = query.queryDocumentExtractor();
 		queryDocumentExtractor.close();
-		return facetResults.get( facetingName );
+		//handle edge case of an empty index
+		if (facetResults == null) {
+			return Collections.emptyList();
+		}
+		List<Facet> results = facetResults.get( facetingName );
+		if (results != null) {
+			return results;
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	public FacetSelection getFacetGroup(String groupName) {
