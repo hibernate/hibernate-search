@@ -160,7 +160,7 @@ public class TimeoutTest extends SearchTestCase {
 		final QueryBuilder builder = fts.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
 		Query query = builder.all().createQuery();
 		FullTextQuery hibernateQuery = fts.createFullTextQuery( query, Clock.class );
-		hibernateQuery.setTimeout( 5, TimeUnit.MINUTES );
+		hibernateQuery.setTimeout( 300, TimeUnit.SECONDS );
 		List results = hibernateQuery.list();
 		assertFalse( hibernateQuery.hasPartialResults() );
 		assertEquals( 1000, results.size() );

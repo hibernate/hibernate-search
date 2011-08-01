@@ -215,7 +215,7 @@ public class MutableFactoryTest {
 			assertFalse( "thread failed #" + runnable.getWorkNumber() + " Failure: " + runnable.getFailureInfo(), runnable.isFailure() );
 		}
 
-		poolExecutor.awaitTermination( 1, TimeUnit.MINUTES );
+		poolExecutor.awaitTermination( 60, TimeUnit.SECONDS );
 
 		for (int i = 0 ; i < nbrOfThread*nbrOfClassesPerThread ; i++) {
 			Query luceneQuery = parser.parse( "Emmanuel" + i);

@@ -62,7 +62,7 @@ public class WorkerTestCase extends SearchTestCase {
 			es.execute( reverseWork );
 		}
 		es.shutdown();
-		es.awaitTermination( 100, TimeUnit.MINUTES );
+		es.awaitTermination( 6000, TimeUnit.SECONDS );
 		getSessions().close();
 		Assert.assertTrue( "Something was wrong in the concurrent threads, please check logs for stacktraces", allFine.get() );
 		System.out.println(
