@@ -21,80 +21,58 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.query.nullValues;
+package org.hibernate.search.test.embedded;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
 
 /**
- * @author Hardy Ferentschik
+ * A mapping from product to its "features"
+ *
+ * @author Samppa Saarela
  */
 @Entity
-@Indexed
-public class Value {
-	@Id
-	@GeneratedValue
-	private int id;
+public class ProductFeature {
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES, indexNullAs = "_custom_token_")
-	private String value;
+	@Id @GeneratedValue
+	private Integer id;
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
-	private String fallback;
+	@Field(index= Index.UN_TOKENIZED)
+	private String name;
 
-	@Field(index = Index.UN_TOKENIZED,
-			store = Store.YES,
-			indexNullAs = "_dummy_",
-			bridge = @FieldBridge(impl = DummyStringBridge.class))
-	@Column(name="dummyvalue")
-	private String dummy;
+	@ManyToOne
+	@ContainedIn
+	private AbstractProduct product;
 
-	public Value() {
-	}
+	// Some other fields justifying this class as an entity...
 
-	public Value(String value) {
-		this.value = value;
-	}
-
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public String getValue() {
-		return value;
+	public String getName() {
+		return name;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getFallback() {
-		return fallback;
+	public AbstractProduct getProduct() {
+		return product;
 	}
 
-	public void setFallback(String fallback) {
-		this.fallback = fallback;
-	}
-
-	public String getDummy() {
-		return dummy;
-	}
-
-	public void setDummy(String dummy) {
-		this.dummy = dummy;
+	public void setProduct(AbstractProduct product) {
+		this.product = product;
 	}
 }
-
-

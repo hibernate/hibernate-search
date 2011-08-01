@@ -43,7 +43,6 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IdHashShardingStrategy;
 import org.hibernate.search.store.RAMDirectoryProvider;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -195,25 +194,6 @@ public class ShardsTest extends SearchTestCase {
 		}
 		tx.commit();
 		s.close();
-	}
-
-	protected void setUp() throws Exception {
-		File sub = getBaseIndexDir();
-		sub.mkdir();
-		File[] files = sub.listFiles();
-		for ( File file : files ) {
-			if ( file.isDirectory() ) {
-				FileHelper.delete( file );
-			}
-		}
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
-		setCfg( null );  //we need a fresh session factory each time for index set up
 	}
 
 	@SuppressWarnings("unchecked")

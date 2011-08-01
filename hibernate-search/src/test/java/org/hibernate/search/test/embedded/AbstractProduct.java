@@ -21,80 +21,63 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.query.nullValues;
+package org.hibernate.search.test.embedded;
 
-import javax.persistence.Column;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
+import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
- * @author Hardy Ferentschik
+ * Abstract base class for products, having e.g. abstract getCode()
+ * returning depending on product type isbn, issn or ean.
+ *
+ * @author Samppa Saarela
  */
 @Entity
-@Indexed
-public class Value {
-	@Id
-	@GeneratedValue
-	private int id;
+public abstract class AbstractProduct {
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES, indexNullAs = "_custom_token_")
-	private String value;
+	@Id @GeneratedValue @DocumentId
+	private Integer id;
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
-	private String fallback;
+	@Field(index= Index.TOKENIZED)
+	private String name;
 
-	@Field(index = Index.UN_TOKENIZED,
-			store = Store.YES,
-			indexNullAs = "_dummy_",
-			bridge = @FieldBridge(impl = DummyStringBridge.class))
-	@Column(name="dummyvalue")
-	private String dummy;
+	@ManyToMany(mappedBy="product", cascade=CascadeType.ALL) //just to make the test easier, cascade doesn't really make any business sense
+	@IndexedEmbedded
+	private Set<ProductFeature> features = new HashSet<ProductFeature>();
 
-	public Value() {
-	}
-
-	public Value(String value) {
-		this.value = value;
-	}
-
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public String getValue() {
-		return value;
+	public String getName() {
+		return name;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getFallback() {
-		return fallback;
+	public Set<ProductFeature> getFeatures() {
+		return features;
 	}
 
-	public void setFallback(String fallback) {
-		this.fallback = fallback;
+	public void setFeatures(Set<ProductFeature> authors) {
+		this.features = authors;
 	}
 
-	public String getDummy() {
-		return dummy;
-	}
-
-	public void setDummy(String dummy) {
-		this.dummy = dummy;
-	}
 }
-
-

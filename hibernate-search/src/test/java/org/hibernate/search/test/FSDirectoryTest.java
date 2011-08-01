@@ -47,25 +47,6 @@ import org.hibernate.search.util.FileHelper;
  */
 public class FSDirectoryTest extends SearchTestCase {
 
-	protected void setUp() throws Exception {
-		File sub = getBaseIndexDir();
-		sub.mkdir();
-		File[] files = sub.listFiles();
-		for ( File file : files ) {
-			if ( file.isDirectory() ) {
-				FileHelper.delete( file );
-			}
-		}
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
-		setCfg( null );  // we need a fresh session factory each time for index set up
-	}
-
 	public void testEventIntegration() throws Exception {
 
 		Session s = getSessions().openSession();

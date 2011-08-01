@@ -42,7 +42,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.util.FileHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -50,25 +49,6 @@ import org.hibernate.search.util.FileHelper;
 public class WorkerTestCase extends SearchTestCase {
 	
 	private final AtomicBoolean allFine = new AtomicBoolean( true );
-
-	protected void setUp() throws Exception {
-		File sub = getBaseIndexDir();
-		sub.mkdir();
-		File[] files = sub.listFiles();
-		for ( File file : files ) {
-			if ( file.isDirectory() ) {
-				FileHelper.delete( file );
-			}
-		}
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
-		setCfg( null ); //we need a fresh session factory each time for index set up
-	}
 
 	public void testConcurrency() throws Exception {
 		int nThreads = 15;
@@ -82,7 +62,7 @@ public class WorkerTestCase extends SearchTestCase {
 			es.execute( reverseWork );
 		}
 		es.shutdown();
-		es.awaitTermination( 100, TimeUnit.MINUTES );
+		es.awaitTermination( 6000, TimeUnit.SECONDS );
 		getSessions().close();
 		Assert.assertTrue( "Something was wrong in the concurrent threads, please check logs for stacktraces", allFine.get() );
 		System.out.println(

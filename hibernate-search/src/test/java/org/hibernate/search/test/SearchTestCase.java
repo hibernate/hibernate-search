@@ -40,17 +40,17 @@ import org.hibernate.HibernateException;
 import org.hibernate.Interceptor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.event.FullTextIndexEventListener;
 import org.hibernate.search.test.util.JGroupsEnvironment;
+import org.hibernate.search.util.FileHelper;
 import org.hibernate.testing.junit.functional.annotations.HibernateTestCase;
 
 /**
@@ -140,6 +140,9 @@ public abstract class SearchTestCase extends HibernateTestCase {
 	}
 
 	protected SessionFactory getSessions() {
+		if ( sessions == null ) {
+			buildConfiguration();
+		}
 		return sessions;
 	}
 
@@ -175,8 +178,13 @@ public abstract class SearchTestCase extends HibernateTestCase {
 		return listener;
 	}
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		if ( sessions != null ) {
+			sessions.close();
+			sessions = null;
+		}
 		ensureIndexesAreEmpty();
 	}
 
@@ -185,16 +193,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 			log.debug( "JMS based test. Skipping index emptying" );
 			return;
 		}
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx;
-		tx = s.beginTransaction();
-		for ( Class<?> clazz : getAnnotatedClasses() ) {
-			if ( clazz.getAnnotation( Indexed.class ) != null ) {
-				s.purgeAll( clazz );
-			}
-		}
-		tx.commit();
-		s.close();
+		FileHelper.delete( indexDir );
 	}
 
 	protected SearchFactory getSearchFactory() {
@@ -211,10 +210,7 @@ public abstract class SearchTestCase extends HibernateTestCase {
 		return indexDir;
 	}
 
-	protected void buildConfiguration() throws Exception {
-		if ( getSessions() != null ) {
-			getSessions().close();
-		}
+	protected void buildConfiguration() {
 		try {
 			setCfg( new Configuration() );
 			configure( cfg );
@@ -233,9 +229,13 @@ public abstract class SearchTestCase extends HibernateTestCase {
 			}
 			setSessions( getCfg().buildSessionFactory( /*new TestInterceptor()*/ ) );
 		}
-		catch ( Exception e ) {
+		catch ( HibernateException e ) {
 			e.printStackTrace();
 			throw e;
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+			throw new SearchException( e );
 		}
 	}
 
