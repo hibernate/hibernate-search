@@ -35,5 +35,15 @@ public class SerializableBinaryField extends SerializableField {
 		this.length = context.getBinaryLength();
 	}
 
+	public byte[] getValue() {
+		return value;
+	}
 
+	public int getOffset() {
+		return offset;
+	}
+
+	public int getLength() {
+		return length;
+	}
 }

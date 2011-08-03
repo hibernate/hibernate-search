@@ -29,11 +29,19 @@ import org.hibernate.mapping.List;
  */
 public class SerializableTokenStreamField extends SerializableField {
 	private SerializableTokenStream value;
+	private TermVector termVector;
 
 	public SerializableTokenStreamField(LuceneFieldContext context) {
 		super( context );
 		this.value = context.getTokenStream();
+		this.termVector = context.getTermVector();
 	}
 
+	public SerializableTokenStream getValue() {
+		return value;
+	}
 
+	public TermVector getTermVector() {
+		return termVector;
+	}
 }

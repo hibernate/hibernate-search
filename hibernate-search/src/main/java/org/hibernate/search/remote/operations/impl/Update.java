@@ -48,4 +48,11 @@ public class Update implements Operation {
 		return id;
 	}
 
+	public Map<String, String> getFieldToAnalyzerMap() {
+		return fieldToAnalyzerMap;
+	}
+
+	public SerializableDocument getDocument() {
+		return document;
+	}
 }

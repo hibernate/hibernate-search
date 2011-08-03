@@ -27,11 +27,31 @@ import org.hibernate.metamodel.relational.Value;
  */
 public class SerializableStringField extends SerializableField {
 	private String value;
+	private Store store;
+	private Index index;
+	private TermVector termVector;
 
 	public SerializableStringField(LuceneFieldContext context) {
 		super( context );
 		this.value = context.getStringValue();
+		this.store = context.getStore();
+		this.index = context.getIndex();
+		this.termVector = context.getTermVector();
 	}
 
+	public String getValue() {
+		return value;
+	}
 
+	public Store getStore() {
+		return store;
+	}
+
+	public Index getIndex() {
+		return index;
+	}
+
+	public TermVector getTermVector() {
+		return termVector;
+	}
 }
