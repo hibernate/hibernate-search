@@ -27,11 +27,19 @@ import java.io.Reader;
  */
 public class SerializableReaderField extends SerializableField {
 	private Reader value;
+	private TermVector termVector;
 
 	public SerializableReaderField(LuceneFieldContext context) {
 		super( context );
 		this.value = context.getReaderValue();
+		this.termVector = context.getTermVector();
 	}
 
+	public Reader getValue() {
+		return value;
+	}
 
+	public TermVector getTermVector() {
+		return termVector;
+	}
 }

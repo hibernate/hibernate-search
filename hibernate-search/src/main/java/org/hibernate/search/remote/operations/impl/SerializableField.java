@@ -27,20 +27,30 @@ public abstract class SerializableField implements SerializableFieldable {
 	private String name;
 	//TODO state not kept, how to know if a string ought to be interned? default seems to be intern
 	//private boolean interned
-	private Store store;
-	private Index index;
-	private TermVector termVector;
 	private float boost;
 	private boolean omitNorms;
 	private boolean omitTermFreqAndPositions;
 
 	public SerializableField(LuceneFieldContext context) {
 		this.name = context.getName();
-		this.store = context.getStore();
-		this.index = context.getIndex();
-		this.termVector = context.getTermVector();
 		this.boost = context.getBoost();
 		this.omitNorms = context.isOmitNorms();
 		this.omitTermFreqAndPositions = context.isOmitTermFreqAndPositions();
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public float getBoost() {
+		return boost;
+	}
+
+	public boolean isOmitNorms() {
+		return omitNorms;
+	}
+
+	public boolean isOmitTermFreqAndPositions() {
+		return omitTermFreqAndPositions;
 	}
 }

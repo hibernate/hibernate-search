@@ -76,6 +76,8 @@ public class LuceneFieldContext {
 				return TermVector.WITH_POSITIONS;
 			case WITH_POSITIONS_OFFSETS:
 				return TermVector.WITH_POSITIONS_OFFSETS;
+			case YES:
+				return TermVector.YES;
 			default:
 				throw new SearchException( "Unable to convert Field.TermVector value into serializable TermVector: " + vector);
 		}
