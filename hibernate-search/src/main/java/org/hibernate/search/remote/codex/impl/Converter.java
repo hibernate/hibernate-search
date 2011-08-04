@@ -55,14 +55,12 @@ import org.hibernate.search.remote.operations.impl.SerializableLongField;
 import org.hibernate.search.remote.operations.impl.LuceneNumericFieldContext;
 import org.hibernate.search.remote.operations.impl.Message;
 import org.hibernate.search.remote.operations.impl.Operation;
-import org.hibernate.search.remote.operations.impl.Optimize;
 import org.hibernate.search.remote.operations.impl.OptimizeAll;
 import org.hibernate.search.remote.operations.impl.PurgeAll;
 import org.hibernate.search.remote.operations.impl.SerializableCustomFieldable;
 import org.hibernate.search.remote.operations.impl.SerializableNumericField;
 import org.hibernate.search.remote.operations.impl.SerializableReaderField;
 import org.hibernate.search.remote.operations.impl.SerializableStringField;
-import org.hibernate.search.remote.operations.impl.SerializableTokenStream;
 import org.hibernate.search.remote.operations.impl.SerializableTokenStreamField;
 import org.hibernate.search.remote.operations.impl.Store;
 import org.hibernate.search.remote.operations.impl.TermVector;
@@ -76,13 +74,7 @@ public class Converter {
 		Set<Operation> ops = new HashSet<Operation>( works.size() );
 		for (LuceneWork work : works) {
 			if (work instanceof OptimizeLuceneWork) {
-				OptimizeLuceneWork safeWork = (OptimizeLuceneWork) work;
-				if ( safeWork.getEntityClass() != null ) {
-					ops.add( new Optimize( safeWork.getEntityClass() ) );
-				}
-				else {
-					ops.add( new OptimizeAll() );
-				}
+				ops.add( new OptimizeAll() );
 			}
 			else if (work instanceof PurgeAllLuceneWork) {
 				PurgeAllLuceneWork safeWork = (PurgeAllLuceneWork) work;
@@ -114,10 +106,6 @@ public class Converter {
 		for ( Operation operation : message.getOperations() ) {
 			if (operation instanceof OptimizeAll) {
 				results.add( new OptimizeLuceneWork() );
-			}
-			else if (operation instanceof Optimize) {
-				Optimize safeOperation = (Optimize) operation;
-				results.add( new OptimizeLuceneWork( safeOperation.getEntityClass() ) );
 			}
 			else if (operation instanceof PurgeAll) {
 				PurgeAll safeOperation = (PurgeAll) operation;
