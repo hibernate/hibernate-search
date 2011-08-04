@@ -55,9 +55,9 @@ public class CopyTokenStream extends TokenStream {
 		}
 	}
 
-	public CopyTokenStream(SerializableTokenStream stream) {
+	public CopyTokenStream(List<List<AttributeImpl>> stream) {
 		this.index = 0;
-		this.cache = stream.getStream();
+		this.cache = stream;
 	}
 
 	@Override
