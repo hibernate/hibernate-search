@@ -1,0 +1,8 @@
+{
+    "name": "Fieldables",
+    "type": "array",
+    "items": [`CustomFieldable`,
+            `NumericIntField`, `NumericLongField`, `NumericFloatField`, `NumericDoubleField`,
+            `BinaryField`, `StringField`, `TokenStreamField`, `ReaderField`
+            ]
+}
