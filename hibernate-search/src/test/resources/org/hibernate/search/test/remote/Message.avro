@@ -1,0 +1,15 @@
+{
+    "name": "Message",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "version",
+            "type": "int"
+        },
+
+        {
+            "name": "operations",
+            "type": `Operations`
+        }
+    ]
+}

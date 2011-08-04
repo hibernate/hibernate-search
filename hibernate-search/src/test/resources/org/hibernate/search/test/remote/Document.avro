@@ -1,0 +1,15 @@
+{
+    "name": "Document",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "boost",
+            "type": "float"
+        },
+
+        {
+            "name": "fieldables",
+            "type": `Fieldables`
+        }
+    ]
+}

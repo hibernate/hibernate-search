@@ -1,0 +1,30 @@
+{
+    "name": "TokenStreamField",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "value",
+            "type": {"type": "array", "items":{"type": "array", "items":"bytes"}}
+        },
+        {
+            "name": "termVector",
+            "type": `TermVector`
+        },
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "boost",
+            "type": "float"
+        },
+        {
+            "name": "omitNorms",
+            "type": "boolean"
+        },
+        {
+            "name": "omitTermFreqAndPositions",
+            "type": "boolean"
+        }
+    ]
+}
