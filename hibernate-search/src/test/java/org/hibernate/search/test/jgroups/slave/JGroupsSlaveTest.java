@@ -108,7 +108,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	private void prepareJGroupsChannel() throws Exception {
 		channel = new JChannel( XMLHelper.elementFromString( prepareXmlJGroupsConfiguration() ) );
 		channel.connect( CHANNEL_NAME );
-		channel.setReceiver( new JGroupsReceiver() );
+		channel.setReceiver( new JGroupsReceiver(getSearchFactoryImpl()) );
 	}
 
 	protected void setUp() throws Exception {
