@@ -26,13 +26,13 @@ import java.io.Serializable;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableCustomFieldable implements SerializableFieldable {
-	private Serializable instance;
+	private byte[] instance;
 
-	public SerializableCustomFieldable(Serializable fieldable) {
+	public SerializableCustomFieldable(byte[] fieldable) {
 		this.instance = fieldable;
 	}
 
-	public Serializable getInstance() {
+	public byte[] getInstance() {
 		return instance;
 	}
 }

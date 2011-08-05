@@ -20,9 +20,6 @@
  */
 package org.hibernate.search.remote.codex.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,48 +51,34 @@ import org.hibernate.search.remote.operations.impl.SerializableTokenStreamField;
 import org.hibernate.search.remote.operations.impl.Update;
 
 /**
- * //FIXME classloader hell for id deserialization
- *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class ModelDeserializer implements Deserializer {
-	private Message message;
-	List<LuceneWork> results;
 
 	@Override
 	public void deserialize(byte[] data, LuceneHydrator hydrator) {
-		Message message;
-		try {
-			ByteArrayInputStream byteIn = new ByteArrayInputStream( data );
-			ObjectInputStream in = new ObjectInputStream( byteIn );
-			message = (Message) in.readObject();
-		}
-		catch ( IOException e ) {
-			throw new SearchException( "Unable to deserialize Hibernate Search works", e );
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new SearchException( "Unable to deserialize Hibernate Search works", e );
-		}
-		if (message.getProtocolVersion() != 1) {
+		Message message = SerializationHelper.toInstance( data, Message.class );
+
+		if ( message.getProtocolVersion() != 1 ) {
 			throw new SearchException( "Serialization protocol not supported. Protocol version: " + message.getProtocolVersion() );
 		}
 		for ( Operation operation : message.getOperations() ) {
-			if (operation instanceof OptimizeAll ) {
+			if ( operation instanceof OptimizeAll ) {
 				hydrator.addOptimizeAll();
 			}
-			else if (operation instanceof PurgeAll ) {
-				PurgeAll safeOperation = (PurgeAll) operation;
+			else if ( operation instanceof PurgeAll ) {
+				PurgeAll safeOperation = ( PurgeAll ) operation;
 				hydrator.addPurgeAllLuceneWork( safeOperation.getClass().getName() );
 			}
-			else if (operation instanceof Delete ) {
-				Delete safeOperation = (Delete) operation;
+			else if ( operation instanceof Delete ) {
+				Delete safeOperation = ( Delete ) operation;
 				hydrator.addDeleteLuceneWork(
 						safeOperation.getEntityClassName(),
 						safeOperation.getId()
 				);
 			}
-			else if (operation instanceof Add ) {
-				Add safeOperation = (Add) operation;
+			else if ( operation instanceof Add ) {
+				Add safeOperation = ( Add ) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
 				hydrator.addAddLuceneWork(
 						safeOperation.getEntityClassName(),
@@ -103,8 +86,8 @@ public class ModelDeserializer implements Deserializer {
 						safeOperation.getFieldToAnalyzerMap()
 				);
 			}
-			else if (operation instanceof Update ) {
-				Update safeOperation = (Update) operation;
+			else if ( operation instanceof Update ) {
+				Update safeOperation = ( Update ) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
 				hydrator.addUpdateLuceneWork(
 						safeOperation.getEntityClassName(),
@@ -117,16 +100,16 @@ public class ModelDeserializer implements Deserializer {
 
 	private void buildLuceneDocument(SerializableDocument document, LuceneHydrator hydrator) {
 		hydrator.defineDocument( document.getBoost() );
-		for (SerializableFieldable field : document.getFieldables() ) {
-			if (field instanceof SerializableCustomFieldable ) {
-				SerializableCustomFieldable safeField = (SerializableCustomFieldable) field;
+		for ( SerializableFieldable field : document.getFieldables() ) {
+			if ( field instanceof SerializableCustomFieldable ) {
+				SerializableCustomFieldable safeField = ( SerializableCustomFieldable ) field;
 				hydrator.addFieldable( safeField.getInstance() );
 			}
-			else if (field instanceof SerializableNumericField ) {
-				SerializableNumericField safeField = (SerializableNumericField) field;
+			else if ( field instanceof SerializableNumericField ) {
+				SerializableNumericField safeField = ( SerializableNumericField ) field;
 				if ( field instanceof SerializableIntField ) {
 					hydrator.addIntNumericField(
-							( (SerializableIntField) field ).getValue(),
+							( ( SerializableIntField ) field ).getValue(),
 							safeField.getName(),
 							safeField.getPrecisionStep(),
 							safeField.getStore(),
@@ -172,11 +155,11 @@ public class ModelDeserializer implements Deserializer {
 					throw new SearchException( "Unknown SerializableNumericField: " + field.getClass() );
 				}
 			}
-			else if (field instanceof SerializableField ) {
-				SerializableField safeField = (SerializableField) field;
+			else if ( field instanceof SerializableField ) {
+				SerializableField safeField = ( SerializableField ) field;
 				Field luceneField;
 				if ( field instanceof SerializableBinaryField ) {
-					SerializableBinaryField reallySafeField = (SerializableBinaryField) field;
+					SerializableBinaryField reallySafeField = ( SerializableBinaryField ) field;
 					hydrator.addFieldWithBinaryData(
 							reallySafeField.getName(),
 							reallySafeField.getValue(),
@@ -188,7 +171,7 @@ public class ModelDeserializer implements Deserializer {
 					);
 				}
 				else if ( field instanceof SerializableStringField ) {
-					SerializableStringField reallySafeField = (SerializableStringField) field;
+					SerializableStringField reallySafeField = ( SerializableStringField ) field;
 					hydrator.addFieldWithStringData(
 							reallySafeField.getName(),
 							reallySafeField.getValue(),
@@ -201,7 +184,7 @@ public class ModelDeserializer implements Deserializer {
 					);
 				}
 				else if ( field instanceof SerializableTokenStreamField ) {
-					SerializableTokenStreamField reallySafeField = (SerializableTokenStreamField) field;
+					SerializableTokenStreamField reallySafeField = ( SerializableTokenStreamField ) field;
 					hydrator.addFieldWithTokenStreamData(
 							reallySafeField.getName(),
 							reallySafeField.getValue().getStream(),
@@ -212,7 +195,7 @@ public class ModelDeserializer implements Deserializer {
 					);
 				}
 				else if ( field instanceof SerializableReaderField ) {
-					SerializableReaderField reallySafeField = (SerializableReaderField) field;
+					SerializableReaderField reallySafeField = ( SerializableReaderField ) field;
 					hydrator.addFieldWithSerializableReaderData(
 							reallySafeField.getName(),
 							reallySafeField.getValue(),

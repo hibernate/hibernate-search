@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.remote.codex.spi;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -41,11 +40,11 @@ public interface Serializer {
 
 	void addPurgeAll(String entityClassName);
 
-	void addDelete(String entityClassName, Serializable id);
+	void addDelete(String entityClassName, byte[] id);
 
-	void addAdd(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap);
+	void addAdd(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap);
 
-	void addUpdate(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap);
+	void addUpdate(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap);
 
 	byte[] serialize();
 
@@ -67,7 +66,7 @@ public interface Serializer {
 
 	void addFieldWithSerializableReaderData(LuceneFieldContext luceneFieldContext);
 
-	void addFieldWithSerializableFieldable(Serializable fieldable);
+	void addFieldWithSerializableFieldable(byte[] fieldable);
 
 	void addDocument(float boost);
 }

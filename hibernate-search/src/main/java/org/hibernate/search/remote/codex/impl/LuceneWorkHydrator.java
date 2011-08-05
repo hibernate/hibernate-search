@@ -47,6 +47,8 @@ import org.hibernate.search.remote.operations.impl.Store;
 import org.hibernate.search.remote.operations.impl.TermVector;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
+import static org.hibernate.search.remote.codex.impl.SerializationHelper.*;
+
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
@@ -78,8 +80,9 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addDeleteLuceneWork(String entityClassName, Serializable id) {
+	public void addDeleteLuceneWork(String entityClassName, byte[] idAsByte) {
 		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
+		Serializable id = toSerializable( idAsByte, loader );
 		LuceneWork result = new DeleteLuceneWork(
 				id,
 				objectIdInString(entityClass, id),
@@ -89,8 +92,9 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addAddLuceneWork(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap) {
+	public void addAddLuceneWork(String entityClassName, byte[] idAsByte, Map<String, String> fieldToAnalyzerMap) {
 		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
+		Serializable id = toSerializable( idAsByte, loader );
 		LuceneWork result = new AddLuceneWork(
 				id,
 				objectIdInString(entityClass, id),
@@ -103,8 +107,9 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addUpdateLuceneWork(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap) {
+	public void addUpdateLuceneWork(String entityClassName, byte[] idAsByte, Map<String, String> fieldToAnalyzerMap) {
 		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
+		Serializable id = toSerializable( idAsByte, loader );
 		LuceneWork result = new AddLuceneWork(
 				id,
 				objectIdInString(entityClass, id),
@@ -126,8 +131,8 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addFieldable(Serializable instance) {
-		getLuceneDocument().add( ( Fieldable ) instance );
+	public void addFieldable(byte[] instanceAsByte) {
+		getLuceneDocument().add( ( Fieldable ) toSerializable( instanceAsByte, loader ) );
 	}
 
 	@Override
@@ -208,7 +213,8 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addFieldWithSerializableReaderData(String name, Reader value, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	public void addFieldWithSerializableReaderData(String name, byte[] valueAsByte, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		Reader value = (Reader) toSerializable( valueAsByte, loader );
 		Field luceneField = new Field( name, value, getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
 	}

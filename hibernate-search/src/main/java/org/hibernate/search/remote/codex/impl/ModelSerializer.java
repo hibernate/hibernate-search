@@ -20,10 +20,6 @@
  */
 package org.hibernate.search.remote.codex.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +27,6 @@ import java.util.Set;
 
 import org.apache.lucene.document.Fieldable;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.remote.codex.spi.Serializer;
 import org.hibernate.search.remote.operations.impl.Add;
@@ -79,18 +74,18 @@ public class ModelSerializer implements Serializer {
 	}
 
 	@Override
-	public void addDelete(String entityClassName, Serializable id) {
+	public void addDelete(String entityClassName, byte[] id) {
 		ops.add( new Delete( entityClassName, id ) );
 	}
 
 	@Override
-	public void addAdd(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap) {
+	public void addAdd(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
 		ops.add( new Add( entityClassName, id, currentDocument, fieldToAnalyzerMap ) );
 		clearDocument();
 	}
 
 	@Override
-	public void addUpdate(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap) {
+	public void addUpdate(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
 		ops.add( new Update( entityClassName, id, currentDocument, fieldToAnalyzerMap ) );
 		clearDocument();
 	}
@@ -98,17 +93,7 @@ public class ModelSerializer implements Serializer {
 	@Override
 	public byte[] serialize() {
 		Message message = new Message( 1, ops );
-		//no need to close ByteArrayOutputStream
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			ObjectOutputStream stream = new ObjectOutputStream(out);
-			stream.writeObject( message );
-			stream.close();
-		}
-		catch ( IOException e ) {
-			throw new SearchException( "Unable to serialize work", e );
-		}
-		return out.toByteArray();
+		return SerializationHelper.toByteArray( message );
 	}
 
 	@Override
@@ -118,22 +103,22 @@ public class ModelSerializer implements Serializer {
 
 	@Override
 	public void addIntNumericField(int value, LuceneNumericFieldContext context) {
-		serialFields.add( new SerializableIntField(value, context) );
+		serialFields.add( new SerializableIntField( value, context ) );
 	}
 
 	@Override
 	public void addLongNumericField(long value, LuceneNumericFieldContext context) {
-		serialFields.add( new SerializableLongField(value, context) );
+		serialFields.add( new SerializableLongField( value, context ) );
 	}
 
 	@Override
 	public void addFloatNumericField(float value, LuceneNumericFieldContext context) {
-		serialFields.add( new SerializableFloatField(value, context) );
+		serialFields.add( new SerializableFloatField( value, context ) );
 	}
 
 	@Override
 	public void addDoubleNumericField(double value, LuceneNumericFieldContext context) {
-		serialFields.add( new SerializableDoubleField(value, context) );
+		serialFields.add( new SerializableDoubleField( value, context ) );
 	}
 
 	@Override
@@ -157,7 +142,7 @@ public class ModelSerializer implements Serializer {
 	}
 
 	@Override
-	public void addFieldWithSerializableFieldable(Serializable fieldable) {
+	public void addFieldWithSerializableFieldable(byte[] fieldable) {
 		serialFields.add( new SerializableCustomFieldable( fieldable ) );
 	}
 

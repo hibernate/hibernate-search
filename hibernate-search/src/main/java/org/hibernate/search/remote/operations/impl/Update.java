@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.remote.operations.impl;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,11 +28,11 @@ import java.util.Map;
  */
 public class Update implements Operation {
 	private String entityClassName;
-	private Serializable id;
+	private byte[] id;
 	private Map<String,String> fieldToAnalyzerMap = new HashMap<String, String>();
 	private SerializableDocument document;
 
-	public Update(String entityClassName, Serializable id, SerializableDocument document, Map<String, String> fieldToAnalyzerMap) {
+	public Update(String entityClassName, byte[] id, SerializableDocument document, Map<String, String> fieldToAnalyzerMap) {
 		this.entityClassName = entityClassName;
 		this.id = id;
 		this.document = document;
@@ -44,7 +43,7 @@ public class Update implements Operation {
 		return entityClassName;
 	}
 
-	public Serializable getId() {
+	public byte[] getId() {
 		return id;
 	}
 

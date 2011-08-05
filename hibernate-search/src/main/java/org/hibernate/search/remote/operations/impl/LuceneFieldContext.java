@@ -28,6 +28,7 @@ import org.apache.lucene.document.Field;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.remote.codex.impl.CopyTokenStream;
+import org.hibernate.search.remote.codex.impl.SerializationHelper;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -99,10 +100,10 @@ public class LuceneFieldContext {
 		return field.stringValue();
 	}
 
-	public Reader getReaderValue() {
+	public byte[] getReaderValue() {
 		Reader reader = field.readerValue();
 		if (reader instanceof Serializable) {
-			return reader;
+			return SerializationHelper.toByteArray( (Serializable) reader );
 		}
 		else {
 			throw new AssertionFailure( "Should not call getReaderValue for a non Serializable Reader" );

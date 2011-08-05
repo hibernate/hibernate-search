@@ -20,16 +20,15 @@
  */
 package org.hibernate.search.remote.operations.impl;
 
-import java.io.Serializable;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class Delete implements Operation {
 	private String entityClassName;
-	private Serializable id;
+	private byte[] id;
 
-	public Delete(String entityClassName, Serializable id) {
+	public Delete(String entityClassName, byte[] id) {
 		this.entityClassName = entityClassName;
 		this.id = id;
 	}
@@ -38,7 +37,7 @@ public class Delete implements Operation {
 		return entityClassName;
 	}
 
-	public Serializable getId() {
+	public byte[] getId() {
 		return id;
 	}
 }
