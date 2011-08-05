@@ -41,7 +41,7 @@ public class OptimizeLuceneWork extends LuceneWork implements Serializable {
 	 * Optimizes the index(es) of a specific entity
 	 * @param entity
 	 */
-	public OptimizeLuceneWork(Class entity) {
+	public OptimizeLuceneWork(Class<?> entity) {
 		super( null, null, entity );
 	}
 
