@@ -47,7 +47,17 @@ public class AvroSerializerProvider implements SerializerProvider {
 	private static final Log log = LoggerFactory.make();
 	private Map<String,Schema> schemas;
 	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1/";
+	public static byte MAJOR_VERSION = (byte)(-128 + 1);
+	public static byte MINOR_VERSION = (byte)(-128 + 0);
 	private int unique;
+
+	public static int getMajorVersion() {
+		return MAJOR_VERSION + 128; //rebase to 0
+	}
+
+	public static int getMinorVersion() {
+		return MINOR_VERSION + 128; //rebase to 0
+	}
 
 	@Override
 	public Serializer getSerializer() {
@@ -60,7 +70,7 @@ public class AvroSerializerProvider implements SerializerProvider {
 	}
 
 	public AvroSerializerProvider() {
-		log.debugf( "Use Avro serialization protocol v1" );
+		log.serializationProtocol( getMajorVersion(), getMinorVersion() );
 		this.schemas = new HashMap<String, Schema>( 20 );
 		parseSchema("TermVector");
 		parseSchema("Index");
