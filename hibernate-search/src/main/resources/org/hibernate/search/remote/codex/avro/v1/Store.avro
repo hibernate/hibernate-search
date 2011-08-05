@@ -1,0 +1,6 @@
+{
+    //__ replaced by unique id since Store is embedded several times
+    "name": "Store__",
+    "type": "enum",
+    "symbols" : ["YES", "NO"]
+}

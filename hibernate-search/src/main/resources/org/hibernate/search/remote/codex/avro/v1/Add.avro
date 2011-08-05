@@ -1,0 +1,22 @@
+{
+    "name": "Add",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "class",
+            "type": "string"
+        },
+        {
+            "name": "id",
+            "type": "bytes"
+        },
+        {
+            "name": "document",
+            "type": `Document`
+        },
+        {
+            "name": "fieldToAnalyzerMap",
+            "type": [{"type": "map", "values": "string"}, "null"]
+        }
+    ]
+}

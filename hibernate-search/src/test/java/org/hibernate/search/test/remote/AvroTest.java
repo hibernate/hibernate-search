@@ -23,7 +23,6 @@ package org.hibernate.search.test.remote;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
-import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -44,7 +43,8 @@ import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.util.Utf8;
 import org.junit.Test;
-import static org.fest.assertions.Assertions.*;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -52,40 +52,41 @@ import static org.fest.assertions.Assertions.*;
 public class AvroTest {
 	@Test
 	public void experimentWithAvro() throws Exception {
-		final Schema termVectorSchema = parseSchema("org/hibernate/search/test/remote/TermVector.avro", "TermVector");
-		final Schema indexSchema = parseSchema("org/hibernate/search/test/remote/Index.avro", "Index");
-		final Schema storeSchema = parseSchema("org/hibernate/search/test/remote/Store.avro", "Store");
-		final Schema tokenStreamSchema = parseSchema("org/hibernate/search/test/remote/TokenStreamField.avro", "TokenStreamField");
-		final Schema readerSchema = parseSchema("org/hibernate/search/test/remote/ReaderField.avro", "ReaderField");
-		final Schema stringSchema = parseSchema("org/hibernate/search/test/remote/StringField.avro", "StringField");
-		final Schema binarySchema = parseSchema("org/hibernate/search/test/remote/BinaryField.avro", "BinaryField");
-		final Schema intFieldSchema = parseSchema("org/hibernate/search/test/remote/NumericIntField.avro", "NumericIntField");
-		final Schema longFieldSchema = parseSchema("org/hibernate/search/test/remote/NumericLongField.avro", "NumericLongField");
-		final Schema floatFieldSchema = parseSchema("org/hibernate/search/test/remote/NumericFloatField.avro", "NumericFloatField");
-		final Schema doubleFieldSchema = parseSchema("org/hibernate/search/test/remote/NumericDoubleField.avro", "NumericDoubleField");
-		final Schema custonFieldableSchema = parseSchema("org/hibernate/search/test/remote/CustomFieldable.avro", "CustomFieldable");
-		final Schema fieldablesSchema = parseSchema("org/hibernate/search/test/remote/Fieldables.avro", "Fieldables");
-		final Schema documentSchema = parseSchema("org/hibernate/search/test/remote/Document.avro", "Document");
-		final Schema optimizeAllSchema = parseSchema("org/hibernate/search/test/remote/OptimizeAll.avro", "OptimizeAll");
-		final Schema purgeAllSchema = parseSchema("org/hibernate/search/test/remote/PurgeAll.avro", "PurgeAll");
-		final Schema deleteSchema = parseSchema("org/hibernate/search/test/remote/Delete.avro", "Delete");
-		final Schema addSchema = parseSchema("org/hibernate/search/test/remote/Add.avro", "Add");
-		final Schema opsSchema = parseSchema("org/hibernate/search/test/remote/Operations.avro", "Operations");
-		Schema messageSchema = parseSchema("org/hibernate/search/test/remote/Message.avro", "Message");
+		String root = "org/hibernate/search/remote/codex/avro/v1/";
+		final Schema termVectorSchema = parseSchema( root + "TermVector.avro", "TermVector" );
+		final Schema indexSchema = parseSchema( root + "Index.avro", "Index" );
+		final Schema storeSchema = parseSchema( root + "Store.avro", "Store" );
+		final Schema tokenStreamSchema = parseSchema( root + "TokenStreamField.avro", "TokenStreamField" );
+		final Schema readerSchema = parseSchema( root + "ReaderField.avro", "ReaderField" );
+		final Schema stringSchema = parseSchema( root + "StringField.avro", "StringField" );
+		final Schema binarySchema = parseSchema( root + "BinaryField.avro", "BinaryField" );
+		final Schema intFieldSchema = parseSchema( root + "NumericIntField.avro", "NumericIntField" );
+		final Schema longFieldSchema = parseSchema( root + "NumericLongField.avro", "NumericLongField" );
+		final Schema floatFieldSchema = parseSchema( root + "NumericFloatField.avro", "NumericFloatField" );
+		final Schema doubleFieldSchema = parseSchema( root + "NumericDoubleField.avro", "NumericDoubleField" );
+		final Schema custonFieldableSchema = parseSchema( root + "CustomFieldable.avro", "CustomFieldable" );
+		final Schema fieldablesSchema = parseSchema( root + "Fieldables.avro", "Fieldables" );
+		final Schema documentSchema = parseSchema( root + "Document.avro", "Document" );
+		final Schema optimizeAllSchema = parseSchema( root + "OptimizeAll.avro", "OptimizeAll" );
+		final Schema purgeAllSchema = parseSchema( root + "PurgeAll.avro", "PurgeAll" );
+		final Schema deleteSchema = parseSchema( root + "Delete.avro", "Delete" );
+		final Schema addSchema = parseSchema( root + "Add.avro", "Add" );
+		final Schema opsSchema = parseSchema( root + "Operations.avro", "Operations" );
+		Schema messageSchema = parseSchema( root + "Message.avro", "Message" );
 
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>(messageSchema);
-        Encoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );
+		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>( messageSchema );
+		Encoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );
 
 		byte[] serializableSample = new byte[10];
-		for(int i = 0 ; i < 10;i++) {
-			serializableSample[i] = (byte)i;
+		for ( int i = 0; i < 10; i++ ) {
+			serializableSample[i] = ( byte ) i;
 		}
 
 
 		GenericArray<GenericRecord> fieldables = new GenericData.Array<GenericRecord>( 1, fieldablesSchema );
 		//custom fieldable
-		GenericRecord customFieldable = new GenericData.Record(custonFieldableSchema);
+		GenericRecord customFieldable = new GenericData.Record( custonFieldableSchema );
 		customFieldable.put( "instance", ByteBuffer.wrap( serializableSample ) );
 		fieldables.add( customFieldable );
 
@@ -104,49 +105,49 @@ public class AvroTest {
 		fieldables.add( numericField );
 
 		//fields
-		GenericRecord field = createField(binarySchema);
+		GenericRecord field = createField( binarySchema );
 		field.put( "offset", 0 );
 		field.put( "length", 10 );
 		field.put( "value", ByteBuffer.wrap( serializableSample ) );
 		fieldables.add( field );
-		field = createField(stringSchema);
+		field = createField( stringSchema );
 		field.put( "value", stringSchema.getName() );
 		field.put( "store", "YES" );
 		field.put( "index", "ANALYZED" );
 		field.put( "termVector", "WITH_OFFSETS" );
 		fieldables.add( field );
-		field = createField(tokenStreamSchema);
-		List<List<ByteBuffer>> tokenStr = new ArrayList<List<ByteBuffer>>(  );
+		field = createField( tokenStreamSchema );
+		List<List<ByteBuffer>> tokenStr = new ArrayList<List<ByteBuffer>>();
 		tokenStr.add( new ArrayList<ByteBuffer>() );
-		tokenStr.get(0).add( ByteBuffer.wrap( serializableSample ) );
+		tokenStr.get( 0 ).add( ByteBuffer.wrap( serializableSample ) );
 		field.put( "value", tokenStr );
 		field.put( "termVector", "WITH_OFFSETS" );
 		fieldables.add( field );
-		field = createField(readerSchema);
+		field = createField( readerSchema );
 		field.put( "value", ByteBuffer.wrap( serializableSample ) );
 		field.put( "termVector", "WITH_OFFSETS" );
 		fieldables.add( field );
 
-		GenericRecord doc = new GenericData.Record(documentSchema);
+		GenericRecord doc = new GenericData.Record( documentSchema );
 		doc.put( "boost", 2.3f );
 		doc.put( "fieldables", fieldables );
 
-		GenericRecord add = new GenericData.Record(addSchema);
+		GenericRecord add = new GenericData.Record( addSchema );
 		add.put( "class", AvroTest.class.getName() );
-		add.put("id", ByteBuffer.wrap( serializableSample ) );
+		add.put( "id", ByteBuffer.wrap( serializableSample ) );
 		add.put( "document", doc );
-		Map<String,String> analyzers = new HashMap<String, String>(  );
+		Map<String, String> analyzers = new HashMap<String, String>();
 		analyzers.put( "name", "ngram" );
 		analyzers.put( "description", "porter" );
 		add.put( "fieldToAnalyzerMap", analyzers );
 
-		GenericRecord delete = new GenericData.Record(deleteSchema);
+		GenericRecord delete = new GenericData.Record( deleteSchema );
 		delete.put( "class", AvroTest.class.getName() );
-		delete.put("id", ByteBuffer.wrap( serializableSample ) );
+		delete.put( "id", ByteBuffer.wrap( serializableSample ) );
 
-		GenericRecord purgeAll = new GenericData.Record(purgeAllSchema);
+		GenericRecord purgeAll = new GenericData.Record( purgeAllSchema );
 		purgeAll.put( "class", AvroTest.class.getName() );
-		GenericRecord optimizeAll = new GenericData.Record(optimizeAllSchema);
+		GenericRecord optimizeAll = new GenericData.Record( optimizeAllSchema );
 
 		GenericArray<GenericRecord> operations = new GenericData.Array<GenericRecord>( 1, opsSchema );
 		operations.add( purgeAll );
@@ -154,115 +155,115 @@ public class AvroTest {
 		operations.add( delete );
 		operations.add( add );
 
-		GenericRecord message = new GenericData.Record(messageSchema);
+		GenericRecord message = new GenericData.Record( messageSchema );
 		message.put( "version", 1 );
 		message.put( "operations", operations );
 
-		writer.write(message, encoder);
+		writer.write( message, encoder );
 		encoder.flush();
 
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(out.toByteArray());
+		ByteArrayInputStream inputStream = new ByteArrayInputStream( out.toByteArray() );
 		Decoder decoder = DecoderFactory.get().binaryDecoder( inputStream, null );
-		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>(messageSchema);
-		while(true){
-			try{
-				GenericRecord result = reader.read(null, decoder);
-				System.out.println(result);
+		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>( messageSchema );
+		while ( true ) {
+			try {
+				GenericRecord result = reader.read( null, decoder );
+				System.out.println( result );
 
 				assertThat( result ).isNotNull();
 				//operations
-				assertThat( result.get("operations") ).isNotNull().isInstanceOf( List.class );
-				List<?> ops = (List<?>) result.get("operations");
+				assertThat( result.get( "operations" ) ).isNotNull().isInstanceOf( List.class );
+				List<?> ops = ( List<?> ) result.get( "operations" );
 				assertThat( ops ).hasSize( 4 );
 
 				//Delete
-				assertThat( ops.get(2) ).isInstanceOf( GenericRecord.class );
-				GenericRecord deleteOp = (GenericRecord) ops.get(2);
+				assertThat( ops.get( 2 ) ).isInstanceOf( GenericRecord.class );
+				GenericRecord deleteOp = ( GenericRecord ) ops.get( 2 );
 				assertThat( deleteOp.getSchema().getName() ).isEqualTo( "Delete" );
 				assertThat( deleteOp.get( "id" ) ).isInstanceOf( ByteBuffer.class );
-				ByteBuffer bb = (ByteBuffer) deleteOp.get( "id" );
+				ByteBuffer bb = ( ByteBuffer ) deleteOp.get( "id" );
 				assertThat( bb.hasArray() ).isTrue();
 				byte[] copy = new byte[bb.remaining()];
 				bb.get( copy );
 				assertThat( serializableSample ).isEqualTo( copy );
 
 				//Add
-				assertThat( ops.get(3) ).isInstanceOf( GenericRecord.class );
-				GenericRecord addOp = (GenericRecord) ops.get(3);
+				assertThat( ops.get( 3 ) ).isInstanceOf( GenericRecord.class );
+				GenericRecord addOp = ( GenericRecord ) ops.get( 3 );
 				assertThat( addOp.getSchema().getName() ).isEqualTo( "Add" );
 				assertThat( addOp.get( "id" ) ).isInstanceOf( ByteBuffer.class );
-				bb = (ByteBuffer) addOp.get( "id" );
+				bb = ( ByteBuffer ) addOp.get( "id" );
 				assertThat( bb.hasArray() ).isTrue();
 				copy = new byte[bb.remaining()];
-				bb.get(copy);
+				bb.get( copy );
 				assertThat( serializableSample ).isEqualTo( copy );
 
 				//fieldToAnalyzerMap
-				assertThat( addOp.get("fieldToAnalyzerMap") ).isInstanceOf( Map.class );
-				assertThat( (Map) addOp.get("fieldToAnalyzerMap") ).hasSize( 2 );
+				assertThat( addOp.get( "fieldToAnalyzerMap" ) ).isInstanceOf( Map.class );
+				assertThat( ( Map ) addOp.get( "fieldToAnalyzerMap" ) ).hasSize( 2 );
 
 				//document
-				assertThat( addOp.get("document") ).isNotNull();
-				GenericRecord document = (GenericRecord) addOp.get("document");
-				assertThat( document.get("boost") ).isEqualTo( 2.3f );
+				assertThat( addOp.get( "document" ) ).isNotNull();
+				GenericRecord document = ( GenericRecord ) addOp.get( "document" );
+				assertThat( document.get( "boost" ) ).isEqualTo( 2.3f );
 
 				//numeric fields
 				assertThat( document.get( "fieldables" ) ).isNotNull().isInstanceOf( List.class );
-				List<?> fields = (List<?>) document.get( "fieldables" );
+				List<?> fields = ( List<?> ) document.get( "fieldables" );
 
 				assertThat( fields ).hasSize( 9 ); //custom + 4 numerics + 4 fields
 
-				field = (GenericRecord) fields.get(0);
+				field = ( GenericRecord ) fields.get( 0 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "CustomFieldable" );
-				field = (GenericRecord) fields.get(1);
+				field = ( GenericRecord ) fields.get( 1 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "NumericIntField" );
-				assertThat( field.get("value") ).isEqualTo( 3 );
+				assertThat( field.get( "value" ) ).isEqualTo( 3 );
 				assertNumericField( field );
-				field = (GenericRecord) fields.get(2);
+				field = ( GenericRecord ) fields.get( 2 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "NumericLongField" );
-				assertThat( field.get("value") ).isEqualTo( 3l );
+				assertThat( field.get( "value" ) ).isEqualTo( 3l );
 				assertNumericField( field );
-				field = (GenericRecord) fields.get(3);
+				field = ( GenericRecord ) fields.get( 3 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "NumericFloatField" );
-				assertThat( field.get("value") ).isEqualTo( 2.3f );
+				assertThat( field.get( "value" ) ).isEqualTo( 2.3f );
 				assertNumericField( field );
-				field = (GenericRecord) fields.get(4);
+				field = ( GenericRecord ) fields.get( 4 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "NumericDoubleField" );
-				assertThat( field.get("value") ).isEqualTo( 2.3d );
+				assertThat( field.get( "value" ) ).isEqualTo( 2.3d );
 				assertNumericField( field );
 
 				//fields
-				field = (GenericRecord) fields.get(5);
+				field = ( GenericRecord ) fields.get( 5 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "BinaryField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( ByteBuffer.class );
-				asserField(field);
+				asserField( field );
 
-				field = (GenericRecord) fields.get(6);
+				field = ( GenericRecord ) fields.get( 6 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "StringField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( Utf8.class );
 				assertTermVector( field );
 				assertIndexAndStore( field );
-				asserField(field);
+				asserField( field );
 
-				field = (GenericRecord) fields.get(7);
+				field = ( GenericRecord ) fields.get( 7 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "TokenStreamField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( List.class );
-				List<List<ByteBuffer>> l1 = (List<List<ByteBuffer>>) field.get( "value" );
-				bb = l1.get( 0 ).get(0);
+				List<List<ByteBuffer>> l1 = ( List<List<ByteBuffer>> ) field.get( "value" );
+				bb = l1.get( 0 ).get( 0 );
 				assertThat( bb ).isNotNull();
 				assertTermVector( field );
-				asserField(field);
+				asserField( field );
 
-				field = (GenericRecord) fields.get(8);
+				field = ( GenericRecord ) fields.get( 8 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "ReaderField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( ByteBuffer.class );
 				assertTermVector( field );
-				asserField(field);
+				asserField( field );
 			}
-			catch(EOFException eof) {
+			catch ( EOFException eof ) {
 				break;
 			}
-			catch(Exception ex){
+			catch ( Exception ex ) {
 				ex.printStackTrace();
 			}
 		}
@@ -282,14 +283,14 @@ public class AvroTest {
 
 	private void asserField(GenericRecord field) {
 		assertThat( field.get( "name" ) ).isInstanceOf( Utf8.class );
-		assertThat( field.get("name").toString() ).isEqualTo( field.getSchema().getName() );
-		assertThat( field.get("boost") ).isEqualTo( 2.3f );
-		assertThat( field.get("omitNorms") ).isEqualTo( true );
-		assertThat( field.get("omitTermFreqAndPositions") ).isEqualTo( true );
+		assertThat( field.get( "name" ).toString() ).isEqualTo( field.getSchema().getName() );
+		assertThat( field.get( "boost" ) ).isEqualTo( 2.3f );
+		assertThat( field.get( "omitNorms" ) ).isEqualTo( true );
+		assertThat( field.get( "omitTermFreqAndPositions" ) ).isEqualTo( true );
 	}
 
 	private GenericRecord createField(Schema schema) {
-		GenericRecord field = new GenericData.Record(schema);
+		GenericRecord field = new GenericData.Record( schema );
 		field.put( "name", schema.getName() );
 		field.put( "boost", 2.3f );
 		field.put( "omitNorms", true );
@@ -298,19 +299,19 @@ public class AvroTest {
 	}
 
 	private void assertNumericField(GenericRecord field) {
-		assertThat( field.get("name") ).isInstanceOf( Utf8.class );
-		assertThat( field.get("name").toString() ).isEqualTo( "int" );
-		assertThat( field.get("precisionStep") ).isEqualTo( 3 );
-		assertThat( field.get("boost") ).isEqualTo( 2.3f );
-		assertThat( field.get("indexed") ).isEqualTo( true );
-		assertThat( field.get("omitNorms") ).isEqualTo( true );
-		assertThat( field.get("omitTermFreqAndPositions") ).isEqualTo( true );
-		assertThat( ( field.get("store") ) ).isInstanceOf( GenericData.EnumSymbol.class );
-		assertThat( ( field.get("store") ).toString() ).isEqualTo( "YES" );
+		assertThat( field.get( "name" ) ).isInstanceOf( Utf8.class );
+		assertThat( field.get( "name" ).toString() ).isEqualTo( "int" );
+		assertThat( field.get( "precisionStep" ) ).isEqualTo( 3 );
+		assertThat( field.get( "boost" ) ).isEqualTo( 2.3f );
+		assertThat( field.get( "indexed" ) ).isEqualTo( true );
+		assertThat( field.get( "omitNorms" ) ).isEqualTo( true );
+		assertThat( field.get( "omitTermFreqAndPositions" ) ).isEqualTo( true );
+		assertThat( ( field.get( "store" ) ) ).isInstanceOf( GenericData.EnumSymbol.class );
+		assertThat( ( field.get( "store" ) ).toString() ).isEqualTo( "YES" );
 	}
 
 	private GenericRecord createNumeric(Schema schema) {
-		GenericRecord numericField = new GenericData.Record(schema);
+		GenericRecord numericField = new GenericData.Record( schema );
 		numericField.put( "name", "int" );
 		numericField.put( "precisionStep", 3 );
 		numericField.put( "store", "YES" );

@@ -1,0 +1,5 @@
+{
+    "name": "Operations",
+    "type": "array",
+    "items": [`OptimizeAll`, `PurgeAll`, `Delete`, `Add`]
+}
