@@ -74,24 +74,24 @@ public class ModelSerializer implements Serializer {
 	}
 
 	@Override
-	public void addPurgeAll(Class<?> entityClass) {
-		ops.add( new PurgeAll( entityClass ) );
+	public void addPurgeAll(String entityClassName) {
+		ops.add( new PurgeAll( entityClassName ) );
 	}
 
 	@Override
-	public void addDelete(Class<?> entityClass, Serializable id) {
-		ops.add( new Delete( entityClass, id ) );
+	public void addDelete(String entityClassName, Serializable id) {
+		ops.add( new Delete( entityClassName, id ) );
 	}
 
 	@Override
-	public void addAdd(Class<?> entityClass, Serializable id, Map<String, String> fieldToAnalyzerMap) {
-		ops.add( new Add( entityClass, id, currentDocument, fieldToAnalyzerMap ) );
+	public void addAdd(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap) {
+		ops.add( new Add( entityClassName, id, currentDocument, fieldToAnalyzerMap ) );
 		clearDocument();
 	}
 
 	@Override
-	public void addUpdate(Class<?> entityClass, Serializable id, Map<String, String> fieldToAnalyzerMap) {
-		ops.add( new Update( entityClass, id, currentDocument, fieldToAnalyzerMap ) );
+	public void addUpdate(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap) {
+		ops.add( new Update( entityClassName, id, currentDocument, fieldToAnalyzerMap ) );
 		clearDocument();
 	}
 

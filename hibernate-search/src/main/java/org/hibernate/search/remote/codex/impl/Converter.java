@@ -64,18 +64,18 @@ public class Converter {
 				serializer.addOptimizeAll();
 			}
 			else if (work instanceof PurgeAllLuceneWork) {
-				serializer.addPurgeAll( work.getEntityClass() );
+				serializer.addPurgeAll( work.getEntityClass().getName() );
 			}
 			else if (work instanceof DeleteLuceneWork) {
-				serializer.addDelete( work.getEntityClass(), work.getId() );
+				serializer.addDelete( work.getEntityClass().getName(), work.getId() );
 			}
 			else if (work instanceof AddLuceneWork ) {
 				buildDocument( work.getDocument(), serializer );
-				serializer.addAdd( work.getEntityClass(), work.getId(), work.getFieldToAnalyzerMap() );
+				serializer.addAdd( work.getEntityClass().getName(), work.getId(), work.getFieldToAnalyzerMap() );
 			}
 			else if (work instanceof UpdateLuceneWork ) {
 				buildDocument( work.getDocument(), serializer );
-				serializer.addUpdate( work.getEntityClass(), work.getId(), work.getFieldToAnalyzerMap() );
+				serializer.addUpdate( work.getEntityClass().getName(), work.getId(), work.getFieldToAnalyzerMap() );
 			}
 		}
 		return serializer.serialize();
