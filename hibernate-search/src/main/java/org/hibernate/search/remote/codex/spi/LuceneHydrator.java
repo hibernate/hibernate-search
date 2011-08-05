@@ -20,8 +20,6 @@
  */
 package org.hibernate.search.remote.codex.spi;
 
-import java.io.Reader;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -39,17 +37,15 @@ public interface LuceneHydrator {
 
 	void addPurgeAllLuceneWork(String entityClassName);
 
-	//TODO use byte[] for id instead
-	void addDeleteLuceneWork(String entityClassName, Serializable id);
+	void addDeleteLuceneWork(String entityClassName, byte[] id);
 
-	void addAddLuceneWork(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap);
+	void addAddLuceneWork(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap);
 
-	void addUpdateLuceneWork(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap);
+	void addUpdateLuceneWork(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap);
 
 	void defineDocument(float boost);
 
-	//TODO use byte[] instead
-	void addFieldable(Serializable instance);
+	void addFieldable(byte[] instance);
 
 	//TODO forgot boost => do it across the whole chain
 	void addIntNumericField(int value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
@@ -66,5 +62,5 @@ public interface LuceneHydrator {
 
 	void addFieldWithTokenStreamData(String name, List<List<AttributeImpl>> tokenStream, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addFieldWithSerializableReaderData(String name, Reader value, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addFieldWithSerializableReaderData(String name, byte[] value, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 }

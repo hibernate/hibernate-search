@@ -42,6 +42,8 @@ import org.hibernate.search.remote.codex.spi.SerializerProvider;
 import org.hibernate.search.remote.operations.impl.LuceneFieldContext;
 import org.hibernate.search.remote.operations.impl.LuceneNumericFieldContext;
 
+import static org.hibernate.search.remote.codex.impl.SerializationHelper.*;
+
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
@@ -67,15 +69,15 @@ public class Converter {
 				serializer.addPurgeAll( work.getEntityClass().getName() );
 			}
 			else if (work instanceof DeleteLuceneWork) {
-				serializer.addDelete( work.getEntityClass().getName(), work.getId() );
+				serializer.addDelete( work.getEntityClass().getName(), toByteArray( work.getId() ) );
 			}
 			else if (work instanceof AddLuceneWork ) {
 				buildDocument( work.getDocument(), serializer );
-				serializer.addAdd( work.getEntityClass().getName(), work.getId(), work.getFieldToAnalyzerMap() );
+				serializer.addAdd( work.getEntityClass().getName(), toByteArray( work.getId() ), work.getFieldToAnalyzerMap() );
 			}
 			else if (work instanceof UpdateLuceneWork ) {
 				buildDocument( work.getDocument(), serializer );
-				serializer.addUpdate( work.getEntityClass().getName(), work.getId(), work.getFieldToAnalyzerMap() );
+				serializer.addUpdate( work.getEntityClass().getName(), toByteArray( work.getId() ), work.getFieldToAnalyzerMap() );
 			}
 		}
 		return serializer.serialize();
@@ -147,7 +149,7 @@ public class Converter {
 				}
 			}
 			else if (fieldable instanceof Serializable) { //Today Fieldable is Serializable but for how long?
-				serializer.addFieldWithSerializableFieldable( ( Serializable ) fieldable );
+				serializer.addFieldWithSerializableFieldable( toByteArray( ( Serializable ) fieldable ) );
 			}
 			else {
 				throw new SearchException( "Cannot serialize custom field '" + fieldable.getClass() + "'. Must be NumericField, Field or a Serializable Fieldable implementation." );

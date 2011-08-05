@@ -26,7 +26,7 @@ import java.io.Reader;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableReaderField extends SerializableField {
-	private Reader value;
+	private byte[] value;
 	private TermVector termVector;
 
 	public SerializableReaderField(LuceneFieldContext context) {
@@ -35,7 +35,7 @@ public class SerializableReaderField extends SerializableField {
 		this.termVector = context.getTermVector();
 	}
 
-	public Reader getValue() {
+	public byte[] getValue() {
 		return value;
 	}
 
