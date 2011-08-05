@@ -24,13 +24,13 @@ package org.hibernate.search.remote.operations.impl;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class PurgeAll implements Operation {
-	private Class<?> entityClass;
+	private String entityClassName;
 
-	public PurgeAll(Class<?> entityClass) {
-		this.entityClass = entityClass;
+	public PurgeAll(String entityClassName) {
+		this.entityClassName = entityClassName;
 	}
 
-	public Class<?> getEntityClass() {
-		return entityClass;
+	public String getEntityClassName() {
+		return entityClassName;
 	}
 }

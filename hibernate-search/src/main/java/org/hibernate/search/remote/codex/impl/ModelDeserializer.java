@@ -90,7 +90,7 @@ public class ModelDeserializer implements Deserializer {
 			else if (operation instanceof Delete ) {
 				Delete safeOperation = (Delete) operation;
 				hydrator.addDeleteLuceneWork(
-						safeOperation.getEntityClass().getName(),
+						safeOperation.getEntityClassName(),
 						safeOperation.getId()
 				);
 			}
@@ -98,7 +98,7 @@ public class ModelDeserializer implements Deserializer {
 				Add safeOperation = (Add) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
 				hydrator.addAddLuceneWork(
-						safeOperation.getEntityClass().getName(),
+						safeOperation.getEntityClassName(),
 						safeOperation.getId(),
 						safeOperation.getFieldToAnalyzerMap()
 				);
@@ -107,7 +107,7 @@ public class ModelDeserializer implements Deserializer {
 				Update safeOperation = (Update) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
 				hydrator.addUpdateLuceneWork(
-						safeOperation.getEntityClass().getName(),
+						safeOperation.getEntityClassName(),
 						safeOperation.getId(),
 						safeOperation.getFieldToAnalyzerMap()
 				);

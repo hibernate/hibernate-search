@@ -28,20 +28,20 @@ import java.util.Map;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class Add implements Operation {
-	private Class<?> entityClass;
+	private String entityClassName;
 	private Serializable id;
 	private Map<String,String> fieldToAnalyzerMap = new HashMap<String, String>();
 	private SerializableDocument document;
 
-	public Add(Class<?> entityClass, Serializable id, SerializableDocument document, Map<String,String> fieldToAnalyzerMap) {
-		this.entityClass = entityClass;
+	public Add(String entityClassName, Serializable id, SerializableDocument document, Map<String,String> fieldToAnalyzerMap) {
+		this.entityClassName = entityClassName;
 		this.id = id;
 		this.document = document;
 		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
 	}
 
-	public Class<?> getEntityClass() {
-		return entityClass;
+	public String getEntityClassName() {
+		return entityClassName;
 	}
 
 	public Serializable getId() {

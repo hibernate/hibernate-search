@@ -29,7 +29,6 @@ import org.apache.lucene.document.Fieldable;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.remote.operations.impl.LuceneFieldContext;
 import org.hibernate.search.remote.operations.impl.LuceneNumericFieldContext;
-import org.hibernate.search.remote.operations.impl.Message;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -40,13 +39,13 @@ public interface Serializer {
 
 	void addOptimizeAll();
 
-	void addPurgeAll(Class<?> entityClass);
+	void addPurgeAll(String entityClassName);
 
-	void addDelete(Class<?> entityClass, Serializable id);
+	void addDelete(String entityClassName, Serializable id);
 
-	void addAdd(Class<?> entityClass, Serializable id, Map<String, String> fieldToAnalyzerMap);
+	void addAdd(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap);
 
-	void addUpdate(Class<?> entityClass, Serializable id, Map<String, String> fieldToAnalyzerMap);
+	void addUpdate(String entityClassName, Serializable id, Map<String, String> fieldToAnalyzerMap);
 
 	byte[] serialize();
 

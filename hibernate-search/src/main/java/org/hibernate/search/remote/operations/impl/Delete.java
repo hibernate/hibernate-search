@@ -26,16 +26,16 @@ import java.io.Serializable;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class Delete implements Operation {
-	private Class<?> entityClass;
+	private String entityClassName;
 	private Serializable id;
 
-	public Delete(Class<?> entityClass, Serializable id) {
-		this.entityClass = entityClass;
+	public Delete(String entityClassName, Serializable id) {
+		this.entityClassName = entityClassName;
 		this.id = id;
 	}
 
-	public Class<?> getEntityClass() {
-		return entityClass;
+	public String getEntityClassName() {
+		return entityClassName;
 	}
 
 	public Serializable getId() {
