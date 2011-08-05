@@ -30,6 +30,11 @@ import org.hibernate.search.remote.operations.impl.LuceneFieldContext;
 import org.hibernate.search.remote.operations.impl.LuceneNumericFieldContext;
 
 /**
+ * Contract between Hibernate Search and the Serialization mechanism.
+ * Step in building the specific structures are represented by a method.
+ *
+ * LuceneWorkSerializer controls the LuceneWork traversal flow.
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public interface Serializer {

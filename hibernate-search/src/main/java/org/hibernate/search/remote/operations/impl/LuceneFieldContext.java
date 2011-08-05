@@ -44,41 +44,41 @@ public class LuceneFieldContext {
 		return field.name();
 	}
 
-	public Store getStore() {
-		return field.isStored() ? Store.YES : Store.NO;
+	public SerializableStore getStore() {
+		return field.isStored() ? SerializableStore.YES : SerializableStore.NO;
 	}
 
-	public Index getIndex() {
+	public SerializableIndex getIndex() {
 		Field.Index index = Field.Index.toIndex( field.isIndexed(), field.isTokenized(), field.getOmitNorms() );
 		switch ( index ) {
 			case ANALYZED:
-				return Index.ANALYZED;
+				return SerializableIndex.ANALYZED;
 			case ANALYZED_NO_NORMS:
-				return Index.ANALYZED_NO_NORMS;
+				return SerializableIndex.ANALYZED_NO_NORMS;
 			case NO:
-				return Index.NO;
+				return SerializableIndex.NO;
 			case NOT_ANALYZED:
-				return Index.NOT_ANALYZED;
+				return SerializableIndex.NOT_ANALYZED;
 			case NOT_ANALYZED_NO_NORMS:
-				return Index.NOT_ANALYZED_NO_NORMS;
+				return SerializableIndex.NOT_ANALYZED_NO_NORMS;
 			default:
 				throw new SearchException( "Unable to convert Field.Index value into serializable Index: " + index);
 		}
 	}
 
-	public TermVector getTermVector() {
+	public SerializableTermVector getTermVector() {
 		Field.TermVector vector = Field.TermVector.toTermVector( field.isStored(), field.isStoreOffsetWithTermVector(), field.isStorePositionWithTermVector() );
 		switch ( vector ) {
 			case NO:
-				return TermVector.NO;
+				return SerializableTermVector.NO;
 			case WITH_OFFSETS:
-				return TermVector.WITH_OFFSETS;
+				return SerializableTermVector.WITH_OFFSETS;
 			case WITH_POSITIONS:
-				return TermVector.WITH_POSITIONS;
+				return SerializableTermVector.WITH_POSITIONS;
 			case WITH_POSITIONS_OFFSETS:
-				return TermVector.WITH_POSITIONS_OFFSETS;
+				return SerializableTermVector.WITH_POSITIONS_OFFSETS;
 			case YES:
-				return TermVector.YES;
+				return SerializableTermVector.YES;
 			default:
 				throw new SearchException( "Unable to convert Field.TermVector value into serializable TermVector: " + vector);
 		}

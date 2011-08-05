@@ -21,8 +21,15 @@
 package org.hibernate.search.remote.codex.spi;
 
 /**
+ * Contract between Hibernate Search and the Deserializer.
+ * All the LuceneWork construction is delegated to methods of
+ * LuceneWorksBuilder.
+ *
+ * After deserialize is call, Hibernate Search will
+ * extract the built List of LuceneWork
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public interface Deserializer {
-	void deserialize(byte[] data, LuceneHydrator hydrator);
+	void deserialize(byte[] data, LuceneWorksBuilder hydrator);
 }

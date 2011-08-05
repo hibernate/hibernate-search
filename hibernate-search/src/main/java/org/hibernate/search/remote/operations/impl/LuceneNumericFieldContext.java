@@ -40,8 +40,8 @@ public class LuceneNumericFieldContext {
 		return field.getPrecisionStep();
 	}
 
-	public Store getStore() {
-		return field.isStored() ? Store.YES : Store.NO;
+	public SerializableStore getStore() {
+		return field.isStored() ? SerializableStore.YES : SerializableStore.NO;
 	}
 
 	public boolean isIndexed() {

@@ -36,10 +36,10 @@ import org.apache.lucene.util.AttributeImpl;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.remote.codex.impl.SerializationHelper;
 import org.hibernate.search.remote.codex.spi.Deserializer;
-import org.hibernate.search.remote.codex.spi.LuceneHydrator;
-import org.hibernate.search.remote.operations.impl.Index;
-import org.hibernate.search.remote.operations.impl.Store;
-import org.hibernate.search.remote.operations.impl.TermVector;
+import org.hibernate.search.remote.codex.spi.LuceneWorksBuilder;
+import org.hibernate.search.remote.operations.impl.SerializableIndex;
+import org.hibernate.search.remote.operations.impl.SerializableStore;
+import org.hibernate.search.remote.operations.impl.SerializableTermVector;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -56,26 +56,26 @@ public class AvroDeserializer implements Deserializer {
 	}
 
 	@Override
-	public void deserialize(byte[] data, LuceneHydrator hydrator) {
+	public void deserialize(byte[] data, LuceneWorksBuilder hydrator) {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
 		int majorVersion = inputStream.read();
 		int minorVersion = inputStream.read();
-		if ( AvroSerializerProvider.getMajorVersion() != majorVersion ) {
+		if ( AvroSerializationProvider.getMajorVersion() != majorVersion ) {
 			throw new SearchException(
 					"Unable to parse message from protocol version "
 							+ majorVersion + "." + minorVersion
 							+ ". Current protocol version: "
-							+ AvroSerializerProvider.getMajorVersion()
-							+ "." + AvroSerializerProvider.getMinorVersion() );
+							+ AvroSerializationProvider.getMajorVersion()
+							+ "." + AvroSerializationProvider.getMinorVersion() );
 		}
-		if ( AvroSerializerProvider.getMinorVersion() < minorVersion ) {
+		if ( AvroSerializationProvider.getMinorVersion() < minorVersion ) {
 			//TODO what to do about it? Log each time? Once?
 			if ( log.isTraceEnabled() ) {
 				log.tracef( "Parsing message from a future protocol version. Some feature might not be propagated. Message version: "
 								+ majorVersion + "." + minorVersion
 								+ ". Current protocol version: "
-								+ AvroSerializerProvider.getMajorVersion()
-								+ "." + AvroSerializerProvider.getMinorVersion()
+								+ AvroSerializationProvider.getMajorVersion()
+								+ "." + AvroSerializationProvider.getMinorVersion()
 				);
 			}
 		}
@@ -132,7 +132,7 @@ public class AvroDeserializer implements Deserializer {
 		}
 	}
 
-	private void buildLuceneDocument(GenericRecord document, LuceneHydrator hydrator) {
+	private void buildLuceneDocument(GenericRecord document, LuceneWorksBuilder hydrator) {
 		hydrator.defineDocument( asFloat( document, "boost" ) );
 		List<GenericRecord> fieldables = asListOfGenericRecords( document, "fieldables" );
 		for ( GenericRecord field : fieldables ) {
@@ -309,19 +309,19 @@ public class AvroDeserializer implements Deserializer {
 		return ( (Boolean) record.get(field) ).booleanValue();
 	}
 
-	private Store asStore(GenericRecord field) {
+	private SerializableStore asStore(GenericRecord field) {
 		String string = field.get("store").toString();
-		return Store.valueOf( string );
+		return SerializableStore.valueOf( string );
 	}
 
-	private Index asIndex(GenericRecord field) {
+	private SerializableIndex asIndex(GenericRecord field) {
 		String string = field.get("index").toString();
-		return Index.valueOf( string );
+		return SerializableIndex.valueOf( string );
 	}
 
-	private TermVector asTermVector(GenericRecord field) {
+	private SerializableTermVector asTermVector(GenericRecord field) {
 		String string = field.get("termVector").toString();
-		return TermVector.valueOf( string );
+		return SerializableTermVector.valueOf( string );
 	}
 
 	private byte[] asByteArray(GenericRecord operation, String field) {

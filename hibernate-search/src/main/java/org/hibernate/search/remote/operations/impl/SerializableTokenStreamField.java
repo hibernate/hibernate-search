@@ -20,16 +20,12 @@
  */
 package org.hibernate.search.remote.operations.impl;
 
-import java.io.Reader;
-
-import org.hibernate.mapping.List;
-
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableTokenStreamField extends SerializableField {
 	private SerializableTokenStream value;
-	private TermVector termVector;
+	private SerializableTermVector termVector;
 
 	public SerializableTokenStreamField(LuceneFieldContext context) {
 		super( context );
@@ -41,7 +37,7 @@ public class SerializableTokenStreamField extends SerializableField {
 		return value;
 	}
 
-	public TermVector getTermVector() {
+	public SerializableTermVector getTermVector() {
 		return termVector;
 	}
 }

@@ -23,10 +23,10 @@ package org.hibernate.search.remote.operations.impl;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public enum TermVector {
+public enum SerializableIndex {
 	NO,
-	YES,
-	WITH_POSITIONS,
-	WITH_OFFSETS,
-	WITH_POSITIONS_OFFSETS
+	ANALYZED,
+	NOT_ANALYZED,
+	NOT_ANALYZED_NO_NORMS,
+	ANALYZED_NO_NORMS
 }
