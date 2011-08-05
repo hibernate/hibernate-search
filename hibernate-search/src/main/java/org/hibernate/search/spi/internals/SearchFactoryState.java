@@ -34,6 +34,7 @@ import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.store.DirectoryProvider;
 
 import java.util.Map;
@@ -75,4 +76,5 @@ public interface SearchFactoryState {
 
 	ErrorHandler getErrorHandler();
 
+	LuceneWorkSerializer getSerializer();
 }

@@ -35,6 +35,8 @@ import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
+import org.hibernate.search.remote.codex.spi.Serializer;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
@@ -65,6 +67,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private boolean transactionManagerExpected = true;
 	private IndexManagerHolder allIndexesManager;
 	private ErrorHandler errorHandler;
+	private LuceneWorkSerializer serializer;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -82,6 +85,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		transactionManagerExpected = oldFactoryState.isTransactionManagerExpected();
 		allIndexesManager = oldFactoryState.getAllIndexesManager();
 		errorHandler = oldFactoryState.getErrorHandler();
+		serializer = oldFactoryState.getSerializer();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -221,4 +225,12 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.errorHandler = errorHandler;
 	}
 
+	@Override
+	public LuceneWorkSerializer getSerializer() {
+		return serializer;
+	}
+
+	public void setSerializer(LuceneWorkSerializer serializer) {
+		this.serializer = serializer;
+	}
 }
