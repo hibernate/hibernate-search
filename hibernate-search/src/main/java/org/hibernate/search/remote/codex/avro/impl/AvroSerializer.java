@@ -108,6 +108,8 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public byte[] serialize() {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		out.write( AvroSerializerProvider.getMajorVersion() );
+		out.write( AvroSerializerProvider.getMinorVersion() );
 		Schema msgSchema = schemas.get( "Message" );
 		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>( msgSchema );
 		BinaryEncoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );

@@ -40,6 +40,8 @@ import org.hibernate.search.remote.codex.spi.LuceneHydrator;
 import org.hibernate.search.remote.operations.impl.Index;
 import org.hibernate.search.remote.operations.impl.Store;
 import org.hibernate.search.remote.operations.impl.TermVector;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -47,6 +49,7 @@ import org.hibernate.search.remote.operations.impl.TermVector;
 public class AvroDeserializer implements Deserializer {
 
 	private final Map<String, Schema> schemas;
+	private static final Log log = LoggerFactory.make();
 
 	public AvroDeserializer(Map<String, Schema> schemas) {
 		this.schemas = schemas;
@@ -55,6 +58,28 @@ public class AvroDeserializer implements Deserializer {
 	@Override
 	public void deserialize(byte[] data, LuceneHydrator hydrator) {
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+		int majorVersion = inputStream.read();
+		int minorVersion = inputStream.read();
+		if ( AvroSerializerProvider.getMajorVersion() != majorVersion ) {
+			throw new SearchException(
+					"Unable to parse message from protocol version "
+							+ majorVersion + "." + minorVersion
+							+ ". Current protocol version: "
+							+ AvroSerializerProvider.getMajorVersion()
+							+ "." + AvroSerializerProvider.getMinorVersion() );
+		}
+		if ( AvroSerializerProvider.getMinorVersion() < minorVersion ) {
+			//TODO what to do about it? Log each time? Once?
+			if ( log.isTraceEnabled() ) {
+				log.tracef( "Parsing message from a future protocol version. Some feature might not be propagated. Message version: "
+								+ majorVersion + "." + minorVersion
+								+ ". Current protocol version: "
+								+ AvroSerializerProvider.getMajorVersion()
+								+ "." + AvroSerializerProvider.getMinorVersion()
+				);
+			}
+		}
+
 		Decoder decoder = DecoderFactory.get().binaryDecoder( inputStream, null );
 		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>( schemas.get("Message") );
 		GenericRecord result;

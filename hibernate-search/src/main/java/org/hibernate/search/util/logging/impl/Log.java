@@ -373,5 +373,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %s")
 	void unableToShutdownAsyncronousIndexingByTimeout(String indexName);
 
+	@LogMessage(level = INFO)
+	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d")
+	void serializationProtocol(int major, int minor);
+
 
 }
