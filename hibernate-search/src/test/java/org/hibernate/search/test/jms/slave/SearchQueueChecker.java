@@ -31,6 +31,7 @@ import javax.jms.JMSException;
 
 
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 /**
  * Helper class to verify that the Slave places messages onto the queue.
@@ -41,6 +42,11 @@ import org.hibernate.search.backend.LuceneWork;
 public class SearchQueueChecker implements MessageListener {
 	public static int queues;
 	public static int works;
+	private SearchFactoryImplementor searchFactory;
+
+	public SearchQueueChecker(SearchFactoryImplementor searchFactory) {
+		this.searchFactory = searchFactory;
+	}
 
 	public static void reset() {
 		queues = 0;
@@ -56,7 +62,7 @@ public class SearchQueueChecker implements MessageListener {
 
 		List<LuceneWork> queue;
 		try {
-			queue = ( List<LuceneWork> ) objectMessage.getObject();
+			queue = searchFactory.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
 		}
 		catch ( JMSException e ) {
 			return;
