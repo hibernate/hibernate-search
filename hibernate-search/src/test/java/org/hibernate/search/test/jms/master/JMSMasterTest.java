@@ -116,7 +116,8 @@ public class JMSMasterTest extends SearchTestCase {
 		message.setStringProperty(
 				org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY,
 				org.hibernate.search.test.jms.master.TShirt.class.getName() ); //index name for this test
-		message.setObject( ( Serializable ) queue );
+		byte[] data = getSearchFactoryImpl().getSerializer().toSerializedModel( queue );
+		message.setObject( data );
 		QueueSender sender = getQueueSession().createSender( getMessageQueue() );
 		sender.send( message );
 	}
