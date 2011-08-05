@@ -30,6 +30,7 @@ import org.jgroups.Message;
 import org.jgroups.Receiver;
 import org.jgroups.View;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -63,10 +64,14 @@ public class JGroupsMasterMessageListener implements Receiver {
 		final String indexName;
 		try {
 			BackendMessage decoded = ( BackendMessage ) message.getObject();
-			queue = decoded.queue;
+			queue = searchFactory.getSerializer().toLuceneWorks( decoded.queue );
 			indexName = decoded.indexName;
 		}
 		catch ( ClassCastException e ) {
+			log.illegalObjectRetrievedFromMessage( e );
+			return;
+		}
+		catch ( SearchException e ) {
 			log.illegalObjectRetrievedFromMessage( e );
 			return;
 		}

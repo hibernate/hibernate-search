@@ -98,7 +98,8 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		//send message to all listeners
-		BackendMessage wrapper = new BackendMessage( "org.hibernate.search.test.jms.master.TShirt", queue);
+		byte[] data = getSearchFactoryImpl().getSerializer().toSerializedModel( queue );
+		BackendMessage wrapper = new BackendMessage( "org.hibernate.search.test.jms.master.TShirt", data);
 		Message message = new Message( null, null, wrapper );
 		channel.send( message );
 	}

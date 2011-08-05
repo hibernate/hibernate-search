@@ -81,6 +81,10 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 		prepareJGroupsChannel( props );
 	}
 
+	public SearchFactoryImplementor getSearchFactory() {
+		return searchFactory;
+	}
+
 	private void prepareJGroupsChannel(Properties props) {
 		log.jGroupsStartingChannel();
 		try {
