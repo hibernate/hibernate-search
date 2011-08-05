@@ -1,0 +1,10 @@
+{
+    "name": "CustomFieldable",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "instance",
+            "type": "bytes"
+        }
+    ]
+}
