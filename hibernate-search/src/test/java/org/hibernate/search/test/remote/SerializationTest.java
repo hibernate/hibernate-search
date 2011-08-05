@@ -34,9 +34,8 @@ import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
-import org.hibernate.search.remote.codex.avro.impl.AvroSerializerProvider;
-import org.hibernate.search.remote.codex.impl.Converter;
-import org.hibernate.search.remote.operations.impl.PurgeAll;
+import org.hibernate.search.remote.codex.avro.impl.AvroSerializationProvider;
+import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.test.SearchTestCase;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -47,7 +46,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class SerializationTest extends SearchTestCase {
 	@Test
 	public void testAvroSerialization() throws Exception {
-		Converter converter = new Converter( new AvroSerializerProvider(), getSearchFactoryImpl() );
+		LuceneWorkSerializer converter = new LuceneWorkSerializer( new AvroSerializationProvider(), getSearchFactoryImpl() );
 		List<LuceneWork> works = new ArrayList<LuceneWork>();
 		works.add( new OptimizeLuceneWork() );
 		works.add( new OptimizeLuceneWork(RemoteEntity.class) ); //class won't be send over

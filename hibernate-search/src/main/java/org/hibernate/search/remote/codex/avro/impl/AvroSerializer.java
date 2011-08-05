@@ -42,7 +42,7 @@ import org.hibernate.search.remote.codex.impl.SerializationHelper;
 import org.hibernate.search.remote.codex.spi.Serializer;
 import org.hibernate.search.remote.operations.impl.LuceneFieldContext;
 import org.hibernate.search.remote.operations.impl.LuceneNumericFieldContext;
-import org.hibernate.search.remote.operations.impl.TermVector;
+import org.hibernate.search.remote.operations.impl.SerializableTermVector;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -108,8 +108,8 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public byte[] serialize() {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		out.write( AvroSerializerProvider.getMajorVersion() );
-		out.write( AvroSerializerProvider.getMinorVersion() );
+		out.write( AvroSerializationProvider.getMajorVersion() );
+		out.write( AvroSerializationProvider.getMinorVersion() );
 		Schema msgSchema = schemas.get( "Message" );
 		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>( msgSchema );
 		BinaryEncoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );
@@ -205,7 +205,7 @@ public class AvroSerializer implements Serializer {
 		GenericRecord field = createNormalField( "TokenStreamField", context );
 
 		field.put( "value", context.getTokenStream().getStream() );
-		TermVector termVector = context.getTermVector();
+		SerializableTermVector termVector = context.getTermVector();
 		//FIXME shouldn't have to serialize
 		byte[] data = SerializationHelper.toByteArray( termVector );
 		field.put( "termVector", ByteBuffer.wrap( data ) );

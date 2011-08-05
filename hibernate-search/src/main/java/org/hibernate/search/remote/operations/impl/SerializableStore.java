@@ -18,23 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.remote.codex.impl;
-
-import org.hibernate.search.remote.codex.spi.Deserializer;
-import org.hibernate.search.remote.codex.spi.SerializerProvider;
-import org.hibernate.search.remote.codex.spi.Serializer;
+package org.hibernate.search.remote.operations.impl;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class ModelSerializerProvider implements SerializerProvider {
-	@Override
-	public Serializer getSerializer() {
-		return new ModelSerializer();
-	}
-
-	@Override
-	public Deserializer getDeserializer() {
-		return new ModelDeserializer();
-	}
+public enum SerializableStore {
+	YES,
+	NO
 }

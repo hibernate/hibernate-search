@@ -26,7 +26,7 @@ package org.hibernate.search.remote.operations.impl;
 public abstract class SerializableNumericField implements SerializableFieldable {
 	private String name;
 	private int precisionStep;
-	private Store store;
+	private SerializableStore store;
 	private boolean indexed; //or should it be Index for future extension?
 	private float boost;
 	private boolean omitNorms;
@@ -50,7 +50,7 @@ public abstract class SerializableNumericField implements SerializableFieldable 
 		return precisionStep;
 	}
 
-	public Store getStore() {
+	public SerializableStore getStore() {
 		return store;
 	}
 

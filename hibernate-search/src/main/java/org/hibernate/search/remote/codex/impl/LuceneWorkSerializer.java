@@ -38,25 +38,34 @@ import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.remote.codex.spi.Deserializer;
 import org.hibernate.search.remote.codex.spi.Serializer;
-import org.hibernate.search.remote.codex.spi.SerializerProvider;
+import org.hibernate.search.remote.codex.spi.SerializationProvider;
 import org.hibernate.search.remote.operations.impl.LuceneFieldContext;
 import org.hibernate.search.remote.operations.impl.LuceneNumericFieldContext;
 
 import static org.hibernate.search.remote.codex.impl.SerializationHelper.*;
 
 /**
+ * Serializes List<LuceneWork> back and forth using
+ * a pluggable SerializerProvider.
+ *
+ * This class control the over all traversal process and delegates true serialization
+ * work to the SerializerProvider.
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class Converter {
+public class LuceneWorkSerializer {
 
 	private SearchFactoryImplementor searchFactory;
-	private SerializerProvider provider;
+	private SerializationProvider provider;
 
-	public Converter(SerializerProvider provider, SearchFactoryImplementor searchFactory) {
+	public LuceneWorkSerializer(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
 		this.provider = provider;
 		this.searchFactory = searchFactory;
 	}
 
+	/**
+	 * Convert a List of LuceneWork into a byte[]
+	 */
 	public byte[] toSerializedModel(List<LuceneWork> works) {
 		Serializer serializer = provider.getSerializer();
 		serializer.luceneWorks( works );
@@ -83,6 +92,9 @@ public class Converter {
 		return serializer.serialize();
 	}
 
+	/**
+	 * Convert a byte[] to a List of LuceneWork (assuming the same SerializationProvider is used of course)
+	 */
 	public List<LuceneWork> toLuceneWorks(byte[] data) {
 		Deserializer deserializer = provider.getDeserializer();
 		LuceneWorkHydrator hydrator = new LuceneWorkHydrator( searchFactory );

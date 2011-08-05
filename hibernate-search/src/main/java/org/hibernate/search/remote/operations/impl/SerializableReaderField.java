@@ -20,14 +20,12 @@
  */
 package org.hibernate.search.remote.operations.impl;
 
-import java.io.Reader;
-
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableReaderField extends SerializableField {
 	private byte[] value;
-	private TermVector termVector;
+	private SerializableTermVector termVector;
 
 	public SerializableReaderField(LuceneFieldContext context) {
 		super( context );
@@ -39,7 +37,7 @@ public class SerializableReaderField extends SerializableField {
 		return value;
 	}
 
-	public TermVector getTermVector() {
+	public SerializableTermVector getTermVector() {
 		return termVector;
 	}
 }

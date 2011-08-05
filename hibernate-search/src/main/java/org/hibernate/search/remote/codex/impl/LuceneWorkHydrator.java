@@ -41,10 +41,10 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.remote.codex.spi.LuceneHydrator;
-import org.hibernate.search.remote.operations.impl.Index;
-import org.hibernate.search.remote.operations.impl.Store;
-import org.hibernate.search.remote.operations.impl.TermVector;
+import org.hibernate.search.remote.codex.spi.LuceneWorksBuilder;
+import org.hibernate.search.remote.operations.impl.SerializableIndex;
+import org.hibernate.search.remote.operations.impl.SerializableStore;
+import org.hibernate.search.remote.operations.impl.SerializableTermVector;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 import static org.hibernate.search.remote.codex.impl.SerializationHelper.*;
@@ -52,7 +52,7 @@ import static org.hibernate.search.remote.codex.impl.SerializationHelper.*;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class LuceneWorkHydrator implements LuceneHydrator {
+public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private SearchFactoryImplementor searchFactory;
 	private List<LuceneWork> results;
 	private ClassLoader loader;
@@ -136,7 +136,7 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addIntNumericField(int value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	public void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		NumericField numField = new NumericField(
 						name,
 						precisionStep,
@@ -149,7 +149,7 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addLongNumericField(long value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	public void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		NumericField numField = new NumericField(
 						name,
 						precisionStep,
@@ -162,7 +162,7 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addFloatNumericField(float value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	public void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		NumericField numField = new NumericField(
 						name,
 						precisionStep,
@@ -175,7 +175,7 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addDoubleNumericField(double value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	public void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		NumericField numField = new NumericField(
 						name,
 						precisionStep,
@@ -201,19 +201,19 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 	}
 
 	@Override
-	public void addFieldWithStringData(String name, String value, Store store, Index index, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	public void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		Field luceneField = new Field( name, value, getStore( store ), getIndex( index ), getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
 	}
 
 	@Override
-	public void addFieldWithTokenStreamData(String name, List<List<AttributeImpl>> tokenStream, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	public void addFieldWithTokenStreamData(String name, List<List<AttributeImpl>> tokenStream, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		Field luceneField = new Field( name, new CopyTokenStream(tokenStream), getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
 	}
 
 	@Override
-	public void addFieldWithSerializableReaderData(String name, byte[] valueAsByte, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	public void addFieldWithSerializableReaderData(String name, byte[] valueAsByte, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		Reader value = (Reader) toSerializable( valueAsByte, loader );
 		Field luceneField = new Field( name, value, getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
@@ -235,7 +235,7 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 		return documentBuilder.objectToString( documentBuilder.getIdKeywordName(), id );
 	}
 
-	private static Field.TermVector getTermVector(TermVector termVector) {
+	private static Field.TermVector getTermVector(SerializableTermVector termVector) {
 		switch ( termVector ) {
 			case NO:
 				return Field.TermVector.NO;
@@ -252,7 +252,7 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 		}
 	}
 
-	private static Field.Index getIndex(Index index) {
+	private static Field.Index getIndex(SerializableIndex index) {
 		switch ( index ) {
 			case ANALYZED:
 				return Field.Index.ANALYZED;
@@ -269,7 +269,7 @@ public class LuceneWorkHydrator implements LuceneHydrator {
 		}
 	}
 
-	private static Field.Store getStore(Store store) {
+	private static Field.Store getStore(SerializableStore store) {
 		switch ( store ) {
 			case NO:
 				return Field.Store.NO;

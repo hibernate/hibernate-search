@@ -20,15 +20,11 @@
  */
 package org.hibernate.search.remote.codex.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.lucene.document.Field;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.remote.codex.spi.Deserializer;
-import org.hibernate.search.remote.codex.spi.LuceneHydrator;
+import org.hibernate.search.remote.codex.spi.LuceneWorksBuilder;
 import org.hibernate.search.remote.operations.impl.Add;
 import org.hibernate.search.remote.operations.impl.Delete;
 import org.hibernate.search.remote.operations.impl.Message;
@@ -56,7 +52,7 @@ import org.hibernate.search.remote.operations.impl.Update;
 public class ModelDeserializer implements Deserializer {
 
 	@Override
-	public void deserialize(byte[] data, LuceneHydrator hydrator) {
+	public void deserialize(byte[] data, LuceneWorksBuilder hydrator) {
 		Message message = SerializationHelper.toInstance( data, Message.class );
 
 		if ( message.getProtocolVersion() != 1 ) {
@@ -98,7 +94,7 @@ public class ModelDeserializer implements Deserializer {
 		}
 	}
 
-	private void buildLuceneDocument(SerializableDocument document, LuceneHydrator hydrator) {
+	private void buildLuceneDocument(SerializableDocument document, LuceneWorksBuilder hydrator) {
 		hydrator.defineDocument( document.getBoost() );
 		for ( SerializableFieldable field : document.getFieldables() ) {
 			if ( field instanceof SerializableCustomFieldable ) {

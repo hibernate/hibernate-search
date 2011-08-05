@@ -21,9 +21,31 @@
 package org.hibernate.search.remote.codex.spi;
 
 /**
+ * Serialization provider
+ *
+ * Providers are encouraged to offer a backward and forward compatible protocol.
+ *
+ * //FIXME should these two bytes be processed by Hibernate Search and not the protocol implementation
+ * ie we would pass the result of this?
+ *
+ * Before the actual serialized flux, two bytes are reserved:
+ * - majorVersion
+ * - minorVersion
+ *
+ * A major version increase implies an incompatible protocol change.
+ * Messages of a majorVersion > current version should be refused.
+ *
+ * A minor version increase implies a compatible protocol change.
+ * Messages of a minorVersion > current version are parsed but new
+ * operation will be ignored or rejected. Question: only ignored?
+ *
+ * If message's major version is < current version, the
+ * implementation is strongly encourated to parse and process them.
+ * It is mandatory if only message's minor version is < current version.
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface SerializerProvider {
+public interface SerializationProvider {
 	Serializer getSerializer();
 	Deserializer getDeserializer();
 }

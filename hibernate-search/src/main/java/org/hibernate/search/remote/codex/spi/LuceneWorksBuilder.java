@@ -25,14 +25,14 @@ import java.util.Map;
 
 import org.apache.lucene.util.AttributeImpl;
 
-import org.hibernate.search.remote.operations.impl.Index;
-import org.hibernate.search.remote.operations.impl.Store;
-import org.hibernate.search.remote.operations.impl.TermVector;
+import org.hibernate.search.remote.operations.impl.SerializableIndex;
+import org.hibernate.search.remote.operations.impl.SerializableStore;
+import org.hibernate.search.remote.operations.impl.SerializableTermVector;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface LuceneHydrator {
+public interface LuceneWorksBuilder {
 	void addOptimizeAll();
 
 	void addPurgeAllLuceneWork(String entityClassName);
@@ -48,19 +48,19 @@ public interface LuceneHydrator {
 	void addFieldable(byte[] instance);
 
 	//TODO forgot boost => do it across the whole chain
-	void addIntNumericField(int value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addLongNumericField(long value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addFloatNumericField(float value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addDoubleNumericField(double value, String name, int precisionStep, Store store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
 
 	void addFieldWithBinaryData(String name, byte[] value, int offset, int length, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addFieldWithStringData(String name, String value, Store store, Index index, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addFieldWithTokenStreamData(String name, List<List<AttributeImpl>> tokenStream, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addFieldWithTokenStreamData(String name, List<List<AttributeImpl>> tokenStream, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addFieldWithSerializableReaderData(String name, byte[] value, TermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addFieldWithSerializableReaderData(String name, byte[] value, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 }

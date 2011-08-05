@@ -18,38 +18,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.remote.operations.impl;
-
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * Represents a canonical model for the data that ought to be serialized.
+ * A ModelSerializationProvider convert List of LuceneWork into this canonical
+ * model.
+ *
+ * Note that some objects are reused in the Serialization / Deserialization contract used by
+ * other serializers but most are not and this code is mostly unused.
+ *
+ * Still it is a useful and typesafe referencesthat we might want to keep around.
+ *
+ * @author Emmanuel Bernard
  */
-public class SerializableStringField extends SerializableField {
-	private String value;
-	private SerializableStore store;
-	private SerializableIndex index;
-	private SerializableTermVector termVector;
-
-	public SerializableStringField(LuceneFieldContext context) {
-		super( context );
-		this.value = context.getStringValue();
-		this.store = context.getStore();
-		this.index = context.getIndex();
-		this.termVector = context.getTermVector();
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public SerializableStore getStore() {
-		return store;
-	}
-
-	public SerializableIndex getIndex() {
-		return index;
-	}
-
-	public SerializableTermVector getTermVector() {
-		return termVector;
-	}
-}
+package org.hibernate.search.remote.operations.impl;

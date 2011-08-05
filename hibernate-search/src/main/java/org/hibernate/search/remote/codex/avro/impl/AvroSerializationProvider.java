@@ -35,14 +35,14 @@ import org.apache.avro.Schema;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.remote.codex.spi.Deserializer;
 import org.hibernate.search.remote.codex.spi.Serializer;
-import org.hibernate.search.remote.codex.spi.SerializerProvider;
+import org.hibernate.search.remote.codex.spi.SerializationProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class AvroSerializerProvider implements SerializerProvider {
+public class AvroSerializationProvider implements SerializationProvider {
 
 	private static final Log log = LoggerFactory.make();
 	private Map<String,Schema> schemas;
@@ -69,7 +69,7 @@ public class AvroSerializerProvider implements SerializerProvider {
 		return new AvroDeserializer( schemas );
 	}
 
-	public AvroSerializerProvider() {
+	public AvroSerializationProvider() {
 		log.serializationProtocol( getMajorVersion(), getMinorVersion() );
 		this.schemas = new HashMap<String, Schema>( 20 );
 		parseSchema("TermVector");
