@@ -34,6 +34,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.impl.JNDIHelper;
@@ -51,6 +52,7 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 	private Queue jmsQueue;
 	private QueueConnectionFactory factory;
 	private String indexName;
+	private SearchFactoryImplementor searchFactory;
 	public static final String JMS_CONNECTION_FACTORY = Environment.WORKER_PREFIX + "jms.connection_factory";
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
 
@@ -60,6 +62,7 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 		this.jmsConnectionFactoryName = props.getProperty( JMS_CONNECTION_FACTORY );
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
+		this.searchFactory = context.getUninitializedSearchFactory();
 		prepareJMSTools();
 	}
 
@@ -101,6 +104,10 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 					e
 			);
 		}
+	}
+
+	public SearchFactoryImplementor getSearchFactory() {
+		return searchFactory;
 	}
 
 	public void close() {
