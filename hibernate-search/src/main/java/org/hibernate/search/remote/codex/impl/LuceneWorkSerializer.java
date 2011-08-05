@@ -51,6 +51,8 @@ import static org.hibernate.search.remote.codex.impl.SerializationHelper.*;
  * This class control the over all traversal process and delegates true serialization
  * work to the SerializerProvider.
  *
+ * //FIXME should it be an interface as it's part of SearchFactoryImplementor?
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class LuceneWorkSerializer {

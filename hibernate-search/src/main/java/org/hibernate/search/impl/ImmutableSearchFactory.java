@@ -41,6 +41,7 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
+import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -105,6 +106,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final boolean transactionManagerExpected;
 	private final IndexManagerHolder allIndexesManager;
 	private final ErrorHandler errorHandler;
+	private final LuceneWorkSerializer serializer;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -130,6 +132,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
 		this.allIndexesManager = state.getAllIndexesManager();
 		this.errorHandler = state.getErrorHandler();
+		this.serializer = state.getSerializer();
 
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
@@ -349,6 +352,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public IndexManagerHolder getAllIndexesManager() {
 		return this.allIndexesManager;
+	}
+
+	@Override
+	public LuceneWorkSerializer getSerializer() {
+		return serializer;
 	}
 
 	@Override
