@@ -181,7 +181,6 @@ public class AvroTest {
 		operations.add( add );
 
 		GenericRecord message = new GenericData.Record( messageSchema );
-		message.put( "version", 1 );
 		message.put( "operations", operations );
 
 		writer.write( message, encoder );

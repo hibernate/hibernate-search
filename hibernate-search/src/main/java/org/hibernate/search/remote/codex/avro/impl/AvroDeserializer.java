@@ -90,12 +90,6 @@ public class AvroDeserializer implements Deserializer {
 		catch ( IOException e ) {
 			throw new SearchException( "Unable to deserialize Avro stream", e );
 		}
-
-		if ( asInt( result, "version" ) != 1 ) {
-			throw new SearchException( "Serialization protocol not supported. Protocol version: " + result.get(
-					"version"
-			) );
-		}
 		List<GenericRecord> operations = asListOfGenericRecords( result, "operations" );
 		for ( GenericRecord operation : operations ) {
 			String schema = operation.getSchema().getName();

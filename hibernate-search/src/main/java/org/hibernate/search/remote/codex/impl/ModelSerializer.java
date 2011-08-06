@@ -92,7 +92,7 @@ public class ModelSerializer implements Serializer {
 
 	@Override
 	public byte[] serialize() {
-		Message message = new Message( 1, ops );
+		Message message = new Message( ops );
 		return SerializationHelper.toByteArray( message );
 	}
 
