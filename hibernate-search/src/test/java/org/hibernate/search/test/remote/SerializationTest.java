@@ -23,13 +23,11 @@ package org.hibernate.search.test.remote;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.avro.util.Utf8;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
@@ -44,6 +42,7 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.remote.codex.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
+import org.hibernate.search.remote.codex.impl.SerializationHelper;
 import org.hibernate.search.test.SearchTestCase;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -54,11 +53,85 @@ import static org.fest.assertions.Assertions.assertThat;
 public class SerializationTest extends SearchTestCase {
 	@Test
 	public void testAvroSerialization() throws Exception {
-		LuceneWorkSerializer converter = new LuceneWorkSerializer( new AvroSerializationProvider(), getSearchFactoryImpl() );
+		LuceneWorkSerializer converter = new LuceneWorkSerializer(
+				new AvroSerializationProvider(),
+				getSearchFactoryImpl()
+		);
+		List<LuceneWork> works = buildWorks();
+
+		byte[] bytes = converter.toSerializedModel( works );
+		List<LuceneWork> copyOfWorks = converter.toLuceneWorks( bytes );
+
+		assertThat( copyOfWorks ).hasSize( works.size() );
+		for ( int index = 0; index < works.size(); index++ ) {
+			assertLuceneWork( works.get( index ), copyOfWorks.get( index ) );
+		}
+	}
+
+	@Test
+	/**
+	 * Our avro serializer is slower (1.6) than Java serialization esp when the VM is not warm (small loop value like = 1000
+	 * In evens up on longer loops like 100000
+	 *
+	 * Our avro serializer is slower (2.5) than Java serialization esp when the VM is not warm (small loop value like = 1000
+	 * In evens up or beats the Java serialization on longer loops like 100000
+	 *
+	 * Test done after initial implementation (in particular the schema is not part of the message
+	 */
+	public void testAvroSerializationPerf() throws Exception {
+		int loop = 1000; //TODO do 10000 or 100000
+		LuceneWorkSerializer converter = new LuceneWorkSerializer(
+				new AvroSerializationProvider(),
+				getSearchFactoryImpl()
+		);
+		List<LuceneWork> works = buildWorks();
+
+		long begin;
+		long end;
+		byte[] javaBytes = null;
+		begin = System.nanoTime();
+		for (int i = 0 ; i < loop ; i++) {
+			javaBytes = SerializationHelper.toByteArray( ( Serializable ) works );
+		}
+		end = System.nanoTime();
+		System.out.println("Java serialization: " + ((end-begin)/1000000) );
+		System.out.println("Java message size: " + javaBytes.length );
+
+		begin = System.nanoTime();
+		List<LuceneWork> copyOfWorkForJavaSerial = null;
+		for (int i = 0 ; i < loop ; i++) {
+			copyOfWorkForJavaSerial = (List<LuceneWork>) SerializationHelper.toSerializable( javaBytes, Thread.currentThread().getContextClassLoader() );
+		}
+		end = System.nanoTime();
+		System.out.println("Java deserialization: " + ((end-begin)/1000000) );
+
+		byte[] avroBytes = null;
+		begin = System.nanoTime();
+		for (int i = 0 ; i < loop ; i++) {
+			avroBytes = converter.toSerializedModel( works );
+		}
+		end = System.nanoTime();
+		System.out.println("Avro serialization: " + ((end-begin)/1000000) );
+		System.out.println("Avro message size: " + avroBytes.length );
+
+		List<LuceneWork> copyOfWorks = null;
+		begin = System.nanoTime();
+		for (int i = 0 ; i < loop ; i++) {
+			copyOfWorks = converter.toLuceneWorks( avroBytes );
+		}
+		end = System.nanoTime();
+		System.out.println("Avro deserialization: " + ((end-begin)/1000000) );
+
+		//make sure the compiler doe snot cheat
+		System.out.println(copyOfWorks == copyOfWorkForJavaSerial);
+
+	}
+
+	private List<LuceneWork> buildWorks() {
 		List<LuceneWork> works = new ArrayList<LuceneWork>();
 		works.add( new OptimizeLuceneWork() );
 		works.add( new OptimizeLuceneWork() );
-		works.add( new OptimizeLuceneWork(RemoteEntity.class) ); //class won't be send over
+		works.add( new OptimizeLuceneWork( RemoteEntity.class ) ); //class won't be send over
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
 		works.add( new DeleteLuceneWork( 123, "123", RemoteEntity.class ) );
@@ -79,16 +152,28 @@ public class SerializationTest extends SearchTestCase {
 		numField.setLongValue( 23l );
 		doc.add( numField );
 
-		Map<String,String> analyzers = new HashMap<String,String>(  );
+		Map<String, String> analyzers = new HashMap<String, String>();
 		analyzers.put( "godo", "ngram" );
-		works.add( new AddLuceneWork( 123, "123", RemoteEntity.class, doc , analyzers ) );
+		works.add( new AddLuceneWork( 123, "123", RemoteEntity.class, doc, analyzers ) );
 
 		doc = new Document();
 		doc.setBoost( 2.3f );
-		Field field = new Field( "StringF", "String field", Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_OFFSETS );
+		Field field = new Field(
+				"StringF",
+				"String field",
+				Field.Store.YES,
+				Field.Index.ANALYZED,
+				Field.TermVector.WITH_OFFSETS
+		);
 		doc.add( field );
 
-		field = new Field( "StringF2", "String field 2", Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_OFFSETS );
+		field = new Field(
+				"StringF2",
+				"String field 2",
+				Field.Store.YES,
+				Field.Index.ANALYZED,
+				Field.TermVector.WITH_OFFSETS
+		);
 		doc.add( field );
 
 		byte[] array = new byte[4];
@@ -100,53 +185,48 @@ public class SerializationTest extends SearchTestCase {
 		doc.add( field );
 
 		SerializableStringReader reader = new SerializableStringReader( "Serializable String Reader" );
-		field =  new Field( "ReaderField", reader, Field.TermVector.WITH_OFFSETS );
-		doc.add(field);
+		field = new Field( "ReaderField", reader, Field.TermVector.WITH_OFFSETS );
+		doc.add( field );
 		//TODO  TokenStream
 
 		works.add( new UpdateLuceneWork( 1234, "1234", RemoteEntity.class, doc ) );
 		works.add( new AddLuceneWork( 125, "125", RemoteEntity.class, new Document() ) );
-
-		byte[] bytes = converter.toSerializedModel( works );
-		List<LuceneWork> copyOfWorks = converter.toLuceneWorks( bytes );
-		assertThat(copyOfWorks).hasSize( works.size() );
-		for (int index = 0 ; index < works.size() ; index++) {
-			assertLuceneWork( works.get( index ), copyOfWorks.get( index ) );
-		}
+		return works;
 	}
 
 	private void assertLuceneWork(LuceneWork work, LuceneWork copy) {
 		assertThat( copy ).isInstanceOf( work.getClass() );
-		if (work instanceof OptimizeLuceneWork) {
-			assertOptimize( (OptimizeLuceneWork) work, (OptimizeLuceneWork) copy );
+		if ( work instanceof OptimizeLuceneWork ) {
+			assertOptimize( ( OptimizeLuceneWork ) work, ( OptimizeLuceneWork ) copy );
 		}
-		else if (work instanceof PurgeAllLuceneWork) {
-			assertPurgeAll( (PurgeAllLuceneWork) work, (PurgeAllLuceneWork) copy );
+		else if ( work instanceof PurgeAllLuceneWork ) {
+			assertPurgeAll( ( PurgeAllLuceneWork ) work, ( PurgeAllLuceneWork ) copy );
 		}
-		else if (work instanceof DeleteLuceneWork) {
+		else if ( work instanceof DeleteLuceneWork ) {
 			assertDelete( ( DeleteLuceneWork ) work, ( DeleteLuceneWork ) copy );
 		}
-		else if (work instanceof AddLuceneWork) {
+		else if ( work instanceof AddLuceneWork ) {
 			assertAdd( ( AddLuceneWork ) work, ( AddLuceneWork ) copy );
 		}
 	}
 
 	private void assertAdd(AddLuceneWork work, AddLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as("Add.getEntityClass is not copied").isEqualTo( copy.getEntityClass() );
-		assertThat( work.getId() ).as("Add.getId is not copied").isEqualTo( copy.getId() );
-		assertThat( work.getIdInString() ).as("Add.getIdInString is not the same").isEqualTo( copy.getIdInString() );
-		assertThat( work.getFieldToAnalyzerMap() ).as("Add.getFieldToAnalyzerMap is not the same").isEqualTo( copy.getFieldToAnalyzerMap() );
+		assertThat( work.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
+		assertThat( work.getId() ).as( "Add.getId is not copied" ).isEqualTo( copy.getId() );
+		assertThat( work.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
+		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
+				.isEqualTo( copy.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
 	}
 
 	private void assertDocument(Document document, Document copy) {
 		assertThat( document.getBoost() ).isEqualTo( copy.getBoost() );
-		for ( int index = 0 ; index < document.getFields().size() ; index++ ) {
-			Fieldable field = document.getFields().get(index);
-			Fieldable fieldCopy = copy.getFields().get(index);
+		for ( int index = 0; index < document.getFields().size(); index++ ) {
+			Fieldable field = document.getFields().get( index );
+			Fieldable fieldCopy = copy.getFields().get( index );
 			assertThat( field ).isInstanceOf( fieldCopy.getClass() );
 			if ( field instanceof NumericField ) {
-				assertNumericField((NumericField) field, (NumericField) fieldCopy);
+				assertNumericField( ( NumericField ) field, ( NumericField ) fieldCopy );
 			}
 			else if ( field instanceof Field ) {
 				assertNormalField( ( Field ) field, ( Field ) fieldCopy );
@@ -201,11 +281,14 @@ public class SerializationTest extends SearchTestCase {
 	}
 
 	private void assertDelete(DeleteLuceneWork work, DeleteLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as("Delete.getEntityClass is not copied").isEqualTo( copy.getEntityClass() );
+		assertThat( work.getEntityClass() ).as( "Delete.getEntityClass is not copied" )
+				.isEqualTo( copy.getEntityClass() );
 		assertThat( work.getId() ).as( "Delete.getId is not copied" ).isEqualTo( copy.getId() );
-		assertThat( work.getDocument() ).as("Delete.getDocument is not the same").isEqualTo( copy.getDocument() );
-		assertThat( work.getIdInString() ).as("Delete.getIdInString is not the same").isEqualTo( copy.getIdInString() );
-		assertThat( work.getFieldToAnalyzerMap() ).as( "Delete.getFieldToAnalyzerMap is not the same" ).isEqualTo( copy.getFieldToAnalyzerMap() );
+		assertThat( work.getDocument() ).as( "Delete.getDocument is not the same" ).isEqualTo( copy.getDocument() );
+		assertThat( work.getIdInString() ).as( "Delete.getIdInString is not the same" )
+				.isEqualTo( copy.getIdInString() );
+		assertThat( work.getFieldToAnalyzerMap() ).as( "Delete.getFieldToAnalyzerMap is not the same" )
+				.isEqualTo( copy.getFieldToAnalyzerMap() );
 	}
 
 	private void assertOptimize(OptimizeLuceneWork work, OptimizeLuceneWork copy) {
@@ -213,7 +296,8 @@ public class SerializationTest extends SearchTestCase {
 	}
 
 	private void assertPurgeAll(PurgeAllLuceneWork work, PurgeAllLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as("PurgeAll.getEntityClass is not copied").isEqualTo( copy.getEntityClass() );
+		assertThat( work.getEntityClass() ).as( "PurgeAll.getEntityClass is not copied" )
+				.isEqualTo( copy.getEntityClass() );
 	}
 
 	@Override
