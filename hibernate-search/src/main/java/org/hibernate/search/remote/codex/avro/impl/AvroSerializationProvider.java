@@ -92,6 +92,7 @@ public class AvroSerializationProvider implements SerializationProvider {
 		parseSchema( "PurgeAll" );
 		parseSchema( "Delete" );
 		parseSchema( "Add" );
+		parseSchema( "Update" );
 		parseSchema( "Message" );
 
 		this.protocol = parseProtocol( "Works" );
