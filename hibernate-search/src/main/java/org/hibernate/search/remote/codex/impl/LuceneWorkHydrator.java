@@ -38,6 +38,7 @@ import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -110,7 +111,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	public void addUpdateLuceneWork(String entityClassName, byte[] idAsByte, Map<String, String> fieldToAnalyzerMap) {
 		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
 		Serializable id = toSerializable( idAsByte, loader );
-		LuceneWork result = new AddLuceneWork(
+		LuceneWork result = new UpdateLuceneWork(
 				id,
 				objectIdInString(entityClass, id),
 				entityClass,

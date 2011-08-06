@@ -87,7 +87,6 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public void addAdd(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
 		GenericRecord add = new GenericData.Record( protocol.getType( "Add" ) );
-		protocol.getType( "Add" ).getFields().get( 2 );
 		add.put( "class", entityClassName );
 		add.put( "id", ByteBuffer.wrap( id ) );
 		add.put( "document", document );
@@ -217,7 +216,7 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addFieldWithSerializableReaderData(LuceneFieldContext context) {
-		GenericRecord field = createNormalField( "StringField", context );
+		GenericRecord field = createNormalField( "ReaderField", context );
 		field.put( "value", ByteBuffer.wrap( context.getReaderValue() ) );
 		field.put( "termVector", context.getTermVector() );
 		fieldables.add( field );

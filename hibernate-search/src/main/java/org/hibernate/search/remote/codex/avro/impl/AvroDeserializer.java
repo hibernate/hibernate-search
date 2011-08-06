@@ -123,7 +123,7 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "Update".equals( schema ) ) {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
 				Map<String, String> analyzers = getAnalyzers( operation );
-				hydrator.addAddLuceneWork(
+				hydrator.addUpdateLuceneWork(
 						asString( operation, "class" ),
 						asByteArray( operation, "id" ),
 						analyzers
@@ -137,6 +137,7 @@ public class AvroDeserializer implements Deserializer {
 
 	private Map<String, String> getAnalyzers(GenericRecord operation) {
 		Map<?,?> analyzersWithUtf8  = (Map<?,?>) operation.get( "fieldToAnalyzerMap" );
+		if (analyzersWithUtf8 == null) return null;
 		Map<String,String> analyzers = new HashMap<String, String>( analyzersWithUtf8.size() );
 		for ( Map.Entry<?,?> entry : analyzersWithUtf8.entrySet() ) {
 			analyzers.put( entry.getKey().toString(), entry.getValue().toString() );
