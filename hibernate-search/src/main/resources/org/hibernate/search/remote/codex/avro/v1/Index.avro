@@ -1,6 +1,5 @@
 {
-    //__ replaced by unique id since Index is embedded several times
-    "name": "Index__",
+    "name": "Index",
     "type": "enum",
     "symbols" : ["NO",
                 "ANALYZED",

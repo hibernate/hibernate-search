@@ -23,10 +23,11 @@ package org.hibernate.search.remote.codex.avro.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.avro.Schema;
+import org.apache.avro.Protocol;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.Decoder;
@@ -48,11 +49,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class AvroDeserializer implements Deserializer {
 
-	private final Map<String, Schema> schemas;
 	private static final Log log = LoggerFactory.make();
+	private final Protocol protocol;
 
-	public AvroDeserializer(Map<String, Schema> schemas) {
-		this.schemas = schemas;
+	public AvroDeserializer(Protocol protocol) {
+		this.protocol = protocol;
 	}
 
 	@Override
@@ -81,7 +82,7 @@ public class AvroDeserializer implements Deserializer {
 		}
 
 		Decoder decoder = DecoderFactory.get().binaryDecoder( inputStream, null );
-		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>( schemas.get("Message") );
+		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>( protocol.getType("Message") );
 		GenericRecord result;
 		try {
 			result = reader.read(null, decoder);
@@ -112,24 +113,35 @@ public class AvroDeserializer implements Deserializer {
 			}
 			else if ( "Add".equals( schema ) ) {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
+				Map<String, String> analyzers = getAnalyzers( operation );
 				hydrator.addAddLuceneWork(
 						asString( operation, "class" ),
 						asByteArray( operation, "id" ),
-						( Map<String, String> ) operation.get( "fieldToAnalyzerMap" )
+						analyzers
 				);
 			}
 			else if ( "Update".equals( schema ) ) {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
+				Map<String, String> analyzers = getAnalyzers( operation );
 				hydrator.addAddLuceneWork(
 						asString( operation, "class" ),
 						asByteArray( operation, "id" ),
-						(Map<String,String>) operation.get( "fieldToAnalyzerMap" )
+						analyzers
 				);
 			}
 			else {
 				throw new SearchException( "Unexpected operation type: " + schema );
 			}
 		}
+	}
+
+	private Map<String, String> getAnalyzers(GenericRecord operation) {
+		Map<?,?> analyzersWithUtf8  = (Map<?,?>) operation.get( "fieldToAnalyzerMap" );
+		Map<String,String> analyzers = new HashMap<String, String>( analyzersWithUtf8.size() );
+		for ( Map.Entry<?,?> entry : analyzersWithUtf8.entrySet() ) {
+			analyzers.put( entry.getKey().toString(), entry.getValue().toString() );
+		}
+		return analyzers;
 	}
 
 	private void buildLuceneDocument(GenericRecord document, LuceneWorksBuilder hydrator) {
@@ -233,48 +245,6 @@ public class AvroDeserializer implements Deserializer {
 				throw new SearchException( "Unknown Field type: " + schema );
 			}
 		}
-
-
-
-
-
-
-
-
-
-
-/*
-
-				else if ( field instanceof SerializableTokenStreamField ) {
-					SerializableTokenStreamField reallySafeField = ( SerializableTokenStreamField ) field;
-					hydrator.addFieldWithTokenStreamData(
-							reallySafeField.getName(),
-							reallySafeField.getValue().getStream(),
-							reallySafeField.getTermVector(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
-				}
-				else if ( field instanceof SerializableReaderField ) {
-					SerializableReaderField reallySafeField = ( SerializableReaderField ) field;
-					hydrator.addFieldWithSerializableReaderData(
-							reallySafeField.getName(),
-							reallySafeField.getValue(),
-							reallySafeField.getTermVector(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
-				}
-				else {
-					throw new SearchException( "Unknown SerializableField: " + field.getClass() );
-				}
-			}
-			else {
-				throw new SearchException( "Unknown SerializableFieldable: " + field.getClass() );
-			}
-		}       */
 	}
 
 	private GenericRecord asGenericRecord(GenericRecord operation, String field) {

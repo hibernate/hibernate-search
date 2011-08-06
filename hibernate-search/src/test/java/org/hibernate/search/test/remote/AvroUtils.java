@@ -21,10 +21,6 @@
 package org.hibernate.search.test.remote;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,7 +30,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.avro.Schema;
+import org.apache.avro.Protocol;
 
 import org.hibernate.search.SearchException;
 
@@ -43,15 +39,20 @@ import org.hibernate.search.SearchException;
  *
  * @author Boris Lublinsky
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
- *
- * //TODO convert to non static method
- *
+ *         <p/>
+ *         //TODO convert to non static method
  */
 public class AvroUtils {
 
-	private static Map<String, Schema> schemas = new HashMap<String, Schema>();
+	private static Map<String, String> schemas = new HashMap<String, String>();
 
 	private AvroUtils() {
+	}
+
+	public static void parseSchema(String filename, String name) {
+		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( filename );
+		String messageSchemaAsString = AvroUtils.readInputStream( in, filename );
+		AvroUtils.addSchema( name, messageSchemaAsString );
 	}
 
 	public static String readInputStream(InputStream inputStream, String filename) {
@@ -60,7 +61,7 @@ public class AvroUtils {
 			char[] buffer = new char[1000];
 			Reader reader = new BufferedReader( new InputStreamReader( inputStream, "UTF-8" ) );
 			int r = reader.read( buffer );
-			while (r != -1) {
+			while ( r != -1 ) {
 				writer.write( buffer, 0, r );
 				r = reader.read( buffer );
 			}
@@ -71,32 +72,26 @@ public class AvroUtils {
 		}
 	}
 
-	public static void addSchema(String name, Schema schema) {
-		schemas.put( name, schema );
+	public static void addSchema(String name, String schema) {
+		schemas.put( "`" + name + "`", schema );
 
 	}
 
-	public static Schema getSchema(String name) {
-		return schemas.get( name );
-
+	public static Protocol parseProtocol(String filename, String name) {
+		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( filename );
+		String protocolSkeleton = AvroUtils.readInputStream( in, filename );
+		String protocolString = inlineSchemas( protocolSkeleton );
+		return Protocol.parse( protocolString );
 	}
 
-	private static int inc;
-
-	public static String resolveSchema(String sc) {
-
-		String result = sc;
-		for ( Map.Entry<String, Schema> entry : schemas.entrySet() ) {
+	public static String inlineSchemas(String protocolSkeleton) {
+		String result = protocolSkeleton;
+		for ( Map.Entry<String, String> entry : schemas.entrySet() ) {
 			result = replace(
 					result, entry.getKey(),
 					entry.getValue().toString()
 			);
-			result = replace(
-					result, "__",
-					""+inc+"__" //second level or more inclusion
-			);
 		}
-		inc++;
 		return result;
 
 	}

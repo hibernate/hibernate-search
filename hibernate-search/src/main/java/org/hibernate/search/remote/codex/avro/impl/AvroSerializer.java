@@ -24,9 +24,11 @@ package org.hibernate.search.remote.codex.avro.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.Protocol;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericArray;
 import org.apache.avro.generic.GenericData;
@@ -48,35 +50,35 @@ import org.hibernate.search.remote.operations.impl.SerializableTermVector;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class AvroSerializer implements Serializer {
-	private Map<String, Schema> schemas;
-	private GenericArray<GenericRecord> fieldables;
-	private GenericArray<GenericRecord> operations;
+	private List<GenericRecord> fieldables;
+	private List<GenericRecord> operations;
 	private GenericRecord document;
+	private final Protocol protocol;
 
-	public AvroSerializer(Map<String, Schema> schemas) {
-		this.schemas = schemas;
+	public AvroSerializer(Protocol protocol) {
+		this.protocol = protocol;
 	}
 
 	@Override
 	public void luceneWorks(List<LuceneWork> works) {
-		operations = new GenericData.Array<GenericRecord>( works.size(), schemas.get( "Operations" ) );
+		operations = new ArrayList<GenericRecord>( works.size() );
 	}
 
 	@Override
 	public void addOptimizeAll() {
-		operations.add( new GenericData.Record( schemas.get( "OptimizeAll" ) ) );
+		operations.add( new GenericData.Record( protocol.getType( "OptimizeAll" ) ) );
 	}
 
 	@Override
 	public void addPurgeAll(String entityClassName) {
-		GenericRecord purgeAll = new GenericData.Record( schemas.get( "PurgeAll" ) );
+		GenericRecord purgeAll = new GenericData.Record( protocol.getType( "PurgeAll" ) );
 		purgeAll.put( "class", entityClassName );
 		operations.add( purgeAll );
 	}
 
 	@Override
 	public void addDelete(String entityClassName, byte[] id) {
-		GenericRecord delete = new GenericData.Record( schemas.get( "Delete" ) );
+		GenericRecord delete = new GenericData.Record( protocol.getType( "Delete" ) );
 		delete.put( "class", entityClassName );
 		delete.put( "id", ByteBuffer.wrap( id ) );
 		operations.add( delete );
@@ -84,7 +86,8 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addAdd(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
-		GenericRecord add = new GenericData.Record( schemas.get( "Add" ) );
+		GenericRecord add = new GenericData.Record( protocol.getType( "Add" ) );
+		protocol.getType( "Add" ).getFields().get( 2 );
 		add.put( "class", entityClassName );
 		add.put( "id", ByteBuffer.wrap( id ) );
 		add.put( "document", document );
@@ -95,7 +98,7 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addUpdate(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
-		GenericRecord update = new GenericData.Record( schemas.get( "Update" ) );
+		GenericRecord update = new GenericData.Record( protocol.getType( "Update" ) );
 		update.put( "class", entityClassName );
 		update.put( "id", ByteBuffer.wrap( id ) );
 		update.put( "document", document );
@@ -110,7 +113,7 @@ public class AvroSerializer implements Serializer {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		out.write( AvroSerializationProvider.getMajorVersion() );
 		out.write( AvroSerializationProvider.getMinorVersion() );
-		Schema msgSchema = schemas.get( "Message" );
+		Schema msgSchema = protocol.getType( "Message" );
 		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>( msgSchema );
 		BinaryEncoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );
 		GenericRecord message = new GenericData.Record( msgSchema );
@@ -129,7 +132,7 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void fields(List<Fieldable> fields) {
-		fieldables = new GenericData.Array<GenericRecord>( fields.size(), schemas.get( "Fieldables" ) );
+		fieldables = new ArrayList<GenericRecord>( fields.size() );
 	}
 
 	@Override
@@ -140,7 +143,7 @@ public class AvroSerializer implements Serializer {
 	}
 
 	private GenericRecord createNumericfield(String schemaName, LuceneNumericFieldContext context) {
-		GenericRecord numericField = new GenericData.Record( schemas.get( schemaName ) );
+		GenericRecord numericField = new GenericData.Record( protocol.getType( schemaName ) );
 		numericField.put( "name", context.getName() );
 		numericField.put( "precisionStep", context.getPrecisionStep() );
 		numericField.put( "store", context.getStore() );
@@ -182,7 +185,7 @@ public class AvroSerializer implements Serializer {
 	}
 
 	private GenericRecord createNormalField(String schemaName, LuceneFieldContext context) {
-		GenericRecord field = new GenericData.Record( schemas.get( schemaName ) );
+		GenericRecord field = new GenericData.Record( protocol.getType( schemaName ) );
 		field.put( "name", context.getName() );
 		field.put( "boost", context.getBoost() );
 		field.put( "omitNorms", context.isOmitNorms() );
@@ -222,14 +225,14 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addFieldWithSerializableFieldable(byte[] fieldable) {
-		GenericRecord customFieldable = new GenericData.Record( schemas.get("CustomFieldable") );
+		GenericRecord customFieldable = new GenericData.Record( protocol.getType( "CustomFieldable" ) );
 		customFieldable.put( "instance", ByteBuffer.wrap( fieldable ) );
 		fieldables.add( customFieldable );
 	}
 
 	@Override
 	public void addDocument(float boost) {
-		document = new GenericData.Record( schemas.get("Document") );
+		document = new GenericData.Record( protocol.getType( "Document" ) );
 		document.put( "boost", boost );
 		document.put( "fieldables", fieldables );
 	}
