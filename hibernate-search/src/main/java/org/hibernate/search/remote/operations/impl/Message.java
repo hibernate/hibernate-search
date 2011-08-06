@@ -32,16 +32,10 @@ import java.util.Set;
  */
 
 public class Message implements Serializable {
-	private int protocolVersion;
 	private Set<Operation> operations;
 
-	public Message(int version, Set<Operation> operations) {
-		this.protocolVersion = version;
+	public Message(Set<Operation> operations) {
 		this.operations = operations;
-	}
-
-	public int getProtocolVersion() {
-		return protocolVersion;
 	}
 
 	public Set<Operation> getOperations() {

@@ -116,7 +116,6 @@ public class AvroSerializer implements Serializer {
 		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>( msgSchema );
 		BinaryEncoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );
 		GenericRecord message = new GenericData.Record( msgSchema );
-		message.put( "version", 1 );
 		message.put( "operations", operations );
 		operations = null;
 		try {
