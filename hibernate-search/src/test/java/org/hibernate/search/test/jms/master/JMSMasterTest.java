@@ -43,6 +43,7 @@ import javax.naming.NamingException;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumericField;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 
@@ -168,6 +169,9 @@ public class JMSMasterTest extends SearchTestCase {
 		doc.add( field );
 		field = new Field( "logo", shirt.getLogo(), Field.Store.NO, Field.Index.ANALYZED );
 		doc.add( field );
+		NumericField numField = new NumericField( "length" );
+		numField.setDoubleValue( shirt.getLength() );
+		doc.add( numField );
 		LuceneWork luceneWork = new AddLuceneWork(
 				shirt.getId(), String.valueOf( shirt.getId() ), shirt.getClass(), doc
 		);
@@ -191,7 +195,7 @@ public class JMSMasterTest extends SearchTestCase {
 			public void execute(Connection connection) throws SQLException {
 				final Statement statement = connection.createStatement();
 				statement.executeUpdate(
-						"insert into TShirt_Master(id, logo, size_) values( 1, 'JBoss balls', 'large')"
+						"insert into TShirt_Master(id, logo, size_, length_) values( 1, 'JBoss balls', 'large', 23.2)"
 				);
 				statement.close();
 			}
