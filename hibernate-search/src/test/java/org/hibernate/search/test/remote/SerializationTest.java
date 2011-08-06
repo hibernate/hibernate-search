@@ -20,9 +20,16 @@
  */
 package org.hibernate.search.test.remote;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Serializable;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.avro.util.Utf8;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
@@ -34,6 +41,7 @@ import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.remote.codex.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.test.SearchTestCase;
@@ -49,9 +57,56 @@ public class SerializationTest extends SearchTestCase {
 		LuceneWorkSerializer converter = new LuceneWorkSerializer( new AvroSerializationProvider(), getSearchFactoryImpl() );
 		List<LuceneWork> works = new ArrayList<LuceneWork>();
 		works.add( new OptimizeLuceneWork() );
+		works.add( new OptimizeLuceneWork() );
 		works.add( new OptimizeLuceneWork(RemoteEntity.class) ); //class won't be send over
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
+		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
 		works.add( new DeleteLuceneWork( 123, "123", RemoteEntity.class ) );
+		works.add( new DeleteLuceneWork( 123, "123", RemoteEntity.class ) );
+
+		Document doc = new Document();
+		doc.setBoost( 2.3f );
+		NumericField numField = new NumericField( "double", 23, Field.Store.NO, true );
+		numField.setDoubleValue( 23d );
+		doc.add( numField );
+		numField = new NumericField( "int", 23, Field.Store.NO, true );
+		numField.setIntValue( 23 );
+		doc.add( numField );
+		numField = new NumericField( "float", 23, Field.Store.NO, true );
+		numField.setFloatValue( 2.3f );
+		doc.add( numField );
+		numField = new NumericField( "long", 23, Field.Store.NO, true );
+		numField.setLongValue( 23l );
+		doc.add( numField );
+
+		Map<String,String> analyzers = new HashMap<String,String>(  );
+		analyzers.put( "godo", "ngram" );
+		works.add( new AddLuceneWork( 123, "123", RemoteEntity.class, doc , analyzers ) );
+
+		doc = new Document();
+		doc.setBoost( 2.3f );
+		Field field = new Field( "StringF", "String field", Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_OFFSETS );
+		doc.add( field );
+
+		field = new Field( "StringF2", "String field 2", Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_OFFSETS );
+		doc.add( field );
+
+		byte[] array = new byte[4];
+		array[0] = 2;
+		array[1] = 5;
+		array[2] = 5;
+		array[3] = 8;
+		field = new Field( "binary", array, 0, array.length );
+		doc.add( field );
+
+		SerializableStringReader reader = new SerializableStringReader( "Serializable String Reader" );
+		field =  new Field( "ReaderField", reader, Field.TermVector.WITH_OFFSETS );
+		doc.add(field);
+		//TODO  TokenStream
+
+		works.add( new UpdateLuceneWork( 1234, "1234", RemoteEntity.class, doc ) );
+		works.add( new AddLuceneWork( 125, "125", RemoteEntity.class, new Document() ) );
+
 		byte[] bytes = converter.toSerializedModel( works );
 		List<LuceneWork> copyOfWorks = converter.toLuceneWorks( bytes );
 		assertThat(copyOfWorks).hasSize( works.size() );
@@ -167,4 +222,29 @@ public class SerializationTest extends SearchTestCase {
 				RemoteEntity.class
 		};
 	}
+
+	private static class SerializableStringReader extends Reader implements Serializable {
+
+
+		private String string;
+
+		@Override
+		public int read(char[] cbuf, int off, int len) throws IOException {
+			return 0;
+		}
+
+		@Override
+		public void close() throws IOException {
+		}
+
+		/**
+		 * Creates a new string reader.
+		 *
+		 * @param s String providing the character stream.
+		 */
+		public SerializableStringReader(String s) {
+			this.string = s;
+		}
+	}
+
 }
