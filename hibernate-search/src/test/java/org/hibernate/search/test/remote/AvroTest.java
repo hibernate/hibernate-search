@@ -73,6 +73,7 @@ public class AvroTest {
 		parseSchema( root + "PurgeAll.avro", "PurgeAll" );
 		parseSchema( root + "Delete.avro", "Delete" );
 		parseSchema( root + "Add.avro", "Add" );
+		parseSchema( root + "Update.avro", "Update" );
 		parseSchema( root + "Message.avro", "Message" );
 
 
@@ -95,6 +96,7 @@ public class AvroTest {
 		final Schema purgeAllSchema = protocol.getType( "PurgeAll" );
 		final Schema deleteSchema = protocol.getType( "Delete" );
 		final Schema addSchema = protocol.getType( "Add" );
+		final Schema updateSchema = protocol.getType( "Update" );
 		Schema messageSchema = protocol.getType( "Message" );
 
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
