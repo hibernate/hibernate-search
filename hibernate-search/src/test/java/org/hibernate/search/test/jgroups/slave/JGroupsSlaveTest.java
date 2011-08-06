@@ -65,9 +65,11 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		TShirt ts = new TShirt();
 		ts.setLogo( "Boston" );
 		ts.setSize( "XXL" );
+		ts.setLength( 23.3d );
 		TShirt ts2 = new TShirt();
 		ts2.setLogo( "Mapple leaves" );
 		ts2.setSize( "L" );
+		ts2.setLength( 23.32d );
 		s.persist( ts );
 		s.persist( ts2 );
 		tx.commit();
