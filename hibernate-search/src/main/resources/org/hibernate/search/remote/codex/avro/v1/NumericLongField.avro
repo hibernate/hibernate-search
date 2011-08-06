@@ -16,7 +16,7 @@
         },
         {
             "name": "store",
-            "type": `Store`
+            "type": "Store"
         },
         {
             "name": "indexed",

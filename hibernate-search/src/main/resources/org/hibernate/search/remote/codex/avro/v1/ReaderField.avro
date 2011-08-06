@@ -8,7 +8,7 @@
         },
         {
             "name": "termVector",
-            "type": `TermVector`
+            "type": "TermVector"
         },
         {
             "name": "name",

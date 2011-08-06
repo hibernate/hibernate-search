@@ -9,7 +9,10 @@
 
         {
             "name": "operations",
-            "type": `Operations`
+            "type": {
+                "type": "array",
+                "items": ["OptimizeAll", "PurgeAll", "Delete", "Add"]
+            }
         }
     ]
 }

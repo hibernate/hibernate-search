@@ -30,26 +30,30 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.avro.Schema;
+import org.apache.avro.Protocol;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.remote.codex.spi.Deserializer;
-import org.hibernate.search.remote.codex.spi.Serializer;
 import org.hibernate.search.remote.codex.spi.SerializationProvider;
+import org.hibernate.search.remote.codex.spi.Serializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * parsing code inspired by http://www.infoq.com/articles/ApacheAvro
+ * from Boris Lublinsky
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class AvroSerializationProvider implements SerializationProvider {
 
 	private static final Log log = LoggerFactory.make();
-	private Map<String,Schema> schemas;
+	private Map<String, String> schemas = new HashMap<String,String>();
 	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1/";
-	public static byte MAJOR_VERSION = (byte)(-128 + 1);
-	public static byte MINOR_VERSION = (byte)(-128 + 0);
+	public static byte MAJOR_VERSION = ( byte ) ( -128 + 1 );
+	public static byte MINOR_VERSION = ( byte ) ( -128 + 0 );
 	private int unique;
+	private Protocol protocol;
 
 	public static int getMajorVersion() {
 		return MAJOR_VERSION + 128; //rebase to 0
@@ -61,40 +65,39 @@ public class AvroSerializationProvider implements SerializationProvider {
 
 	@Override
 	public Serializer getSerializer() {
-		return new AvroSerializer( schemas );
+		return new AvroSerializer( protocol );
 	}
 
 	@Override
 	public Deserializer getDeserializer() {
-		return new AvroDeserializer( schemas );
+		return new AvroDeserializer( protocol );
 	}
 
 	public AvroSerializationProvider() {
 		log.serializationProtocol( getMajorVersion(), getMinorVersion() );
-		this.schemas = new HashMap<String, Schema>( 20 );
-		parseSchema("TermVector");
-		parseSchema("Index");
-		parseSchema("Store");
-		parseSchema("TokenStreamField");
-		parseSchema("ReaderField");
-		parseSchema("StringField");
-		parseSchema("BinaryField");
-		parseSchema("NumericIntField");
-		parseSchema("NumericLongField");
-		parseSchema("NumericFloatField");
-		parseSchema("NumericDoubleField");
-		parseSchema("CustomFieldable");
-		parseSchema("Fieldables");
-		parseSchema("Document");
-		parseSchema("OptimizeAll");
-		parseSchema("PurgeAll");
-		parseSchema("Delete");
-		parseSchema("Add");
-		parseSchema("Operations");
-		parseSchema("Message");
+		parseSchema( "TermVector" );
+		parseSchema( "Index" );
+		parseSchema( "Store" );
+		parseSchema( "TokenStreamField" );
+		parseSchema( "ReaderField" );
+		parseSchema( "StringField" );
+		parseSchema( "BinaryField" );
+		parseSchema( "NumericIntField" );
+		parseSchema( "NumericLongField" );
+		parseSchema( "NumericFloatField" );
+		parseSchema( "NumericDoubleField" );
+		parseSchema( "CustomFieldable" );
+		parseSchema( "Document" );
+		parseSchema( "OptimizeAll" );
+		parseSchema( "PurgeAll" );
+		parseSchema( "Delete" );
+		parseSchema( "Add" );
+		parseSchema( "Message" );
+
+		this.protocol = parseProtocol( "Works" );
 	}
 
-	private Schema parseSchema(String filename) {
+	private void parseSchema(String filename) {
 		String fullFileNameileName = V1_PATH + filename + ".avro";
 		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( fullFileNameileName );
 		String messageSchemaAsString;
@@ -109,25 +112,16 @@ public class AvroSerializationProvider implements SerializationProvider {
 				//we don't care
 			}
 		}
-		String jsonSchema = resolveSchema( messageSchemaAsString );
-		Schema schema;
-		try {
-			schema = Schema.parse( jsonSchema );
-		}
-		catch ( RuntimeException e ) {
-			throw new SearchException( "Unable to parse schema: " +fullFileNameileName + "\n" + jsonSchema, e );
-		}
-		schemas.put( filename, schema );
-		return schema;
+		schemas.put( filename, messageSchemaAsString );
 	}
-	
+
 	public String readInputStream(InputStream inputStream, String filename) {
 		try {
 			Writer writer = new StringWriter();
 			char[] buffer = new char[1000];
 			Reader reader = new BufferedReader( new InputStreamReader( inputStream, "UTF-8" ) );
 			int r = reader.read( buffer );
-			while (r != -1) {
+			while ( r != -1 ) {
 				writer.write( buffer, 0, r );
 				r = reader.read( buffer );
 			}
@@ -138,25 +132,23 @@ public class AvroSerializationProvider implements SerializationProvider {
 		}
 	}
 
+	public Protocol parseProtocol(String name) {
+		String filename = V1_PATH + name + ".avpr";
+		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( filename );
+		String protocolSkeleton = readInputStream( in, filename );
+		String protocolString = inlineSchemas( protocolSkeleton );
+		return Protocol.parse( protocolString );
+	}
 
-
-	public String resolveSchema(String sc) {
-
-		String result = sc;
-		for ( Map.Entry<String, Schema> entry : schemas.entrySet() ) {
+	public String inlineSchemas(String protocolSkeleton) {
+		String result = protocolSkeleton;
+		for ( Map.Entry<String, String> entry : schemas.entrySet() ) {
 			result = replace(
 					result, "`" + entry.getKey() + "`",
 					entry.getValue().toString()
 			);
-			//make sure Schema names are unique when embedded
-			result = replace(
-					result, "__",
-					unique + "__" //second level or more inclusion
-			);
 		}
-		unique++;
 		return result;
-
 	}
 
 	static String replace(String str, String pattern, String replace) {

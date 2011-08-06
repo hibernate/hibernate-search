@@ -8,15 +8,15 @@
         },
         {
             "name": "store",
-            "type": `Store`
+            "type": "Store"
         },
         {
             "name": "index",
-            "type": `Index`
+            "type": "Index"
         },
         {
             "name": "termVector",
-            "type": `TermVector`
+            "type": "TermVector"
         },
         {
             "name": "name",

@@ -1,6 +1,5 @@
 {
-    //__ replaced by unique id since TermVector is embedded several times
-    "name": "TermVector__",
+    "name": "TermVector",
     "type": "enum",
     "symbols" : ["NO",
                 "YES",

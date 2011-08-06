@@ -12,7 +12,7 @@
         },
         {
             "name": "document",
-            "type": `Document`
+            "type": "Document"
         },
         {
             "name": "fieldToAnalyzerMap",

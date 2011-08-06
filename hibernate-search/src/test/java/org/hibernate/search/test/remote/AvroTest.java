@@ -30,8 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.avro.Protocol;
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericArray;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericDatumWriter;
@@ -45,34 +45,57 @@ import org.apache.avro.util.Utf8;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.search.test.remote.AvroUtils.*;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class AvroTest {
+
+
 	@Test
 	public void experimentWithAvro() throws Exception {
 		String root = "org/hibernate/search/remote/codex/avro/v1/";
-		final Schema termVectorSchema = parseSchema( root + "TermVector.avro", "TermVector" );
-		final Schema indexSchema = parseSchema( root + "Index.avro", "Index" );
-		final Schema storeSchema = parseSchema( root + "Store.avro", "Store" );
-		final Schema tokenStreamSchema = parseSchema( root + "TokenStreamField.avro", "TokenStreamField" );
-		final Schema readerSchema = parseSchema( root + "ReaderField.avro", "ReaderField" );
-		final Schema stringSchema = parseSchema( root + "StringField.avro", "StringField" );
-		final Schema binarySchema = parseSchema( root + "BinaryField.avro", "BinaryField" );
-		final Schema intFieldSchema = parseSchema( root + "NumericIntField.avro", "NumericIntField" );
-		final Schema longFieldSchema = parseSchema( root + "NumericLongField.avro", "NumericLongField" );
-		final Schema floatFieldSchema = parseSchema( root + "NumericFloatField.avro", "NumericFloatField" );
-		final Schema doubleFieldSchema = parseSchema( root + "NumericDoubleField.avro", "NumericDoubleField" );
-		final Schema custonFieldableSchema = parseSchema( root + "CustomFieldable.avro", "CustomFieldable" );
-		final Schema fieldablesSchema = parseSchema( root + "Fieldables.avro", "Fieldables" );
-		final Schema documentSchema = parseSchema( root + "Document.avro", "Document" );
-		final Schema optimizeAllSchema = parseSchema( root + "OptimizeAll.avro", "OptimizeAll" );
-		final Schema purgeAllSchema = parseSchema( root + "PurgeAll.avro", "PurgeAll" );
-		final Schema deleteSchema = parseSchema( root + "Delete.avro", "Delete" );
-		final Schema addSchema = parseSchema( root + "Add.avro", "Add" );
-		final Schema opsSchema = parseSchema( root + "Operations.avro", "Operations" );
-		Schema messageSchema = parseSchema( root + "Message.avro", "Message" );
+		parseSchema( root + "TermVector.avro", "TermVector" );
+		parseSchema( root + "Index.avro", "Index" );
+		parseSchema( root + "Store.avro", "Store" );
+		parseSchema( root + "TokenStreamField.avro", "TokenStreamField" );
+		parseSchema( root + "ReaderField.avro", "ReaderField" );
+		parseSchema( root + "StringField.avro", "StringField" );
+		parseSchema( root + "BinaryField.avro", "BinaryField" );
+		parseSchema( root + "NumericIntField.avro", "NumericIntField" );
+		parseSchema( root + "NumericLongField.avro", "NumericLongField" );
+		parseSchema( root + "NumericFloatField.avro", "NumericFloatField" );
+		parseSchema( root + "NumericDoubleField.avro", "NumericDoubleField" );
+		parseSchema( root + "CustomFieldable.avro", "CustomFieldable" );
+		parseSchema( root + "Document.avro", "Document" );
+		parseSchema( root + "OptimizeAll.avro", "OptimizeAll" );
+		parseSchema( root + "PurgeAll.avro", "PurgeAll" );
+		parseSchema( root + "Delete.avro", "Delete" );
+		parseSchema( root + "Add.avro", "Add" );
+		parseSchema( root + "Message.avro", "Message" );
+
+
+		String filename = root + "Works.avpr";
+		Protocol protocol = parseProtocol( filename, "Works" );
+		final Schema termVectorSchema = protocol.getType( "TermVector" );
+		final Schema indexSchema = protocol.getType( "Index" );
+		final Schema storeSchema = protocol.getType( "Store" );
+		final Schema tokenStreamSchema = protocol.getType( "TokenStreamField" );
+		final Schema readerSchema = protocol.getType( "ReaderField" );
+		final Schema stringSchema = protocol.getType( "StringField" );
+		final Schema binarySchema = protocol.getType( "BinaryField" );
+		final Schema intFieldSchema = protocol.getType( "NumericIntField" );
+		final Schema longFieldSchema = protocol.getType( "NumericLongField" );
+		final Schema floatFieldSchema = protocol.getType( "NumericFloatField" );
+		final Schema doubleFieldSchema = protocol.getType( "NumericDoubleField" );
+		final Schema custonFieldableSchema = protocol.getType( "CustomFieldable" );
+		final Schema documentSchema = protocol.getType( "Document" );
+		final Schema optimizeAllSchema = protocol.getType( "OptimizeAll" );
+		final Schema purgeAllSchema = protocol.getType( "PurgeAll" );
+		final Schema deleteSchema = protocol.getType( "Delete" );
+		final Schema addSchema = protocol.getType( "Add" );
+		Schema messageSchema = protocol.getType( "Message" );
 
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>( messageSchema );
@@ -84,7 +107,7 @@ public class AvroTest {
 		}
 
 
-		GenericArray<GenericRecord> fieldables = new GenericData.Array<GenericRecord>( 1, fieldablesSchema );
+		List<GenericRecord> fieldables = new ArrayList<GenericRecord>( 1 );
 		//custom fieldable
 		GenericRecord customFieldable = new GenericData.Record( custonFieldableSchema );
 		customFieldable.put( "instance", ByteBuffer.wrap( serializableSample ) );
@@ -149,7 +172,7 @@ public class AvroTest {
 		purgeAll.put( "class", AvroTest.class.getName() );
 		GenericRecord optimizeAll = new GenericData.Record( optimizeAllSchema );
 
-		GenericArray<GenericRecord> operations = new GenericData.Array<GenericRecord>( 1, opsSchema );
+		List<GenericRecord> operations = new ArrayList<GenericRecord>( 1 );
 		operations.add( purgeAll );
 		operations.add( optimizeAll );
 		operations.add( delete );
@@ -320,14 +343,5 @@ public class AvroTest {
 		numericField.put( "omitNorms", true );
 		numericField.put( "omitTermFreqAndPositions", true );
 		return numericField;
-	}
-
-	private Schema parseSchema(String filename, String name) {
-		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( filename );
-		String messageSchemaAsString = AvroUtils.readInputStream( in, filename );
-		String jsonSchema = AvroUtils.resolveSchema( messageSchemaAsString );
-		Schema messSchema = Schema.parse( jsonSchema );
-		AvroUtils.addSchema( "`" + name + "`", messSchema );
-		return messSchema;
 	}
 }
