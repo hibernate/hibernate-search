@@ -486,12 +486,12 @@ em.getTransaction().begin();
 // create native Lucene query unsing the query DSL
 // alternatively you can write the Lucene query using the Lucene query parser
 // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
-QueryBuilder qb = fullTextSession.getSearchFactory()
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
     .buildQueryBuilder().forEntity( Book.class ).get();
 org.apache.lucene.search.Query query = qb
   .keyword()
   .onFields("title", "subtitle", "authors.name", "publicationDate")
-  .matching("Java rocks!");
+  .matching("Java rocks!")
   .createQuery();
 
 // wrap Lucene query in a javax.persistence.Query
