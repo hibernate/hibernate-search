@@ -48,7 +48,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 
 	private final Class<?> managedType;
 	private final DocumentBuilderIndexedEntity<?> builder;
-	private final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make();
 	private final boolean idIsNumeric;
 
 	DeleteExtWorkDelegate(Workspace workspace) {
