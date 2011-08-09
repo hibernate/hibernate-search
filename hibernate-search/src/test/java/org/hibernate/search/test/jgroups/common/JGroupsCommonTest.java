@@ -51,7 +51,7 @@ import org.hibernate.search.test.jgroups.master.TShirt;
 public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "testing-flush-udp.xml";
-	public static final long NETWORK_TIMEOUT = 50;
+	public static final long NETWORK_TIMEOUT = 100;
 	
 	/**
 	 * Name of the JGroups channel used in test
@@ -66,9 +66,11 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		TShirt ts = new TShirt();
 		ts.setLogo( "Boston" );
 		ts.setSize( "XXL" );
+		ts.setLength( 23.4d );
 		TShirt ts2 = new TShirt();
 		ts2.setLogo( "Mapple leaves" );
 		ts2.setSize( "L" );
+		ts2.setLength( 23.42d );
 		s.persist( ts );
 		s.persist( ts2 );
 		tx.commit();

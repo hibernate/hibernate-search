@@ -1,0 +1,9 @@
+{
+    "name": "TermVector",
+    "type": "enum",
+    "symbols" : ["NO",
+                "YES",
+                "WITH_POSITIONS",
+                "WITH_OFFSETS",
+                "WITH_POSITIONS_OFFSETS"]
+}

@@ -1,4 +1,6 @@
-/* 
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -38,11 +40,11 @@ public class UpdateLuceneWork extends LuceneWork implements Serializable {
 	
 	private final Map<String, String> fieldToAnalyzerMap;
 
-	public UpdateLuceneWork(Serializable id, String idInString, Class entity, Document document) {
+	public UpdateLuceneWork(Serializable id, String idInString, Class<?> entity, Document document) {
 		this( id, idInString, entity, document, null );
 	}
 
-	public UpdateLuceneWork(Serializable id, String idInString, Class entity, Document document, Map<String, String> fieldToAnalyzerMap) {
+	public UpdateLuceneWork(Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
 		super( id, idInString, entity, document );
 		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
 	}

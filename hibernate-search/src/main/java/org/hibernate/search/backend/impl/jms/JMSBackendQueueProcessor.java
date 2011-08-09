@@ -26,12 +26,14 @@ package org.hibernate.search.backend.impl.jms;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
 import javax.jms.QueueConnection;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 
+import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
@@ -67,6 +69,8 @@ public class JMSBackendQueueProcessor implements Runnable {
 			}
 		}
 		if ( filteredQueue.size() == 0) return;
+		LuceneWorkSerializer serializer = factory.getSearchFactory().getSerializer();
+		byte[] data = serializer.toSerializedModel( filteredQueue );
 		factory.prepareJMSTools();
 		QueueConnection cnn = null;
 		QueueSender sender;
@@ -75,11 +79,9 @@ public class JMSBackendQueueProcessor implements Runnable {
 			cnn = factory.getJMSFactory().createQueueConnection();
 			//TODO make transacted parameterized
 			session = cnn.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
-
 			ObjectMessage message = session.createObjectMessage();
-			message.setObject( (Serializable) filteredQueue );
-			message.setStringProperty( AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY,
-					indexName );
+			message.setObject( data );
+			message.setStringProperty( AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY, indexName );
 
 			sender = session.createSender( factory.getJmsQueue() );
 			sender.send( message );

@@ -1,0 +1,13 @@
+{
+    "name": "Message",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "operations",
+            "type": {
+                "type": "array",
+                "items": ["OptimizeAll", "PurgeAll", "Delete", "Add", "Update"]
+            }
+        }
+    ]
+}

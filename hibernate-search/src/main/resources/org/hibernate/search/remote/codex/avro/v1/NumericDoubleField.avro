@@ -1,0 +1,38 @@
+{
+    "name": "NumericDoubleField",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "value",
+            "type": "double"
+        },
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "precisionStep",
+            "type": "int"
+        },
+        {
+            "name": "store",
+            "type": "Store"
+        },
+        {
+            "name": "indexed",
+            "type": "boolean"
+        },
+        {
+            "name": "boost",
+            "type": "float"
+        },
+        {
+            "name": "omitNorms",
+            "type": "boolean"
+        },
+        {
+            "name": "omitTermFreqAndPositions",
+            "type": "boolean"
+        }
+    ]
+}

@@ -76,9 +76,11 @@ public class JMSSlaveTest extends SearchTestCase {
 		TShirt ts = new TShirt();
 		ts.setLogo( "Boston" );
 		ts.setSize( "XXL" );
+		ts.setLength( 23.4d );
 		TShirt ts2 = new TShirt();
 		ts2.setLogo( "Mapple leaves" );
 		ts2.setSize( "L" );
+		ts2.setLength( 23.42d );
 		s.persist( ts );
 		s.persist( ts2 );
 		tx.commit();
@@ -132,7 +134,7 @@ public class JMSSlaveTest extends SearchTestCase {
 
 	private void registerMessageListener() throws Exception {
 		MessageConsumer consumer = getQueueSession().createConsumer( getMessageQueue() );
-		consumer.setMessageListener( new SearchQueueChecker() );
+		consumer.setMessageListener( new SearchQueueChecker( getSearchFactoryImpl() ) );
 	}
 
 	private Queue getMessageQueue() throws Exception {

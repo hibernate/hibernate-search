@@ -83,8 +83,8 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 			}
 			return;
 		}
-		
-		BackendMessage toSend = new BackendMessage( indexName, queue );
+		byte[] data = factory.getSearchFactory().getSerializer().toSerializedModel( queue );
+		BackendMessage toSend = new BackendMessage( indexName, data );
 
 		/* Creates and send message with lucene works to master.
 		 * As long as message destination address is null, Lucene works will be received by all listeners that implements

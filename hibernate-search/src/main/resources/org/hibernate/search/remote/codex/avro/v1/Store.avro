@@ -1,0 +1,5 @@
+{
+    "name": "Store",
+    "type": "enum",
+    "symbols" : ["YES", "NO"]
+}

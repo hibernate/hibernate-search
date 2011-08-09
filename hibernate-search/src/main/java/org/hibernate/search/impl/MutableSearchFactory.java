@@ -45,6 +45,7 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -216,6 +217,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public IndexManagerHolder getAllIndexesManager() {
 		return delegate.getAllIndexesManager();
+	}
+
+	@Override
+	public LuceneWorkSerializer getSerializer() {
+		return delegate.getSerializer();
 	}
 
 	@Override

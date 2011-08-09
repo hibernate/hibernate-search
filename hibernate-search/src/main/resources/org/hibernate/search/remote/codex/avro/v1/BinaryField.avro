@@ -1,0 +1,34 @@
+{
+    "name": "BinaryField",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "value",
+            "type": "bytes"
+        },
+        {
+            "name": "offset",
+            "type": "int"
+        },
+        {
+            "name": "length",
+            "type": "int"
+        },
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "boost",
+            "type": "float"
+        },
+        {
+            "name": "omitNorms",
+            "type": "boolean"
+        },
+        {
+            "name": "omitTermFreqAndPositions",
+            "type": "boolean"
+        }
+    ]
+}

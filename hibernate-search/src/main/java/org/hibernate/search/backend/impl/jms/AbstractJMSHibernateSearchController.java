@@ -97,9 +97,12 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		final ObjectMessage objectMessage = (ObjectMessage) message;
 		final String indexName;
 		final List<LuceneWork> queue;
+		Session session = getSession();
+		SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
 		try {
-			queue = (List<LuceneWork>) objectMessage.getObject();
+			queue = factory.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
 			indexName = objectMessage.getStringProperty( INDEX_NAME_JMS_PROPERTY );
+			perform( indexName, queue, factory );
 		}
 		catch (JMSException e) {
 			log.unableToRetrieveObjectFromMessage( message.getClass(), e );
@@ -109,21 +112,16 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 			log.illegalObjectRetrievedFromMessage( e );
 			return;
 		}
-		perform( indexName, queue );
-	}
-
-	private void perform(String indexName, List<LuceneWork> queue) {
-		Session session = getSession();
-
-		try {
-			SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
-			IndexManagerHolder allIndexesManager = factory.getAllIndexesManager();
-			IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
-			indexManager.performOperations( queue );
-		}
 		finally {
 			cleanSessionIfNeeded(session);
 		}
+	}
+
+	private void perform(String indexName, List<LuceneWork> queue, SearchFactoryImplementor factory) {
+
+		IndexManagerHolder allIndexesManager = factory.getAllIndexesManager();
+		IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
+		indexManager.performOperations( queue );
 	}
 
 	@PostConstruct
