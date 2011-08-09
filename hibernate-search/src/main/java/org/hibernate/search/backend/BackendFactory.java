@@ -34,7 +34,8 @@ import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.remote.codex.avro.impl.AvroSerializationProvider;
-import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
+import org.hibernate.search.remote.codex.impl.PluggableSerializationLuceneWorkSerializer;
+import org.hibernate.search.remote.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -120,7 +121,7 @@ public class BackendFactory {
 
 	public static LuceneWorkSerializer createSerializer(String indexName, Properties cfg,
 			WorkerBuildContext buildContext) {
-		return new LuceneWorkSerializer(
+		return new PluggableSerializationLuceneWorkSerializer(
 				new AvroSerializationProvider(),
 				buildContext.getUninitializedSearchFactory() );
 	}

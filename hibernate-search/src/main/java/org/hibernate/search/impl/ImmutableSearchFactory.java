@@ -41,7 +41,6 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
-import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;

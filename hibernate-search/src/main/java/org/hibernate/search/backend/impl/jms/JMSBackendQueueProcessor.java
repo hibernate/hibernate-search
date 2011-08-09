@@ -31,7 +31,7 @@ import javax.jms.QueueConnection;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 
-import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
+import org.hibernate.search.remote.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;

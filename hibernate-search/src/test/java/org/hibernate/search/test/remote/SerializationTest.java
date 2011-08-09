@@ -41,7 +41,8 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.remote.codex.avro.impl.AvroSerializationProvider;
-import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
+import org.hibernate.search.remote.codex.impl.PluggableSerializationLuceneWorkSerializer;
+import org.hibernate.search.remote.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.remote.codex.impl.SerializationHelper;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -53,7 +54,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class SerializationTest extends SearchTestCase {
 	@Test
 	public void testAvroSerialization() throws Exception {
-		LuceneWorkSerializer converter = new LuceneWorkSerializer(
+		LuceneWorkSerializer converter = new PluggableSerializationLuceneWorkSerializer(
 				new AvroSerializationProvider(),
 				getSearchFactoryImpl()
 		);
@@ -80,7 +81,7 @@ public class SerializationTest extends SearchTestCase {
 	 */
 	public void testAvroSerializationPerf() throws Exception {
 		int loop = 1000; //TODO do 10000 or 100000
-		LuceneWorkSerializer converter = new LuceneWorkSerializer(
+		LuceneWorkSerializer converter = new PluggableSerializationLuceneWorkSerializer(
 				new AvroSerializationProvider(),
 				getSearchFactoryImpl()
 		);

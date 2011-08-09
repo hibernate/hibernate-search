@@ -1,6 +1,6 @@
-/*
+/* 
  * Hibernate, Relational Persistence for Idiomatic Java
- *
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -20,16 +20,26 @@
  */
 package org.hibernate.search.remote.codex.spi;
 
+import java.util.List;
+
+import org.hibernate.search.backend.LuceneWork;
+
 /**
- * Contract between Hibernate Search and the Deserializer.
- * All the LuceneWork construction is delegated to methods of
- * PluggableSerializationLuceneWorkSerializer.
- *
- * After deserialize is call, Hibernate Search will
- * extract the built List of LuceneWork
- *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * For clustering we need some way to serialize the LuceneWork(s)
+ * to the other nodes.
+ * 
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public interface Deserializer {
-	void deserialize(byte[] data, LuceneWorksBuilder hydrator);
+public interface LuceneWorkSerializer {
+
+	/**
+	 * Convert a List of LuceneWork into a byte[]
+	 */
+	byte[] toSerializedModel(List<LuceneWork> works);
+
+	/**
+	 * Convert a byte[] to a List of LuceneWork
+	 */
+	List<LuceneWork> toLuceneWorks(byte[] data);
+
 }

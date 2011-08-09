@@ -37,6 +37,7 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.remote.codex.spi.Deserializer;
+import org.hibernate.search.remote.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.remote.codex.spi.Serializer;
 import org.hibernate.search.remote.codex.spi.SerializationProvider;
 import org.hibernate.search.remote.operations.impl.LuceneFieldContext;
@@ -51,16 +52,14 @@ import static org.hibernate.search.remote.codex.impl.SerializationHelper.*;
  * This class control the over all traversal process and delegates true serialization
  * work to the SerializerProvider.
  *
- * //FIXME should it be an interface as it's part of SearchFactoryImplementor?
- *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class LuceneWorkSerializer {
+public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSerializer {
 
 	private SearchFactoryImplementor searchFactory;
 	private SerializationProvider provider;
 
-	public LuceneWorkSerializer(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
+	public PluggableSerializationLuceneWorkSerializer(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
 		this.provider = provider;
 		this.searchFactory = searchFactory;
 	}
@@ -68,6 +67,7 @@ public class LuceneWorkSerializer {
 	/**
 	 * Convert a List of LuceneWork into a byte[]
 	 */
+	@Override
 	public byte[] toSerializedModel(List<LuceneWork> works) {
 		Serializer serializer = provider.getSerializer();
 		serializer.luceneWorks( works );
@@ -97,6 +97,7 @@ public class LuceneWorkSerializer {
 	/**
 	 * Convert a byte[] to a List of LuceneWork (assuming the same SerializationProvider is used of course)
 	 */
+	@Override
 	public List<LuceneWork> toLuceneWorks(byte[] data) {
 		Deserializer deserializer = provider.getDeserializer();
 		LuceneWorkHydrator hydrator = new LuceneWorkHydrator( searchFactory );

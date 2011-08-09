@@ -43,7 +43,7 @@ import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
+import org.hibernate.search.remote.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
