@@ -24,7 +24,9 @@
 package org.hibernate.search.test.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -33,6 +35,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.event.LoadEventListener;
+import org.hibernate.event.def.DefaultLoadEventListener;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
@@ -60,6 +64,7 @@ public class FullTextSessionBuilder {
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private SessionFactory sessionFactory;
 	private boolean usingFileSystem = false;
+	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
 	
 	static {
 		String buildDir = System.getProperty( "build.dir" );
@@ -163,6 +168,12 @@ public class FullTextSessionBuilder {
 			hibConfiguration.addAnnotatedClass( annotatedClass );
 		}
 		hibConfiguration.getProperties().putAll( cfg );
+		if ( ! additionalLoadEventListeners.isEmpty() ) {
+			additionalLoadEventListeners.add( new DefaultLoadEventListener() );
+			LoadEventListener[] loadListeners = new LoadEventListener[additionalLoadEventListeners.size()];
+			additionalLoadEventListeners.toArray( loadListeners );
+			hibConfiguration.setListeners( "load", loadListeners );
+		}
 		sessionFactory = hibConfiguration.buildSessionFactory();
 		return this;
 	}
@@ -195,6 +206,11 @@ public class FullTextSessionBuilder {
 
 	public static void cleanupFilesystem() {
 		FileHelper.delete( indexRootDirectory );
+	}
+
+	public FullTextSessionBuilder addLoadEventListener(LoadEventListener additionalLoadEventListener) {
+		additionalLoadEventListeners.add( additionalLoadEventListener );
+		return this;
 	}
 
 }

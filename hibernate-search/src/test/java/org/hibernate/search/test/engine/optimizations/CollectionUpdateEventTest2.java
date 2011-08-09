@@ -20,10 +20,14 @@
 package org.hibernate.search.test.engine.optimizations;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.event.LoadEvent;
+import org.hibernate.event.LoadEventListener;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.test.embedded.depth.LeakingLuceneBackend;
@@ -38,18 +42,24 @@ import org.junit.Test;
  */
 public class CollectionUpdateEventTest2 {
 
+	private LoadCountingListener loadCountListener;
+
 	@Test
 	public void testScenario() {
 		
 		FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory();
 		try {
 			assertOperationsPerformed( 0 );
+			assertLocationsLoaded( 0 );
 			initializeData( fullTextSessionBuilder );
 			assertOperationsPerformed( 5 );
+			assertLocationsLoaded( 0 );
 			FullTextSession fullTextSession = fullTextSessionBuilder.openFullTextSession();
 			try {
 				LocationGroup group = (LocationGroup) fullTextSession.get( LocationGroup.class, 1L );
+				assertLocationsLoaded( 0 );
 				addLocationToGroupCollection( fullTextSession, group );
+				assertLocationsLoaded( 0 );
 				assertOperationsPerformed( 1 );
 			}
 			finally {
@@ -61,6 +71,10 @@ public class CollectionUpdateEventTest2 {
 		}
 	}
 
+	private void assertLocationsLoaded(int expectedLoads) {
+		Assert.assertEquals( expectedLoads, loadCountListener.locationLoadEvents.get() );
+	}
+
 	private void assertOperationsPerformed(int expectedOperationCount) {
 		List<LuceneWork> lastProcessedQueue = LeakingLuceneBackend.getLastProcessedQueue();
 		Assert.assertEquals( expectedOperationCount, lastProcessedQueue.size() );
@@ -68,11 +82,13 @@ public class CollectionUpdateEventTest2 {
 	}
 
 	private FullTextSessionBuilder createSearchFactory() {
+		loadCountListener = new LoadCountingListener();
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 				.setProperty( "hibernate.search.worker.backend",
 						org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() )
 				.addAnnotatedClass( LocationGroup.class )
-				.addAnnotatedClass( Location.class );
+				.addAnnotatedClass( Location.class )
+				.addLoadEventListener( loadCountListener );
 		return builder.build();
 	}
 
@@ -115,6 +131,16 @@ public class CollectionUpdateEventTest2 {
 		fullTextSession.merge( group );
 
 		transaction.commit();
+	}
+
+	public static class LoadCountingListener implements LoadEventListener {
+		final AtomicInteger locationLoadEvents = new AtomicInteger();
+		@Override
+		public void onLoad(LoadEvent event, LoadType loadType) throws HibernateException {
+			if ( Location.class.getName().equals( event.getEntityClassName() ) ) {
+				locationLoadEvents.incrementAndGet();
+			}
+		}
 	}
 
 }
