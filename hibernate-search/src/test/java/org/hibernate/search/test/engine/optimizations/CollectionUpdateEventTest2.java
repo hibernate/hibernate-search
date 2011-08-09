@@ -19,7 +19,6 @@
 
 package org.hibernate.search.test.engine.optimizations;
 
-import java.lang.annotation.ElementType;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -27,13 +26,12 @@ import junit.framework.Assert;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.embedded.depth.LeakingLuceneBackend;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
 /**
- * Related to test case of HSEARCH-782
+ * Related to HSEARCH-782: make sure we don't unnecessarily index entities or load unrelated entities
  * 
  * @author Adam Harris
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -75,19 +73,6 @@ public class CollectionUpdateEventTest2 {
 						org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() )
 				.addAnnotatedClass( LocationGroup.class )
 				.addAnnotatedClass( Location.class );
-		SearchMapping fluentMapping = builder.fluentMapping();
-		fluentMapping.entity( LocationGroup.class )
-				.property( "name", ElementType.FIELD )
-				.property( "locations", ElementType.FIELD )
-					.containedIn()
-			.entity( Location.class )
-				.indexed()
-				.property( "locationId", ElementType.FIELD )
-					.documentId()
-				.property( "name", ElementType.FIELD )
-				.property( "locationGroup", ElementType.FIELD )
-					.indexEmbedded()
-						.depth( 1 );
 		return builder.build();
 	}
 

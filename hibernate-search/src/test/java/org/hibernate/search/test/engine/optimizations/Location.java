@@ -32,6 +32,10 @@ import javax.persistence.Table;
 import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 import org.hibernate.annotations.Proxy;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
  * Related to test case of HSEARCH-782; indexed properties are defined
@@ -43,23 +47,22 @@ import org.hibernate.annotations.Proxy;
 @Entity
 @Proxy(lazy = false)
 @Table(name = "location")
-//indexed
+@Indexed
 public class Location {
 
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	//indexed & documentId
+	@DocumentId
 	private Long locationId;
 
 	@Column(length = 255)
-	//indexed
+	@Field
 	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = LocationGroup.class)
 	@JoinColumn(name = "location_group_id")
 	@LazyToOne(LazyToOneOption.PROXY)
-	//indexed
-	//indexedEmbedded(depth=1)
+	@IndexedEmbedded(depth=1)
 	private LocationGroup locationGroup;
 
 	public Location() {
