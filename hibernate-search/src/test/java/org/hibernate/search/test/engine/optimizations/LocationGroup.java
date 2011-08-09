@@ -33,6 +33,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Proxy;
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.Field;
 
 /**
  * Related to test case of HSEARCH-782; indexed properties are defined
@@ -51,11 +53,11 @@ public class LocationGroup {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long groupId;
 
-	//indexed
+	@Field
 	@Column(length = 255)
 	private String name;
 
-	//contained-in Location
+	@ContainedIn
 	@OneToMany(mappedBy = "locationGroup", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
 	Collection<Location> locations = new ArrayList<Location>();
 
