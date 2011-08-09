@@ -34,7 +34,6 @@ import org.jgroups.JChannel;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
@@ -64,25 +63,21 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 	public static final String JG_CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
 
 	protected String clusterName = "HSearchCluster";
-	protected SearchFactoryImplementor searchFactory;
 	protected Channel channel = null;
 	protected Address address;
 	protected String indexName;
+	protected IndexManager indexManager;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+		this.indexManager = indexManager;
 		JGroupsHelper.verifyIPv4IsPreferred();
-		this.searchFactory = context.getUninitializedSearchFactory();
 		indexName = indexManager.getIndexName();
 
 		if ( props.containsKey( JG_CLUSTER_NAME ) ) {
 			setClusterName( props.getProperty( JG_CLUSTER_NAME ) );
 		}
 		prepareJGroupsChannel( props );
-	}
-
-	public SearchFactoryImplementor getSearchFactory() {
-		return searchFactory;
 	}
 
 	private void prepareJGroupsChannel(Properties props) {

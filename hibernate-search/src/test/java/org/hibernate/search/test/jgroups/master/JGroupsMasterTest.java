@@ -46,6 +46,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jgroups.BackendMessage;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.test.jms.master.TShirt;
@@ -98,9 +99,11 @@ public class JGroupsMasterTest extends SearchTestCase {
 	}
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
+		final String indexManagerName = "org.hibernate.search.test.jms.master.TShirt";
+		IndexManager indexManager = getSearchFactoryImpl().getAllIndexesManager().getIndexManager( indexManagerName );
 		//send message to all listeners
-		byte[] data = getSearchFactoryImpl().getSerializer().toSerializedModel( queue );
-		BackendMessage wrapper = new BackendMessage( "org.hibernate.search.test.jms.master.TShirt", data);
+		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
+		BackendMessage wrapper = new BackendMessage( indexManagerName, data);
 		Message message = new Message( null, null, wrapper );
 		channel.send( message );
 	}

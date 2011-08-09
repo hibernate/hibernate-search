@@ -28,6 +28,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -118,5 +119,10 @@ public interface IndexManager {
 	 * To optimize the underlying index. Some implementations might ignore the request, if it doesn't apply to them.
 	 */
 	void optimize();
+
+	/**
+	 * @return the Serializer implementation used for this IndexManager
+	 */
+	LuceneWorkSerializer getSerializer();
 
 }

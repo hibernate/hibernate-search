@@ -55,10 +55,12 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 	private SearchFactoryImplementor searchFactory;
 	public static final String JMS_CONNECTION_FACTORY = Environment.WORKER_PREFIX + "jms.connection_factory";
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
+	private IndexManager indexManager;
 
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		//TODO proper exception if jms queues and connections are not there
 		this.properties = props;
+		this.indexManager = indexManager;
 		this.jmsConnectionFactoryName = props.getProperty( JMS_CONNECTION_FACTORY );
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
@@ -67,7 +69,7 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new JMSBackendQueueProcessor( indexName, queue, this );
+		return new JMSBackendQueueProcessor( indexName, queue, indexManager, this );
 	}
 
 	public QueueConnectionFactory getJMSFactory() {

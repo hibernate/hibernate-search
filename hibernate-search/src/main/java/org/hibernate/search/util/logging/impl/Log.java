@@ -377,5 +377,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d")
 	void serializationProtocol(int major, int minor);
 
+	@LogMessage(level = ERROR)
+	@Message(id = 80, value = "Received a remote message about an unknown index '%s': discarding message!")
+	void messageReceivedForUndefinedIndex(String indexName);
 
 }

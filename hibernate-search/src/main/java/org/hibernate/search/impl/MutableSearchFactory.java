@@ -220,11 +220,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	}
 
 	@Override
-	public LuceneWorkSerializer getSerializer() {
-		return delegate.getSerializer();
-	}
-
-	@Override
 	public IndexReader openIndexReader(Class<?>... entities) {
 		return delegate.openIndexReader( entities );
 	}

@@ -33,6 +33,6 @@ import org.hibernate.search.backend.LuceneWork;
 public class SlaveJGroupsBackendQueueProcessorFactory extends JGroupsBackendQueueProcessorFactory {
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new JGroupsBackendQueueProcessor( indexName, queue, this );
+		return new JGroupsBackendQueueProcessor( indexName, queue, this, indexManager );
 	}
 }

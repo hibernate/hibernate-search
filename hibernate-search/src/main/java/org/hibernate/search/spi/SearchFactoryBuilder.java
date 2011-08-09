@@ -53,8 +53,6 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.remote.codex.avro.impl.AvroSerializationProvider;
-import org.hibernate.search.remote.codex.impl.LuceneWorkSerializer;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -347,7 +345,6 @@ public class SearchFactoryBuilder {
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
 			factoryState.setErrorHandler( createErrorHandler( cfg ) );
-			factoryState.setSerializer( createSerializer( cfg ) );
 		}
 	}
 
@@ -607,10 +604,6 @@ public class SearchFactoryBuilder {
 					ImmutableSearchFactory.class, "Error Handler"
 			);
 		}
-	}
-
-	private LuceneWorkSerializer createSerializer(SearchConfiguration cfg) {
-		return new LuceneWorkSerializer(new AvroSerializationProvider(), rootFactory);
 	}
 
 	/**

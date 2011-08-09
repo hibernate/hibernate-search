@@ -62,10 +62,18 @@ public class JGroupsMasterMessageListener implements Receiver {
 	public void receive(Message message) {
 		final List<LuceneWork> queue;
 		final String indexName;
+		final IndexManager indexManager;
 		try {
 			BackendMessage decoded = ( BackendMessage ) message.getObject();
-			queue = searchFactory.getSerializer().toLuceneWorks( decoded.queue );
 			indexName = decoded.indexName;
+			indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
+			if ( indexManager != null ) {
+				queue = indexManager.getSerializer().toLuceneWorks( decoded.queue );
+			}
+			else {
+				log.messageReceivedForUndefinedIndex( indexName );
+				return;
+			}
 		}
 		catch ( ClassCastException e ) {
 			log.illegalObjectRetrievedFromMessage( e );

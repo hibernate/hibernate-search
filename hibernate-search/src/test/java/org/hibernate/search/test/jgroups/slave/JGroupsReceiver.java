@@ -32,6 +32,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jgroups.BackendMessage;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * @author Lukasz Moren
@@ -58,7 +59,8 @@ public class JGroupsReceiver extends ReceiverAdapter {
 		final BackendMessage received;
 		try {
 			received = ( BackendMessage ) message.getObject();
-			List<LuceneWork> queue = searchFactory.getSerializer().toLuceneWorks( received.queue );
+			IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( received.indexName );
+			List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( received.queue );
 			queues++;
 			works += queue.size();
 		}

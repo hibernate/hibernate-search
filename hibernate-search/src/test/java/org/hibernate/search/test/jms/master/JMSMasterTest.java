@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.jms.master;
 
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -56,6 +55,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -114,10 +114,12 @@ public class JMSMasterTest extends SearchTestCase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		ObjectMessage message = getQueueSession().createObjectMessage();
+		final String indexName = org.hibernate.search.test.jms.master.TShirt.class.getName();
 		message.setStringProperty(
 				org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY,
-				org.hibernate.search.test.jms.master.TShirt.class.getName() ); //index name for this test
-		byte[] data = getSearchFactoryImpl().getSerializer().toSerializedModel( queue );
+				indexName );
+		IndexManager indexManager = getSearchFactoryImpl().getAllIndexesManager().getIndexManager( indexName );
+		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
 		message.setObject( data );
 		QueueSender sender = getQueueSession().createSender( getMessageQueue() );
 		sender.send( message );

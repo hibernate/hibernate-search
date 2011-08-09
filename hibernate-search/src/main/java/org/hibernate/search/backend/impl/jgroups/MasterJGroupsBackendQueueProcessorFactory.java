@@ -31,6 +31,7 @@ import org.jgroups.Receiver;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
@@ -46,21 +47,19 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 
 	private LuceneBackendQueueProcessorFactory luceneBackendQueueProcessorFactory;
 	private Receiver masterListener;
-	private IndexManager indexManager;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		super.initialize( props, context, indexManager );
-		this.indexManager = indexManager;
 		initLuceneBackendQueueProcessorFactory( props, context );
-		registerMasterListener();
+		registerMasterListener( context.getUninitializedSearchFactory() );
 	}
 
 	public Runnable getProcessor(List<LuceneWork> queue) {
 		return luceneBackendQueueProcessorFactory.getProcessor( queue );
 	}
 
-	private void registerMasterListener() {
+	private void registerMasterListener(SearchFactoryImplementor searchFactory) {
 		//register JGroups receiver in master node to get Lucene docs from slave nodes
 		masterListener = new JGroupsMasterMessageListener( searchFactory );
 		channel.setReceiver( masterListener );

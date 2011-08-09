@@ -21,9 +21,6 @@
 package org.hibernate.search.backend.impl.jgroups;
 
 import java.io.Serializable;
-import java.util.List;
-
-import org.hibernate.search.backend.LuceneWork;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.

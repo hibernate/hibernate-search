@@ -106,7 +106,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final boolean transactionManagerExpected;
 	private final IndexManagerHolder allIndexesManager;
 	private final ErrorHandler errorHandler;
-	private final LuceneWorkSerializer serializer;
 
 	/**
 	 * Each directory provider (index) can have its own performance settings.
@@ -132,8 +131,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
 		this.allIndexesManager = state.getAllIndexesManager();
 		this.errorHandler = state.getErrorHandler();
-		this.serializer = state.getSerializer();
-
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false
@@ -352,11 +349,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public IndexManagerHolder getAllIndexesManager() {
 		return this.allIndexesManager;
-	}
-
-	@Override
-	public LuceneWorkSerializer getSerializer() {
-		return serializer;
 	}
 
 	@Override

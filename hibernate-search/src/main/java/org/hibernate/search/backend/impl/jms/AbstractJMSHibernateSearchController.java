@@ -25,8 +25,6 @@ package org.hibernate.search.backend.impl.jms;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -34,7 +32,6 @@ import javax.jms.ObjectMessage;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -97,12 +94,18 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		final ObjectMessage objectMessage = (ObjectMessage) message;
 		final String indexName;
 		final List<LuceneWork> queue;
+		final IndexManager indexManager;
 		Session session = getSession();
 		SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
 		try {
-			queue = factory.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
 			indexName = objectMessage.getStringProperty( INDEX_NAME_JMS_PROPERTY );
-			perform( indexName, queue, factory );
+			indexManager = factory.getAllIndexesManager().getIndexManager( indexName );
+			if ( indexManager == null ) {
+				log.messageReceivedForUndefinedIndex( indexName );
+				return;
+			}
+			queue = indexManager.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
+			indexManager.performOperations( queue );
 		}
 		catch (JMSException e) {
 			log.unableToRetrieveObjectFromMessage( message.getClass(), e );
@@ -117,22 +120,4 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		}
 	}
 
-	private void perform(String indexName, List<LuceneWork> queue, SearchFactoryImplementor factory) {
-
-		IndexManagerHolder allIndexesManager = factory.getAllIndexesManager();
-		IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
-		indexManager.performOperations( queue );
-	}
-
-	@PostConstruct
-	public void initialize() {
-		//init the source copy process
-		//TODO actually this is probably wrong since this is now part of the DP
-	}
-
-	@PreDestroy
-	public void shutdown() {
-		//stop the source copy process
-		//TODO actually this is probably wrong since this is now part of the DP
-	}
 }

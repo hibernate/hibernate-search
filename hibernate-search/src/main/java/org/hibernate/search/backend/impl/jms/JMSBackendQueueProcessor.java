@@ -23,10 +23,8 @@
  */
 package org.hibernate.search.backend.impl.jms;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
 import javax.jms.QueueConnection;
@@ -39,6 +37,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -52,11 +51,13 @@ public class JMSBackendQueueProcessor implements Runnable {
 	private final List<LuceneWork> queue;
 	private final JMSBackendQueueProcessorFactory factory;
 	private final String indexName;
+	private final IndexManager indexManager;
 
-	public JMSBackendQueueProcessor(String indexName, List<LuceneWork> queue,
+	public JMSBackendQueueProcessor(String indexName, List<LuceneWork> queue, IndexManager indexManager,
 					JMSBackendQueueProcessorFactory jmsBackendQueueProcessorFactory) {
 		this.indexName = indexName;
 		this.queue = queue;
+		this.indexManager = indexManager;
 		this.factory = jmsBackendQueueProcessorFactory;
 	}
 
@@ -69,7 +70,7 @@ public class JMSBackendQueueProcessor implements Runnable {
 			}
 		}
 		if ( filteredQueue.size() == 0) return;
-		LuceneWorkSerializer serializer = factory.getSearchFactory().getSerializer();
+		LuceneWorkSerializer serializer = indexManager.getSerializer();
 		byte[] data = serializer.toSerializedModel( filteredQueue );
 		factory.prepareJMSTools();
 		QueueConnection cnn = null;
