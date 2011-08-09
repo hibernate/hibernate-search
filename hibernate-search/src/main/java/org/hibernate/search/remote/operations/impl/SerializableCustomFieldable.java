@@ -20,8 +20,6 @@
  */
 package org.hibernate.search.remote.operations.impl;
 
-import java.io.Serializable;
-
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */

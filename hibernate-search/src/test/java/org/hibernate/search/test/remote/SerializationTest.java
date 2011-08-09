@@ -78,9 +78,17 @@ public class SerializationTest extends SearchTestCase {
 	 * In evens up or beats the Java serialization on longer loops like 100000
 	 *
 	 * Test done after initial implementation (in particular the schema is not part of the message
+	 * 
+	 * With 1000000:
+	 * Java serialization: 28730
+	 * Java message size: 2509
+	 * Java deserialization: 82970
+	 * Avro serialization: 24245
+	 * Avro message size: 1064
+	 * Avro deserialization: 54444
 	 */
 	public void testAvroSerializationPerf() throws Exception {
-		int loop = 1000; //TODO do 10000 or 100000
+		final int loop = 10; //TODO do 10000 or 100000
 		LuceneWorkSerializer converter = new PluggableSerializationLuceneWorkSerializer(
 				new AvroSerializationProvider(),
 				getSearchFactoryImpl()
@@ -123,7 +131,7 @@ public class SerializationTest extends SearchTestCase {
 		end = System.nanoTime();
 		System.out.println("Avro deserialization: " + ((end-begin)/1000000) );
 
-		//make sure the compiler doe snot cheat
+		//make sure the compiler does not cheat
 		System.out.println(copyOfWorks == copyOfWorkForJavaSerial);
 
 	}
@@ -185,7 +193,7 @@ public class SerializationTest extends SearchTestCase {
 		field = new Field( "binary", array, 0, array.length );
 		doc.add( field );
 
-		SerializableStringReader reader = new SerializableStringReader( "Serializable String Reader" );
+		SerializableStringReader reader = new SerializableStringReader();
 		field = new Field( "ReaderField", reader, Field.TermVector.WITH_OFFSETS );
 		doc.add( field );
 		//TODO  TokenStream
@@ -325,9 +333,6 @@ public class SerializationTest extends SearchTestCase {
 
 	private static class SerializableStringReader extends Reader implements Serializable {
 
-
-		private String string;
-
 		@Override
 		public int read(char[] cbuf, int off, int len) throws IOException {
 			return 0;
@@ -337,14 +342,6 @@ public class SerializationTest extends SearchTestCase {
 		public void close() throws IOException {
 		}
 
-		/**
-		 * Creates a new string reader.
-		 *
-		 * @param s String providing the character stream.
-		 */
-		public SerializableStringReader(String s) {
-			this.string = s;
-		}
 	}
 
 }

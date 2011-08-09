@@ -21,8 +21,6 @@
 package org.hibernate.search.remote.codex.impl;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-
 import org.apache.lucene.document.Field;
 
 import org.hibernate.search.SearchException;

@@ -30,7 +30,6 @@ import java.io.ObjectStreamClass;
 import java.io.Serializable;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.remote.operations.impl.Message;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>

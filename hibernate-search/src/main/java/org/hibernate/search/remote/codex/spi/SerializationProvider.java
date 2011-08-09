@@ -40,7 +40,7 @@ package org.hibernate.search.remote.codex.spi;
  * operation will be ignored or rejected. Question: only ignored?
  *
  * If message's major version is < current version, the
- * implementation is strongly encourated to parse and process them.
+ * implementation is strongly encouraged to parse and process them.
  * It is mandatory if only message's minor version is < current version.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
