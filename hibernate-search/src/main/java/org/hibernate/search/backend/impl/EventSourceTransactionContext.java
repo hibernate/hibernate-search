@@ -134,19 +134,19 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 		return transactionManager == null;
 	}
 
-    private <T extends Service> T getService(Class<T> serviceClass) {
-        return eventSource.getFactory().getServiceRegistry().getService(serviceClass);
-    }
+	private <T extends Service> T getService(Class<T> serviceClass) {
+		return eventSource.getFactory().getServiceRegistry().getService(serviceClass);
+	}
 
-    private FullTextIndexEventListener getIndexWorkFlushEventListener() {
+	private FullTextIndexEventListener getIndexWorkFlushEventListener() {
 		if ( this.flushListener != null) {
 			//for the "transient" case: might have been nullified.
 			return flushListener;
 		}
-        final Iterable<FlushEventListener> listeners = getService(EventListenerRegistry.class)
-                .getEventListenerGroup(EventType.FLUSH).listeners();
-		for (FlushEventListener listener : listeners) {
-			if ( listener.getClass().equals( FullTextIndexEventListener.class ) ) {
+		final Iterable<FlushEventListener> listeners = getService(EventListenerRegistry.class)
+				.getEventListenerGroup(EventType.FLUSH).listeners();
+		for ( FlushEventListener listener : listeners ) {
+			if ( FullTextIndexEventListener.class.isAssignableFrom( listener.getClass() ) ) {
 				return (FullTextIndexEventListener) listener;
 			}
 		}
