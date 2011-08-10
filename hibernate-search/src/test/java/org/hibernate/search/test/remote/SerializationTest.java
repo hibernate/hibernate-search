@@ -209,6 +209,12 @@ public class SerializationTest extends SearchTestCase {
 		else if ( work instanceof AddLuceneWork ) {
 			assertAdd( ( AddLuceneWork ) work, ( AddLuceneWork ) copy );
 		}
+		else if ( work instanceof UpdateLuceneWork ) {
+			assertUpdate( ( UpdateLuceneWork ) work, ( UpdateLuceneWork ) copy );
+		}
+		else {
+			fail( "unexpected type" );
+		}
 	}
 
 	private void assertAdd(AddLuceneWork work, AddLuceneWork copy) {
@@ -218,6 +224,16 @@ public class SerializationTest extends SearchTestCase {
 		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
 				.isEqualTo( copy.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
+	}
+	
+	private void assertUpdate(UpdateLuceneWork work, UpdateLuceneWork copy) {
+		assertThat( work.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
+		assertThat( work.getId() ).as( "Add.getId is not copied" ).isEqualTo( copy.getId() );
+		assertThat( work.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
+		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
+				.isEqualTo( copy.getFieldToAnalyzerMap() );
+		// To be addressed by HSEARCH-834
+		//assertDocument( work.getDocument(), copy.getDocument() );
 	}
 
 	private void assertDocument(Document document, Document copy) {
@@ -233,7 +249,6 @@ public class SerializationTest extends SearchTestCase {
 				assertNormalField( ( Field ) field, ( Field ) fieldCopy );
 			}
 		}
-
 	}
 
 	private void assertNormalField(Field field, Field copy) {
