@@ -35,8 +35,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.event.LoadEventListener;
-import org.hibernate.event.def.DefaultLoadEventListener;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.event.spi.LoadEventListener;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
@@ -44,6 +46,9 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
+import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.testing.cache.CachingRegionFactory;
 
 /**
@@ -168,13 +173,17 @@ public class FullTextSessionBuilder {
 			hibConfiguration.addAnnotatedClass( annotatedClass );
 		}
 		hibConfiguration.getProperties().putAll( cfg );
-		if ( ! additionalLoadEventListeners.isEmpty() ) {
-			additionalLoadEventListeners.add( new DefaultLoadEventListener() );
-			LoadEventListener[] loadListeners = new LoadEventListener[additionalLoadEventListeners.size()];
-			additionalLoadEventListeners.toArray( loadListeners );
-			hibConfiguration.setListeners( "load", loadListeners );
+
+		final ServiceRegistry serviceRegistry = new ServiceRegistryBuilder( hibConfiguration.getProperties() ).buildServiceRegistry();
+		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory( serviceRegistry );
+		ServiceRegistryImplementor serviceRegistryImplementor = sessionFactoryImpl.getServiceRegistry();
+		EventListenerRegistry registry = serviceRegistryImplementor.getService( EventListenerRegistry.class );
+
+		for ( LoadEventListener listener : additionalLoadEventListeners ) {
+			registry.getEventListenerGroup( EventType.LOAD ).appendListener( listener );
 		}
-		sessionFactory = hibConfiguration.buildSessionFactory();
+
+		sessionFactory = sessionFactoryImpl;
 		return this;
 	}
 
