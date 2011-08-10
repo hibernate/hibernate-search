@@ -24,10 +24,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.event.LoadEvent;
 import org.hibernate.event.LoadEventListener;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.test.embedded.depth.LeakingLuceneBackend;
@@ -55,12 +58,21 @@ public class CollectionUpdateEventTest2 {
 			assertOperationsPerformed( 5 );
 			assertLocationsLoaded( 0 );
 			FullTextSession fullTextSession = fullTextSessionBuilder.openFullTextSession();
+			assertFoundLocations( fullTextSession, "floor", 5 );
+			assertFoundLocations( fullTextSession, "airport", 0 );
+			fullTextSession.clear();
 			try {
-				LocationGroup group = (LocationGroup) fullTextSession.get( LocationGroup.class, 1L );
-				assertLocationsLoaded( 0 );
-				addLocationToGroupCollection( fullTextSession, group );
+				addLocationToGroupCollection( fullTextSession );
+				fullTextSession.clear();
 				assertLocationsLoaded( 0 );
 				assertOperationsPerformed( 1 );
+				assertFoundLocations( fullTextSession, "floor", 6 );
+				updateLocationGroupName( fullTextSession );
+				fullTextSession.clear();
+				assertFoundLocations( fullTextSession, "floor", 0 );
+				assertFoundLocations( fullTextSession, "airport", 6 );
+				assertLocationsLoaded( 6 );
+				assertOperationsPerformed( 6 );
 			}
 			finally {
 				fullTextSession.close();
@@ -120,17 +132,37 @@ public class CollectionUpdateEventTest2 {
 		}
 	}
 
-	private void addLocationToGroupCollection(FullTextSession fullTextSession, LocationGroup group) {
+	private void addLocationToGroupCollection(FullTextSession fullTextSession) {
 		final Transaction transaction = fullTextSession.beginTransaction();
+		LocationGroup group = (LocationGroup) fullTextSession.get( LocationGroup.class, 1L );
 
 		Location location = new Location( "New Room" );
 		fullTextSession.persist( location );
 
 		group.getLocations().add( location );
 		location.setLocationGroup( group );
-		fullTextSession.merge( group );
 
 		transaction.commit();
+	}
+
+	private void updateLocationGroupName(FullTextSession fullTextSession) {
+		final Transaction transaction = fullTextSession.beginTransaction();
+
+		LocationGroup group = (LocationGroup) fullTextSession.get( LocationGroup.class, 1L );
+		LocationGroup locationGroup = (LocationGroup) fullTextSession.merge( group );
+		locationGroup.setName( "Airport" );
+
+		transaction.commit();
+	}
+
+	private void assertFoundLocations(FullTextSession fullTextSession, String locationGroupName, int expectedFoundLocations) {
+		final Transaction transaction = fullTextSession.beginTransaction();
+		TermQuery luceneQuery = new TermQuery( new Term( "locationGroup.name", locationGroupName ) );
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Location.class );
+		int resultSize = fullTextQuery.getResultSize();
+		transaction.commit();
+		
+		Assert.assertEquals( expectedFoundLocations, resultSize );
 	}
 
 	public static class LoadCountingListener implements LoadEventListener {
