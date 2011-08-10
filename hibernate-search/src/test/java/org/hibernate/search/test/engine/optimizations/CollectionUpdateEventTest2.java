@@ -72,7 +72,7 @@ public class CollectionUpdateEventTest2 {
 				assertFoundLocations( fullTextSession, "floor", 0 );
 				assertFoundLocations( fullTextSession, "airport", 6 );
 				assertLocationsLoaded( 6 );
-				assertOperationsPerformed( 6 );
+				assertOperationsPerformed( 12 ); // it's an update: 2*6 operations
 			}
 			finally {
 				fullTextSession.close();
