@@ -65,10 +65,12 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
@@ -620,6 +622,22 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 				ReflectionHelper.setAccessible( member );
 				propertiesMetadata.embeddedGetters.add( member );
+				final String nullMarker = embeddedNullToken( context, embeddedAnn );
+				propertiesMetadata.embeddedNullTokens.add( nullMarker );
+
+				TwoWayStringBridge embeddedNullBridge = new TwoWayStringBridge() {
+					@Override
+					public String objectToString(Object object) {
+						return nullMarker;
+					}
+
+					@Override
+					public Object stringToObject(String stringValue) {
+						return null;
+					}
+				};
+				final FieldBridge fieldBridge = new TwoWayString2FieldBridgeAdaptor( embeddedNullBridge );
+				propertiesMetadata.embeddedNullFieldBridges.add( fieldBridge );
 				PropertiesMetadata metadata = new PropertiesMetadata();
 				propertiesMetadata.embeddedPropertiesMetadata.add( metadata );
 				metadata.boost = getBoost( member, null );
@@ -627,12 +645,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				Analyzer analyzer = getAnalyzer( member, context );
 				metadata.analyzer = analyzer != null ? analyzer : propertiesMetadata.analyzer;
 				String localPrefix = buildEmbeddedPrefix( prefix, embeddedAnn, member );
-				
+				propertiesMetadata.embeddedNullFields.add( embeddedNullField( localPrefix, embeddedAnn ) );
+
 				if ( disableOptimizations ) {
 					optimizationBlackList.add( elementClass );
 				}
-				
+
 				initializeClass( elementClass, metadata, false, localPrefix, processedClasses, context, optimizationBlackList, disableOptimizations );
+
 				/**
 				 * We will only index the "expected" type but that's OK, HQL cannot do down-casting either
 				 */
@@ -662,6 +682,21 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			level--;
 			maxLevel = oldMaxLevel; //set back the the old max level
 		}
+	}
+
+	private String embeddedNullField(String localPrefix, IndexedEmbedded embeddedAnn) {
+		return localPrefix.substring( 0, localPrefix.lastIndexOf( embeddedAnn.prefix() ) );
+	}
+
+	private String embeddedNullToken(ConfigContext context, IndexedEmbedded embeddedAnn) {
+		String indexNullAs = embeddedAnn.indexNullAs();
+		if ( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL.equals( indexNullAs ) ) {
+			return null;
+		}
+		if ( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN.equals( indexNullAs ) ) {
+			return context.getDefaultNullToken();
+		}
+		return indexNullAs;
 	}
 
 	private void bindClassBridgeAnnotation(String prefix, PropertiesMetadata propertiesMetadata, ClassBridge ann, XClass clazz, ConfigContext context) {
@@ -697,7 +732,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
 		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
 		propertiesMetadata.precisionSteps.add( getPrecisionStep( numericFieldAnn ) );
-
+		
 		// null token
 		String indexNullAs = fieldAnn.indexNullAs();
 		if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL ) ) {
@@ -876,6 +911,9 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
 		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
+		public final List<String> embeddedNullTokens = new ArrayList<String>();
+		public final List<String> embeddedNullFields = new ArrayList<String>();
+		public final List<FieldBridge> embeddedNullFieldBridges = new ArrayList<FieldBridge>();
 		public final List<PropertiesMetadata> embeddedPropertiesMetadata = new ArrayList<PropertiesMetadata>();
 		public final List<Container> embeddedContainers = new ArrayList<Container>();
 		public final List<XMember> containedInGetters = new ArrayList<XMember>();

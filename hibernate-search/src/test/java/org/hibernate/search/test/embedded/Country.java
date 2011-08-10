@@ -55,7 +55,7 @@ public class Country {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	//FIXME with JPA 2, move to @OrderColumn
 	@IndexColumn(name = "list_position")
-	@IndexedEmbedded
+	@IndexedEmbedded(indexNullAs = "nullStates")
 	private List<State> states = new ArrayList<State>();
 
 	public Integer getId() {
