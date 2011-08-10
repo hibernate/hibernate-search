@@ -24,7 +24,9 @@
 package org.hibernate.search.test.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -33,6 +35,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.event.spi.LoadEventListener;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
@@ -40,6 +46,9 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
+import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.testing.cache.CachingRegionFactory;
 
 /**
@@ -60,6 +69,7 @@ public class FullTextSessionBuilder {
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private SessionFactory sessionFactory;
 	private boolean usingFileSystem = false;
+	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
 	
 	static {
 		String buildDir = System.getProperty( "build.dir" );
@@ -163,7 +173,17 @@ public class FullTextSessionBuilder {
 			hibConfiguration.addAnnotatedClass( annotatedClass );
 		}
 		hibConfiguration.getProperties().putAll( cfg );
-		sessionFactory = hibConfiguration.buildSessionFactory();
+
+		final ServiceRegistry serviceRegistry = new ServiceRegistryBuilder( hibConfiguration.getProperties() ).buildServiceRegistry();
+		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory( serviceRegistry );
+		ServiceRegistryImplementor serviceRegistryImplementor = sessionFactoryImpl.getServiceRegistry();
+		EventListenerRegistry registry = serviceRegistryImplementor.getService( EventListenerRegistry.class );
+
+		for ( LoadEventListener listener : additionalLoadEventListeners ) {
+			registry.getEventListenerGroup( EventType.LOAD ).appendListener( listener );
+		}
+
+		sessionFactory = sessionFactoryImpl;
 		return this;
 	}
 
@@ -195,6 +215,11 @@ public class FullTextSessionBuilder {
 
 	public static void cleanupFilesystem() {
 		FileHelper.delete( indexRootDirectory );
+	}
+
+	public FullTextSessionBuilder addLoadEventListener(LoadEventListener additionalLoadEventListener) {
+		additionalLoadEventListeners.add( additionalLoadEventListener );
+		return this;
 	}
 
 }
