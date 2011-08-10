@@ -57,7 +57,7 @@ public class LocationGroup {
 	@Column(length = 255)
 	private String name;
 
-//	@ContainedIn
+	@ContainedIn
 	@OneToMany(mappedBy = "locationGroup", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
 	Collection<Location> locations = new ArrayList<Location>();
 
