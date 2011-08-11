@@ -1828,13 +1828,15 @@ FacetingRequest labelFacetingRequest = builder.facet()
       facets returned.</para>
 
       <tip>
-        <para>There are several preconditions an indexed field has to meet in
-        order to apply faceting on it. The indexed property must be of type
-        <classname>String</classname>, <classname>Date</classname> or a
-        subtype of <classname>Number</classname>. Furthermore the property has
-        to be indexed with <constant>Index.UN_TOKENIZED</constant> and in case
-        of a numeric property you need to specify
-        <classname>@NumericField</classname>.</para>
+        <para>At the moment there are several preconditions an indexed field
+        has to meet in order to apply faceting on it. The indexed property
+        must be of type <classname>String</classname>,
+        <classname>Date</classname> or a subtype of
+        <classname>Number</classname> and <constant>null</constant> values
+        should be avoided. Furthermore the property has to be indexed with
+        <constant>Index.UN_TOKENIZED</constant> and in case of a numeric
+        property <classname>@NumericField</classname> needs to be
+        specified.</para>
       </tip>
 
       <para>The creation of a range faceting request is quite similar except

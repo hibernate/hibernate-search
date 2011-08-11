@@ -74,6 +74,8 @@ public abstract class AbstractFacetTest extends SearchTestCase {
 	};
 	public static final double[] fruitPrices = { 0.50, 0.99, 1.50, 1.50, 1.50, 1.60, 1.70, 1.80, 2.00, 2.50 };
 
+	public static final Integer[] horsePowers = { 200, 400, 600, 1300, 730 };
+
 	protected FullTextSession fullTextSession;
 	protected Transaction tx;
 

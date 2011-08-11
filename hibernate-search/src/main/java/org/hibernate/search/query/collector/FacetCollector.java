@@ -58,7 +58,7 @@ public class FacetCollector extends Collector {
 	/**
 	 * The next collector in the delegation chain
 	 */
-	private final Collector delegate;
+	private final Collector nextInChainCollector;
 
 	/**
 	 * Facet request this collector handles
@@ -82,7 +82,7 @@ public class FacetCollector extends Collector {
 	private boolean initialised = false;
 
 	public FacetCollector(Collector delegate, FacetingRequestImpl facetRequest) {
-		this.delegate = delegate;
+		this.nextInChainCollector = delegate;
 		this.facetRequest = facetRequest;
 		this.facetCounts = createFacetCounter( facetRequest );
 		fieldLoader = FieldCacheLoadingType.getLoadingStrategy(
@@ -96,7 +96,7 @@ public class FacetCollector extends Collector {
 			initialiseCollector( reader );
 		}
 		initialiseFieldCaches( reader );
-		delegate.setNextReader( reader, docBase );
+		nextInChainCollector.setNextReader( reader, docBase );
 	}
 
 	@Override
@@ -105,17 +105,17 @@ public class FacetCollector extends Collector {
 		if ( value != null ) {
 			facetCounts.countValue( value );
 		}
-		delegate.collect( doc );
+		nextInChainCollector.collect( doc );
 	}
 
 	@Override
 	public void setScorer(Scorer scorer) throws IOException {
-		delegate.setScorer( scorer );
+		nextInChainCollector.setScorer( scorer );
 	}
 
 	@Override
 	public boolean acceptsDocsOutOfOrder() {
-		return delegate.acceptsDocsOutOfOrder();
+		return nextInChainCollector.acceptsDocsOutOfOrder();
 	}
 
 	public String getFacetName() {
