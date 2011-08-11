@@ -37,8 +37,19 @@ import org.hibernate.search.query.facet.RangeFacet;
  * @author Hardy Ferentschik
  */
 public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
+	/**
+	 * The facet range, speak the min and max values for this range facet
+	 */
 	private final FacetRange<T> range;
+
+	/**
+	 * The index of the specified ranges
+	 */
 	private final int rangeIndex;
+
+	/**
+	 * The document builder.
+	 */
 	private final DocumentBuilderIndexedEntity<?> documentBuilder;
 
 	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index, DocumentBuilderIndexedEntity<?> documentBuilder) {
@@ -105,7 +116,9 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 
 	private Query createNumericRangeQuery() {
 		NumericRangeQuery query;
-		if ( range.getMin() instanceof Double ) {
+		// either end of the range must have a valid value (see also HSEARCH-770)
+		Object minOrMax = getNonNullMinOrMax( range );
+		if ( minOrMax instanceof Double ) {
 			query = NumericRangeQuery.newDoubleRange(
 					getFieldName(),
 					(Double) range.getMin(),
@@ -114,7 +127,7 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 					range.isMaxIncluded()
 			);
 		}
-		else if ( range.getMin() instanceof Float ) {
+		else if ( minOrMax instanceof Float ) {
 			query = NumericRangeQuery.newFloatRange(
 					getFieldName(),
 					(Float) range.getMin(),
@@ -123,7 +136,7 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 					range.isMaxIncluded()
 			);
 		}
-		else if ( range.getMin() instanceof Integer ) {
+		else if ( minOrMax instanceof Integer ) {
 			query = NumericRangeQuery.newIntRange(
 					getFieldName(),
 					(Integer) range.getMin(),
@@ -133,7 +146,7 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 			);
 		}
 
-		else if ( range.getMin() instanceof Long ) {
+		else if ( minOrMax instanceof Long ) {
 			query = NumericRangeQuery.newLongRange(
 					getFieldName(),
 					(Long) range.getMin(),
