@@ -40,10 +40,10 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.remote.codex.avro.impl.AvroSerializationProvider;
-import org.hibernate.search.remote.codex.impl.PluggableSerializationLuceneWorkSerializer;
-import org.hibernate.search.remote.codex.spi.LuceneWorkSerializer;
-import org.hibernate.search.remote.codex.impl.SerializationHelper;
+import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializationProvider;
+import org.hibernate.search.indexes.serialization.codex.impl.PluggableSerializationLuceneWorkSerializer;
+import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.test.SearchTestCase;
 
 import static org.fest.assertions.Assertions.assertThat;
