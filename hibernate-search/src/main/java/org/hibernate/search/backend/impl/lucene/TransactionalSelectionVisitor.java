@@ -44,10 +44,16 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {
 	
+	public static final TransactionalSelectionVisitor INSTANCE = new TransactionalSelectionVisitor();
+	
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
+	
+	private TransactionalSelectionVisitor() {
+		// use INSTANCE as this delegator is stateless
+	}
 
 	public ContextAwareSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;

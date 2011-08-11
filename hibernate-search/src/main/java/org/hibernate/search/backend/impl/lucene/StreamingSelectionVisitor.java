@@ -48,6 +48,12 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
+	
+	public static final StreamingSelectionVisitor INSTANCE = new StreamingSelectionVisitor();
+	
+	private StreamingSelectionVisitor() {
+		// use INSTANCE as this delegator is stateless
+	}
 
 	public StreamingOperationSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;

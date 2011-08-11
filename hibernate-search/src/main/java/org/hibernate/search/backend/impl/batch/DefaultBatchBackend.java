@@ -29,7 +29,9 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
 import org.hibernate.search.backend.impl.lucene.StreamingSelectionVisitor;
+import org.hibernate.search.backend.impl.lucene.TransactionalSelectionVisitor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -44,8 +46,6 @@ import org.hibernate.search.store.IndexShardingStrategy;
 public class DefaultBatchBackend implements BatchBackend {
 	
 	public static final String CONCURRENT_WRITERS = Environment.BATCH_BACKEND + ".concurrent_writers";
-
-	private static final StreamingSelectionVisitor providerSelectionVisitor = new StreamingSelectionVisitor();
 
 	private SearchFactoryIntegrator searchFactoryImplementor;
 
@@ -65,7 +65,14 @@ public class DefaultBatchBackend implements BatchBackend {
 		final Class<?> entityType = work.getEntityClass();
 		EntityIndexBinder<?> entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-		work.getWorkDelegate( providerSelectionVisitor ).performStreamOperation( work, shardingStrategy, forceAsync );
+		if ( forceAsync ) {
+			work.getWorkDelegate( StreamingSelectionVisitor.INSTANCE ).performStreamOperation( work, shardingStrategy, forceAsync );
+		}
+		else {
+			WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
+			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE ).performOperation( work, shardingStrategy, workContext );
+			workContext.commitOperations(); //FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
+		}
 	}
 
 }
