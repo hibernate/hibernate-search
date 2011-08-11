@@ -139,20 +139,44 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	public void testRangeBelowMiddleAbove() {
+		final String facetingName = "cdPriceFaceting";
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
-				.name( priceRange )
+				.name( facetingName )
 				.onField( indexFieldName )
 				.range()
 				.below( 1000 )
 				.from( 1001 ).to( 1500 )
-				.above( 1500 ).excludeLimit()
+				.above( 1501 )
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
 		FacetManager facetManager = query.getFacetManager();
-		facetManager.enableFaceting( rangeRequest );
+		query.getFacetManager().enableFaceting( rangeRequest );
 
-		List<Facet> facets = facetManager.getFacets( priceRange );
+		List<Facet> facets = query.getFacetManager().getFacets( facetingName );
 		assertFacetCounts( facets, new int[] { 5, 3, 2 } );
+
+	}
+
+	// HSEARCH-770
+	public void testRangeBelowWithFacetSelection() {
+		final String facetingName = "truckHorsePowerFaceting";
+		FacetingRequest rangeRequest = queryBuilder( Truck.class ).facet()
+				.name( facetingName )
+				.onField( "horsePower" )
+				.range()
+				.below( 1000 )
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Truck.class );
+		FacetManager facetManager = query.getFacetManager();
+		query.getFacetManager().enableFaceting( rangeRequest );
+
+		List<Facet> facets = facetManager.getFacets( facetingName ); // OK
+		facets = facetManager.getFacets( facetingName ); // Still OK
+		assertFacetCounts( facets, new int[] { 4 } );
+
+		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 0 ) ); //narrow search on facet
+		facets = facetManager.getFacets( facetingName ); // Exception...
+		assertFacetCounts( facets, new int[] { 4 } );
 	}
 
 	public void testRangeQueryForDoubleWithZeroCount() {
@@ -287,6 +311,10 @@ public class RangeFacetingTest extends AbstractFacetTest {
 			Fruit fruit = new Fruit( fruits[i], fruitPrices[i] );
 			session.save( fruit );
 		}
+		for ( int i = 0; i < horsePowers.length; i++ ) {
+			Truck truck = new Truck( horsePowers[i] );
+			session.save( truck );
+		}
 		tx.commit();
 		session.clear();
 	}
@@ -294,7 +322,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Cd.class,
-				Fruit.class
+				Fruit.class,
+				Truck.class
 		};
 	}
 }
