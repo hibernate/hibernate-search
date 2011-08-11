@@ -41,12 +41,6 @@ public class LeakingLuceneBackend extends LuceneBackendQueueProcessorFactory {
 	private static List<LuceneWork> lastProcessedQueue = new ArrayList<LuceneWork>();
 	
 	@Override
-	public Runnable getProcessor(List<LuceneWork> queue) {
-		lastProcessedQueue = queue;
-		return super.getProcessor( queue );
-	}
-	
-	@Override
 	public void close() {
 		lastProcessedQueue = null;
 		super.close();
@@ -60,4 +54,10 @@ public class LeakingLuceneBackend extends LuceneBackendQueueProcessorFactory {
 		lastProcessedQueue = new ArrayList<LuceneWork>();
 	}
 	
+	@Override
+	public void applyWork(List<LuceneWork> workList) {
+		super.applyWork( workList );
+		lastProcessedQueue = workList;
+	}
+
 }

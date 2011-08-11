@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.backend.impl.jms;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import javax.jms.Queue;
@@ -33,7 +34,7 @@ import javax.naming.NamingException;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -44,7 +45,7 @@ import org.hibernate.search.util.impl.JNDIHelper;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
+public class JMSBackendQueueProcessorFactory implements BackendQueueProcessor {
 	private String jmsQueueName;
 	private String jmsConnectionFactoryName;
 	private static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
@@ -66,10 +67,6 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 		this.indexName = indexManager.getIndexName();
 		this.searchFactory = context.getUninitializedSearchFactory();
 		prepareJMSTools();
-	}
-
-	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new JMSBackendQueueProcessor( indexName, queue, indexManager, this );
 	}
 
 	public QueueConnectionFactory getJMSFactory() {
@@ -114,5 +111,17 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 
 	public void close() {
 		// no need to release anything
+	}
+
+	@Override
+	public void applyWork(List<LuceneWork> workList) {
+		//TODO review this integration with the old Runnable-style execution
+		Runnable operation = new JMSBackendQueueProcessor( indexName, workList, indexManager, this );
+		operation.run();
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation) {
+		applyWork( Collections.singletonList( singleOperation ) );
 	}
 }

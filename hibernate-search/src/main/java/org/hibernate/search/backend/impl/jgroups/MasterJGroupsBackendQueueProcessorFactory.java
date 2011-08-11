@@ -55,10 +55,6 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 		registerMasterListener( context.getUninitializedSearchFactory() );
 	}
 
-	public Runnable getProcessor(List<LuceneWork> queue) {
-		return luceneBackendQueueProcessorFactory.getProcessor( queue );
-	}
-
 	private void registerMasterListener(SearchFactoryImplementor searchFactory) {
 		//register JGroups receiver in master node to get Lucene docs from slave nodes
 		masterListener = new JGroupsMasterMessageListener( searchFactory );
@@ -78,5 +74,15 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 	public void close() {
 		super.close();
 		luceneBackendQueueProcessorFactory.close();
+	}
+
+	@Override
+	public void applyWork(List<LuceneWork> workList) {
+		luceneBackendQueueProcessorFactory.applyWork( workList );
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation) {
+		luceneBackendQueueProcessorFactory.applyStreamWork( singleOperation );
 	}
 }

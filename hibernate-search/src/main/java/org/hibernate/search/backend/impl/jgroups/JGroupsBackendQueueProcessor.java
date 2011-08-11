@@ -43,25 +43,22 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JGroupsBackendQueueProcessor implements Runnable {
+public class JGroupsBackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final JGroupsBackendQueueProcessorFactory factory;
-	private final List<LuceneWork> queue;
 	private final String indexName;
 	private final IndexManager indexManager;
 
-	public JGroupsBackendQueueProcessor(String indexName, List<LuceneWork> queue,
-			JGroupsBackendQueueProcessorFactory factory, IndexManager indexManager) {
+	public JGroupsBackendQueueProcessor(JGroupsBackendQueueProcessorFactory factory, IndexManager indexManager) {
 		this.factory = factory;
-		this.queue = queue;
-		this.indexName = indexName;
 		this.indexManager = indexManager;
+		this.indexName = indexManager.getIndexName();
 	}
 
 	@SuppressWarnings("unchecked")
-	public void run() {
+	public void sendLuceneWorkList(List<LuceneWork> queue) {
 		boolean trace = log.isTraceEnabled();
 		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>( queue );
 		if ( trace ) {
@@ -87,7 +84,7 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 			}
 			return;
 		}
-		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
+		byte[] data = indexManager.getSerializer().toSerializedModel( filteredQueue );
 		BackendMessage toSend = new BackendMessage( indexName, data );
 
 		/* Creates and send message with lucene works to master.

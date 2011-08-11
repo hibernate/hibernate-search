@@ -31,7 +31,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.impl.FullTextSessionImpl;
@@ -58,7 +58,7 @@ public class ClassLoaderHelperTest {
 
 		try {
 			ClassLoaderHelper.instanceFromName(
-					BackendQueueProcessorFactory.class, "HeyThisClassIsNotThere", getClass(), "backend"
+					BackendQueueProcessor.class, "HeyThisClassIsNotThere", getClass(), "backend"
 			);
 			fail( "was expecting a SearchException" );
 		}

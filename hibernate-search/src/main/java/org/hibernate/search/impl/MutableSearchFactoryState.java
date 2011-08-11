@@ -25,7 +25,7 @@
 package org.hibernate.search.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -53,7 +53,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<Class<?>, EntityIndexBinder<?>> indexBindingsPerEntity;
 	private String indexingStrategy;
 	private Worker worker;
-	private BackendQueueProcessorFactory backendQueueProcessorFactory;
+	private BackendQueueProcessor backendQueueProcessorFactory;
 	private Map<String, FilterDef> filterDefinitions;
 	private FilterCachingStrategy filterCachingStrategy;
 	private Map<String, Analyzer> analyzers;
@@ -108,7 +108,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return worker;
 	}
 
-	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
+	public BackendQueueProcessor getBackendQueueProcessorFactory() {
 		return backendQueueProcessorFactory;
 	}
 
@@ -156,7 +156,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.worker = worker;
 	}
 
-	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
+	public void setBackendQueueProcessorFactory(BackendQueueProcessor backendQueueProcessorFactory) {
 		this.backendQueueProcessorFactory = backendQueueProcessorFactory;
 	}
 
