@@ -205,9 +205,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return allIndexesManager;
 	}
 
-	/**
-	 * @param factory
-	 */
 	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
 		allIndexesManager.setActiveSearchFactory( factory );
 	}

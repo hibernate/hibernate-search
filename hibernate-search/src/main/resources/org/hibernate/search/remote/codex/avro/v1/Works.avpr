@@ -1,0 +1,31 @@
+{
+    "protocol": "Works",
+    "doc": "Hibernate Search exchange protocol for List of LuceneWork",
+    "types": [
+        `Index`,
+        `Store`,
+        `TermVector`,
+
+        `BinaryField`,
+        `ReaderField`,
+        `StringField`,
+        `TokenStreamField`,
+
+        `NumericIntField`,
+        `NumericLongField`,
+        `NumericFloatField`,
+        `NumericDoubleField`,
+
+        `CustomFieldable`,
+
+        `Document`,
+
+        `OptimizeAll`,
+        `PurgeAll`,
+        `Delete`,
+        `Add`,
+        `Update`,
+
+        `Message`
+    ]
+}

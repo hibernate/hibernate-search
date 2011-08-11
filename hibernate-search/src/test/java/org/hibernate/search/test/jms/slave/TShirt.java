@@ -32,6 +32,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.NumericField;
 
 /**
  * @author Emmanuel Bernard
@@ -47,6 +48,9 @@ public class TShirt {
 	private String logo;
 	@Column(name="size_")
 	private String size;
+	@Field @NumericField
+	@Column(name="length_")
+	private double length;
 
 	public int getId() {
 		return id;
@@ -70,5 +74,13 @@ public class TShirt {
 
 	public void setSize(String size) {
 		this.size = size;
+	}
+
+	public double getLength() {
+		return length;
+	}
+
+	public void setLength(double length) {
+		this.length = length;
 	}
 }

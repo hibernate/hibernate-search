@@ -33,6 +33,7 @@ import org.jgroups.Message;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -49,11 +50,14 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 	private final JGroupsBackendQueueProcessorFactory factory;
 	private final List<LuceneWork> queue;
 	private final String indexName;
+	private final IndexManager indexManager;
 
-	public JGroupsBackendQueueProcessor(String indexName, List<LuceneWork> queue, JGroupsBackendQueueProcessorFactory factory) {
+	public JGroupsBackendQueueProcessor(String indexName, List<LuceneWork> queue,
+			JGroupsBackendQueueProcessorFactory factory, IndexManager indexManager) {
 		this.factory = factory;
 		this.queue = queue;
 		this.indexName = indexName;
+		this.indexManager = indexManager;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -83,8 +87,8 @@ public class JGroupsBackendQueueProcessor implements Runnable {
 			}
 			return;
 		}
-		
-		BackendMessage toSend = new BackendMessage( indexName, queue );
+		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
+		BackendMessage toSend = new BackendMessage( indexName, data );
 
 		/* Creates and send message with lucene works to master.
 		 * As long as message destination address is null, Lucene works will be received by all listeners that implements

@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -21,19 +21,17 @@
 package org.hibernate.search.backend.impl.jgroups;
 
 import java.io.Serializable;
-import java.util.List;
-
-import org.hibernate.search.backend.LuceneWork;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class BackendMessage implements Serializable {
 
 	public final String indexName;
-	public final List<LuceneWork> queue;
+	public final byte[] queue;
 
-	public BackendMessage(String indexName, List<LuceneWork> queue) {
+	public BackendMessage(String indexName, byte[] queue) {
 		this.indexName = indexName;
 		this.queue = queue;
 	}

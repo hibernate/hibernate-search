@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.backend.impl.jms;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jms.JMSException;
@@ -37,6 +36,8 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -50,11 +51,13 @@ public class JMSBackendQueueProcessor implements Runnable {
 	private final List<LuceneWork> queue;
 	private final JMSBackendQueueProcessorFactory factory;
 	private final String indexName;
+	private final IndexManager indexManager;
 
-	public JMSBackendQueueProcessor(String indexName, List<LuceneWork> queue,
+	public JMSBackendQueueProcessor(String indexName, List<LuceneWork> queue, IndexManager indexManager,
 					JMSBackendQueueProcessorFactory jmsBackendQueueProcessorFactory) {
 		this.indexName = indexName;
 		this.queue = queue;
+		this.indexManager = indexManager;
 		this.factory = jmsBackendQueueProcessorFactory;
 	}
 
@@ -67,6 +70,8 @@ public class JMSBackendQueueProcessor implements Runnable {
 			}
 		}
 		if ( filteredQueue.size() == 0) return;
+		LuceneWorkSerializer serializer = indexManager.getSerializer();
+		byte[] data = serializer.toSerializedModel( filteredQueue );
 		factory.prepareJMSTools();
 		QueueConnection cnn = null;
 		QueueSender sender;
@@ -75,11 +80,9 @@ public class JMSBackendQueueProcessor implements Runnable {
 			cnn = factory.getJMSFactory().createQueueConnection();
 			//TODO make transacted parameterized
 			session = cnn.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
-
 			ObjectMessage message = session.createObjectMessage();
-			message.setObject( (Serializable) filteredQueue );
-			message.setStringProperty( AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY,
-					indexName );
+			message.setObject( data );
+			message.setStringProperty( AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY, indexName );
 
 			sender = session.createSender( factory.getJmsQueue() );
 			sender.send( message );

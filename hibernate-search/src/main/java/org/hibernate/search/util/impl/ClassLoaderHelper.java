@@ -226,7 +226,7 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	private static Class<?> classForName(String classNameToLoad, Class<?> caller, String componentDescription) {
+	public static Class<?> classForName(String classNameToLoad, Class<?> caller, String componentDescription) {
 		Class<?> clazzDef;
 		try {
 			clazzDef = ReflectHelper.classForName( classNameToLoad, caller );

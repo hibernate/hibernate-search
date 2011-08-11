@@ -23,11 +23,16 @@
  */
 package org.hibernate.search.test.jgroups.slave;
 
+import java.util.List;
+
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jgroups.BackendMessage;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * @author Lukasz Moren
@@ -36,6 +41,11 @@ public class JGroupsReceiver extends ReceiverAdapter {
 
 	public static int queues;
 	public static int works;
+	private SearchFactoryImplementor searchFactory;
+
+	public JGroupsReceiver(SearchFactoryImplementor searchFactory) {
+		this.searchFactory = searchFactory;
+	}
 
 	public static void reset() {
 		queues = 0;
@@ -49,8 +59,10 @@ public class JGroupsReceiver extends ReceiverAdapter {
 		final BackendMessage received;
 		try {
 			received = ( BackendMessage ) message.getObject();
+			IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( received.indexName );
+			List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( received.queue );
 			queues++;
-			works += received.queue.size();
+			works += queue.size();
 		}
 		catch ( ClassCastException e ) {
 			throw new SearchException( e );

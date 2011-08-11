@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumericField;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.jgroups.JChannel;
@@ -45,6 +46,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jgroups.BackendMessage;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.test.jms.master.TShirt;
@@ -97,8 +99,11 @@ public class JGroupsMasterTest extends SearchTestCase {
 	}
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
+		final String indexManagerName = "org.hibernate.search.test.jms.master.TShirt";
+		IndexManager indexManager = getSearchFactoryImpl().getAllIndexesManager().getIndexManager( indexManagerName );
 		//send message to all listeners
-		BackendMessage wrapper = new BackendMessage( "org.hibernate.search.test.jms.master.TShirt", queue);
+		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
+		BackendMessage wrapper = new BackendMessage( indexManagerName, data);
 		Message message = new Message( null, null, wrapper );
 		channel.send( message );
 	}
@@ -120,6 +125,9 @@ public class JGroupsMasterTest extends SearchTestCase {
 		doc.add( field );
 		field = new Field( "logo", shirt.getLogo(), Field.Store.NO, Field.Index.ANALYZED );
 		doc.add( field );
+		NumericField numField = new NumericField( "length" );
+		numField.setDoubleValue( shirt.getLength() );
+		doc.add( numField );
 		LuceneWork luceneWork = new AddLuceneWork(
 				shirt.getId(), String.valueOf( shirt.getId() ), shirt.getClass(), doc
 		);
@@ -140,6 +148,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 		ts.setId( 1 );
 		ts.setLogo( "JBoss balls" );
 		ts.setSize( "large" );
+		ts.setLength( 23.2d );
 		s.persist( ts );
 		s.getTransaction().commit();
 		FullTextSession fullTextSession = Search.getFullTextSession( s );

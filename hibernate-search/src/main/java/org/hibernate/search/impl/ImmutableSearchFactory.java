@@ -130,7 +130,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
 		this.allIndexesManager = state.getAllIndexesManager();
 		this.errorHandler = state.getErrorHandler();
-
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false

@@ -36,7 +36,7 @@ public class PurgeAllLuceneWork extends LuceneWork implements Serializable {
 	
 	private static final long serialVersionUID = 8124091288284011715L;
 
-	public PurgeAllLuceneWork(Class entity) {
+	public PurgeAllLuceneWork(Class<?> entity) {
 		super( null, null, entity, null );
 	}
 	

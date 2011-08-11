@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.jms.master;
 
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -43,6 +42,7 @@ import javax.naming.NamingException;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumericField;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 
@@ -55,6 +55,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.DocumentBuilder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -113,10 +114,13 @@ public class JMSMasterTest extends SearchTestCase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		ObjectMessage message = getQueueSession().createObjectMessage();
+		final String indexName = org.hibernate.search.test.jms.master.TShirt.class.getName();
 		message.setStringProperty(
 				org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY,
-				org.hibernate.search.test.jms.master.TShirt.class.getName() ); //index name for this test
-		message.setObject( ( Serializable ) queue );
+				indexName );
+		IndexManager indexManager = getSearchFactoryImpl().getAllIndexesManager().getIndexManager( indexName );
+		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
+		message.setObject( data );
 		QueueSender sender = getQueueSession().createSender( getMessageQueue() );
 		sender.send( message );
 	}
@@ -167,6 +171,9 @@ public class JMSMasterTest extends SearchTestCase {
 		doc.add( field );
 		field = new Field( "logo", shirt.getLogo(), Field.Store.NO, Field.Index.ANALYZED );
 		doc.add( field );
+		NumericField numField = new NumericField( "length" );
+		numField.setDoubleValue( shirt.getLength() );
+		doc.add( numField );
 		LuceneWork luceneWork = new AddLuceneWork(
 				shirt.getId(), String.valueOf( shirt.getId() ), shirt.getClass(), doc
 		);
@@ -190,7 +197,7 @@ public class JMSMasterTest extends SearchTestCase {
 			public void execute(Connection connection) throws SQLException {
 				final Statement statement = connection.createStatement();
 				statement.executeUpdate(
-						"insert into TShirt_Master(id, logo, size_) values( 1, 'JBoss balls', 'large')"
+						"insert into TShirt_Master(id, logo, size_, length_) values( 1, 'JBoss balls', 'large', 23.2)"
 				);
 				statement.close();
 			}

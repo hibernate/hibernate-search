@@ -32,6 +32,9 @@ import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
 import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializationProvider;
+import org.hibernate.search.indexes.serialization.codex.impl.PluggableSerializationLuceneWorkSerializer;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -114,6 +117,13 @@ public class BackendFactory {
 	
 	public static int getWorkerBatchSize(Properties properties) {
 		return ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
+	}
+
+	public static LuceneWorkSerializer createSerializer(String indexName, Properties cfg,
+			WorkerBuildContext buildContext) {
+		return new PluggableSerializationLuceneWorkSerializer(
+				new AvroSerializationProvider(),
+				buildContext.getUninitializedSearchFactory() );
 	}
 
 }
