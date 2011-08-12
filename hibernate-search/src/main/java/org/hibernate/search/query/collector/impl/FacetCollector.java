@@ -134,7 +134,7 @@ public class FacetCollector extends Collector {
 		// Facet instances which we can only do for count based ordering
 		if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( request.getSort() ) ) {
 			facetList = createRangeFacetList( counter.getCounts().entrySet(), request, counter.getCounts().size() );
-			Collections.sort( facetList, new RangeFacetComparator( request.getSort() ) );
+			Collections.sort( facetList, new RangeDefinitionOrderFacetComparator( ) );
 			if ( facetRequest.getMaxNumberOfFacets() > 0 ) {
 				facetList = facetList.subList( 0, facetRequest.getMaxNumberOfFacets() );
 			}
@@ -233,20 +233,9 @@ public class FacetCollector extends Collector {
 		}
 	}
 
-	static public class RangeFacetComparator implements Comparator<Facet> {
-		private final FacetSortOrder sortOder;
-
-		public RangeFacetComparator(FacetSortOrder sortOrder) {
-			this.sortOder = sortOrder;
-		}
-
+	static public class RangeDefinitionOrderFacetComparator implements Comparator<Facet> {
 		public int compare(Facet facet1, Facet facet2) {
-			if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( sortOder ) ) {
-				return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
-			}
-			else {
-				return facet1.getValue().compareTo( facet2.getValue() );
-			}
+			return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
 		}
 	}
 
