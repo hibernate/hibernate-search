@@ -126,17 +126,20 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertFacetCounts( facetList, new int[] { 5, 4, 4 } );
 	}
 
+	// see also HSEARCH-776
 	public void testMaxFacetCounts() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
+				.orderedBy( FacetSortOrder.COUNT_DESC )
 				.maxFacetCount( 1 )
 				.createFacetingRequest();
 		FullTextQuery query = queryHondaWithFacet( request );
 
 		List<Facet> facetList = query.getFacetManager().getFacets( facetName );
 		assertEquals( "The number of facets should be restricted", 1, facetList.size() );
+		assertFacetCounts( facetList, new int[] { 5 } );
 	}
 
 	public void testNullFieldNameThrowsException() {

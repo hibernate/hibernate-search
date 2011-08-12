@@ -25,10 +25,12 @@
 package org.hibernate.search.query.collector.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -81,8 +83,8 @@ public class FacetCollector extends Collector {
 	 */
 	private boolean initialised = false;
 
-	public FacetCollector(Collector delegate, FacetingRequestImpl facetRequest) {
-		this.nextInChainCollector = delegate;
+	public FacetCollector(Collector nextInChainCollector, FacetingRequestImpl facetRequest) {
+		this.nextInChainCollector = nextInChainCollector;
 		this.facetRequest = facetRequest;
 		this.facetCounts = createFacetCounter( facetRequest );
 		fieldLoader = FieldCacheLoadingType.getLoadingStrategy(
@@ -127,20 +129,43 @@ public class FacetCollector extends Collector {
 	}
 
 	private List<Facet> createSortedFacetList(FacetCounter counter, FacetingRequestImpl request) {
+		List<Facet> facetList;
+		// handle RANGE_DEFINITION_ODER differently from count based orders. we try to avoid the creation of
+		// Facet instances which we can only do for count based ordering
+		if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( request.getSort() ) ) {
+			facetList = createRangeFacetList( counter.getCounts().entrySet(), request, counter.getCounts().size() );
+			Collections.sort( facetList, new RangeFacetComparator( request.getSort() ) );
+			if ( facetRequest.getMaxNumberOfFacets() > 0 ) {
+				facetList = facetList.subList( 0, facetRequest.getMaxNumberOfFacets() );
+			}
+		}
+		else {
+			List<Map.Entry<String, Integer>> countEntryList = newArrayList();
+			for ( Entry<String, Integer> stringIntegerEntry : counter.getCounts().entrySet() ) {
+				countEntryList.add( stringIntegerEntry );
+			}
+			int facetCount = facetRequest.getMaxNumberOfFacets() > 0 ?
+					facetRequest.getMaxNumberOfFacets() : countEntryList.size();
+			Collections.sort( countEntryList, new FacetEntryComparator( request.getSort() ) );
+			facetList = createRangeFacetList( countEntryList, request, facetCount );
+		}
+		return facetList;
+	}
+
+	private List<Facet> createRangeFacetList(Collection<Entry<String, Integer>> countEntryList, FacetingRequestImpl request, int count) {
 		List<Facet> facetList = newArrayList();
 		int includedFacetCount = 0;
-		for ( Map.Entry<String, Integer> countEntry : counter.getCounts().entrySet() ) {
+		for ( Map.Entry<String, Integer> countEntry : countEntryList ) {
 			Facet facet = request.createFacet( countEntry.getKey(), countEntry.getValue() );
 			if ( !request.hasZeroCountsIncluded() && facet.getCount() == 0 ) {
 				continue;
 			}
-			if ( facetRequest.getMaxNumberOfFacets() > 0 && includedFacetCount == facetRequest.getMaxNumberOfFacets() ) {
-				break;
-			}
 			facetList.add( facet );
 			includedFacetCount++;
+			if ( includedFacetCount == count ) {
+				break;
+			}
 		}
-		Collections.sort( facetList, new FacetComparator( request.getSort() ) );
 		return facetList;
 	}
 
@@ -188,21 +213,35 @@ public class FacetCollector extends Collector {
 		}
 	}
 
-	static public class FacetComparator implements Comparator<Facet> {
+	static public class FacetEntryComparator implements Comparator<Entry<String, Integer>> {
 		private final FacetSortOrder sortOder;
 
-		public FacetComparator(FacetSortOrder sortOrder) {
+		public FacetEntryComparator(FacetSortOrder sortOrder) {
+			this.sortOder = sortOrder;
+		}
+
+		public int compare(Entry<String, Integer> entry1, Entry<String, Integer> entry2) {
+			if ( FacetSortOrder.COUNT_ASC.equals( sortOder ) ) {
+				return entry1.getValue() - entry2.getValue();
+			}
+			else if ( FacetSortOrder.COUNT_DESC.equals( sortOder ) ) {
+				return entry2.getValue() - entry1.getValue();
+			}
+			else {
+				return entry1.getKey().compareTo( entry2.getKey() );
+			}
+		}
+	}
+
+	static public class RangeFacetComparator implements Comparator<Facet> {
+		private final FacetSortOrder sortOder;
+
+		public RangeFacetComparator(FacetSortOrder sortOrder) {
 			this.sortOder = sortOrder;
 		}
 
 		public int compare(Facet facet1, Facet facet2) {
-			if ( FacetSortOrder.COUNT_ASC.equals( sortOder ) ) {
-				return facet1.getCount() - facet2.getCount();
-			}
-			else if ( FacetSortOrder.COUNT_DESC.equals( sortOder ) ) {
-				return facet2.getCount() - facet1.getCount();
-			}
-			else if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( sortOder ) ) {
+			if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( sortOder ) ) {
 				return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
 			}
 			else {
@@ -252,6 +291,7 @@ public class FacetCollector extends Collector {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		void countValue(Object value) {
 			for ( FacetRange<T> range : ranges ) {
 				if ( range.isInRange( (T) value ) ) {
