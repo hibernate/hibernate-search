@@ -26,6 +26,7 @@ package org.hibernate.search.test.jmx;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
@@ -35,6 +36,11 @@ import javax.management.MBeanOperationInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
+import org.osjava.sj.memory.MemoryContext;
 
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -138,6 +144,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 
 		cfg.setProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" );
 		cfg.setProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
+		cfg.setProperty( "hibernate.jndi.org.osjava.sj.factory", "org.hibernate.search.test.jmx.IndexControlMBeanTest$CustomContextFactory" );
 		cfg.setProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() );
 		cfg.setProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
 
@@ -161,5 +168,29 @@ public class IndexControlMBeanTest extends SearchTestCase {
 						new String[] { String.class.getName() }
 				)
 		);
+	}
+
+	public static class CustomContextFactory implements InitialContextFactory {
+		public CustomContextFactory() {
+			super();
+		}
+
+		public Context getInitialContext(Hashtable environment) throws NamingException {
+			return new CloseNoOpMemoryContext( environment );
+		}
+	}
+
+	public static class CloseNoOpMemoryContext extends MemoryContext {
+		public CloseNoOpMemoryContext(Hashtable env) {
+			super( env );
+		}
+
+		// see HSEARCH-802
+		// see http://code.google.com/p/osjava/issues/detail?id=12
+		// What is the intended semantics of Context#close()
+		@Override
+		public void close() {
+			// noop
+		}
 	}
 }
