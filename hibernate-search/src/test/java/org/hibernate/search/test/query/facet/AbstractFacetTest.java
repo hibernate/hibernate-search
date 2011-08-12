@@ -41,8 +41,11 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public abstract class AbstractFacetTest extends SearchTestCase {
 	public static final String[] colors = { "red", "black", "white", "blue" };
+
 	public static final String[] makes = { "Honda", "Toyota", "BMW", "Mercedes" };
-	public static final int[] ccs = { 2407, 2831, 3398 };
+
+	public static final int[] ccs = { 3398, 2407, 2831 };
+
 	public static final String[] albums = {
 			"A boy named Johnny",
 			"A boy named Sue",
@@ -56,6 +59,7 @@ public abstract class AbstractFacetTest extends SearchTestCase {
 			"Water from the Wells of Home"
 	};
 	public static final int[] albumPrices = { 499, 999, 1500, 1500, 1500, 1600, 1700, 1800, 2000, 2500 };
+
 	public static final String[] releaseDates = {
 			"2001", "2002", "1972", "1982", "2010", "1968", "1973", "2003", "2002", "1988"
 	};
