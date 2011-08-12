@@ -135,8 +135,8 @@
         <hibernateVersion>4.0.0.Beta5</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Final</hibernateCommonsAnnotationVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bytemanVersion>1.5.1</bytemanVersion>
-        <jbossLoggingVersion>3.0.0.CR1</jbossLoggingVersion>
+        <bytemanVersion>1.5.2</bytemanVersion>
+        <jbossLoggingVersion>3.0.0.GA</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.0.Beta7</jbossLoggingProcessorVersion>
     </properties>
 

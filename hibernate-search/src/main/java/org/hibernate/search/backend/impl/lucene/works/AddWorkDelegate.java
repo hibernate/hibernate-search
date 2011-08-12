@@ -66,10 +66,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		ScopedAnalyzer analyzer = documentBuilder.getAnalyzer();
 		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap );
 		if ( log.isTraceEnabled() ) {
-			log.trace(
-					"add to Lucene index: {}#{}:{}",
-					new Object[] { entityType, work.getId(), work.getDocument() }
-			);
+			log.trace( "add to Lucene index: " + entityType + "#" + work.getId() + ":" + work.getDocument() );
 		}
 		try {
 			writer.addDocument( work.getDocument(), analyzer );
