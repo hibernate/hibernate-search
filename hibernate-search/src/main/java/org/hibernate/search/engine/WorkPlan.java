@@ -157,6 +157,8 @@ public class WorkPlan {
 	 */
 	class PerClassWork<T> {
 		
+		private final boolean containedInOnly;
+
 		/**
 		 * The type of entities being managed by this instance.
 		 * @param clazz
@@ -164,6 +166,7 @@ public class WorkPlan {
 		PerClassWork(Class<T> clazz) {
 			this.entityClass = clazz;
 			this.documentBuilder = getEntityBuilder( searchFactoryImplementor, clazz );
+			this.containedInOnly = documentBuilder instanceof DocumentBuilderContainedEntity;
 		}
 		
 		/**
@@ -219,6 +222,10 @@ public class WorkPlan {
 		 * @return the appropriate id to use for this work
 		 */
 		private Serializable extractProperId(Work<T> work) {
+			// see HSEARCH-662
+			if ( containedInOnly ) {
+				return work.getId();
+			}
 			T entity = work.getEntity();
 			// 1) entity is null for purge operation, which requires to trust the work id
 			// 2) types mapped as provided id require to use the work id
