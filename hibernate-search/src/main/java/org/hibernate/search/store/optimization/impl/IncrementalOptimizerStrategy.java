@@ -31,7 +31,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.backend.impl.lucene.Workspace;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

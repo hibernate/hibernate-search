@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend;
+package org.hibernate.search.backend.impl.lucene;
 
 import java.io.IOException;
 import java.util.Set;
@@ -36,6 +36,7 @@ import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
 
+import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.util.logging.impl.Log;

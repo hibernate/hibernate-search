@@ -21,7 +21,7 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.backend.impl.lucene.Workspace;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 
 /**

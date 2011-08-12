@@ -24,7 +24,6 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

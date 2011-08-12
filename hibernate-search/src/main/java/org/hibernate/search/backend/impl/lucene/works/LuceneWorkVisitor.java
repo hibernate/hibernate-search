@@ -29,7 +29,7 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.impl.WorkVisitor;
-import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.backend.impl.lucene.Workspace;
 
 /**
  * @author Sanne Grinovero

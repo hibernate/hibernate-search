@@ -31,7 +31,6 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
