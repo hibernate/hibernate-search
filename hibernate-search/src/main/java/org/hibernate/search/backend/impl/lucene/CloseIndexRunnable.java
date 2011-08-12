@@ -35,9 +35,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class CloseIndexRunnable implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
-	private final Workspace workspace;
+	private final WorkspaceImpl workspace;
 
-	public CloseIndexRunnable(Workspace workspace) {
+	public CloseIndexRunnable(WorkspaceImpl workspace) {
 		this.workspace = workspace;
 	}
 

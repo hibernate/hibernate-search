@@ -46,13 +46,13 @@ class PerDPResources {
 	
 	private final ExecutorService executor;
 	private final LuceneWorkVisitor visitor;
-	private final Workspace workspace;
+	private final WorkspaceImpl workspace;
 	private final boolean exclusiveIndexUsage;
 	private final ErrorHandler errorHandler;
 	
 	PerDPResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		errorHandler = context.getErrorHandler();
-		workspace = new Workspace( indexManager, errorHandler );
+		workspace = new WorkspaceImpl( indexManager, errorHandler );
 		visitor = new LuceneWorkVisitor( workspace );
 		int maxQueueLength = indexManager.getMaxQueueLength();
 		executor = Executors.newFixedThreadPool( 1, "Directory writer", maxQueueLength );
@@ -67,7 +67,7 @@ class PerDPResources {
 		return visitor;
 	}
 
-	public Workspace getWorkspace() {
+	public WorkspaceImpl getWorkspace() {
 		return workspace;
 	}
 

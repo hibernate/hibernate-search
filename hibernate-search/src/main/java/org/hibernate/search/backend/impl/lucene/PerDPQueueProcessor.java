@@ -53,7 +53,7 @@ class PerDPQueueProcessor implements Runnable {
 	
 	private static final Log log = LoggerFactory.make();
 	
-	private final Workspace workspace;
+	private final WorkspaceImpl workspace;
 	private final LuceneWorkVisitor worker;
 	private final ExecutorService executor;
 	private final boolean exclusiveIndexUsage;

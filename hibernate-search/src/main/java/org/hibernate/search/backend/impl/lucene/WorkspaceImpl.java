@@ -36,12 +36,10 @@ import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
 
-import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.util.logging.impl.Log;
 
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters.ParameterSet;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
 import org.hibernate.search.exception.ErrorContext;
@@ -50,6 +48,7 @@ import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -62,9 +61,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-//TODO renaming to "DirectoryWorkspace" would be nice.
-//Clarify where it belongs SPI or Impl and what to expose to OptimizerStrategy
-public class Workspace {
+class WorkspaceImpl implements Workspace {
 
 	private static final Log log = LoggerFactory.make();
 	
@@ -98,7 +95,7 @@ public class Workspace {
 
 	private final DirectoryBasedIndexManager indexManager;
 	
-	public Workspace(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
+	public WorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
 		this.indexManager = indexManager;
 		this.directoryProvider = indexManager.getDirectoryProvider();
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
@@ -113,18 +110,17 @@ public class Workspace {
 		indexManager.setIndexWriterConfig( writerConfig );
 	}
 
+	@Override
 	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {
 		return indexManager.getIndexBindingForEntity( entity ).getDocumentBuilder();
 	}
 
+	@Override
 	public Analyzer getAnalyzer(String name) {
 		return indexManager.getAnalyzer( name );
 	}
 
-	/**
-	 * If optimization has not been forced give a chance to configured OptimizerStrategy
-	 * to optimize the index.
-	 */
+	@Override
 	public void optimizerPhase() {
 		// used getAndSet(0) because Workspace is going to be reused by next transaction.
 		synchronized ( optimizerStrategy ) {
@@ -133,13 +129,7 @@ public class Workspace {
 		}
 	}
 	
-	/**
-	 * Used by OptimizeLuceneWork after index optimization to flag that
-	 * optimization has been forced.
-	 * @see OptimizeLuceneWork
-	 * @see SearchFactory#optimize()
-	 * @see SearchFactory#optimize(Class)
-	 */
+	@Override
 	public void optimize() {
 		//Needs to ensure the optimizerStrategy is accessed in threadsafe way
 		synchronized ( optimizerStrategy ) {
@@ -182,9 +172,7 @@ public class Workspace {
 		return writer;
 	}
 
-	/**
-	 * @see #getIndexWriter(ErrorContextBuilder)
-	 */
+	@Override
 	public IndexWriter getIndexWriter() {
 		return getIndexWriter( null );
 	}
@@ -229,19 +217,12 @@ public class Workspace {
 		}
 	}
 
-	/**
-	 * Increment the counter of modification operations done on the index.
-	 * Used (currently only) by the OptimizerStrategy.
-	 * @param modCount the increment to add to the counter.
-	 */
+	@Override
 	public void incrementModificationCounter(int modCount) {
 		operations.addAndGet( modCount );
 	}
 
-	/**
-	 * @return The unmodifiable set of entity types being indexed
-	 * in the underlying Lucene Directory backing this Workspace.
-	 */
+	@Override
 	public Set<Class<?>> getEntitiesInDirectory() {
 		return entitiesInDirectory;
 	}
