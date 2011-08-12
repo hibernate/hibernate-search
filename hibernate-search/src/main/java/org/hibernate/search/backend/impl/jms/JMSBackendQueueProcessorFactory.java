@@ -26,6 +26,9 @@ package org.hibernate.search.backend.impl.jms;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
 import javax.naming.InitialContext;
@@ -39,6 +42,8 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.impl.JNDIHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -57,6 +62,8 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessor {
 	public static final String JMS_CONNECTION_FACTORY = Environment.WORKER_PREFIX + "jms.connection_factory";
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
 	private IndexManager indexManager;
+
+	private static final Log log = LoggerFactory.make();
 
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		//TODO proper exception if jms queues and connections are not there
@@ -124,4 +131,11 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessor {
 	public void applyStreamWork(LuceneWork singleOperation) {
 		applyWork( Collections.singletonList( singleOperation ) );
 	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		log.warnSuspiciousBackendDirectoryCombination( indexName );
+		return new ReentrantLock(); // keep the invoker happy, still it's useless
+	}
+
 }

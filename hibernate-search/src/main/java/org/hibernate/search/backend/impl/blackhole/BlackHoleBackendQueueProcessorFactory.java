@@ -25,6 +25,8 @@ package org.hibernate.search.backend.impl.blackhole;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
@@ -43,9 +45,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  */
 public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProcessor {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
+	private final ReentrantLock backendLock = new ReentrantLock();
+
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		// no-op
@@ -68,6 +72,11 @@ public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProces
 	public void applyStreamWork(LuceneWork singleOperation) {
 		// no-op
 		log.debug( "Discarding a sintgle LuceneWork" );
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		return backendLock;
 	}
 
 }

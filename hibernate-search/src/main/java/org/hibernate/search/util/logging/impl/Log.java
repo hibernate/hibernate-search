@@ -381,4 +381,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 80, value = "Received a remote message about an unknown index '%s': discarding message!")
 	void messageReceivedForUndefinedIndex(String indexName);
 
+	@LogMessage(level = WARN)
+	@Message(id = 81, value = "The index '%s' is using a non-recommended combination of backend and directoryProvider implementations")
+	void warnSuspiciousBackendDirectoryCombination(String indexName);
+
 }

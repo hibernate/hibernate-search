@@ -28,6 +28,8 @@ import java.util.Properties;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -56,6 +58,8 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 	private IndexManager indexManager;
 	private ExecutorService backendExecutor;
 	private boolean sync;
+
+	private final ReentrantLock backendLock = new ReentrantLock();
 
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.indexManager = indexManager;
@@ -100,6 +104,11 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 		else {
 			applyWork( singletonList );
 		}
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		return backendLock;
 	}
 
 }

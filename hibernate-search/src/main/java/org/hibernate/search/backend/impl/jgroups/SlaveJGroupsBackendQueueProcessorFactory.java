@@ -26,15 +26,21 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class SlaveJGroupsBackendQueueProcessorFactory extends JGroupsBackendQueueProcessorFactory {
+	
+	private static final Log log = LoggerFactory.make();
 	
 	private JGroupsBackendQueueProcessor jgroupsProcessor;
 
@@ -53,6 +59,12 @@ public class SlaveJGroupsBackendQueueProcessorFactory extends JGroupsBackendQueu
 	public void applyStreamWork(LuceneWork singleOperation) {
 		//TODO optimize for single operation?
 		jgroupsProcessor.sendLuceneWorkList( Collections.singletonList( singleOperation ) );
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		log.warnSuspiciousBackendDirectoryCombination( indexName );
+		return new ReentrantLock(); // keep the invoker happy, still it's useless
 	}
 
 }

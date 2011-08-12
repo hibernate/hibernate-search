@@ -25,6 +25,7 @@ package org.hibernate.search.backend.spi;
 
 import java.util.Properties;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -67,5 +68,10 @@ public interface BackendQueueProcessor {
 	 * @param singleOperation
 	 */
 	void applyStreamWork(LuceneWork singleOperation);
+
+	/**
+	 * @return a Lock instance which will block index modifications when acquired
+	 */
+	Lock getExclusiveWriteLock();
 
 }

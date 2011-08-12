@@ -60,7 +60,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters indexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
-	private final ReentrantLock dirLock = new ReentrantLock();
 	private int maxQueueLength = Executors.QUEUE_MAX_LENGTH;
 	private boolean exclusiveIndexUsage;
 	private LuceneWorkSerializer serializer;
@@ -92,10 +91,10 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
-		directoryProvider.start( this );
 		indexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
 		backend = BackendFactory.createBackend( this, buildContext, cfg );
+		directoryProvider.start( this );
 		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, cfg );
 		exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
 		readers = CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
@@ -185,7 +184,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	
 	//Not exposed on the IndexManager interface
 	public Lock getDirectoryModificationLock() {
-		return dirLock;
+		return backend.getExclusiveWriteLock();
 	}
 
 	//Not exposed on the interface
