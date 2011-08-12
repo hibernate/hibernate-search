@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.impl.lucene;
+package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -29,114 +29,104 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.backend.impl.ContextAwareSelectionDelegate;
-import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
-import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * This visitor applies the selection logic from the plugged IndexShardingStrategies to
- * transactional operations, so similar to StreamingSelectionVisitor but preparing a
- * context bound list of operations instead of sending all changes directly to the backend.
+ * stream operations, as used by optimize() and batching operations.
+ * Using a visitor/selector pattern for different implementations of addAsPayLoadsToQueue
+ * depending on the type of LuceneWork.
  * 
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero
  */
-public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {
-	
-	public static final TransactionalSelectionVisitor INSTANCE = new TransactionalSelectionVisitor();
+public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperationSelectionDelegate> {
 	
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
 	
-	private TransactionalSelectionVisitor() {
+	public static final StreamingSelectionVisitor INSTANCE = new StreamingSelectionVisitor();
+	
+	private StreamingSelectionVisitor() {
 		// use INSTANCE as this delegator is stateless
 	}
 
-	public ContextAwareSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
+	public StreamingOperationSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 	
-	public ContextAwareSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
+	public StreamingOperationSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 
-	public ContextAwareSelectionDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
+	public StreamingOperationSelectionDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
 		return deleteDelegate;
 	}
 
-	public ContextAwareSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
+	public StreamingOperationSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
 		return optimizeDelegate;
 	}
 
-	public ContextAwareSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
+	public StreamingOperationSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
 		return purgeDelegate;
 	}
 	
-	private static class AddSelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class AddSelectionDelegate implements StreamingOperationSelectionDelegate {
 
-		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
-				WorkQueuePerIndexSplitter context) {
+		public final void performStreamOperation(LuceneWork work,
+				IndexShardingStrategy shardingStrategy, boolean forceAsync) {
 			IndexManager indexManager = shardingStrategy.getIndexManagersForAddition(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString(),
 					work.getDocument()
 			);
-			context.getIndexManagerQueue( indexManager ).add( work );
+			indexManager.performStreamOperation( work, forceAsync );
 		}
 
 	}
 	
-	private static class DeleteSelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class DeleteSelectionDelegate implements StreamingOperationSelectionDelegate {
 
-		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
-				WorkQueuePerIndexSplitter context) {
+		public final void performStreamOperation(LuceneWork work,
+				IndexShardingStrategy shardingStrategy, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString()
 			);
 			for (IndexManager indexManager : indexManagers) {
-				context.getIndexManagerQueue( indexManager ).add( work );
+				indexManager.performStreamOperation( work, forceAsync );
 			}
 		}
 
 	}
+	
+	private static class OptimizeSelectionDelegate implements StreamingOperationSelectionDelegate {
 
-	/**
-	 * In this exceptional case we still delegate to a streaming operation instead:
-	 * no need for transactions as optimizing doesn't affect index-encoded state.
-	 */
-	private static class OptimizeSelectionDelegate implements ContextAwareSelectionDelegate {
-
-		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
-				WorkQueuePerIndexSplitter context) {
+		public final void performStreamOperation(LuceneWork work,
+				IndexShardingStrategy shardingStrategy, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
 			for (IndexManager indexManager : indexManagers) {
-				indexManager.performStreamOperation( work, false );
+				indexManager.performStreamOperation( work, forceAsync );
 			}
 		}
 
 	}
 	
-	private static class PurgeAllSelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class PurgeAllSelectionDelegate implements StreamingOperationSelectionDelegate {
 
-		@Override
-		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
-				WorkQueuePerIndexSplitter context) {
+		public final void performStreamOperation(LuceneWork work,
+				IndexShardingStrategy shardingStrategy, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString()
 			);
 			for (IndexManager indexManager : indexManagers) {
-				context.getIndexManagerQueue( indexManager ).add( work );
+				indexManager.performStreamOperation( work, forceAsync );
 			}
 		}
 

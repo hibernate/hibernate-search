@@ -29,9 +29,9 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
+import org.hibernate.search.backend.impl.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
-import org.hibernate.search.backend.impl.lucene.StreamingSelectionVisitor;
-import org.hibernate.search.backend.impl.lucene.TransactionalSelectionVisitor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.store.IndexShardingStrategy;
 
