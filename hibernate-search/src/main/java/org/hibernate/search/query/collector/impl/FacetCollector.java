@@ -291,6 +291,7 @@ public class FacetCollector extends Collector {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		void countValue(Object value) {
 			for ( FacetRange<T> range : ranges ) {
 				if ( range.isInRange( (T) value ) ) {
