@@ -91,18 +91,12 @@ public class BackendFactory {
 	 * @param indexManagerName The indexManager going to be linked to this ExecutorService
 	 * @return null if the work needs execution in sync
 	 */
-	public static ExecutorService buildWorkerExecutor(Properties properties, String indexManagerName) {
-		boolean sync = isConfiguredAsSync( properties );
-		if ( sync ) {
-			return null;
-		}
-		else {
-			int threadPoolSize = getWorkerThreadPoolSize( properties );
-			int queueSize = getWorkerQueueSize( properties );
-			return Executors.newFixedThreadPool( threadPoolSize,
-					"backend queueing processor for index " + indexManagerName,
-					queueSize );
-		}
+	public static ExecutorService buildWorkersExecutor(Properties properties, String indexManagerName) {
+		int threadPoolSize = getWorkerThreadPoolSize( properties );
+		int queueSize = getWorkerQueueSize( properties );
+		return Executors.newFixedThreadPool( threadPoolSize,
+				"backend queueing processor for index " + indexManagerName,
+				queueSize );
 	}
 	
 	public static int getWorkerThreadPoolSize(Properties properties) {

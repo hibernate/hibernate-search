@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -35,7 +34,6 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
@@ -60,8 +58,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters indexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
-	private int maxQueueLength = Executors.QUEUE_MAX_LENGTH;
-	private boolean exclusiveIndexUsage;
 	private LuceneWorkSerializer serializer;
 	private SearchFactoryImplementor boundSearchFactory = null;
 	private DirectoryBasedReaderManager readers = null;
@@ -95,8 +91,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
 		backend = BackendFactory.createBackend( this, buildContext, cfg );
 		directoryProvider.start( this );
-		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, cfg );
-		exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
 		readers = CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
 		serializer = BackendFactory.createSerializer( indexName, cfg, buildContext );
 	}
@@ -160,16 +154,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	//Not exposed on the IndexManager interface
 	public BackendQueueProcessor getBackendQueueProcessorFactory() {
 		return backend;
-	}
-
-	//Not exposed on the IndexManager interface
-	public int getMaxQueueLength() {
-		return maxQueueLength;
-	}
-
-	//Not exposed on the IndexManager interface
-	public boolean isExclusiveIndexUsage() {
-		return this.exclusiveIndexUsage;
 	}
 
 	//Not exposed on the IndexManager interface

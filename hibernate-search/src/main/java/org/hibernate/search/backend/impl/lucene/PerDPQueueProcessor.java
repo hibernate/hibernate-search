@@ -68,7 +68,7 @@ class PerDPQueueProcessor implements Runnable {
 	public PerDPQueueProcessor(PerDPResources resources, List<LuceneWork> queue) {
 		this.worker = resources.getVisitor();
 		this.workspace = resources.getWorkspace();
-		this.executor = resources.getExecutor();
+		this.executor = resources.getWorkersExecutor();
 		this.exclusiveIndexUsage = resources.isExclusiveIndexUsageEnabled();
 		this.handler = resources.getErrorHandler();
 		this.workOnWriter = queue;

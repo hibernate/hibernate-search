@@ -26,17 +26,12 @@ package org.hibernate.search.backend.impl.lucene;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 
@@ -52,63 +47,44 @@ import org.hibernate.search.backend.LuceneWork;
  */
 public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor {
 
-	private static final Log log = LoggerFactory.make();
-
 	private PerDPResources resources;
-	private IndexManager indexManager;
-	private ExecutorService backendExecutor;
 	private boolean sync;
 
 	private final ReentrantLock backendLock = new ReentrantLock();
 
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
-		this.indexManager = indexManager;
 		sync = BackendFactory.isConfiguredAsSync( props );
-		resources = new PerDPResources( context, (DirectoryBasedIndexManager) indexManager );
-		backendExecutor = BackendFactory.buildWorkerExecutor( props, indexManager.getIndexName() );
+		resources = new PerDPResources( context, indexManager, props );
 	}
 
 	public void close() {
 		resources.shutdown();
-		if ( backendExecutor != null ) {
-			backendExecutor.shutdown();
-			try {
-				backendExecutor.awaitTermination( 20, TimeUnit.SECONDS );
-			}
-			catch ( InterruptedException e ) {
-			}
-			if ( ! backendExecutor.isTerminated() ) {
-				log.unableToShutdownAsyncronousIndexingByTimeout( indexManager.getIndexName() );
-			}
-		}
 	}
 
 	@Override
 	public void applyWork(List<LuceneWork> workList) {
-		LuceneBackendQueueProcessor luceneBackendQueueProcessor = new LuceneBackendQueueProcessor( workList, indexManager, resources, sync );
+		LuceneBackendQueueProcessor luceneBackendQueueProcessor = new LuceneBackendQueueProcessor( workList, resources, sync );
 		if ( sync ) {
 			luceneBackendQueueProcessor.run();
 		}
 		else {
-			backendExecutor.execute( luceneBackendQueueProcessor );
+			resources.getQueueingExecutor().execute( luceneBackendQueueProcessor );
 		}
 	}
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation) {
 		List<LuceneWork> singletonList = Collections.singletonList( singleOperation );
-		if ( backendExecutor != null ) {
-			LuceneBackendQueueProcessor luceneBackendQueueProcessor = new LuceneBackendQueueProcessor( singletonList, indexManager, resources, false );
-			backendExecutor.execute( luceneBackendQueueProcessor );
-		}
-		else {
-			applyWork( singletonList );
-		}
+		applyWork( singletonList );
 	}
 
 	@Override
 	public Lock getExclusiveWriteLock() {
 		return backendLock;
+	}
+
+	public PerDPResources getIndexResources() {
+		return resources;
 	}
 
 }

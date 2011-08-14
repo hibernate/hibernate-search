@@ -24,15 +24,16 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
-import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
  * Apply the operations to Lucene directories.
@@ -51,7 +52,6 @@ class LuceneBackendQueueProcessor implements Runnable {
 	private static final Log log = LoggerFactory.make();
 
 	LuceneBackendQueueProcessor(List<LuceneWork> queue,
-			IndexManager indexManager,
 			PerDPResources resourcesMap,
 			boolean syncMode) {
 		this.sync = syncMode;
