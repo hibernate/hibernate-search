@@ -37,6 +37,10 @@ import org.hibernate.search.util.logging.impl.Log;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
  * Collects all resources needed to apply changes to one index,
@@ -56,6 +60,10 @@ public class PerDPResources {
 	private final ExecutorService workersExecutor;
 	private final int maxQueueLength;
 	private final String indexName;
+	private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+	private final ReadLock readLock = readWriteLock.readLock();
+	private final WriteLock writeLock = readWriteLock.writeLock();
 	
 	PerDPResources(WorkerBuildContext context, IndexManager indexManager, Properties props) {
 		indexName = indexManager.getIndexName();
@@ -125,6 +133,14 @@ public class PerDPResources {
 
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
+	}
+
+	public Lock getParallelModificationLock() {
+		return readLock;
+	}
+
+	public Lock getExclusiveModificationLock() {
+		return writeLock;
 	}
 
 }

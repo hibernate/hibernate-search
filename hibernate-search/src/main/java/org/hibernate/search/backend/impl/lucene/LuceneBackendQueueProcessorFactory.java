@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -49,8 +48,6 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 
 	private PerDPResources resources;
 	private boolean sync;
-
-	private final ReentrantLock backendLock = new ReentrantLock();
 
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
@@ -80,7 +77,7 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 
 	@Override
 	public Lock getExclusiveWriteLock() {
-		return backendLock;
+		return resources.getExclusiveModificationLock();
 	}
 
 	public PerDPResources getIndexResources() {
