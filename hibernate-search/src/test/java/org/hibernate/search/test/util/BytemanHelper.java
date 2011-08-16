@@ -41,6 +41,7 @@ public class BytemanHelper extends Helper {
 			Thread.sleep( 1000 );
 		}
 		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			log.error( "unexpected interruption", e );
 		}
 	}

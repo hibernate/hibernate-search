@@ -120,6 +120,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				}
 				catch ( InterruptedException e ) {
 					//continue
+					Thread.currentThread().interrupt();
 				}
 			}
 			currentMarkerInSource =

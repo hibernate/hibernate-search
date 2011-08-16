@@ -116,6 +116,7 @@ public class PerDPResources {
 		}
 		catch ( InterruptedException e ) {
 			log.interruptedWhileWaitingForIndexActivity();
+			Thread.currentThread().interrupt();
 		}
 		if ( ! executor.isTerminated() ) {
 			log.unableToShutdownAsyncronousIndexingByTimeout( indexName );

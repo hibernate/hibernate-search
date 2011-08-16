@@ -93,6 +93,7 @@ public class SharingBufferIndexProviderTest {
 			try {
 				startSignal.await();
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 				//manage termination:
 				return;
 			}
