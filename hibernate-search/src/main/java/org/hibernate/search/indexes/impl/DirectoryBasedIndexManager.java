@@ -80,8 +80,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void destroy() {
 		readers.stop();
-		directoryProvider.stop();
 		backend.close();
+		directoryProvider.stop();
 	}
 
 	@Override
