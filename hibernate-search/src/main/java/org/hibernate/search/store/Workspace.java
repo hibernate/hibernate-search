@@ -27,7 +27,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.exception.impl.ErrorContextBuilder;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -54,7 +53,10 @@ public interface Workspace {
 	void optimize();
 
 	/**
-	 * @see #getIndexWriter(ErrorContextBuilder)
+	 * Gets the IndexWriter, opening one if needed.
+	 * Unless null is returned, each {@link #getIndexWriter()} invocation shall be balanced
+	 * by a {@link #indexWriterReleased()} invocation when it's not longer needed.
+	 * @return a new IndexWriter or an already open one, or null if an error happened.
 	 */
 	IndexWriter getIndexWriter();
 
@@ -70,5 +72,15 @@ public interface Workspace {
 	 * in the underlying Lucene Directory backing this Workspace.
 	 */
 	Set<Class<?>> getEntitiesInDirectory();
+
+	/**
+	 * TODO track IndexWriter open/close counters - needed for some configurations only
+	 */
+	void indexWriterReleased();
+
+	/**
+	 * 
+	 */
+	void afterTransactionApplied();
 
 }

@@ -23,16 +23,17 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
+import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 
 /**
@@ -44,39 +45,84 @@ import org.hibernate.search.exception.impl.ErrorContextBuilder;
  * @author Sanne Grinovero
  */
 class LuceneBackendQueueProcessor implements Runnable {
-	
-	private final boolean sync;
-	private final ErrorHandler errorHandler;
-	private final PerDPQueueProcessor dpProcessors;
-	
+
 	private static final Log log = LoggerFactory.make();
 
-	LuceneBackendQueueProcessor(List<LuceneWork> queue,
-			PerDPResources resourcesMap,
-			boolean syncMode) {
-		this.sync = syncMode;
-		this.errorHandler = resourcesMap.getErrorHandler();
-		this.dpProcessors = new PerDPQueueProcessor( resourcesMap, queue );
+	private final Lock modificationLock;
+	private final PerDPResources resources;
+	private final List<LuceneWork> queue;
+
+	LuceneBackendQueueProcessor(List<LuceneWork> queue, PerDPResources resources) {
+		this.queue = queue;
+		this.resources = resources;
+		this.modificationLock = resources.getParallelModificationLock();
 	}
 
 	public void run() {
-		ExecutorService executor = dpProcessors.getOwningExecutor();
+		modificationLock.lock();
 		try {
-			if ( sync ) {
-				//even in sync operations we always delegate to a single thread,
-				//to make sure all index operations are applied in sequence.
-				Future<?> future = executor.submit( dpProcessors );
-				future.get();
-			}
-			else {
-				executor.execute( dpProcessors );	
-			}
+			applyUpdates();
 		} catch ( Exception e ) {
 			log.backendError( e );
 			ErrorContextBuilder builder = new ErrorContextBuilder();
+			builder.allWorkToBeDone( queue );
 			builder.errorThatOccurred( e );
-			errorHandler.handle( builder.createErrorContext() );
+			resources.getErrorHandler().handle( builder.createErrorContext() );
+			resources.getWorkspace().closeIndexWriter();
+		}
+		finally {
+			modificationLock.unlock();
 		}
 	}
-	
+
+	/**
+	 * Applies all modifications to the index in parallel using the workers executor
+	 * @throws ExecutionException
+	 * @throws InterruptedException
+	 */
+	private void applyUpdates() throws InterruptedException, ExecutionException {
+		WorkspaceImpl workspace = resources.getWorkspace();
+		
+		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
+		errorContextBuilder.allWorkToBeDone( queue );
+		
+		IndexWriter indexWriter = workspace.getIndexWriter( errorContextBuilder );
+		if ( indexWriter == null ) {
+			log.cannotOpenIndexWriterCausePreviousError();
+			return;
+		}
+		try {
+			ExecutorService executor = resources.getWorkersExecutor();
+			int queueSize = queue.size();
+			Future[] submittedTasks = new Future[ queueSize ];
+			for ( int i = 0; i < queueSize; i++ ) {
+				SingleTaskRunnable task = new SingleTaskRunnable( queue.get( i ), resources, indexWriter );
+				submittedTasks[i] = executor.submit( task );
+			}
+			// now wait for all tasks being completed before releasing our lock
+			// (this thread waits even in async backend mode)
+			boolean someFailureHappened = false;
+			LinkedList<LuceneWork> failedUpdates = new LinkedList<LuceneWork>();
+			for ( int i = 0; i < queueSize; i++ ) {
+				Future task = submittedTasks[i];
+				try {
+					task.get();
+					errorContextBuilder.workCompleted( queue.get( i ) );
+				}
+				catch (ExecutionException e) {
+					someFailureHappened = true;
+					failedUpdates.add( queue.get( i ) );
+					errorContextBuilder.errorThatOccurred( e.getCause() );
+				}
+			}
+			if ( someFailureHappened ) {
+				errorContextBuilder.addAllWorkThatFailed( failedUpdates );
+				resources.getErrorHandler().handle( errorContextBuilder.createErrorContext() );
+			}
+		}
+		finally {
+			resources.getWorkspace().afterTransactionApplied();
+		}
+	}
+
 }

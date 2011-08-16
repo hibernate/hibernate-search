@@ -24,6 +24,7 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.io.IOException;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -46,6 +47,7 @@ import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.exception.impl.SingleErrorContext;
+import org.hibernate.search.indexes.impl.CommonPropertiesParse;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.Workspace;
@@ -94,14 +96,18 @@ class WorkspaceImpl implements Workspace {
 	private final AtomicLong operations = new AtomicLong( 0L );
 
 	private final DirectoryBasedIndexManager indexManager;
+
+	private final boolean exclusiveIndexUsage;
 	
-	public WorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
+	public WorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
+		String indexName = indexManager.getIndexName();
 		this.indexManager = indexManager;
 		this.directoryProvider = indexManager.getDirectoryProvider();
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
 		this.entitiesInDirectory = indexManager.getContainedTypes();
 		this.indexingParams = indexManager.getIndexingParameters();
 		this.errorHandler = errorHandler;
+		this.exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
 		indexingParams.applyToWriter( writerConfig );
 		Similarity similarity = indexManager.getSimilarity();
 		if ( similarity != null ) {
@@ -139,7 +145,8 @@ class WorkspaceImpl implements Workspace {
 
 	/**
 	 * Gets the IndexWriter, opening one if needed.
-	 * @param errorContextBuilder might contain some context useful to provide when handling IOExceptions
+	 * @param errorContextBuilder might contain some context useful to provide when handling IOExceptions.
+	 *  Is an optional parameter.
 	 * @return a new IndexWriter or one already open.
 	 */
 	public synchronized IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
@@ -265,6 +272,33 @@ class WorkspaceImpl implements Workspace {
 			 errorContext = new SingleErrorContext( ioe );
 		}
 		this.errorHandler.handle( errorContext );
+	}
+
+	/**
+	 * TODO track IndexWriter open/close counters - needed for some configurations only
+	 */
+	@Override
+	public void indexWriterReleased() {
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void afterTransactionApplied() {
+		if ( exclusiveIndexUsage ) {
+			commitIndexWriter();
+		}
+		else {
+			closeIndexWriter();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void shutDownNow() {
+		forceLockRelease();
 	}
 
 }

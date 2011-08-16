@@ -54,7 +54,6 @@ public class PerDPResources {
 	
 	private final LuceneWorkVisitor visitor;
 	private final WorkspaceImpl workspace;
-	private final boolean exclusiveIndexUsage;
 	private final ErrorHandler errorHandler;
 	private final ExecutorService queueingExecutor;
 	private final ExecutorService workersExecutor;
@@ -68,9 +67,8 @@ public class PerDPResources {
 	PerDPResources(WorkerBuildContext context, IndexManager indexManager, Properties props) {
 		indexName = indexManager.getIndexName();
 		errorHandler = context.getErrorHandler();
-		workspace = new WorkspaceImpl( (DirectoryBasedIndexManager) indexManager, errorHandler );
+		workspace = new WorkspaceImpl( (DirectoryBasedIndexManager) indexManager, errorHandler, props );
 		visitor = new LuceneWorkVisitor( workspace );
-		exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, props );
 		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
 		queueingExecutor = Executors.newFixedThreadPool( 1, "Directory writer for index " + indexName, maxQueueLength );
 		workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
@@ -78,10 +76,6 @@ public class PerDPResources {
 
 	public ExecutorService getQueueingExecutor() {
 		return queueingExecutor;
-	}
-
-	public boolean isExclusiveIndexUsage() {
-		return exclusiveIndexUsage;
 	}
 
 	public ExecutorService getWorkersExecutor() {
@@ -104,18 +98,15 @@ public class PerDPResources {
 		return workspace;
 	}
 
-	public boolean isExclusiveIndexUsageEnabled() {
-		return exclusiveIndexUsage;
-	}
-
 	public void shutdown() {
-		if ( exclusiveIndexUsage ) {
-			//make sure we close the index as last operation
-			queueingExecutor.execute( new CloseIndexRunnable( workspace ) );
-		}
 		//need to close them in this specific order:
-		flushCloseExecutor( queueingExecutor );
-		flushCloseExecutor( workersExecutor );
+		try {
+			flushCloseExecutor( queueingExecutor );
+			flushCloseExecutor( workersExecutor );
+		}
+		finally {
+			workspace.shutDownNow();
+		}
 	}
 
 	private void flushCloseExecutor(ExecutorService executor) {
