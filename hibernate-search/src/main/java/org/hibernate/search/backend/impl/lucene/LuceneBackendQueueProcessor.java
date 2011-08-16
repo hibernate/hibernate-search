@@ -68,7 +68,6 @@ class LuceneBackendQueueProcessor implements Runnable {
 			builder.allWorkToBeDone( queue );
 			builder.errorThatOccurred( e );
 			resources.getErrorHandler().handle( builder.createErrorContext() );
-			resources.getWorkspace().closeIndexWriter();
 		}
 		finally {
 			modificationLock.unlock();

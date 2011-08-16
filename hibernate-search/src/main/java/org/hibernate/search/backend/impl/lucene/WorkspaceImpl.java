@@ -275,13 +275,6 @@ class WorkspaceImpl implements Workspace {
 	}
 
 	/**
-	 * TODO track IndexWriter open/close counters - needed for some configurations only
-	 */
-	@Override
-	public void indexWriterReleased() {
-	}
-
-	/**
 	 * 
 	 */
 	@Override
