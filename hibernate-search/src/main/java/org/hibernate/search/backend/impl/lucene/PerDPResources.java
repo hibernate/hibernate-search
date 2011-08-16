@@ -70,7 +70,7 @@ public class PerDPResources {
 		workspace = new WorkspaceImpl( (DirectoryBasedIndexManager) indexManager, errorHandler, props );
 		visitor = new LuceneWorkVisitor( workspace );
 		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
-		queueingExecutor = Executors.newFixedThreadPool( 1, "Directory writer for index " + indexName, maxQueueLength );
+		queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
 		workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
 	}
 

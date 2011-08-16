@@ -95,7 +95,7 @@ public class BackendFactory {
 		int threadPoolSize = getWorkerThreadPoolSize( properties );
 		int queueSize = getWorkerQueueSize( properties );
 		return Executors.newFixedThreadPool( threadPoolSize,
-				"backend queueing processor for index " + indexManagerName,
+				"IndexWriter worker executor for " + indexManagerName,
 				queueSize );
 	}
 	

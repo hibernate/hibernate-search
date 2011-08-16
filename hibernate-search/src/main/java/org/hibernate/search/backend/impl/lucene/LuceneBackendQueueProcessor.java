@@ -62,16 +62,24 @@ class LuceneBackendQueueProcessor implements Runnable {
 		modificationLock.lock();
 		try {
 			applyUpdates();
+		} catch ( InterruptedException e ) {
+			Thread.currentThread().interrupt();
+			log.interruptedWhileWaitingForIndexActivity();
+			handleException( e );
 		} catch ( Exception e ) {
-			log.backendError( e );
-			ErrorContextBuilder builder = new ErrorContextBuilder();
-			builder.allWorkToBeDone( queue );
-			builder.errorThatOccurred( e );
-			resources.getErrorHandler().handle( builder.createErrorContext() );
+			handleException( e );
 		}
 		finally {
 			modificationLock.unlock();
 		}
+	}
+
+	private void handleException(Exception e) {
+		log.backendError( e );
+		ErrorContextBuilder builder = new ErrorContextBuilder();
+		builder.allWorkToBeDone( queue );
+		builder.errorThatOccurred( e );
+		resources.getErrorHandler().handle( builder.createErrorContext() );
 	}
 
 	/**
