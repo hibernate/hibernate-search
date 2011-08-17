@@ -22,7 +22,9 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.Properties;
 
+import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 
 /**
@@ -30,13 +32,39 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
  */
 public class SharedIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 
+	private final Object lock = new Object();
+	private int openWriterUsers = 0;
+
 	public SharedIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
 		super( indexManager, errorHandler, cfg );
 	}
 
 	@Override
 	public void afterTransactionApplied() {
-		writerHolder.closeIndexWriter();
+		synchronized ( lock ) {
+			openWriterUsers--;
+			if ( openWriterUsers == 0 ) {
+				writerHolder.closeIndexWriter();
+			}
+			else {
+				writerHolder.commitIndexWriter();
+			}
+		}
+	}
+
+	@Override
+	public IndexWriter getIndexWriter() {
+		synchronized ( lock ) {
+			openWriterUsers++;
+			return super.getIndexWriter();
+		}
+	}
+
+	public IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
+		synchronized ( lock ) {
+			openWriterUsers++;
+			return super.getIndexWriter( errorContextBuilder );
+		}
 	}
 
 }
