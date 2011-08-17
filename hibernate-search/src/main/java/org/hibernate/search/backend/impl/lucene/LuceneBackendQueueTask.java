@@ -44,7 +44,7 @@ import org.hibernate.search.exception.impl.ErrorContextBuilder;
  * @author John Griffin
  * @author Sanne Grinovero
  */
-class LuceneBackendQueueProcessor implements Runnable {
+class LuceneBackendQueueTask implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -52,7 +52,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 	private final PerDPResources resources;
 	private final List<LuceneWork> queue;
 
-	LuceneBackendQueueProcessor(List<LuceneWork> queue, PerDPResources resources) {
+	LuceneBackendQueueTask(List<LuceneWork> queue, PerDPResources resources) {
 		this.queue = queue;
 		this.resources = resources;
 		this.modificationLock = resources.getParallelModificationLock();

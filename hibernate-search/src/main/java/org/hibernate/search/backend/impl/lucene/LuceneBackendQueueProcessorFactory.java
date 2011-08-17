@@ -67,7 +67,7 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 
 	@Override
 	public void applyWork(List<LuceneWork> workList) {
-		LuceneBackendQueueProcessor luceneBackendQueueProcessor = new LuceneBackendQueueProcessor( workList, resources );
+		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask( workList, resources );
 		if ( sync ) {
 			Future<?> future = resources.getQueueingExecutor().submit( luceneBackendQueueProcessor );
 			try {
