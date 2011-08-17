@@ -104,6 +104,7 @@ public class ProducerConsumerQueue<T> {
 				queue.put( exitToken );//awake all waiting threads to let them quit.
 			} catch (InterruptedException e) {
 				//just quit, consumers will be interrupted anyway if it's a shutdown.
+				Thread.currentThread().interrupt();
 			}
 		}
 	}

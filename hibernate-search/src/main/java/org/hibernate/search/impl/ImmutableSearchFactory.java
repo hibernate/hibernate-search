@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
@@ -204,7 +204,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return worker;
 	}
 
-	public void setBackendQueueProcessorFactory(BackendQueueProcessorFactory backendQueueProcessorFactory) {
+	public void setBackendQueueProcessorFactory(BackendQueueProcessor backendQueueProcessorFactory) {
 		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called" );
 	}
 

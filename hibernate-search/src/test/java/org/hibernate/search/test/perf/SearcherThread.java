@@ -81,6 +81,7 @@ public class SearcherThread implements Runnable {
 			startSignal.await();
 		} catch (InterruptedException e) {
 			log.error( "tests canceled", e );
+			Thread.currentThread().interrupt();
 			return;
 		}
 		if ( isLucene ) {

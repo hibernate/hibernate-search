@@ -24,6 +24,7 @@
 package org.hibernate.search.backend.impl.jms;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
@@ -48,12 +49,12 @@ public class JMSBackendQueueProcessor implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final List<LuceneWork> queue;
+	private final Collection<LuceneWork> queue;
 	private final JMSBackendQueueProcessorFactory factory;
 	private final String indexName;
 	private final IndexManager indexManager;
 
-	public JMSBackendQueueProcessor(String indexName, List<LuceneWork> queue, IndexManager indexManager,
+	public JMSBackendQueueProcessor(String indexName, Collection<LuceneWork> queue, IndexManager indexManager,
 					JMSBackendQueueProcessorFactory jmsBackendQueueProcessorFactory) {
 		this.indexName = indexName;
 		this.queue = queue;

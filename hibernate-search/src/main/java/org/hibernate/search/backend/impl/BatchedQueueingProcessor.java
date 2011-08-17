@@ -29,7 +29,6 @@ import java.util.Properties;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.lucene.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -49,7 +48,6 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 	private static final Log log = LoggerFactory.make();
 
 	private final int batchSize;
-	private static final TransactionalSelectionVisitor providerSelectionVisitor = new TransactionalSelectionVisitor();
 
 	private final Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders;
 
@@ -92,7 +90,8 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			final Class<?> entityType = work.getEntityClass();
 			EntityIndexBinder<?> entityIndexBinding = entityIndexBinders.get( entityType );
 			IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-			work.getWorkDelegate( providerSelectionVisitor ).performOperation( work, shardingStrategy, context );
+			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE )
+				.performOperation( work, shardingStrategy, context );
 		}
 		context.commitOperations();
 	}

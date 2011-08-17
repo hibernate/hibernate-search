@@ -25,15 +25,22 @@ package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.backend.Workspace;
+import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.impl.CommonPropertiesParse;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
  * Collects all resources needed to apply changes to one index,
@@ -41,57 +48,91 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Sanne Grinovero
  */
-class PerDPResources {
+public class LuceneBackendResources {
 	
 	private static final Log log = LoggerFactory.make();
 	
-	private final ExecutorService executor;
 	private final LuceneWorkVisitor visitor;
-	private final Workspace workspace;
-	private final boolean exclusiveIndexUsage;
+	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
+	private final ExecutorService queueingExecutor;
+	private final ExecutorService workersExecutor;
+	private final int maxQueueLength;
+	private final String indexName;
+	private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+	private final ReadLock readLock = readWriteLock.readLock();
+	private final WriteLock writeLock = readWriteLock.writeLock();
 	
-	PerDPResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
+	LuceneBackendResources(WorkerBuildContext context, IndexManager indexManager, Properties props) {
+		indexName = indexManager.getIndexName();
 		errorHandler = context.getErrorHandler();
-		workspace = new Workspace( indexManager, errorHandler );
+		workspace = WorkspaceFactory.createWorkspace( (DirectoryBasedIndexManager) indexManager, errorHandler, props );
 		visitor = new LuceneWorkVisitor( workspace );
-		int maxQueueLength = indexManager.getMaxQueueLength();
-		executor = Executors.newFixedThreadPool( 1, "Directory writer", maxQueueLength );
-		exclusiveIndexUsage = indexManager.isExclusiveIndexUsage();
+		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
+		queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
+		workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
 	}
 
-	public ExecutorService getExecutor() {
-		return executor;
+	public ExecutorService getQueueingExecutor() {
+		return queueingExecutor;
+	}
+
+	public ExecutorService getWorkersExecutor() {
+		return workersExecutor;
+	}
+
+	public int getMaxQueueLength() {
+		return maxQueueLength;
+	}
+
+	public String getIndexName() {
+		return indexName;
 	}
 
 	public LuceneWorkVisitor getVisitor() {
 		return visitor;
 	}
 
-	public Workspace getWorkspace() {
+	public AbstractWorkspaceImpl getWorkspace() {
 		return workspace;
 	}
 
-	public boolean isExclusiveIndexUsageEnabled() {
-		return exclusiveIndexUsage;
+	public void shutdown() {
+		//need to close them in this specific order:
+		try {
+			flushCloseExecutor( queueingExecutor );
+			flushCloseExecutor( workersExecutor );
+		}
+		finally {
+			workspace.shutDownNow();
+		}
 	}
 
-	public void shutdown() {
-		//sets the index to be closed after all current jobs are processed:
-		if ( exclusiveIndexUsage ) {
-			executor.execute( new CloseIndexRunnable( workspace ) );
-		}
+	private void flushCloseExecutor(ExecutorService executor) {
 		executor.shutdown();
 		try {
 			executor.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
 		}
-		catch (InterruptedException e) {
+		catch ( InterruptedException e ) {
 			log.interruptedWhileWaitingForIndexActivity();
+			Thread.currentThread().interrupt();
+		}
+		if ( ! executor.isTerminated() ) {
+			log.unableToShutdownAsyncronousIndexingByTimeout( indexName );
 		}
 	}
 
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
 	}
-	
+
+	public Lock getParallelModificationLock() {
+		return readLock;
+	}
+
+	public Lock getExclusiveModificationLock() {
+		return writeLock;
+	}
+
 }

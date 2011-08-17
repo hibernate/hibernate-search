@@ -24,7 +24,7 @@
 package org.hibernate.search.test.configuration;
 
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -48,7 +48,7 @@ public class CustomBackendTest {
 		verifyBackendUsage( LuceneBackendQueueProcessorFactory.class );
 	}
 	
-	private void verifyBackendUsage(String name, Class<? extends BackendQueueProcessorFactory> backendType) {
+	private void verifyBackendUsage(String name, Class<? extends BackendQueueProcessor> backendType) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.default.worker.backend", name )
@@ -58,12 +58,12 @@ public class CustomBackendTest {
 		ftSession.close();
 		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( "org.hibernate.search.test.configuration.BlogEntry" );
-		BackendQueueProcessorFactory backendQueueProcessorFactory = indexManager.getBackendQueueProcessorFactory();
+		BackendQueueProcessor backendQueueProcessorFactory = indexManager.getBackendQueueProcessorFactory();
 		assertEquals( backendType, backendQueueProcessorFactory.getClass() );
 		builder.close();
 	}
 
-	public void verifyBackendUsage(Class<? extends BackendQueueProcessorFactory> backendType) {
+	public void verifyBackendUsage(Class<? extends BackendQueueProcessor> backendType) {
 		verifyBackendUsage( backendType.getName(), backendType );
 	}
 

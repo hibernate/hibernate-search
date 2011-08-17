@@ -45,7 +45,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory
- * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
+ * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
  * @see org.jgroups.Receiver
  */
 public class JGroupsMasterMessageListener implements Receiver {

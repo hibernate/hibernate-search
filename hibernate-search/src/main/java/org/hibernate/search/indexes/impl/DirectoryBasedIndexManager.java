@@ -20,15 +20,11 @@
  */
 package org.hibernate.search.indexes.impl;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -36,9 +32,8 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
@@ -47,8 +42,6 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This implementation of IndexManager is coupled to a
@@ -58,19 +51,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class DirectoryBasedIndexManager implements IndexManager {
 	
-	private static final Log log = LoggerFactory.make();
-	
 	private String indexName;
 	private final DirectoryProvider directoryProvider;
 	private Similarity similarity;
-	private ExecutorService backendExecutor;
-	private BackendQueueProcessorFactory backend;
+	private BackendQueueProcessor backend;
 	private OptimizerStrategy optimizer;
 	private LuceneIndexingParameters indexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
-	private final ReentrantLock dirLock = new ReentrantLock();
-	private int maxQueueLength = Executors.QUEUE_MAX_LENGTH;
-	private boolean exclusiveIndexUsage;
 	private LuceneWorkSerializer serializer;
 	private SearchFactoryImplementor boundSearchFactory = null;
 	private DirectoryBasedReaderManager readers = null;
@@ -92,31 +79,18 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void destroy() {
-		if ( backendExecutor != null ) {
-			backendExecutor.shutdown();
-			try {
-				backendExecutor.awaitTermination( 20, TimeUnit.SECONDS );
-			}
-			catch ( InterruptedException e ) {
-			}
-			if ( ! backendExecutor.isTerminated() ) {
-				log.unableToShutdownAsyncronousIndexingByTimeout( this.indexName );
-			}
-		}
 		readers.stop();
+		backend.close();
 		directoryProvider.stop();
 	}
 
 	@Override
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
-		directoryProvider.start( this );
-		backendExecutor = BackendFactory.buildWorkerExecutor( cfg, indexName );
 		indexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
 		backend = BackendFactory.createBackend( this, buildContext, cfg );
-		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, cfg );
-		exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
+		directoryProvider.start( this );
 		readers = CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
 		serializer = BackendFactory.createSerializer( indexName, cfg, buildContext );
 	}
@@ -144,20 +118,12 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void performStreamOperation(LuceneWork singleOperation, boolean forceAsync) {
 		//TODO implement async
-		ArrayList<LuceneWork> list = new ArrayList<LuceneWork>(1);
-		list.add( singleOperation );
-		performOperations( list );
+		backend.applyStreamWork( singleOperation );
 	}
 
 	@Override
 	public void performOperations(List<LuceneWork> workList) {
-		Runnable runnable = backend.getProcessor( workList );
-		if ( backendExecutor != null ) {
-			backendExecutor.execute( runnable );
-		}
-		else {
-			runnable.run();
-		}
+		backend.applyWork( workList );
 	}
 
 	@Override
@@ -186,18 +152,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	//Not exposed on the IndexManager interface
-	public BackendQueueProcessorFactory getBackendQueueProcessorFactory() {
+	public BackendQueueProcessor getBackendQueueProcessorFactory() {
 		return backend;
-	}
-
-	//Not exposed on the IndexManager interface
-	public int getMaxQueueLength() {
-		return maxQueueLength;
-	}
-
-	//Not exposed on the IndexManager interface
-	public boolean isExclusiveIndexUsage() {
-		return this.exclusiveIndexUsage;
 	}
 
 	//Not exposed on the IndexManager interface
@@ -212,7 +168,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	
 	//Not exposed on the IndexManager interface
 	public Lock getDirectoryModificationLock() {
-		return dirLock;
+		return backend.getExclusiveWriteLock();
 	}
 
 	//Not exposed on the interface

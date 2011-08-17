@@ -30,7 +30,7 @@ import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProces
 import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.codex.impl.PluggableSerializationLuceneWorkSerializer;
@@ -45,11 +45,11 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  */
 public class BackendFactory {
 	
-	public static BackendQueueProcessorFactory createBackend(IndexManager indexManager, WorkerBuildContext context, Properties properties) {
+	public static BackendQueueProcessor createBackend(IndexManager indexManager, WorkerBuildContext context, Properties properties) {
 
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		
-		final BackendQueueProcessorFactory backendQueueProcessorFactory;
+		final BackendQueueProcessor backendQueueProcessorFactory;
 		
 		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
@@ -68,7 +68,7 @@ public class BackendFactory {
 		}
 		else {
 			backendQueueProcessorFactory = ClassLoaderHelper.instanceFromName(
-					BackendQueueProcessorFactory.class,
+					BackendQueueProcessor.class,
 					backend, BackendFactory.class, "processor"
 			);
 		}
@@ -91,18 +91,12 @@ public class BackendFactory {
 	 * @param indexManagerName The indexManager going to be linked to this ExecutorService
 	 * @return null if the work needs execution in sync
 	 */
-	public static ExecutorService buildWorkerExecutor(Properties properties, String indexManagerName) {
-		boolean sync = isConfiguredAsSync( properties );
-		if ( sync ) {
-			return null;
-		}
-		else {
-			int threadPoolSize = getWorkerThreadPoolSize( properties );
-			int queueSize = getWorkerQueueSize( properties );
-			return Executors.newFixedThreadPool( threadPoolSize,
-					"backend queueing processor for index " + indexManagerName,
-					queueSize );
-		}
+	public static ExecutorService buildWorkersExecutor(Properties properties, String indexManagerName) {
+		int threadPoolSize = getWorkerThreadPoolSize( properties );
+		int queueSize = getWorkerQueueSize( properties );
+		return Executors.newFixedThreadPool( threadPoolSize,
+				"IndexWriter worker executor for " + indexManagerName,
+				queueSize );
 	}
 	
 	public static int getWorkerThreadPoolSize(Properties properties) {

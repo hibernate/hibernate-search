@@ -105,6 +105,8 @@ public class IndexAndSearchTest {
 		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( ( Session ) em.getDelegate() );
 		ftSession.purgeAll( Book.class );
 		ftSession.flushToIndexes();
+		ftSession.close();
+		emf.close();
 	}
 
 	private List<Book> search(String searchQuery) throws ParseException {

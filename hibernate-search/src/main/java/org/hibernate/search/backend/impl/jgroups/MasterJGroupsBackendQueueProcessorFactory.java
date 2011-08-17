@@ -25,10 +25,14 @@ package org.hibernate.search.backend.impl.jgroups;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jgroups.Receiver;
 
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -45,6 +49,8 @@ import org.hibernate.search.indexes.spi.IndexManager;
  */
 public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQueueProcessorFactory {
 
+	private static final Log log = LoggerFactory.make();
+
 	private LuceneBackendQueueProcessorFactory luceneBackendQueueProcessorFactory;
 	private Receiver masterListener;
 
@@ -53,10 +59,6 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 		super.initialize( props, context, indexManager );
 		initLuceneBackendQueueProcessorFactory( props, context );
 		registerMasterListener( context.getUninitializedSearchFactory() );
-	}
-
-	public Runnable getProcessor(List<LuceneWork> queue) {
-		return luceneBackendQueueProcessorFactory.getProcessor( queue );
 	}
 
 	private void registerMasterListener(SearchFactoryImplementor searchFactory) {
@@ -78,5 +80,21 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 	public void close() {
 		super.close();
 		luceneBackendQueueProcessorFactory.close();
+	}
+
+	@Override
+	public void applyWork(List<LuceneWork> workList) {
+		luceneBackendQueueProcessorFactory.applyWork( workList );
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation) {
+		luceneBackendQueueProcessorFactory.applyStreamWork( singleOperation );
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		log.warnSuspiciousBackendDirectoryCombination( indexName );
+		return new ReentrantLock(); // keep the invoker happy, still it's useless
 	}
 }

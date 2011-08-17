@@ -23,13 +23,19 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
+import java.util.Collections;
 import java.util.Properties;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
 
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 
@@ -43,29 +49,56 @@ import org.hibernate.search.backend.LuceneWork;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
+public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor {
 
-	private PerDPResources resources;
-	private IndexManager indexManager;
+	private static final Log log = LoggerFactory.make();
 
-	/**
-	 * copy of BatchedQueueingProcessor.sync
-	 */
+	private LuceneBackendResources resources;
 	private boolean sync;
 
-
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
-		this.indexManager = indexManager;
-		this.sync = BackendFactory.isConfiguredAsSync( props );
-		resources = new PerDPResources( context, (DirectoryBasedIndexManager) indexManager );
-	}
-
-	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new LuceneBackendQueueProcessor( queue, indexManager, resources, sync );
+		sync = BackendFactory.isConfiguredAsSync( props );
+		resources = new LuceneBackendResources( context, indexManager, props );
 	}
 
 	public void close() {
 		resources.shutdown();
 	}
-	
+
+	@Override
+	public void applyWork(List<LuceneWork> workList) {
+		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask( workList, resources );
+		if ( sync ) {
+			Future<?> future = resources.getQueueingExecutor().submit( luceneBackendQueueProcessor );
+			try {
+				future.get();
+			}
+			catch ( InterruptedException e ) {
+				Thread.currentThread().interrupt();
+				log.interruptedWhileWaitingForIndexActivity();
+			}
+			catch ( ExecutionException e ) {
+				throw new SearchException( "Error applying updates to the Lucene index", e.getCause() );
+			}
+		}
+		else {
+			resources.getQueueingExecutor().execute( luceneBackendQueueProcessor );
+		}
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation) {
+		List<LuceneWork> singletonList = Collections.singletonList( singleOperation );
+		applyWork( singletonList );
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		return resources.getExclusiveModificationLock();
+	}
+
+	public LuceneBackendResources getIndexResources() {
+		return resources;
+	}
+
 }

@@ -126,6 +126,7 @@ public class Executors {
 			}
 			catch (InterruptedException e1) {
 				log.interruptedWorkError( r );
+				Thread.currentThread().interrupt();
 			}
         }
     }

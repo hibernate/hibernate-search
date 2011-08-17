@@ -111,6 +111,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			transaction.commit();
 		} catch (InterruptedException e) {
 			// just quit
+			Thread.currentThread().interrupt();
 		}
 		finally {
 			if (upperSession == null) {

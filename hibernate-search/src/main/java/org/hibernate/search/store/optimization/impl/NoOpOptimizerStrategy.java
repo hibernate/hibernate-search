@@ -25,8 +25,8 @@ package org.hibernate.search.store.optimization.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**

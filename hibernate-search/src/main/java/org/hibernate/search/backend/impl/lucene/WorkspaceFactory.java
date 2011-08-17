@@ -1,4 +1,6 @@
 /* 
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -16,34 +18,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
+package org.hibernate.search.backend.impl.lucene;
 
-package org.hibernate.search.test.util;
+import java.util.Properties;
 
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.impl.CommonPropertiesParse;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.jboss.byteman.rule.Rule;
-import org.jboss.byteman.rule.helper.Helper;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class BytemanHelper extends Helper {
-	
-	protected BytemanHelper(Rule rule) {
-		super( rule );
+class WorkspaceFactory {
+
+	private static final Log log = LoggerFactory.make();
+
+	static AbstractWorkspaceImpl createWorkspace(DirectoryBasedIndexManager indexManager,
+			ErrorHandler errorHandler, Properties cfg) {
+		final String indexName = indexManager.getIndexName();
+		final boolean exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
+		if ( exclusiveIndexUsage ) {
+			log.debugf( "Starting workspace for index " + indexName + " using an exclusive index strategy" );
+			return new ExclusiveIndexWorkspaceImpl( indexManager, errorHandler, cfg );
+		}
+		else {
+			log.debugf( "Starting workspace for index " + indexName + " using a shared index strategy" );
+			return new SharedIndexWorkspaceImpl( indexManager, errorHandler, cfg );
+		}
 	}
 
-	public static final Log log = LoggerFactory.make();
-	
-	public void sleepASecond() {
-		try {
-			log.info( "Byteman rule triggered: sleeping a second" );
-			Thread.sleep( 1000 );
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			log.error( "unexpected interruption", e );
-		}
-	}
-	
 }

@@ -33,6 +33,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.util.impl.JNDIHelper;
 
 
@@ -94,7 +95,8 @@ public class IndexControl implements IndexControlMBean {
 					.startAndWait();
 		}
 		catch ( InterruptedException e ) {
-			throw new RuntimeException( "Unable to complete indexing" );
+			Thread.currentThread().interrupt();
+			throw new SearchException( "Unable to complete indexing" );
 		}
 		session.close();
 	}

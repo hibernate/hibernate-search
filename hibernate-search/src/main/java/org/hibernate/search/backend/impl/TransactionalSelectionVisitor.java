@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.impl.lucene;
+package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -29,9 +29,6 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.backend.impl.ContextAwareSelectionDelegate;
-import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
-import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -44,10 +41,16 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {
 	
+	public static final TransactionalSelectionVisitor INSTANCE = new TransactionalSelectionVisitor();
+	
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
+	
+	private TransactionalSelectionVisitor() {
+		// use INSTANCE as this delegator is stateless
+	}
 
 	public ContextAwareSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;

@@ -30,12 +30,12 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.Workspace;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -66,10 +66,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		ScopedAnalyzer analyzer = documentBuilder.getAnalyzer();
 		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap );
 		if ( log.isTraceEnabled() ) {
-			log.trace(
-					"add to Lucene index: {}#{}:{}",
-					new Object[] { entityType, work.getId(), work.getDocument() }
-			);
+			log.trace( "add to Lucene index: " + entityType + "#" + work.getId() + ":" + work.getDocument() );
 		}
 		try {
 			writer.addDocument( work.getDocument(), analyzer );

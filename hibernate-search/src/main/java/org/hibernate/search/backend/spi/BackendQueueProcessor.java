@@ -25,19 +25,20 @@ package org.hibernate.search.backend.spi;
 
 import java.util.Properties;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
- * Interface for different types of queue processor factories. Implementations need a no-arg constructor.
- * The factory typically prepares or pools the resources needed by the queue processor.
+ * Interface for different types of queue processors. Implementations need a no-arg constructor.
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-public interface BackendQueueProcessorFactory {
-	
+public interface BackendQueueProcessor {
+
 	/**
 	 * Used at startup, called once as first method.
 	 * @param props all configuration properties
@@ -47,17 +48,30 @@ public interface BackendQueueProcessorFactory {
 	void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager);
 
 	/**
-	 * Return a runnable implementation responsible for processing the queue to a given backend.
-	 *
-	 * @param queue The work queue to process.
-	 * @return <code>Runnable</code> which processes <code>queue</code> when started.
-	 */
-	Runnable getProcessor(List<LuceneWork> queue);
-	
-	/**
 	 * Used to shutdown and eventually release resources.
 	 * No other method should be used after this one.
 	 */
 	void close();
-	
+
+	/**
+	 * Applies a list of operations to the index. A single list might be processed by applying
+	 * elements in parallel threads, but no work should be started on a new workList until the previous
+	 * one was fully processed.
+	 * Work could be applied asynchronously according to capabilities and configuration of implementor.
+	 * @param workList
+	 */
+	void applyWork(List<LuceneWork> workList);
+
+	/**
+	 * Applies a single operation on the index, and different operations can be applied in parallel,
+	 * even in parallel to a workList instance being processed by {@link #applyWork(List)}
+	 * @param singleOperation
+	 */
+	void applyStreamWork(LuceneWork singleOperation);
+
+	/**
+	 * @return a Lock instance which will block index modifications when acquired
+	 */
+	Lock getExclusiveWriteLock();
+
 }

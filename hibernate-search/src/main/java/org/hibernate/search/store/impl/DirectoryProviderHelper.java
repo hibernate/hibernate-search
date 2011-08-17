@@ -91,13 +91,12 @@ public final class DirectoryProviderHelper {
 		File sourceDirectory;
 		if ( log.isTraceEnabled() ) {
 			log.trace(
-					"Guess source directory from {} {} and {} {}", new Object[] {
-							ROOT_INDEX_PROP_NAME,
-							( root != null ? root : "<null>" ),
-							RELATIVE_INDEX_PROP_NAME,
+					"Guess source directory from " + ROOT_INDEX_PROP_NAME + " " +
+							( root != null ? root : "<null>" ) +
+							 " and " +
+							RELATIVE_INDEX_PROP_NAME + " " +
 							( relative != null ? relative : "<null>" )
-					}
-			);
+					);
 		}
 		if ( relative == null ) {
 			relative = directoryProviderName;

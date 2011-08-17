@@ -24,7 +24,6 @@
 package org.hibernate.search.backend.impl.jgroups;
 
 import java.net.URL;
-import java.util.List;
 import java.util.Properties;
 
 import org.jgroups.Address;
@@ -33,11 +32,10 @@ import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.JGroupsHelper;
 import org.hibernate.search.util.impl.XMLHelper;
@@ -49,7 +47,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Lukasz Moren
  */
-public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
+public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -158,8 +156,6 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 			}
 		}
 	}
-
-	public abstract Runnable getProcessor(List<LuceneWork> queue);
 
 	public void close() {
 		try {

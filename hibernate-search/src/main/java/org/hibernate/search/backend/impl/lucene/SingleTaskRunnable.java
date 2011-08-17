@@ -1,4 +1,6 @@
 /* 
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -16,34 +18,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
+package org.hibernate.search.backend.impl.lucene;
 
-package org.hibernate.search.test.util;
-
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.jboss.byteman.rule.Rule;
-import org.jboss.byteman.rule.helper.Helper;
+import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.backend.LuceneWork;
 
 /**
+ * Applies an update operation to the IndexWriter
+ * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class BytemanHelper extends Helper {
+public class SingleTaskRunnable implements Runnable {
 	
-	protected BytemanHelper(Rule rule) {
-		super( rule );
+	private final LuceneWork work;
+	private final LuceneBackendResources resources;
+	private final IndexWriter indexWriter;
+
+	public SingleTaskRunnable(LuceneWork work, LuceneBackendResources resources, IndexWriter indexWriter) {
+		this.work = work;
+		this.resources = resources;
+		this.indexWriter = indexWriter;
 	}
 
-	public static final Log log = LoggerFactory.make();
-	
-	public void sleepASecond() {
-		try {
-			log.info( "Byteman rule triggered: sleeping a second" );
-			Thread.sleep( 1000 );
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			log.error( "unexpected interruption", e );
-		}
+	@Override
+	public void run() {
+		work.getWorkDelegate( resources.getVisitor() ).performWork( work, indexWriter );
 	}
-	
+
 }

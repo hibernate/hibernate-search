@@ -23,8 +23,12 @@
  */
 package org.hibernate.search.backend.impl.jms;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import javax.jms.Queue;
 import javax.jms.QueueConnectionFactory;
 import javax.naming.InitialContext;
@@ -33,18 +37,20 @@ import javax.naming.NamingException;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.spi.BackendQueueProcessorFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.impl.JNDIHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFactory {
+public class JMSBackendQueueProcessorFactory implements BackendQueueProcessor {
 	private String jmsQueueName;
 	private String jmsConnectionFactoryName;
 	private static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
@@ -57,6 +63,8 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
 	private IndexManager indexManager;
 
+	private static final Log log = LoggerFactory.make();
+
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		//TODO proper exception if jms queues and connections are not there
 		this.properties = props;
@@ -66,10 +74,6 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 		this.indexName = indexManager.getIndexName();
 		this.searchFactory = context.getUninitializedSearchFactory();
 		prepareJMSTools();
-	}
-
-	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new JMSBackendQueueProcessor( indexName, queue, indexManager, this );
 	}
 
 	public QueueConnectionFactory getJMSFactory() {
@@ -115,4 +119,23 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessorFac
 	public void close() {
 		// no need to release anything
 	}
+
+	@Override
+	public void applyWork(List<LuceneWork> workList) {
+		//TODO review this integration with the old Runnable-style execution
+		Runnable operation = new JMSBackendQueueProcessor( indexName, workList, indexManager, this );
+		operation.run();
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation) {
+		applyWork( Collections.singletonList( singleOperation ) );
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		log.warnSuspiciousBackendDirectoryCombination( indexName );
+		return new ReentrantLock(); // keep the invoker happy, still it's useless
+	}
+
 }

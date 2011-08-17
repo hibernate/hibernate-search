@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,16 +23,48 @@
  */
 package org.hibernate.search.backend.impl.jgroups;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * @author Lukasz Moren
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class SlaveJGroupsBackendQueueProcessorFactory extends JGroupsBackendQueueProcessorFactory {
+	
+	private static final Log log = LoggerFactory.make();
+	
+	private JGroupsBackendQueueProcessor jgroupsProcessor;
 
-	public Runnable getProcessor(List<LuceneWork> queue) {
-		return new JGroupsBackendQueueProcessor( indexName, queue, this, indexManager );
+	@Override
+	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+		super.initialize( props, context, indexManager );
+		jgroupsProcessor = new JGroupsBackendQueueProcessor( this, indexManager );
 	}
+
+	@Override
+	public void applyWork(List<LuceneWork> workList) {
+		jgroupsProcessor.sendLuceneWorkList( workList );
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation) {
+		//TODO optimize for single operation?
+		jgroupsProcessor.sendLuceneWorkList( Collections.singletonList( singleOperation ) );
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		log.warnSuspiciousBackendDirectoryCombination( indexName );
+		return new ReentrantLock(); // keep the invoker happy, still it's useless
+	}
+
 }
