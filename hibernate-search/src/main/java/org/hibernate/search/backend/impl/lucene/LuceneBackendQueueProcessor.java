@@ -88,7 +88,7 @@ class LuceneBackendQueueProcessor implements Runnable {
 	 * @throws InterruptedException
 	 */
 	private void applyUpdates() throws InterruptedException, ExecutionException {
-		WorkspaceImpl workspace = resources.getWorkspace();
+		AbstractWorkspaceImpl workspace = resources.getWorkspace();
 		
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
 		errorContextBuilder.allWorkToBeDone( queue );

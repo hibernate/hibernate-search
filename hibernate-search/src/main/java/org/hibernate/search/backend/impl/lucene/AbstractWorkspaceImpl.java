@@ -32,7 +32,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
-import org.hibernate.search.indexes.impl.CommonPropertiesParse;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -44,28 +43,24 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-class WorkspaceImpl implements Workspace {
+abstract class AbstractWorkspaceImpl implements Workspace {
 
 	private final OptimizerStrategy optimizerStrategy;
 	private final Set<Class<?>> entitiesInDirectory;
-	private final IndexWriterHolder writerHolder;
+	private final DirectoryBasedIndexManager indexManager;
+
+	protected final IndexWriterHolder writerHolder;
 
 	/**
 	 * Keeps a count of modification operations done on the index.
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 
-	private final DirectoryBasedIndexManager indexManager;
-
-	private final boolean exclusiveIndexUsage;
-
-	public WorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
-		String indexName = indexManager.getIndexName();
+	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
 		this.indexManager = indexManager;
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
 		this.entitiesInDirectory = indexManager.getContainedTypes();
 		this.writerHolder = new IndexWriterHolder( errorHandler, indexManager );
-		this.exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
 	}
 
 	@Override
@@ -106,14 +101,7 @@ class WorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public void afterTransactionApplied() {
-		if ( exclusiveIndexUsage ) {
-			writerHolder.commitIndexWriter();
-		}
-		else {
-			writerHolder.closeIndexWriter();
-		}
-	}
+	public abstract void afterTransactionApplied();
 
 	public void shutDownNow() {
 		writerHolder.forceLockRelease();

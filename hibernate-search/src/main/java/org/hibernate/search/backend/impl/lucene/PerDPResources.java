@@ -53,7 +53,7 @@ public class PerDPResources {
 	private static final Log log = LoggerFactory.make();
 	
 	private final LuceneWorkVisitor visitor;
-	private final WorkspaceImpl workspace;
+	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
 	private final ExecutorService queueingExecutor;
 	private final ExecutorService workersExecutor;
@@ -67,7 +67,7 @@ public class PerDPResources {
 	PerDPResources(WorkerBuildContext context, IndexManager indexManager, Properties props) {
 		indexName = indexManager.getIndexName();
 		errorHandler = context.getErrorHandler();
-		workspace = new WorkspaceImpl( (DirectoryBasedIndexManager) indexManager, errorHandler, props );
+		workspace = WorkspaceFactory.createWorkspace( (DirectoryBasedIndexManager) indexManager, errorHandler, props );
 		visitor = new LuceneWorkVisitor( workspace );
 		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
 		queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
@@ -94,7 +94,7 @@ public class PerDPResources {
 		return visitor;
 	}
 
-	public WorkspaceImpl getWorkspace() {
+	public AbstractWorkspaceImpl getWorkspace() {
 		return workspace;
 	}
 
