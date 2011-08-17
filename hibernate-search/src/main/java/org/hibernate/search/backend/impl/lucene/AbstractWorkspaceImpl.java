@@ -43,7 +43,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-abstract class AbstractWorkspaceImpl implements Workspace {
+public abstract class AbstractWorkspaceImpl implements Workspace {
 
 	private final OptimizerStrategy optimizerStrategy;
 	private final Set<Class<?>> entitiesInDirectory;

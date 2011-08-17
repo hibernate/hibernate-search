@@ -49,12 +49,7 @@ public class CommonPropertiesParse {
 	}
 	
 	public static boolean isExclusiveIndexUsageEnabled(String indexName, Properties indexProps) {
-		String exclusiveIndexUsageProperty = indexProps.getProperty( Environment.EXCLUSIVE_INDEX_USE, "false" );
-		boolean exclusiveIndexUsage = ConfigurationParseHelper.parseBoolean(
-				exclusiveIndexUsageProperty,
-				"Illegal value for property " + Environment.EXCLUSIVE_INDEX_USE + " on index " + indexName
-		);
-		return exclusiveIndexUsage;
+		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.EXCLUSIVE_INDEX_USE, true );
 	}
 
 	/**
