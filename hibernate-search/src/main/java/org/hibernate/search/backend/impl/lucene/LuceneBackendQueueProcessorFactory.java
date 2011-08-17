@@ -53,12 +53,12 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 
 	private static final Log log = LoggerFactory.make();
 
-	private PerDPResources resources;
+	private LuceneBackendResources resources;
 	private boolean sync;
 
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
-		resources = new PerDPResources( context, indexManager, props );
+		resources = new LuceneBackendResources( context, indexManager, props );
 	}
 
 	public void close() {
@@ -97,7 +97,7 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 		return resources.getExclusiveModificationLock();
 	}
 
-	public PerDPResources getIndexResources() {
+	public LuceneBackendResources getIndexResources() {
 		return resources;
 	}
 

@@ -49,10 +49,10 @@ class LuceneBackendQueueTask implements Runnable {
 	private static final Log log = LoggerFactory.make();
 
 	private final Lock modificationLock;
-	private final PerDPResources resources;
+	private final LuceneBackendResources resources;
 	private final List<LuceneWork> queue;
 
-	LuceneBackendQueueTask(List<LuceneWork> queue, PerDPResources resources) {
+	LuceneBackendQueueTask(List<LuceneWork> queue, LuceneBackendResources resources) {
 		this.queue = queue;
 		this.resources = resources;
 		this.modificationLock = resources.getParallelModificationLock();

@@ -31,10 +31,10 @@ import org.hibernate.search.backend.LuceneWork;
 public class SingleTaskRunnable implements Runnable {
 	
 	private final LuceneWork work;
-	private final PerDPResources resources;
+	private final LuceneBackendResources resources;
 	private final IndexWriter indexWriter;
 
-	public SingleTaskRunnable(LuceneWork work, PerDPResources resources, IndexWriter indexWriter) {
+	public SingleTaskRunnable(LuceneWork work, LuceneBackendResources resources, IndexWriter indexWriter) {
 		this.work = work;
 		this.resources = resources;
 		this.indexWriter = indexWriter;

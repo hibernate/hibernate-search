@@ -48,7 +48,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  *
  * @author Sanne Grinovero
  */
-public class PerDPResources {
+public class LuceneBackendResources {
 	
 	private static final Log log = LoggerFactory.make();
 	
@@ -64,7 +64,7 @@ public class PerDPResources {
 	private final ReadLock readLock = readWriteLock.readLock();
 	private final WriteLock writeLock = readWriteLock.writeLock();
 	
-	PerDPResources(WorkerBuildContext context, IndexManager indexManager, Properties props) {
+	LuceneBackendResources(WorkerBuildContext context, IndexManager indexManager, Properties props) {
 		indexName = indexManager.getIndexName();
 		errorHandler = context.getErrorHandler();
 		workspace = WorkspaceFactory.createWorkspace( (DirectoryBasedIndexManager) indexManager, errorHandler, props );
