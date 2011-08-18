@@ -99,7 +99,6 @@ public interface IndexManager {
 	 */
 	void setSimilarity(Similarity newSimilarity);
 
-	
 	/**
 	 * Returns the default Analyzer configured for this index.
 	 */

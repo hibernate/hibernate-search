@@ -43,9 +43,13 @@
     <xref linkend="search-configuration-event" />).</para>
 
     <para>To interact with Apache Lucene indexes, Hibernate Search has the
-    notion of <classname>DirectoryProvider</classname>s. A directory provider
-    will manage a given Lucene <classname>Directory</classname> type. You can
-    configure directory providers to adjust the directory target (see <xref
+    notion of <classname>IndexManager</classname>s.
+    Each index manager has a name and represents a Lucene index which can
+    be queried and will be updated by entity change events (fired by Hibernate Core).</para>
+    
+    <para>The default index manager implementation uses a <classname>DirectoryProvider</classname>
+    to manage a given Lucene <classname>Directory</classname>.
+    You can configure directory providers to adjust the directory target (see <xref
     linkend="search-configuration-directory" />).</para>
 
     <para>Hibernate Search uses the Lucene index to search an entity and
@@ -106,7 +110,7 @@
 
     <para>Hibernate Search offers the ability to let the batched work being
     processed by different back ends. Three back ends are provided out of the
-    box and you have the option to plugin in your own implementation.</para>
+    box and you have the option to plugin your own implementation.</para>
 
     <section>
       <title>Back end types</title>
@@ -188,8 +192,7 @@
       </section>
 
       <note>Hibernate Search is an extensible architecture. Feel free to drop
-      ideas for other third party back ends to<literal>
-      hibernate-dev@lists.jboss.org</literal>.</note>
+      ideas for additional back ends to <literal>hibernate-dev@lists.jboss.org</literal>.</note>
     </section>
 
     <section>
@@ -204,8 +207,7 @@
 
         <para>This is the safe mode where the back end work is executed in
         concert with the transaction commit. Under highly concurrent
-        environment, this can lead to throughput limitations (due to the
-        Apache Lucene lock mechanism) and it can increase the system response
+        environment, this can lead to throughput limitations and it can increase the system response
         time if the backend is significantly slower than the transactional
         process and if a lot of IO operations are involved.</para>
       </section>
@@ -217,8 +219,7 @@
         thread. That way, throughput and response time are (to a certain
         extend) decorrelated from the back end performance. The drawback is
         that a small delay appears between the transaction commit and the
-        index update and a small overhead is introduced to deal with thread
-        management.</para>
+        index update.</para>
 
         <para>It is recommended to use synchronous execution first and
         evaluate asynchronous execution if performance problems occur and
