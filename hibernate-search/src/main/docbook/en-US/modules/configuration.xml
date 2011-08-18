@@ -91,6 +91,12 @@
     <classname>@Indexed</classname> annotation. If the
     <constant>index</constant> property is not specified the fully qualified
     name of the indexed class will be used as name.</para>
+    
+    <para>For each of these names discovered looking for <literal>@Indexed</literal>
+    annotations, an <literal>IndexManager</literal> is created, which holds
+    references to <literal>ReaderProvider</literal> instances used by Hibernate Search
+    to perform queries (see <xref linkend="IndexReaders"/>) and to each backend,
+    used to apply updates to the index.</para>
 
     <para>Knowing the index name, you can configure the directory provider and
     any additional options by using the prefix
@@ -592,6 +598,10 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     potential discrepancies between database and index states. Lets look at
     the configuration options shown in <xref
     linkend="table-work-execution-configuration" />.</para>
+    
+    <para>Please note that the following options can be different on each index;
+    in fact they need the indexName prefix or use <literal>default</literal>
+    to set the default value for all indexes.</para>
 
     <table id="table-work-execution-configuration">
       <title>Execution configuration</title>
@@ -605,7 +615,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.execution</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.execution</literal></entry>
 
             <entry><para><literal>sync</literal>: synchronous execution
             (default)</para><para><literal>async</literal>: asynchronous
@@ -613,14 +623,15 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.thread_pool.size</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.thread_pool.size</literal></entry>
 
-            <entry>Defines the number of threads in the pool for asynchronous
-            execution. Defaults to 1.</entry>
+            <entry>The backend can apply the updated from the same transaction context (or batch)
+            in parallel, using a threadpool. The default value is 1. You can experiment with larger
+            values if you have many operations per transaction.</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.buffer_queue.max</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.buffer_queue.max</literal></entry>
 
             <entry>Defines the maximal number of work queue if the thread poll
             is starved. Useful only for asynchronous execution. Default to
@@ -636,7 +647,8 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     the single VM. Luckily there is a better approach, namely delegation. It
     is possible to send the indexing work to a different server by configuring
     hibernate.search.worker.backend - see <xref
-    linkend="table-backend-configuration" />.</para>
+    linkend="table-backend-configuration" />. Again this option can be configured
+    differently for each index.</para>
 
     <table id="table-backend-configuration">
       <title>Backend configuration</title>
@@ -650,7 +662,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.backend</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.backend</literal></entry>
 
             <entry><para><literal>lucene</literal>: The default backend which
             runs index updates in the same VM. Also used when the property is
@@ -670,7 +682,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
             test/developer setting which ignores all indexing
             work</para><para>You can also specify the fully qualified name of
             a class implementing
-            <classname>BackendQueueProcessorFactory</classname>. This way you
+            <classname>BackendQueueProcessor</classname>. This way you
             can implement your own communication layer. The implementation is
             responsilbe for returning a <classname>Runnable</classname>
             instance which on execution will process the index
@@ -692,14 +704,14 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.jndi.*</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.jndi.*</literal></entry>
 
             <entry>Defines the JNDI properties to initiate the InitialContext
             (if needed). JNDI is only used by the JMS back end.</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.jms.connection_factory</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.jms.connection_factory</literal></entry>
 
             <entry>Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS connection factory from
@@ -708,7 +720,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.jms.queue</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.jms.queue</literal></entry>
 
             <entry>Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS queue from. The queue will be used to post work
@@ -730,14 +742,14 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.jgroups.clusterName</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.jgroups.clusterName</literal></entry>
 
             <entry>Optional for JGroups back end. Defines the name of JGroups
             channel.</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.jgroups.configurationFile</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.jgroups.configurationFile</literal></entry>
 
             <entry>Optional JGroups network stack configuration. Defines the
             name of a JGroups configuration file, which must exist on
@@ -745,14 +757,14 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.jgroups.configurationXml</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.jgroups.configurationXml</literal></entry>
 
             <entry>Optional JGroups network stack configuration. Defines a
             String representing JGroups configuration as XML.</entry>
           </row>
 
           <row>
-            <entry><literal>hibernate.search.worker.jgroups.configurationString</literal></entry>
+            <entry><literal>hibernate.search.&lt;indexName&gt;.worker.jgroups.configurationString</literal></entry>
 
             <entry>Optional JGroups network stack configuration. Provides
             JGroups configuration in plain text.</entry>
@@ -767,8 +779,8 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
       sense. In fact you can end up with a non-functional configuration. This
       is especially true for the case that you provide your own
       implementations of some of the shown interfaces. Make sure to study the
-      existing code before you write your own <classname>Worker</classname> or
-      <classname>BackendQueueProcessorFactory</classname>
+      existing code before you write your own <literal>Worker</literal> or
+      <literal>BackendQueueProcessor</literal>
       implementation.</para>
     </warning>
   </section>
@@ -817,15 +829,15 @@ hibernate.search.default.refresh = 1800
 hibernate.search.default.directory_provider = filesystem-slave
 
 ## Backend configuration
-hibernate.search.worker.backend = jms
-hibernate.search.worker.jms.connection_factory = /ConnectionFactory
-hibernate.search.worker.jms.queue = queue/hibernatesearch
+hibernate.search.default.worker.backend = jms
+hibernate.search.default.worker.jms.connection_factory = /ConnectionFactory
+hibernate.search.default.worker.jms.queue = queue/hibernatesearch
 #optional jndi configuration (check your JMS provider for more information)
 
 ## Optional asynchronous execution strategy
-# hibernate.search.worker.execution = async
-# hibernate.search.worker.thread_pool.size = 2
-# hibernate.search.worker.buffer_queue.max = 50</programlisting>
+# hibernate.search.default.worker.execution = async
+# hibernate.search.default.worker.thread_pool.size = 2
+# hibernate.search.default.worker.buffer_queue.max = 50</programlisting>
       </example>
 
       <tip>
@@ -932,7 +944,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
         <title>JGroups Slave configuration</title>
 
         <programlisting>### slave configuration
-hibernate.search.worker.backend = jgroupsSlave     </programlisting>
+hibernate.search.default.worker.backend = jgroupsSlave     </programlisting>
       </example>
     </section>
 
@@ -946,7 +958,7 @@ hibernate.search.worker.backend = jgroupsSlave     </programlisting>
         <title>JGroups Master configuration</title>
 
         <programlisting>### master configuration
-hibernate.search.worker.backend = jgroupsMaster   </programlisting>
+hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
       </example>
     </section>
 
@@ -957,12 +969,12 @@ hibernate.search.worker.backend = jgroupsMaster   </programlisting>
       and channel name can be defined and applied to master and slave nodes.
       There are several ways to configure the JGroups transport details. You
       can either set the
-      <constant>hibernate.search.worker.backend.jgroups.configurationFile</constant>
+      <constant>hibernate.search.default.worker.backend.jgroups.configurationFile</constant>
       property and specify a file containing the JGroups configuration or you
       can use the property
-      <constant>hibernate.search.worker.backend.jgroups.configurationXml</constant>
+      <constant>hibernate.search.default.worker.backend.jgroups.configurationXml</constant>
       or
-      <constant>hibernate.search.worker.backend.jgroups.configurationString</constant>
+      <constant>hibernate.search.default.worker.backend.jgroups.configurationString</constant>
       to directly embed either the xml or string JGroups configuration into
       your Hibernate configuration file. All three options are shown in <xref
       linkend="example-jgroup-xml-configuration" />.</para>
@@ -978,10 +990,10 @@ hibernate.search.worker.backend = jgroupsMaster   </programlisting>
 
         <programlisting language="XML" role="XML">## JGroups configuration options
 # OPTION 1 - udp.xml file needs to be located in the classpath
-hibernate.search.worker.backend.jgroups.configurationFile = udp.xml
+hibernate.search.default.worker.backend.jgroups.configurationFile = udp.xml
 
 # OPTION 2 - protocol stack configuration provided in XML format
-hibernate.search.worker.backend.jgroups.configurationXml =
+hibernate.search.default.worker.backend.jgroups.configurationXml =
 
 &lt;config xmlns="urn:org:jgroups"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -1008,7 +1020,7 @@ thread_pool.rejection_policy="Run"/&gt;
 &lt;/config&gt;
 
 # OPTION 3 - protocol stack configuration provided in "old style" jgroups format
-hibernate.search.worker.backend.jgroups.configurationString =
+hibernate.search.default.worker.backend.jgroups.configurationString =
 
 UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):PING(timeout=3000;
 num_initial_members=6):FD(timeout=5000):VERIFY_SUSPECT(timeout=1500):
@@ -1024,7 +1036,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       <example id="example-jgroups-channel-name">
         <title>JGroups channel name configuration</title>
 
-        <programlisting>hibernate.search.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster       </programlisting>
+        <programlisting>hibernate.search.default.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster       </programlisting>
       </example>
     </section>
   </section>
@@ -1121,7 +1133,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       <para>The most simple configuration only requires to enable the
       backend:</para>
 
-      <programlisting>hibernate.search.default.directory_provider infinispan</programlisting>
+      <programlisting>hibernate.search.[default|&lt;indexname&gt;].directory_provider infinispan</programlisting>
 
       <para>That's all what is needed to get a cluster-replicated index, but
       the default configuration does not enable any form of permanent
@@ -1138,12 +1150,12 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       <para>To use and existing <classname>CacheManager</classname> via JNDI
       (optional parameter):</para>
 
-      <programlisting>hibernate.search.infinispan.cachemanager_jndiname = [jndiname]</programlisting>
+      <programlisting>hibernate.search.[default|&lt;indexname&gt;].infinispan.cachemanager_jndiname = [jndiname]</programlisting>
 
       <para>To start a new <classname>CacheManager</classname> from a
       configuration file (optional parameter):</para>
 
-      <programlisting>hibernate.search.infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
+      <programlisting>hibernate.search.[default|&lt;indexname&gt;].infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
 
       <para>If both parameters are defined, JNDI will have priority. If none
       of these is defined, Hibernate Search will use the default Infinispan
@@ -1190,14 +1202,14 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     <para>The default reader strategy is <literal>shared</literal>. This can
     be adjusted:</para>
 
-    <programlisting>hibernate.search.reader.strategy = not-shared</programlisting>
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].reader.strategy = not-shared</programlisting>
 
     <para>Adding this property switches to the <literal>not-shared</literal>
     strategy.</para>
 
     <para>Or if you have a custom reader strategy:</para>
 
-    <programlisting>hibernate.search.reader.strategy = my.corp.myapp.CustomReaderProvider</programlisting>
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].reader.strategy = my.corp.myapp.CustomReaderProvider</programlisting>
 
     <para>where <classname>my.corp.myapp.CustomReaderProvider</classname> is
     the custom strategy implementation.</para>
@@ -1297,8 +1309,7 @@ exclusive_index_use</literallayout>
               performance when writing changes to the index.</para>
             </entry>
 
-            <entry><literal>false</literal> (releases locks as soon as
-            possible)</entry>
+            <entry><literal>true</literal> (improved performance, releases locks only at shutdown)</entry>
           </row>
 
           <row>
@@ -1569,9 +1580,10 @@ enable_dirty_check</literallayout>
     </table>
 
     <tip>
-      <para>When your architecture permits it, always set
+      <para>When your architecture permits it, always keep
       <literal>hibernate.search.default.exclusive_index_use=true</literal> as
-      it greatly improves efficiency in index writing.</para>
+      it greatly improves efficiency in index writing. This is the default
+      since Hibernate Search version 4.</para>
     </tip>
 
     <tip>
@@ -1586,7 +1598,7 @@ enable_dirty_check</literallayout>
       possibly load more data from the database. because associated entities
       are re-indexed as well.</para>
 
-      <programlisting>hibernate.search.worker.backend blackhole</programlisting>
+      <programlisting>hibernate.search.[default|&lt;indexname&gt;].worker.backend blackhole</programlisting>
 
       <para>The recommended approach is to focus first on optimizing the
       object loading, and then use the timings you achieve as a baseline to

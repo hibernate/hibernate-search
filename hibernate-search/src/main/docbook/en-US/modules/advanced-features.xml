@@ -37,75 +37,46 @@
   <section>
     <title>Accessing the SearchFactory</title>
 
-    <para>The <classname>SearchFactory</classname> object keeps track of the
+    <para>The <literal>SearchFactory</literal> object keeps track of the
     underlying Lucene resources for Hibernate Search. It is a convenient way
-    to access Lucene natively. The <classname>SearchFactory</classname> can be
-    accessed from a<classname> FullTextSession</classname>:</para>
+    to access Lucene natively. The <literal>SearchFactory</literal> can be
+    accessed from a <literal>FullTextSession</literal>:</para>
 
     <example>
       <title>Accessing the <classname>SearchFactory</classname></title>
 
       <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
-SearchFactory searchFactory = fullTextSession.getSearchFactory();           </programlisting>
+SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
     </example>
   </section>
 
-  <section>
-    <title>Accessing a Lucene Directory</title>
-
-    <para>You can always access the Lucene directories through plain Lucene.
-    The <classname>Directory</classname> structure is in no way different with
-    or without Hibernate Search. However there are some more convenient ways
-    to access a given Directory. The <classname>SearchFactory</classname>
-    keeps track of the <classname>DirectoryProvider</classname>s per indexed
-    class. One directory provider can be shared amongst several indexed
-    classes, if the classes share the same underlying index directory. While
-    usually not the case, a given entity can have several
-    <classname>DirectoryProvider</classname>s if the index is sharded (see
-    <xref linkend="search-configuration-directory-sharding" />).</para>
-
-    <example>
-      <title>Accessing the Lucene <classname>Directory</classname></title>
-
-      <programlisting>DirectoryProvider[] provider = searchFactory.getDirectoryProviders(Order.class);
-org.apache.lucene.store.Directory directory = provider[0].getDirectory();           </programlisting>
-    </example>
-
-    <para>In this example, directory points to the lucene index storing
-    <classname>Order</classname>s information. Note that the obtained Lucene
-    directory must not be closed (this is Hibernate Search's
-    responsibility).</para>
-  </section>
-
-  <section>
+  <section id="IndexReaders">
     <title>Using an IndexReader</title>
 
     <para>Queries in Lucene are executed on an <literal>IndexReader</literal>.
-    Hibernate Search caches all index readers to maximize performance. Your
-    code can access this cached resources, but you have to follow some "good
-    citizen" rules.</para>
+    Hibernate Search might cache index readers to maximize performance, or provide
+    other efficient strategies to retrieve an updated <literal>IndexReader</literal>
+    minimizing IO operations. Your code can access these cached resources, but you
+    have to follow some "good citizen" rules.</para>
 
     <example>
-      <title>Accessing an <classname>IndexReader</classname></title>
+      <title>Accessing an <literal>IndexReader</literal></title>
 
-      <programlisting>DirectoryProvider orderProvider = searchFactory.getDirectoryProviders(Order.class)[0];
-DirectoryProvider clientProvider = searchFactory.getDirectoryProviders(Client.class)[0];
-
-ReaderProvider readerProvider = searchFactory.getReaderProvider();
-IndexReader reader = readerProvider.openReader(orderProvider, clientProvider);
-
+      <programlisting>IndexReader reader = searchFactory.openIndexReader(Order.class);
 try {
    //do read-only operations on the reader
 }
 finally {
-   readerProvider.closeReader(reader);
+   searchFactory.closeIndexReader(reader);
 }          </programlisting>
     </example>
 
-    <para>The ReaderProvider (described in<xref
-    linkend="search-architecture-readerstrategy" />), will open an IndexReader
-    on top of the index(es) referenced by the directory providers. Because
-    this <classname>IndexReader</classname> is shared amongst several clients,
+    <para>In this example the <literal>SearchFactory</literal> will figure out which indexes
+    are needed to query this entity, eventually considering a Sharding strategy, and then using
+    the configured <literal>ReaderProvider</literal> (described in<xref
+    linkend="search-architecture-readerstrategy" />) for each index open multiple indexes,
+    and will then return a virtual <literal>IndexReader</literal> on top of all involved
+    indexes. Because this <literal>IndexReader</literal> is shared amongst several clients,
     you must adhere to the following rules:</para>
 
     <itemizedlist>
@@ -116,17 +87,37 @@ finally {
       </listitem>
 
       <listitem>
-        <para>Don't use this <classname>IndexReader</classname> for
-        modification operations (you would get an exception). If you want to
-        use a read/write index reader, open one from the Lucene Directory
-        object.</para>
+        <para>Don't use this <literal>IndexReader</literal> for
+        modification operations (it's a readonly <literal>IndexReader</literal>,
+        so you would get an exception).
+        </para>
       </listitem>
     </itemizedlist>
 
     <para>Aside from those rules, you can use the
-    <classname>IndexReader</classname> freely, especially to do native
+    <literal>IndexReader</literal> freely, especially to do native
     queries. Using the shared <literal>IndexReader</literal>s will make most
-    queries more efficient.</para>
+    queries more efficient than by opening one directly from - for example - the filesystem.</para>
+  </section>
+
+  <section>
+    <title>Accessing a Lucene Directory</title>
+    
+    <para>A Directory is the abstraction used by Lucene to represent the index storage;
+    Hibernate Search doesn't interact directly with a Lucene Directory but
+    abstracts these via an <literal>IndexManager</literal> so that an index does not
+    necessarily need to be implemented by a Directory: this way you can plug in
+    custom <literal>IndexManager</literal> representations to route index
+    updates to remote systems.</para>
+    
+    <para>If you need to access the <literal>Directory</literal>, you can get a reference to it via
+    the <literal>IndexManager</literal>, but only if the manager you're using is using
+    a <literal>Directory</literal>: in this case you can cast the <literal>IndexManager</literal>
+    to a <literal>DirectoryBasedIndexManager</literal> and then use
+    <literal>getDirectoryProvider().getDirectory()</literal> to get a reference to the underlying 
+    <literal>Directory</literal>. This is not recommended, we would encourage to use the
+    <literal>IndexReader</literal> instead.</para>
+
   </section>
 
   <section>
@@ -151,21 +142,30 @@ finally {
       </listitem>
 
       <listitem>
-        <para><classname>BackendQueueProcessorFactory</classname></para>
+        <para><classname>BackendQueueProcessor</classname></para>
       </listitem>
 
       <listitem>
         <para><classname>Worker</classname></para>
       </listitem>
+      
+      <listitem>
+        <para><classname>ErrorHandler</classname></para>
+      </listitem>
+      
+      <listitem>
+        <para><classname>MassIndexerProgressMonitor</classname></para>
+      </listitem>
     </itemizedlist>
 
-    <para>Some of these compnents need to access a service which is either
+    <para>Some of these components need to access a service which is either
     available in the environment or whose lifecycle is bound to the
     <classname>SearchFactory</classname>. Sometimes, you even want the same
     service to be shared amongst several instances of these contract. One
     example is the ability the share an Infinispan cache instance between
-    several directory providers to store the various indexes using the same
-    underlying infrastructure.</para>
+    several directory providers running in different <literal>JVM</literal>s
+    to store the various indexes using the same underlying infrastructure; this
+    provider real-time replication of indexes across nodes.</para>
 
     <section>
       <title>Exposing a service</title>

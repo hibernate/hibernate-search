@@ -64,7 +64,6 @@ public final class Environment {
 	public static final String QUEUEINGPROCESSOR_BATCHSIZE = "hibernate.search.batch_size";
 
 	/**
-	 * only used then execution is async
 	 * Thread pool size
 	 * default 1
 	 */

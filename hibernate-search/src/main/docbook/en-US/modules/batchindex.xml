@@ -195,7 +195,7 @@ transaction.commit();</programlisting>
       </example>
 
       <note>
-        <para><literal>hibernate.search.worker.batch_size</literal> has been
+        <para><literal>hibernate.search.default.worker.batch_size</literal> has been
         deprecated in favor of this explicit API which provides better
         control</para>
       </note>
@@ -228,9 +228,8 @@ transaction.commit();</programlisting>
 
       <warning>
         <para>During the progress of a MassIndexer the content of the index is
-        undefined, make sure that nobody will try to make some query during
-        index rebuilding! If somebody should query the index it will not
-        corrupt but most results will likely be missing.</para>
+        undefined! If a query is performed while the MassIndexer is working most
+        likely some results will be missing.</para>
       </warning>
 
       <example>
@@ -336,10 +335,6 @@ transaction.commit();</programlisting>
     <para>All <literal>.indexwriter</literal> parameters are Lucene specific
     and Hibernate Search is just passing these parameters through - see <xref
     linkend="lucene-indexing-performance" /> for more details.</para>
-    
-    <para><literal>hibernate.search.batchbackend.concurrent_writers</literal> defaults to
-        <literal>2</literal> and represent the number of threads being used at the Analysis
-        and indexwriter stage of the MassIndexing pipeline. The <classname>MassIndexer</classname>
-        .<methodname>threadsForIndexWriter(int)</methodname> method overrides this value.</para>
+
   </section>
 </chapter>
