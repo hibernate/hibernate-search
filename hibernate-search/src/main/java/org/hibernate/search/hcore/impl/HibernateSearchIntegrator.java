@@ -30,6 +30,7 @@ import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.internal.util.config.ConfigurationHelper;
+import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -54,13 +55,17 @@ public class HibernateSearchIntegrator implements Integrator {
 			Configuration configuration,
 			SessionFactoryImplementor sessionFactory,
 			SessionFactoryServiceRegistry serviceRegistry) {
-		final boolean registerListeners = ConfigurationHelper.getBoolean( AUTO_REGISTER, configuration.getProperties(), true );
+		final boolean registerListeners = ConfigurationHelper.getBoolean(
+				AUTO_REGISTER,
+				configuration.getProperties(),
+				true
+		);
 		if ( !registerListeners ) {
 			log.debug( "Skipping Hibernate Search event listener auto registration" );
 			return;
 		}
 
-		listener = new FullTextIndexEventListener(FullTextIndexEventListener.Installation.SINGLE_INSTANCE);
+		listener = new FullTextIndexEventListener( FullTextIndexEventListener.Installation.SINGLE_INSTANCE );
 
 		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
 		//TODO if the event is duplicated, do not initialize the newly created listener
@@ -74,7 +79,12 @@ public class HibernateSearchIntegrator implements Integrator {
 		listenerRegistry.getEventListenerGroup( EventType.POST_COLLECTION_UPDATE ).appendListener( listener );
 		listenerRegistry.getEventListenerGroup( EventType.FLUSH ).appendListener( listener );
 
-		listener.initialize(configuration);
+		listener.initialize( configuration );
+	}
+
+	@Override
+	public void integrate(MetadataImplementor metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+		// todo - HSEARCH-856
 	}
 
 	public static class DuplicationStrategyImpl implements DuplicationStrategy {
@@ -98,7 +108,7 @@ public class HibernateSearchIntegrator implements Integrator {
 
 	@Override
 	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-		if (listener != null ) {
+		if ( listener != null ) {
 			listener.cleanup();
 		}
 	}
