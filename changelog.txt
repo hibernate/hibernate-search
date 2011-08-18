@@ -1,6 +1,85 @@
 Hibernate Search Changelog
 ==========================
 
+4.0.0.Alpha1 (18-08-2011)
+-------------------------
+
+** Bug
+    * [HSEARCH-597] - Inconsistent treatment of extended FullTextIndexEventListener
+    * [HSEARCH-662] - Re-indexing failure in @IndexedEmbedded entities in @ManyToOne relationship
+    * [HSEARCH-681] - NotSerializableException when NumericField gets serialized in JMSBackendQueueProcessor
+    * [HSEARCH-740] - TimeoutTest and ClasstypeFieldCacheExtractionTest
+    * [HSEARCH-741] - NPE using two fulltext filters, one of them matching nothing (some filters only)
+    * [HSEARCH-742] - Failure to open IndexWriter is hidden as NullPointerException in backend
+    * [HSEARCH-744] - NullPointerException when using a range query on a numeric field and searching for values below a given boundary (Mathieu Perez)
+    * [HSEARCH-747] - Add documentation on ability to add programmatic mapping via a @Factory class
+    * [HSEARCH-770] - Range facets: .below on numeric null values (AssertionFailure: Unsupported range type)
+    * [HSEARCH-776] - maxFacetCount returns incorrect results when ordering a faceted query
+    * [HSEARCH-779] - classBridge not applicable in indexed() entities in the programmatic mapping API
+    * [HSEARCH-780] - Dirty analysis of @IndexedEmbedded on a superclass collection fails (Samppa Saarela)
+    * [HSEARCH-782] - Unnecessary loading of @ContainedIn entities causes big performance hit
+    * [HSEARCH-802] - IndexControlMBeanTest fails with NPE because Hibernate Core closes the JNDI context
+    * [HSEARCH-803] - JGroups configuration error leading to parsing exception in JGroupsSlaveTest
+    * [HSEARCH-815] - IncrementalOptimizer uses wrong logging statements
+    * [HSEARCH-819] - Performance and Integration tests still using HSQLDB (project uses H2)
+    * [HSEARCH-822] - SearchFactoryState should use concurrent Maps for incrementally updated metadata
+    * [HSEARCH-850] - Some InterruptedExceptions don't restore the interrupted thread state
+
+** Improvement
+    * [HSEARCH-723] - Upgrade to Infinispan 5
+    * [HSEARCH-748] - Point out that defining an Analyzer is not enough to use it
+    * [HSEARCH-750] - Have an IndexManager concept to manage IndexWriters, Readers and backend
+    * [HSEARCH-757] - Explicitly control binary format of communication with the backend
+    * [HSEARCH-762] - enable exclusive_index_use=true by default
+    * [HSEARCH-773] - Example in documentation contains compilation erros (Nabeel Ali Memon and Juraj Martinka)
+    * [HSEARCH-783] - Upgrade to Lucene 3.3
+    * [HSEARCH-785] - Expose topDocs to integration layer, and make HSQueryImpl Serializable
+    * [HSEARCH-792] - Consider renaming LockFactoryFactory to LockFactoryProvider
+    * [HSEARCH-796] - Remove EventListenerRegister after move to Hibernate Core 4
+    * [HSEARCH-806] - Recommend specifying a Lucene compatibility version in configuration
+    * [HSEARCH-814] - Avoid optimizing more than once the same index
+    * [HSEARCH-830] - Make LuceneWork use Class<?> instead of the raw type
+    * [HSEARCH-848] - Isolated failures in backend work operations don't affect subsequent operations in same workQueue
+
+** New Feature
+    * [HSEARCH-626] - Allow MassIndexer to work alongside regular indexing / querying
+    * [HSEARCH-675] - Move to i18n logs and exception via JBoss Logging
+    * [HSEARCH-746] - Split API, SPI and private classes into separate packages
+    * [HSEARCH-754] - Add configuration options to control maximum size of segments
+    * [HSEARCH-756] - send "Update" operations to the backend
+    * [HSEARCH-761] - Have a backend instance for each index
+    * [HSEARCH-799] - Move Hibernate Search Integrator class from Hibernate Core to Hibernate Search
+
+** Remove Feature
+    * [HSEARCH-743] - Unify configuration settings for batch and transaction indexwriter settings
+    * [HSEARCH-751] - Remove SharedReaderProvider
+    * [HSEARCH-752] - Remove deprecated methods and constants
+
+** Task
+    * [HSEARCH-660] - Remove DirtyStrategy when we start depending on Core 4.x
+    * [HSEARCH-676] - Split contracts between public APIs, SPIs and internal classes
+    * [HSEARCH-738] - Add tests using Infinispan while scaling the cluster size
+    * [HSEARCH-739] - Define an M2Eclipse configuration section in the parent pom.xml
+    * [HSEARCH-755] - Upgrade to Hibernate Core 4
+    * [HSEARCH-760] - ReaderProvider to not provide MultiSearchers
+    * [HSEARCH-769] - dummy is a reserved keyword on sybase
+    * [HSEARCH-771] - ProgrammaticMappingTest should pass when executing tests in any order
+    * [HSEARCH-772] - Isolate JGroups tests to be able to run different test profiles in parallel
+    * [HSEARCH-774] - build using Java6 as target
+    * [HSEARCH-775] - Have all tests close the SessionFactory and other resources
+    * [HSEARCH-788] - Several components minor versions upgrades
+    * [HSEARCH-801] - Move Version.touch() to an appropriate position
+    * [HSEARCH-805] - Cleanup dependencies, reorganize jars in distribution
+    * [HSEARCH-807] - Document dependency to Hibernate 4
+    * [HSEARCH-808] - Add an option to SearchConfiguration to disable warnings about missing transactions
+    * [HSEARCH-825] - Align documentation with the IndexManager approach
+    * [HSEARCH-838] - Upgrade do Hibernate Core 4.0.0.Beta5
+    * [HSEARCH-839] - Upgrade to Infinispan 5.0.0.FINAL and JGroups 2.12.1.3.Final
+    * [HSEARCH-844] - Update Byteman to version 1.5.2
+    * [HSEARCH-845] - Update JBoss Logger to 3.0.0.GA
+    * [HSEARCH-857] - Upgrade to Hibernate Core 4.0.0.CR1
+
+
 3.4.0.Final (18-04-2011)
 ------------------------
 

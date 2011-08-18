@@ -88,6 +88,8 @@
                             <exclude>org.jboss.logging:jboss-logging-generator</exclude>
                             <exclude>org.rhq.helpers:*</exclude>
                             <exclude>i18nlog:i18nlog</exclude>
+                            <exclude>com.fasterxml:*</exclude>
+                            <exclude>org.jboss:jandex</exclude>
                         </excludes>
                     </dependencySet>
 
@@ -95,6 +97,12 @@
                         <outputDirectory>/dist/lib/optional</outputDirectory>
                         <scope>runtime</scope>
                         <excludes>
+                            <!-- Avro excludes -->
+                            <exclude>org.apache.avro:avro</exclude>
+                            <exclude>org.codehaus.jackson:*</exclude>
+                            <exclude>com.thoughtworks.paranamer:paranamer</exclude>
+                            <exclude>org.xerial.snappy:snappy-java</exclude>
+
                             <exclude>org.slf4j:slf4j-api</exclude>
                             <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
                             <exclude>org.jboss:jandex</exclude>
@@ -159,6 +167,11 @@
                             <exclude>xml-apis:*</exclude>
                             <exclude>org.hibernate.javax.persistence:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <!-- Avro excludes -->
+                            <exclude>org.apache.avro:avro</exclude>
+                            <exclude>org.codehaus.jackson:*</exclude>
+                            <exclude>com.thoughtworks.paranamer:paranamer</exclude>
+                            <exclude>org.xerial.snappy:snappy-java</exclude>
                         </excludes>
                     </dependencySet>
                 </dependencySets>
@@ -181,7 +194,7 @@
             <outputDirectory>/</outputDirectory>
         </file>
     </files>
-    
+
     <fileSets>
         <!-- Include all sources -->
         <fileSet>
@@ -189,9 +202,6 @@
             <outputDirectory>project</outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
-                <exclude>readme.txt</exclude>
-                <exclude>lgpl.txt</exclude>
-                <exclude>changelog.txt</exclude>
                 <exclude>.git</exclude>
                 <exclude>*.log</exclude>
                 <exclude>*.sh</exclude>
@@ -203,6 +213,8 @@
                 <exclude>**/target/**</exclude>
                 <exclude>**/.idea/**</exclude>
                 <exclude>**/*.iml</exclude>
+                <exclude>atlassian-ide-plugin.xml</exclude>
+                <exclude>.sonar-ide.properties</exclude>
             </excludes>
         </fileSet>
     </fileSets>
