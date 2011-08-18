@@ -1170,12 +1170,6 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       the <literal>hibernate-search-infinispan.jar</literal>. Several indexes
       can share the same caches.</para>
 
-      <warning>
-        <para>Infinispan uses JGroups, which requires the JVM property
-        <literal>java.net.preferIPv4Stack</literal> be set to
-        <literal>true</literal>:
-        <code>-Djava.net.preferIPv4Stack=true</code></para>
-      </warning>
     </section>
   </section>
 

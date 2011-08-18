@@ -37,7 +37,6 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.impl.JGroupsHelper;
 import org.hibernate.search.util.impl.XMLHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -69,7 +68,6 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
 		this.indexManager = indexManager;
-		JGroupsHelper.verifyIPv4IsPreferred();
 		indexName = indexManager.getIndexName();
 
 		if ( props.containsKey( JG_CLUSTER_NAME ) ) {
