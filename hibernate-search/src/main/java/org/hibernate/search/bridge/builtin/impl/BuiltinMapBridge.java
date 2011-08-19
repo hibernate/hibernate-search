@@ -30,22 +30,12 @@ import org.hibernate.search.bridge.builtin.MapBridge;
  */
 public class BuiltinMapBridge extends MapBridge implements StringBridge {
 
-	private static final StringBridge DEFAULT_STRING_BRIDGE = new StringBridge() {
-
-		@Override
-		public String objectToString(Object object) {
-			if ( object == null )
-				return null;
-
-			return object.toString();
-		}
-
-	};
+	private static final String2FieldBridgeAdaptor DEFAULT_STRING_BRIDGE = new String2FieldBridgeAdaptor( new DefaultStringBridge() );
 
 	private final StringBridge bridge;
 
 	public BuiltinMapBridge() {
-		this( new String2FieldBridgeAdaptor( DEFAULT_STRING_BRIDGE ) );
+		this( DEFAULT_STRING_BRIDGE );
 	}
 
 	public BuiltinMapBridge(final FieldBridge fieldBridge) {
@@ -63,6 +53,7 @@ public class BuiltinMapBridge extends MapBridge implements StringBridge {
 	 *
 	 * @see org.hibernate.search.bridge.StringBridge#objectToString(java.lang.Object)
 	 */
+	@Override
 	public String objectToString(Object object) {
 		return bridge.objectToString( object );
 	}
