@@ -51,7 +51,7 @@ public class Attribute {
 	private Product product;
 
 	@OneToMany(mappedBy = "attribute", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@IndexedEmbedded
+	@IndexedEmbedded(indexNullAs = "nullValues")
 	private List<AttributeValue> values;
 
 	private Attribute() {
@@ -59,8 +59,12 @@ public class Attribute {
 	}
 
 	public Attribute(Product product) {
+		this( product, new ArrayList<AttributeValue>() );
+	}
+
+	public Attribute(Product product, List<AttributeValue> values) {
 		this.product = product;
-		values = new ArrayList<AttributeValue>();
+		this.values = values;
 	}
 
 	public long getId() {

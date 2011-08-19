@@ -65,6 +65,8 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
@@ -455,12 +457,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									 Set<String> processedFieldNames,
 									 ContextualExceptionBridge contextualBridge,
 									 EntityInitializer objectInitializer) {
-		if ( instance == null ) {
-			return;
-		}
 
 		// needed for field access: I cannot work in the proxied version
-		Object unproxiedInstance = objectInitializer.unproxy( instance );
+		Object unproxiedInstance = unproxy( instance, objectInitializer );
 
 		// process the class bridges
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
@@ -506,8 +505,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
 
 			if ( value == null ) {
+				manageNullValue( doc, propertiesMetadata, contextualBridge, i, member, value );
 				continue;
 			}
+
 			PropertiesMetadata embeddedMetadata = propertiesMetadata.embeddedPropertiesMetadata.get( i );
 			switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
 				case ARRAY:
@@ -571,6 +572,31 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			}
 			contextualBridge.popMethod();
 		}
+	}
+
+	private void manageNullValue(Document doc, PropertiesMetadata propertiesMetadata, ContextualExceptionBridge contextualBridge, int i, XMember member, Object value) {
+		final String nullMarker = propertiesMetadata.embeddedNullTokens.get( i );
+		if ( nullMarker != null ) {
+			LuceneOptions options = new LuceneOptionsImpl(
+				Store.NO,
+				org.apache.lucene.document.Field.Index.NOT_ANALYZED_NO_NORMS,
+				org.apache.lucene.document.Field.TermVector.NO,
+				1F );
+			String fieldName = propertiesMetadata.embeddedNullFields.get( i );
+			contextualBridge
+				.setFieldBridge(propertiesMetadata.embeddedNullFieldBridges.get( i ) )
+				.pushMethod( member )
+				.setFieldName( fieldName )
+				.set( fieldName, value, doc, options );
+			contextualBridge.popMethod();
+		}
+	}
+
+	private Object unproxy(Object instance, EntityInitializer objectInitializer) {
+		if ( instance == null )
+			return null;
+			
+		return objectInitializer.unproxy( instance );
 	}
 
 	/**
@@ -703,6 +729,15 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			fieldBridge = getBridge( metadata.embeddedPropertiesMetadata.get( index ), fieldName );
 			if ( fieldBridge != null ) {
 				return fieldBridge;
+			}
+		}
+
+		// Process null embedded fields
+		final int nbrOfEmbeddedGetters = metadata.embeddedGetters.size();
+		for ( int index = 0; index < nbrOfEmbeddedGetters; index++ ) {
+			String memberName = metadata.embeddedNullFields.get( index );
+			if ( memberName.equals( fieldName ) ) {
+				return metadata.embeddedNullFieldBridges.get( index );
 			}
 		}
 
