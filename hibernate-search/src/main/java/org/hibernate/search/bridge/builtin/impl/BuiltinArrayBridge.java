@@ -27,17 +27,7 @@ import org.hibernate.search.bridge.builtin.ArrayBridge;
  */
 public class BuiltinArrayBridge extends ArrayBridge implements StringBridge {
 
-	private static final StringBridge DEFAULT_STRING_BRIDGE = new StringBridge() {
-
-		@Override
-		public String objectToString(Object object) {
-			if ( object == null )
-				return null;
-
-			return object.toString();
-		}
-
-	};
+	private static final String2FieldBridgeAdaptor DEFAULT_STRING_BRIDGE = new String2FieldBridgeAdaptor( new DefaultStringBridge() );
 
 	private final StringBridge bridge;
 
