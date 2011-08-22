@@ -36,6 +36,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -44,6 +45,8 @@ import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
 import org.hibernate.search.indexes.serialization.operations.impl.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.operations.impl.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
+
+import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.toByteArray;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -203,9 +206,22 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public void addFieldWithTokenStreamData(LuceneFieldContext context) {
 		GenericRecord field = createNormalField( "TokenStreamField", context );
-		field.put( "value", context.getTokenStream().getStream() );
+		List<List<AttributeImpl>> stream = context.getTokenStream().getStream();
+		List<List<Object>> value = new ArrayList<List<Object>>( stream.size() );
+		for( List<AttributeImpl> attrs : stream ) {
+			List<Object> elements = new ArrayList<Object>( attrs.size() );
+			for(AttributeImpl attr : attrs) {
+				elements.add( buildAttributeImpl( attr ) );
+			}
+			value.add(elements);
+		}
+		field.put( "value", value );
 		field.put( "termVector", context.getTermVector() );
 		fieldables.add( field );
+	}
+
+	private Object buildAttributeImpl(AttributeImpl attr) {
+		return ByteBuffer.wrap( toByteArray(attr) );
 	}
 
 	@Override

@@ -6,6 +6,8 @@
         `Store`,
         `TermVector`,
 
+        `attribute/TokenTrackingAttribute`,
+
         `BinaryField`,
         `ReaderField`,
         `StringField`,

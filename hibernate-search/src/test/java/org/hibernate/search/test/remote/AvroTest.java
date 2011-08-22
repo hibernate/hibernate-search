@@ -23,6 +23,7 @@ package org.hibernate.search.test.remote;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +56,7 @@ public class AvroTest {
 	@Test
 	public void experimentWithAvro() throws Exception {
 		String root = "org/hibernate/search/remote/codex/avro/v1/";
+		parseSchema( root + "attribute" + File.separator + "TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
 		parseSchema( root + "TermVector.avro", "TermVector" );
 		parseSchema( root + "Index.avro", "Index" );
 		parseSchema( root + "Store.avro", "Store" );
@@ -81,6 +83,7 @@ public class AvroTest {
 		final Schema termVectorSchema = protocol.getType( "TermVector" );
 		final Schema indexSchema = protocol.getType( "Index" );
 		final Schema storeSchema = protocol.getType( "Store" );
+		final Schema tokenTrackingAttribute = protocol.getType( "TokenTrackingAttribute" );
 		final Schema tokenStreamSchema = protocol.getType( "TokenStreamField" );
 		final Schema readerSchema = protocol.getType( "ReaderField" );
 		final Schema stringSchema = protocol.getType( "StringField" );
