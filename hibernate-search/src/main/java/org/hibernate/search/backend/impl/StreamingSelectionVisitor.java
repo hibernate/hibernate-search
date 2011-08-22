@@ -77,7 +77,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, boolean forceAsync) {
-			IndexManager indexManager = shardingStrategy.getIndexManagersForAddition(
+			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString(),

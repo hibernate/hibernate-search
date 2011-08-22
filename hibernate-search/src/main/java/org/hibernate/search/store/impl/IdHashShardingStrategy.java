@@ -48,7 +48,7 @@ public class IdHashShardingStrategy implements IndexShardingStrategy {
 		return providers;
 	}
 
-	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return providers[ hashKey(idInString) ];
 	}
 

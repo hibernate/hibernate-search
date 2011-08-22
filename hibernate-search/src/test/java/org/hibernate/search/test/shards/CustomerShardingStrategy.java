@@ -43,23 +43,26 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class CustomerShardingStrategy implements IndexShardingStrategy {
 
-	// stored DirectoryProviders in a array indexed by customerID
-	private IndexManager[] providers;
+	// stored IndexManagers in a array indexed by customerID
+	private IndexManager[] indexManagers;
 	
 	@Override
-	public void initialize(Properties properties, IndexManager[] providers) {
-		this.providers = providers;
+	public void initialize(Properties properties, IndexManager[] indexManagers) {
+		this.indexManagers = indexManagers;
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForAllShards() {
-		return providers;
+		return indexManagers;
 	}
 
-	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-		Integer customerID = Integer.parseInt(document.getField("customerID").stringValue());
-		return providers[customerID];
+	@Override
+	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+		Integer customerID = Integer.parseInt(document.getFieldable("customerID").stringValue());
+		return indexManagers[customerID];
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return getIndexManagersForAllShards();
 	}
@@ -69,13 +72,14 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 	 * can be certain that all the data for a particular customer Filter is in a single
 	 * shard; simply return that shard by customerID.
 	 */
+	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] filters) {
 		FullTextFilter filter = getCustomerFilter(filters, "customer");
 		if (filter == null) {
 			return getIndexManagersForAllShards();
 		}
 		else {
-			return new IndexManager[] { providers[Integer.parseInt(filter.getParameter("customerID").toString())] };
+			return new IndexManager[] { indexManagers[Integer.parseInt(filter.getParameter("customerID").toString())] };
 		}
 	}
 

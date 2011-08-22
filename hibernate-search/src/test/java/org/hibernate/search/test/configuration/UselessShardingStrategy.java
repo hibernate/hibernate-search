@@ -38,7 +38,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
  */
 public class UselessShardingStrategy implements IndexShardingStrategy {
 	
-	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return null;
 	}
 
