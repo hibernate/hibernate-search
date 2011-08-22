@@ -422,11 +422,12 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
     optimizing searches by selecting which shard to run the query against. By
     activating a filter (see <xref linkend="query-filter-shard" />), a
     sharding strategy can select a subset of the shards used to answer a query
-    (<classname>IndexShardingStrategy.getDirectoryProvidersForQuery</classname>)
+    (<classname>IndexShardingStrategy.getIndexManagersForQuery</classname>)
     and thus speed up the query execution.</para>
 
-    <para>Each shard has an independent directory provider configuration. The
-    <classname>DirectoryProvider</classname> index names for the Animal entity
+    <para>Each shard has an independent <classname>IndexManager</classname> and so
+    can be configured to use a different directory provider and backend configurations.
+    The <classname>IndexManager</classname> index names for the Animal entity
     in <xref linkend="example-sharding-configuration" /> are
     <literal>Animal.0</literal> to <literal>Animal.4</literal>. In other
     words, each shard has the name of it's owning index followed by
@@ -1170,12 +1171,6 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       the <literal>hibernate-search-infinispan.jar</literal>. Several indexes
       can share the same caches.</para>
 
-      <warning>
-        <para>Infinispan uses JGroups, which requires the JVM property
-        <literal>java.net.preferIPv4Stack</literal> be set to
-        <literal>true</literal>:
-        <code>-Djava.net.preferIPv4Stack=true</code></para>
-      </warning>
     </section>
   </section>
 

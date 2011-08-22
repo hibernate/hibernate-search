@@ -52,7 +52,7 @@ public interface IndexShardingStrategy {
 	/**
 	 * return the IndexManager where the given entity will be indexed
 	 */
-	IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document);
+	IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document);
 
 	/**
 	 * return the DirectoryProvider(s) where the given entity is stored and where the deletion operation needs to be applied

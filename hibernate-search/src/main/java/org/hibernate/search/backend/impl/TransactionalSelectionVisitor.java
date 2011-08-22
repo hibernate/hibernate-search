@@ -77,7 +77,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
 				WorkQueuePerIndexSplitter context) {
-			IndexManager indexManager = shardingStrategy.getIndexManagersForAddition(
+			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition(
 					work.getEntityClass(),
 					work.getId(),
 					work.getIdInString(),

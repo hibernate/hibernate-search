@@ -1607,7 +1607,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
       <itemizedlist>
         <listitem>
           <para>create a sharding strategy that does select a subset of
-          <classname>DirectoryProvider</classname>s depending on sone filter
+          <classname>IndexManager</classname>s depending on some filter
           configuration</para>
         </listitem>
 
@@ -1621,26 +1621,26 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
       <programlisting language="JAVA" role="JAVA">public class CustomerShardingStrategy implements IndexShardingStrategy {
 
- // stored DirectoryProviders in a array indexed by customerID
- private DirectoryProvider&lt;?&gt;[] providers;
+ // stored IndexManagers in a array indexed by customerID
+ private IndexManager[] indexManagers;
  
- public void initialize(Properties properties, DirectoryProvider&lt;?&gt;[] providers) {
-  this.providers = providers;
+ public void initialize(Properties properties, IndexManager[] indexManagers) {
+   this.indexManagers = indexManagers;
  }
 
- public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForAllShards() {
-  return providers;
+ public IndexManager[] getIndexManagersForAllShards() {
+   return indexManagers;
  }
 
- public DirectoryProvider&lt;?&gt; getDirectoryProviderForAddition(
+ public IndexManager getIndexManagerForAddition(
      Class&lt;?&gt; entity, Serializable id, String idInString, Document document) {
-  Integer customerID = Integer.parseInt(document.getField("customerID").stringValue());
-  return providers[customerID];
+   Integer customerID = Integer.parseInt(document.getFieldable("customerID").stringValue());
+   return indexManagers[customerID];
  }
 
- public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForDeletion(
+ public IndexManager[] getIndexManagersForDeletion(
      Class&lt;?&gt; entity, Serializable id, String idInString) {
-  return getDirectoryProvidersForAllShards();
+   return getIndexManagersForAllShards();
  }
 
   /**
@@ -1648,23 +1648,23 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
   * can be certain that all the data for a particular customer Filter is in a single
   * shard; simply return that shard by customerID.
   */
- public DirectoryProvider&lt;?&gt;[] getDirectoryProvidersForQuery(
+ public IndexManager[] getIndexManagersForQuery(
      FullTextFilterImplementor[] filters) {
-  FFullTextFilter filter = getCustomerFilter(filters, "customer");
-  if (filter == null) {
-   return getDirectoryProvidersForAllShards();
-  }
-  else {
-   return new DirectoryProvider[] { providers[Integer.parseInt(
+   FFullTextFilter filter = getCustomerFilter(filters, "customer");
+   if (filter == null) {
+     return getIndexManagersForAllShards();
+   }
+   else {
+     return new IndexManager[] { indexManagers[Integer.parseInt(
        filter.getParameter("customerID").toString())] };
-  }
+   }
  }
 
- private FullTextFilter getFilter(FullTextFilterImplementor[] filters, String name) {
-  for (FullTextFilterImplementor filter: filters) {
-   if (filter.getName().equals(name)) return filter;
-  }
-  return null;
+ private FullTextFilter getCustomerFilter(FullTextFilterImplementor[] filters, String name) {
+   for (FullTextFilterImplementor filter: filters) {
+     if (filter.getName().equals(name)) return filter;
+   }
+   return null;
  }
 }</programlisting>
 

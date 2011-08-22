@@ -50,7 +50,7 @@ public class NotShardedStrategy implements IndexShardingStrategy {
 		return directoryProvider;
 	}
 
-	public IndexManager getIndexManagersForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
+	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return directoryProvider[0];
 	}
 

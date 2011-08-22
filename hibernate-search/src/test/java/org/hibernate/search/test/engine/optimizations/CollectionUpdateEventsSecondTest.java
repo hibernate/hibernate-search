@@ -43,7 +43,7 @@ import org.junit.Test;
  * @author Adam Harris
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class CollectionUpdateEventTest2 {
+public class CollectionUpdateEventsSecondTest {
 
 	private LoadCountingListener loadCountListener;
 
@@ -57,7 +57,7 @@ public class CollectionUpdateEventTest2 {
 			assertLocationsLoaded( 0 );
 			//create initial data
 			initializeData( fullTextSessionBuilder );
-			//this should have dtriggered 5 indexing operations, no entity loadings:
+			//this should have triggered 5 indexing operations, no entity loadings:
 			assertOperationsPerformed( 5 );
 			assertLocationsLoaded( 0 );
 			FullTextSession fullTextSession = fullTextSessionBuilder.openFullTextSession();

@@ -77,7 +77,7 @@ public class CustomerShardingStrategyTest {
 		document.add(new Field("customerID", "5", Field.Store.NO, Field.Index.NOT_ANALYZED));
 		
 		assertTrue(providers[0].equals(
-			shardStrategy.getIndexManagersForAddition(null, null, null, document)
+			shardStrategy.getIndexManagerForAddition(null, null, null, document)
 			));
 	}
 	
