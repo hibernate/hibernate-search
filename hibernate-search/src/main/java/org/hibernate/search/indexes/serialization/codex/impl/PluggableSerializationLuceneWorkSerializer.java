@@ -42,6 +42,8 @@ import org.hibernate.search.indexes.serialization.codex.spi.SerializationProvide
 import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
 import org.hibernate.search.indexes.serialization.operations.impl.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.operations.impl.LuceneNumericFieldContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.*;
 
@@ -55,6 +57,7 @@ import static org.hibernate.search.indexes.serialization.codex.impl.Serializatio
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSerializer {
+	private static Log log = LoggerFactory.make();
 
 	private SearchFactoryImplementor searchFactory;
 	private SerializationProvider provider;
@@ -69,29 +72,39 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 	 */
 	@Override
 	public byte[] toSerializedModel(List<LuceneWork> works) {
-		Serializer serializer = provider.getSerializer();
-		serializer.luceneWorks( works );
+		try {
+			Serializer serializer = provider.getSerializer();
+			serializer.luceneWorks( works );
 
-		for (LuceneWork work : works) {
-			if (work instanceof OptimizeLuceneWork) {
-				serializer.addOptimizeAll();
+			for (LuceneWork work : works) {
+				if (work instanceof OptimizeLuceneWork) {
+					serializer.addOptimizeAll();
+				}
+				else if (work instanceof PurgeAllLuceneWork) {
+					serializer.addPurgeAll( work.getEntityClass().getName() );
+				}
+				else if (work instanceof DeleteLuceneWork) {
+					serializer.addDelete( work.getEntityClass().getName(), toByteArray( work.getId() ) );
+				}
+				else if (work instanceof AddLuceneWork ) {
+					buildDocument( work.getDocument(), serializer );
+					serializer.addAdd( work.getEntityClass().getName(), toByteArray( work.getId() ), work.getFieldToAnalyzerMap() );
+				}
+				else if (work instanceof UpdateLuceneWork ) {
+					buildDocument( work.getDocument(), serializer );
+					serializer.addUpdate( work.getEntityClass().getName(), toByteArray( work.getId() ), work.getFieldToAnalyzerMap() );
+				}
 			}
-			else if (work instanceof PurgeAllLuceneWork) {
-				serializer.addPurgeAll( work.getEntityClass().getName() );
+			return serializer.serialize();
+		}
+		catch ( RuntimeException e ) {
+			if ( e instanceof SearchException ) {
+				throw e;
 			}
-			else if (work instanceof DeleteLuceneWork) {
-				serializer.addDelete( work.getEntityClass().getName(), toByteArray( work.getId() ) );
-			}
-			else if (work instanceof AddLuceneWork ) {
-				buildDocument( work.getDocument(), serializer );
-				serializer.addAdd( work.getEntityClass().getName(), toByteArray( work.getId() ), work.getFieldToAnalyzerMap() );
-			}
-			else if (work instanceof UpdateLuceneWork ) {
-				buildDocument( work.getDocument(), serializer );
-				serializer.addUpdate( work.getEntityClass().getName(), toByteArray( work.getId() ), work.getFieldToAnalyzerMap() );
+			else {
+				throw new SearchException( log.unableToReadSerializedLuceneWorks(), e );
 			}
 		}
-		return serializer.serialize();
 	}
 
 	/**
@@ -99,10 +112,20 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 	 */
 	@Override
 	public List<LuceneWork> toLuceneWorks(byte[] data) {
-		Deserializer deserializer = provider.getDeserializer();
-		LuceneWorkHydrator hydrator = new LuceneWorkHydrator( searchFactory );
-		deserializer.deserialize( data, hydrator );
-		return hydrator.getLuceneWorks();
+		try {
+			Deserializer deserializer = provider.getDeserializer();
+			LuceneWorkHydrator hydrator = new LuceneWorkHydrator( searchFactory );
+			deserializer.deserialize( data, hydrator );
+			return hydrator.getLuceneWorks();
+		}
+		catch ( RuntimeException e ) {
+			if ( e instanceof SearchException ) {
+				throw e;
+			}
+			else {
+				throw new SearchException( log.unableToReadSerializedLuceneWorks(), e );
+			}
+		}
 	}
 
 

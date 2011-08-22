@@ -37,6 +37,8 @@ import org.jboss.logging.LogMessage;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
+import org.hibernate.search.SearchException;
+
 /**
  * Hibernate Search's log abstraction layer on top of JBoss Logging.
  *
@@ -385,4 +387,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 81, value = "The index '%s' is using a non-recommended combination of backend and directoryProvider implementations")
 	void warnSuspiciousBackendDirectoryCombination(String indexName);
 
+	@Message( value="Unable to start serialization layer", id=82 )
+	String unableToStartSerializationLayer();
+
+	@Message( value="Unable to serialize List<LuceneWork>", id=83 )
+	String unableToSerializeLuceneWorks();
+
+	@Message( value="Unable to read serialized List<LuceneWork>", id=84 )
+	String unableToReadSerializedLuceneWorks();
 }
