@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessorFactory;
 import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
@@ -39,11 +40,15 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class BackendFactory {
+
+	private static final Log log = LoggerFactory.make();
 	
 	public static BackendQueueProcessor createBackend(IndexManager indexManager, WorkerBuildContext context, Properties properties) {
 
@@ -115,9 +120,19 @@ public class BackendFactory {
 
 	public static LuceneWorkSerializer createSerializer(String indexName, Properties cfg,
 			WorkerBuildContext buildContext) {
-		return new PluggableSerializationLuceneWorkSerializer(
-				new AvroSerializationProvider(),
-				buildContext.getUninitializedSearchFactory() );
+		try {
+			return new PluggableSerializationLuceneWorkSerializer(
+					new AvroSerializationProvider(),
+					buildContext.getUninitializedSearchFactory() );
+		}
+		catch (RuntimeException e) {
+			if ( e instanceof SearchException ) {
+				throw e;
+			}
+			else {
+				throw new SearchException( log.unableToStartSerializationLayer(), e );
+			}
+		}
 	}
 
 }
