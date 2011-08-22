@@ -203,12 +203,8 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public void addFieldWithTokenStreamData(LuceneFieldContext context) {
 		GenericRecord field = createNormalField( "TokenStreamField", context );
-
 		field.put( "value", context.getTokenStream().getStream() );
-		SerializableTermVector termVector = context.getTermVector();
-		//FIXME shouldn't have to serialize
-		byte[] data = SerializationHelper.toByteArray( termVector );
-		field.put( "termVector", ByteBuffer.wrap( data ) );
+		field.put( "termVector", context.getTermVector() );
 		fieldables.add( field );
 	}
 
