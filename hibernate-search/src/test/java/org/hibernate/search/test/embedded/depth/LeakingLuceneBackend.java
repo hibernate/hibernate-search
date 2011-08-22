@@ -42,7 +42,7 @@ public class LeakingLuceneBackend extends LuceneBackendQueueProcessorFactory {
 	
 	@Override
 	public void close() {
-		lastProcessedQueue = null;
+		lastProcessedQueue = new ArrayList<LuceneWork>();
 		super.close();
 	}
 	

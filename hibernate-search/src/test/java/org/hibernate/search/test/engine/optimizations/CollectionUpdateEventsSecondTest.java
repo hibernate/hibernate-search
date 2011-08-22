@@ -57,7 +57,7 @@ public class CollectionUpdateEventsSecondTest {
 			assertLocationsLoaded( 0 );
 			//create initial data
 			initializeData( fullTextSessionBuilder );
-			//this should have dtriggered 5 indexing operations, no entity loadings:
+			//this should have triggered 5 indexing operations, no entity loadings:
 			assertOperationsPerformed( 5 );
 			assertLocationsLoaded( 0 );
 			FullTextSession fullTextSession = fullTextSessionBuilder.openFullTextSession();
