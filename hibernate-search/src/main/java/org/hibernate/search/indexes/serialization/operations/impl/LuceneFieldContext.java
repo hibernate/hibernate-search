@@ -67,7 +67,7 @@ public class LuceneFieldContext {
 	}
 
 	public SerializableTermVector getTermVector() {
-		Field.TermVector vector = Field.TermVector.toTermVector( field.isStored(), field.isStoreOffsetWithTermVector(), field.isStorePositionWithTermVector() );
+		Field.TermVector vector = Field.TermVector.toTermVector( field.isTermVectorStored(), field.isStoreOffsetWithTermVector(), field.isStorePositionWithTermVector() );
 		switch ( vector ) {
 			case NO:
 				return SerializableTermVector.NO;
