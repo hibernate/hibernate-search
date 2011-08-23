@@ -60,7 +60,16 @@ public interface LuceneWorksBuilder {
 
 	void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addFieldWithTokenStreamData(String name, List<List<AttributeImpl>> tokenStream, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addFieldWithTokenStreamData(String name, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
 	void addFieldWithSerializableReaderData(String name, byte[] value, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
+
+	void addSerializedAttribute(byte[] bytes);
+
+	void addAttributeInstance(AttributeImpl attribute);
+
+	void addTokenTrackingAttribute(List<Integer> positions);
+
+	void addToken();
+
 }

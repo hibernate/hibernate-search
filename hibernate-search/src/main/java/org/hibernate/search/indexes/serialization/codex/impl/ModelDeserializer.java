@@ -21,7 +21,10 @@
 package org.hibernate.search.indexes.serialization.codex.impl;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
+
 import org.apache.lucene.document.Field;
+import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializationProvider;
@@ -206,9 +209,15 @@ public class ModelDeserializer implements Deserializer {
 				}
 				else if ( field instanceof SerializableTokenStreamField ) {
 					SerializableTokenStreamField reallySafeField = ( SerializableTokenStreamField ) field;
+					List<List<AttributeImpl>> tokens = reallySafeField.getValue().getStream();
+					for (List<AttributeImpl> token : tokens) {
+						for (AttributeImpl attribute : token) {
+							hydrator.addAttributeInstance( attribute );
+						}
+						hydrator.addToken();
+					}
 					hydrator.addFieldWithTokenStreamData(
 							reallySafeField.getName(),
-							reallySafeField.getValue().getStream(),
 							reallySafeField.getTermVector(),
 							safeField.getBoost(),
 							safeField.isOmitNorms(),

@@ -23,6 +23,7 @@ package org.hibernate.search.indexes.serialization.codex.impl;
 import java.io.Reader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.util.AttributeImpl;
+import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -49,6 +51,7 @@ import org.hibernate.search.indexes.serialization.operations.impl.SerializableTe
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.*;
+import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.toSerializable;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -58,6 +61,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private List<LuceneWork> results;
 	private ClassLoader loader;
 	private Document luceneDocument;
+	private List<AttributeImpl> attributes;
+	private List<List<AttributeImpl>> tokens;
 
 	public LuceneWorkHydrator(SearchFactoryImplementor searchFactory) {
 		this.searchFactory = searchFactory;
@@ -208,9 +213,14 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addFieldWithTokenStreamData(String name, List<List<AttributeImpl>> tokenStream, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		Field luceneField = new Field( name, new CopyTokenStream(tokenStream), getTermVector( termVector ) );
+	public void addFieldWithTokenStreamData(String name, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		Field luceneField = new Field( name, new CopyTokenStream(tokens), getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
+		clearTokens();
+	}
+
+	private void clearTokens() {
+		tokens = new ArrayList<List<AttributeImpl>>(  );
 	}
 
 	@Override
@@ -218,6 +228,38 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		Reader value = (Reader) toSerializable( valueAsByte, loader );
 		Field luceneField = new Field( name, value, getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
+	}
+
+	@Override
+	public void addSerializedAttribute(byte[] bytes) {
+		getAttributes().add( ( AttributeImpl ) toSerializable( bytes, loader ) );
+	}
+
+	@Override
+	public void addAttributeInstance(AttributeImpl attribute) {
+		getAttributes().add( attribute );
+	}
+
+	@Override
+	public void addTokenTrackingAttribute(List<Integer> positions) {
+		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attr = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
+		int size = positions.size() - 1;
+		int[] basePosition = new int[size];
+		for(int index = 0 ; index < size ; index++) {
+			basePosition[index] = positions.get( index );
+		}
+		attr.reset( basePosition, positions.get( size ) );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addToken() {
+		getTokens().add( getAttributes() );
+		clearAttributes();
+	}
+
+	private void clearAttributes() {
+		attributes = new ArrayList<AttributeImpl>(  );
 	}
 
 	private Document getLuceneDocument() {
@@ -279,5 +321,19 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 			default:
 				throw new SearchException( "Unable to convert serializable Store to Lucene Store: " + store );
 		}
+	}
+
+	public List<AttributeImpl> getAttributes() {
+		if (attributes == null) {
+			attributes = new ArrayList<AttributeImpl>();
+		}
+		return attributes;
+	}
+
+	public List<List<AttributeImpl>> getTokens() {
+		if (tokens == null) {
+			tokens = new ArrayList<List<AttributeImpl>>(  );
+		}
+		return tokens;
 	}
 }
