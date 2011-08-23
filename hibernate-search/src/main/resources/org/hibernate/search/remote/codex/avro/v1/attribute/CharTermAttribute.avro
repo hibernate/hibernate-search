@@ -1,0 +1,10 @@
+{
+    "name": "CharTermAttribute",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "sequence",
+            "type": "string"
+        }
+    ]
+}

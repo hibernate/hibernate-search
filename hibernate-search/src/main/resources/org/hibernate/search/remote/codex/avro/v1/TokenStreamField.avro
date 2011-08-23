@@ -9,7 +9,8 @@
                     "type": "array",
                     "items": [
                         "bytes",
-                        "TokenTrackingAttribute"
+                        "TokenTrackingAttribute",
+                        "CharTermAttribute"
                     ]
                 }
             }
