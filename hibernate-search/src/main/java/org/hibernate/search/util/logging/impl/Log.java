@@ -388,11 +388,11 @@ public interface Log extends BasicLogger {
 	void warnSuspiciousBackendDirectoryCombination(String indexName);
 
 	@Message( value="Unable to start serialization layer", id=82 )
-	String unableToStartSerializationLayer();
+	SearchException unableToStartSerializationLayer(@Cause Throwable e);
 
 	@Message( value="Unable to serialize List<LuceneWork>", id=83 )
-	String unableToSerializeLuceneWorks();
+	SearchException unableToSerializeLuceneWorks(@Cause Throwable e);
 
 	@Message( value="Unable to read serialized List<LuceneWork>", id=84 )
-	String unableToReadSerializedLuceneWorks();
+	SearchException unableToReadSerializedLuceneWorks(@Cause Throwable e);
 }

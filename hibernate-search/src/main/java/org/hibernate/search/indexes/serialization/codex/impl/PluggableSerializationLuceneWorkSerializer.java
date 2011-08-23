@@ -102,7 +102,7 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 				throw e;
 			}
 			else {
-				throw new SearchException( log.unableToReadSerializedLuceneWorks(), e );
+				throw log.unableToSerializeLuceneWorks( e );
 			}
 		}
 	}
@@ -123,7 +123,7 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 				throw e;
 			}
 			else {
-				throw new SearchException( log.unableToReadSerializedLuceneWorks(), e );
+				throw log.unableToReadSerializedLuceneWorks( e );
 			}
 		}
 	}
