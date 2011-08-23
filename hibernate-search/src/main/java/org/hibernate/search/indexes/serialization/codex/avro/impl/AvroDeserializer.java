@@ -258,6 +258,9 @@ public class AvroDeserializer implements Deserializer {
 			if ( "TokenTrackingAttribute".equals( name ) ) {
 				hydrator.addTokenTrackingAttribute( (List<Integer>) record.get( "positions" ) );
 			}
+			else if ( "CharTermAttribute".equals( name ) ) {
+				hydrator.addCharTermAttribute( (CharSequence) record.get( "sequence" ) );
+			}
 			else {
 				log.unknownAttributeSerializedRepresentation( name );
 			}

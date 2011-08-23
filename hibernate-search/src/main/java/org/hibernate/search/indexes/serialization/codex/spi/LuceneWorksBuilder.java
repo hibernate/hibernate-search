@@ -70,6 +70,7 @@ public interface LuceneWorksBuilder {
 
 	void addTokenTrackingAttribute(List<Integer> positions);
 
-	void addToken();
+	void addCharTermAttribute(CharSequence sequence);
 
+	void addToken();
 }

@@ -23,20 +23,20 @@ package org.hibernate.search.test.remote;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
-import org.jacorb.idl.runtime.token;
 import org.junit.Test;
 
 import org.hibernate.search.backend.AddLuceneWork;
@@ -209,6 +209,11 @@ public class SerializationTest extends SearchTestCase {
 		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attrImpl = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
 		attrImpl.reset( new int[]{ 1,2, 3 }, 4 );
 		source.get(0).add( attrImpl );
+
+		CharTermAttributeImpl charAttr = new CharTermAttributeImpl();
+		charAttr.append( "Wazzza" );
+		source.get(0).add( charAttr );
+
 		CopyTokenStream tokenStream = new CopyTokenStream( source );
 		field = new Field("tokenstream", tokenStream);
 		doc.add(field);
@@ -340,7 +345,10 @@ public class SerializationTest extends SearchTestCase {
 				}
 				if ( origAttr instanceof AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) {
 					assertThat( ((AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) origAttr).getPositions() )
-							.isEqualTo( ((AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) copyAttr).getPositions() );
+							.isEqualTo( ( ( AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) copyAttr ).getPositions() );
+				}
+				else if ( origAttr instanceof CharTermAttribute) {
+					assertThat( origAttr.toString() ).isEqualTo( copyAttr.toString() );
 				}
 			}
 		}

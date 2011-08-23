@@ -27,11 +27,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.util.AttributeImpl;
+import org.apache.lucene.util.AttributeSource;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.SearchException;
@@ -249,6 +252,15 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 			basePosition[index] = positions.get( index );
 		}
 		attr.reset( basePosition, positions.get( size ) );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addCharTermAttribute(CharSequence sequence) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( CharTermAttribute.class );
+		( (CharTermAttribute) attr).append( sequence );
 		getAttributes().add( attr );
 	}
 
