@@ -72,5 +72,9 @@ public interface LuceneWorksBuilder {
 
 	void addCharTermAttribute(CharSequence sequence);
 
+	void addPayloadAttribute(byte[] payloads);
+
 	void addToken();
+
+
 }

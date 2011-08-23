@@ -10,7 +10,8 @@
                     "items": [
                         "bytes",
                         "TokenTrackingAttribute",
-                        "CharTermAttribute"
+                        "CharTermAttribute",
+                        "PayloadAttribute"
                     ]
                 }
             }
