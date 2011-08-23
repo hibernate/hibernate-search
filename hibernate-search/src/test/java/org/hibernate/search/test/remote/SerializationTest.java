@@ -23,15 +23,20 @@ package org.hibernate.search.test.remote;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.util.AttributeImpl;
+import org.apache.solr.handler.AnalysisRequestHandlerBase;
+import org.jacorb.idl.runtime.token;
 import org.junit.Test;
 
 import org.hibernate.search.backend.AddLuceneWork;
@@ -41,9 +46,11 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializationProvider;
+import org.hibernate.search.indexes.serialization.codex.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.codex.impl.PluggableSerializationLuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
+import org.hibernate.search.indexes.serialization.operations.impl.SerializableTokenStream;
 import org.hibernate.search.test.SearchTestCase;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -196,7 +203,15 @@ public class SerializationTest extends SearchTestCase {
 		SerializableStringReader reader = new SerializableStringReader();
 		field = new Field( "ReaderField", reader, Field.TermVector.WITH_OFFSETS );
 		doc.add( field );
-		//TODO  TokenStream
+
+		List<List<AttributeImpl>> source = new ArrayList<List<AttributeImpl>>(  );
+		source.add( new ArrayList<AttributeImpl>() );
+		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attrImpl = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
+		attrImpl.reset( new int[]{ 1,2, 3 }, 4 );
+		source.get(0).add( attrImpl );
+		CopyTokenStream tokenStream = new CopyTokenStream( source );
+		field = new Field("tokenstream", tokenStream);
+		doc.add(field);
 
 		works.add( new UpdateLuceneWork( 1234, "1234", RemoteEntity.class, doc ) );
 		works.add( new AddLuceneWork( 125, "125", RemoteEntity.class, new Document() ) );
@@ -240,8 +255,23 @@ public class SerializationTest extends SearchTestCase {
 		assertThat( work.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
 		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
 				.isEqualTo( copy.getFieldToAnalyzerMap() );
-		// To be addressed by HSEARCH-834
+		//TODO To be addressed by HSEARCH-834 merge  assertTokenStreams with assertDocument
 		//assertDocument( work.getDocument(), copy.getDocument() );
+		assertDocumentTokenStreams( work.getDocument(), copy.getDocument() );
+	}
+
+	//TODO To be addressed by HSEARCH-834 merge  assertTokenStreams with assertDocument
+		//assertDocument( work.getDocument(), copy.getDocument() );
+	private void assertDocumentTokenStreams(Document document, Document copy) {
+		for ( int index = 0; index < document.getFields().size(); index++ ) {
+			Fieldable field = document.getFields().get( index );
+			Fieldable fieldCopy = copy.getFields().get( index );
+			assertThat( field ).isInstanceOf( fieldCopy.getClass() );
+			if ( field instanceof Field ) {
+				assertNormalField( ( Field ) field, ( Field ) fieldCopy );
+
+			}
+		}
 	}
 
 	private void assertDocument(Document document, Document copy) {
@@ -270,15 +300,69 @@ public class SerializationTest extends SearchTestCase {
 		assertThat( copy.isBinary() ).isEqualTo( field.isBinary() );
 		assertThat( copy.isIndexed() ).isEqualTo( field.isIndexed() );
 		assertThat( copy.isLazy() ).isEqualTo( field.isLazy() );
-		assertThat( copy.isStoreOffsetWithTermVector() ).isEqualTo( field.isStoreOffsetWithTermVector() );
+		assertThat( copy.isStoreOffsetWithTermVector() ).as("store offset with position missing").isEqualTo( field.isStoreOffsetWithTermVector() );
 		assertThat( copy.isStorePositionWithTermVector() ).isEqualTo( field.isStorePositionWithTermVector() );
 		assertThat( copy.isStored() ).isEqualTo( field.isStored() );
 		assertThat( copy.isTokenized() ).isEqualTo( field.isTokenized() );
-		assertThat( copy.readerValue() ).isEqualTo( field.readerValue() );
-		assertThat( copy.tokenStreamValue() ).isEqualTo( field.tokenStreamValue() );
+		assertThat( compareReaders( copy.readerValue(), field.readerValue() ) ).isTrue();
+		assertThat( compareTokenStreams( field.tokenStreamValue(), copy.tokenStreamValue() ) ).isTrue();
 		assertThat( copy.stringValue() ).isEqualTo( field.stringValue() );
 
 		assertThat( copy.isTermVectorStored() ).isEqualTo( field.isTermVectorStored() );
+	}
+
+	private boolean compareTokenStreams(TokenStream original, TokenStream copy) {
+		if (original == null) {
+			return copy == null;
+		}
+		try {
+			original.reset();
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException( e );
+		}
+		SerializableTokenStream serOriginal = CopyTokenStream.buildSerializabletokenStream( original );
+		SerializableTokenStream serCopy = CopyTokenStream.buildSerializabletokenStream( copy );
+		if ( serOriginal.getStream().size() != serCopy.getStream().size() ) {
+			return false;
+		}
+		for ( int i = 0 ; i < serOriginal.getStream().size() ; i++ ) {
+			List<AttributeImpl> origToken = serOriginal.getStream().get( i );
+			List<AttributeImpl> copyToken = serCopy.getStream().get( i );
+			if ( origToken.size() != copyToken.size() ) {
+				return false;
+			}
+			for ( int j = 0 ; j < origToken.size() ; j++ ) {
+				AttributeImpl origAttr = origToken.get( j );
+				AttributeImpl copyAttr = copyToken.get( j );
+				if ( origAttr.getClass() != copyAttr.getClass() ) {
+					return false;
+				}
+				if ( origAttr instanceof AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) {
+					assertThat( ((AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) origAttr).getPositions() )
+							.isEqualTo( ((AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) copyAttr).getPositions() );
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean compareReaders(Reader copy, Reader original) {
+		if (original == null) {
+			return copy == null;
+		}
+		try {
+			for( int o = original.read(); o != -1 ; o = original.read() ) {
+				int c = copy.read();
+				if (o != c) {
+					return false;
+				}
+			}
+			return copy.read() == -1;
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException( e );
+		}
 	}
 
 	private void assertNumericField(NumericField field, NumericField copy) {
@@ -332,10 +416,18 @@ public class SerializationTest extends SearchTestCase {
 	}
 
 	private static class SerializableStringReader extends Reader implements Serializable {
+		private boolean read = false;
 
 		@Override
 		public int read(char[] cbuf, int off, int len) throws IOException {
-			return 0;
+			if (read) {
+				return -1;
+			}
+			else {
+				read = true;
+				cbuf[off] = 2;
+				return 1;
+			}
 		}
 
 		@Override
