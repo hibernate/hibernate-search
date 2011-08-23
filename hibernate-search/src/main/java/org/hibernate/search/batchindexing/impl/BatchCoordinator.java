@@ -98,7 +98,7 @@ public class BatchCoordinator implements Runnable {
 			afterBatch();
 		}
 		catch ( InterruptedException e ) {
-			log.interruptedBatchIndexig();
+			log.interruptedBatchIndexing();
 			Thread.currentThread().interrupt();
 		}
 		finally {
