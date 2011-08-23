@@ -29,10 +29,12 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.index.Payload;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.AttributeSource;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
@@ -261,6 +263,15 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( CharTermAttribute.class );
 		( (CharTermAttribute) attr).append( sequence );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addPayloadAttribute(byte[] payloads) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( PayloadAttribute.class );
+		( (PayloadAttribute) attr).setPayload( new Payload( payloads ) );
 		getAttributes().add( attr );
 	}
 

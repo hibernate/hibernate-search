@@ -31,10 +31,13 @@ import java.util.Map;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
+import org.apache.lucene.analysis.tokenattributes.PayloadAttributeImpl;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.index.Payload;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
 import org.junit.Test;
@@ -214,6 +217,10 @@ public class SerializationTest extends SearchTestCase {
 		charAttr.append( "Wazzza" );
 		source.get(0).add( charAttr );
 
+		PayloadAttributeImpl payloadAttribute = new PayloadAttributeImpl();
+		payloadAttribute.setPayload( new Payload( new byte[] {0,1, 2, 3} ) );
+		source.get(0).add( payloadAttribute );
+
 		CopyTokenStream tokenStream = new CopyTokenStream( source );
 		field = new Field("tokenstream", tokenStream);
 		doc.add(field);
@@ -349,6 +356,11 @@ public class SerializationTest extends SearchTestCase {
 				}
 				else if ( origAttr instanceof CharTermAttribute) {
 					assertThat( origAttr.toString() ).isEqualTo( copyAttr.toString() );
+				}
+				else if ( origAttr instanceof PayloadAttribute) {
+					assertThat( ( (PayloadAttribute) origAttr).getPayload() ).isEqualTo(
+							( ( PayloadAttribute ) copyAttr ).getPayload()
+					);
 				}
 			}
 		}

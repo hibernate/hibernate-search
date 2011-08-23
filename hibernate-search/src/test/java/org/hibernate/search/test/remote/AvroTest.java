@@ -58,6 +58,7 @@ public class AvroTest {
 		String root = "org/hibernate/search/remote/codex/avro/v1/";
 		parseSchema( root + "attribute" + File.separator + "TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
 		parseSchema( root + "attribute" + File.separator + "CharTermAttribute.avro", "attribute/CharTermAttribute" );
+		parseSchema( root + "attribute" + File.separator + "PayloadAttribute.avro", "attribute/PayloadAttribute" );
 		parseSchema( root + "TermVector.avro", "TermVector" );
 		parseSchema( root + "Index.avro", "Index" );
 		parseSchema( root + "Store.avro", "Store" );

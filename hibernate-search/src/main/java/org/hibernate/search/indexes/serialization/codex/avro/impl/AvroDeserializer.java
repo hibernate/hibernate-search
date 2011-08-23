@@ -261,6 +261,9 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "CharTermAttribute".equals( name ) ) {
 				hydrator.addCharTermAttribute( (CharSequence) record.get( "sequence" ) );
 			}
+			else if ( "PayloadAttribute".equals( name ) ) {
+				hydrator.addPayloadAttribute( asByteArray(record, "payload") );
+			}
 			else {
 				log.unknownAttributeSerializedRepresentation( name );
 			}

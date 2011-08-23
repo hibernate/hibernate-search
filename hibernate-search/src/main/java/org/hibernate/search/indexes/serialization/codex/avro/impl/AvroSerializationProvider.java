@@ -81,6 +81,7 @@ public class AvroSerializationProvider implements SerializationProvider {
 		parseSchema( "Store" );
 		parseSchema( "attribute/TokenTrackingAttribute" );
 		parseSchema( "attribute/CharTermAttribute" );
+		parseSchema( "attribute/PayloadAttribute" );
 		parseSchema( "TokenStreamField" );
 		parseSchema( "ReaderField" );
 		parseSchema( "StringField" );
