@@ -18,7 +18,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jbossJTA.version>4.14.0.Final</jbossJTA.version>
-        <spring-release-version>3.0.5.RELEASE</spring-release-version>
+        <spring-release-version>3.0.6.RELEASE</spring-release-version>
     </properties>
 
     <build>
@@ -142,7 +142,6 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-testing</artifactId>
-            <version>${hibernateVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
