@@ -97,6 +97,7 @@ public class AvroSerializationProvider implements SerializationProvider {
 		parseSchema( "NumericDoubleField" );
 		parseSchema( "CustomFieldable" );
 		parseSchema( "Document" );
+		parseSchema( "Id" );
 		parseSchema( "OptimizeAll" );
 		parseSchema( "PurgeAll" );
 		parseSchema( "Delete" );
@@ -148,6 +149,7 @@ public class AvroSerializationProvider implements SerializationProvider {
 		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( filename );
 		String protocolSkeleton = readInputStream( in, filename );
 		String protocolString = inlineSchemas( protocolSkeleton );
+		//System.out.println("\n\n" + protocolString + "\n\n");
 		return Protocol.parse( protocolString );
 	}
 

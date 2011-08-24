@@ -22,6 +22,7 @@ package org.hibernate.search.indexes.serialization.codex.avro.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +34,10 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.util.Utf8;
 import org.apache.lucene.util.AttributeImpl;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.codex.spi.Deserializer;
@@ -101,32 +104,47 @@ public class AvroDeserializer implements Deserializer {
 				hydrator.addPurgeAllLuceneWork( asString( operation, "class" ) );
 			}
 			else if ( "Delete".equals( schema ) ) {
+				processId(operation, hydrator);
 				hydrator.addDeleteLuceneWork(
-						asString( operation, "class" ),
-						asByteArray( operation, "id" )
+						asString( operation, "class" )
 				);
 			}
 			else if ( "Add".equals( schema ) ) {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
 				Map<String, String> analyzers = getAnalyzers( operation );
+				processId(operation, hydrator);
 				hydrator.addAddLuceneWork(
 						asString( operation, "class" ),
-						asByteArray( operation, "id" ),
 						analyzers
 				);
 			}
 			else if ( "Update".equals( schema ) ) {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
 				Map<String, String> analyzers = getAnalyzers( operation );
+				processId(operation, hydrator);
 				hydrator.addUpdateLuceneWork(
 						asString( operation, "class" ),
-						asByteArray( operation, "id" ),
 						analyzers
 				);
 			}
 			else {
 				throw new SearchException( "Unexpected operation type: " + schema );
 			}
+		}
+	}
+
+	private void processId(GenericRecord operation, LuceneWorksBuilder hydrator) {
+		GenericRecord id = (GenericRecord)operation.get("id");
+		Object value = id.get( "value" );
+		if (value instanceof ByteBuffer) {
+			hydrator.addIdAsJavaSerialized( asByteArray( ( ByteBuffer ) value ) );
+		}
+		else if (value instanceof Utf8) {
+			hydrator.addId( value.toString() );
+		}
+		else {
+			//the rest are serialized objects
+			hydrator.addId( (Serializable) value );
 		}
 	}
 

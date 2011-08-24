@@ -50,11 +50,9 @@ import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
 import org.hibernate.search.indexes.serialization.operations.impl.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.operations.impl.LuceneNumericFieldContext;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -66,6 +64,7 @@ import static org.hibernate.search.indexes.serialization.codex.impl.Serializatio
 public class AvroSerializer implements Serializer {
 	private static final Log log = LoggerFactory.make();
 
+	private GenericRecord idRecord;
 	private List<GenericRecord> fieldables;
 	private List<GenericRecord> operations;
 	private GenericRecord document;
@@ -93,32 +92,71 @@ public class AvroSerializer implements Serializer {
 	}
 
 	@Override
-	public void addDelete(String entityClassName, byte[] id) {
-		GenericRecord delete = new GenericData.Record( protocol.getType( "Delete" ) );
-		delete.put( "class", entityClassName );
-		delete.put( "id", ByteBuffer.wrap( id ) );
-		operations.add( delete );
+	public void addIdSerializedInJava(byte[] id) {
+		this.idRecord = new GenericData.Record( protocol.getType( "Id" ) );
+		idRecord.put( "value", ByteBuffer.wrap( id ) );
 	}
 
 	@Override
-	public void addAdd(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
+	public void addIdAsInteger(int id) {
+		this.idRecord = new GenericData.Record( protocol.getType( "Id" ) );
+		idRecord.put( "value", id );
+	}
+
+	@Override
+	public void addIdAsLong(long id) {
+		this.idRecord = new GenericData.Record( protocol.getType( "Id" ) );
+		idRecord.put( "value", id );
+	}
+
+	@Override
+	public void addIdAsFloat(float id) {
+		this.idRecord = new GenericData.Record( protocol.getType( "Id" ) );
+		idRecord.put( "value", id );
+	}
+
+	@Override
+	public void addIdAsDouble(double id) {
+		this.idRecord = new GenericData.Record( protocol.getType( "Id" ) );
+		idRecord.put( "value", id );
+	}
+
+	@Override
+	public void addIdAsString(String id) {
+		this.idRecord = new GenericData.Record( protocol.getType( "Id" ) );
+		idRecord.put( "value", id );
+	}
+
+	@Override
+	public void addDelete(String entityClassName) {
+		GenericRecord delete = new GenericData.Record( protocol.getType( "Delete" ) );
+		delete.put( "class", entityClassName );
+		delete.put( "id", idRecord );
+		operations.add( delete );
+		idRecord = null;
+	}
+
+	@Override
+	public void addAdd(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
 		GenericRecord add = new GenericData.Record( protocol.getType( "Add" ) );
 		add.put( "class", entityClassName );
-		add.put( "id", ByteBuffer.wrap( id ) );
+		add.put( "id", idRecord );
 		add.put( "document", document );
 		add.put( "fieldToAnalyzerMap", fieldToAnalyzerMap );
 		operations.add( add );
+		idRecord = null;
 		clearDocument();
 	}
 
 	@Override
-	public void addUpdate(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
+	public void addUpdate(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
 		GenericRecord update = new GenericData.Record( protocol.getType( "Update" ) );
 		update.put( "class", entityClassName );
-		update.put( "id", ByteBuffer.wrap( id ) );
+		update.put( "id", idRecord );
 		update.put( "document", document );
 		update.put( "fieldToAnalyzerMap", fieldToAnalyzerMap );
 		operations.add( update );
+		idRecord = null;
 		clearDocument();
 	}
 
