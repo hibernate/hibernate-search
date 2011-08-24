@@ -270,6 +270,15 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "PositionIncrementAttribute".equals( name ) ) {
 				hydrator.addPositionIncrementAttribute( asInt(record, "positionIncrement") );
 			}
+			else if ( "FlagsAttribute".equals( name ) ) {
+				hydrator.addFlagsAttribute( asInt(record, "flags") );
+			}
+			else if ( "TypeAttribute".equals( name ) ) {
+				hydrator.addTypeAttribute( asString(record, "type") );
+			}
+			else if ( "OffsetAttribute".equals( name ) ) {
+				hydrator.addOffsetAttribute( asInt(record, "startOffset"), asInt(record, "endOffset") );
+			}
 			else {
 				log.unknownAttributeSerializedRepresentation( name );
 			}

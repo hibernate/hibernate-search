@@ -11,6 +11,9 @@
         `attribute/PayloadAttribute`,
         `attribute/KeywordAttribute`,
         `attribute/PositionIncrementAttribute`,
+        `attribute/FlagsAttribute`,
+        `attribute/TypeAttribute`,
+        `attribute/OffsetAttribute`,
 
         `BinaryField`,
         `ReaderField`,

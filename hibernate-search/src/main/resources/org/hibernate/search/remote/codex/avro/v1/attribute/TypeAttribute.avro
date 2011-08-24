@@ -1,0 +1,14 @@
+{
+    "name": "OffsetAttribute",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "startOffset",
+            "type": "int"
+        },
+        {
+            "name": "endOffset",
+            "type": "int"
+        }
+    ]
+}

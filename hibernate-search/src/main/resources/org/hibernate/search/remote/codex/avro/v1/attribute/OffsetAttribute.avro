@@ -1,0 +1,10 @@
+{
+    "name": "TypeAttribute",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "type",
+            "type": "string"
+        }
+    ]
+}
