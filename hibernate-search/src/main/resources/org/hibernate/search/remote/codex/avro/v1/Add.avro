@@ -8,7 +8,7 @@
         },
         {
             "name": "id",
-            "type": "bytes"
+            "type": "Id"
         },
         {
             "name": "document",
