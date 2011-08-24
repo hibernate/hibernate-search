@@ -92,10 +92,11 @@ public class SerializationTest extends SearchTestCase {
 
 	@Test
 	/**
+	 * 20110815
 	 * Our avro serializer is slower (1.6) than Java serialization esp when the VM is not warm (small loop value like = 1000
 	 * In evens up on longer loops like 100000
 	 *
-	 * Our avro serializer is slower (2.5) than Java serialization esp when the VM is not warm (small loop value like = 1000
+	 * Our avro deserializer is slower (2.5) than Java serialization esp when the VM is not warm (small loop value like = 1000
 	 * In evens up or beats the Java serialization on longer loops like 100000
 	 *
 	 * Test done after initial implementation (in particular the schema is not part of the message
@@ -107,6 +108,25 @@ public class SerializationTest extends SearchTestCase {
 	 * Avro serialization: 24245
 	 * Avro message size: 1064
 	 * Avro deserialization: 54444
+	 *
+	 *
+	 * 20110824
+	 * The new Work sample is bigger and Avro's layer has been optimized
+	 * Our avro serializer is faster (1.8 times) than Java serialization for 100000.
+	 *
+	 * Our avro deserializer is faster (2.7 times) than Java serialization for 100000.
+	 *
+	 * The message size is 4.4 smaller in Avro
+	 *
+	 * (the schema is not part of the message)
+	 *
+	 * With 1000000:
+	 * Java serialization: 55786
+	 * Java message size: 4094
+	 * Java deserialization: 160764
+	 * Avro serialization: 30430
+	 * Avro message size: 929
+	 * Avro deserialization: 59255
 	 */
 	public void testAvroSerializationPerf() throws Exception {
 		final int loop = 10; //TODO do 10000 or 100000
