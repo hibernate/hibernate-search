@@ -50,6 +50,7 @@
             <entry>A JDK or JRE version <emphasis>6</emphasis> or greater. You
             can download a Java Runtime for Windows/Linux/Solaris <ulink
             url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</ulink>.
+            Java version <emphasis>7</emphasis> is currently not recommended: see box <xref linkend="java7bugWarning"/>.
             Hibernate Search 3.x was compatible with Java version <emphasis>5</emphasis> too.</entry>
           </row>
 
@@ -93,6 +94,17 @@
         </tbody>
       </tgroup>
     </table>
+    <warning id="java7bugWarning" xreflabel="Hotspot bugs in Java 7 affecting Apache Lucene">
+        <title>Hotspot bugs in Java 7 affecting Apache Lucene</title>
+        <para>It is currently not recommended to use Java 7 yet; the first released version had
+        some hotspot optimization bugs which affect Apache Lucene; Hibernate Search relies on Lucene
+        to provide it's fulltext query capabilities. These bugs could potentially result
+        in JVM crashes or in wrong results by other code as well, not necessarily limited to Lucene.</para>
+        <para>For more details and pointers to the exact bug reports see
+        <ulink url="http://blog.thetaphi.de/2011/07/real-story-behind-java-7-ga-bugs.html">
+        this blogpost</ulink> from a well known Lucene committer; at time of writing it seems
+        the bugs are still unsolved but it seems likely the next updates will contain a fix.</para>
+      </warning>
   </section>
 
   <section>
