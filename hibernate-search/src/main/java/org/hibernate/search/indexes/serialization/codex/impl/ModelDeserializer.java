@@ -138,6 +138,7 @@ public class ModelDeserializer implements Deserializer {
 							safeField.getPrecisionStep(),
 							safeField.getStore(),
 							safeField.isIndexed(),
+							safeField.getBoost(),
 							safeField.isOmitNorms(),
 							safeField.isOmitTermFreqAndPositions()
 					);
@@ -149,6 +150,7 @@ public class ModelDeserializer implements Deserializer {
 							safeField.getPrecisionStep(),
 							safeField.getStore(),
 							safeField.isIndexed(),
+							safeField.getBoost(),
 							safeField.isOmitNorms(),
 							safeField.isOmitTermFreqAndPositions()
 					);
@@ -160,6 +162,7 @@ public class ModelDeserializer implements Deserializer {
 							safeField.getPrecisionStep(),
 							safeField.getStore(),
 							safeField.isIndexed(),
+							safeField.getBoost(),
 							safeField.isOmitNorms(),
 							safeField.isOmitTermFreqAndPositions()
 					);
@@ -171,6 +174,7 @@ public class ModelDeserializer implements Deserializer {
 							safeField.getPrecisionStep(),
 							safeField.getStore(),
 							safeField.isIndexed(),
+							safeField.getBoost(),
 							safeField.isOmitNorms(),
 							safeField.isOmitTermFreqAndPositions()
 					);
