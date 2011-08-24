@@ -31,6 +31,8 @@ import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.serialization.operations.impl.SerializableTokenStream;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Copy all AttributeImpl for each incrementToken
@@ -42,6 +44,7 @@ import org.hibernate.search.indexes.serialization.operations.impl.SerializableTo
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class CopyTokenStream extends TokenStream implements Serializable {
+	private static final Log log = LoggerFactory.make();
 
 	private List<List<AttributeImpl>> cache;
 	private int index;
@@ -52,7 +55,7 @@ public class CopyTokenStream extends TokenStream implements Serializable {
 			return new SerializableTokenStream(stream);
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to read token stream", e );
+			throw log.unableToReadTokenStream();
 		}
 	}
 

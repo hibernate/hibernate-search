@@ -177,7 +177,7 @@ public class AvroSerializer implements Serializer {
 			encoder.flush();
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to serialize message with Avro", e );
+			throw log.unableToSerializeInAvro(e);
 		}
 		return out.toByteArray();
 	}

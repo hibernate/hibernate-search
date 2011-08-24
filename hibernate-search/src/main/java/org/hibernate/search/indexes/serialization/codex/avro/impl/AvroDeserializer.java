@@ -24,7 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +34,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.util.Utf8;
-import org.apache.lucene.util.AttributeImpl;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.codex.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorksBuilder;
 import org.hibernate.search.indexes.serialization.operations.impl.SerializableIndex;
@@ -66,12 +61,12 @@ public class AvroDeserializer implements Deserializer {
 		int majorVersion = inputStream.read();
 		int minorVersion = inputStream.read();
 		if ( AvroSerializationProvider.getMajorVersion() != majorVersion ) {
-			throw new SearchException(
-					"Unable to parse message from protocol version "
-							+ majorVersion + "." + minorVersion
-							+ ". Current protocol version: "
-							+ AvroSerializationProvider.getMajorVersion()
-							+ "." + AvroSerializationProvider.getMinorVersion() );
+			throw log.incompatibleProtocolVersion(
+					majorVersion,
+					minorVersion,
+					AvroSerializationProvider.getMajorVersion(),
+					AvroSerializationProvider.getMinorVersion()
+			);
 		}
 		if ( AvroSerializationProvider.getMinorVersion() < minorVersion ) {
 			//TODO what to do about it? Log each time? Once?
@@ -92,7 +87,7 @@ public class AvroDeserializer implements Deserializer {
 			result = reader.read(null, decoder);
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to deserialize Avro stream", e );
+			throw log.unableToDeserializeAvroStream( e );
 		}
 		List<GenericRecord> operations = asListOfGenericRecords( result, "operations" );
 		for ( GenericRecord operation : operations ) {
@@ -128,7 +123,7 @@ public class AvroDeserializer implements Deserializer {
 				);
 			}
 			else {
-				throw new SearchException( "Unexpected operation type: " + schema );
+				throw log.cannotDeserializeOperation( schema );
 			}
 		}
 	}
@@ -258,7 +253,7 @@ public class AvroDeserializer implements Deserializer {
 				);
 			}
 			else {
-				throw new SearchException( "Unknown Field type: " + schema );
+				throw log.cannotDeserializeField(schema);
 			}
 		}
 	}
