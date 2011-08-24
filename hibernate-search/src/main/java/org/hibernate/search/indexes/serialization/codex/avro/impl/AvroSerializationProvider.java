@@ -53,7 +53,6 @@ public class AvroSerializationProvider implements SerializationProvider {
 	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1/";
 	public static byte MAJOR_VERSION = ( byte ) ( -128 + 1 );
 	public static byte MINOR_VERSION = ( byte ) ( -128 + 0 );
-	private int unique;
 	private Protocol protocol;
 
 	public static int getMajorVersion() {
