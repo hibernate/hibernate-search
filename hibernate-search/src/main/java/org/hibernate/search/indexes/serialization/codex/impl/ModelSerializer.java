@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.indexes.serialization.codex.impl;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ import org.hibernate.search.indexes.serialization.operations.impl.Update;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class ModelSerializer implements Serializer {
+	private Serializable id;
 	private Set<Operation> ops;
 	private Set<SerializableFieldable> serialFields;
 	private SerializableDocument currentDocument;
@@ -74,18 +76,48 @@ public class ModelSerializer implements Serializer {
 	}
 
 	@Override
-	public void addDelete(String entityClassName, byte[] id) {
+	public void addIdSerializedInJava(byte[] id) {
+		this.id = id;
+	}
+
+	@Override
+	public void addIdAsInteger(int id) {
+		this.id = id;
+	}
+
+	@Override
+	public void addIdAsLong(long id) {
+		this.id = id;
+	}
+
+	@Override
+	public void addIdAsFloat(float id) {
+		this.id = id;
+	}
+
+	@Override
+	public void addIdAsDouble(double id) {
+		this.id = id;
+	}
+
+	@Override
+	public void addIdAsString(String id) {
+		this.id = id;
+	}
+
+	@Override
+	public void addDelete(String entityClassName) {
 		ops.add( new Delete( entityClassName, id ) );
 	}
 
 	@Override
-	public void addAdd(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
+	public void addAdd(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
 		ops.add( new Add( entityClassName, id, currentDocument, fieldToAnalyzerMap ) );
 		clearDocument();
 	}
 
 	@Override
-	public void addUpdate(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap) {
+	public void addUpdate(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
 		ops.add( new Update( entityClassName, id, currentDocument, fieldToAnalyzerMap ) );
 		clearDocument();
 	}

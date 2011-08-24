@@ -96,26 +96,26 @@ public class ModelDeserializer implements Deserializer {
 			}
 			else if ( operation instanceof Delete ) {
 				Delete safeOperation = ( Delete ) operation;
+				hydrator.addId( safeOperation.getId() );
 				hydrator.addDeleteLuceneWork(
-						safeOperation.getEntityClassName(),
-						safeOperation.getId()
+						safeOperation.getEntityClassName()
 				);
 			}
 			else if ( operation instanceof Add ) {
 				Add safeOperation = ( Add ) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
+				hydrator.addId( safeOperation.getId() );
 				hydrator.addAddLuceneWork(
 						safeOperation.getEntityClassName(),
-						safeOperation.getId(),
 						safeOperation.getFieldToAnalyzerMap()
 				);
 			}
 			else if ( operation instanceof Update ) {
 				Update safeOperation = ( Update ) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
+				hydrator.addId( safeOperation.getId() );
 				hydrator.addUpdateLuceneWork(
 						safeOperation.getEntityClassName(),
-						safeOperation.getId(),
 						safeOperation.getFieldToAnalyzerMap()
 				);
 			}
