@@ -29,6 +29,8 @@
 
         `Document`,
 
+        `Id`,
+
         `OptimizeAll`,
         `PurgeAll`,
         `Delete`,
