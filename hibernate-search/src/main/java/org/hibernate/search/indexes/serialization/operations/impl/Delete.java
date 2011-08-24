@@ -21,14 +21,16 @@
 package org.hibernate.search.indexes.serialization.operations.impl;
 
 
+import java.io.Serializable;
+
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class Delete implements Operation {
 	private String entityClassName;
-	private byte[] id;
+	private Serializable id;
 
-	public Delete(String entityClassName, byte[] id) {
+	public Delete(String entityClassName, Serializable id) {
 		this.entityClassName = entityClassName;
 		this.id = id;
 	}
@@ -37,7 +39,7 @@ public class Delete implements Operation {
 		return entityClassName;
 	}
 
-	public byte[] getId() {
+	public Serializable getId() {
 		return id;
 	}
 }
