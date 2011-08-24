@@ -73,6 +73,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private Document luceneDocument;
 	private List<AttributeImpl> attributes;
 	private List<List<AttributeImpl>> tokens;
+	private Serializable id;
 
 	public LuceneWorkHydrator(SearchFactoryImplementor searchFactory) {
 		this.searchFactory = searchFactory;
@@ -96,21 +97,30 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addDeleteLuceneWork(String entityClassName, byte[] idAsByte) {
+	public void addIdAsJavaSerialized(byte[] idAsByte) {
+		this.id = toSerializable( idAsByte, loader );
+	}
+
+	@Override
+	public void addId(Serializable id) {
+		this.id = id;
+	}
+
+	@Override
+	public void addDeleteLuceneWork(String entityClassName) {
 		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
-		Serializable id = toSerializable( idAsByte, loader );
 		LuceneWork result = new DeleteLuceneWork(
 				id,
 				objectIdInString(entityClass, id),
 				entityClass
 		);
 		results.add( result );
+		id = null;
 	}
 
 	@Override
-	public void addAddLuceneWork(String entityClassName, byte[] idAsByte, Map<String, String> fieldToAnalyzerMap) {
+	public void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
 		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
-		Serializable id = toSerializable( idAsByte, loader );
 		LuceneWork result = new AddLuceneWork(
 				id,
 				objectIdInString(entityClass, id),
@@ -120,12 +130,16 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		results.add( result );
 		clearDocument();
+		id = null;
 	}
 
 	@Override
-	public void addUpdateLuceneWork(String entityClassName, byte[] idAsByte, Map<String, String> fieldToAnalyzerMap) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
-		Serializable id = toSerializable( idAsByte, loader );
+	public void addUpdateLuceneWork(String entityClassName,  Map<String, String> fieldToAnalyzerMap) {
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				LuceneWorkHydrator.class,
+				"entity class"
+		);
 		LuceneWork result = new UpdateLuceneWork(
 				id,
 				objectIdInString(entityClass, id),
@@ -135,6 +149,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		results.add( result );
 		clearDocument();
+		id = null;
 	}
 
 	private void clearDocument() {

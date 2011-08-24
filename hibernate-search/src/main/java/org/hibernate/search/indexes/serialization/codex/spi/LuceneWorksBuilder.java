@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.indexes.serialization.codex.spi;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -37,11 +38,15 @@ public interface LuceneWorksBuilder {
 
 	void addPurgeAllLuceneWork(String entityClassName);
 
-	void addDeleteLuceneWork(String entityClassName, byte[] id);
+	void addIdAsJavaSerialized(byte[] idAsByte);
 
-	void addAddLuceneWork(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap);
+	void addId(Serializable id);
 
-	void addUpdateLuceneWork(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap);
+	void addDeleteLuceneWork(String entityClassName);
+
+	void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap);
+
+	void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap);
 
 	void defineDocument(float boost);
 

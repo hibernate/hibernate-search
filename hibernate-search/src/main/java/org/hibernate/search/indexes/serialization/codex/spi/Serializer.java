@@ -45,11 +45,23 @@ public interface Serializer {
 
 	void addPurgeAll(String entityClassName);
 
-	void addDelete(String entityClassName, byte[] id);
+	void addIdSerializedInJava(byte[] id);
 
-	void addAdd(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap);
+	void addIdAsInteger(int id);
 
-	void addUpdate(String entityClassName, byte[] id, Map<String, String> fieldToAnalyzerMap);
+	void addIdAsLong(long id);
+
+	void addIdAsFloat(float id);
+
+	void addIdAsDouble(double id);
+
+	void addIdAsString(String id);
+
+	void addDelete(String entityClassName);
+
+	void addAdd(String entityClassName, Map<String, String> fieldToAnalyzerMap);
+
+	void addUpdate(String entityClassName, Map<String, String> fieldToAnalyzerMap);
 
 	byte[] serialize();
 
