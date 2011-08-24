@@ -84,15 +84,18 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 					serializer.addPurgeAll( work.getEntityClass().getName() );
 				}
 				else if (work instanceof DeleteLuceneWork) {
-					serializer.addDelete( work.getEntityClass().getName(), toByteArray( work.getId() ) );
+					processId(work, serializer);
+					serializer.addDelete( work.getEntityClass().getName() );
 				}
 				else if (work instanceof AddLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
-					serializer.addAdd( work.getEntityClass().getName(), toByteArray( work.getId() ), work.getFieldToAnalyzerMap() );
+					processId(work, serializer);
+					serializer.addAdd( work.getEntityClass().getName(),  work.getFieldToAnalyzerMap() );
 				}
 				else if (work instanceof UpdateLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
-					serializer.addUpdate( work.getEntityClass().getName(), toByteArray( work.getId() ), work.getFieldToAnalyzerMap() );
+					processId(work, serializer);
+					serializer.addUpdate( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
 				}
 			}
 			return serializer.serialize();
@@ -104,6 +107,28 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 			else {
 				throw log.unableToSerializeLuceneWorks( e );
 			}
+		}
+	}
+
+	private void processId(LuceneWork work, Serializer serializer) {
+		Serializable id = work.getId();
+		if ( id instanceof Integer ) {
+			serializer.addIdAsInteger( ( Integer ) id );
+		}
+		else if ( id instanceof Long ) {
+			serializer.addIdAsLong( ( Long ) id );
+		}
+		else if ( id instanceof Float ) {
+			serializer.addIdAsFloat( ( Float ) id );
+		}
+		else if ( id instanceof Double ) {
+			serializer.addIdAsDouble( ( Double ) id );
+		}
+		else if ( id instanceof String ) {
+			serializer.addIdAsString( id.toString() );
+		}
+		else {
+			serializer.addIdSerializedInJava( toByteArray( id ) );
 		}
 	}
 
