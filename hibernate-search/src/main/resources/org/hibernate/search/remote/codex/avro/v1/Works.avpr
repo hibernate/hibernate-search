@@ -9,6 +9,7 @@
         `attribute/TokenTrackingAttribute`,
         `attribute/CharTermAttribute`,
         `attribute/PayloadAttribute`,
+        `attribute/KeywordAttribute`,
 
         `BinaryField`,
         `ReaderField`,

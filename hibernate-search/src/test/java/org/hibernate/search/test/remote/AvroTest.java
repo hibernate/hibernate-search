@@ -59,6 +59,7 @@ public class AvroTest {
 		parseSchema( root + "attribute" + File.separator + "TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
 		parseSchema( root + "attribute" + File.separator + "CharTermAttribute.avro", "attribute/CharTermAttribute" );
 		parseSchema( root + "attribute" + File.separator + "PayloadAttribute.avro", "attribute/PayloadAttribute" );
+		parseSchema( root + "attribute" + File.separator + "KeywordAttribute.avro", "attribute/KeywordAttribute" );
 		parseSchema( root + "TermVector.avro", "TermVector" );
 		parseSchema( root + "Index.avro", "Index" );
 		parseSchema( root + "Store.avro", "Store" );

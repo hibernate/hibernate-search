@@ -31,6 +31,8 @@ import java.util.Map;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttributeImpl;
 import org.apache.lucene.document.Document;
@@ -221,6 +223,10 @@ public class SerializationTest extends SearchTestCase {
 		payloadAttribute.setPayload( new Payload( new byte[] {0,1, 2, 3} ) );
 		source.get(0).add( payloadAttribute );
 
+		KeywordAttributeImpl keywordAttr = new KeywordAttributeImpl();
+		keywordAttr.setKeyword( true );
+		source.get(0).add( keywordAttr );
+
 		CopyTokenStream tokenStream = new CopyTokenStream( source );
 		field = new Field("tokenstream", tokenStream);
 		doc.add(field);
@@ -360,6 +366,11 @@ public class SerializationTest extends SearchTestCase {
 				else if ( origAttr instanceof PayloadAttribute) {
 					assertThat( ( (PayloadAttribute) origAttr).getPayload() ).isEqualTo(
 							( ( PayloadAttribute ) copyAttr ).getPayload()
+					);
+				}
+				else if ( origAttr instanceof KeywordAttribute) {
+					assertThat( ( (KeywordAttribute) origAttr).isKeyword() ).isEqualTo(
+							( (KeywordAttribute) copyAttr ).isKeyword()
 					);
 				}
 			}

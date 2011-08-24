@@ -74,7 +74,7 @@ public interface LuceneWorksBuilder {
 
 	void addPayloadAttribute(byte[] payloads);
 
+	void addKeywordAttribute(boolean isKeyword);
+
 	void addToken();
-
-
 }
