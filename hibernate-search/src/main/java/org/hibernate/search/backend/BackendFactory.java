@@ -130,7 +130,7 @@ public class BackendFactory {
 				throw e;
 			}
 			else {
-				throw new SearchException( log.unableToStartSerializationLayer(), e );
+				throw log.unableToStartSerializationLayer( e );
 			}
 		}
 	}

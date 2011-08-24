@@ -79,20 +79,20 @@ public interface Log extends BasicLogger {
 	void jGroupsFlushNotPresentInStack();
 
 	@LogMessage(level = ERROR)
-	@Message(id = 8, value = "Error while trying to create a channel using config files: %s")
+	@Message(id = 8, value = "Error while trying to create a channel using config files: %1$s")
 	void jGroupsChannelCreationUsingFileError(String configuration);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 9, value = "Error while trying to create a channel using config XML: %s")
+	@Message(id = 9, value = "Error while trying to create a channel using config XML: %1$s")
 	void jGroupsChannelCreationUsingXmlError(String configuration);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 10, value = "Error while trying to create a channel using config string: %s")
+	@Message(id = 10, value = "Error while trying to create a channel using config string: %1$s")
 	void jGroupsChannelCreationFromStringError(String configuration);
 
 	@LogMessage(level = INFO)
 	@Message(id = 11,
-			value = "Unable to use any JGroups configuration mechanisms provided in properties %s. Using default JGroups configuration file!")
+			value = "Unable to use any JGroups configuration mechanisms provided in properties %1$s. Using default JGroups configuration file!")
 	void jGroupsConfigurationNotFoundInProperties(Properties props);
 
 	@LogMessage(level = WARN)
@@ -109,31 +109,31 @@ public interface Log extends BasicLogger {
 	void jGroupsClosingChannelError(@Cause Exception toLog);
 
 	@LogMessage(level = INFO)
-	@Message(id = 15, value = "Received new cluster view: %s")
+	@Message(id = 15, value = "Received new cluster view: %1$s")
 	void jGroupsReceivedNewClusterView(Object view);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 16, value = "Incorrect message type: %s")
-	void incorrectMessageType(Class<?> class1);
+	@Message(id = 16, value = "Incorrect message type: %1$s")
+	void incorrectMessageType(Class<?> messageType);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %s")
+	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
 	void interruptedWorkError(Runnable r);
 
 	@LogMessage(level = INFO)
-	@Message(id = 18, value = "Skipping directory synchronization, previous work still in progress: %s")
+	@Message(id = 18, value = "Skipping directory synchronization, previous work still in progress: %1$s")
 	void skippingDirectorySynchronization(String indexName);
 
 	@LogMessage(level = WARN)
-	@Message(id = 19, value = "Unable to remove previous marker file from source of %s")
+	@Message(id = 19, value = "Unable to remove previous marker file from source of %1$s")
 	void unableToRemovePreviousMarket(String indexName);
 
 	@LogMessage(level = WARN)
-	@Message(id = 20, value = "Unable to create current marker in source of %s")
+	@Message(id = 20, value = "Unable to create current marker in source of %1$s")
 	void unableToCreateCurrentMarker(String indexName, @Cause Exception e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 21, value = "Unable to synchronize source of %s")
+	@Message(id = 21, value = "Unable to synchronize source of %1$s")
 	void unableToSynchronizeSource(String indexName, @Cause Exception e);
 
 	@LogMessage(level = WARN)
@@ -146,15 +146,15 @@ public interface Log extends BasicLogger {
 	void unableToCompareSourceWithDestinationDirectory(String source, String destination);
 
 	@LogMessage(level = WARN)
-	@Message(id = 24, value = "Unable to reindex entity on collection change, id cannot be extracted: %s")
+	@Message(id = 24, value = "Unable to reindex entity on collection change, id cannot be extracted: %1$s")
 	void idCannotBeExtracted(String affectedOwnerEntityName);
 
 	@LogMessage(level = WARN)
-	@Message(id = 25, value = "Service provider has been used but not released: %s")
+	@Message(id = 25, value = "Service provider has been used but not released: %1$s")
 	void serviceProviderNotReleased(Class<?> class1);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 26, value = "Fail to properly stop service: %s")
+	@Message(id = 26, value = "Fail to properly stop service: %1$s")
 	void stopServiceFailed(Class<?> class1, @Cause Exception e);
 
 	@LogMessage(level = INFO)
@@ -162,12 +162,12 @@ public interface Log extends BasicLogger {
 	void indexingEntities(long count);
 
 	@LogMessage(level = INFO)
-	@Message(id = 28, value = "Reindexed %d entities")
-	void indexingEntitiesCompleted(long l);
+	@Message(id = 28, value = "Reindexed %1$d entities")
+	void indexingEntitiesCompleted(long nbrOfEntities);
 
 	@LogMessage(level = INFO)
-	@Message(id = 29, value = "Indexing completed. Reindexed %d entities. Unregistering MBean from server")
-	void indexingCompletedAndMBeanUnregistered(long l);
+	@Message(id = 29, value = "Indexing completed. Reindexed %1$d entities. Unregistering MBean from server")
+	void indexingCompletedAndMBeanUnregistered(long nbrOfEntities);
 
 	@LogMessage(level = INFO)
 	@Message(id = 30, value = "%1$d documents indexed in %2$d ms")
@@ -178,15 +178,15 @@ public interface Log extends BasicLogger {
 	void indexingSpeed(float estimateSpeed, float estimatePercentileComplete);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 32, value = "Could not delete %s")
+	@Message(id = 32, value = "Could not delete %1$s")
 	void notDeleted(File file);
 
 	@LogMessage(level = WARN)
-	@Message(id = 33, value = "Could not change timestamp for %s. Index synchronization may be slow.")
+	@Message(id = 33, value = "Could not change timestamp for %1$s. Index synchronization may be slow.")
 	void notChangeTimestamp(File destFile);
 
 	@LogMessage(level = INFO)
-	@Message(id = 34, value = "Hibernate Search %s")
+	@Message(id = 34, value = "Hibernate Search %1$s")
 	void version(String versionString);
 
 	@LogMessage(level = WARN)
@@ -198,7 +198,7 @@ public interface Log extends BasicLogger {
 	void cannotGuessTransactionStatus(@Cause Exception e);
 
 	@LogMessage(level = WARN)
-	@Message(id = 37, value = "Unable to properly close searcher during lucene query: %s")
+	@Message(id = 37, value = "Unable to properly close searcher during lucene query: %1$s")
 	void unableToCloseSearcherDuringQuery(String query, @Cause Exception e);
 
 	@LogMessage(level = WARN)
@@ -216,7 +216,7 @@ public interface Log extends BasicLogger {
 	void unexpectedValueMissingFromFieldCache();
 
 	@LogMessage(level = WARN)
-	@Message(id = 41, value = "Index directory not found, creating: '%s'")
+	@Message(id = 41, value = "Index directory not found, creating: '%1$s'")
 	void indexDirectoryNotFoundCreatingNewOne(String absolutePath);
 
 	@LogMessage(level = WARN)
@@ -232,22 +232,22 @@ public interface Log extends BasicLogger {
 	void abstractClassesCannotInsertDocuments();
 
 	@LogMessage(level = WARN)
-	@Message(id = 45, value = "@ContainedIn is pointing to an entity having @ProvidedId. " +
+	@Message(id = 45, value = "@ContainedIn is pointing to an entity having @ProvidedId: %1$s. " +
 			"This is not supported, indexing of contained in entities will be skipped. " +
 			"Indexed data of the embedded object might become out of date in objects of type ")
 	void containedInPointsToProvidedId(Class<?> objectClass);
 
 	@LogMessage(level = WARN)
 	@Message(id = 46,
-			value = "FieldCache was enabled on class %s but for this type of identifier we can't extract values from the FieldCache: cache disabled")
+			value = "FieldCache was enabled on class %1$s but for this type of identifier we can't extract values from the FieldCache: cache disabled")
 	void cannotExtractValueForIdentifier(Class<?> beanClass);
 
 	@LogMessage(level = WARN)
-	@Message(id = 47, value = "Unable to close JMS connection for %s")
+	@Message(id = 47, value = "Unable to close JMS connection for %1$s")
 	void unableToCloseJmsConnection(String jmsQueueName, @Cause Exception e);
 
 	@LogMessage(level = WARN)
-	@Message(id = 48, value = "Unable to retrieve named analyzer: %s")
+	@Message(id = 48, value = "Unable to retrieve named analyzer: %1$s")
 	void unableToRetrieveNamedAnalyzer(String value);
 
 	@LogMessage(level = WARN)
@@ -281,7 +281,7 @@ public interface Log extends BasicLogger {
 	void unableToCLoseLuceneIndexReader(@Cause Exception e);
 
 	@LogMessage(level = WARN)
-	@Message(id = 56, value = "Unable to un-register existing MBean: ")
+	@Message(id = 56, value = "Unable to un-register existing MBean: %1$s")
 	void unableToUnregisterExistingMBean(String name, @Cause Exception e);
 
 	@LogMessage(level = WARN)
@@ -290,7 +290,7 @@ public interface Log extends BasicLogger {
 	void eventListenerWontBeRegistered();
 
 	@LogMessage(level = ERROR)
-	@Message(id = 58, value = "%s")
+	@Message(id = 58, value = "%1$s")
 	void exceptionOccured(String errorMsg, @Cause Throwable exceptionThatOccurred);
 
 	@LogMessage(level = ERROR)
@@ -307,7 +307,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = ERROR)
 	@Message(id = 62, value = "Batch indexing was interrupted")
-	void interruptedBatchIndexig();
+	void interruptedBatchIndexing();
 
 	@LogMessage(level = ERROR)
 	@Message(id = 63, value = "Error during batch indexing: ")
@@ -318,19 +318,19 @@ public interface Log extends BasicLogger {
 	void errorExecutingRunnableInTransaction(@Cause Throwable e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 65, value = "Error while rollbacking transaction after %s")
+	@Message(id = 65, value = "Error while rollbacking transaction after %1$s")
 	void errorRollbackingTransaction(String message, @Cause Exception e1);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 66, value = "Failed to initialize SlaveDirectoryProvider %s")
+	@Message(id = 66, value = "Failed to initialize SlaveDirectoryProvider %1$s")
 	void failedSlaveDirectoryProviderInitialization(String indexName, @Cause Exception re);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 67, value = "Unable to properly close Lucene directory %s")
+	@Message(id = 67, value = "Unable to properly close Lucene directory %1$s")
 	void unableToCloseLuceneDirectory(Object directory, @Cause Exception e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 68, value = "Unable to retrieve object from message: %s")
+	@Message(id = 68, value = "Unable to retrieve object from message: %1$s")
 	void unableToRetrieveObjectFromMessage(Class<?> messageClass, @Cause Exception e);
 
 	@LogMessage(level = ERROR)
@@ -364,7 +364,7 @@ public interface Log extends BasicLogger {
 	void recommendConfiguringLuceneVersion();
 
 	@LogMessage(level = ERROR)
-	@Message(id = 76, value = "Could not open Lucene index: data is corrupted. index name: \"%s\"")
+	@Message(id = 76, value = "Could not open Lucene index: data is corrupted. index name: '%1$s'")
 	void cantOpenCorruptedIndex(@Cause CorruptIndexException e, String indexName);
 
 	@LogMessage(level = ERROR)
@@ -372,7 +372,7 @@ public interface Log extends BasicLogger {
 	void ioExceptionOnIndex(@Cause IOException e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %s")
+	@Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %1$s")
 	void unableToShutdownAsyncronousIndexingByTimeout(String indexName);
 
 	@LogMessage(level = INFO)
@@ -380,19 +380,19 @@ public interface Log extends BasicLogger {
 	void serializationProtocol(int major, int minor);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 80, value = "Received a remote message about an unknown index '%s': discarding message!")
+	@Message(id = 80, value = "Received a remote message about an unknown index '%1$s': discarding message!")
 	void messageReceivedForUndefinedIndex(String indexName);
 
 	@LogMessage(level = WARN)
-	@Message(id = 81, value = "The index '%s' is using a non-recommended combination of backend and directoryProvider implementations")
+	@Message(id = 81, value = "The index '%1$s' is using a non-recommended combination of backend and directoryProvider implementations")
 	void warnSuspiciousBackendDirectoryCombination(String indexName);
 
-	@Message( value="Unable to start serialization layer", id=82 )
-	String unableToStartSerializationLayer();
+	@Message(id=82, value="Unable to start serialization layer")
+	SearchException unableToStartSerializationLayer(@Cause Throwable e);
 
-	@Message( value="Unable to serialize List<LuceneWork>", id=83 )
-	String unableToSerializeLuceneWorks();
+	@Message(id=83, value="Unable to serialize List<LuceneWork>")
+	SearchException unableToSerializeLuceneWorks(@Cause Throwable e);
 
-	@Message( value="Unable to read serialized List<LuceneWork>", id=84 )
-	String unableToReadSerializedLuceneWorks();
+	@Message(id=84, value="Unable to read serialized List<LuceneWork>")
+	SearchException unableToReadSerializedLuceneWorks(@Cause Throwable e);
 }
