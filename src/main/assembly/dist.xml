@@ -144,6 +144,7 @@
                             <exclude>commons-collections:commons-collections</exclude>
                             <exclude>org.slf4j:slf4j-api</exclude>
                             <exclude>dom4j:dom4j</exclude>
+                            <exclude>commons-lang:commons-lang</exclude>
                         </excludes>
                     </dependencySet>
                 </dependencySets>
@@ -182,10 +183,17 @@
                 <exclude>**/.settings/**</exclude>
                 <exclude>**/.project</exclude>
                 <exclude>**/.classpath</exclude>
+                <exclude>**/.factorypath</exclude>
                 <exclude>**/.externalToolBuilders/**</exclude>
                 <exclude>**/target/**</exclude>
                 <exclude>**/.idea/**</exclude>
                 <exclude>**/*.iml</exclude>
+                <exclude>**/infinispan.log</exclude>
+                <exclude>**/*.sh</exclude>
+                <exclude>**/test-tmp</exclude>
+                <exclude>**/pom.xml.versionsBackup</exclude>
+                <exclude>**/.factorypath</exclude>
+                <exclude>privatebuild</exclude>
             </excludes>
         </fileSet>
     </fileSets>
