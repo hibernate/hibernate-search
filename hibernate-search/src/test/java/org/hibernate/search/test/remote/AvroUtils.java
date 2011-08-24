@@ -81,7 +81,7 @@ public class AvroUtils {
 		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( filename );
 		String protocolSkeleton = AvroUtils.readInputStream( in, filename );
 		String protocolString = inlineSchemas( protocolSkeleton );
-		System.out.println("\n\n" + protocolString + "\n\n");
+		//System.out.println("\n\n" + protocolString + "\n\n");
 		return Protocol.parse( protocolString );
 	}
 
