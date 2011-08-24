@@ -78,5 +78,11 @@ public interface LuceneWorksBuilder {
 
 	void addPositionIncrementAttribute(int positionIncrement);
 
+	void addFlagsAttribute(int flags);
+
+	void addTypeAttribute(String type);
+
+	void addOffsetAttribute(int startOffset, int endOffset);
+
 	void addToken();
 }

@@ -29,9 +29,12 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
@@ -291,7 +294,34 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( PositionIncrementAttribute.class );
-		( (PositionIncrementAttribute) attr).setPositionIncrement(positionIncrement);
+		( (PositionIncrementAttribute) attr).setPositionIncrement( positionIncrement );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addFlagsAttribute(int flags) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( FlagsAttribute.class );
+		( (FlagsAttribute) attr).setFlags( flags );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addTypeAttribute(String type) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( TypeAttribute.class );
+		( (TypeAttribute) attr).setType( type );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addOffsetAttribute(int startOffset, int endOffset) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( OffsetAttribute.class );
+		( (OffsetAttribute) attr).setOffset( startOffset, endOffset );
 		getAttributes().add( attr );
 	}
 

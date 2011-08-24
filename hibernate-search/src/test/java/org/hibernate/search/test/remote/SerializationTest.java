@@ -31,12 +31,18 @@ import java.util.Map;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
+import org.apache.lucene.analysis.tokenattributes.FlagsAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.tokenattributes.TypeAttributeImpl;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
@@ -233,6 +239,18 @@ public class SerializationTest extends SearchTestCase {
 		posIncrAttr.setPositionIncrement( 3 );
 		source.get(0).add( posIncrAttr );
 
+		FlagsAttributeImpl flagsAttr = new FlagsAttributeImpl();
+		flagsAttr.setFlags( 435 );
+		source.get(0).add( flagsAttr );
+
+		TypeAttributeImpl typeAttr = new TypeAttributeImpl();
+		typeAttr.setType( "acronym" );
+		source.get(0).add( typeAttr );
+
+		OffsetAttributeImpl offsetAttr = new OffsetAttributeImpl();
+		offsetAttr.setOffset( 4, 7 );
+		source.get(0).add( offsetAttr );
+
 
 		CopyTokenStream tokenStream = new CopyTokenStream( source );
 		field = new Field("tokenstream", tokenStream);
@@ -384,6 +402,22 @@ public class SerializationTest extends SearchTestCase {
 					assertThat( ( (PositionIncrementAttribute) origAttr).getPositionIncrement() ).isEqualTo(
 							( (PositionIncrementAttribute) copyAttr ).getPositionIncrement()
 					);
+				}
+				else if ( origAttr instanceof FlagsAttribute ) {
+					assertThat( ( (FlagsAttribute) origAttr).getFlags() ).isEqualTo(
+							( (FlagsAttribute) copyAttr ).getFlags()
+					);
+				}
+				else if ( origAttr instanceof TypeAttribute ) {
+					assertThat( ( (TypeAttribute) origAttr).type() ).isEqualTo(
+							( (TypeAttribute) copyAttr ).type()
+					);
+				}
+				else if ( origAttr instanceof OffsetAttribute ) {
+					OffsetAttribute orig = (OffsetAttribute) origAttr;
+					OffsetAttribute cop = (OffsetAttribute) copyAttr;
+					assertThat( orig.startOffset() ).isEqualTo( cop.startOffset() );
+					assertThat( orig.endOffset() ).isEqualTo( cop.endOffset() );
 				}
 			}
 		}

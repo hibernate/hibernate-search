@@ -13,7 +13,10 @@
                         "CharTermAttribute",
                         "PayloadAttribute",
                         "KeywordAttribute",
-                        "PositionIncrementAttribute"
+                        "PositionIncrementAttribute",
+                        "FlagsAttribute",
+                        "TypeAttribute",
+                        "OffsetAttribute"
                     ]
                 }
             }
