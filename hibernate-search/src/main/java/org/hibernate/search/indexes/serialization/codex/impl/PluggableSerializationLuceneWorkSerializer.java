@@ -187,7 +187,8 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 						);
 						break;
 					default:
-					    throw new SearchException( "Unknown NumericField type: " + safeField.getDataType() );
+						String dataType = safeField.getDataType() == null ? "null" : safeField.getDataType().toString();
+						throw log.unknownNumericFieldType( dataType );
 				}
 			}
 			else if (fieldable instanceof Field) {
@@ -202,20 +203,20 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 					serializer.addFieldWithSerializableReaderData( new LuceneFieldContext( safeField ) );
 				}
 				else if ( safeField.readerValue() != null )  {
-					throw new SearchException( "Conversion from Reader to String not yet implemented" );
+					throw log.conversionFromReaderToStringNotYetImplemented();
 				}
 				else if ( safeField.tokenStreamValue() != null )  {
 					serializer.addFieldWithTokenStreamData( new LuceneFieldContext( safeField ) );
 				}
 				else {
-					throw new SearchException( "Unknown value type for Field: " + safeField );
+					throw log.unknownFieldType( safeField.getClass() );
 				}
 			}
 			else if (fieldable instanceof Serializable) { //Today Fieldable is Serializable but for how long?
 				serializer.addFieldWithSerializableFieldable( toByteArray( ( Serializable ) fieldable ) );
 			}
 			else {
-				throw new SearchException( "Cannot serialize custom field '" + fieldable.getClass() + "'. Must be NumericField, Field or a Serializable Fieldable implementation." );
+				throw log.cannotSerializeCustomField( fieldable.getClass() );
 			}
 		}
 		serializer.addDocument( document.getBoost() );

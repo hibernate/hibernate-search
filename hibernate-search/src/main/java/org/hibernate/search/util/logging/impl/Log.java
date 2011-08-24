@@ -28,8 +28,12 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Properties;
 
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
@@ -38,6 +42,8 @@ import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializationProvider;
+import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
 
 /**
  * Hibernate Search's log abstraction layer on top of JBoss Logging.
@@ -401,4 +407,53 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 86, value = "Unknown attribute serialzied representation: %1$s")
 	SearchException unknownAttributeSerializedRepresentation(String name);
+
+	@Message(id = 87, value = "Unable to read TokenStream")
+	SearchException unableToReadTokenStream();
+
+	@Message(id = 88, value = "Unable to convert serializable TermVector to Lucene TermVector: %1$s")
+	SearchException unableToConvertSerializableTermVectorToLuceneTermVector(String termVector);
+
+	@Message(id = 89, value = "Unable to convert serializable Index to Lucene Index: %1$s")
+	SearchException unableToConvertSerializableIndexToLuceneIndex(String index);
+
+	@Message(id = 90, value = "Unable to convert serializable Store to Lucene Store: %1$s")
+	SearchException unableToConvertSerializableStoreToLuceneStore(String store);
+
+	@Message(id = 91, value = "Unknown NumericField type: %1$s")
+	SearchException unknownNumericFieldType(String dataType);
+
+	@Message(id = 92, value = "Conversion from Reader to String not yet implemented")
+	SearchException conversionFromReaderToStringNotYetImplemented();
+
+	@Message(id = 93, value = "Unknown Field type: %1$s")
+	SearchException unknownFieldType(Class<?> fieldType);
+
+	@Message(id = 94, value = "Cannot serialize custom Fieldable '%1$s'. Must be NumericField, Field or a Serializable Fieldable implementation.")
+	SearchException cannotSerializeCustomField(Class<?> fieldType);
+
+	@Message(id = 95, value = "Fail to serialize object of type %1$s")
+	SearchException failToSerializeObject(Class<?> type, @Cause Throwable e);
+
+	@Message(id = 96, value = "Fail to deserialize object")
+	SearchException failToDeserializeObject(@Cause Throwable e);
+
+	@Message(id = 97, value = "Unable to read file %1$s")
+	SearchException unableToReadFile(String filename, @Cause Throwable e);
+
+	@Message(id = 98, value = "Unable to parse message from protocol version %1$d.%2$d. "
+							+ "Current protocol version: %3$d.%4$d")
+	SearchException incompatibleProtocolVersion(int messageMajor, int messageMinor, int currentMajor, int currentMinor);
+
+	@Message(id = 99, value = "Unable to deserialize Avro stream")
+	SearchException unableToDeserializeAvroStream(@Cause Throwable e);
+
+	@Message(id = 100, value = "Cannot deserialize operation %1$s, unknown operation.")
+	SearchException cannotDeserializeOperation(String schema);
+
+	@Message(id = 101, value = "Cannot deserialize field type %1$s, unknown field type.")
+	SearchException cannotDeserializeField(String schema);
+
+	@Message(id = 102, value = "Unable to serialize Lucene works in Avro")
+	SearchException unableToSerializeInAvro(@Cause Throwable e);
 }

@@ -139,7 +139,7 @@ public class AvroSerializationProvider implements SerializationProvider {
 			return writer.toString();
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to read " + filename, e );
+			throw log.unableToReadFile(filename, e);
 		}
 	}
 

@@ -29,12 +29,14 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializationHelper {
+	private static Log log = LoggerFactory.make();
 	public static byte[] toByteArray(Serializable instance) {
 		//no need to close ByteArrayOutputStream
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -44,7 +46,7 @@ public class SerializationHelper {
 			stream.close();
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to serialize object: " + instance.getClass(), e );
+			throw log.failToSerializeObject(instance.getClass(), e);
 		}
 		return out.toByteArray();
 	}
@@ -56,10 +58,10 @@ public class SerializationHelper {
 			return (T) in.readObject();
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to deserialize object", e );
+			throw log.failToDeserializeObject(e);
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new SearchException( "Unable to deserialize object", e );
+			throw log.failToDeserializeObject(e);
 		}
 	}
 
@@ -70,10 +72,10 @@ public class SerializationHelper {
 			return (Serializable) in.readObject();
 		}
 		catch ( IOException e ) {
-			throw new SearchException( "Unable to deserialize object", e );
+			throw log.failToDeserializeObject(e);
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new SearchException( "Unable to deserialize object", e );
+			throw log.failToDeserializeObject(e);
 		}
 	}
 

@@ -59,6 +59,8 @@ import org.hibernate.search.indexes.serialization.operations.impl.SerializableIn
 import org.hibernate.search.indexes.serialization.operations.impl.SerializableStore;
 import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.*;
 import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.toSerializable;
@@ -67,6 +69,8 @@ import static org.hibernate.search.indexes.serialization.codex.impl.Serializatio
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class LuceneWorkHydrator implements LuceneWorksBuilder {
+	private static final Log log = LoggerFactory.make();
+
 	private SearchFactoryImplementor searchFactory;
 	private List<LuceneWork> results;
 	private ClassLoader loader;
@@ -379,7 +383,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 			case YES:
 				return Field.TermVector.YES;
 			 default:
-				throw new SearchException( "Unable to convert serializable TermVector to Lucene TermVector: " + termVector );
+				throw log.unableToConvertSerializableTermVectorToLuceneTermVector( termVector.toString() );
 		}
 	}
 
@@ -396,7 +400,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 			case NOT_ANALYZED_NO_NORMS:
 				return Field.Index.NOT_ANALYZED_NO_NORMS;
 			default:
-				throw new SearchException( "Unable to convert serializable Index to Lucene Index: " + index );
+				throw log.unableToConvertSerializableIndexToLuceneIndex( index.toString() );
 		}
 	}
 
@@ -407,7 +411,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 			case YES:
 				return Field.Store.YES;
 			default:
-				throw new SearchException( "Unable to convert serializable Store to Lucene Store: " + store );
+				throw log.unableToConvertSerializableStoreToLuceneStore( store.toString() );
 		}
 	}
 
