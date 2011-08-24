@@ -23,6 +23,7 @@ package org.hibernate.search.test.remote;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +56,14 @@ public class AvroTest {
 	@Test
 	public void experimentWithAvro() throws Exception {
 		String root = "org/hibernate/search/remote/codex/avro/v1/";
+		parseSchema( root + "attribute" + File.separator + "TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
+		parseSchema( root + "attribute" + File.separator + "CharTermAttribute.avro", "attribute/CharTermAttribute" );
+		parseSchema( root + "attribute" + File.separator + "PayloadAttribute.avro", "attribute/PayloadAttribute" );
+		parseSchema( root + "attribute" + File.separator + "KeywordAttribute.avro", "attribute/KeywordAttribute" );
+		parseSchema( root + "attribute" + File.separator + "PositionIncrementAttribute.avro", "attribute/PositionIncrementAttribute" );
+		parseSchema( root + "attribute" + File.separator + "FlagsAttribute.avro", "attribute/FlagsAttribute" );
+		parseSchema( root + "attribute" + File.separator + "TypeAttribute.avro", "attribute/TypeAttribute" );
+		parseSchema( root + "attribute" + File.separator + "OffsetAttribute.avro", "attribute/OffsetAttribute" );
 		parseSchema( root + "TermVector.avro", "TermVector" );
 		parseSchema( root + "Index.avro", "Index" );
 		parseSchema( root + "Store.avro", "Store" );
@@ -81,6 +90,7 @@ public class AvroTest {
 		final Schema termVectorSchema = protocol.getType( "TermVector" );
 		final Schema indexSchema = protocol.getType( "Index" );
 		final Schema storeSchema = protocol.getType( "Store" );
+		final Schema tokenTrackingAttribute = protocol.getType( "TokenTrackingAttribute" );
 		final Schema tokenStreamSchema = protocol.getType( "TokenStreamField" );
 		final Schema readerSchema = protocol.getType( "ReaderField" );
 		final Schema stringSchema = protocol.getType( "StringField" );
@@ -141,10 +151,21 @@ public class AvroTest {
 		field.put( "termVector", "WITH_OFFSETS" );
 		fieldables.add( field );
 		field = createField( tokenStreamSchema );
-		List<List<ByteBuffer>> tokenStr = new ArrayList<List<ByteBuffer>>();
-		tokenStr.add( new ArrayList<ByteBuffer>() );
-		tokenStr.get( 0 ).add( ByteBuffer.wrap( serializableSample ) );
-		field.put( "value", tokenStr );
+
+		List<List<Object>> tokens = new ArrayList<List<Object>>(  );
+		List<Object> attrs = new ArrayList<Object>(  );
+		tokens.add( attrs );
+		GenericData.Record attr = new GenericData.Record( tokenTrackingAttribute );
+		List<Integer> positions = new ArrayList<Integer>();
+		positions.add(1);
+		positions.add(2);
+		positions.add(3);
+		positions.add(4);
+		attr.put( "positions", positions);
+		attrs.add( attr );
+		attrs.add( ByteBuffer.wrap( serializableSample ) );
+
+		field.put( "value", tokens );
 		field.put( "termVector", "WITH_OFFSETS" );
 		fieldables.add( field );
 		field = createField( readerSchema );
@@ -271,9 +292,10 @@ public class AvroTest {
 				field = ( GenericRecord ) fields.get( 7 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "TokenStreamField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( List.class );
-				List<List<ByteBuffer>> l1 = ( List<List<ByteBuffer>> ) field.get( "value" );
-				bb = l1.get( 0 ).get( 0 );
-				assertThat( bb ).isNotNull();
+				List<List<Object>> l1 = ( List<List<Object>> ) field.get( "value" );
+				assertThat( l1.get( 0 ) ).as("Wrong attribute impl list").hasSize( 2 );
+				Object object = l1.get( 0 ).get( 0 );
+				assertThat( object ).isNotNull();
 				assertTermVector( field );
 				asserField( field );
 
@@ -288,6 +310,7 @@ public class AvroTest {
 			}
 			catch ( Exception ex ) {
 				ex.printStackTrace();
+				throw ex;
 			}
 		}
 	}

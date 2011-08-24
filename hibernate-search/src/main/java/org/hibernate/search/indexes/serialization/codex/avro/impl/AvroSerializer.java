@@ -23,6 +23,7 @@ package org.hibernate.search.indexes.serialization.codex.avro.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,17 @@ import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.EncoderFactory;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.util.AttributeImpl;
+import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -44,11 +55,17 @@ import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
 import org.hibernate.search.indexes.serialization.operations.impl.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.operations.impl.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.toByteArray;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class AvroSerializer implements Serializer {
+	private static final Log log = LoggerFactory.make();
+
 	private List<GenericRecord> fieldables;
 	private List<GenericRecord> operations;
 	private GenericRecord document;
@@ -203,9 +220,80 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public void addFieldWithTokenStreamData(LuceneFieldContext context) {
 		GenericRecord field = createNormalField( "TokenStreamField", context );
-		field.put( "value", context.getTokenStream().getStream() );
+		List<List<AttributeImpl>> stream = context.getTokenStream().getStream();
+		List<List<Object>> value = new ArrayList<List<Object>>( stream.size() );
+		for( List<AttributeImpl> attrs : stream ) {
+			List<Object> elements = new ArrayList<Object>( attrs.size() );
+			for(AttributeImpl attr : attrs) {
+				elements.add( buildAttributeImpl( attr ) );
+			}
+			value.add(elements);
+		}
+		field.put( "value", value );
 		field.put( "termVector", context.getTermVector() );
 		fieldables.add( field );
+	}
+
+	private Object buildAttributeImpl(AttributeImpl attr) {
+		if ( attr instanceof AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "TokenTrackingAttribute" ) );
+			int[] positions = ( (AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) attr ).getPositions();
+			List<Integer> fullPositions = new ArrayList<Integer>( positions.length );
+			for (int position : positions) {
+				fullPositions.add( position );
+			}
+			record.put( "positions", fullPositions );
+			return record;
+		}
+		else if (attr instanceof CharTermAttributeImpl) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "CharTermAttribute" ) );
+			CharTermAttribute charAttr = (CharTermAttribute) attr;
+			record.put("sequence", charAttr.toString() );
+			return record;
+		}
+		else if (attr instanceof PayloadAttribute) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "PayloadAttribute" ) );
+			PayloadAttribute payloadAttr = (PayloadAttribute) attr;
+			record.put("payload", ByteBuffer.wrap( payloadAttr.getPayload().toByteArray() ) );
+			return record;
+		}
+		else if (attr instanceof KeywordAttribute) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "KeywordAttribute" ) );
+			KeywordAttribute narrowedAttr = (KeywordAttribute) attr;
+			record.put("isKeyword", narrowedAttr.isKeyword() );
+			return record;
+		}
+		else if (attr instanceof PositionIncrementAttribute ) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "PositionIncrementAttribute" ) );
+			PositionIncrementAttribute narrowedAttr = (PositionIncrementAttribute) attr;
+			record.put("positionIncrement", narrowedAttr.getPositionIncrement() );
+			return record;
+		}
+		else if (attr instanceof FlagsAttribute ) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "FlagsAttribute" ) );
+			FlagsAttribute narrowedAttr = (FlagsAttribute) attr;
+			record.put("flags", narrowedAttr.getFlags() );
+			return record;
+		}
+		else if (attr instanceof TypeAttribute ) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "TypeAttribute" ) );
+			TypeAttribute narrowedAttr = (TypeAttribute) attr;
+			record.put("type", narrowedAttr.type() );
+			return record;
+		}
+		else if (attr instanceof OffsetAttribute ) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "OffsetAttribute" ) );
+			OffsetAttribute narrowedAttr = (OffsetAttribute) attr;
+			record.put("startOffset", narrowedAttr.startOffset() );
+			record.put("endOffset", narrowedAttr.endOffset() );
+			return record;
+		}
+		else if (attr instanceof Serializable) {
+			return ByteBuffer.wrap( toByteArray(attr) );
+		}
+		else {
+			throw log.attributeNotRecognizedNorSerializable( attr.getClass() );
+		}
 	}
 
 	@Override

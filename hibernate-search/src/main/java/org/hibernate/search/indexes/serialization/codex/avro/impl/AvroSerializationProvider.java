@@ -21,6 +21,7 @@
 package org.hibernate.search.indexes.serialization.codex.avro.impl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -78,6 +79,14 @@ public class AvroSerializationProvider implements SerializationProvider {
 		parseSchema( "TermVector" );
 		parseSchema( "Index" );
 		parseSchema( "Store" );
+		parseSchema( "attribute/TokenTrackingAttribute" );
+		parseSchema( "attribute/CharTermAttribute" );
+		parseSchema( "attribute/PayloadAttribute" );
+		parseSchema( "attribute/KeywordAttribute" );
+		parseSchema( "attribute/PositionIncrementAttribute" );
+		parseSchema( "attribute/FlagsAttribute" );
+		parseSchema( "attribute/TypeAttribute" );
+		parseSchema( "attribute/OffsetAttribute" );
 		parseSchema( "TokenStreamField" );
 		parseSchema( "ReaderField" );
 		parseSchema( "StringField" );
@@ -99,11 +108,12 @@ public class AvroSerializationProvider implements SerializationProvider {
 	}
 
 	private void parseSchema(String filename) {
-		String fullFileNameileName = V1_PATH + filename + ".avro";
-		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( fullFileNameileName );
+		String fullFileName = V1_PATH + filename + ".avro";
+		fullFileName = fullFileName.replace( '/', File.separatorChar );
+		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( fullFileName );
 		String messageSchemaAsString;
 		try {
-			messageSchemaAsString = readInputStream( in, fullFileNameileName );
+			messageSchemaAsString = readInputStream( in, fullFileName );
 		}
 		finally {
 			try {

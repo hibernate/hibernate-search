@@ -1,0 +1,10 @@
+{
+    "name": "FlagsAttribute",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "flags",
+            "type": "int"
+        }
+    ]
+}

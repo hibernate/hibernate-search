@@ -23,6 +23,7 @@ package org.hibernate.search.indexes.serialization.codex.avro.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,11 +216,9 @@ public class AvroDeserializer implements Deserializer {
 				);
 			}
 			else if ( "TokenStreamField".equals( schema ) ) {
+				buildAttributes(field, "value", hydrator);
 				hydrator.addFieldWithTokenStreamData(
 						asString( field, "name" ),
-						//FIXME remove serialization
-						( List<List<AttributeImpl>> ) SerializationHelper.toSerializable(
-								asByteArray( field, "value" ), Thread.currentThread().getContextClassLoader() ),
 						asTermVector( field ),
 						asFloat( field, "boost" ),
 						asBoolean( field, "omitNorms" ),
@@ -239,6 +238,56 @@ public class AvroDeserializer implements Deserializer {
 			else {
 				throw new SearchException( "Unknown Field type: " + schema );
 			}
+		}
+	}
+
+	private void buildAttributes(GenericRecord record, String field, LuceneWorksBuilder hydrator) {
+		List<List<?>> tokens = (List<List<?>>) record.get( field );
+		for ( List<?> token : tokens ) {
+			for(Object attribute : token) {
+				buildAttribute( attribute, hydrator );
+			}
+			hydrator.addToken();
+		}
+	}
+
+	private void buildAttribute(Object element, LuceneWorksBuilder hydrator) {
+		if ( element instanceof GenericRecord ) {
+			GenericRecord record = (GenericRecord) element;
+			String name = record.getSchema().getName();
+			if ( "TokenTrackingAttribute".equals( name ) ) {
+				hydrator.addTokenTrackingAttribute( (List<Integer>) record.get( "positions" ) );
+			}
+			else if ( "CharTermAttribute".equals( name ) ) {
+				hydrator.addCharTermAttribute( (CharSequence) record.get( "sequence" ) );
+			}
+			else if ( "PayloadAttribute".equals( name ) ) {
+				hydrator.addPayloadAttribute( asByteArray(record, "payload") );
+			}
+			else if ( "KeywordAttribute".equals( name ) ) {
+				hydrator.addKeywordAttribute( asBoolean(record, "isKeyword") );
+			}
+			else if ( "PositionIncrementAttribute".equals( name ) ) {
+				hydrator.addPositionIncrementAttribute( asInt(record, "positionIncrement") );
+			}
+			else if ( "FlagsAttribute".equals( name ) ) {
+				hydrator.addFlagsAttribute( asInt(record, "flags") );
+			}
+			else if ( "TypeAttribute".equals( name ) ) {
+				hydrator.addTypeAttribute( asString(record, "type") );
+			}
+			else if ( "OffsetAttribute".equals( name ) ) {
+				hydrator.addOffsetAttribute( asInt(record, "startOffset"), asInt(record, "endOffset") );
+			}
+			else {
+				log.unknownAttributeSerializedRepresentation( name );
+			}
+		}
+		if ( element instanceof ByteBuffer) {
+			hydrator.addSerializedAttribute( asByteArray( (ByteBuffer) element ) );
+		}
+		else {
+			log.unknownAttributeSerializedRepresentation( element.getClass().getName() );
 		}
 	}
 
@@ -291,6 +340,10 @@ public class AvroDeserializer implements Deserializer {
 
 	private byte[] asByteArray(GenericRecord operation, String field) {
 		ByteBuffer buffer = (ByteBuffer) operation.get(field);
+		return asByteArray( buffer );
+	}
+
+	private byte[] asByteArray(ByteBuffer buffer) {
 		byte[] copy = new byte[buffer.remaining()];
 		buffer.get( copy );
 		return copy;

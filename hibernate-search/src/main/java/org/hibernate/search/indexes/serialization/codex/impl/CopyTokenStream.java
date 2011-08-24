@@ -21,6 +21,7 @@
 package org.hibernate.search.indexes.serialization.codex.impl;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +41,7 @@ import org.hibernate.search.indexes.serialization.operations.impl.SerializableTo
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class CopyTokenStream extends TokenStream {
+public class CopyTokenStream extends TokenStream implements Serializable {
 
 	private List<List<AttributeImpl>> cache;
 	private int index;

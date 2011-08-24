@@ -4,7 +4,22 @@
     "fields" : [
         {
             "name": "value",
-            "type": {"type": "array", "items":{"type": "array", "items":"bytes"}}
+            "type": {"type": "array", "items":
+                {
+                    "type": "array",
+                    "items": [
+                        "bytes",
+                        "TokenTrackingAttribute",
+                        "CharTermAttribute",
+                        "PayloadAttribute",
+                        "KeywordAttribute",
+                        "PositionIncrementAttribute",
+                        "FlagsAttribute",
+                        "TypeAttribute",
+                        "OffsetAttribute"
+                    ]
+                }
+            }
         },
         {
             "name": "termVector",

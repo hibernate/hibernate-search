@@ -23,14 +23,26 @@ package org.hibernate.search.indexes.serialization.codex.impl;
 import java.io.Reader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.index.Payload;
 import org.apache.lucene.util.AttributeImpl;
+import org.apache.lucene.util.AttributeSource;
+import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -49,6 +61,7 @@ import org.hibernate.search.indexes.serialization.operations.impl.SerializableTe
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.*;
+import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.toSerializable;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -58,6 +71,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private List<LuceneWork> results;
 	private ClassLoader loader;
 	private Document luceneDocument;
+	private List<AttributeImpl> attributes;
+	private List<List<AttributeImpl>> tokens;
 
 	public LuceneWorkHydrator(SearchFactoryImplementor searchFactory) {
 		this.searchFactory = searchFactory;
@@ -208,9 +223,14 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addFieldWithTokenStreamData(String name, List<List<AttributeImpl>> tokenStream, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		Field luceneField = new Field( name, new CopyTokenStream(tokenStream), getTermVector( termVector ) );
+	public void addFieldWithTokenStreamData(String name, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		Field luceneField = new Field( name, new CopyTokenStream(tokens), getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
+		clearTokens();
+	}
+
+	private void clearTokens() {
+		tokens = new ArrayList<List<AttributeImpl>>(  );
 	}
 
 	@Override
@@ -218,6 +238,101 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		Reader value = (Reader) toSerializable( valueAsByte, loader );
 		Field luceneField = new Field( name, value, getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
+	}
+
+	@Override
+	public void addSerializedAttribute(byte[] bytes) {
+		getAttributes().add( ( AttributeImpl ) toSerializable( bytes, loader ) );
+	}
+
+	@Override
+	public void addAttributeInstance(AttributeImpl attribute) {
+		getAttributes().add( attribute );
+	}
+
+	@Override
+	public void addTokenTrackingAttribute(List<Integer> positions) {
+		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attr = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
+		int size = positions.size() - 1;
+		int[] basePosition = new int[size];
+		for(int index = 0 ; index < size ; index++) {
+			basePosition[index] = positions.get( index );
+		}
+		attr.reset( basePosition, positions.get( size ) );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addCharTermAttribute(CharSequence sequence) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( CharTermAttribute.class );
+		( (CharTermAttribute) attr).append( sequence );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addPayloadAttribute(byte[] payloads) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( PayloadAttribute.class );
+		( (PayloadAttribute) attr).setPayload( new Payload( payloads ) );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addKeywordAttribute(boolean isKeyword) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( KeywordAttribute.class );
+		( (KeywordAttribute) attr).setKeyword( isKeyword );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addPositionIncrementAttribute(int positionIncrement) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( PositionIncrementAttribute.class );
+		( (PositionIncrementAttribute) attr).setPositionIncrement( positionIncrement );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addFlagsAttribute(int flags) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( FlagsAttribute.class );
+		( (FlagsAttribute) attr).setFlags( flags );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addTypeAttribute(String type) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( TypeAttribute.class );
+		( (TypeAttribute) attr).setType( type );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addOffsetAttribute(int startOffset, int endOffset) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( OffsetAttribute.class );
+		( (OffsetAttribute) attr).setOffset( startOffset, endOffset );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addToken() {
+		getTokens().add( getAttributes() );
+		clearAttributes();
+	}
+
+	private void clearAttributes() {
+		attributes = new ArrayList<AttributeImpl>(  );
 	}
 
 	private Document getLuceneDocument() {
@@ -279,5 +394,19 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 			default:
 				throw new SearchException( "Unable to convert serializable Store to Lucene Store: " + store );
 		}
+	}
+
+	public List<AttributeImpl> getAttributes() {
+		if (attributes == null) {
+			attributes = new ArrayList<AttributeImpl>();
+		}
+		return attributes;
+	}
+
+	public List<List<AttributeImpl>> getTokens() {
+		if (tokens == null) {
+			tokens = new ArrayList<List<AttributeImpl>>(  );
+		}
+		return tokens;
 	}
 }
