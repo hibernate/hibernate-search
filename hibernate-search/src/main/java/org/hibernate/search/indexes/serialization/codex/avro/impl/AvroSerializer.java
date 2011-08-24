@@ -38,6 +38,7 @@ import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.util.AttributeImpl;
@@ -250,6 +251,12 @@ public class AvroSerializer implements Serializer {
 			GenericRecord record = new GenericData.Record( protocol.getType( "PayloadAttribute" ) );
 			PayloadAttribute payloadAttr = (PayloadAttribute) attr;
 			record.put("payload", ByteBuffer.wrap( payloadAttr.getPayload().toByteArray() ) );
+			return record;
+		}
+		else if (attr instanceof KeywordAttribute) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "KeywordAttribute" ) );
+			KeywordAttribute narrowedAttr = (KeywordAttribute) attr;
+			record.put("isKeyword", narrowedAttr.isKeyword() );
 			return record;
 		}
 		else if (attr instanceof Serializable) {

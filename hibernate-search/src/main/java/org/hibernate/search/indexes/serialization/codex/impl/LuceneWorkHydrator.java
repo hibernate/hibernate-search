@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -272,6 +273,15 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( PayloadAttribute.class );
 		( (PayloadAttribute) attr).setPayload( new Payload( payloads ) );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addKeywordAttribute(boolean isKeyword) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( KeywordAttribute.class );
+		( (KeywordAttribute) attr).setKeyword(isKeyword);
 		getAttributes().add( attr );
 	}
 

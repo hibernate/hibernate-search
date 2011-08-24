@@ -1,0 +1,10 @@
+{
+    "name": "KeywordAttribute",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "isKeyword",
+            "type": "boolean"
+        }
+    ]
+}

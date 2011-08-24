@@ -11,7 +11,8 @@
                         "bytes",
                         "TokenTrackingAttribute",
                         "CharTermAttribute",
-                        "PayloadAttribute"
+                        "PayloadAttribute",
+                        "KeywordAttribute"
                     ]
                 }
             }
