@@ -23,7 +23,7 @@
   -->
 
 <!ENTITY version "WORKING">
-<!ENTITY hibernateVersion "3.6.3.Final">
+<!ENTITY hibernateVersion "3.6.7.Final">
 <!ENTITY today "TODAY">
 <!ENTITY copyrightYear "2004">
 <!ENTITY copyrightHolder "Red Hat Inc., Emmanuel Bernard and the various authors">
