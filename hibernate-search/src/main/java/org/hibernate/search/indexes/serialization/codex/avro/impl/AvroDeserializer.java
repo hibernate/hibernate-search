@@ -173,6 +173,7 @@ public class AvroDeserializer implements Deserializer {
 							asInt( field, "precisionStep" ),
 							asStore( field ),
 							asBoolean(field, "indexed"),
+							asFloat( field, "boost" ),
 							asBoolean( field, "omitNorms" ),
 							asBoolean( field, "omitTermFreqAndPositions" )
 				);
@@ -184,6 +185,7 @@ public class AvroDeserializer implements Deserializer {
 							asInt( field, "precisionStep" ),
 							asStore( field ),
 							asBoolean(field, "indexed"),
+							asFloat( field, "boost" ),
 							asBoolean( field, "omitNorms" ),
 							asBoolean( field, "omitTermFreqAndPositions" )
 				);
@@ -195,6 +197,7 @@ public class AvroDeserializer implements Deserializer {
 							asInt( field, "precisionStep" ),
 							asStore( field ),
 							asBoolean(field, "indexed"),
+							asFloat( field, "boost" ),
 							asBoolean( field, "omitNorms" ),
 							asBoolean( field, "omitTermFreqAndPositions" )
 				);
@@ -206,6 +209,7 @@ public class AvroDeserializer implements Deserializer {
 							asInt( field, "precisionStep" ),
 							asStore( field ),
 							asBoolean(field, "indexed"),
+							asFloat( field, "boost" ),
 							asBoolean( field, "omitNorms" ),
 							asBoolean( field, "omitTermFreqAndPositions" )
 				);

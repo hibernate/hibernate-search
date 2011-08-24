@@ -192,6 +192,9 @@ public class SerializationTest extends SearchTestCase {
 		doc.setBoost( 2.3f );
 		NumericField numField = new NumericField( "double", 23, Field.Store.NO, true );
 		numField.setDoubleValue( 23d );
+		numField.setOmitNorms( true );
+		numField.setOmitTermFreqAndPositions( true );
+		numField.setBoost( 3f );
 		doc.add( numField );
 		numField = new NumericField( "int", 23, Field.Store.NO, true );
 		numField.setIntValue( 23 );
@@ -216,6 +219,9 @@ public class SerializationTest extends SearchTestCase {
 				Field.Index.ANALYZED,
 				Field.TermVector.WITH_OFFSETS
 		);
+		field.setOmitNorms( true );
+		field.setOmitTermFreqAndPositions( true );
+		field.setBoost( 3f );
 		doc.add( field );
 
 		field = new Field(
@@ -242,7 +248,10 @@ public class SerializationTest extends SearchTestCase {
 		List<List<AttributeImpl>> tokens = buildTokenSteamWithAttributes();
 
 		CopyTokenStream tokenStream = new CopyTokenStream( tokens );
-		field = new Field("tokenstream", tokenStream);
+		field = new Field("tokenstream", tokenStream, Field.TermVector.WITH_POSITIONS_OFFSETS);
+		field.setOmitNorms( true );
+		field.setOmitTermFreqAndPositions( true );
+		field.setBoost( 3f );
 		doc.add(field);
 
 		works.add( new UpdateLuceneWork( 1234, "1234", RemoteEntity.class, doc ) );
@@ -324,23 +333,7 @@ public class SerializationTest extends SearchTestCase {
 		assertThat( work.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
 		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
 				.isEqualTo( copy.getFieldToAnalyzerMap() );
-		//TODO To be addressed by HSEARCH-834 merge  assertTokenStreams with assertDocument
-		//assertDocument( work.getDocument(), copy.getDocument() );
-		assertDocumentTokenStreams( work.getDocument(), copy.getDocument() );
-	}
-
-	//TODO To be addressed by HSEARCH-834 merge  assertTokenStreams with assertDocument
-		//assertDocument( work.getDocument(), copy.getDocument() );
-	private void assertDocumentTokenStreams(Document document, Document copy) {
-		for ( int index = 0; index < document.getFields().size(); index++ ) {
-			Fieldable field = document.getFields().get( index );
-			Fieldable fieldCopy = copy.getFields().get( index );
-			assertThat( field ).isInstanceOf( fieldCopy.getClass() );
-			if ( field instanceof Field ) {
-				assertNormalField( ( Field ) field, ( Field ) fieldCopy );
-
-			}
-		}
+		assertDocument( work.getDocument(), copy.getDocument() );
 	}
 
 	private void assertDocument(Document document, Document copy) {
@@ -369,7 +362,7 @@ public class SerializationTest extends SearchTestCase {
 		assertThat( copy.isBinary() ).isEqualTo( field.isBinary() );
 		assertThat( copy.isIndexed() ).isEqualTo( field.isIndexed() );
 		assertThat( copy.isLazy() ).isEqualTo( field.isLazy() );
-		assertThat( copy.isStoreOffsetWithTermVector() ).as("store offset with position missing").isEqualTo( field.isStoreOffsetWithTermVector() );
+		assertThat( copy.isStoreOffsetWithTermVector() ).isEqualTo( field.isStoreOffsetWithTermVector() );
 		assertThat( copy.isStorePositionWithTermVector() ).isEqualTo( field.isStorePositionWithTermVector() );
 		assertThat( copy.isStored() ).isEqualTo( field.isStored() );
 		assertThat( copy.isTokenized() ).isEqualTo( field.isTokenized() );

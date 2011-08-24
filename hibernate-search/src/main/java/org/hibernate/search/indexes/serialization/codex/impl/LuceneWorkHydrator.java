@@ -23,12 +23,10 @@ package org.hibernate.search.indexes.serialization.codex.impl;
 import java.io.Reader;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
@@ -60,7 +58,6 @@ import org.hibernate.search.indexes.serialization.operations.impl.SerializableSt
 import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
-import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.*;
 import static org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper.toSerializable;
 
 /**
@@ -167,53 +164,70 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		NumericField numField = new NumericField(
-						name,
-						precisionStep,
-						getStore( store ),
-						indexed);
-		numField.setOmitNorms( omitNorms );
-		numField.setOmitTermFreqAndPositions( omitTermFreqAndPositions );
+	public void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		NumericField numField = buildNumericField(
+				name,
+				precisionStep,
+				store,
+				indexed,
+				boost, omitNorms,
+				omitTermFreqAndPositions
+		);
 		numField.setIntValue( value );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
-	public void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		NumericField numField = new NumericField(
-						name,
-						precisionStep,
-						getStore( store ),
-						indexed);
-		numField.setOmitNorms( omitNorms );
-		numField.setOmitTermFreqAndPositions( omitTermFreqAndPositions );
+	public void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		NumericField numField = buildNumericField(
+				name,
+				precisionStep,
+				store,
+				indexed,
+				boost, omitNorms,
+				omitTermFreqAndPositions
+		);
 		numField.setLongValue( value );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
-	public void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		NumericField numField = new NumericField(
-						name,
-						precisionStep,
-						getStore( store ),
-						indexed);
-		numField.setOmitNorms( omitNorms );
-		numField.setOmitTermFreqAndPositions( omitTermFreqAndPositions );
+	public void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		NumericField numField = buildNumericField(
+				name,
+				precisionStep,
+				store,
+				indexed,
+				boost, omitNorms,
+				omitTermFreqAndPositions
+		);
 		numField.setFloatValue( value );
 		getLuceneDocument().add( numField );
 	}
 
-	@Override
-	public void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	private NumericField buildNumericField(String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		NumericField numField = new NumericField(
 						name,
 						precisionStep,
 						getStore( store ),
 						indexed);
+		numField.setBoost( boost );
 		numField.setOmitNorms( omitNorms );
 		numField.setOmitTermFreqAndPositions( omitTermFreqAndPositions );
+		return numField;
+	}
+
+	@Override
+	public void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		NumericField numField = buildNumericField(
+				name,
+				precisionStep,
+				store,
+				indexed,
+				boost,
+				omitNorms,
+				omitTermFreqAndPositions
+		);
 		numField.setDoubleValue( value );
 		getLuceneDocument().add( numField );
 	}

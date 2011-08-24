@@ -53,13 +53,13 @@ public interface LuceneWorksBuilder {
 	void addFieldable(byte[] instance);
 
 	//TODO forgot boost => do it across the whole chain
-	void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
-	void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions);
+	void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
 	void addFieldWithBinaryData(String name, byte[] value, int offset, int length, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
