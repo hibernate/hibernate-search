@@ -23,6 +23,7 @@ package org.hibernate.search.test.remote;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -156,15 +157,16 @@ public class SerializationTest extends SearchTestCase {
 
 	}
 
-	private List<LuceneWork> buildWorks() {
+	private List<LuceneWork> buildWorks() throws Exception {
 		List<LuceneWork> works = new ArrayList<LuceneWork>();
 		works.add( new OptimizeLuceneWork() );
 		works.add( new OptimizeLuceneWork() );
 		works.add( new OptimizeLuceneWork( RemoteEntity.class ) ); //class won't be send over
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
-		works.add( new DeleteLuceneWork( 123, "123", RemoteEntity.class ) );
-		works.add( new DeleteLuceneWork( 123, "123", RemoteEntity.class ) );
+		works.add( new DeleteLuceneWork( 123l, "123", RemoteEntity.class ) );
+		works.add( new DeleteLuceneWork( "Sissi", "Sissi", RemoteEntity.class ) );
+		works.add( new DeleteLuceneWork( new URL("http://emmanuelbernard.com"), "http://emmanuelbernard.com", RemoteEntity.class ) );
 
 		Document doc = new Document();
 		doc.setBoost( 2.3f );

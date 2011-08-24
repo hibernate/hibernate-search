@@ -77,6 +77,7 @@ public class AvroTest {
 		parseSchema( root + "NumericDoubleField.avro", "NumericDoubleField" );
 		parseSchema( root + "CustomFieldable.avro", "CustomFieldable" );
 		parseSchema( root + "Document.avro", "Document" );
+		parseSchema( root + "Id.avro", "Id" );
 		parseSchema( root + "OptimizeAll.avro", "OptimizeAll" );
 		parseSchema( root + "PurgeAll.avro", "PurgeAll" );
 		parseSchema( root + "Delete.avro", "Delete" );
@@ -101,6 +102,7 @@ public class AvroTest {
 		final Schema doubleFieldSchema = protocol.getType( "NumericDoubleField" );
 		final Schema custonFieldableSchema = protocol.getType( "CustomFieldable" );
 		final Schema documentSchema = protocol.getType( "Document" );
+		final Schema idSchema = protocol.getType( "Id" );
 		final Schema optimizeAllSchema = protocol.getType( "OptimizeAll" );
 		final Schema purgeAllSchema = protocol.getType( "PurgeAll" );
 		final Schema deleteSchema = protocol.getType( "Delete" );
@@ -179,7 +181,9 @@ public class AvroTest {
 
 		GenericRecord add = new GenericData.Record( addSchema );
 		add.put( "class", AvroTest.class.getName() );
-		add.put( "id", ByteBuffer.wrap( serializableSample ) );
+		GenericRecord id = new GenericData.Record( idSchema );
+		id.put( "value", ByteBuffer.wrap( serializableSample ) );
+		add.put( "id", id );
 		add.put( "document", doc );
 		Map<String, String> analyzers = new HashMap<String, String>();
 		analyzers.put( "name", "ngram" );
@@ -188,7 +192,9 @@ public class AvroTest {
 
 		GenericRecord delete = new GenericData.Record( deleteSchema );
 		delete.put( "class", AvroTest.class.getName() );
-		delete.put( "id", ByteBuffer.wrap( serializableSample ) );
+		id = new GenericData.Record( idSchema );
+		id.put( "value", new Long(30) );
+		delete.put( "id", id );
 
 		GenericRecord purgeAll = new GenericData.Record( purgeAllSchema );
 		purgeAll.put( "class", AvroTest.class.getName() );
@@ -224,21 +230,19 @@ public class AvroTest {
 				assertThat( ops.get( 2 ) ).isInstanceOf( GenericRecord.class );
 				GenericRecord deleteOp = ( GenericRecord ) ops.get( 2 );
 				assertThat( deleteOp.getSchema().getName() ).isEqualTo( "Delete" );
-				assertThat( deleteOp.get( "id" ) ).isInstanceOf( ByteBuffer.class );
-				ByteBuffer bb = ( ByteBuffer ) deleteOp.get( "id" );
-				assertThat( bb.hasArray() ).isTrue();
-				byte[] copy = new byte[bb.remaining()];
-				bb.get( copy );
-				assertThat( serializableSample ).isEqualTo( copy );
+				Object actual = ( ( GenericRecord ) deleteOp.get( "id" ) ).get( "value" );
+				assertThat(actual).isInstanceOf( Long.class );
+				assertThat(actual).isEqualTo( new Long(30) );
 
 				//Add
 				assertThat( ops.get( 3 ) ).isInstanceOf( GenericRecord.class );
 				GenericRecord addOp = ( GenericRecord ) ops.get( 3 );
 				assertThat( addOp.getSchema().getName() ).isEqualTo( "Add" );
-				assertThat( addOp.get( "id" ) ).isInstanceOf( ByteBuffer.class );
-				bb = ( ByteBuffer ) addOp.get( "id" );
+				actual = ( ( GenericRecord ) addOp.get( "id" ) ).get( "value" );
+				assertThat( actual ).isInstanceOf( ByteBuffer.class );
+				ByteBuffer bb = ( ByteBuffer ) actual;
 				assertThat( bb.hasArray() ).isTrue();
-				copy = new byte[bb.remaining()];
+				byte[] copy = new byte[bb.remaining()];
 				bb.get( copy );
 				assertThat( serializableSample ).isEqualTo( copy );
 
