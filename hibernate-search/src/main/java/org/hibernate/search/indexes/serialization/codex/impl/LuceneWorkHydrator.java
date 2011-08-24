@@ -31,6 +31,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
@@ -281,7 +282,16 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( KeywordAttribute.class );
-		( (KeywordAttribute) attr).setKeyword(isKeyword);
+		( (KeywordAttribute) attr).setKeyword( isKeyword );
+		getAttributes().add( attr );
+	}
+
+	@Override
+	public void addPositionIncrementAttribute(int positionIncrement) {
+		AttributeImpl attr = AttributeSource.AttributeFactory
+				.DEFAULT_ATTRIBUTE_FACTORY
+				.createAttributeInstance( PositionIncrementAttribute.class );
+		( (PositionIncrementAttribute) attr).setPositionIncrement(positionIncrement);
 		getAttributes().add( attr );
 	}
 

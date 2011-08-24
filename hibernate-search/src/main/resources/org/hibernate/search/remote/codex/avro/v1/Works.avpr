@@ -10,6 +10,7 @@
         `attribute/CharTermAttribute`,
         `attribute/PayloadAttribute`,
         `attribute/KeywordAttribute`,
+        `attribute/PositionIncrementAttribute`,
 
         `BinaryField`,
         `ReaderField`,

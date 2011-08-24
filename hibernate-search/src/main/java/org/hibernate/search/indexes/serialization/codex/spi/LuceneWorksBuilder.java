@@ -76,5 +76,7 @@ public interface LuceneWorksBuilder {
 
 	void addKeywordAttribute(boolean isKeyword);
 
+	void addPositionIncrementAttribute(int positionIncrement);
+
 	void addToken();
 }
