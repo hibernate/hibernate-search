@@ -35,6 +35,8 @@ import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttributeImpl;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
@@ -227,6 +229,11 @@ public class SerializationTest extends SearchTestCase {
 		keywordAttr.setKeyword( true );
 		source.get(0).add( keywordAttr );
 
+		PositionIncrementAttributeImpl posIncrAttr = new PositionIncrementAttributeImpl();
+		posIncrAttr.setPositionIncrement( 3 );
+		source.get(0).add( posIncrAttr );
+
+
 		CopyTokenStream tokenStream = new CopyTokenStream( source );
 		field = new Field("tokenstream", tokenStream);
 		doc.add(field);
@@ -371,6 +378,11 @@ public class SerializationTest extends SearchTestCase {
 				else if ( origAttr instanceof KeywordAttribute) {
 					assertThat( ( (KeywordAttribute) origAttr).isKeyword() ).isEqualTo(
 							( (KeywordAttribute) copyAttr ).isKeyword()
+					);
+				}
+				else if ( origAttr instanceof PositionIncrementAttribute) {
+					assertThat( ( (PositionIncrementAttribute) origAttr).getPositionIncrement() ).isEqualTo(
+							( (PositionIncrementAttribute) copyAttr ).getPositionIncrement()
 					);
 				}
 			}

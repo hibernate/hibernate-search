@@ -40,6 +40,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
@@ -257,6 +258,12 @@ public class AvroSerializer implements Serializer {
 			GenericRecord record = new GenericData.Record( protocol.getType( "KeywordAttribute" ) );
 			KeywordAttribute narrowedAttr = (KeywordAttribute) attr;
 			record.put("isKeyword", narrowedAttr.isKeyword() );
+			return record;
+		}
+		else if (attr instanceof PositionIncrementAttribute ) {
+			GenericRecord record = new GenericData.Record( protocol.getType( "PositionIncrementAttribute" ) );
+			PositionIncrementAttribute narrowedAttr = (PositionIncrementAttribute) attr;
+			record.put("positionIncrement", narrowedAttr.getPositionIncrement() );
 			return record;
 		}
 		else if (attr instanceof Serializable) {

@@ -12,7 +12,8 @@
                         "TokenTrackingAttribute",
                         "CharTermAttribute",
                         "PayloadAttribute",
-                        "KeywordAttribute"
+                        "KeywordAttribute",
+                        "PositionIncrementAttribute"
                     ]
                 }
             }

@@ -267,6 +267,9 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "KeywordAttribute".equals( name ) ) {
 				hydrator.addKeywordAttribute( asBoolean(record, "isKeyword") );
 			}
+			else if ( "PositionIncrementAttribute".equals( name ) ) {
+				hydrator.addPositionIncrementAttribute( asInt(record, "positionIncrement") );
+			}
 			else {
 				log.unknownAttributeSerializedRepresentation( name );
 			}

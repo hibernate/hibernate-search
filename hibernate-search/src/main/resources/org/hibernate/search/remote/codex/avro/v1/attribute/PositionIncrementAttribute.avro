@@ -1,0 +1,10 @@
+{
+    "name": "PositionIncrementAttribute",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "positionIncrement",
+            "type": "int"
+        }
+    ]
+}
