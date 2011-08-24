@@ -217,48 +217,52 @@ public class SerializationTest extends SearchTestCase {
 		field = new Field( "ReaderField", reader, Field.TermVector.WITH_OFFSETS );
 		doc.add( field );
 
-		List<List<AttributeImpl>> source = new ArrayList<List<AttributeImpl>>(  );
-		source.add( new ArrayList<AttributeImpl>() );
-		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attrImpl = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
-		attrImpl.reset( new int[]{ 1,2, 3 }, 4 );
-		source.get(0).add( attrImpl );
+		List<List<AttributeImpl>> tokens = buildTokenSteamWithAttributes();
 
-		CharTermAttributeImpl charAttr = new CharTermAttributeImpl();
-		charAttr.append( "Wazzza" );
-		source.get(0).add( charAttr );
-
-		PayloadAttributeImpl payloadAttribute = new PayloadAttributeImpl();
-		payloadAttribute.setPayload( new Payload( new byte[] {0,1, 2, 3} ) );
-		source.get(0).add( payloadAttribute );
-
-		KeywordAttributeImpl keywordAttr = new KeywordAttributeImpl();
-		keywordAttr.setKeyword( true );
-		source.get(0).add( keywordAttr );
-
-		PositionIncrementAttributeImpl posIncrAttr = new PositionIncrementAttributeImpl();
-		posIncrAttr.setPositionIncrement( 3 );
-		source.get(0).add( posIncrAttr );
-
-		FlagsAttributeImpl flagsAttr = new FlagsAttributeImpl();
-		flagsAttr.setFlags( 435 );
-		source.get(0).add( flagsAttr );
-
-		TypeAttributeImpl typeAttr = new TypeAttributeImpl();
-		typeAttr.setType( "acronym" );
-		source.get(0).add( typeAttr );
-
-		OffsetAttributeImpl offsetAttr = new OffsetAttributeImpl();
-		offsetAttr.setOffset( 4, 7 );
-		source.get(0).add( offsetAttr );
-
-
-		CopyTokenStream tokenStream = new CopyTokenStream( source );
+		CopyTokenStream tokenStream = new CopyTokenStream( tokens );
 		field = new Field("tokenstream", tokenStream);
 		doc.add(field);
 
 		works.add( new UpdateLuceneWork( 1234, "1234", RemoteEntity.class, doc ) );
 		works.add( new AddLuceneWork( 125, "125", RemoteEntity.class, new Document() ) );
 		return works;
+	}
+
+	private List<List<AttributeImpl>> buildTokenSteamWithAttributes() {
+		List<List<AttributeImpl>> tokens = new ArrayList<List<AttributeImpl>>(  );
+		tokens.add( new ArrayList<AttributeImpl>() );
+		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attrImpl = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
+		attrImpl.reset( new int[] { 1, 2, 3 }, 4 );
+		tokens.get(0).add( attrImpl );
+
+		CharTermAttributeImpl charAttr = new CharTermAttributeImpl();
+		charAttr.append( "Wazzza" );
+		tokens.get(0).add( charAttr );
+
+		PayloadAttributeImpl payloadAttribute = new PayloadAttributeImpl();
+		payloadAttribute.setPayload( new Payload( new byte[] { 0, 1, 2, 3 } ) );
+		tokens.get(0).add( payloadAttribute );
+
+		KeywordAttributeImpl keywordAttr = new KeywordAttributeImpl();
+		keywordAttr.setKeyword( true );
+		tokens.get(0).add( keywordAttr );
+
+		PositionIncrementAttributeImpl posIncrAttr = new PositionIncrementAttributeImpl();
+		posIncrAttr.setPositionIncrement( 3 );
+		tokens.get(0).add( posIncrAttr );
+
+		FlagsAttributeImpl flagsAttr = new FlagsAttributeImpl();
+		flagsAttr.setFlags( 435 );
+		tokens.get(0).add( flagsAttr );
+
+		TypeAttributeImpl typeAttr = new TypeAttributeImpl();
+		typeAttr.setType( "acronym" );
+		tokens.get(0).add( typeAttr );
+
+		OffsetAttributeImpl offsetAttr = new OffsetAttributeImpl();
+		offsetAttr.setOffset( 4, 7 );
+		tokens.get( 0 ).add( offsetAttr );
+		return tokens;
 	}
 
 	private void assertLuceneWork(LuceneWork work, LuceneWork copy) {
@@ -381,47 +385,51 @@ public class SerializationTest extends SearchTestCase {
 				if ( origAttr.getClass() != copyAttr.getClass() ) {
 					return false;
 				}
-				if ( origAttr instanceof AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) {
-					assertThat( ((AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) origAttr).getPositions() )
-							.isEqualTo( ( ( AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) copyAttr ).getPositions() );
-				}
-				else if ( origAttr instanceof CharTermAttribute) {
-					assertThat( origAttr.toString() ).isEqualTo( copyAttr.toString() );
-				}
-				else if ( origAttr instanceof PayloadAttribute) {
-					assertThat( ( (PayloadAttribute) origAttr).getPayload() ).isEqualTo(
-							( ( PayloadAttribute ) copyAttr ).getPayload()
-					);
-				}
-				else if ( origAttr instanceof KeywordAttribute) {
-					assertThat( ( (KeywordAttribute) origAttr).isKeyword() ).isEqualTo(
-							( (KeywordAttribute) copyAttr ).isKeyword()
-					);
-				}
-				else if ( origAttr instanceof PositionIncrementAttribute) {
-					assertThat( ( (PositionIncrementAttribute) origAttr).getPositionIncrement() ).isEqualTo(
-							( (PositionIncrementAttribute) copyAttr ).getPositionIncrement()
-					);
-				}
-				else if ( origAttr instanceof FlagsAttribute ) {
-					assertThat( ( (FlagsAttribute) origAttr).getFlags() ).isEqualTo(
-							( (FlagsAttribute) copyAttr ).getFlags()
-					);
-				}
-				else if ( origAttr instanceof TypeAttribute ) {
-					assertThat( ( (TypeAttribute) origAttr).type() ).isEqualTo(
-							( (TypeAttribute) copyAttr ).type()
-					);
-				}
-				else if ( origAttr instanceof OffsetAttribute ) {
-					OffsetAttribute orig = (OffsetAttribute) origAttr;
-					OffsetAttribute cop = (OffsetAttribute) copyAttr;
-					assertThat( orig.startOffset() ).isEqualTo( cop.startOffset() );
-					assertThat( orig.endOffset() ).isEqualTo( cop.endOffset() );
-				}
+				testAttributeTypes( origAttr, copyAttr );
 			}
 		}
 		return true;
+	}
+
+	private void testAttributeTypes(AttributeImpl origAttr, AttributeImpl copyAttr) {
+		if ( origAttr instanceof AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) {
+			assertThat( ((AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) origAttr).getPositions() )
+					.isEqualTo( ( ( AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) copyAttr ).getPositions() );
+		}
+		else if ( origAttr instanceof CharTermAttribute ) {
+			assertThat( origAttr.toString() ).isEqualTo( copyAttr.toString() );
+		}
+		else if ( origAttr instanceof PayloadAttribute ) {
+			assertThat( ( (PayloadAttribute) origAttr).getPayload() ).isEqualTo(
+					( ( PayloadAttribute ) copyAttr ).getPayload()
+			);
+		}
+		else if ( origAttr instanceof KeywordAttribute ) {
+			assertThat( ( (KeywordAttribute) origAttr).isKeyword() ).isEqualTo(
+					( (KeywordAttribute) copyAttr ).isKeyword()
+			);
+		}
+		else if ( origAttr instanceof PositionIncrementAttribute ) {
+			assertThat( ( (PositionIncrementAttribute) origAttr).getPositionIncrement() ).isEqualTo(
+					( (PositionIncrementAttribute) copyAttr ).getPositionIncrement()
+			);
+		}
+		else if ( origAttr instanceof FlagsAttribute ) {
+			assertThat( ( (FlagsAttribute) origAttr).getFlags() ).isEqualTo(
+					( (FlagsAttribute) copyAttr ).getFlags()
+			);
+		}
+		else if ( origAttr instanceof TypeAttribute ) {
+			assertThat( ( (TypeAttribute) origAttr).type() ).isEqualTo(
+					( (TypeAttribute) copyAttr ).type()
+			);
+		}
+		else if ( origAttr instanceof OffsetAttribute ) {
+			OffsetAttribute orig = (OffsetAttribute) origAttr;
+			OffsetAttribute cop = (OffsetAttribute) copyAttr;
+			assertThat( orig.startOffset() ).isEqualTo( cop.startOffset() );
+			assertThat( orig.endOffset() ).isEqualTo( cop.endOffset() );
+		}
 	}
 
 	private boolean compareReaders(Reader copy, Reader original) {
