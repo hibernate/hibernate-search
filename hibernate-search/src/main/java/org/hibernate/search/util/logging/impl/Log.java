@@ -396,9 +396,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 84, value = "Unable to read serialized List<LuceneWork>")
 	SearchException unableToReadSerializedLuceneWorks(@Cause Throwable e);
 
-	@Message( value="Attribute type is not recognized and not serializable: %1$s", id=85 )
+	@Message(id = 85, value = "Attribute type is not recognized and not serializable: %1$s")
 	SearchException attributeNotRecognizedNorSerializable(Class<?> attributeType);
 
-	@Message( value="Unknown attribute serialzied representation: %1$s", id=86 )
+	@Message(id = 86, value = "Unknown attribute serialzied representation: %1$s")
 	SearchException unknownAttributeSerializedRepresentation(String name);
 }
