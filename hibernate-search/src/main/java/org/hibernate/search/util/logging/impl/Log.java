@@ -387,12 +387,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 81, value = "The index '%1$s' is using a non-recommended combination of backend and directoryProvider implementations")
 	void warnSuspiciousBackendDirectoryCombination(String indexName);
 
-	@Message(id=82, value="Unable to start serialization layer")
+	@Message(id = 82, value = "Unable to start serialization layer")
 	SearchException unableToStartSerializationLayer(@Cause Throwable e);
 
-	@Message(id=83, value="Unable to serialize List<LuceneWork>")
+	@Message(id = 83, value = "Unable to serialize List<LuceneWork>")
 	SearchException unableToSerializeLuceneWorks(@Cause Throwable e);
 
-	@Message(id=84, value="Unable to read serialized List<LuceneWork>")
+	@Message(id = 84, value = "Unable to read serialized List<LuceneWork>")
 	SearchException unableToReadSerializedLuceneWorks(@Cause Throwable e);
 }
