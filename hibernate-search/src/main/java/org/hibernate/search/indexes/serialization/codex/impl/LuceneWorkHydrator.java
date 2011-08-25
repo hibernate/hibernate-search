@@ -89,7 +89,11 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addPurgeAllLuceneWork(String entityClassName) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				LuceneWorkHydrator.class,
+				"entity class"
+		);
 		results.add( new PurgeAllLuceneWork( entityClass ) );
 	}
 
@@ -105,10 +109,14 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addDeleteLuceneWork(String entityClassName) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				LuceneWorkHydrator.class,
+				"entity class"
+		);
 		LuceneWork result = new DeleteLuceneWork(
 				id,
-				objectIdInString(entityClass, id),
+				objectIdInString( entityClass, id ),
 				entityClass
 		);
 		results.add( result );
@@ -117,10 +125,14 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, LuceneWorkHydrator.class, "entity class" );
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				LuceneWorkHydrator.class,
+				"entity class"
+		);
 		LuceneWork result = new AddLuceneWork(
 				id,
-				objectIdInString(entityClass, id),
+				objectIdInString( entityClass, id ),
 				entityClass,
 				getLuceneDocument(),
 				fieldToAnalyzerMap
@@ -131,7 +143,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addUpdateLuceneWork(String entityClassName,  Map<String, String> fieldToAnalyzerMap) {
+	public void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				LuceneWorkHydrator.class,
@@ -139,7 +151,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		LuceneWork result = new UpdateLuceneWork(
 				id,
-				objectIdInString(entityClass, id),
+				objectIdInString( entityClass, id ),
 				entityClass,
 				getLuceneDocument(),
 				fieldToAnalyzerMap
@@ -160,7 +172,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addFieldable(byte[] instanceAsByte) {
-		getLuceneDocument().add( ( Fieldable ) toSerializable( instanceAsByte, loader ) );
+		getLuceneDocument().add( (Fieldable) toSerializable( instanceAsByte, loader ) );
 	}
 
 	@Override
@@ -170,7 +182,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 				precisionStep,
 				store,
 				indexed,
-				boost, omitNorms,
+				boost,
+				omitNorms,
 				omitTermFreqAndPositions
 		);
 		numField.setIntValue( value );
@@ -184,7 +197,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 				precisionStep,
 				store,
 				indexed,
-				boost, omitNorms,
+				boost,
+				omitNorms,
 				omitTermFreqAndPositions
 		);
 		numField.setLongValue( value );
@@ -198,7 +212,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 				precisionStep,
 				store,
 				indexed,
-				boost, omitNorms,
+				boost,
+				omitNorms,
 				omitTermFreqAndPositions
 		);
 		numField.setFloatValue( value );
@@ -207,10 +222,11 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	private NumericField buildNumericField(String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		NumericField numField = new NumericField(
-						name,
-						precisionStep,
-						getStore( store ),
-						indexed);
+				name,
+				precisionStep,
+				getStore( store ),
+				indexed
+		);
 		numField.setBoost( boost );
 		numField.setOmitNorms( omitNorms );
 		numField.setOmitTermFreqAndPositions( omitTermFreqAndPositions );
@@ -234,7 +250,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addFieldWithBinaryData(String name, byte[] value, int offset, int length, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		Field luceneField = new Field(name, value, offset, length);
+		Field luceneField = new Field( name, value, offset, length );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
 	}
 
@@ -253,13 +269,13 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addFieldWithTokenStreamData(String name, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		Field luceneField = new Field( name, new CopyTokenStream(tokens), getTermVector( termVector ) );
+		Field luceneField = new Field( name, new CopyTokenStream( tokens ), getTermVector( termVector ) );
 		setCommonFieldAttributesAddAddToDocument( boost, omitNorms, omitTermFreqAndPositions, luceneField );
 		clearTokens();
 	}
 
 	private void clearTokens() {
-		tokens = new ArrayList<List<AttributeImpl>>(  );
+		tokens = new ArrayList<List<AttributeImpl>>();
 	}
 
 	@Override
@@ -271,7 +287,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addSerializedAttribute(byte[] bytes) {
-		getAttributes().add( ( AttributeImpl ) toSerializable( bytes, loader ) );
+		getAttributes().add( (AttributeImpl) toSerializable( bytes, loader ) );
 	}
 
 	@Override
@@ -284,7 +300,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attr = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
 		int size = positions.size() - 1;
 		int[] basePosition = new int[size];
-		for(int index = 0 ; index < size ; index++) {
+		for ( int index = 0; index < size; index++ ) {
 			basePosition[index] = positions.get( index );
 		}
 		attr.reset( basePosition, positions.get( size ) );
@@ -296,7 +312,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( CharTermAttribute.class );
-		( (CharTermAttribute) attr).append( sequence );
+		( (CharTermAttribute) attr ).append( sequence );
 		getAttributes().add( attr );
 	}
 
@@ -305,7 +321,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( PayloadAttribute.class );
-		( (PayloadAttribute) attr).setPayload( new Payload( payloads ) );
+		( (PayloadAttribute) attr ).setPayload( new Payload( payloads ) );
 		getAttributes().add( attr );
 	}
 
@@ -314,7 +330,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( KeywordAttribute.class );
-		( (KeywordAttribute) attr).setKeyword( isKeyword );
+		( (KeywordAttribute) attr ).setKeyword( isKeyword );
 		getAttributes().add( attr );
 	}
 
@@ -323,7 +339,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( PositionIncrementAttribute.class );
-		( (PositionIncrementAttribute) attr).setPositionIncrement( positionIncrement );
+		( (PositionIncrementAttribute) attr ).setPositionIncrement( positionIncrement );
 		getAttributes().add( attr );
 	}
 
@@ -332,7 +348,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( FlagsAttribute.class );
-		( (FlagsAttribute) attr).setFlags( flags );
+		( (FlagsAttribute) attr ).setFlags( flags );
 		getAttributes().add( attr );
 	}
 
@@ -341,7 +357,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( TypeAttribute.class );
-		( (TypeAttribute) attr).setType( type );
+		( (TypeAttribute) attr ).setType( type );
 		getAttributes().add( attr );
 	}
 
@@ -350,7 +366,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		AttributeImpl attr = AttributeSource.AttributeFactory
 				.DEFAULT_ATTRIBUTE_FACTORY
 				.createAttributeInstance( OffsetAttribute.class );
-		( (OffsetAttribute) attr).setOffset( startOffset, endOffset );
+		( (OffsetAttribute) attr ).setOffset( startOffset, endOffset );
 		getAttributes().add( attr );
 	}
 
@@ -361,11 +377,11 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	private void clearAttributes() {
-		attributes = new ArrayList<AttributeImpl>(  );
+		attributes = new ArrayList<AttributeImpl>();
 	}
 
 	private Document getLuceneDocument() {
-		if (luceneDocument == null) {
+		if ( luceneDocument == null ) {
 			luceneDocument = new Document();
 		}
 		return luceneDocument;
@@ -373,7 +389,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	private String objectIdInString(Class<?> entityClass, Serializable id) {
 		EntityIndexBinder<?> indexBindingForEntity = searchFactory.getIndexBindingForEntity( entityClass );
-		if (indexBindingForEntity == null) {
+		if ( indexBindingForEntity == null ) {
 			throw new SearchException( "Unable to find entity type metadata while deserializing: " + entityClass );
 		}
 		DocumentBuilderIndexedEntity<?> documentBuilder = indexBindingForEntity.getDocumentBuilder();
@@ -392,7 +408,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 				return Field.TermVector.WITH_POSITIONS_OFFSETS;
 			case YES:
 				return Field.TermVector.YES;
-			 default:
+			default:
 				throw new SearchException( "Unable to convert serializable TermVector to Lucene TermVector: " + termVector );
 		}
 	}
@@ -426,15 +442,15 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	public List<AttributeImpl> getAttributes() {
-		if (attributes == null) {
+		if ( attributes == null ) {
 			attributes = new ArrayList<AttributeImpl>();
 		}
 		return attributes;
 	}
 
 	public List<List<AttributeImpl>> getTokens() {
-		if (tokens == null) {
-			tokens = new ArrayList<List<AttributeImpl>>(  );
+		if ( tokens == null ) {
+			tokens = new ArrayList<List<AttributeImpl>>();
 		}
 		return tokens;
 	}

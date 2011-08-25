@@ -66,6 +66,8 @@ import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.operations.impl.SerializableTokenStream;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -73,6 +75,8 @@ import static org.fest.assertions.Assertions.assertThat;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializationTest extends SearchTestCase {
+	private static final Log log = LoggerFactory.make();
+
 	@Test
 	public void testAvroSerialization() throws Exception {
 		LuceneWorkSerializer converter = new PluggableSerializationLuceneWorkSerializer(
@@ -100,7 +104,7 @@ public class SerializationTest extends SearchTestCase {
 	 * In evens up or beats the Java serialization on longer loops like 100000
 	 *
 	 * Test done after initial implementation (in particular the schema is not part of the message
-	 * 
+	 *
 	 * With 1000000:
 	 * Java serialization: 28730
 	 * Java message size: 2509
@@ -140,40 +144,44 @@ public class SerializationTest extends SearchTestCase {
 		long end;
 		byte[] javaBytes = null;
 		begin = System.nanoTime();
-		for (int i = 0 ; i < loop ; i++) {
-			javaBytes = SerializationHelper.toByteArray( ( Serializable ) works );
+		for ( int i = 0; i < loop; i++ ) {
+			javaBytes = SerializationHelper.toByteArray( (Serializable) works );
 		}
 		end = System.nanoTime();
-		System.out.println("Java serialization: " + ((end-begin)/1000000) );
-		System.out.println("Java message size: " + javaBytes.length );
+		log.debug( "Java serialization: " + ( ( end - begin ) / 1000000 ) );
+		log.debug( "Java message size: " + javaBytes.length );
 
 		begin = System.nanoTime();
+
 		List<LuceneWork> copyOfWorkForJavaSerial = null;
-		for (int i = 0 ; i < loop ; i++) {
-			copyOfWorkForJavaSerial = (List<LuceneWork>) SerializationHelper.toSerializable( javaBytes, Thread.currentThread().getContextClassLoader() );
+		for ( int i = 0; i < loop; i++ ) {
+			copyOfWorkForJavaSerial = (List<LuceneWork>) SerializationHelper.toSerializable(
+					javaBytes,
+					Thread.currentThread().getContextClassLoader()
+			);
 		}
 		end = System.nanoTime();
-		System.out.println("Java deserialization: " + ((end-begin)/1000000) );
+		log.debug( "Java de-serialization: " + ( ( end - begin ) / 1000000 ) );
 
 		byte[] avroBytes = null;
 		begin = System.nanoTime();
-		for (int i = 0 ; i < loop ; i++) {
+		for ( int i = 0; i < loop; i++ ) {
 			avroBytes = converter.toSerializedModel( works );
 		}
 		end = System.nanoTime();
-		System.out.println("Avro serialization: " + ((end-begin)/1000000) );
-		System.out.println("Avro message size: " + avroBytes.length );
+		log.debug( "Avro serialization: " + ( ( end - begin ) / 1000000 ) );
+		log.debug( "Avro message size: " + avroBytes.length );
 
 		List<LuceneWork> copyOfWorks = null;
 		begin = System.nanoTime();
-		for (int i = 0 ; i < loop ; i++) {
+		for ( int i = 0; i < loop; i++ ) {
 			copyOfWorks = converter.toLuceneWorks( avroBytes );
 		}
 		end = System.nanoTime();
-		System.out.println("Avro deserialization: " + ((end-begin)/1000000) );
+		log.debug( "Avro deserialization: " + ( ( end - begin ) / 1000000 ) );
 
 		//make sure the compiler does not cheat
-		System.out.println(copyOfWorks == copyOfWorkForJavaSerial);
+		log.debug( copyOfWorks == copyOfWorkForJavaSerial );
 
 	}
 
@@ -186,7 +194,13 @@ public class SerializationTest extends SearchTestCase {
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
 		works.add( new DeleteLuceneWork( 123l, "123", RemoteEntity.class ) );
 		works.add( new DeleteLuceneWork( "Sissi", "Sissi", RemoteEntity.class ) );
-		works.add( new DeleteLuceneWork( new URL("http://emmanuelbernard.com"), "http://emmanuelbernard.com", RemoteEntity.class ) );
+		works.add(
+				new DeleteLuceneWork(
+						new URL( "http://emmanuelbernard.com" ),
+						"http://emmanuelbernard.com",
+						RemoteEntity.class
+				)
+		);
 
 		Document doc = new Document();
 		doc.setBoost( 2.3f );
@@ -248,11 +262,11 @@ public class SerializationTest extends SearchTestCase {
 		List<List<AttributeImpl>> tokens = buildTokenSteamWithAttributes();
 
 		CopyTokenStream tokenStream = new CopyTokenStream( tokens );
-		field = new Field("tokenstream", tokenStream, Field.TermVector.WITH_POSITIONS_OFFSETS);
+		field = new Field( "tokenstream", tokenStream, Field.TermVector.WITH_POSITIONS_OFFSETS );
 		field.setOmitNorms( true );
 		field.setOmitTermFreqAndPositions( true );
 		field.setBoost( 3f );
-		doc.add(field);
+		doc.add( field );
 
 		works.add( new UpdateLuceneWork( 1234, "1234", RemoteEntity.class, doc ) );
 		works.add( new AddLuceneWork( 125, "125", RemoteEntity.class, new Document() ) );
@@ -260,35 +274,35 @@ public class SerializationTest extends SearchTestCase {
 	}
 
 	private List<List<AttributeImpl>> buildTokenSteamWithAttributes() {
-		List<List<AttributeImpl>> tokens = new ArrayList<List<AttributeImpl>>(  );
+		List<List<AttributeImpl>> tokens = new ArrayList<List<AttributeImpl>>();
 		tokens.add( new ArrayList<AttributeImpl>() );
 		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attrImpl = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
 		attrImpl.reset( new int[] { 1, 2, 3 }, 4 );
-		tokens.get(0).add( attrImpl );
+		tokens.get( 0 ).add( attrImpl );
 
 		CharTermAttributeImpl charAttr = new CharTermAttributeImpl();
 		charAttr.append( "Wazzza" );
-		tokens.get(0).add( charAttr );
+		tokens.get( 0 ).add( charAttr );
 
 		PayloadAttributeImpl payloadAttribute = new PayloadAttributeImpl();
 		payloadAttribute.setPayload( new Payload( new byte[] { 0, 1, 2, 3 } ) );
-		tokens.get(0).add( payloadAttribute );
+		tokens.get( 0 ).add( payloadAttribute );
 
 		KeywordAttributeImpl keywordAttr = new KeywordAttributeImpl();
 		keywordAttr.setKeyword( true );
-		tokens.get(0).add( keywordAttr );
+		tokens.get( 0 ).add( keywordAttr );
 
 		PositionIncrementAttributeImpl posIncrAttr = new PositionIncrementAttributeImpl();
 		posIncrAttr.setPositionIncrement( 3 );
-		tokens.get(0).add( posIncrAttr );
+		tokens.get( 0 ).add( posIncrAttr );
 
 		FlagsAttributeImpl flagsAttr = new FlagsAttributeImpl();
 		flagsAttr.setFlags( 435 );
-		tokens.get(0).add( flagsAttr );
+		tokens.get( 0 ).add( flagsAttr );
 
 		TypeAttributeImpl typeAttr = new TypeAttributeImpl();
 		typeAttr.setType( "acronym" );
-		tokens.get(0).add( typeAttr );
+		tokens.get( 0 ).add( typeAttr );
 
 		OffsetAttributeImpl offsetAttr = new OffsetAttributeImpl();
 		offsetAttr.setOffset( 4, 7 );
@@ -299,19 +313,20 @@ public class SerializationTest extends SearchTestCase {
 	private void assertLuceneWork(LuceneWork work, LuceneWork copy) {
 		assertThat( copy ).isInstanceOf( work.getClass() );
 		if ( work instanceof OptimizeLuceneWork ) {
-			assertOptimize( ( OptimizeLuceneWork ) work, ( OptimizeLuceneWork ) copy );
+			assertNotNull( copy );
+			assertTrue( copy instanceof OptimizeLuceneWork );
 		}
 		else if ( work instanceof PurgeAllLuceneWork ) {
-			assertPurgeAll( ( PurgeAllLuceneWork ) work, ( PurgeAllLuceneWork ) copy );
+			assertPurgeAll( (PurgeAllLuceneWork) work, (PurgeAllLuceneWork) copy );
 		}
 		else if ( work instanceof DeleteLuceneWork ) {
-			assertDelete( ( DeleteLuceneWork ) work, ( DeleteLuceneWork ) copy );
+			assertDelete( (DeleteLuceneWork) work, (DeleteLuceneWork) copy );
 		}
 		else if ( work instanceof AddLuceneWork ) {
-			assertAdd( ( AddLuceneWork ) work, ( AddLuceneWork ) copy );
+			assertAdd( (AddLuceneWork) work, (AddLuceneWork) copy );
 		}
 		else if ( work instanceof UpdateLuceneWork ) {
-			assertUpdate( ( UpdateLuceneWork ) work, ( UpdateLuceneWork ) copy );
+			assertUpdate( (UpdateLuceneWork) work, (UpdateLuceneWork) copy );
 		}
 		else {
 			fail( "unexpected type" );
@@ -326,7 +341,7 @@ public class SerializationTest extends SearchTestCase {
 				.isEqualTo( copy.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
 	}
-	
+
 	private void assertUpdate(UpdateLuceneWork work, UpdateLuceneWork copy) {
 		assertThat( work.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
 		assertThat( work.getId() ).as( "Add.getId is not copied" ).isEqualTo( copy.getId() );
@@ -343,10 +358,10 @@ public class SerializationTest extends SearchTestCase {
 			Fieldable fieldCopy = copy.getFields().get( index );
 			assertThat( field ).isInstanceOf( fieldCopy.getClass() );
 			if ( field instanceof NumericField ) {
-				assertNumericField( ( NumericField ) field, ( NumericField ) fieldCopy );
+				assertNumericField( (NumericField) field, (NumericField) fieldCopy );
 			}
 			else if ( field instanceof Field ) {
-				assertNormalField( ( Field ) field, ( Field ) fieldCopy );
+				assertNormalField( (Field) field, (Field) fieldCopy );
 			}
 		}
 	}
@@ -374,7 +389,7 @@ public class SerializationTest extends SearchTestCase {
 	}
 
 	private boolean compareTokenStreams(TokenStream original, TokenStream copy) {
-		if (original == null) {
+		if ( original == null ) {
 			return copy == null;
 		}
 		try {
@@ -388,13 +403,13 @@ public class SerializationTest extends SearchTestCase {
 		if ( serOriginal.getStream().size() != serCopy.getStream().size() ) {
 			return false;
 		}
-		for ( int i = 0 ; i < serOriginal.getStream().size() ; i++ ) {
+		for ( int i = 0; i < serOriginal.getStream().size(); i++ ) {
 			List<AttributeImpl> origToken = serOriginal.getStream().get( i );
 			List<AttributeImpl> copyToken = serCopy.getStream().get( i );
 			if ( origToken.size() != copyToken.size() ) {
 				return false;
 			}
-			for ( int j = 0 ; j < origToken.size() ; j++ ) {
+			for ( int j = 0; j < origToken.size(); j++ ) {
 				AttributeImpl origAttr = origToken.get( j );
 				AttributeImpl copyAttr = copyToken.get( j );
 				if ( origAttr.getClass() != copyAttr.getClass() ) {
@@ -408,34 +423,34 @@ public class SerializationTest extends SearchTestCase {
 
 	private void testAttributeTypes(AttributeImpl origAttr, AttributeImpl copyAttr) {
 		if ( origAttr instanceof AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) {
-			assertThat( ((AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) origAttr).getPositions() )
-					.isEqualTo( ( ( AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) copyAttr ).getPositions() );
+			assertThat( ( (AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) origAttr ).getPositions() )
+					.isEqualTo( ( (AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) copyAttr ).getPositions() );
 		}
 		else if ( origAttr instanceof CharTermAttribute ) {
 			assertThat( origAttr.toString() ).isEqualTo( copyAttr.toString() );
 		}
 		else if ( origAttr instanceof PayloadAttribute ) {
-			assertThat( ( (PayloadAttribute) origAttr).getPayload() ).isEqualTo(
-					( ( PayloadAttribute ) copyAttr ).getPayload()
+			assertThat( ( (PayloadAttribute) origAttr ).getPayload() ).isEqualTo(
+					( (PayloadAttribute) copyAttr ).getPayload()
 			);
 		}
 		else if ( origAttr instanceof KeywordAttribute ) {
-			assertThat( ( (KeywordAttribute) origAttr).isKeyword() ).isEqualTo(
+			assertThat( ( (KeywordAttribute) origAttr ).isKeyword() ).isEqualTo(
 					( (KeywordAttribute) copyAttr ).isKeyword()
 			);
 		}
 		else if ( origAttr instanceof PositionIncrementAttribute ) {
-			assertThat( ( (PositionIncrementAttribute) origAttr).getPositionIncrement() ).isEqualTo(
+			assertThat( ( (PositionIncrementAttribute) origAttr ).getPositionIncrement() ).isEqualTo(
 					( (PositionIncrementAttribute) copyAttr ).getPositionIncrement()
 			);
 		}
 		else if ( origAttr instanceof FlagsAttribute ) {
-			assertThat( ( (FlagsAttribute) origAttr).getFlags() ).isEqualTo(
+			assertThat( ( (FlagsAttribute) origAttr ).getFlags() ).isEqualTo(
 					( (FlagsAttribute) copyAttr ).getFlags()
 			);
 		}
 		else if ( origAttr instanceof TypeAttribute ) {
-			assertThat( ( (TypeAttribute) origAttr).type() ).isEqualTo(
+			assertThat( ( (TypeAttribute) origAttr ).type() ).isEqualTo(
 					( (TypeAttribute) copyAttr ).type()
 			);
 		}
@@ -448,13 +463,13 @@ public class SerializationTest extends SearchTestCase {
 	}
 
 	private boolean compareReaders(Reader copy, Reader original) {
-		if (original == null) {
+		if ( original == null ) {
 			return copy == null;
 		}
 		try {
-			for( int o = original.read(); o != -1 ; o = original.read() ) {
+			for ( int o = original.read(); o != -1; o = original.read() ) {
 				int c = copy.read();
-				if (o != c) {
+				if ( o != c ) {
 					return false;
 				}
 			}
@@ -499,12 +514,8 @@ public class SerializationTest extends SearchTestCase {
 				.isEqualTo( copy.getFieldToAnalyzerMap() );
 	}
 
-	private void assertOptimize(OptimizeLuceneWork work, OptimizeLuceneWork copy) {
-		//nothing besides the type
-	}
-
 	private void assertPurgeAll(PurgeAllLuceneWork work, PurgeAllLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as( "PurgeAll.getEntityClass is not copied" )
+		assertThat( work.getEntityClass() ).as( "PurgeAllLuceneWork.getEntityClass is not copied" )
 				.isEqualTo( copy.getEntityClass() );
 	}
 
@@ -520,7 +531,7 @@ public class SerializationTest extends SearchTestCase {
 
 		@Override
 		public int read(char[] cbuf, int off, int len) throws IOException {
-			if (read) {
+			if ( read ) {
 				return -1;
 			}
 			else {
@@ -535,5 +546,4 @@ public class SerializationTest extends SearchTestCase {
 		}
 
 	}
-
 }
