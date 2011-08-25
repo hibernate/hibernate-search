@@ -1,6 +1,34 @@
 Hibernate Search Changelog
 ==========================
 
+3.4.1.Final (25-08-2011)
+------------------------
+
+** Bug
+    * [HSEARCH-662] - Re-indexing failure in @IndexedEmbedded entities in @ManyToOne relationship
+    * [HSEARCH-740] - TimeoutTest and ClasstypeFieldCacheExtractionTest
+    * [HSEARCH-744] - NullPointerException when using a range query on a numeric field and searching for values below a given boundary (Mathieu Perez)
+    * [HSEARCH-745] - Empty Index and FacetManagerImpl.getFacets() NullPointerException
+    * [HSEARCH-770] - Range facets: .below on numeric null values (AssertionFailure: Unsupported range type)
+    * [HSEARCH-776] - maxFacetCount returns incorrect results when ordering a faceted query
+    * [HSEARCH-780] - Dirty analysis of @IndexedEmbedded on a superclass collection fails (Samppa Saarela)
+    * [HSEARCH-782] - Unnecessary loading of @ContainedIn entities causes big performance hit
+    * [HSEARCH-802] - IndexControlMBeanTest fails with NPE because Hibernate Core closes the JNDI context
+
+** Improvement
+    * [HSEARCH-773] - Example in documentation contains compilation erros (Nabeel Ali Memon and Juraj Martinka)
+
+** Task
+    * [HSEARCH-739] - Define an M2Eclipse configuration section in the parent pom.xml
+    * [HSEARCH-769] - dummy is a reserved keyword on sybase
+    * [HSEARCH-771] - ProgrammaticMappingTest should pass when executing tests in any order
+    * [HSEARCH-772] - Isolate JGroups tests to be able to run different test profiles in parallel
+    * [HSEARCH-811] - Update dependencies for branch 3.4.x
+    * [HSEARCH-820] - Document limitations and workarounds for JVM bug affecting Lucene users
+    * [HSEARCH-828] - Avoid using Java6 specific features in test for Java5 compatible branch 3.4
+    * [HSEARCH-870] - Remove duplicate commons-lang from distribution, and unneeded log files and pom backups are bundled in the distribution as well
+
+
 3.4.0.Final (18-04-2011)
 ------------------------
 
