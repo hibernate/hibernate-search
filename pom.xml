@@ -27,7 +27,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>3.4.1-SNAPSHOT</version>
+    <version>3.4.1.Final</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>
@@ -501,7 +501,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
