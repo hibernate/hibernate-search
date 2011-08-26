@@ -18,16 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
+
 /**
- * Represents a canonical model for the data that ought to be serialized.
- * A ModelSerializationProvider convert List of LuceneWork into this canonical
- * model.
+ * Optimize all indexes
  *
- * Note that some objects are reused in the Serialization / Deserialization contract used by
- * other serializers but most are not and this code is mostly unused.
- *
- * Still it is a useful and typesafe referencesthat we might want to keep around.
- *
- * @author Emmanuel Bernard
+ * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+public class OptimizeAll implements Operation {
+}

@@ -18,12 +18,41 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Optimize all indexes
- *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class OptimizeAll implements Operation {
+public class Update implements Operation {
+	private String entityClassName;
+	private Serializable id;
+	private Map<String,String> fieldToAnalyzerMap = new HashMap<String, String>();
+	private SerializableDocument document;
+
+	public Update(String entityClassName, Serializable id, SerializableDocument document, Map<String, String> fieldToAnalyzerMap) {
+		this.entityClassName = entityClassName;
+		this.id = id;
+		this.document = document;
+		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
+	}
+
+	public String getEntityClassName() {
+		return entityClassName;
+	}
+
+	public Serializable getId() {
+		return id;
+	}
+
+	public Map<String, String> getFieldToAnalyzerMap() {
+		return fieldToAnalyzerMap;
+	}
+
+	public SerializableDocument getDocument() {
+		return document;
+	}
 }

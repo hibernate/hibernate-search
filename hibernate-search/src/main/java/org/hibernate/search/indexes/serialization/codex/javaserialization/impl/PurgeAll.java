@@ -18,28 +18,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
-
-
-import java.io.Serializable;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class Delete implements Operation {
+public class PurgeAll implements Operation {
 	private String entityClassName;
-	private Serializable id;
 
-	public Delete(String entityClassName, Serializable id) {
+	public PurgeAll(String entityClassName) {
 		this.entityClassName = entityClassName;
-		this.id = id;
 	}
 
 	public String getEntityClassName() {
 		return entityClassName;
-	}
-
-	public Serializable getId() {
-		return id;
 	}
 }

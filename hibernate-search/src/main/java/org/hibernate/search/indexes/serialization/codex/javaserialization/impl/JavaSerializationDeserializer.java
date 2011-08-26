@@ -31,26 +31,6 @@ import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializat
 import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.codex.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorksBuilder;
-import org.hibernate.search.indexes.serialization.operations.impl.Add;
-import org.hibernate.search.indexes.serialization.operations.impl.Delete;
-import org.hibernate.search.indexes.serialization.operations.impl.Message;
-import org.hibernate.search.indexes.serialization.operations.impl.Operation;
-import org.hibernate.search.indexes.serialization.operations.impl.OptimizeAll;
-import org.hibernate.search.indexes.serialization.operations.impl.PurgeAll;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableBinaryField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableCustomFieldable;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableDocument;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableDoubleField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableFieldable;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableFloatField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableIntField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableLongField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableNumericField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableReaderField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableStringField;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableTokenStreamField;
-import org.hibernate.search.indexes.serialization.operations.impl.Update;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

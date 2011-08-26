@@ -18,22 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
-import org.hibernate.search.indexes.serialization.codex.spi.LuceneNumericFieldContext;
+import java.io.Serializable;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableDoubleField extends SerializableNumericField {
-	private double value;
-
-	public SerializableDoubleField(double value, LuceneNumericFieldContext context) {
-		super(context);
-		this.value = value;
-	}
-
-	public double getValue() {
-		return value;
-	}
+public interface SerializableFieldable extends Serializable {
 }

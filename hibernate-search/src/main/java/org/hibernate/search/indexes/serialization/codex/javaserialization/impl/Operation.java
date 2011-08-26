@@ -18,34 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
-import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
 
 /**
+ * A message is made of:
+ * - a protocol version number
+ * - a set of operations
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableBinaryField extends SerializableField {
-	private byte[] value;
-	private int offset;
-	private int length;
-
-	public SerializableBinaryField(LuceneFieldContext context) {
-		super( context );
-		this.value = context.getBinaryValue();
-		this.offset = context.getBinaryOffset();
-		this.length = context.getBinaryLength();
-	}
-
-	public byte[] getValue() {
-		return value;
-	}
-
-	public int getOffset() {
-		return offset;
-	}
-
-	public int getLength() {
-		return length;
-	}
+public interface Operation {
 }
