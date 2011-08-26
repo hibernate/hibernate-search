@@ -50,6 +50,7 @@ public class AvroDeserializer implements Deserializer {
 
 	private static final Log log = LoggerFactory.make();
 	private final Protocol protocol;
+	private List<Utf8> classReferences;
 
 	public AvroDeserializer(Protocol protocol) {
 		this.protocol = protocol;
@@ -89,6 +90,8 @@ public class AvroDeserializer implements Deserializer {
 		catch ( IOException e ) {
 			throw log.unableToDeserializeAvroStream( e );
 		}
+
+		classReferences = asListOfString( result, "classReferences" );
 		List<GenericRecord> operations = asListOfGenericRecords( result, "operations" );
 		for ( GenericRecord operation : operations ) {
 			String schema = operation.getSchema().getName();
@@ -96,12 +99,12 @@ public class AvroDeserializer implements Deserializer {
 				hydrator.addOptimizeAll();
 			}
 			else if ( "PurgeAll".equals( schema ) ) {
-				hydrator.addPurgeAllLuceneWork( asString( operation, "class" ) );
+				hydrator.addPurgeAllLuceneWork( asClass( operation, "class" ) );
 			}
 			else if ( "Delete".equals( schema ) ) {
 				processId(operation, hydrator);
 				hydrator.addDeleteLuceneWork(
-						asString( operation, "class" )
+						asClass( operation, "class" )
 				);
 			}
 			else if ( "Add".equals( schema ) ) {
@@ -109,7 +112,7 @@ public class AvroDeserializer implements Deserializer {
 				Map<String, String> analyzers = getAnalyzers( operation );
 				processId(operation, hydrator);
 				hydrator.addAddLuceneWork(
-						asString( operation, "class" ),
+						asClass( operation, "class" ),
 						analyzers
 				);
 			}
@@ -118,7 +121,7 @@ public class AvroDeserializer implements Deserializer {
 				Map<String, String> analyzers = getAnalyzers( operation );
 				processId(operation, hydrator);
 				hydrator.addUpdateLuceneWork(
-						asString( operation, "class" ),
+						asClass( operation, "class" ),
 						analyzers
 				);
 			}
@@ -126,6 +129,15 @@ public class AvroDeserializer implements Deserializer {
 				throw log.cannotDeserializeOperation( schema );
 			}
 		}
+	}
+
+	private String asClass(GenericRecord operation, String attribute) {
+		Integer index =  (Integer) operation.get( attribute );
+		return classReferences.get( index ).toString();
+	}
+
+	private List<Utf8> asListOfString(GenericRecord result, String attribute) {
+		return (List<Utf8>) result.get(attribute);
 	}
 
 	private void processId(GenericRecord operation, LuceneWorksBuilder hydrator) {
@@ -167,7 +179,7 @@ public class AvroDeserializer implements Deserializer {
 							asString( field, "name" ),
 							asInt( field, "precisionStep" ),
 							asStore( field ),
-							asBoolean(field, "indexed"),
+							asBoolean( field, "indexed" ),
 							asFloat( field, "boost" ),
 							asBoolean( field, "omitNorms" ),
 							asBoolean( field, "omitTermFreqAndPositions" )
@@ -203,7 +215,7 @@ public class AvroDeserializer implements Deserializer {
 							asString( field, "name" ),
 							asInt( field, "precisionStep" ),
 							asStore( field ),
-							asBoolean(field, "indexed"),
+							asBoolean( field, "indexed" ),
 							asFloat( field, "boost" ),
 							asBoolean( field, "omitNorms" ),
 							asBoolean( field, "omitTermFreqAndPositions" )

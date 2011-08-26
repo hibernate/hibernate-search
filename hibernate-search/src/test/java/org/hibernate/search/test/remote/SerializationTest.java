@@ -120,7 +120,7 @@ public class SerializationTest extends SearchTestCase {
 	 *
 	 * Our avro deserializer is faster (2.7 times) than Java serialization for 100000.
 	 *
-	 * The message size is 4.4 smaller in Avro
+	 * The message size is 4.4 times smaller in Avro
 	 *
 	 * (the schema is not part of the message)
 	 *
@@ -131,6 +131,23 @@ public class SerializationTest extends SearchTestCase {
 	 * Avro serialization: 30430
 	 * Avro message size: 929
 	 * Avro deserialization: 59255
+	 *
+	 * 20110826
+	 * Our avro serializer is faster (1.7 times) than Java serialization for 100000.
+	 *
+	 * Our avro deserializer is faster (2.7 times) than Java serialization for 100000.
+	 *
+	 * The message size is 6.6 times smaller in Avro
+	 *
+	 * (the schema is not part of the message)
+	 *
+	 * With 1000000:
+	 * Java serialization: 52682
+	 * Java message size: 4094
+	 * Java de-serialization: 168595
+	 * Avro serialization: 30586
+	 * Avro message size: 617
+	 * Avro deserialization: 62141
 	 */
 	public void testAvroSerializationPerf() throws Exception {
 		final int loop = 10; //TODO do 10000 or 100000

@@ -119,6 +119,8 @@ public class AvroTest {
 			serializableSample[i] = ( byte ) i;
 		}
 
+		List<String> classReferences = new ArrayList<String>(  );
+		classReferences.add( AvroTest.class.getName() );
 
 		List<GenericRecord> fieldables = new ArrayList<GenericRecord>( 1 );
 		//custom fieldable
@@ -180,7 +182,7 @@ public class AvroTest {
 		doc.put( "fieldables", fieldables );
 
 		GenericRecord add = new GenericData.Record( addSchema );
-		add.put( "class", AvroTest.class.getName() );
+		add.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		GenericRecord id = new GenericData.Record( idSchema );
 		id.put( "value", ByteBuffer.wrap( serializableSample ) );
 		add.put( "id", id );
@@ -191,13 +193,13 @@ public class AvroTest {
 		add.put( "fieldToAnalyzerMap", analyzers );
 
 		GenericRecord delete = new GenericData.Record( deleteSchema );
-		delete.put( "class", AvroTest.class.getName() );
+		delete.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		id = new GenericData.Record( idSchema );
 		id.put( "value", new Long(30) );
 		delete.put( "id", id );
 
 		GenericRecord purgeAll = new GenericData.Record( purgeAllSchema );
-		purgeAll.put( "class", AvroTest.class.getName() );
+		purgeAll.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		GenericRecord optimizeAll = new GenericData.Record( optimizeAllSchema );
 
 		List<GenericRecord> operations = new ArrayList<GenericRecord>( 1 );
@@ -206,7 +208,9 @@ public class AvroTest {
 		operations.add( delete );
 		operations.add( add );
 
+
 		GenericRecord message = new GenericData.Record( messageSchema );
+		message.put( "classReferences", classReferences );
 		message.put( "operations", operations );
 
 		writer.write( message, encoder );

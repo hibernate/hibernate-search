@@ -67,11 +67,13 @@ public class AvroSerializer implements Serializer {
 	private GenericRecord idRecord;
 	private List<GenericRecord> fieldables;
 	private List<GenericRecord> operations;
+	private List<String> classReferences;
 	private GenericRecord document;
 	private final Protocol protocol;
 
 	public AvroSerializer(Protocol protocol) {
 		this.protocol = protocol;
+		this.classReferences = new ArrayList<String>();
 	}
 
 	@Override
@@ -86,9 +88,19 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addPurgeAll(String entityClassName) {
+		int classRef = getClassReference( entityClassName );
 		GenericRecord purgeAll = new GenericData.Record( protocol.getType( "PurgeAll" ) );
-		purgeAll.put( "class", entityClassName );
+		purgeAll.put( "class", classRef );
 		operations.add( purgeAll );
+	}
+
+	private int getClassReference(String entityClassName) {
+		int classRef = classReferences.indexOf( entityClassName );
+		if ( classRef == -1 ) {
+			classReferences.add( entityClassName );
+			classRef = classReferences.size() - 1;
+		}
+		return classRef;
 	}
 
 	@Override
@@ -129,8 +141,9 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addDelete(String entityClassName) {
+		int classRef = getClassReference( entityClassName );
 		GenericRecord delete = new GenericData.Record( protocol.getType( "Delete" ) );
-		delete.put( "class", entityClassName );
+		delete.put( "class", classRef );
 		delete.put( "id", idRecord );
 		operations.add( delete );
 		idRecord = null;
@@ -138,8 +151,9 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addAdd(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
+		int classRef = getClassReference( entityClassName );
 		GenericRecord add = new GenericData.Record( protocol.getType( "Add" ) );
-		add.put( "class", entityClassName );
+		add.put( "class", classRef );
 		add.put( "id", idRecord );
 		add.put( "document", document );
 		add.put( "fieldToAnalyzerMap", fieldToAnalyzerMap );
@@ -150,8 +164,9 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addUpdate(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
+		int classRef = getClassReference( entityClassName );
 		GenericRecord update = new GenericData.Record( protocol.getType( "Update" ) );
-		update.put( "class", entityClassName );
+		update.put( "class", classRef );
 		update.put( "id", idRecord );
 		update.put( "document", document );
 		update.put( "fieldToAnalyzerMap", fieldToAnalyzerMap );
@@ -170,6 +185,7 @@ public class AvroSerializer implements Serializer {
 		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>( msgSchema );
 		BinaryEncoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );
 		GenericRecord message = new GenericData.Record( msgSchema );
+		message.put( "classReferences", classReferences );
 		message.put( "operations", operations );
 		operations = null;
 		try {
