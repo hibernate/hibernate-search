@@ -35,7 +35,6 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.textbuilder.SentenceInventor;
@@ -72,7 +71,6 @@ public class IndexingGeneratedCorpusTest {
 				.addAnnotatedClass( Nation.class )
 				.addAnnotatedClass( SecretBook.class )
 				.setProperty( "hibernate.show_sql", "false" ) // too verbose for this test
-				.setProperty( DefaultBatchBackend.CONCURRENT_WRITERS, "4" )
 				.build();
 		createMany( Book.class, BOOK_NUM );
 		createMany( Dvd.class, DVD_NUM );

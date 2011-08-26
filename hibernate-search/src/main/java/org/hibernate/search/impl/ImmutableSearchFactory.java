@@ -284,7 +284,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return indexHierarchy.getIndexedClasses( classes );
 	}
 
-	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer forceToNumWriterThreads) {
+	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
 		final BatchBackend batchBackend = new DefaultBatchBackend();
 		batchBackend.initialize( configurationProperties, progressMonitor, this );
 		return batchBackend;
