@@ -64,7 +64,7 @@ import org.hibernate.search.indexes.serialization.codex.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.codex.impl.PluggableSerializationLuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableTokenStream;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableTokenStream;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

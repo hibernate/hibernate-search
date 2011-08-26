@@ -18,15 +18,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.spi;
+
+import java.io.Serializable;
+import java.util.List;
+
+import org.apache.lucene.util.AttributeImpl;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public enum OperationType {
-	ADD,
-	UPDATE,
-	DELETE,
-	PURGE_ALL,
-	OPTIMIZE
+public class SerializableTokenStream implements Serializable {
+	private List<List<AttributeImpl>> stream;
+
+	public SerializableTokenStream(List<List<AttributeImpl>> stream) {
+		this.stream = stream;
+	}
+
+	public List<List<AttributeImpl>> getStream() {
+		return stream;
+	}
 }

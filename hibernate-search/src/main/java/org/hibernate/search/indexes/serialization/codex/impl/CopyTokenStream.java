@@ -29,8 +29,7 @@ import java.util.List;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.util.AttributeImpl;
 
-import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableTokenStream;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableTokenStream;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

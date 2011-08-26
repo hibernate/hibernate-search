@@ -26,10 +26,6 @@ import java.util.Map;
 
 import org.apache.lucene.util.AttributeImpl;
 
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableIndex;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableStore;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
-
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */

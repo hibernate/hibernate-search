@@ -48,11 +48,10 @@ import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
-import org.hibernate.search.indexes.serialization.operations.impl.LuceneFieldContext;
-import org.hibernate.search.indexes.serialization.operations.impl.LuceneNumericFieldContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

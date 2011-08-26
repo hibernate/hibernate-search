@@ -28,12 +28,8 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Properties;
 
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
@@ -42,8 +38,6 @@ import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializationProvider;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
 
 /**
  * Hibernate Search's log abstraction layer on top of JBoss Logging.

@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.codex.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -28,6 +28,7 @@ import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.serialization.codex.avro.impl.AvroSerializationProvider;
+import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.codex.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorksBuilder;
 import org.hibernate.search.indexes.serialization.operations.impl.Add;
@@ -56,7 +57,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class ModelDeserializer implements Deserializer {
+public class JavaSerializationDeserializer implements Deserializer {
 	private static final Log log = LoggerFactory.make();
 
 	@Override

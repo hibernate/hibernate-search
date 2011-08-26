@@ -37,11 +37,11 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.codex.spi.Deserializer;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.codex.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
-import org.hibernate.search.indexes.serialization.operations.impl.LuceneFieldContext;
-import org.hibernate.search.indexes.serialization.operations.impl.LuceneNumericFieldContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

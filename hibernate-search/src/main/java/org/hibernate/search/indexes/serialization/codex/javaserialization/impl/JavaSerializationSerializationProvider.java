@@ -18,24 +18,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
-import java.io.Serializable;
-import java.util.List;
-
-import org.apache.lucene.util.AttributeImpl;
+import org.hibernate.search.indexes.serialization.codex.spi.Deserializer;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializationProvider;
+import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableTokenStream implements Serializable {
-	private List<List<AttributeImpl>> stream;
-
-	public SerializableTokenStream(List<List<AttributeImpl>> stream) {
-		this.stream = stream;
+public class JavaSerializationSerializationProvider implements SerializationProvider {
+	@Override
+	public Serializer getSerializer() {
+		return new JavaSerializationSerializer();
 	}
 
-	public List<List<AttributeImpl>> getStream() {
-		return stream;
+	@Override
+	public Deserializer getDeserializer() {
+		return new JavaSerializationDeserializer();
 	}
 }
