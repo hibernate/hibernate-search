@@ -56,7 +56,6 @@ public class BatchCoordinator implements Runnable {
 	private final int collectionLoadingThreads;
 	private final CacheMode cacheMode;
 	private final int objectLoadingBatchSize;
-	private final Integer writerThreads; //could be null: in case global configuration properties are applied
 	private final boolean optimizeAtEnd;
 	private final boolean purgeAtStart;
 	private final boolean optimizeAfterPurge;
@@ -86,12 +85,11 @@ public class BatchCoordinator implements Runnable {
 		this.optimizeAfterPurge = optimizeAfterPurge;
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
-		this.writerThreads = writerThreads;
 		this.endAllSignal = new CountDownLatch( rootEntities.size() );
 	}
 
 	public void run() {
-		backend = searchFactoryImplementor.makeBatchBackend( monitor, writerThreads );
+		backend = searchFactoryImplementor.makeBatchBackend( monitor );
 		try {
 			beforeBatch(); // purgeAll and pre-optimize activities
 			doBatchWork();

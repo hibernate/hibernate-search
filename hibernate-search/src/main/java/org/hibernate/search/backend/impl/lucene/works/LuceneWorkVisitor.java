@@ -43,7 +43,7 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	private final PurgeAllWorkDelegate purgeAllDelegate;
 	
 	public LuceneWorkVisitor(Workspace workspace) {
-		if ( workspace.getEntitiesInDirectory().size() == 1 ) {
+		if ( workspace.getEntitiesInIndexManager().size() == 1 ) {
 			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
 		}
 		else {

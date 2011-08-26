@@ -54,7 +54,7 @@ public class CommonPropertiesParse {
 
 	/**
 	 * @param indexName
-	 * @param indexProps MaskedProperties for this DirectoryProvider
+	 * @param indexProps MaskedProperties for this IndexManager
 	 * @return the maximum queue length to be used on the backends of this index
 	 */
 	public static int extractMaxQueueSize(String indexName, Properties indexProps) {

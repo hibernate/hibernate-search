@@ -37,7 +37,7 @@ import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
- * Lucene workspace for a DirectoryProvider.
+ * Lucene workspace for an IndexManager
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -46,7 +46,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
 public abstract class AbstractWorkspaceImpl implements Workspace {
 
 	private final OptimizerStrategy optimizerStrategy;
-	private final Set<Class<?>> entitiesInDirectory;
+	private final Set<Class<?>> entitiesInIndexManager;
 	private final DirectoryBasedIndexManager indexManager;
 
 	protected final IndexWriterHolder writerHolder;
@@ -59,7 +59,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
 		this.indexManager = indexManager;
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
-		this.entitiesInDirectory = indexManager.getContainedTypes();
+		this.entitiesInIndexManager = indexManager.getContainedTypes();
 		this.writerHolder = new IndexWriterHolder( errorHandler, indexManager );
 	}
 
@@ -96,8 +96,8 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public Set<Class<?>> getEntitiesInDirectory() {
-		return entitiesInDirectory;
+	public Set<Class<?>> getEntitiesInIndexManager() {
+		return entitiesInIndexManager;
 	}
 
 	@Override

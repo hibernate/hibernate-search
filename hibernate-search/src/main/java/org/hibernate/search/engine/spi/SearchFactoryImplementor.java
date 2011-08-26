@@ -53,7 +53,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
 
-	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer writerThreads);
+	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
 
 	boolean isJMXEnabled();
 

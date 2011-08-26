@@ -99,12 +99,6 @@ public final class Environment {
 	public static final String CACHE_DOCIDRESULTS_SIZE = "hibernate.search.filter.cache_docidresults.size";
 
 	/**
-	 * batch backend implementation class (must have a no-arg constructor and implement BatchBackend)
-	 * also prefix for configuration settings of the batch backend
-	 */
-	public static final String BATCH_BACKEND = "hibernate.search.batchbackend";
-
-	/**
 	 * When set to true a lock on the index will not be released until the
 	 * SearchFactory (or SessionFactory) is closed.
 	 * This improves performance in applying changes to the index, but no other application

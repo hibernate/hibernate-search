@@ -67,9 +67,9 @@ public interface Workspace {
 
 	/**
 	 * @return The unmodifiable set of entity types being indexed
-	 * in the underlying Lucene Directory backing this Workspace.
+	 * in the underlying IndexManager backing this Workspace.
 	 */
-	Set<Class<?>> getEntitiesInDirectory();
+	Set<Class<?>> getEntitiesInIndexManager();
 
 	/**
 	 * 

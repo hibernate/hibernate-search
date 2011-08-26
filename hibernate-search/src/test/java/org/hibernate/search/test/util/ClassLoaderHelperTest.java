@@ -32,9 +32,8 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.backend.impl.batch.BatchBackend;
-import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.impl.FullTextSessionImpl;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 import org.junit.Test;
@@ -50,11 +49,11 @@ public class ClassLoaderHelperTest {
 
 	@Test
 	public void testInstanceFromName() {
-		BatchBackend batchBackend = ClassLoaderHelper.instanceFromName(
-				BatchBackend.class, DefaultBatchBackend.class.getName(), getClass(), "Lucene batch backend"
+		IndexManager indexManager = ClassLoaderHelper.instanceFromName(
+				IndexManager.class, RamIndexManager.class.getName(), getClass(), "Lucene index manager"
 		);
-		assertNotNull( batchBackend );
-		assertTrue( batchBackend.getClass().equals( DefaultBatchBackend.class ) );
+		assertNotNull( indexManager );
+		assertTrue( indexManager.getClass().equals( RamIndexManager.class ) );
 
 		try {
 			ClassLoaderHelper.instanceFromName(
@@ -71,11 +70,11 @@ public class ClassLoaderHelperTest {
 	@Test
 	public void testInstanceFromClass() {
 		//testing for interface implementation:
-		BatchBackend batchBackend = ClassLoaderHelper.instanceFromClass(
-				BatchBackend.class, DefaultBatchBackend.class, "Lucene batch backend"
+		IndexManager batchBackend = ClassLoaderHelper.instanceFromClass(
+				IndexManager.class, RamIndexManager.class, "Lucene index manager"
 		);
 		assertNotNull( batchBackend );
-		assertTrue( batchBackend.getClass().equals( DefaultBatchBackend.class ) );
+		assertTrue( batchBackend.getClass().equals( RamIndexManager.class ) );
 
 		//testing for subclasses:
 		Similarity sim = ClassLoaderHelper.instanceFromClass(
@@ -86,10 +85,10 @@ public class ClassLoaderHelperTest {
 
 		//testing proper error messages:
 		wrappingTestFromClass(
-				"Wrong configuration of Lucene batch backend: class " +
+				"Wrong configuration of Lucene index manager: class " +
 						"org.hibernate.search.test.util.ClassLoaderHelperTest does not implement " +
-						"interface org.hibernate.search.backend.impl.batch.BatchBackend",
-				BatchBackend.class, ClassLoaderHelperTest.class, "Lucene batch backend"
+						"interface org.hibernate.search.indexes.spi.IndexManager",
+				IndexManager.class, ClassLoaderHelperTest.class, "Lucene index manager"
 		);
 		wrappingTestFromClass(
 				"org.hibernate.search.impl.FullTextSessionImpl defined for component session " +
@@ -102,9 +101,9 @@ public class ClassLoaderHelperTest {
 		);
 		wrappingTestFromClass(
 				"Wrong configuration of default similarity: " +
-						"class org.hibernate.search.backend.impl.batch.DefaultBatchBackend " +
+						"class org.hibernate.search.test.util.RamIndexManager " +
 						"is not a subtype of org.apache.lucene.search.Similarity",
-				Similarity.class, DefaultBatchBackend.class, "default similarity"
+				Similarity.class, RamIndexManager.class, "default similarity"
 		);
 		wrappingTestFromClass(
 				"Unable to instantiate default similarity class: org.apache.lucene.search.Similarity. " +

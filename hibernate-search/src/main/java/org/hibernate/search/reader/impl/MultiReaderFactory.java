@@ -40,12 +40,12 @@ public class MultiReaderFactory {
 	
 	private static final Log log = LoggerFactory.make();
 
-	public static IndexReader openReader(IndexManager... directoryProviders) {
-		final int length = directoryProviders.length;
+	public static IndexReader openReader(IndexManager... indexManagers) {
+		final int length = indexManagers.length;
 		IndexReader[] readers = new IndexReader[length];
 		ReaderProvider[] managers = new ReaderProvider[length];
 		for (int index = 0; index < length; index++) {
-			ReaderProvider indexReaderManager = directoryProviders[index].getIndexReaderManager();
+			ReaderProvider indexReaderManager = indexManagers[index].getIndexReaderManager();
 			IndexReader openIndexReader = indexReaderManager.openIndexReader();
 			readers[index] = openIndexReader;
 			managers[index] = indexReaderManager;
