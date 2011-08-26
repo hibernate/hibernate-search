@@ -25,7 +25,6 @@ package org.hibernate.search.backend.impl.batch;
 
 import java.util.Properties;
 
-import org.hibernate.search.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.LuceneWork;
@@ -45,8 +44,6 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class DefaultBatchBackend implements BatchBackend {
 	
-	public static final String CONCURRENT_WRITERS = Environment.BATCH_BACKEND + ".concurrent_writers";
-
 	private SearchFactoryIntegrator searchFactoryImplementor;
 
 	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, SearchFactoryIntegrator searchFactory) {

@@ -44,12 +44,9 @@ import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.configuration.impl.MaskedProperty;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
@@ -288,26 +285,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor, Integer forceToNumWriterThreads) {
-		final BatchBackend batchBackend;
-		String impl = configurationProperties.getProperty( Environment.BATCH_BACKEND );
-		if ( StringHelper.isEmpty( impl ) || "LuceneBatch".equalsIgnoreCase( impl ) ) {
-			batchBackend = new DefaultBatchBackend();
-		}
-		else {
-			batchBackend = ClassLoaderHelper.instanceFromName(
-					BatchBackend.class, impl, ImmutableSearchFactory.class,
-					"batchbackend"
-			);
-		}
-		Properties cfg = this.configurationProperties;
-		if ( forceToNumWriterThreads != null ) {
-			cfg = new Properties( cfg );
-			cfg.put( DefaultBatchBackend.CONCURRENT_WRITERS, forceToNumWriterThreads.toString() );
-		}
-		Properties batchBackendConfiguration = new MaskedProperty(
-				cfg, Environment.BATCH_BACKEND
-		);
-		batchBackend.initialize( batchBackendConfiguration, progressMonitor, this );
+		final BatchBackend batchBackend = new DefaultBatchBackend();
+		batchBackend.initialize( configurationProperties, progressMonitor, this );
 		return batchBackend;
 	}
 
