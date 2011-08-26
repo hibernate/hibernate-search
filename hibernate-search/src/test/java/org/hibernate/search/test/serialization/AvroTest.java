@@ -55,7 +55,7 @@ public class AvroTest {
 
 	@Test
 	public void experimentWithAvro() throws Exception {
-		String root = "org/hibernate/search/remote/codex/avro/v1/";
+		String root = "org/hibernate/search/remote/codex/avro/v1_0/";
 		parseSchema( root + "attribute" + File.separator + "TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
 		parseSchema( root + "attribute" + File.separator + "CharTermAttribute.avro", "attribute/CharTermAttribute" );
 		parseSchema( root + "attribute" + File.separator + "PayloadAttribute.avro", "attribute/PayloadAttribute" );
@@ -64,25 +64,25 @@ public class AvroTest {
 		parseSchema( root + "attribute" + File.separator + "FlagsAttribute.avro", "attribute/FlagsAttribute" );
 		parseSchema( root + "attribute" + File.separator + "TypeAttribute.avro", "attribute/TypeAttribute" );
 		parseSchema( root + "attribute" + File.separator + "OffsetAttribute.avro", "attribute/OffsetAttribute" );
-		parseSchema( root + "TermVector.avro", "TermVector" );
-		parseSchema( root + "Index.avro", "Index" );
-		parseSchema( root + "Store.avro", "Store" );
-		parseSchema( root + "TokenStreamField.avro", "TokenStreamField" );
-		parseSchema( root + "ReaderField.avro", "ReaderField" );
-		parseSchema( root + "StringField.avro", "StringField" );
-		parseSchema( root + "BinaryField.avro", "BinaryField" );
-		parseSchema( root + "NumericIntField.avro", "NumericIntField" );
-		parseSchema( root + "NumericLongField.avro", "NumericLongField" );
-		parseSchema( root + "NumericFloatField.avro", "NumericFloatField" );
-		parseSchema( root + "NumericDoubleField.avro", "NumericDoubleField" );
-		parseSchema( root + "CustomFieldable.avro", "CustomFieldable" );
+		parseSchema( root + "field" + File.separator + "TermVector.avro", "field/TermVector" );
+		parseSchema( root + "field" + File.separator + "Index.avro", "field/Index" );
+		parseSchema( root + "field" + File.separator + "Store.avro", "field/Store" );
+		parseSchema( root + "field" + File.separator + "TokenStreamField.avro", "field/TokenStreamField" );
+		parseSchema( root + "field" + File.separator + "ReaderField.avro", "field/ReaderField" );
+		parseSchema( root + "field" + File.separator + "StringField.avro", "field/StringField" );
+		parseSchema( root + "field" + File.separator + "BinaryField.avro", "field/BinaryField" );
+		parseSchema( root + "field" + File.separator + "NumericIntField.avro", "field/NumericIntField" );
+		parseSchema( root + "field" + File.separator + "NumericLongField.avro", "field/NumericLongField" );
+		parseSchema( root + "field" + File.separator + "NumericFloatField.avro", "field/NumericFloatField" );
+		parseSchema( root + "field" + File.separator + "NumericDoubleField.avro", "field/NumericDoubleField" );
+		parseSchema( root + "field" + File.separator + "CustomFieldable.avro", "field/CustomFieldable" );
 		parseSchema( root + "Document.avro", "Document" );
-		parseSchema( root + "Id.avro", "Id" );
-		parseSchema( root + "OptimizeAll.avro", "OptimizeAll" );
-		parseSchema( root + "PurgeAll.avro", "PurgeAll" );
-		parseSchema( root + "Delete.avro", "Delete" );
-		parseSchema( root + "Add.avro", "Add" );
-		parseSchema( root + "Update.avro", "Update" );
+		parseSchema( root + "operation" + File.separator + "Id.avro", "operation/Id" );
+		parseSchema( root + "operation" + File.separator + "OptimizeAll.avro", "operation/OptimizeAll" );
+		parseSchema( root + "operation" + File.separator + "PurgeAll.avro", "operation/PurgeAll" );
+		parseSchema( root + "operation" + File.separator + "Delete.avro", "operation/Delete" );
+		parseSchema( root + "operation" + File.separator + "Add.avro", "operation/Add" );
+		parseSchema( root + "operation" + File.separator + "Update.avro", "operation/Update" );
 		parseSchema( root + "Message.avro", "Message" );
 
 
