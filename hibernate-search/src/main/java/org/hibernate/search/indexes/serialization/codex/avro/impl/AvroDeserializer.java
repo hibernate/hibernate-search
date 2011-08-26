@@ -37,9 +37,9 @@ import org.apache.avro.util.Utf8;
 
 import org.hibernate.search.indexes.serialization.codex.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneWorksBuilder;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableIndex;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableStore;
-import org.hibernate.search.indexes.serialization.operations.impl.SerializableTermVector;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableIndex;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableStore;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableTermVector;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

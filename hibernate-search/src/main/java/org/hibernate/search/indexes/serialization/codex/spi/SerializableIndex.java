@@ -18,15 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.spi;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public enum SerializableTermVector {
+public enum SerializableIndex {
 	NO,
-	YES,
-	WITH_POSITIONS,
-	WITH_OFFSETS,
-	WITH_POSITIONS_OFFSETS
+	ANALYZED,
+	NOT_ANALYZED,
+	NOT_ANALYZED_NO_NORMS,
+	ANALYZED_NO_NORMS
 }

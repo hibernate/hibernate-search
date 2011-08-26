@@ -26,8 +26,6 @@ import java.util.Map;
 import org.apache.lucene.document.Fieldable;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.indexes.serialization.operations.impl.LuceneFieldContext;
-import org.hibernate.search.indexes.serialization.operations.impl.LuceneNumericFieldContext;
 
 /**
  * Contract between Hibernate Search and the Serialization mechanism.

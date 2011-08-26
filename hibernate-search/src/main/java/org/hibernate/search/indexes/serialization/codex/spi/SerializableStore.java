@@ -18,23 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.codex.impl;
-
-import org.hibernate.search.indexes.serialization.codex.spi.Deserializer;
-import org.hibernate.search.indexes.serialization.codex.spi.SerializationProvider;
-import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
+package org.hibernate.search.indexes.serialization.codex.spi;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class ModelSerializationProvider implements SerializationProvider {
-	@Override
-	public Serializer getSerializer() {
-		return new ModelSerializer();
-	}
-
-	@Override
-	public Deserializer getDeserializer() {
-		return new ModelDeserializer();
-	}
+public enum SerializableStore {
+	YES,
+	NO
 }

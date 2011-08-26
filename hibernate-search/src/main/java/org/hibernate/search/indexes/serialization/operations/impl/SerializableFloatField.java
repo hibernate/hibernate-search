@@ -20,6 +20,8 @@
  */
 package org.hibernate.search.indexes.serialization.operations.impl;
 
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneNumericFieldContext;
+
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */

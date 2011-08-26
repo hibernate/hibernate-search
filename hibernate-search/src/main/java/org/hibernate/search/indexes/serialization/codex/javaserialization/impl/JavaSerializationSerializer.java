@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.codex.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -29,11 +29,12 @@ import java.util.Set;
 import org.apache.lucene.document.Fieldable;
 
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.indexes.serialization.codex.impl.SerializationHelper;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.codex.spi.Serializer;
 import org.hibernate.search.indexes.serialization.operations.impl.Add;
 import org.hibernate.search.indexes.serialization.operations.impl.Delete;
-import org.hibernate.search.indexes.serialization.operations.impl.LuceneFieldContext;
-import org.hibernate.search.indexes.serialization.operations.impl.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.operations.impl.Message;
 import org.hibernate.search.indexes.serialization.operations.impl.Operation;
 import org.hibernate.search.indexes.serialization.operations.impl.OptimizeAll;
@@ -54,7 +55,7 @@ import org.hibernate.search.indexes.serialization.operations.impl.Update;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class ModelSerializer implements Serializer {
+public class JavaSerializationSerializer implements Serializer {
 	private Serializable id;
 	private Set<Operation> ops;
 	private Set<SerializableFieldable> serialFields;

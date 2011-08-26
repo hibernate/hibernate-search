@@ -20,6 +20,9 @@
  */
 package org.hibernate.search.indexes.serialization.operations.impl;
 
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableTermVector;
+
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
