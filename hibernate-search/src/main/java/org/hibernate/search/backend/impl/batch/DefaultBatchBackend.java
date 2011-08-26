@@ -44,10 +44,10 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class DefaultBatchBackend implements BatchBackend {
 	
-	private SearchFactoryIntegrator searchFactoryImplementor;
+	private final SearchFactoryIntegrator searchFactoryImplementor;
 
-	public void initialize(Properties cfg, MassIndexerProgressMonitor monitor, SearchFactoryIntegrator searchFactory) {
-		this.searchFactoryImplementor = searchFactory;
+	public DefaultBatchBackend(SearchFactoryIntegrator searchFactoryImplementor, MassIndexerProgressMonitor progressMonitor) {
+		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
 
 	public void enqueueAsyncWork(LuceneWork work) throws InterruptedException {

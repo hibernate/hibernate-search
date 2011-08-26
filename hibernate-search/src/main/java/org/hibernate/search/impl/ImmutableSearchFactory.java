@@ -285,9 +285,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
-		final BatchBackend batchBackend = new DefaultBatchBackend();
-		batchBackend.initialize( configurationProperties, progressMonitor, this );
-		return batchBackend;
+		return new DefaultBatchBackend( this, progressMonitor );
 	}
 
 	public PolymorphicIndexHierarchy getIndexHierarchy() {

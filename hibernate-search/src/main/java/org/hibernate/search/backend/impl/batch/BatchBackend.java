@@ -23,11 +23,8 @@
  */
 package org.hibernate.search.backend.impl.batch;
 
-import java.util.Properties;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
 
 /**
  * Implementations of this interface are not drop-in replacements for the standard BackendQueueProcessorFactory,
@@ -38,15 +35,6 @@ import org.hibernate.search.spi.SearchFactoryIntegrator;
  * @author Sanne Grinovero
  */
 public interface BatchBackend {
-
-	/**
-	 * Used at startup, called once as first method.
-	 *
-	 * @param props all configuration properties
-	 * @param monitor the indexing progress monitor
-	 * @param searchFactory the running SearchFactory
-	 */
-	void initialize(Properties props, MassIndexerProgressMonitor monitor, SearchFactoryIntegrator searchFactory);
 
 	/**
 	 * Enqueues one work to be processed asynchronously
