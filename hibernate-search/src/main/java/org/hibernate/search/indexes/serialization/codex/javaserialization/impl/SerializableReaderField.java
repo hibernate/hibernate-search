@@ -18,22 +18,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
-import org.hibernate.search.indexes.serialization.codex.spi.LuceneNumericFieldContext;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableTermVector;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableIntField extends SerializableNumericField {
-	private int value;
+public class SerializableReaderField extends SerializableField {
+	private byte[] value;
+	private SerializableTermVector termVector;
 
-	public SerializableIntField(int value, LuceneNumericFieldContext context) {
-		super(context);
-		this.value = value;
+	public SerializableReaderField(LuceneFieldContext context) {
+		super( context );
+		this.value = context.getReaderValue();
+		this.termVector = context.getTermVector();
 	}
 
-	public int getValue() {
+	public byte[] getValue() {
 		return value;
+	}
+
+	public SerializableTermVector getTermVector() {
+		return termVector;
 	}
 }

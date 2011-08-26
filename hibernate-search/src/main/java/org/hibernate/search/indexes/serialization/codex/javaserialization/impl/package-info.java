@@ -18,19 +18,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
-
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * Represents a canonical model for the data that ought to be serialized.
+ * A JavaSerializationSerializationProvider convert List of LuceneWork into this canonical
+ * model.
+ *
+ * Note that some objects are reused in the Serialization / Deserialization contract used by
+ * other serializers but most are not and this code is mostly unused.
+ *
+ * Still it is a useful and typesafe references that we might want to keep around.
+ *
+ * @author Emmanuel Bernard
  */
-public class PurgeAll implements Operation {
-	private String entityClassName;
-
-	public PurgeAll(String entityClassName) {
-		this.entityClassName = entityClassName;
-	}
-
-	public String getEntityClassName() {
-		return entityClassName;
-	}
-}
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;

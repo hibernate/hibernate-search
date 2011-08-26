@@ -18,30 +18,34 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
 import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
-import org.hibernate.search.indexes.serialization.codex.spi.SerializableTermVector;
-import org.hibernate.search.indexes.serialization.codex.spi.SerializableTokenStream;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableTokenStreamField extends SerializableField {
-	private SerializableTokenStream value;
-	private SerializableTermVector termVector;
+public class SerializableBinaryField extends SerializableField {
+	private byte[] value;
+	private int offset;
+	private int length;
 
-	public SerializableTokenStreamField(LuceneFieldContext context) {
+	public SerializableBinaryField(LuceneFieldContext context) {
 		super( context );
-		this.value = context.getTokenStream();
-		this.termVector = context.getTermVector();
+		this.value = context.getBinaryValue();
+		this.offset = context.getBinaryOffset();
+		this.length = context.getBinaryLength();
 	}
 
-	public SerializableTokenStream getValue() {
+	public byte[] getValue() {
 		return value;
 	}
 
-	public SerializableTermVector getTermVector() {
-		return termVector;
+	public int getOffset() {
+		return offset;
+	}
+
+	public int getLength() {
+		return length;
 	}
 }

@@ -18,19 +18,41 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
+
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableCustomFieldable implements SerializableFieldable {
-	private byte[] instance;
+public abstract class SerializableField implements SerializableFieldable {
+	private String name;
+	//TODO state not kept, how to know if a string ought to be interned? default seems to be intern
+	//private boolean interned
+	private float boost;
+	private boolean omitNorms;
+	private boolean omitTermFreqAndPositions;
 
-	public SerializableCustomFieldable(byte[] fieldable) {
-		this.instance = fieldable;
+	public SerializableField(LuceneFieldContext context) {
+		this.name = context.getName();
+		this.boost = context.getBoost();
+		this.omitNorms = context.isOmitNorms();
+		this.omitTermFreqAndPositions = context.isOmitTermFreqAndPositions();
 	}
 
-	public byte[] getInstance() {
-		return instance;
+	public String getName() {
+		return name;
+	}
+
+	public float getBoost() {
+		return boost;
+	}
+
+	public boolean isOmitNorms() {
+		return omitNorms;
+	}
+
+	public boolean isOmitTermFreqAndPositions() {
+		return omitTermFreqAndPositions;
 	}
 }

@@ -18,41 +18,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
-import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public abstract class SerializableField implements SerializableFieldable {
-	private String name;
-	//TODO state not kept, how to know if a string ought to be interned? default seems to be intern
-	//private boolean interned
+public class SerializableDocument implements Serializable {
 	private float boost;
-	private boolean omitNorms;
-	private boolean omitTermFreqAndPositions;
+	private Set<SerializableFieldable> fieldables;
 
-	public SerializableField(LuceneFieldContext context) {
-		this.name = context.getName();
-		this.boost = context.getBoost();
-		this.omitNorms = context.isOmitNorms();
-		this.omitTermFreqAndPositions = context.isOmitTermFreqAndPositions();
-	}
-
-	public String getName() {
-		return name;
+	public SerializableDocument(Set<SerializableFieldable> fieldables, float boost) {
+		this.fieldables = fieldables;
+		this.boost = boost;
 	}
 
 	public float getBoost() {
 		return boost;
 	}
 
-	public boolean isOmitNorms() {
-		return omitNorms;
+	public void setBoost(float boost) {
+		this.boost = boost;
 	}
 
-	public boolean isOmitTermFreqAndPositions() {
-		return omitTermFreqAndPositions;
+	public Set<SerializableFieldable> getFieldables() {
+		return fieldables;
 	}
 }

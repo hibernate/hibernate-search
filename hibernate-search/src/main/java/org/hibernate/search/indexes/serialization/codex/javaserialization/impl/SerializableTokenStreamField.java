@@ -18,32 +18,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
-import java.io.Serializable;
-import java.util.Set;
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableTermVector;
+import org.hibernate.search.indexes.serialization.codex.spi.SerializableTokenStream;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableDocument implements Serializable {
-	private float boost;
-	private Set<SerializableFieldable> fieldables;
+public class SerializableTokenStreamField extends SerializableField {
+	private SerializableTokenStream value;
+	private SerializableTermVector termVector;
 
-	public SerializableDocument(Set<SerializableFieldable> fieldables, float boost) {
-		this.fieldables = fieldables;
-		this.boost = boost;
+	public SerializableTokenStreamField(LuceneFieldContext context) {
+		super( context );
+		this.value = context.getTokenStream();
+		this.termVector = context.getTermVector();
 	}
 
-	public float getBoost() {
-		return boost;
+	public SerializableTokenStream getValue() {
+		return value;
 	}
 
-	public void setBoost(float boost) {
-		this.boost = boost;
-	}
-
-	public Set<SerializableFieldable> getFieldables() {
-		return fieldables;
+	public SerializableTermVector getTermVector() {
+		return termVector;
 	}
 }

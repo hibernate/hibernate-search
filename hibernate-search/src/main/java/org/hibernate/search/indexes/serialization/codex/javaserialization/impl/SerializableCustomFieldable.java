@@ -18,43 +18,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
-
-import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
-import org.hibernate.search.indexes.serialization.codex.spi.SerializableIndex;
-import org.hibernate.search.indexes.serialization.codex.spi.SerializableStore;
-import org.hibernate.search.indexes.serialization.codex.spi.SerializableTermVector;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableStringField extends SerializableField {
-	private String value;
-	private SerializableStore store;
-	private SerializableIndex index;
-	private SerializableTermVector termVector;
+public class SerializableCustomFieldable implements SerializableFieldable {
+	private byte[] instance;
 
-	public SerializableStringField(LuceneFieldContext context) {
-		super( context );
-		this.value = context.getStringValue();
-		this.store = context.getStore();
-		this.index = context.getIndex();
-		this.termVector = context.getTermVector();
+	public SerializableCustomFieldable(byte[] fieldable) {
+		this.instance = fieldable;
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public SerializableStore getStore() {
-		return store;
-	}
-
-	public SerializableIndex getIndex() {
-		return index;
-	}
-
-	public SerializableTermVector getTermVector() {
-		return termVector;
+	public byte[] getInstance() {
+		return instance;
 	}
 }

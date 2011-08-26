@@ -18,29 +18,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
-import org.hibernate.search.indexes.serialization.codex.spi.LuceneFieldContext;
-import org.hibernate.search.indexes.serialization.codex.spi.SerializableTermVector;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
+ * A message is made of:
+ * - a protocol version number
+ * - a set of operations
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializableReaderField extends SerializableField {
-	private byte[] value;
-	private SerializableTermVector termVector;
 
-	public SerializableReaderField(LuceneFieldContext context) {
-		super( context );
-		this.value = context.getReaderValue();
-		this.termVector = context.getTermVector();
+public class Message implements Serializable {
+	private Set<Operation> operations;
+
+	public Message(Set<Operation> operations) {
+		this.operations = operations;
 	}
 
-	public byte[] getValue() {
-		return value;
-	}
-
-	public SerializableTermVector getTermVector() {
-		return termVector;
+	public Set<Operation> getOperations() {
+		return operations;
 	}
 }

@@ -18,15 +18,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.operations.impl;
+package org.hibernate.search.indexes.serialization.codex.javaserialization.impl;
 
+import org.hibernate.search.indexes.serialization.codex.spi.LuceneNumericFieldContext;
 
 /**
- * A message is made of:
- * - a protocol version number
- * - a set of operations
- *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface Operation {
+public class SerializableIntField extends SerializableNumericField {
+	private int value;
+
+	public SerializableIntField(int value, LuceneNumericFieldContext context) {
+		super(context);
+		this.value = value;
+	}
+
+	public int getValue() {
+		return value;
+	}
 }
