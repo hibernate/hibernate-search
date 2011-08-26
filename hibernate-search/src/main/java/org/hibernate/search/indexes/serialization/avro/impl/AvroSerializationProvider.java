@@ -49,7 +49,7 @@ public class AvroSerializationProvider implements SerializationProvider {
 
 	private static final Log log = LoggerFactory.make();
 	private Map<String, String> schemas = new HashMap<String,String>();
-	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1/";
+	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1_0/";
 	public static byte MAJOR_VERSION = ( byte ) ( -128 + 1 );
 	public static byte MINOR_VERSION = ( byte ) ( -128 + 0 );
 	private Protocol protocol;
@@ -74,9 +74,6 @@ public class AvroSerializationProvider implements SerializationProvider {
 
 	public AvroSerializationProvider() {
 		log.serializationProtocol( getMajorVersion(), getMinorVersion() );
-		parseSchema( "TermVector" );
-		parseSchema( "Index" );
-		parseSchema( "Store" );
 		parseSchema( "attribute/TokenTrackingAttribute" );
 		parseSchema( "attribute/CharTermAttribute" );
 		parseSchema( "attribute/PayloadAttribute" );
@@ -85,22 +82,25 @@ public class AvroSerializationProvider implements SerializationProvider {
 		parseSchema( "attribute/FlagsAttribute" );
 		parseSchema( "attribute/TypeAttribute" );
 		parseSchema( "attribute/OffsetAttribute" );
-		parseSchema( "TokenStreamField" );
-		parseSchema( "ReaderField" );
-		parseSchema( "StringField" );
-		parseSchema( "BinaryField" );
-		parseSchema( "NumericIntField" );
-		parseSchema( "NumericLongField" );
-		parseSchema( "NumericFloatField" );
-		parseSchema( "NumericDoubleField" );
-		parseSchema( "CustomFieldable" );
+		parseSchema( "field/TermVector" );
+		parseSchema( "field/Index" );
+		parseSchema( "field/Store" );
+		parseSchema( "field/TokenStreamField" );
+		parseSchema( "field/ReaderField" );
+		parseSchema( "field/StringField" );
+		parseSchema( "field/BinaryField" );
+		parseSchema( "field/NumericIntField" );
+		parseSchema( "field/NumericLongField" );
+		parseSchema( "field/NumericFloatField" );
+		parseSchema( "field/NumericDoubleField" );
+		parseSchema( "field/CustomFieldable" );
 		parseSchema( "Document" );
-		parseSchema( "Id" );
-		parseSchema( "OptimizeAll" );
-		parseSchema( "PurgeAll" );
-		parseSchema( "Delete" );
-		parseSchema( "Add" );
-		parseSchema( "Update" );
+		parseSchema( "operation/Id" );
+		parseSchema( "operation/OptimizeAll" );
+		parseSchema( "operation/PurgeAll" );
+		parseSchema( "operation/Delete" );
+		parseSchema( "operation/Add" );
+		parseSchema( "operation/Update" );
 		parseSchema( "Message" );
 
 		this.protocol = parseProtocol( "Works" );
