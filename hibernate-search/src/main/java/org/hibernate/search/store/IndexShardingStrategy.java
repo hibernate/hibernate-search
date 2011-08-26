@@ -55,13 +55,13 @@ public interface IndexShardingStrategy {
 	IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document);
 
 	/**
-	 * return the DirectoryProvider(s) where the given entity is stored and where the deletion operation needs to be applied
-	 * id and idInString can be null. If null, all the directory providers containing entity types should be returned
+	 * return the IndexManager(s) where the given entity is stored and where the deletion operation needs to be applied
+	 * id and idInString can be null. If null, all the IndexManagers containing entity types should be returned
 	 */
 	IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString);
 
 	/**
-	 * return the set of DirectoryProvider(s) where the entities matching the filters are stored
+	 * return the set of IndexManager(s) where the entities matching the filters are stored
 	 * this optional optimization allows queries to hit a subset of all shards, which may be useful for some datasets
 	 * if this optimization is not needed, return getIndexManagersForAllShards()
 	 *

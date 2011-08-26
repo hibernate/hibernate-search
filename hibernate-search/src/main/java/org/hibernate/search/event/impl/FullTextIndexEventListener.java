@@ -82,7 +82,6 @@ import static org.hibernate.search.event.impl.FullTextIndexEventListener.Install
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-//TODO implement and use a LockableDirectoryProvider that wraps a DP to handle the lock inside the LDP
 //TODO make this class final as soon as FullTextIndexCollectionEventListener is removed.
 @SuppressWarnings("serial")
 public class FullTextIndexEventListener implements PostDeleteEventListener,

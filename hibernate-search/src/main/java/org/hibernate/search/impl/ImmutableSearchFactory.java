@@ -89,7 +89,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	private final Map<Class<?>, EntityIndexBinder<?>> indexBindingForEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
-	//keep track of the index modifiers per DirectoryProvider since multiple entity can use the same directory provider
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
