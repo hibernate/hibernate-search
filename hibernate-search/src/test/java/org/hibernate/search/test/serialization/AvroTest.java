@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.remote;
+package org.hibernate.search.test.serialization;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,7 +45,7 @@ import org.apache.avro.util.Utf8;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.search.test.remote.AvroUtils.*;
+import static org.hibernate.search.test.serialization.AvroUtils.*;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
