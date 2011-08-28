@@ -37,10 +37,6 @@ import org.hibernate.search.spi.WorkerBuildContext;
 public class RamIndexManager extends DirectoryBasedIndexManager {
 	
 	private static final LogErrorHandler logErrorHadler = new LogErrorHandler();
-	
-	private RamIndexManager() {
-		//make sure tests use the helper below:
-	}
 
 	public static RamIndexManager makeRamDirectory() {
 		RamIndexManager ramIndexManager = new RamIndexManager();

@@ -21,6 +21,7 @@
 package org.hibernate.search.indexes.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +30,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
@@ -44,6 +46,8 @@ import org.hibernate.search.store.impl.NotShardedStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Stores references to IndexManager instances, and starts/stops them.
@@ -60,10 +64,23 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  */
 public class IndexManagerHolder {
 	
+	public static final String INDEXMANAGER_IMPL_NAME = "indexmanager";
+
+	private static final Log log = LoggerFactory.make();
+
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
-	
+
 	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
+
+	private static final Map<String, String> defaultIndexManagerClasses;
+
+	static {
+		defaultIndexManagerClasses = new HashMap<String, String>( 3 );
+		defaultIndexManagerClasses.put( "", DirectoryBasedIndexManager.class.getName() );
+		defaultIndexManagerClasses.put( "transactional", DirectoryBasedIndexManager.class.getName() );
+		defaultIndexManagerClasses.put( "NRT", NRTIndexManager.class.getName() );
+	}
 
 	/**
 	 * Multiple IndexManager might be built for the same entity to implement Sharding.
@@ -162,12 +179,26 @@ public class IndexManagerHolder {
 		manager.setSimilarity( newSimilarity );
 	}
 
-	//FIXME for now we only build "legacy" DirectoryBasedIndexManager
-	// we should support replacing the IndexManager type with other types: HSEARCH-823
 	private IndexManager createDirectoryManager(String indexName, Properties indexProps, Class<?> entity, WorkerBuildContext context) {
-		DirectoryBasedIndexManager manager = new DirectoryBasedIndexManager();
-		manager.initialize( indexName, indexProps, context );
-		return manager;
+		String indexManagerName = indexProps.getProperty( INDEXMANAGER_IMPL_NAME, "transactional" );
+		final IndexManager manager;
+		if ( StringHelper.isEmpty( indexManagerName ) ) {
+			manager = new DirectoryBasedIndexManager();
+		}
+		else {
+			String longName = defaultIndexManagerClasses.get( indexManagerName );
+			if ( longName == null ) {
+				longName = indexManagerName;
+			}
+			manager = ClassLoaderHelper.instanceFromName( IndexManager.class, longName,
+						IndexManagerHolder.class, "index manager" );
+		}
+		try {
+			manager.initialize( indexName, indexProps, context );
+			return manager;
+		} catch (Exception e) {
+			throw log.unableToInitializeIndexManager( indexName, e );
+		}
 	}
 
 	/**
