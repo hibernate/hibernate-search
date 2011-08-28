@@ -42,7 +42,7 @@ public class IdShardingStrategyTest {
 	public void setUp() throws Exception {
 		shardStrategy = new IdHashShardingStrategy();
 		shardStrategy.initialize( null, new IndexManager[] {
-				new RamIndexManager(), new RamIndexManager() } );
+				RamIndexManager.makeRamDirectory(), RamIndexManager.makeRamDirectory() } );
 	}
 
 	@Test

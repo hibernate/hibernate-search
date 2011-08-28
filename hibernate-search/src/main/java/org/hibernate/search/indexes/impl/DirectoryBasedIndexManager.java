@@ -41,6 +41,7 @@ import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
@@ -52,7 +53,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
 public class DirectoryBasedIndexManager implements IndexManager {
 	
 	private String indexName;
-	private final DirectoryProvider directoryProvider;
+	private DirectoryProvider directoryProvider;
 	private Similarity similarity;
 	private BackendQueueProcessor backend;
 	private OptimizerStrategy optimizer;
@@ -62,10 +63,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private SearchFactoryImplementor boundSearchFactory = null;
 	private DirectoryBasedReaderManager readers = null;
 	private IndexWriterConfig writerConfig;
-	
-	public DirectoryBasedIndexManager(DirectoryProvider directoryProvider) {
-		this.directoryProvider = directoryProvider;
-	}
 
 	@Override
 	public String getIndexName() {
@@ -87,6 +84,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
+		directoryProvider = DirectoryProviderFactory.createDirectoryProvider( indexName, cfg, buildContext );
 		indexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
 		backend = BackendFactory.createBackend( this, buildContext, cfg );

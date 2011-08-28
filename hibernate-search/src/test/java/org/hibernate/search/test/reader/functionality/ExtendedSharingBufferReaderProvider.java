@@ -152,8 +152,11 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	 */
 	public class MockDirectoryBasedIndexManager extends DirectoryBasedIndexManager {
 
-		public MockDirectoryBasedIndexManager() {
-			super( new MockDirectoryProvider() );
+		private MockDirectoryProvider provider = new MockDirectoryProvider();
+		
+		@Override
+		public DirectoryProvider getDirectoryProvider() {
+			return provider;
 		}
 		
 	}
