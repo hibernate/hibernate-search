@@ -37,7 +37,6 @@ import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
@@ -166,9 +165,7 @@ public class IndexManagerHolder {
 	//FIXME for now we only build "legacy" DirectoryBasedIndexManager
 	// we should support replacing the IndexManager type with other types: HSEARCH-823
 	private IndexManager createDirectoryManager(String indexName, Properties indexProps, Class<?> entity, WorkerBuildContext context) {
-		DirectoryProvider<?> provider = DirectoryProviderFactory.createDirectoryProvider ( indexName, indexProps, context );
-		
-		DirectoryBasedIndexManager manager = new DirectoryBasedIndexManager( provider );
+		DirectoryBasedIndexManager manager = new DirectoryBasedIndexManager();
 		manager.initialize( indexName, indexProps, context );
 		return manager;
 	}

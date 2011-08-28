@@ -62,7 +62,7 @@ public class ShardsTest extends SearchTestCase {
 	}
 
 	public void testIdShardingStrategy() {
-		IndexManager[] dps = new IndexManager[] { new RamIndexManager(), new RamIndexManager() };
+		IndexManager[] dps = new IndexManager[] { RamIndexManager.makeRamDirectory(), RamIndexManager.makeRamDirectory() };
 		IdHashShardingStrategy shardingStrategy = new IdHashShardingStrategy();
 		shardingStrategy.initialize( null, dps );
 		assertTrue( dps[1] == shardingStrategy.getIndexManagerForAddition( Animal.class, 1, "1", null ) );

@@ -33,6 +33,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.impl.FullTextSessionImpl;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
@@ -50,10 +51,10 @@ public class ClassLoaderHelperTest {
 	@Test
 	public void testInstanceFromName() {
 		IndexManager indexManager = ClassLoaderHelper.instanceFromName(
-				IndexManager.class, RamIndexManager.class.getName(), getClass(), "Lucene index manager"
+				IndexManager.class, DirectoryBasedIndexManager.class.getName(), getClass(), "Lucene index manager"
 		);
 		assertNotNull( indexManager );
-		assertTrue( indexManager.getClass().equals( RamIndexManager.class ) );
+		assertTrue( indexManager.getClass().equals( DirectoryBasedIndexManager.class ) );
 
 		try {
 			ClassLoaderHelper.instanceFromName(
@@ -71,10 +72,10 @@ public class ClassLoaderHelperTest {
 	public void testInstanceFromClass() {
 		//testing for interface implementation:
 		IndexManager batchBackend = ClassLoaderHelper.instanceFromClass(
-				IndexManager.class, RamIndexManager.class, "Lucene index manager"
+				IndexManager.class, DirectoryBasedIndexManager.class, "Lucene index manager"
 		);
 		assertNotNull( batchBackend );
-		assertTrue( batchBackend.getClass().equals( RamIndexManager.class ) );
+		assertTrue( batchBackend.getClass().equals( DirectoryBasedIndexManager.class ) );
 
 		//testing for subclasses:
 		Similarity sim = ClassLoaderHelper.instanceFromClass(
@@ -101,9 +102,9 @@ public class ClassLoaderHelperTest {
 		);
 		wrappingTestFromClass(
 				"Wrong configuration of default similarity: " +
-						"class org.hibernate.search.test.util.RamIndexManager " +
+						"class org.hibernate.search.indexes.impl.DirectoryBasedIndexManager " +
 						"is not a subtype of org.apache.lucene.search.Similarity",
-				Similarity.class, RamIndexManager.class, "default similarity"
+				Similarity.class, DirectoryBasedIndexManager.class, "default similarity"
 		);
 		wrappingTestFromClass(
 				"Unable to instantiate default similarity class: org.apache.lucene.search.Similarity. " +

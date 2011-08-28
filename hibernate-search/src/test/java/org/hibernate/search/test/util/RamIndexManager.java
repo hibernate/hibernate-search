@@ -22,24 +22,69 @@ package org.hibernate.search.test.util;
 
 import java.util.Properties;
 
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.impl.RAMDirectoryProvider;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
  * At this point mainly used for tests
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class RamIndexManager extends DirectoryBasedIndexManager {
-
-	public RamIndexManager() {
-		super( makeRamDirectory() );
+	
+	private static final LogErrorHandler logErrorHadler = new LogErrorHandler();
+	
+	private RamIndexManager() {
+		//make sure tests use the helper below:
 	}
 
-	private static DirectoryProvider makeRamDirectory() {
-		RAMDirectoryProvider ramDirectoryProvider = new RAMDirectoryProvider();
-		ramDirectoryProvider.initialize( "testIndex", new Properties(), null );
-		return ramDirectoryProvider;
+	public static RamIndexManager makeRamDirectory() {
+		RamIndexManager ramIndexManager = new RamIndexManager();
+		Properties properties = new Properties();
+		properties.setProperty( "directory_provider", "ram" );
+		ramIndexManager.initialize( "testIndex", properties, new EmptyWorkerBuildContext() );
+		return ramIndexManager;
+	}
+	
+	private static class EmptyWorkerBuildContext implements WorkerBuildContext {
+
+		@Override
+		public SearchFactoryImplementor getUninitializedSearchFactory() {
+			return null;
+		}
+
+		@Override
+		public String getIndexingStrategy() {
+			return null;
+		}
+
+		@Override
+		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
+			return null;
+		}
+
+		@Override
+		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
+		}
+
+		@Override
+		public IndexManagerHolder getAllIndexesManager() {
+			return null;
+		}
+
+		@Override
+		public ErrorHandler getErrorHandler() {
+			return logErrorHadler;
+		}
+
+		@Override
+		public boolean isTransactionManagerExpected() {
+			return false;
+		}
 	}
 
 }

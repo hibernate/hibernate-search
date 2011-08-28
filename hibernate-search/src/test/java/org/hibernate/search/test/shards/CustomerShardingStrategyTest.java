@@ -47,16 +47,16 @@ public class CustomerShardingStrategyTest {
 		
 		// initialize w/ 10 shards
 		shardStrategy.initialize( null, new IndexManager[] {
-				new RamIndexManager(), 
-				new RamIndexManager(),
-				new RamIndexManager(),
-				new RamIndexManager(),
-				new RamIndexManager(),
-				new RamIndexManager(),
-				new RamIndexManager(),
-				new RamIndexManager(),
-				new RamIndexManager(),
-				new RamIndexManager()
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory(),
+				RamIndexManager.makeRamDirectory()
 		} );
 	}
 
