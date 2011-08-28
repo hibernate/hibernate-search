@@ -450,4 +450,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 102, value = "Unable to serialize Lucene works in Avro")
 	SearchException unableToSerializeInAvro(@Cause Throwable e);
+
+	@Message(id = 103, value = "Unable to initialize IndexManager %1$s")
+	SearchException unableToInitializeIndexManager(String indexName, @Cause Throwable e);
 }
