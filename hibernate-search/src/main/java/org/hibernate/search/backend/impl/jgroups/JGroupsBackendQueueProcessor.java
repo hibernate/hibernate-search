@@ -23,89 +23,173 @@
  */
 package org.hibernate.search.backend.impl.jgroups;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URL;
+import java.util.Properties;
 
-import org.jgroups.ChannelClosedException;
-import org.jgroups.ChannelNotConnectedException;
-import org.jgroups.Message;
+import org.jgroups.Address;
+import org.jgroups.Channel;
+import org.jgroups.ChannelException;
+import org.jgroups.JChannel;
 
+import org.hibernate.search.Environment;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.OptimizeLuceneWork;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.XMLHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Responsible for sending Lucene works from slave nodes to master node
+ * Common base class for Master and Slave BackendQueueProcessorFactories
  *
  * @author Lukasz Moren
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JGroupsBackendQueueProcessor {
+public abstract class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final JGroupsBackendQueueProcessorFactory factory;
-	private final String indexName;
-	private final IndexManager indexManager;
+	public static final String JGROUPS_PREFIX = Environment.WORKER_BACKEND + ".jgroups.";
 
-	public JGroupsBackendQueueProcessor(JGroupsBackendQueueProcessorFactory factory, IndexManager indexManager) {
-		this.factory = factory;
+	public static final String CONFIGURATION_STRING = JGROUPS_PREFIX + "configurationString";
+	public static final String CONFIGURATION_XML = JGROUPS_PREFIX + "configurationXml";
+	public static final String CONFIGURATION_FILE = JGROUPS_PREFIX + "configurationFile";
+	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
+
+	public static final String JG_CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
+
+	protected String clusterName = "HSearchCluster";
+	protected Channel channel = null;
+	protected Address address;
+	protected String indexName;
+	protected DirectoryBasedIndexManager indexManager;
+
+	@Override
+	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		this.indexManager = indexManager;
-		this.indexName = indexManager.getIndexName();
+		indexName = indexManager.getIndexName();
+
+		if ( props.containsKey( JG_CLUSTER_NAME ) ) {
+			setClusterName( props.getProperty( JG_CLUSTER_NAME ) );
+		}
+		prepareJGroupsChannel( props );
 	}
 
-	@SuppressWarnings("unchecked")
-	public void sendLuceneWorkList(List<LuceneWork> queue) {
-		boolean trace = log.isTraceEnabled();
-		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>( queue );
-		if ( trace ) {
-			log.tracef( "Preparing %d Lucene works to be sent to master node.", filteredQueue.size() );
-		}
-
-		for ( LuceneWork work : queue ) {
-			if ( work instanceof OptimizeLuceneWork ) {
-				//TODO might be correct to do, but should be filtered earlier, and skipped server-side.
-				//we don't want optimization to be propagated
-				filteredQueue.remove( work );
-			}
-		}
-		if ( trace ) {
-			log.tracef(
-				"Filtering: optimized Lucene works are not going to be sent to master node. There is %d Lucene works after filtering.",
-				filteredQueue.size()
-			);
-		}
-		if ( filteredQueue.isEmpty() ) {
-			if ( trace ) {
-				log.trace( "Nothing to send. Propagating works to a cluster has been skipped." );
-			}
-			return;
-		}
-		byte[] data = indexManager.getSerializer().toSerializedModel( filteredQueue );
-		BackendMessage toSend = new BackendMessage( indexName, data );
-
-		/* Creates and send message with lucene works to master.
-		 * As long as message destination address is null, Lucene works will be received by all listeners that implements
-		 * org.jgroups.MessageListener interface, multiple master nodes in cluster are allowed. */
+	private void prepareJGroupsChannel(Properties props) {
+		log.jGroupsStartingChannel();
 		try {
-			Message message = new Message( null, factory.getAddress(), toSend );
-			factory.getChannel().send( message );
-			if ( trace ) {
-				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );
-			}
+			buildChannel( props );
+			channel.setOpt( Channel.AUTO_RECONNECT, Boolean.TRUE );
+			channel.connect( clusterName );
 		}
-		catch ( ChannelNotConnectedException e ) {
-			throw new SearchException(
-					"Unable to send Lucene work. Channel is not connected to: "
-							+ factory.getClusterName()
-			);
+		catch ( ChannelException e ) {
+			throw new SearchException( "Unable to connect to: [" + clusterName + "] JGroups channel" );
 		}
-		catch ( ChannelClosedException e ) {
-			throw new SearchException( "Unable to send Lucene work. Attempt to send message on closed JGroups channel" );
+		log.jGroupsConnectedToCluster(clusterName, getAddress() );
+
+		if ( !channel.flushSupported() ) {
+			log.jGroupsFlushNotPresentInStack();
 		}
 	}
-	
+
+	/**
+	 * Reads configuration and builds channel with its base.
+	 * In order of preference - we first look for an external JGroups file, then a set of XML properties, and
+	 * finally the legacy JGroups String properties.
+	 *
+	 * @param props configuration file
+	 */
+	private void buildChannel(Properties props) {
+		String cfg;
+		if ( props != null ) {
+			if ( props.containsKey( CONFIGURATION_FILE ) ) {
+				cfg = props.getProperty( CONFIGURATION_FILE );
+				try {
+					channel = new JChannel( ConfigurationParseHelper.locateConfig(cfg) );
+				}
+				catch ( Exception e ) {
+					log.jGroupsChannelCreationUsingFileError( cfg );
+					throw new SearchException( e );
+				}
+			}
+
+			if ( props.containsKey( CONFIGURATION_XML ) ) {
+				cfg = props.getProperty( CONFIGURATION_XML );
+				try {
+					channel = new JChannel( XMLHelper.elementFromString( cfg ) );
+				}
+				catch ( Exception e ) {
+					log.jGroupsChannelCreationUsingXmlError( cfg );
+					throw new SearchException( e );
+				}
+			}
+
+			if ( props.containsKey( CONFIGURATION_STRING ) ) {
+				cfg = props.getProperty( CONFIGURATION_STRING );
+				try {
+					channel = new JChannel( cfg );
+				}
+				catch ( Exception e ) {
+					log.jGroupsChannelCreationFromStringError( cfg );
+					throw new SearchException( e );
+				}
+			}
+		}
+
+		if ( channel == null ) {
+			log.jGroupsConfigurationNotFoundInProperties( props );
+			try {
+				URL fileUrl = ConfigurationParseHelper.locateConfig( DEFAULT_JGROUPS_CONFIGURATION_FILE );
+				if ( fileUrl != null ) {
+					channel = new JChannel( fileUrl );
+				}
+				else {
+					log.jGroupsDefaultConfigurationFileNotFound();
+					channel = new JChannel();
+				}
+			}
+			catch ( ChannelException e ) {
+				throw new SearchException( "Unable to start JGroups channel", e );
+			}
+		}
+	}
+
+	public void close() {
+		try {
+			if ( channel != null && channel.isOpen() ) {
+				log.jGroupsDisconnectingAndClosingChannel();
+				channel.disconnect();
+				channel.close();
+			}
+		}
+		catch ( Exception toLog ) {
+			log.jGroupsClosingChannelError( toLog );
+			channel = null;
+		}
+	}
+
+	public Channel getChannel() {
+		return channel;
+	}
+
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
+	}
+
+	public String getClusterName() {
+		return clusterName;
+	}
+
+	/**
+	 * Cluster's node address
+	 *
+	 * @return Address
+	 */
+	public Address getAddress() {
+		if ( address == null && channel != null ) {
+			address = channel.getLocalAddress();
+		}
+		return address;
+	}
 }

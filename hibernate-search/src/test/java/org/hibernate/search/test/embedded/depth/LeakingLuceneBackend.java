@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 
 /**
  * This backend wraps the default Lucene backend to leak out the last performed list of work for testing purposes: tests
@@ -36,7 +36,7 @@ import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFacto
  * @author Sanne Grinovero
  * 
  */
-public class LeakingLuceneBackend extends LuceneBackendQueueProcessorFactory {
+public class LeakingLuceneBackend extends LuceneBackendQueueProcessor {
 	
 	private static List<LuceneWork> lastProcessedQueue = new ArrayList<LuceneWork>();
 	

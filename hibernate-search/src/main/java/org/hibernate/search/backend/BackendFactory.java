@@ -26,11 +26,11 @@ import java.util.concurrent.ExecutorService;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
@@ -54,31 +54,31 @@ public class BackendFactory {
 
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		
-		final BackendQueueProcessor backendQueueProcessorFactory;
+		final BackendQueueProcessor backendQueueProcessor;
 		
 		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
+			backendQueueProcessor = new LuceneBackendQueueProcessor();
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new JMSBackendQueueProcessorFactory();
+			backendQueueProcessor = new JMSBackendQueueProcessor();
 		}
 		else if ( "blackhole".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessorFactory = new BlackHoleBackendQueueProcessorFactory();
+			backendQueueProcessor = new BlackHoleBackendQueueProcessor();
 		}
 		else if ( "jgroupsMaster".equals( backend ) ) {
-				backendQueueProcessorFactory = new MasterJGroupsBackendQueueProcessorFactory();
+				backendQueueProcessor = new MasterJGroupsBackendQueueProcessor();
 		}
 		else if ( "jgroupsSlave".equals( backend ) ) {
-				backendQueueProcessorFactory = new SlaveJGroupsBackendQueueProcessorFactory();
+				backendQueueProcessor = new SlaveJGroupsBackendQueueProcessor();
 		}
 		else {
-			backendQueueProcessorFactory = ClassLoaderHelper.instanceFromName(
+			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
 					BackendQueueProcessor.class,
 					backend, BackendFactory.class, "processor"
 			);
 		}
-		backendQueueProcessorFactory.initialize( properties, context, indexManager );
-		return backendQueueProcessorFactory;
+		backendQueueProcessor.initialize( properties, context, indexManager );
+		return backendQueueProcessor;
 	}
 	
 	/**

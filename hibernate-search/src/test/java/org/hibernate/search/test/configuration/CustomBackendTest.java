@@ -25,8 +25,8 @@ package org.hibernate.search.test.configuration;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessorFactory;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -42,10 +42,10 @@ public class CustomBackendTest {
 	
 	@Test
 	public void test() {
-		verifyBackendUsage( "blackhole", BlackHoleBackendQueueProcessorFactory.class );
-		verifyBackendUsage( "lucene", LuceneBackendQueueProcessorFactory.class );
-		verifyBackendUsage( BlackHoleBackendQueueProcessorFactory.class );
-		verifyBackendUsage( LuceneBackendQueueProcessorFactory.class );
+		verifyBackendUsage( "blackhole", BlackHoleBackendQueueProcessor.class );
+		verifyBackendUsage( "lucene", LuceneBackendQueueProcessor.class );
+		verifyBackendUsage( BlackHoleBackendQueueProcessor.class );
+		verifyBackendUsage( LuceneBackendQueueProcessor.class );
 	}
 	
 	private void verifyBackendUsage(String name, Class<? extends BackendQueueProcessor> backendType) {
@@ -58,8 +58,8 @@ public class CustomBackendTest {
 		ftSession.close();
 		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( "org.hibernate.search.test.configuration.BlogEntry" );
-		BackendQueueProcessor backendQueueProcessorFactory = indexManager.getBackendQueueProcessorFactory();
-		assertEquals( backendType, backendQueueProcessorFactory.getClass() );
+		BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
+		assertEquals( backendType, backendQueueProcessor.getClass() );
 		builder.close();
 	}
 

@@ -200,7 +200,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return worker;
 	}
 
-	public void setBackendQueueProcessorFactory(BackendQueueProcessor backendQueueProcessorFactory) {
+	public void setBackendQueueProcessor(BackendQueueProcessor backendQueueProcessor) {
 		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called" );
 	}
 

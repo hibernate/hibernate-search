@@ -23,7 +23,7 @@ package org.hibernate.search.indexes.impl;
 import java.util.Properties;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.NRTWorkspaceImpl;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
@@ -59,11 +59,11 @@ public class NRTIndexManager extends DirectoryBasedIndexManager {
 		if ( backend != null ) {
 			log.ignoringBackendOptionForIndex( indexName, "lucene-nrt" );
 		}
-		LuceneBackendQueueProcessorFactory backendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
+		LuceneBackendQueueProcessor backendQueueProcessor = new LuceneBackendQueueProcessor();
 		nrtWorkspace = new NRTWorkspaceImpl( this, buildContext.getErrorHandler(), cfg );
-		backendQueueProcessorFactory.setCustomWorkspace( nrtWorkspace );
-		backendQueueProcessorFactory.initialize( cfg, buildContext, this );
-		return backendQueueProcessorFactory;
+		backendQueueProcessor.setCustomWorkspace( nrtWorkspace );
+		backendQueueProcessor.initialize( cfg, buildContext, this );
+		return backendQueueProcessor;
 	}
 
 	@Override

@@ -49,7 +49,7 @@ import org.hibernate.search.backend.LuceneWork;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor {
+public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 

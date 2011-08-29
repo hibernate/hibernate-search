@@ -151,7 +151,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	//Not exposed on the IndexManager interface
-	public BackendQueueProcessor getBackendQueueProcessorFactory() {
+	public BackendQueueProcessor getBackendQueueProcessor() {
 		return backend;
 	}
 

@@ -27,7 +27,7 @@ package org.hibernate.search.backend.impl.batch;
 import org.hibernate.search.backend.LuceneWork;
 
 /**
- * Implementations of this interface are not drop-in replacements for the standard BackendQueueProcessorFactory,
+ * Implementations of this interface are not drop-in replacements for the standard BackendQueueProcessor,
  * but are meant to be used only during batch processing.
  * The order of LuceneWork(s) processed is not guaranteed as the queue is consumed by several
  * concurrent workers.

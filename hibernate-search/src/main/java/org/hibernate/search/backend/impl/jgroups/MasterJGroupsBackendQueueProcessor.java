@@ -34,30 +34,30 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 
 /**
  * Backend factory used in JGroups clustering mode in master node.
- * Wraps {@link LuceneBackendQueueProcessorFactory} with providing extra
+ * Wraps {@link LuceneBackendQueueProcessor} with providing extra
  * functionality to receive Lucene works from slave nodes.
  *
  * @author Lukasz Moren
- * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory
- * @see org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessorFactory
+ * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
+ * @see org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessor
  */
-public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQueueProcessorFactory {
+public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private LuceneBackendQueueProcessorFactory luceneBackendQueueProcessorFactory;
+	private LuceneBackendQueueProcessor luceneBackendQueueProcessor;
 	private Receiver masterListener;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		super.initialize( props, context, indexManager );
-		initLuceneBackendQueueProcessorFactory( props, context );
+		initLuceneBackendQueueProcessor( props, context );
 		registerMasterListener( context.getUninitializedSearchFactory() );
 	}
 
@@ -67,9 +67,9 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 		channel.setReceiver( masterListener );
 	}
 
-	private void initLuceneBackendQueueProcessorFactory(Properties props, WorkerBuildContext context) {
-		luceneBackendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
-		luceneBackendQueueProcessorFactory.initialize( props, context, indexManager );
+	private void initLuceneBackendQueueProcessor(Properties props, WorkerBuildContext context) {
+		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
+		luceneBackendQueueProcessor.initialize( props, context, indexManager );
 	}
 
 	public Receiver getMasterListener() {
@@ -79,17 +79,17 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 	@Override
 	public void close() {
 		super.close();
-		luceneBackendQueueProcessorFactory.close();
+		luceneBackendQueueProcessor.close();
 	}
 
 	@Override
 	public void applyWork(List<LuceneWork> workList) {
-		luceneBackendQueueProcessorFactory.applyWork( workList );
+		luceneBackendQueueProcessor.applyWork( workList );
 	}
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation) {
-		luceneBackendQueueProcessorFactory.applyStreamWork( singleOperation );
+		luceneBackendQueueProcessor.applyStreamWork( singleOperation );
 	}
 
 	@Override
