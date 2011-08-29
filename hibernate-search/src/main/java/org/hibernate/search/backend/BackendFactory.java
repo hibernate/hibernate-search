@@ -36,7 +36,7 @@ import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.PluggableSerializationLuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -50,7 +50,7 @@ public class BackendFactory {
 
 	private static final Log log = LoggerFactory.make();
 	
-	public static BackendQueueProcessor createBackend(IndexManager indexManager, WorkerBuildContext context, Properties properties) {
+	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties properties) {
 
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		

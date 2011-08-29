@@ -30,7 +30,6 @@ import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.CommonPropertiesParse;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -64,10 +63,10 @@ public class LuceneBackendResources {
 	private final ReadLock readLock = readWriteLock.readLock();
 	private final WriteLock writeLock = readWriteLock.writeLock();
 	
-	LuceneBackendResources(WorkerBuildContext context, IndexManager indexManager, Properties props) {
+	LuceneBackendResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, Properties props) {
 		indexName = indexManager.getIndexName();
 		errorHandler = context.getErrorHandler();
-		workspace = WorkspaceFactory.createWorkspace( (DirectoryBasedIndexManager) indexManager, errorHandler, props );
+		workspace = WorkspaceFactory.createWorkspace( indexManager, errorHandler, props );
 		visitor = new LuceneWorkVisitor( workspace );
 		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
 		queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
