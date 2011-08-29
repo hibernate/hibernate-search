@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.ExclusiveIndexWorkspaceImpl;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.SharedIndexWorkspaceImpl;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -66,9 +66,9 @@ public class ExclusiveIndexTest {
 
 	private void assertExclusiveIsEnabled(IndexManagerHolder allIndexesManager, String indexName, boolean expectExclusive) {
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( indexName );
-		BackendQueueProcessor backendQueueProcessorFactory = indexManager.getBackendQueueProcessorFactory();
-		assertEquals( LuceneBackendQueueProcessorFactory.class, backendQueueProcessorFactory.getClass() );
-		LuceneBackendQueueProcessorFactory backend = (LuceneBackendQueueProcessorFactory) backendQueueProcessorFactory;
+		BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
+		assertEquals( LuceneBackendQueueProcessor.class, backendQueueProcessor.getClass() );
+		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) backendQueueProcessor;
 		AbstractWorkspaceImpl workspace = backend.getIndexResources().getWorkspace();
 		if ( expectExclusive ) {
 			assertEquals( ExclusiveIndexWorkspaceImpl.class, workspace.getClass() );

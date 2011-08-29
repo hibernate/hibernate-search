@@ -44,7 +44,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jgroups.BackendMessage;
-import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
@@ -177,9 +177,9 @@ public class JGroupsMasterTest extends SearchTestCase {
 		super.configure( cfg );
 		// JGroups configuration for master node
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
-		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessorFactory.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.JG_CLUSTER_NAME, CHANNEL_NAME );
 		cfg.setProperty( "hibernate.search.default." + 
-				JGroupsBackendQueueProcessorFactory.CONFIGURATION_STRING, prepareJGroupsConfigurationString()
+				JGroupsBackendQueueProcessor.CONFIGURATION_STRING, prepareJGroupsConfigurationString()
 		);
 	}
 

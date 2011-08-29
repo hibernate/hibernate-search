@@ -53,7 +53,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<Class<?>, EntityIndexBinder<?>> indexBindingsPerEntity;
 	private String indexingStrategy;
 	private Worker worker;
-	private BackendQueueProcessor backendQueueProcessorFactory;
+	private BackendQueueProcessor backendQueueProcessor;
 	private Map<String, FilterDef> filterDefinitions;
 	private FilterCachingStrategy filterCachingStrategy;
 	private Map<String, Analyzer> analyzers;
@@ -108,8 +108,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return worker;
 	}
 
-	public BackendQueueProcessor getBackendQueueProcessorFactory() {
-		return backendQueueProcessorFactory;
+	public BackendQueueProcessor getBackendQueueProcessor() {
+		return backendQueueProcessor;
 	}
 
 	public Map<String, FilterDef> getFilterDefinitions() {
@@ -156,8 +156,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.worker = worker;
 	}
 
-	public void setBackendQueueProcessorFactory(BackendQueueProcessor backendQueueProcessorFactory) {
-		this.backendQueueProcessorFactory = backendQueueProcessorFactory;
+	public void setBackendQueueProcessor(BackendQueueProcessor backendQueueProcessor) {
+		this.backendQueueProcessor = backendQueueProcessor;
 	}
 
 	public void setFilterDefinitions(Map<String, FilterDef> filterDefinitions) {

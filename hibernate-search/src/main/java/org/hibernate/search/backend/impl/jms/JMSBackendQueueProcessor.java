@@ -23,84 +23,122 @@
  */
 package org.hibernate.search.backend.impl.jms;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import javax.jms.JMSException;
-import javax.jms.ObjectMessage;
-import javax.jms.QueueConnection;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
+import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-import org.hibernate.search.util.logging.impl.Log;
+import javax.jms.Queue;
+import javax.jms.QueueConnectionFactory;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
+import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.OptimizeLuceneWork;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.impl.JNDIHelper;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JMSBackendQueueProcessor implements Runnable {
+public class JMSBackendQueueProcessor implements BackendQueueProcessor {
+
+	private String jmsQueueName;
+	private String jmsConnectionFactoryName;
+	private static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
+	private Properties properties;
+	private Queue jmsQueue;
+	private QueueConnectionFactory factory;
+	private String indexName;
+	private SearchFactoryImplementor searchFactory;
+	public static final String JMS_CONNECTION_FACTORY = Environment.WORKER_PREFIX + "jms.connection_factory";
+	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
+	private IndexManager indexManager;
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Collection<LuceneWork> queue;
-	private final JMSBackendQueueProcessorFactory factory;
-	private final String indexName;
-	private final IndexManager indexManager;
-
-	public JMSBackendQueueProcessor(String indexName, Collection<LuceneWork> queue, IndexManager indexManager,
-					JMSBackendQueueProcessorFactory jmsBackendQueueProcessorFactory) {
-		this.indexName = indexName;
-		this.queue = queue;
+	@Override
+	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
+		//TODO proper exception if jms queues and connections are not there
+		this.properties = props;
 		this.indexManager = indexManager;
-		this.factory = jmsBackendQueueProcessorFactory;
+		this.jmsConnectionFactoryName = props.getProperty( JMS_CONNECTION_FACTORY );
+		this.jmsQueueName = props.getProperty( JMS_QUEUE );
+		this.indexName = indexManager.getIndexName();
+		this.searchFactory = context.getUninitializedSearchFactory();
+		prepareJMSTools();
 	}
 
-	public void run() {
-		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>(queue);
-		for (LuceneWork work : queue) {
-			if ( work instanceof OptimizeLuceneWork ) {
-				//we don't want optimization to be propagated
-				filteredQueue.remove( work );
-			}
+	public QueueConnectionFactory getJMSFactory() {
+		return factory;
+	}
+
+	public Queue getJmsQueue() {
+		return jmsQueue;
+	}
+
+	public String getJmsQueueName() {
+		return jmsQueueName;
+	}
+
+	public void prepareJMSTools() {
+		if ( jmsQueue != null && factory != null ) {
+			return;
 		}
-		if ( filteredQueue.size() == 0) return;
-		LuceneWorkSerializer serializer = indexManager.getSerializer();
-		byte[] data = serializer.toSerializedModel( filteredQueue );
-		factory.prepareJMSTools();
-		QueueConnection cnn = null;
-		QueueSender sender;
-		QueueSession session;
 		try {
-			cnn = factory.getJMSFactory().createQueueConnection();
-			//TODO make transacted parameterized
-			session = cnn.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
-			ObjectMessage message = session.createObjectMessage();
-			message.setObject( data );
-			message.setStringProperty( AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY, indexName );
+			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
+			factory = ( QueueConnectionFactory ) initialContext.lookup( jmsConnectionFactoryName );
+			jmsQueue = ( Queue ) initialContext.lookup( jmsQueueName );
 
-			sender = session.createSender( factory.getJmsQueue() );
-			sender.send( message );
-
-			session.close();
 		}
-		catch (JMSException e) {
-			throw new SearchException( "Unable to send Search work to JMS queue: " + factory.getJmsQueueName(), e );
-		}
-		finally {
-			try {
-				if (cnn != null)
-					cnn.close();
-				}
-			catch ( JMSException e ) {
-				log.unableToCloseJmsConnection( factory.getJmsQueueName(), e );
-			}
+		catch ( NamingException e ) {
+			throw new SearchException(
+					"Unable to lookup Search queue ("
+							+ ( jmsQueueName != null ?
+							jmsQueueName :
+							"null" ) + ") and connection factory ("
+							+ ( jmsConnectionFactoryName != null ?
+							jmsConnectionFactoryName :
+							"null" ) + ")",
+					e
+			);
 		}
 	}
+
+	public SearchFactoryImplementor getSearchFactory() {
+		return searchFactory;
+	}
+
+	public void close() {
+		// no need to release anything
+	}
+
+	@Override
+	public void applyWork(List<LuceneWork> workList) {
+		//TODO review this integration with the old Runnable-style execution
+		Runnable operation = new JMSBackendQueueTask( indexName, workList, indexManager, this );
+		operation.run();
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation) {
+		applyWork( Collections.singletonList( singleOperation ) );
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		log.warnSuspiciousBackendDirectoryCombination( indexName );
+		return new ReentrantLock(); // keep the invoker happy, still it's useless
+	}
+
 }
