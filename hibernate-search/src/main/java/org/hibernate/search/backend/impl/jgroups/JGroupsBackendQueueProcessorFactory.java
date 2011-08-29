@@ -33,7 +33,7 @@ import org.jgroups.JChannel;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -63,10 +63,10 @@ public abstract class JGroupsBackendQueueProcessorFactory implements BackendQueu
 	protected Channel channel = null;
 	protected Address address;
 	protected String indexName;
-	protected IndexManager indexManager;
+	protected DirectoryBasedIndexManager indexManager;
 
 	@Override
-	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		this.indexManager = indexManager;
 		indexName = indexManager.getIndexName();
 

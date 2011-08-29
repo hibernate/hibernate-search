@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class BlackHoleBackendQueueProcessorFactory implements BackendQueueProces
 	private final ReentrantLock backendLock = new ReentrantLock();
 
 	@Override
-	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		// no-op
 		log.initializedBlackholeBackend();
 	}

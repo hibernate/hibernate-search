@@ -30,7 +30,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -45,7 +45,7 @@ public class SlaveJGroupsBackendQueueProcessorFactory extends JGroupsBackendQueu
 	private JGroupsBackendQueueProcessor jgroupsProcessor;
 
 	@Override
-	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		super.initialize( props, context, indexManager );
 		jgroupsProcessor = new JGroupsBackendQueueProcessor( this, indexManager );
 	}

@@ -36,7 +36,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 
 /**
  * Backend factory used in JGroups clustering mode in master node.
@@ -55,7 +55,7 @@ public class MasterJGroupsBackendQueueProcessorFactory extends JGroupsBackendQue
 	private Receiver masterListener;
 
 	@Override
-	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		super.initialize( props, context, indexManager );
 		initLuceneBackendQueueProcessorFactory( props, context );
 		registerMasterListener( context.getUninitializedSearchFactory() );

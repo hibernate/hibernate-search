@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
@@ -45,7 +45,7 @@ public interface BackendQueueProcessor {
 	 * @param context context giving access to required meta data
 	 * @param indexManager the index it is related to.
 	 */
-	void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager);
+	void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager);
 
 	/**
 	 * Used to shutdown and eventually release resources.

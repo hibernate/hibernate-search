@@ -39,6 +39,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.impl.JNDIHelper;
@@ -65,7 +66,8 @@ public class JMSBackendQueueProcessorFactory implements BackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+	@Override
+	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		//TODO proper exception if jms queues and connections are not there
 		this.properties = props;
 		this.indexManager = indexManager;

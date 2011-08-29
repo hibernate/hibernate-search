@@ -32,7 +32,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -56,7 +56,7 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 	private LuceneBackendResources resources;
 	private boolean sync;
 
-	public void initialize(Properties props, WorkerBuildContext context, IndexManager indexManager) {
+	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
 		resources = new LuceneBackendResources( context, indexManager, props );
 	}
