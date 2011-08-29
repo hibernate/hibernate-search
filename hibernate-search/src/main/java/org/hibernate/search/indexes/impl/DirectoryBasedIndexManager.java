@@ -39,6 +39,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.DirectoryProviderFactory;
@@ -70,7 +71,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public DirectoryBasedReaderManager getIndexReaderManager() {
+	public ReaderProvider getIndexReaderManager() {
 		return readers;
 	}
 
