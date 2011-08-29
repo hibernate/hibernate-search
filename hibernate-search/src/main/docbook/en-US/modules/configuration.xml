@@ -1209,6 +1209,32 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     the custom strategy implementation.</para>
   </section>
 
+  <section id="configuration-indexmanager">
+    <title>Overriding the Index Manager</title>
+
+    <para>The role of the index manager component is described at <xref
+    linkend="search-architecture-indexmanager" />. Available implementations are:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><literal>transactional</literal>: the default implementation.</para>
+      </listitem>
+
+      <listitem>
+        <para><literal>NRT</literal>: avoid flushing writes to disk at each commit.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The default implementation is <literal>transactional</literal>. To select an alternative:</para>
+
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = NRT</programlisting>
+
+    <para>Alternatively to <literal>NRT</literal> you can mention the fully qualified class name of your custom
+    implementation, which shall have a no-arguments constructor:</para>
+
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = my.corp.myapp.CustomIndexManager</programlisting>
+  </section>
+
   <section id="lucene-indexing-performance" revision="3">
     <title>Tuning Lucene indexing performance</title>
 
