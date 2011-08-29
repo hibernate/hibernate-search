@@ -32,7 +32,7 @@ public class BuiltinArrayBridge extends ArrayBridge implements StringBridge {
 	private final StringBridge bridge;
 
 	public BuiltinArrayBridge() {
-		this( new String2FieldBridgeAdaptor( DEFAULT_STRING_BRIDGE ) );
+		this( DEFAULT_STRING_BRIDGE );
 	}
 
 	public BuiltinArrayBridge(final FieldBridge fieldBridge) {

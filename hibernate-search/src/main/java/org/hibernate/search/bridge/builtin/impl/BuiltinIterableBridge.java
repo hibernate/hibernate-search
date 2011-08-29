@@ -35,7 +35,7 @@ public class BuiltinIterableBridge extends IterableBridge implements StringBridg
 	private final StringBridge bridge;
 
 	public BuiltinIterableBridge() {
-		this( new String2FieldBridgeAdaptor( DEFAULT_STRING_BRIDGE ) );
+		this( DEFAULT_STRING_BRIDGE );
 	}
 
 	public BuiltinIterableBridge(final FieldBridge fieldBridge) {

@@ -51,7 +51,7 @@ public class Man {
 	private String name;
 
 	@OneToOne
-	@IndexedEmbedded ( indexNullAs = NO_PET )
+	@IndexedEmbedded( indexNullAs = NO_PET )
 	private Pet pet;
 
 	@OneToOne

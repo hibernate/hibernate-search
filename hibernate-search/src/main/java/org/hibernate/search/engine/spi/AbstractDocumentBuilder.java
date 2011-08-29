@@ -684,7 +684,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		else {
 			NumericField numericField = member.getAnnotation( NumericField.class );
 			FieldBridge fieldBridge = BridgeFactory.guessType( null, numericField, member, reflectionManager );
-			if ( indexNullAs != null && fieldBridge instanceof StringBridge ) {
+			if ( fieldBridge instanceof StringBridge ) {
 				fieldBridge = new NullEncodingFieldBridge( (StringBridge) fieldBridge, indexNullAs );
 			}
 			return fieldBridge;

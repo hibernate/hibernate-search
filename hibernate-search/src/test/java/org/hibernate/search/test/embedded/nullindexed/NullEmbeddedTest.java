@@ -173,10 +173,6 @@ public class NullEmbeddedTest extends SearchTestCase {
 		return result;
 	}
 
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-	}
-
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Man.class, Pet.class, Puppy.class, Woman.class };
 	}

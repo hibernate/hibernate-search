@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -229,7 +228,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<IterableBridgeTestEntity> findEmbeddedNullResults( String fieldName, Object value) throws ParseException {
+	private List<IterableBridgeTestEntity> findEmbeddedNullResults( String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
 				.forEntity( IterableBridgeTestEntity.class ).get();
 		Query query = queryBuilder.keyword().onField( fieldName )
@@ -239,7 +238,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<IterableBridgeTestEntity> findResults( String fieldName, Object value) throws ParseException {
+	private List<IterableBridgeTestEntity> findResults( String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
 				.forEntity( IterableBridgeTestEntity.class ).get();
 		Query query = queryBuilder.keyword().onField( fieldName )
@@ -248,8 +247,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<IterableBridgeTestEntity> findNumericResults( String fieldName, Object number)
-			throws ParseException {
+	private List<IterableBridgeTestEntity> findNumericResults( String fieldName, Object number) {
 		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, number, number, true, true );
 		return fullTextSession.createFullTextQuery( query, IterableBridgeTestEntity.class ).list();
 	}
