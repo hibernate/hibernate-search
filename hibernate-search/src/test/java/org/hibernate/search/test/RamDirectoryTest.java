@@ -82,7 +82,7 @@ public class RamDirectoryTest extends SearchTestCase {
 	}
 
 	private int getDocumentNbr() throws Exception {
-		IndexReader reader = IndexReader.open( getDirectory( Document.class ), false );
+		IndexReader reader = IndexReader.open( getDirectory( Document.class ), true );
 		try {
 			return reader.numDocs();
 		}
