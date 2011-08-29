@@ -30,7 +30,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.spi.ReaderProvider;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -47,9 +47,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Since the backend is forced to create a reference IndexReader after each (skipped) commit,
  * some IndexReaders might be opened without being ever used.
  * 
+ * This class implements both Workspace and ReaderProvider.
+ * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements ReaderProvider {
+public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements DirectoryBasedReaderManager {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -124,11 +126,29 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements ReaderPro
 
 	@Override
 	public void closeIndexReader(IndexReader reader) {
+		if ( reader == null ) {
+			return;
+		}
 		try {
 			reader.close();
 		}
 		catch ( IOException e ) {
 			log.unableToCLoseLuceneIndexReader( e );
+		}
+	}
+
+	@Override
+	public void initialize(DirectoryBasedIndexManager indexManager, Properties props) {
+	}
+
+	@Override
+	public void stop() {
+		writeLock.lock();
+		try {
+			closeIndexReader( currentReferenceReader );
+		}
+		finally {
+			writeLock.unlock();
 		}
 	}
 

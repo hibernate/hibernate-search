@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
+import org.hibernate.search.backend.impl.lucene.NRTWorkspaceImpl;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -50,6 +51,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class NRTIndexManager extends DirectoryBasedIndexManager {
 
 	private static final Log log = LoggerFactory.make();
+	private NRTWorkspaceImpl nrtWorkspace;
 
 	@Override
 	protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
@@ -57,14 +59,16 @@ public class NRTIndexManager extends DirectoryBasedIndexManager {
 		if ( backend != null ) {
 			log.ignoringBackendOptionForIndex( indexName, "lucene-nrt" );
 		}
-		BackendQueueProcessor backendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
+		LuceneBackendQueueProcessorFactory backendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
+		nrtWorkspace = new NRTWorkspaceImpl( this, buildContext.getErrorHandler(), cfg );
+		backendQueueProcessorFactory.setCustomWorkspace( nrtWorkspace );
 		backendQueueProcessorFactory.initialize( cfg, buildContext, this );
 		return backendQueueProcessorFactory;
 	}
 
 	@Override
 	protected DirectoryBasedReaderManager createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-		return  CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
+		return nrtWorkspace;
 	}
 
 }

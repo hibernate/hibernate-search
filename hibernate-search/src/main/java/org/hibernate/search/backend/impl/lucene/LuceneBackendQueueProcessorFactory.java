@@ -55,10 +55,11 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 
 	private LuceneBackendResources resources;
 	private boolean sync;
+	private AbstractWorkspaceImpl workspaceOverride;
 
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
-		resources = new LuceneBackendResources( context, indexManager, props );
+		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );
 	}
 
 	public void close() {
@@ -99,6 +100,15 @@ public class LuceneBackendQueueProcessorFactory implements BackendQueueProcessor
 
 	public LuceneBackendResources getIndexResources() {
 		return resources;
+	}
+
+	/**
+	 * If invoked before {@link #initialize(Properties, WorkerBuildContext, DirectoryBasedIndexManager)}
+	 * it can set a customized Workspace instance to be used by this backend.
+	 * @param workspace
+	 */
+	public void setCustomWorkspace(AbstractWorkspaceImpl workspace) {
+		this.workspaceOverride = workspace;
 	}
 
 }
