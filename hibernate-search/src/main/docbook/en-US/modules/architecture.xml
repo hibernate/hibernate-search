@@ -50,7 +50,8 @@
     <para>The default index manager implementation uses a <classname>DirectoryProvider</classname>
     to manage a given Lucene <classname>Directory</classname>.
     You can configure directory providers to adjust the directory target (see <xref
-    linkend="search-configuration-directory" />).</para>
+    linkend="search-configuration-directory" />), or you can ovverride the whole
+    <classname>IndexManager</classname> implementation.</para>
 
     <para>Hibernate Search uses the Lucene index to search an entity and
     return a list of managed entities saving you the tedious object to Lucene
@@ -109,7 +110,7 @@
     <title>Back end</title>
 
     <para>Hibernate Search offers the ability to let the batched work being
-    processed by different back ends. Three back ends are provided out of the
+    processed by different back ends. Several back ends are provided out of the
     box and you have the option to plugin your own implementation.</para>
 
     <section>
@@ -146,6 +147,11 @@
 
         <para>The main advantage is simplicity and immediate visibility of the
         changes in Lucene queries (a requirement in some applications).</para>
+
+        <para>When using a local index and sharing it with other instances is not
+        needed, you can enable <literal>exclusive_index_use</literal> as described
+        in <xref linkend="table-performance-parameters" /> for additional write
+        performance or use the NRT Lucene backend.</para>
       </section>
 
       <section>
@@ -273,6 +279,47 @@
       needs by implementing
       <classname>org.hibernate.search.reader.ReaderProvider</classname>. The
       implementation must be thread safe.</para>
+    </section>
+  </section>
+
+  <section id="search-architecture-indexmanager" xreflabel="IndexManage customization">
+    <title>Index Manager customization</title>
+
+    <para>The Index Manager is the component which holds a reference to the
+    configured Reader strategy, the selected backend, the chosen Directory Provider for each
+    index, and uses the three to implement the methods listed on the <classname>IndexManager</classname>
+    interface.</para>
+
+    <para>It is possible to configure a custom <classname>IndexManager</classname> implementation,
+    and this doesn't need to use the same components. For example you can delegate to a remote
+    indexing service which doesn't necessarily expose a <classname>Directory</classname> interface.
+    For details see <xref linkend="configuration-indexmanager" />.
+    </para>
+
+    <section>
+      <title>Default: <literal>transactional</literal></title>
+      <para>The default <classname>IndexManager</classname> implementation is named transactional.
+      This is the one mostly referred to in this documentation, unless stated otherwise,
+      and is highly configurable as you can select different implementations for the reader strategy,
+      back ends and Directory Providers.</para>
+    </section>
+
+    <section>
+      <title>NRT</title>
+      <para>The <classname>NRTIndexManager</classname> is an extension of the default
+      <classname>IndexManager</classname>, leveraging the Lucene NRT (Near Real Time) features
+      for extreme low latency index writes, but as a tradeoff it requires a non-clutered and non-shared
+      index.
+      In other words, it will ignore configuration settings for alternative back ends other than <literal>Lucene</literal>
+      and will acquire exclusive write locks on the Directory.
+      </para>
+      <para>
+      To achieve this low latency writes, the IndexWriter will not flush to disk each change and the queries
+      will be allowed to read updated state from the unflushed indexwriter buffers; the downside of this strategy is that
+      if the application crashes or the IndexWriter is otherwise killed you'll have to rebuild the indexes
+      as some updates might be lost.</para>
+      <para>Because of this downsides, and since a master node in cluster can be configured for good performance too,
+      this is the recommended configuration only for non clustered websites with a limited amount of data to reindex.</para>
     </section>
   </section>
 </chapter>
