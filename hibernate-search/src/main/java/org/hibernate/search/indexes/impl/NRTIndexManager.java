@@ -20,6 +20,13 @@
  */
 package org.hibernate.search.indexes.impl;
 
+import java.util.Properties;
+
+import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
+import org.hibernate.search.spi.WorkerBuildContext;
+
 /**
  * IndexManager implementation taking advantage of the Near-Real-Time
  * features of Lucene.
@@ -38,5 +45,15 @@ package org.hibernate.search.indexes.impl;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class NRTIndexManager extends DirectoryBasedIndexManager {
+
+	@Override
+	protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+		return BackendFactory.createBackend( this, buildContext, cfg );
+	}
+
+	@Override
+	protected DirectoryBasedReaderManager createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+		return  CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
+	}
 
 }

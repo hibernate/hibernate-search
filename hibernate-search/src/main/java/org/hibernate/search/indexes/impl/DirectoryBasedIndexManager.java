@@ -84,12 +84,12 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
-		directoryProvider = DirectoryProviderFactory.createDirectoryProvider( indexName, cfg, buildContext );
+		directoryProvider = createDirectoryProvider( indexName, cfg, buildContext );
 		indexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
-		backend = BackendFactory.createBackend( this, buildContext, cfg );
+		backend = createBackend( indexName, cfg, buildContext );
 		directoryProvider.start( this );
-		readers = CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
+		readers = createIndexReader( indexName, cfg, buildContext );
 		serializer = BackendFactory.createSerializer( indexName, cfg, buildContext );
 	}
 
@@ -187,6 +187,23 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public LuceneWorkSerializer getSerializer() {
 		return serializer;
+	}
+
+
+	/**
+	 * extensions points from {@link #initialize(String, Properties, WorkerBuildContext)}
+	 */
+
+	protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+		return BackendFactory.createBackend( this, buildContext, cfg );
+	}
+
+	protected DirectoryBasedReaderManager createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+		return  CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
+	}
+
+	protected DirectoryProvider createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+		return  DirectoryProviderFactory.createDirectoryProvider( indexName, cfg, buildContext );
 	}
 
 }
