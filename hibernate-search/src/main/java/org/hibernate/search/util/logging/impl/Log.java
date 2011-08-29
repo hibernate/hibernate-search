@@ -363,13 +363,11 @@ public interface Log extends BasicLogger {
 			+ " was not specified, using LUCENE_CURRENT.")
 	void recommendConfiguringLuceneVersion();
 
-	@LogMessage(level = ERROR)
-	@Message(id = 76, value = "Could not open Lucene index: data is corrupted. index name: '%1$s'")
-	void cantOpenCorruptedIndex(@Cause CorruptIndexException e, String indexName);
+	@Message(id = 76, value = "Could not open Lucene index: index data is corrupted. index name: '%1$s'")
+	SearchException cantOpenCorruptedIndex(@Cause CorruptIndexException e, String indexName);
 
-	@LogMessage(level = ERROR)
-	@Message(id = 77, value = "An IOException happened while accessing the Lucene index")
-	void ioExceptionOnIndex(@Cause IOException e);
+	@Message(id = 77, value = "An IOException happened while accessing the Lucene index '%1$s'")
+	SearchException ioExceptionOnIndex(@Cause IOException e, String indexName);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %1$s")
@@ -453,4 +451,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 103, value = "Unable to initialize IndexManager %1$s")
 	SearchException unableToInitializeIndexManager(String indexName, @Cause Throwable e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 104, value = "Ignoring backend option for index '%1$s', " +
+			"configured IndexManager requires using '%2$s' instead.")
+	void ignoringBackendOptionForIndex(String indexName, String forcedBackend);
 }

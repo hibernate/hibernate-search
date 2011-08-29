@@ -20,8 +20,6 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.Properties;
-
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
@@ -35,8 +33,8 @@ public class SharedIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 	private final Object lock = new Object();
 	private int openWriterUsers = 0;
 
-	public SharedIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
-		super( indexManager, errorHandler, cfg );
+	public SharedIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
+		super( indexManager, errorHandler );
 	}
 
 	@Override

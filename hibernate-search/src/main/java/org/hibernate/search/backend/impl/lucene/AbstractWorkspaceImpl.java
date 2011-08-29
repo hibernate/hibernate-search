@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -56,7 +55,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 
-	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
+	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
 		this.indexManager = indexManager;
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
 		this.entitiesInIndexManager = indexManager.getContainedTypes();

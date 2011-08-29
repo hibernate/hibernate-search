@@ -22,10 +22,13 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.Environment;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessorFactory;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * IndexManager implementation taking advantage of the Near-Real-Time
@@ -46,9 +49,17 @@ import org.hibernate.search.spi.WorkerBuildContext;
  */
 public class NRTIndexManager extends DirectoryBasedIndexManager {
 
+	private static final Log log = LoggerFactory.make();
+
 	@Override
 	protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-		return BackendFactory.createBackend( this, buildContext, cfg );
+		String backend = cfg.getProperty( Environment.WORKER_BACKEND );
+		if ( backend != null ) {
+			log.ignoringBackendOptionForIndex( indexName, "lucene-nrt" );
+		}
+		BackendQueueProcessor backendQueueProcessorFactory = new LuceneBackendQueueProcessorFactory();
+		backendQueueProcessorFactory.initialize( cfg, buildContext, this );
+		return backendQueueProcessorFactory;
 	}
 
 	@Override

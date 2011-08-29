@@ -20,8 +20,6 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.Properties;
-
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 
@@ -30,9 +28,8 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
  */
 public class ExclusiveIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 
-	public ExclusiveIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager,
-			ErrorHandler errorHandler, Properties cfg) {
-		super( indexManager, errorHandler, cfg );
+	public ExclusiveIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
+		super( indexManager, errorHandler );
 	}
 
 	@Override
