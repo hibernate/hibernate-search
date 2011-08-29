@@ -41,11 +41,11 @@ class WorkspaceFactory {
 		final boolean exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
 		if ( exclusiveIndexUsage ) {
 			log.debugf( "Starting workspace for index " + indexName + " using an exclusive index strategy" );
-			return new ExclusiveIndexWorkspaceImpl( indexManager, errorHandler, cfg );
+			return new ExclusiveIndexWorkspaceImpl( indexManager, errorHandler );
 		}
 		else {
 			log.debugf( "Starting workspace for index " + indexName + " using a shared index strategy" );
-			return new SharedIndexWorkspaceImpl( indexManager, errorHandler, cfg );
+			return new SharedIndexWorkspaceImpl( indexManager, errorHandler );
 		}
 	}
 

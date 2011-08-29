@@ -24,6 +24,8 @@ import java.io.IOException;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
@@ -60,6 +62,7 @@ class IndexWriterHolder {
 	private final ErrorHandler errorHandler;
 	private final ParameterSet indexParameters;
 	private final DirectoryProvider directoryProvider;
+	private final String indexName;
 	
 	// variable state:
 	
@@ -68,8 +71,10 @@ class IndexWriterHolder {
 	 */
 	private IndexWriter writer;
 
+
 	IndexWriterHolder(ErrorHandler errorHandler, DirectoryBasedIndexManager indexManager) {
 		this.errorHandler = errorHandler;
+		this.indexName = indexManager.getIndexName();
 		this.luceneParameters = indexManager.getIndexingParameters();
 		this.indexParameters = luceneParameters.getIndexParameters();
 		this.directoryProvider = indexManager.getDirectoryProvider();
@@ -181,6 +186,47 @@ class IndexWriterHolder {
 		}
 		catch (IOException ioe) {
 			handleIOException( ioe, null );
+		}
+	}
+
+	/**
+	 * Opens an IndexReader having visibility on uncommitted writes from
+	 * the IndexWriter, if any writer is open, or null if no IndexWriter is open.
+	 */
+	//TODO HSEARCH-852 : fine grained synchronization
+	public synchronized IndexReader openNRTIndexReader(boolean applyDeletes) {
+		try {
+			if ( writer != null ) {
+				return IndexReader.open( writer, applyDeletes );
+			}
+			else {
+				return null;
+			}
+		}
+		// following exceptions should be propagated as the IndexReader is needed by
+		// the main thread
+		catch ( CorruptIndexException cie ) {
+			throw log.cantOpenCorruptedIndex( cie, indexName );
+		}
+		catch ( IOException ioe ) {
+			throw log.ioExceptionOnIndex( ioe, indexName );
+		}
+	}
+
+	/**
+	 * Opens an IndexReader from the DirectoryProvider (not using the IndexWriter)
+	 */
+	public IndexReader openDirectoryIndexReader() {
+		try {
+			return IndexReader.open( directoryProvider.getDirectory(), true );
+		}
+		// following exceptions should be propagated as the IndexReader is needed by
+		// the main thread
+		catch ( CorruptIndexException cie ) {
+			throw log.cantOpenCorruptedIndex( cie, indexName );
+		}
+		catch ( IOException ioe ) {
+			throw log.ioExceptionOnIndex( ioe, indexName );
 		}
 	}
 
