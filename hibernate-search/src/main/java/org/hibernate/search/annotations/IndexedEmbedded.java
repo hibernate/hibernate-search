@@ -29,8 +29,8 @@ import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Documented;
 
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.FIELD, ElementType.METHOD } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 /**
  * Specifies that an association (@*To*, @Embedded, @CollectionOfEmbedded) is to be indexed
@@ -38,6 +38,17 @@ import java.lang.annotation.Documented;
  * It allows queries involving associated objects restrictions
  */
 public @interface IndexedEmbedded {
+
+	/**
+	 * Default value for {@link #indexNullAs} parameter. Indicates that {@code null} values should not be indexed.
+	 */
+	public static final String DO_NOT_INDEX_NULL = "__DO_NOT_INDEX_NULL__";
+
+	/**
+	 * Value for {@link #indexNullAs} parameter indicating that {@code null} values should not indexed using the
+	 */
+	public static final String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
+
 	/**
 	 * Field name prefix
 	 * Default to 'propertyname.'
@@ -55,4 +66,11 @@ public @interface IndexedEmbedded {
 	 * Overrides the type of an association. If a collection, overrides the type of the collection generics
 	 */
 	Class<?> targetElement() default void.class;
+
+	/**
+	 * @return Returns the value to be used for indexing {@code null}. Per default
+	 *         {@code IndexedEmbedded.DO_NOT_INDEX_NULL} is
+	 *         returned indicating that null values are not indexed.
+	 */
+	String indexNullAs() default DO_NOT_INDEX_NULL;
 }
