@@ -86,12 +86,19 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	@Override
 	public IndexReader openIndexReader() {
-		readLock.lock();
+		// we need to readLock to read the state of the currentReferenceReader
+		readLock.lock(); // balanced by the finally block
+		boolean readlockAcquired = true;
 		try {
 			if ( currentReferenceReader == null ) {
 				readLock.unlock();
-				writeLock.lock();
+				// in this case we need to create a new Reader, so we need to upgrade
+				// the read lock to the write lock (upgrade is not supported by a
+				// ReentrantReadWriteLock so we need to release the readlock first)
+				readlockAcquired = false;
+				writeLock.lock(); // balanced by the inner final block
 				try {
+					// check again as we had to release the lock after the first check:
 					if ( currentReferenceReader == null) {
 						currentReferenceReader = writerHolder.openDirectoryIndexReader();
 					}
@@ -100,11 +107,15 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 					writeLock.unlock();
 				}
 				readLock.lock();
+				// if we succeed in acquiring this, make sure we will release it again:
+				readlockAcquired = true;
 			}
 			return cloneReader( currentReferenceReader );
 		}
 		finally {
-			readLock.unlock();
+			if ( readlockAcquired ) {
+				readLock.unlock();
+			}
 		}
 	}
 
