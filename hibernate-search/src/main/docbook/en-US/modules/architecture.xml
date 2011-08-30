@@ -148,10 +148,8 @@
         <para>The main advantage is simplicity and immediate visibility of the
         changes in Lucene queries (a requirement in some applications).</para>
 
-        <para>When using a local index and sharing it with other instances is not
-        needed, you can enable <literal>exclusive_index_use</literal> as described
-        in <xref linkend="table-performance-parameters" /> for additional write
-        performance or use the near-real-time Lucene backend.</para>
+        <para>An alternative back end viable for non-clustered and non-shared
+        index configurations is the near-real-time backend.</para>
       </section>
 
       <section>
