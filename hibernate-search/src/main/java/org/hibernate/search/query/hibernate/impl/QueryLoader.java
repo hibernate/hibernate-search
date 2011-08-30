@@ -29,6 +29,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
@@ -46,6 +47,7 @@ public class QueryLoader extends AbstractLoader {
 	private boolean isExplicitCriteria;
 	private TimeoutManager timeoutManager;
 	private ObjectsInitializer objectsInitializer;
+	private boolean sizeSafe = true;
 
 
 	public void init(Session session,
@@ -57,6 +59,10 @@ public class QueryLoader extends AbstractLoader {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.timeoutManager = timeoutManager;
 		this.objectsInitializer = objectsInitializer;
+	}
+
+	public boolean isSizeSafe() {
+		return sizeSafe;
 	}
 
 	public void setEntityType(Class entityType) {
@@ -92,7 +98,20 @@ public class QueryLoader extends AbstractLoader {
 	}
 
 	public void setCriteria(Criteria criteria) {
-		isExplicitCriteria = criteria != null;
+		if (criteria != null) {
+			isExplicitCriteria = true;
+			sizeSafe = true;
+			if ( criteria instanceof CriteriaImpl ) {
+				CriteriaImpl impl = (CriteriaImpl) criteria;
+				//restriction of subcriteria => suspect
+				//TODO some subcriteria might be ok (outer joins)
+				sizeSafe = !impl.iterateExpressionEntries().hasNext() && !impl.iterateSubcriteria().hasNext();
+			}
+		}
+		else {
+			sizeSafe = true;
+			isExplicitCriteria = false;
+		}
 		this.criteria = criteria;
 	}
 }

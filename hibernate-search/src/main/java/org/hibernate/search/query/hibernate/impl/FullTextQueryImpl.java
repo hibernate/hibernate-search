@@ -48,6 +48,7 @@ import org.hibernate.engine.query.ParameterMetadata;
 import org.hibernate.impl.AbstractQueryImpl;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
@@ -223,7 +224,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public int getResultSize() {
-		return hSearchQuery.queryResultSize();
+		if ( getLoader().isSizeSafe() ) {
+			return hSearchQuery.queryResultSize();
+		}
+		else {
+			throw new SearchException( "Cannot safely compute getResultSize() when a Criteria with restriction is used. " +
+				"Use query.list().size() or query.getResultList().size(). Criteria at stake: " + criteria.toString() );
+		}
 	}
 
 	public FullTextQuery setCriteriaQuery(Criteria criteria) {
@@ -351,6 +358,10 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 		public List load(EntityInfo... entityInfos) {
 			throw new UnsupportedOperationException( "noLoader should not be used" );
+		}
+
+		public boolean isSizeSafe() {
+			return false;
 		}
 	};
 
