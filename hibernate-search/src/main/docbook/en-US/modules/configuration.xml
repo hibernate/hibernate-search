@@ -1221,15 +1221,15 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       </listitem>
 
       <listitem>
-        <para><literal>NRT</literal>: avoid flushing writes to disk at each commit.</para>
+        <para><literal>near-real-time</literal>: avoid flushing writes to disk at each commit.</para>
       </listitem>
     </itemizedlist>
 
     <para>The default implementation is <literal>transactional</literal>. To select an alternative:</para>
 
-    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = NRT</programlisting>
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = near-real-time</programlisting>
 
-    <para>Alternatively to <literal>NRT</literal> you can mention the fully qualified class name of your custom
+    <para>Alternatively to <literal>near-real-time</literal> you can mention the fully qualified class name of your custom
     implementation, which shall have a no-arguments constructor:</para>
 
     <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = my.corp.myapp.CustomIndexManager</programlisting>
