@@ -131,7 +131,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.indexmanager", "NRT" );
+		cfg.setProperty( "hibernate.search.default.indexmanager", "near-real-time" );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 	}
 

@@ -79,7 +79,7 @@ public class IndexManagerHolder {
 		defaultIndexManagerClasses = new HashMap<String, String>( 3 );
 		defaultIndexManagerClasses.put( "", DirectoryBasedIndexManager.class.getName() );
 		defaultIndexManagerClasses.put( "transactional", DirectoryBasedIndexManager.class.getName() );
-		defaultIndexManagerClasses.put( "NRT", NRTIndexManager.class.getName() );
+		defaultIndexManagerClasses.put( "near-real-time", NRTIndexManager.class.getName() );
 	}
 
 	/**

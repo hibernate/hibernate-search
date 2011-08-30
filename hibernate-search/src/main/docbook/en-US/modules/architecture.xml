@@ -151,7 +151,7 @@
         <para>When using a local index and sharing it with other instances is not
         needed, you can enable <literal>exclusive_index_use</literal> as described
         in <xref linkend="table-performance-parameters" /> for additional write
-        performance or use the NRT Lucene backend.</para>
+        performance or use the near-real-time Lucene backend.</para>
       </section>
 
       <section>
@@ -305,7 +305,7 @@
     </section>
 
     <section>
-      <title>NRT</title>
+      <title>Near-Real-Time</title>
       <para>The <classname>NRTIndexManager</classname> is an extension of the default
       <classname>IndexManager</classname>, leveraging the Lucene NRT (Near Real Time) features
       for extreme low latency index writes, but as a tradeoff it requires a non-clutered and non-shared
