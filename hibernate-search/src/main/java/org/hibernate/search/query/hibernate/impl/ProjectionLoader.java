@@ -119,4 +119,12 @@ public class ProjectionLoader implements Loader {
 
 		return results;
 	}
+
+	@Override
+	public boolean isSizeSafe() {
+		if ( objectLoader == null) {
+			objectLoader = loaderBuilder.buildLoader();
+		}
+		return objectLoader.isSizeSafe();
+	}
 }

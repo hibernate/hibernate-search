@@ -61,6 +61,11 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		this.objectsInitializer = objectsInitializer;
 	}
 
+	@Override
+	public boolean isSizeSafe() {
+		return true; //no user provided criteria
+	}
+
 	public void setEntityTypes(Set<Class<?>> entityTypes) {
 		List<Class<?>> safeEntityTypes = new ArrayList<Class<?>>();
 		//TODO should we go find the root entity for a given class rather than just checking for it's root status?
