@@ -136,7 +136,7 @@ public class FacetCollector extends Collector {
 			facetList = createRangeFacetList( counter.getCounts().entrySet(), request, counter.getCounts().size() );
 			Collections.sort( facetList, new RangeDefinitionOrderFacetComparator( ) );
 			if ( facetRequest.getMaxNumberOfFacets() > 0 ) {
-				facetList = facetList.subList( 0, facetRequest.getMaxNumberOfFacets() );
+				facetList = facetList.subList( 0, Math.min( facetRequest.getMaxNumberOfFacets(), facetList.size() ) );
 			}
 		}
 		else {
