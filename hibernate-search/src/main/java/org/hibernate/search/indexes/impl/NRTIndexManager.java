@@ -57,7 +57,7 @@ public class NRTIndexManager extends DirectoryBasedIndexManager {
 	protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		String backend = cfg.getProperty( Environment.WORKER_BACKEND );
 		if ( backend != null ) {
-			log.ignoringBackendOptionForIndex( indexName, "lucene-nrt" );
+			log.ignoringBackendOptionForIndex( indexName, "near-real-time" );
 		}
 		LuceneBackendQueueProcessor backendQueueProcessor = new LuceneBackendQueueProcessor();
 		nrtWorkspace = new NRTWorkspaceImpl( this, buildContext.getErrorHandler(), cfg );
