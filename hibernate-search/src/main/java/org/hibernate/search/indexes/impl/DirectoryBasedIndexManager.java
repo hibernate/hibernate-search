@@ -37,7 +37,7 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -47,7 +47,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
  * This implementation of IndexManager is coupled to a
- * DirectoryProvider and a DirectoryBasedReaderManager
+ * DirectoryProvider and a DirectoryBasedReaderProvider
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -62,7 +62,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
 	private LuceneWorkSerializer serializer;
 	private SearchFactoryImplementor boundSearchFactory = null;
-	private DirectoryBasedReaderManager readers = null;
+	private DirectoryBasedReaderProvider readers = null;
 	private IndexWriterConfig writerConfig;
 
 	@Override
@@ -199,8 +199,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		return BackendFactory.createBackend( this, buildContext, cfg );
 	}
 
-	protected DirectoryBasedReaderManager createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-		return  CommonPropertiesParse.createDirectoryBasedReaderManager( this, cfg );
+	protected DirectoryBasedReaderProvider createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+		return  CommonPropertiesParse.createDirectoryBasedReaderProvider( this, cfg );
 	}
 
 	protected DirectoryProvider createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {

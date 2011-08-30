@@ -26,7 +26,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.NRTWorkspaceImpl;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -67,7 +67,7 @@ public class NRTIndexManager extends DirectoryBasedIndexManager {
 	}
 
 	@Override
-	protected DirectoryBasedReaderManager createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+	protected DirectoryBasedReaderProvider createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		return nrtWorkspace;
 	}
 
