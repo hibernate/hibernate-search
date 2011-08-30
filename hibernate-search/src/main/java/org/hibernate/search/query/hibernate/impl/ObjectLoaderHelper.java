@@ -73,7 +73,7 @@ public class ObjectLoaderHelper {
 			//FIXME This call is very inefficient when @Entity's id property is different
 			//FIXME from Document stored id as we need to do the actual query again
 			Object element = executeLoad( entityInfo, session );
-			if ( HibernateHelper.isInitialized( element ) ) {
+			if ( element != null && HibernateHelper.isInitialized( element ) ) {
 				//all existing elements should have been loaded by the query,
 				//the other ones are missing ones
 				result.add( element );
