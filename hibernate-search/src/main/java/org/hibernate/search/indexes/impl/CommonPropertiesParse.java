@@ -27,7 +27,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
-import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
@@ -116,10 +116,10 @@ public class CommonPropertiesParse {
 	 * @param cfg
 	 * @return
 	 */
-	public static DirectoryBasedReaderManager createDirectoryBasedReaderManager(DirectoryBasedIndexManager indexManager, Properties cfg) {
+	public static DirectoryBasedReaderProvider createDirectoryBasedReaderProvider(DirectoryBasedIndexManager indexManager, Properties cfg) {
 		Properties props = new MaskedProperty( cfg, Environment.READER_PREFIX );
 		String impl = props.getProperty( "strategy" );
-		DirectoryBasedReaderManager readerProvider;
+		DirectoryBasedReaderProvider readerProvider;
 		if ( StringHelper.isEmpty( impl ) ) {
 			readerProvider = new SharingBufferReaderProvider();
 		}
@@ -131,7 +131,7 @@ public class CommonPropertiesParse {
 		}
 		else {
 			readerProvider = ClassLoaderHelper.instanceFromName(
-					DirectoryBasedReaderManager.class, impl,
+					DirectoryBasedReaderProvider.class, impl,
 					CommonPropertiesParse.class, "readerProvider"
 			);
 		}

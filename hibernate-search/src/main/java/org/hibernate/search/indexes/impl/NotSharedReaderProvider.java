@@ -26,7 +26,7 @@ import java.util.Properties;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class NotSharedReaderProvider implements DirectoryBasedReaderManager {
+public class NotSharedReaderProvider implements DirectoryBasedReaderProvider {
 	
 	private static final Log log = LoggerFactory.make();
 

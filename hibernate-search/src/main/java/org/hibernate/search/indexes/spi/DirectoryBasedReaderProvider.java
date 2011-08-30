@@ -27,7 +27,7 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public interface DirectoryBasedReaderManager extends ReaderProvider {
+public interface DirectoryBasedReaderProvider extends ReaderProvider {
 	
 	void initialize(DirectoryBasedIndexManager indexManager, Properties props);
 

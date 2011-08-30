@@ -32,7 +32,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.spi.DirectoryBasedReaderManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -44,7 +44,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class SharingBufferReaderProvider implements DirectoryBasedReaderManager {
+public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider {
 
 	private static final Log log = LoggerFactory.make();
 
