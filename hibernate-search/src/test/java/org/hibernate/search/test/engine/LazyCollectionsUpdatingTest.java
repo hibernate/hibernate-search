@@ -131,7 +131,6 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
           session.close();
       }
       for (BusStop stop : bus.getStops()) {
-        System.out.println(stop + " - " + stop.getNumMethodCalls());
         assertEquals("@Fields annotation should only call getValue once", 1, stop.getNumMethodCalls());
       }
 	}
