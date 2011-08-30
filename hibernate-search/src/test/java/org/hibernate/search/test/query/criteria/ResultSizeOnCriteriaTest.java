@@ -29,6 +29,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.junit.Test;
@@ -72,7 +73,14 @@ public class ResultSizeOnCriteriaTest extends SearchTestCase {
 		}
 
 		//Compare with resultSize
-		assertThat( hibQuery.getResultSize() ).isEqualTo( result.size() );
+		try {
+			hibQuery.getResultSize();
+			assertThat( true ).as( "HSEARCH000105 should have been raised" ).isFalse();
+		}
+		catch ( SearchException e ) {
+			assertThat( e.getMessage() ).startsWith( "HSEARCH000105" );
+		}
+		assertThat( result ).hasSize( 1 );
 		//getResultSize get only count of tractors matching keyword on field "owner" beginning with "p*"
 		tx.commit();
 
