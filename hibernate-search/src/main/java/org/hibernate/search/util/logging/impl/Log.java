@@ -456,4 +456,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 104, value = "Ignoring backend option for index '%1$s', " +
 			"configured IndexManager requires using '%2$s' instead.")
 	void ignoringBackendOptionForIndex(String indexName, String forcedBackend);
+
+	@Message(id = 105, value = "Cannot safely compute getResultSize() when a Criteria with restriction is used. " +
+			"Use query.list().size() or query.getResultList().size(). Criteria at stake: %1$s")
+	SearchException cannotGetResultSizeWithCriteriaAndRestriction(String criteria);
 }

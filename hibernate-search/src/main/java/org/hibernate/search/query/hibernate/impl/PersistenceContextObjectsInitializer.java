@@ -57,7 +57,7 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		}
 
 		//check the persistence context
-		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( entityInfos.length );
+		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( maxResults );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
 				final boolean isInitialized = HibernateHelper.isInitialized(

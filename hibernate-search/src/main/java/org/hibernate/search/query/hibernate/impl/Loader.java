@@ -48,6 +48,7 @@ public interface Loader {
 
 	Object loadWithoutTiming(EntityInfo entityInfo);
 
-
 	List load(EntityInfo... entityInfos);
+
+	boolean isSizeSafe();
 }
