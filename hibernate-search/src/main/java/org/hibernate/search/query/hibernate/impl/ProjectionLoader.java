@@ -69,6 +69,7 @@ public class ProjectionLoader implements Loader {
 		//no need to timeouManage here, the underlying loader is the real time consumer
 		initThisProjectionFlag(entityInfo);
 		if (projectThis) {
+			Loader objectLoader = getObjectLoader();
 			final Object entityInstance = objectLoader.load( entityInfo );
 			entityInfo.populateWithEntityInstance( entityInstance );
 		}
@@ -87,9 +88,6 @@ public class ProjectionLoader implements Loader {
 	private void initThisProjectionFlag(EntityInfo entityInfo) {
 		if (projectThis == null) {
 			projectThis = entityInfo.isProjectThis();
-			if (projectThis) {
-				objectLoader = loaderBuilder.buildLoader();
-			}
 		}
 	}
 
@@ -102,6 +100,7 @@ public class ProjectionLoader implements Loader {
 
 		initThisProjectionFlag(entityInfos[0]);
 		if (projectThis) {
+			Loader objectLoader = getObjectLoader();
 			objectLoader.load(entityInfos); // load by batch
 			for (EntityInfo entityInfo : entityInfos) {
 				final Object entityInstance = objectLoader.loadWithoutTiming( entityInfo );
@@ -120,11 +119,15 @@ public class ProjectionLoader implements Loader {
 		return results;
 	}
 
-	@Override
-	public boolean isSizeSafe() {
-		if ( objectLoader == null) {
+	private Loader getObjectLoader() {
+		if ( objectLoader == null ) {
 			objectLoader = loaderBuilder.buildLoader();
 		}
-		return objectLoader.isSizeSafe();
+		return objectLoader;
+	}
+
+	@Override
+	public boolean isSizeSafe() {
+		return getObjectLoader().isSizeSafe();
 	}
 }
