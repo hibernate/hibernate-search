@@ -733,11 +733,16 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
 
         <important>
           <para>Only fetch mode can be adjusted, refrain from applying any
-          other restriction.</para>
+          other restriction. While it is known to work as of Hibernate Search
+          4, using restriction (ie a where clause) on your
+          <classname>Criteria</classname> query should be avoided when
+          possible. <methodname>getResultSize()</methodname> will return a
+          <classname>SearchException</classname> if used in conjunction with a
+          <classname>Criteria</classname> with restriction.</para>
         </important>
 
         <important>
-          <para>One cannot use <methodname>setCriteriaQuery</methodname> if
+          <para>You cannot use <methodname>setCriteriaQuery</methodname> if
           more than one entity type is expected to be returned.</para>
         </important>
       </section>
