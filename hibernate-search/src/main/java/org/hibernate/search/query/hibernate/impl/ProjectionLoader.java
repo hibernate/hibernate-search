@@ -126,7 +126,6 @@ public class ProjectionLoader implements Loader {
 		return objectLoader;
 	}
 
-	@Override
 	public boolean isSizeSafe() {
 		return getObjectLoader().isSizeSafe();
 	}

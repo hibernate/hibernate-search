@@ -61,7 +61,6 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		this.objectsInitializer = objectsInitializer;
 	}
 
-	@Override
 	public boolean isSizeSafe() {
 		return true; //no user provided criteria
 	}

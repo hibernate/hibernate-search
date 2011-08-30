@@ -78,7 +78,7 @@ public class ResultSizeOnCriteriaTest extends SearchTestCase {
 			assertThat( true ).as( "HSEARCH000105 should have been raised" ).isFalse();
 		}
 		catch ( SearchException e ) {
-			assertThat( e.getMessage() ).startsWith( "HSEARCH000105" );
+			assertThat( e.getMessage() ).startsWith( "Cannot safely compute" );
 		}
 		assertThat( result ).hasSize( 1 );
 		//getResultSize get only count of tractors matching keyword on field "owner" beginning with "p*"
