@@ -220,6 +220,32 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		assertEquals( "[1.01, 1.5]", facets.get( 1 ).getValue() );
 		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
 	}
+	
+	public void testRangeQueryRangeDefOrderHigherMaxCount() {
+		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
+				.name( priceRange )
+				.onField( indexFieldName )
+				.range()
+				.from( 0.00 ).to( 1.00 )
+				.from( 1.01 ).to( 1.50 )
+				.from( 1.51 ).to( 3.00 )
+				.from( 4.00 ).to( 5.00 )
+				.includeZeroCounts( false )
+				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
+				.maxFacetCount(5)
+				.createFacetingRequest();
+
+		FullTextQuery query = createMatchAllQuery( Fruit.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		List<Facet> facets = query.getFacetManager().getFacets( priceRange );
+		assertFacetCounts( facets, new int[] { 2, 3, 5 } );
+		assertEquals( "[0.0, 1.0]", facets.get( 0 ).getValue() );
+		assertEquals( "[1.01, 1.5]", facets.get( 1 ).getValue() );
+		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
+	}
+
 
 	public void testStringRangeFaceting() {
 		final String facetingName = "albumNameFaceting";
