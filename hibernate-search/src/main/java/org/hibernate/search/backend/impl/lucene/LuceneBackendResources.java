@@ -25,7 +25,6 @@ package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.store.Workspace;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
@@ -64,14 +63,14 @@ public class LuceneBackendResources {
 	private final ReadLock readLock = readWriteLock.readLock();
 	private final WriteLock writeLock = readWriteLock.writeLock();
 	
-	LuceneBackendResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, Properties props, AbstractWorkspaceImpl workspaceOverride) {
-		indexName = indexManager.getIndexName();
-		errorHandler = context.getErrorHandler();
-		workspace = workspaceOverride != null ? workspaceOverride : WorkspaceFactory.createWorkspace( indexManager, errorHandler, props );
-		visitor = new LuceneWorkVisitor( workspace );
-		maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
-		queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
-		workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
+	LuceneBackendResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, Properties props, AbstractWorkspaceImpl workspace) {
+		this.indexName = indexManager.getIndexName();
+		this.errorHandler = context.getErrorHandler();
+		this.workspace = workspace;
+		this.visitor = new LuceneWorkVisitor( workspace );
+		this.maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
+		this.queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
+		this.workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
 	}
 
 	public ExecutorService getQueueingExecutor() {

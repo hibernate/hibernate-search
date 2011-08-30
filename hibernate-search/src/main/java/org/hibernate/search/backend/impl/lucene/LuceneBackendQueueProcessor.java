@@ -59,6 +59,10 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
+		if ( workspaceOverride == null ) {
+			workspaceOverride = WorkspaceFactory.createWorkspace( indexManager,
+					context.getErrorHandler(), props );
+		}
 		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );
 	}
 
