@@ -107,8 +107,6 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		Map<RootEntityMetadata, List<EntityInfo>> entityinfoBuckets =
 				new HashMap<RootEntityMetadata, List<EntityInfo>>( entityMatadata.size());
 		for (EntityInfo entityInfo : entityInfos) {
-
-
 			boolean found = false;
 			final Class<?> clazz = entityInfo.getClazz();
 			for (RootEntityMetadata rootEntityInfo : entityMatadata) {
