@@ -58,6 +58,8 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.util.impl.ContextHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -69,6 +71,7 @@ import org.hibernate.transform.ResultTransformer;
  */
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
 
+	private static final Log log = LoggerFactory.make();
 	private Criteria criteria;
 	private ResultTransformer resultTransformer;
 	private int fetchSize = 1;
@@ -223,7 +226,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	public int getResultSize() {
-		return hSearchQuery.queryResultSize();
+		if ( getLoader().isSizeSafe() ) {
+			return hSearchQuery.queryResultSize();
+		}
+		else {
+			throw log.cannotGetResultSizeWithCriteriaAndRestriction( criteria.toString() );
+		}
 	}
 
 	public FullTextQuery setCriteriaQuery(Criteria criteria) {
@@ -351,6 +359,11 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 		public List load(EntityInfo... entityInfos) {
 			throw new UnsupportedOperationException( "noLoader should not be used" );
+		}
+
+		@Override
+		public boolean isSizeSafe() {
+			return false;
 		}
 	};
 
