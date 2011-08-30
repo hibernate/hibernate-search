@@ -26,14 +26,17 @@ package org.hibernate.search.test.engine;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Transient;
 
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Fields;
 
 /**
  * Test entity: BusStop is @ContainedIn BusLine
@@ -48,7 +51,8 @@ public class BusStop {
 	private Set<BusLine> busses = new HashSet<BusLine>();
 	private String serviceComments = "nothing";
 	private Date startingDate = new Date();
-
+	private transient int numMethodCalls = 0;
+	
 	@Id
 	@GeneratedValue
 	public Long getId() {
@@ -127,4 +131,25 @@ public class BusStop {
 		return true;
 	}
 
+    @Fields({
+      @Field(name="strMultiple"),
+      @Field
+    })
+    @Transient
+	public String getTextTestField() {
+      StringBuilder sb = new StringBuilder();
+      sb.append(getRoadName()).append(" ").append(getServiceComments()).append(" - ").append(getStartingDate());
+      setNumMethodCalls(getNumMethodCalls() + 1);
+      return sb.toString();
+	}
+
+    public int getNumMethodCalls()
+    {
+      return numMethodCalls;
+    }
+
+    public void setNumMethodCalls( int numMethodCalls )
+    {
+      this.numMethodCalls = numMethodCalls;
+    }
 }
