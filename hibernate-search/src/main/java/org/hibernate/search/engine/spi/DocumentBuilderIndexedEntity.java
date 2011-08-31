@@ -487,15 +487,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		for ( int i = 0; i < propertiesMetadata.fieldNames.size(); i++ ) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			Object value = previousValue;
-			if (previousMember != member) {
-	            value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-	            log.trace("using previous value:" + value);
+			if ( previousMember != member ) {
+				value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 			}
 			previousMember = member;
 			previousValue = value;
 
-            final String fieldName = propertiesMetadata.fieldNames.get( i );
 			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get( i );
+			final String fieldName = propertiesMetadata.fieldNames.get( i );
 			contextualBridge
 					.setFieldBridge( fieldBridge )
 					.pushMethod( member )
