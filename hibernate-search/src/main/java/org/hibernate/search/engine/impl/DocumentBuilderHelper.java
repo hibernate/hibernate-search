@@ -87,20 +87,29 @@ public final class DocumentBuilderHelper {
 		contextualBridge.setClass( clazz );
 		if ( builderIndexedEntity.getIdKeywordName() != null ) {
 			final XMember member = builderIndexedEntity.getIdGetter();
-			if ( member != null ) {
-				contextualBridge.pushMethod( member );
-			}
-			populateResult(
-					builderIndexedEntity.getIdKeywordName(),
-					builderIndexedEntity.getIdBridge(),
-					Store.YES,
-					fields,
-					result,
-					document,
-					contextualBridge
-			);
-			if ( member != null ) {
-				contextualBridge.popMethod();
+			final String fieldName = builderIndexedEntity.getIdKeywordName();
+			int matchingPosition = getFieldPosition( fields, fieldName );
+			if ( matchingPosition != -1 ) {
+				if ( member != null ) {
+					contextualBridge.pushMethod( member );
+				}
+				try {
+					populateResult(
+							fieldName,
+							builderIndexedEntity.getIdBridge(),
+							Store.YES,
+							fields,
+							result,
+							document,
+							contextualBridge,
+							matchingPosition
+							);
+				}
+				finally {
+					if ( member != null ) {
+						contextualBridge.popMethod();
+					}
+				}
 			}
 		}
 
@@ -110,24 +119,21 @@ public final class DocumentBuilderHelper {
 	}
 
 	public static void populateResult(String fieldName, FieldBridge fieldBridge, Store store,
-									  String[] fields, Object[] result, Document document, ContextualException2WayBridge contextualBridge) {
-		int matchingPosition = getFieldPosition( fields, fieldName );
-		if ( matchingPosition != -1 ) {
-			//TODO make use of an isTwoWay() method
-			if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
-				contextualBridge.setFieldName( fieldName ).setFieldBridge( (TwoWayFieldBridge) fieldBridge );
-				result[matchingPosition] = contextualBridge.get( fieldName, document );
-				if ( log.isTraceEnabled() ) {
-					log.tracef( "Field %s projected as %s", fieldName, result[matchingPosition] );
-				}
+									  String[] fields, Object[] result, Document document, ContextualException2WayBridge contextualBridge, int matchingPosition) {
+		//TODO make use of an isTwoWay() method
+		if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
+			contextualBridge.setFieldName( fieldName ).setFieldBridge( (TwoWayFieldBridge) fieldBridge );
+			result[matchingPosition] = contextualBridge.get( fieldName, document );
+			if ( log.isTraceEnabled() ) {
+				log.tracef( "Field %s projected as %s", fieldName, result[matchingPosition] );
+			}
+		}
+		else {
+			if ( store == Store.NO ) {
+				throw new SearchException( "Projecting an unstored field: " + fieldName );
 			}
 			else {
-				if ( store == Store.NO ) {
-					throw new SearchException( "Projecting an unstored field: " + fieldName );
-				}
-				else {
-					throw new SearchException( "FieldBridge is not a TwoWayFieldBridge: " + fieldBridge.getClass() );
-				}
+				throw new SearchException( "FieldBridge is not a TwoWayFieldBridge: " + fieldBridge.getClass() );
 			}
 		}
 	}
@@ -137,17 +143,24 @@ public final class DocumentBuilderHelper {
 		final int nbrFoEntityFields = metadata.fieldNames.size();
 		for ( int index = 0; index < nbrFoEntityFields; index++ ) {
 			final String fieldName = metadata.fieldNames.get( index );
-			contextualBridge.pushMethod( metadata.fieldGetters.get( index ) );
-			populateResult(
-					fieldName,
-					metadata.fieldBridges.get( index ),
-					metadata.fieldStore.get( index ),
-					fields,
-					result,
-					document,
-					contextualBridge
-			);
-			contextualBridge.popMethod();
+			int matchingPosition = getFieldPosition( fields, fieldName );
+			if ( matchingPosition != -1 ) {
+				contextualBridge.pushMethod( metadata.fieldGetters.get( index ) );
+				try {
+					populateResult(
+							fieldName,
+							metadata.fieldBridges.get( index ),
+							metadata.fieldStore.get( index ),
+							fields,
+							result,
+							document,
+							contextualBridge,
+							matchingPosition
+							);
+				} finally {
+					contextualBridge.popMethod();
+				}
+			}
 		}
 
 		//process fields of embedded
@@ -167,15 +180,20 @@ public final class DocumentBuilderHelper {
 		//process class bridges
 		final int nbrOfClassBridges = metadata.classBridges.size();
 		for ( int index = 0; index < nbrOfClassBridges; index++ ) {
-			populateResult(
-					metadata.classNames.get( index ),
-					metadata.classBridges.get( index ),
-					metadata.classStores.get( index ),
-					fields,
-					result,
-					document,
-					contextualBridge
-			);
+			final String fieldName = metadata.classNames.get( index );
+			int matchingPosition = getFieldPosition( fields, fieldName );
+			if ( matchingPosition != -1 ) {
+				populateResult(
+						fieldName,
+						metadata.classBridges.get( index ),
+						metadata.classStores.get( index ),
+						fields,
+						result,
+						document,
+						contextualBridge,
+						matchingPosition
+				);
+			}
 		}
 	}
 
