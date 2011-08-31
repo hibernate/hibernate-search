@@ -295,6 +295,11 @@
                 <artifactId>jboss-logging-processor</artifactId>
                 <version>${jbossLoggingProcessorVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging-generator</artifactId>
+                <version>${jbossLoggingProcessorVersion}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
