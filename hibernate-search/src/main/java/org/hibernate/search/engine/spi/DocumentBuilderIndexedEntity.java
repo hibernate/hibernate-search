@@ -483,15 +483,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 		// process the indexed fields
 		XMember previousMember = null;
-		Object previousValue = null; 
+		Object currentFieldValue = null;
 		for ( int i = 0; i < propertiesMetadata.fieldNames.size(); i++ ) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
-			Object value = previousValue;
 			if ( previousMember != member ) {
-				value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
+				currentFieldValue = ReflectionHelper.getMemberValue( unproxiedInstance, member );
+				previousMember = member;
 			}
-			previousMember = member;
-			previousValue = value;
 
 			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get( i );
 			final String fieldName = propertiesMetadata.fieldNames.get( i );
@@ -500,8 +498,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 					.pushMethod( member )
 					.setFieldName( fieldName )
 					.set(
-							fieldName, value, doc,
-							propertiesMetadata.getFieldLuceneOptions( i, value )
+							fieldName, currentFieldValue, doc,
+							propertiesMetadata.getFieldLuceneOptions( i, currentFieldValue )
 					);
 			contextualBridge.popMethod();
 		}
