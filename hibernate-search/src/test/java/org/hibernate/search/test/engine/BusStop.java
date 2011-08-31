@@ -131,25 +131,24 @@ public class BusStop {
 		return true;
 	}
 
-    @Fields({
-      @Field(name="strMultiple"),
-      @Field
-    })
-    @Transient
+	@Fields({
+		@Field(name = "strMultiple"),
+		@Field })
+	@Transient
 	public String getTextTestField() {
-      StringBuilder sb = new StringBuilder();
-      sb.append(getRoadName()).append(" ").append(getServiceComments()).append(" - ").append(getStartingDate());
-      setNumMethodCalls(getNumMethodCalls() + 1);
-      return sb.toString();
+		StringBuilder sb = new StringBuilder();
+		sb.append( getRoadName() ).append( " " ).append( getServiceComments() )
+				.append( " - " ).append( getStartingDate() );
+		setNumMethodCalls( getNumMethodCalls() + 1 );
+		return sb.toString();
 	}
 
-    public int getNumMethodCalls()
-    {
-      return numMethodCalls;
-    }
+	@Transient
+	public int getNumMethodCalls() {
+		return numMethodCalls;
+	}
 
-    public void setNumMethodCalls( int numMethodCalls )
-    {
-      this.numMethodCalls = numMethodCalls;
-    }
+	public void setNumMethodCalls(int numMethodCalls) {
+		this.numMethodCalls = numMethodCalls;
+	}
 }
