@@ -112,7 +112,7 @@
                             <exclude>antlr:antlr</exclude>
                             <exclude>commons-collections:commons-collections</exclude>
                             <exclude>dom4j:dom4j</exclude>
-                            <exclude>org.hibernate:hibernate-commons-annotations</exclude>
+                            <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
                             <exclude>org.hibernate:hibernate-core</exclude>
                             <exclude>org.hibernate:hibernate-search</exclude>
                             <exclude>org.infinispan:*</exclude>
@@ -167,6 +167,7 @@
                             <exclude>xml-apis:*</exclude>
                             <exclude>org.hibernate.javax.persistence:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
                             <!-- Avro excludes -->
                             <exclude>org.apache.avro:avro</exclude>
                             <exclude>org.codehaus.jackson:*</exclude>
