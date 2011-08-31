@@ -25,6 +25,7 @@ package org.hibernate.search.test.engine;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -110,6 +111,30 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 	
+	public void testFieldsAnnotationCalls() {
+	  openSession();
+      Transaction tx = null;
+      BusLine bus = new BusLine();
+      try {
+          tx = session.beginTransaction();
+          bus.setBusLineName( "Linea 64" );
+          addBusStop( bus, "Stazione Termini" );
+          addBusStop( bus, "via Gregorio VII" );
+          addBusStop( bus, "via Alessandro III" );
+          addBusStop( bus, "via M.Buonarroti" );
+          session.persist( bus );
+          tx.commit();
+      } catch (Throwable t) {
+          if ( tx != null )
+              tx.rollback();
+      } finally {
+          session.close();
+      }
+      for (BusStop stop : bus.getStops()) {
+        assertEquals("@Fields annotation should only call getValue once", 1, stop.getNumMethodCalls());
+      }
+	}
+
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();

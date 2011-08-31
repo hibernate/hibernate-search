@@ -8,7 +8,7 @@ buildSrc/.gradle
 # Build output directies
 target
 build
-
+hibernate-search/bin/*
 # IntelliJ specific files/directories
 /out
 .idea
