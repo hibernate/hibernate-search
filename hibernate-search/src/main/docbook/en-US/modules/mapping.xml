@@ -43,7 +43,7 @@
     <note>
       <para>There is currently no xml configuration option available (see
       <ulink
-      url="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-210">HSEARCH-210</ulink>).</para>
+      url="https://hibernate.onjira.com/browse/HSEARCH-210">HSEARCH-210</ulink>).</para>
     </note>
 
     <section id="basic-mapping">
