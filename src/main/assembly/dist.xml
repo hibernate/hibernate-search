@@ -112,7 +112,7 @@
                             <exclude>antlr:antlr</exclude>
                             <exclude>commons-collections:commons-collections</exclude>
                             <exclude>dom4j:dom4j</exclude>
-                            <exclude>org.hibernate:hibernate-commons-annotations</exclude>
+                            <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
                             <exclude>org.hibernate:hibernate-core</exclude>
                             <exclude>org.hibernate:hibernate-search</exclude>
                             <exclude>org.infinispan:*</exclude>
