@@ -436,7 +436,6 @@ org.apache.lucene.search.Query query = qb
   .matching("Java rocks!");
   .createQuery();
 
-
 // wrap Lucene query in a org.hibernate.Query
 org.hibernate.Query hibQuery = 
     fullTextSession.createFullTextQuery(query, Book.class);
@@ -445,7 +444,7 @@ org.hibernate.Query hibQuery =
 List result = hibQuery.list();
   
 tx.commit();
-session.close();  </programlisting>
+session.close();</programlisting>
     </example>
 
     <example>
@@ -475,7 +474,7 @@ javax.persistence.Query persistenceQuery =
 List result = persistenceQuery.getResultList();
 
 em.getTransaction().commit();
-em.close();  </programlisting>
+em.close();</programlisting>
     </example>
   </section>
 

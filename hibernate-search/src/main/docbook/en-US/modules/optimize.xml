@@ -114,7 +114,7 @@ hibernate.search.Animal.optimizer.transaction_limit.max = 50</programlisting>
     <example>
       <title>Programmatic index optimization</title>
 
-      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
 SearchFactory searchFactory = fullTextSession.getSearchFactory();
 
 searchFactory.optimize(Order.class);

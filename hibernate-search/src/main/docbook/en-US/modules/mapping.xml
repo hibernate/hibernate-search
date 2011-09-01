@@ -126,7 +126,7 @@ public class Essay {
                 words it contains. It make sense to tokenize a text field, but
                 probably not a date field.</para>
               </tip><tip>
-                <para>Fields used for sorting must not be tokenized.</para>
+                <para>Fields used for sorting <emphasis>must not</emphasis> be analyzed.</para>
               </tip></para>
           </listitem>
 
@@ -298,7 +298,7 @@ public class Essay {
         <example id="example-annotated-entity">
           <title>Specifying indexed properties</title>
 
-          <programlisting>@Entity
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Essay {
     ...
@@ -342,7 +342,7 @@ public class Essay {
       <example id="example-fields-annotation">
         <title>Using @Fields to map a property multiple times</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed(index = "Book" )
 public class Book {
     <emphasis role="bold">@Fields( {</emphasis>
@@ -457,7 +457,7 @@ public class Address {
         <title>Nested usage of <classname>@IndexedEmbedded</classname> and
         <classname>@ContainedIn</classname></title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Place {
     @Id
@@ -603,7 +603,7 @@ public class Owner {
         <title>Using the <literal>targetElement</literal> property of
         <classname>@IndexedEmbedded</classname></title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Address {
     @Id
@@ -773,7 +773,7 @@ public class VIPBoostStrategy implements BoostStrategy {
       <example>
         <title>Different ways of using @Analyzer</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 <emphasis role="bold">@Analyzer(impl = EntityAnalyzer.class)</emphasis>
 public class MyEntity {
