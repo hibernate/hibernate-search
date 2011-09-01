@@ -110,89 +110,54 @@
   <section>
     <title>Using Maven</title>
 
-    <para>Instead of managing all dependencies manually, maven users have the
-    possibility to use the <ulink
-    url="http://repository.jboss.org/nexus/content/groups/public-jboss/ ">JBoss
-    maven repository</ulink>. Add the following to your Maven
-    <filename>settings.xml file</filename> (see also <ulink
-    url="http://community.jboss.org/wiki/MavenGettingStarted-Users">Maven
-    Getting Started</ulink>):</para>
+    <para>The Hibernate Search artifacts can be found in Maven's central repository but are
+    released first in the <ulink url="http://repository.jboss.org/nexus/content/groups/public-jboss/ ">JBoss
+    maven repository</ulink>. So it's not a requirement but we recommend to add this repository to your
+    <filename>settings.xml file</filename> (see also <ulink url="http://community.jboss.org/wiki/MavenGettingStarted-Users">Maven
+    Getting Started</ulink> for more details).</para>
+
+    <para>This is all you need to add to your pom.xml to get started:</para>
 
     <example>
-      <title>Adding the JBoss maven repository to
-      <filename>settings.xml</filename></title>
-
-      <programlisting language="XML" role="XML">&lt;settings&gt;
-  ...
-  &lt;profiles&gt;
-    ...
-    &lt;profile&gt;
-      &lt;id&gt;jboss-public-repository&lt;/id&gt;
-      &lt;repositories&gt;
-        &lt;repository&gt;
-          &lt;id&gt;jboss-public-repository-group&lt;/id&gt;
-          &lt;name&gt;JBoss Public Maven Repository Group&lt;/name&gt;
-          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public-jboss/&lt;/url&gt;
-          &lt;layout&gt;default&lt;/layout&gt;
-          &lt;releases&gt;
-            &lt;enabled&gt;true&lt;/enabled&gt;
-            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;
-          &lt;/releases&gt;
-          &lt;snapshots&gt;
-            &lt;enabled&gt;true&lt;/enabled&gt;
-            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;
-          &lt;/snapshots&gt;
-        &lt;/repository&gt;
-      &lt;/repositories&gt;
-      &lt;pluginRepositories&gt;
-        &lt;pluginRepository&gt;
-          &lt;id&gt;jboss-public-repository-group&lt;/id&gt;
-          &lt;name&gt;JBoss Public Maven Repository Group&lt;/name&gt;
-          &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public-jboss/&lt;/url&gt;
-          &lt;layout&gt;default&lt;/layout&gt;
-          &lt;releases&gt;
-            &lt;enabled&gt;true&lt;/enabled&gt;
-            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;
-          &lt;/releases&gt;
-          &lt;snapshots&gt;
-            &lt;enabled&gt;true&lt;/enabled&gt;
-            &lt;updatePolicy&gt;never&lt;/updatePolicy&gt;
-          &lt;/snapshots&gt;
-        &lt;/pluginRepository&gt;
-      &lt;/pluginRepositories&gt;
-    &lt;/profile&gt;
-
-  &lt;/profiles&gt;
-
-  &lt;activeProfiles&gt;
-    &lt;activeProfile&gt;jboss-public-repository&lt;/activeProfile&gt;
-  &lt;/activeProfiles&gt;
-  ...
-&lt;/settings&gt;</programlisting>
-    </example>
-
-    <para>Then add the following dependencies to your pom.xml:</para>
-
-    <example>
-      <title>Maven dependencies for Hibernate Search</title>
+      <title>Maven artifact identifier for Hibernate Search</title>
 
       <programlisting language="XML" role="XML">&lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
    &lt;version&gt;&version;&lt;/version&gt;
-&lt;/dependency&gt;
+&lt;/dependency&gt;</programlisting>
+    </example>
+
+    <example>
+      <title>Optional Maven dependencies for Hibernate Search</title>
+
+      <programlisting language="XML" role="XML">&lt;dependency&gt;
+&lt;!-- If using JPA (2), add: --&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
    &lt;version&gt;&hibernateVersion;&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!-- Additional Analyzers: --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search-analyzers&lt;/artifactId&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!-- Infinispan integration: --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search-infinispan&lt;/artifactId&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
     </example>
 
     <para>Only the <emphasis>hibernate-search</emphasis> dependency is
-    mandatory, because it contains together with its required transitive
-    dependencies all required classes needed to use Hibernate
-    Search.<emphasis> hibernate-entitymanager</emphasis> is only required if
+    mandatory.<emphasis> hibernate-entitymanager</emphasis> is only required if
     you want to use Hibernate Search in conjunction with JPA.</para>
+    <para>To use <emphasis>hibernate-search-infinispan</emphasis>, adding the JBoss
+    Maven repository is no longer optional, it's mandatory as it contains the needed
+    Infinispan dependencies and these are currently not mirrored by <literal>central</literal>.</para>
 
     <para><note>
         <para>There is no XML configuration available for Hibernate Search but
