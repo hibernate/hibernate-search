@@ -444,9 +444,8 @@ public class Address {
       <classname>@ContainedIn</classname>.</para>
 
       <tip>
-        <para><literal>@ContainedIn</literal> is only useful on associations
-        pointing to entities as opposed to embedded (collection of)
-        objects.</para>
+        <para><literal>@ContainedIn</literal> is useful on both associations
+        pointing to entities and on embedded (collection of) objects.</para>
       </tip>
 
       <para>Let's make <xref linkend="example-indexing-associations" /> a bit
