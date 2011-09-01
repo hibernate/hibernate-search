@@ -1,6 +1,51 @@
 Hibernate Search Changelog
 ==========================
 
+4.0.0.Alpha2 (01-09-2011)
+-------------------------
+
+** Bug
+    * [HSEARCH-753] - Raise exception when there is a risk of having fullTextQuery.getResultList().size() != fullTextQuery.getResultSize()
+    * [HSEARCH-833] - Make sure that we wrap exceptions from the serialization layer into a SearchException (unless it's already a SearchException)
+    * [HSEARCH-834] - Field level Boost is not (de)serialized on NumericField and should
+    * [HSEARCH-861] - Documentation section "Using filters in a sharded environment" uses the old ShardingStrategy interface as example
+    * [HSEARCH-862] - CollectionUpdateEventTest2 is never run
+    * [HSEARCH-864] - Avro serializer improperly converts termVector as byte[]
+    * [HSEARCH-866] - Deserialization layer build TermVector off Field.isStore instead of Field.isTermVectorStored
+    * [HSEARCH-874] - Javadocs of IndexShardingStrategy are incorrect
+    * [HSEARCH-883] - Index out of bound exception on range facets when IncludeZeroCount = false, maxCount > actual count (Elmer van Chastelet)
+
+** Improvement
+    * [HSEARCH-758] - Have DirectoryManager handle different I/O aspects of an index
+    * [HSEARCH-759] - Provide Near-Real-Time Lucene updates
+    * [HSEARCH-837] - Write a test for TokenStream based Field serialization
+    * [HSEARCH-855] - Classes extending BackendQueueProcessor are misleadingly named XYZBackendQueueProcessorFactory
+    * [HSEARCH-865] - Make i18n log parameter safe for right to left languages or languages requiring different parameter ordering
+    * [HSEARCH-869] - Make avro files in subpackages to clarify structure
+    * [HSEARCH-872] - Reorganize serialization module packages
+    * [HSEARCH-875] - Bad variable names in HSQueryImpl
+    * [HSEARCH-879] - Better serialize class fields in Avro
+    * [HSEARCH-888] - Depend on Hibernate Commons Annotations 4
+    * [HSEARCH-892] - Avoid initializing ContextualException2WayBridge instances for non-requested fields during projection
+
+** New Feature
+    * [HSEARCH-539] - Add Indexing Support(out of the box) For Simple Collections, Like Set<Integer>
+    * [HSEARCH-566] - Support mapping of @javax.persistence.ElementCollection
+    * [HSEARCH-670] - Add indexNullAs to @IndexedEmbedded
+    * [HSEARCH-823] - Make it possible to plug in custom IndexManager implementations
+    * [HSEARCH-860] - Allow JGroups to use IPV6
+
+** Remove Feature
+    * [HSEARCH-877] - Remove option to override the BatchBackend to customize MassIndexer
+    * [HSEARCH-878] - Remove option to change the number of backend threads when starting a MassIndexer
+
+** Task
+    * [HSEARCH-820] - Document limitations and workarounds for JVM bug affecting Lucene users
+    * [HSEARCH-889] - Remove compile (direct) dependency to slf4j
+    * [HSEARCH-891] - Upgrade components: JBossTS at same version as AS7
+    * [HSEARCH-894] - Depend on Hibernate Core 4.0.0.CR2
+
+
 4.0.0.Alpha1 (18-08-2011)
 -------------------------
 
