@@ -41,9 +41,13 @@
     annotations.</para>
 
     <note>
-      <para>There is currently no xml configuration option available (see
-      <ulink
-      url="https://hibernate.onjira.com/browse/HSEARCH-210">HSEARCH-210</ulink>).</para>
+      <para>There is no XML configuration available for Hibernate Search but
+        we provide a powerful programmatic mapping API that elegantly replaces
+        this kind of deployment form (see <xref
+        linkend="hsearch-mapping-programmaticapi" /> for more
+        information).</para>
+      <para>If you want to contribute the XML mapping implementation, see <ulink
+      url="https://hibernate.onjira.com/browse/HSEARCH-210">HSEARCH-210</ulink>.</para>
     </note>
 
     <section id="basic-mapping">

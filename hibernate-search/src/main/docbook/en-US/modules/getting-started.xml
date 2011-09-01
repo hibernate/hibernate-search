@@ -159,13 +159,6 @@
     Maven repository is no longer optional, it's mandatory as it contains the needed
     Infinispan dependencies and these are currently not mirrored by <literal>central</literal>.</para>
 
-    <para><note>
-        <para>There is no XML configuration available for Hibernate Search but
-        we provide a powerful programmatic mapping API that elegantly replace
-        this kind of deployment form (see <xref
-        linkend="hsearch-mapping-programmaticapi" /> for more
-        information).</para>
-      </note></para>
   </section>
 
   <section>
