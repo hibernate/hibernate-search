@@ -124,7 +124,7 @@
     <example>
       <title>Specifying the index name</title>
 
-      <programlisting>package org.hibernate.example;
+      <programlisting  language="JAVA" role="JAVA">package org.hibernate.example;
 
 @Indexed
 public class Status { ... }

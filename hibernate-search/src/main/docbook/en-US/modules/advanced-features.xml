@@ -45,7 +45,7 @@
     <example>
       <title>Accessing the <classname>SearchFactory</classname></title>
 
-      <programlisting>FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
 SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlisting>
     </example>
   </section>
@@ -62,7 +62,7 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlistin
     <example>
       <title>Accessing an <classname>IndexReader</classname></title>
 
-      <programlisting>IndexReader reader = searchFactory.openIndexReader(Order.class);
+      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.openIndexReader(Order.class);
 try {
    //do read-only operations on the reader
 }
@@ -189,7 +189,7 @@ finally {
         <example>
           <title>Example of ServiceProvider implementation</title>
 
-          <programlisting>public class CacheServiceProvider implements ServiceProvider&lt;Cache&gt; {
+          <programlisting language="JAVA" role="JAVA">public class CacheServiceProvider implements ServiceProvider&lt;Cache&gt; {
     private CacheManager manager;
 
     public void start(Properties properties) {

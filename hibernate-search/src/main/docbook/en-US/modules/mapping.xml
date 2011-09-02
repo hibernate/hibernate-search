@@ -41,9 +41,13 @@
     annotations.</para>
 
     <note>
-      <para>There is currently no xml configuration option available (see
-      <ulink
-      url="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-210">HSEARCH-210</ulink>).</para>
+      <para>There is no XML configuration available for Hibernate Search but
+        we provide a powerful programmatic mapping API that elegantly replaces
+        this kind of deployment form (see <xref
+        linkend="hsearch-mapping-programmaticapi" /> for more
+        information).</para>
+      <para>If you want to contribute the XML mapping implementation, see <ulink
+      url="https://hibernate.onjira.com/browse/HSEARCH-210">HSEARCH-210</ulink>.</para>
     </note>
 
     <section id="basic-mapping">
@@ -122,7 +126,7 @@ public class Essay {
                 words it contains. It make sense to tokenize a text field, but
                 probably not a date field.</para>
               </tip><tip>
-                <para>Fields used for sorting must not be tokenized.</para>
+                <para>Fields used for sorting <emphasis>must not</emphasis> be analyzed.</para>
               </tip></para>
           </listitem>
 
@@ -294,7 +298,7 @@ public class Essay {
         <example id="example-annotated-entity">
           <title>Specifying indexed properties</title>
 
-          <programlisting>@Entity
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Essay {
     ...
@@ -338,7 +342,7 @@ public class Essay {
       <example id="example-fields-annotation">
         <title>Using @Fields to map a property multiple times</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed(index = "Book" )
 public class Book {
     <emphasis role="bold">@Fields( {</emphasis>
@@ -440,9 +444,8 @@ public class Address {
       <classname>@ContainedIn</classname>.</para>
 
       <tip>
-        <para><literal>@ContainedIn</literal> is only useful on associations
-        pointing to entities as opposed to embedded (collection of)
-        objects.</para>
+        <para><literal>@ContainedIn</literal> is useful on both associations
+        pointing to entities and on embedded (collection of) objects.</para>
       </tip>
 
       <para>Let's make <xref linkend="example-indexing-associations" /> a bit
@@ -453,7 +456,7 @@ public class Address {
         <title>Nested usage of <classname>@IndexedEmbedded</classname> and
         <classname>@ContainedIn</classname></title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Place {
     @Id
@@ -599,7 +602,7 @@ public class Owner {
         <title>Using the <literal>targetElement</literal> property of
         <classname>@IndexedEmbedded</classname></title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Address {
     @Id
@@ -769,7 +772,7 @@ public class VIPBoostStrategy implements BoostStrategy {
       <example>
         <title>Different ways of using @Analyzer</title>
 
-        <programlisting>@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 <emphasis role="bold">@Analyzer(impl = EntityAnalyzer.class)</emphasis>
 public class MyEntity {
