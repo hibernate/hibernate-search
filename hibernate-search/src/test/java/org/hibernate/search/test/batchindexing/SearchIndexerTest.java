@@ -28,6 +28,8 @@ import java.util.Set;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+import org.junit.Test;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
@@ -36,11 +38,12 @@ import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.impl.MassIndexerImpl;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class SearchIndexerTest {
-	
+
 	/**
 	 * test that the MassIndexer is properly identifying the root entities
 	 * from the selection of classes to be indexed.
@@ -48,12 +51,12 @@ public class SearchIndexerTest {
 	@Test
 	public void testEntityHierarchy() {
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
-			.addAnnotatedClass( ModernBook.class )
-			.addAnnotatedClass( AncientBook.class )
-			.addAnnotatedClass( Dvd.class )
-			.addAnnotatedClass( Book.class )
-			.addAnnotatedClass( Nation.class )
-			.build();
+				.addAnnotatedClass( ModernBook.class )
+				.addAnnotatedClass( AncientBook.class )
+				.addAnnotatedClass( Dvd.class )
+				.addAnnotatedClass( Book.class )
+				.addAnnotatedClass( Nation.class )
+				.build();
 		FullTextSession fullTextSession = ftsb.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 		{
@@ -63,13 +66,22 @@ public class SearchIndexerTest {
 			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		{
-			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, ModernBook.class, AncientBook.class, Book.class );
+			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl(
+					searchFactory,
+					ModernBook.class,
+					AncientBook.class,
+					Book.class
+			);
 			assertTrue( tsii.getRootEntities().contains( Book.class ) );
 			assertFalse( tsii.getRootEntities().contains( ModernBook.class ) );
 			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		{
-			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, ModernBook.class, AncientBook.class );
+			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl(
+					searchFactory,
+					ModernBook.class,
+					AncientBook.class
+			);
 			assertFalse( tsii.getRootEntities().contains( Book.class ) );
 			assertTrue( tsii.getRootEntities().contains( ModernBook.class ) );
 			assertTrue( tsii.getRootEntities().contains( AncientBook.class ) );
@@ -86,9 +98,9 @@ public class SearchIndexerTest {
 		fullTextSession.close();
 		ftsb.close();
 	}
-	
+
 	private static class TestableMassIndexerImpl extends MassIndexerImpl {
-		
+
 		protected TestableMassIndexerImpl(SearchFactoryImplementor searchFactory, Class<?>... types) {
 			super( searchFactory, null, types );
 		}
@@ -96,23 +108,23 @@ public class SearchIndexerTest {
 		public Set<Class<?>> getRootEntities() {
 			return this.rootEntities;
 		}
-		
+
 	}
-	
-	/**
-	 * Test to verify that the identifier loading works even when
-	 * the property is not called "id" 
-	 */
+
+
+	// Test to verify that the identifier loading works even when
+	// the property is not called "id" - see HSEARCH-901
 	@Test
 	public void testIdentifierNaming() throws InterruptedException {
 		//disable automatic indexing, to test manual index creation.
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
-			.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
-			.addAnnotatedClass( Dvd.class )
-			.addAnnotatedClass( Nation.class )
-			.addAnnotatedClass( Book.class )
-			.setProperty( Environment.INDEXING_STRATEGY, "manual" )
-			.build();
+				.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
+				.addAnnotatedClass( Dvd.class )
+				.addAnnotatedClass( Nation.class )
+				.addAnnotatedClass( Book.class )
+				.addAnnotatedClass( WeirdlyIdentifiedEntity.class )
+				.setProperty( Environment.INDEXING_STRATEGY, "manual" )
+				.build();
 		{
 			//creating the test data in database only:
 			FullTextSession fullTextSession = ftsb.openFullTextSession();
@@ -122,33 +134,47 @@ public class SearchIndexerTest {
 			Dvd dvda = new Dvd();
 			dvda.setTitle( "Star Trek (episode 96367)" );
 			dvda.setFirstPublishedIn( us );
-			fullTextSession.save(dvda);
+			fullTextSession.save( dvda );
 			Dvd dvdb = new Dvd();
 			dvdb.setTitle( "The Trek" );
 			dvdb.setFirstPublishedIn( us );
-			fullTextSession.save(dvdb);
+			fullTextSession.save( dvdb );
+			WeirdlyIdentifiedEntity entity = new WeirdlyIdentifiedEntity();
+			entity.setId( "not an identifier" );
+			fullTextSession.save( entity );
 			transaction.commit();
 			fullTextSession.close();
 		}
-		{	
+		{
 			//verify index is still empty:
 			assertEquals( 0, countResults( new Term( "title", "trek" ), ftsb, Dvd.class ) );
+			assertEquals( 0, countResults( new Term( "id", "not" ), ftsb, WeirdlyIdentifiedEntity.class ) );
 		}
 		{
 			FullTextSession fullTextSession = ftsb.openFullTextSession();
 			fullTextSession.createIndexer( Dvd.class )
-				.startAndWait();
+					.startAndWait();
 			fullTextSession.close();
 		}
-		{	
+		{
 			//verify index is now containing both DVDs:
 			assertEquals( 2, countResults( new Term( "title", "trek" ), ftsb, Dvd.class ) );
 		}
+		{
+			FullTextSession fullTextSession = ftsb.openFullTextSession();
+			fullTextSession.createIndexer( WeirdlyIdentifiedEntity.class )
+					.startAndWait();
+			fullTextSession.close();
+		}
+		{
+			//verify index is now containing the weirdly identified entity:
+			assertEquals( 1, countResults( new Term( "id", "identifier" ), ftsb, WeirdlyIdentifiedEntity.class ) );
+		}
 		ftsb.close();
 	}
-	
+
 	//helper method
-	private int countResults( Term termForQuery, FullTextSessionBuilder ftSessionBuilder, Class<?> type ) {
+	private int countResults(Term termForQuery, FullTextSessionBuilder ftSessionBuilder, Class<?> type) {
 		TermQuery fullTextQuery = new TermQuery( termForQuery );
 		FullTextSession fullTextSession = ftSessionBuilder.openFullTextSession();
 		Transaction transaction = fullTextSession.beginTransaction();
