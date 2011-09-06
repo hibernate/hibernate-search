@@ -36,19 +36,19 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * This Runnable is consuming entity identifiers and
+ * This {@code Runnable} is consuming entity identifiers and
  * producing loaded detached entities for the next queue.
- * It will finish when the queue it's consuming from will
+ * It will finish when the queue it is consuming from will
  * signal there are no more identifiers.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	private final ProducerConsumerQueue<List<Serializable>> source;
@@ -57,20 +57,23 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 	private final CacheMode cacheMode;
 	private final Class<?> type;
 	private final MassIndexerProgressMonitor monitor;
+	private final String idName;
 
 	public IdentifierConsumerEntityProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
-			ProducerConsumerQueue<List<?>> fromEntityToAddwork,
+			ProducerConsumerQueue<List<?>> fromEntityToAddWork,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
-			CacheMode cacheMode, Class<?> type) {
-				this.source = fromIdentifierListToEntities;
-				this.destination = fromEntityToAddwork;
-				this.monitor = monitor;
-				this.sessionFactory = sessionFactory;
-				this.cacheMode = cacheMode;
-				this.type = type;
-				log.trace( "created" );
+			CacheMode cacheMode, Class<?> type,
+			String idName) {
+		this.source = fromIdentifierListToEntities;
+		this.destination = fromEntityToAddWork;
+		this.monitor = monitor;
+		this.sessionFactory = sessionFactory;
+		this.cacheMode = cacheMode;
+		this.type = type;
+		this.idName = idName;
+		log.trace( "created" );
 	}
 
 	public void run(Session upperSession) {
@@ -88,17 +91,17 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			loadAllFromQueue( session );
 			transaction.commit();
 		}
-		catch (Throwable e) {
+		catch ( Throwable e ) {
 			log.errorDuringBatchIndexing( e );
 		}
 		finally {
-			if (upperSession == null) {
+			if ( upperSession == null ) {
 				session.close();
 			}
 		}
 		log.trace( "finished" );
 	}
-	
+
 	private void loadAllFromQueue(Session session) {
 		try {
 			Object take;
@@ -113,7 +116,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			}
 			while ( take != null );
 		}
-		catch (InterruptedException e) {
+		catch ( InterruptedException e ) {
 			// just quit
 			Thread.currentThread().interrupt();
 		}
@@ -125,24 +128,25 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 	/**
 	 * Loads a list of entities of defined type using their identifiers.
 	 * The loaded objects are then pushed to the next queue one by one.
+	 *
 	 * @param listIds the list of entity identifiers (of type
 	 * @param session the session to be used
+	 *
 	 * @throws InterruptedException
 	 */
 	private void loadList(List<Serializable> listIds, Session session) throws InterruptedException {
 		//TODO investigate if I should use ObjectLoaderHelper.initializeObjects instead
 		Criteria criteria = session
-			.createCriteria( type )
-			.setCacheMode( cacheMode )
-			.setLockMode( LockMode.NONE )
-			.setCacheable( false )
-			.setFlushMode( FlushMode.MANUAL )
-			.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY )
-			.add( Restrictions.in( "id", listIds ) );
+				.createCriteria( type )
+				.setCacheMode( cacheMode )
+				.setLockMode( LockMode.NONE )
+				.setCacheable( false )
+				.setFlushMode( FlushMode.MANUAL )
+				.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY )
+				.add( Restrictions.in( idName, listIds ) );
 		List<?> list = criteria.list();
 		monitor.entitiesLoaded( list.size() );
 		session.clear();
 		destination.put( list );
 	}
-
 }

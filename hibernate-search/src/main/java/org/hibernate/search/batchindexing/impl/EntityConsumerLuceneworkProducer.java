@@ -1,4 +1,4 @@
-/*
+    /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
  * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
@@ -57,7 +57,7 @@ import org.hibernate.search.util.logging.impl.Log;
  * 
  * @author Sanne Grinovero
  */
-public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
+public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	
 	private static final Log log = LoggerFactory.make();
 	
@@ -72,7 +72,7 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 
 	private final BatchBackend backend;
 	
-	public EntityConsumerLuceneworkProducer(
+	public EntityConsumerLuceneWorkProducer(
 			ProducerConsumerQueue<List<?>> entitySource,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
@@ -163,5 +163,4 @@ public class EntityConsumerLuceneworkProducer implements SessionAwareRunnable {
 		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer );
 		backend.enqueueAsyncWork( addWork );
 	}
-	
 }
