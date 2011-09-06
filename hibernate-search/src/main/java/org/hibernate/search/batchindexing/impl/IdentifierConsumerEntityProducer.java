@@ -57,19 +57,22 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 	private final CacheMode cacheMode;
 	private final Class<?> type;
 	private final MassIndexerProgressMonitor monitor;
+	private final String idName;
 
 	public IdentifierConsumerEntityProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			ProducerConsumerQueue<List<?>> fromEntityToAddwork,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
-			CacheMode cacheMode, Class<?> type) {
+			CacheMode cacheMode, Class<?> type,
+			String idName) {
 				this.source = fromIdentifierListToEntities;
 				this.destination = fromEntityToAddwork;
 				this.monitor = monitor;
 				this.sessionFactory = sessionFactory;
 				this.cacheMode = cacheMode;
 				this.type = type;
+				this.idName = idName;
 				log.trace( "created" );
 	}
 
@@ -138,7 +141,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			.setCacheable( false )
 			.setFlushMode( FlushMode.MANUAL )
 			.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY )
-			.add( Restrictions.in( "id", listIds ) );
+			.add( Restrictions.in( idName, listIds ) );
 		List<?> list = criteria.list();
 		monitor.entitiesLoaded( list.size() );
 		session.clear();
