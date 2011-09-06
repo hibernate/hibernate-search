@@ -111,6 +111,7 @@ public class SearchIndexerTest {
 			.addAnnotatedClass( Dvd.class )
 			.addAnnotatedClass( Nation.class )
 			.addAnnotatedClass( Book.class )
+			.addAnnotatedClass( WeirdlyIdentifiedEntity.class )
 			.setProperty( Environment.INDEXING_STRATEGY, "manual" )
 			.build();
 		{
@@ -127,12 +128,16 @@ public class SearchIndexerTest {
 			dvdb.setTitle( "The Trek" );
 			dvdb.setFirstPublishedIn( us );
 			fullTextSession.save(dvdb);
+			WeirdlyIdentifiedEntity entity = new WeirdlyIdentifiedEntity();
+			entity.setId( "not an identifier" );
+			fullTextSession.save( entity );
 			transaction.commit();
 			fullTextSession.close();
 		}
 		{	
 			//verify index is still empty:
 			assertEquals( 0, countResults( new Term( "title", "trek" ), ftsb, Dvd.class ) );
+			assertEquals( 0, countResults( new Term( "id", "not" ), ftsb, WeirdlyIdentifiedEntity.class ) );
 		}
 		{
 			FullTextSession fullTextSession = ftsb.openFullTextSession();
@@ -143,6 +148,16 @@ public class SearchIndexerTest {
 		{	
 			//verify index is now containing both DVDs:
 			assertEquals( 2, countResults( new Term( "title", "trek" ), ftsb, Dvd.class ) );
+		}
+		{
+			FullTextSession fullTextSession = ftsb.openFullTextSession();
+			fullTextSession.createIndexer( WeirdlyIdentifiedEntity.class )
+				.startAndWait();
+			fullTextSession.close();
+		}
+		{
+			//verify index is now containing the weirdly identified entity:
+			assertEquals( 1, countResults( new Term( "id", "identifier" ), ftsb, WeirdlyIdentifiedEntity.class ) );
 		}
 		ftsb.close();
 	}

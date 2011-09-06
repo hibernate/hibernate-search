@@ -60,6 +60,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final int objectLoadingThreadNum;
 	private final int luceneworkerBuildingThreadNum;
 	private final Class<?> indexedType;
+	private final String idNameOfIndexedType;
 	
 	// status control
 	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index 
@@ -85,6 +86,7 @@ public class BatchIndexingWorkspace implements Runnable {
 			long objectsLimit) {
 		
 		this.indexedType = entityType;
+		this.idNameOfIndexedType = searchFactoryImplementor.getIndexBindingForEntity( entityType ).getDocumentBuilder().getIdentifierName();
 		this.searchFactory = searchFactoryImplementor;
 		this.sessionFactory = sessionFactory;
 		
@@ -132,7 +134,7 @@ public class BatchIndexingWorkspace implements Runnable {
 			//from primary key to loaded entity:
 				final IdentifierConsumerEntityProducer producer = new IdentifierConsumerEntityProducer(
 						fromIdentifierListToEntities, fromEntityToAddwork, monitor,
-						sessionFactory, cacheMode, indexedType
+						sessionFactory, cacheMode, indexedType, idNameOfIndexedType
 				);
 				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
 			}
