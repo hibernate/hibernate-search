@@ -460,4 +460,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 105, value = "Cannot safely compute getResultSize() when a Criteria with restriction is used. " +
 			"Use query.list().size() or query.getResultList().size(). Criteria at stake: %1$s")
 	SearchException cannotGetResultSizeWithCriteriaAndRestriction(String criteria);
+
+	@Message(id = 106, value = "Field %1$s looks like binary but couldn't be decompressed")
+	SearchException fieldLooksBinaryButDecompressionFailed(String fieldName);
 }
