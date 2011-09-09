@@ -50,7 +50,8 @@
             <entry>A JDK or JRE version <emphasis>5</emphasis> or greater. You
             can download a Java Runtime for Windows/Linux/Solaris <ulink
             url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</ulink>.
-            Java version <emphasis>7</emphasis> is currently not recommended: see box <xref linkend="java7bugWarning"/>.</entry>
+            If using Java version <emphasis>7</emphasis> make sure you avoid builds 0 and 1: those versions
+            contained an optimisation bug which would be triggered by Lucene.</entry>
           </row>
 
           <row>
