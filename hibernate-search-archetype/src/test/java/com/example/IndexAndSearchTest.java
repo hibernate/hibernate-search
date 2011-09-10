@@ -131,10 +131,10 @@ public class IndexAndSearchTest {
 		boostPerField.put( bookFields[2], ( float ) 4 );
 		boostPerField.put( bookFields[3], ( float ) .5 );
 
-		FullTextEntityManager ftEm = org.hibernate.search.jpa.Search.getFullTextEntityManager( ( EntityManager ) em );
+		FullTextEntityManager ftEm = org.hibernate.search.jpa.Search.getFullTextEntityManager( em );
 		Analyzer customAnalyzer = ftEm.getSearchFactory().getAnalyzer( "customanalyzer" );
 		QueryParser parser = new MultiFieldQueryParser(
-				Version.LUCENE_29, bookFields,
+				Version.LUCENE_33, bookFields,
 				customAnalyzer, boostPerField
 		);
 

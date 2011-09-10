@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- 
@@ -22,8 +24,10 @@
     <packaging>jar</packaging>
     <name>Hibernate Search Quickstart</name>
     <url>http://www.myorganization.org</url>
-    <description>Hibernate Search quickstart is an archetype for a minimal application using fulltext query capabilities. Use it as an example project.</description>
-    
+    <description>Hibernate Search quickstart is an archetype for a minimal application using fulltext query
+        capabilities.
+    </description>
+
     <scm>
         <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
@@ -41,7 +45,7 @@
             <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
         </license>
     </licenses>
-    
+
     <developers>
         <developer>
             <id>epbernard</id>
@@ -68,6 +72,11 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search</artifactId>
             <!-- When removing the <parent> node you will have to explicitly set the hibernate-search version -->
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-analyzers</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -100,12 +109,6 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>

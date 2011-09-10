@@ -16,12 +16,10 @@
 
             <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
 
-            <property name="hibernate.search.default.indexBase"
-                      value="target"/>
-			
+            <property name="hibernate.search.default.indexBase" value="target"/>
+
             <!-- optional -->
-            <property name="hibernate.search.default.directory_provider"
-                      value="filesystem"/>
+            <property name="hibernate.search.default.directory_provider" value="filesystem"/>
         </properties>
     </persistence-unit>
 </persistence>
