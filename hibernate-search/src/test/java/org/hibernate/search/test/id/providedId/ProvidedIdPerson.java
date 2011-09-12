@@ -23,32 +23,32 @@
  */
 package org.hibernate.search.test.id.providedId;
 
+import java.io.Serializable;
+
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.bridge.builtin.LongBridge;
-
-import java.io.Serializable;
 
 
 /**
  * @author Navin Surtani
  */
-@ProvidedId(bridge = @FieldBridge(impl = LongBridge.class) )
+@ProvidedId(bridge = @FieldBridge(impl = LongBridge.class))
 @Indexed
 public class ProvidedIdPerson implements Serializable {
 
 	// No annotations: this entity uses a ProvidedId
 	private long id;
-	
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+
+	@Field(store = Store.YES)
 	private String name;
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	private String blurb;
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	private int age;
 
 	public String getName() {
@@ -74,5 +74,4 @@ public class ProvidedIdPerson implements Serializable {
 	public void setAge(int age) {
 		this.age = age;
 	}
-
 }

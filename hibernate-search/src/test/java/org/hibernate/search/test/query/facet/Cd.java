@@ -32,10 +32,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
@@ -52,17 +52,17 @@ public class Cd {
 	@GeneratedValue
 	private int id;
 
-	@Fields( {
+	@Fields({
 			@Field,
-			@Field(name = "name_un_analyzed", index = Index.UN_TOKENIZED)
+			@Field(name = "name_un_analyzed", analyze = Analyze.NO)
 	})
 	private String name;
 
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	@NumericField
 	private int price;
 
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	@DateBridge(resolution = Resolution.YEAR)
 	private Date releaseYear;
 

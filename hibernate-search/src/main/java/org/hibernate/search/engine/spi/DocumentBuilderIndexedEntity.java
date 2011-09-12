@@ -42,6 +42,8 @@ import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -269,7 +271,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				String fieldName = prefix + attributeName;
 				propertiesMetadata.fieldNames.add( fieldName );
 				propertiesMetadata.fieldStore.add( Store.YES );
-				propertiesMetadata.fieldIndex.add( getIndex( Index.UN_TOKENIZED ) );
+				Field.Index index =  getIndex( Index.YES, Analyze.NO, Norms.YES );
+				propertiesMetadata.fieldIndex.add( index );
 				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
 				propertiesMetadata.fieldNullTokens.add( null );
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, null, member, reflectionManager ) );
@@ -284,7 +287,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				if ( analyzer == null ) {
 					throw new AssertionFailure( "Analyzer should not be undefined" );
 				}
-				addToScopedAnalyzer( fieldName, analyzer, Index.UN_TOKENIZED );
+				addToScopedAnalyzer( fieldName, analyzer, index );
 			}
 		}
 	}

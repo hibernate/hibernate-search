@@ -33,7 +33,6 @@ import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -60,7 +59,7 @@ public class BoostedGetDescriptionLibrary {
 		this.id = id;
 	}
 
-	@Field(store = Store.YES, index = Index.TOKENIZED)
+	@Field(store = Store.YES)
 	public String getTitle() {
 		return title;
 	}
@@ -69,7 +68,7 @@ public class BoostedGetDescriptionLibrary {
 		this.title = title;
 	}
 
-	@Field(store = Store.YES, index = Index.TOKENIZED)
+	@Field(store = Store.YES)
 	public String getAuthor() {
 		return author;
 	}
@@ -79,7 +78,7 @@ public class BoostedGetDescriptionLibrary {
 	}
 
 	@Boost(2.0F)
-	@Field(store = Store.YES, index = Index.TOKENIZED)
+	@Field(store = Store.YES)
 	public String getDescription() {
 		return description;
 	}

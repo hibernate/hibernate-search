@@ -31,7 +31,6 @@ import javax.persistence.InheritanceType;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -57,7 +56,7 @@ public abstract class BaseClass {
 	}
 
 
-	@Field(name = "name", index = Index.TOKENIZED, store = Store.YES)
+	@Field(name = "name", store = Store.YES)
 	public String getName() {
 		return name;
 	}

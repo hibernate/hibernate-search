@@ -63,7 +63,7 @@ public class Document {
 		this.id = id;
 	}
 
-	@Field(store = Store.YES, index = Index.TOKENIZED)
+	@Field(store = Store.YES)
 	@Boost(2)
 	public String getTitle() {
 		return title;
@@ -73,7 +73,7 @@ public class Document {
 		this.title = title;
 	}
 
-	@Field(name = "Abstract", store = Store.NO, index = Index.TOKENIZED)
+	@Field(name = "Abstract")
 	public String getSummary() {
 		return summary;
 	}
@@ -82,7 +82,7 @@ public class Document {
 		this.summary = summary;
 	}
 
-	@Field(store = Store.NO, index = Index.TOKENIZED)
+	@Field
 	public String getText() {
 		return text;
 	}

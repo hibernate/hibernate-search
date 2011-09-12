@@ -46,7 +46,7 @@ public class Tower {
 	@DocumentId
 	private Long id;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String name;
 
 	@ManyToOne(cascade = CascadeType.ALL)

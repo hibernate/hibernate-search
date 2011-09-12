@@ -32,7 +32,6 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 
 /**
  * @author Hardy Ferentschik
@@ -43,10 +42,10 @@ public class Address {
 	@GeneratedValue
 	private Long id;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String street;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String city;
 
 	@ContainedIn

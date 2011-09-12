@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  * @author Hardy Ferentschik
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface Field {
 	/**
@@ -65,9 +65,19 @@ public @interface Field {
 	Store store() default Store.NO;
 
 	/**
-	 * @return Returns a {@code Index} enum defining how the value should be indexed. Defaults to {@code Index.TOKENIZED}.
+	 * @return Returns a {@code Index} enum defining whether the value should be indexed or not. Defaults to {@code Index.YES}.
 	 */
-	Index index() default Index.TOKENIZED;
+	Index index() default Index.YES;
+
+	/**
+	 * @return Returns a {@code Analyze} enum defining whether the value should be analyzed or not. Defaults to {@code Analyze.YES}.
+	 */
+	Analyze analyze() default Analyze.YES;
+
+	/**
+	 * @return Returns a {@code StoreNorm} enum defining whether the norms should be stored in the index or not. Defaults to {@code StoreNorm.YES}.
+	 */
+	Norms norms() default Norms.YES;
 
 	/**
 	 * @return Returns a {@code TermVector} enum defining if and how term vectors are stored. Defaults to {@code TermVector.NO}.
@@ -85,7 +95,7 @@ public @interface Field {
 	Boost boost() default @Boost(value = 1.0F);
 
 	/**
-	 * @return Returns the field bridge used for this field. Default is autowired.
+	 * @return Returns the field bridge used for this field. Default is auto-wired.
 	 */
 	FieldBridge bridge() default @FieldBridge;
 

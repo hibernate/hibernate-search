@@ -33,7 +33,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.embedded.depth.LeakingLuceneBackend;
+import org.hibernate.search.test.util.LeakingLuceneBackend;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 
@@ -98,7 +98,7 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.use_identifier_rollback", "true" );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
-		cfg.setProperty( "hibernate.search.default.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
+		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
 	}
 
 	@Override

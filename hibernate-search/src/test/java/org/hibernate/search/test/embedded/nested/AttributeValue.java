@@ -32,7 +32,6 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -50,7 +49,7 @@ public class AttributeValue {
 	private Attribute attribute;
 
 	@Column(name = "att_value")
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	private String value;
 
 	private AttributeValue() {

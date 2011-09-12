@@ -28,9 +28,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 
 /**
  * A mapping from product to its "features"
@@ -40,10 +40,11 @@ import org.hibernate.search.annotations.Index;
 @Entity
 public class ProductFeature {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private Integer id;
 
-	@Field(index= Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	private String name;
 
 	@ManyToOne

@@ -31,11 +31,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -45,7 +45,7 @@ import org.hibernate.search.annotations.Store;
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed(index = "Book" )
+@Indexed(index = "Book")
 public class Book {
 
 	private Integer id;
@@ -83,7 +83,7 @@ public class Book {
 		this.body = body;
 	}
 
-	@Field(index=Index.TOKENIZED, store=Store.NO)
+	@Field
 	public String getBody() {
 		return body;
 	}
@@ -92,7 +92,8 @@ public class Book {
 		this.body = body;
 	}
 
-	@Id @DocumentId
+	@Id
+	@DocumentId
 	public Integer getId() {
 		return id;
 	}
@@ -101,10 +102,10 @@ public class Book {
 		this.id = id;
 	}
 
-	@Fields( {
-			@Field(index = Index.TOKENIZED, store = Store.YES),
-			@Field(name = "summary_forSort", index = Index.UN_TOKENIZED, store = Store.YES)
-			} )
+	@Fields({
+			@Field(store = Store.YES),
+			@Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
+	})
 	public String getSummary() {
 		return summary;
 	}
@@ -113,8 +114,8 @@ public class Book {
 		this.summary = summary;
 	}
 
-	@Field(index=Index.UN_TOKENIZED, store=Store.YES)
-	@DateBridge(resolution=Resolution.SECOND)
+	@Field(analyze = Analyze.NO, store = Store.YES)
+	@DateBridge(resolution = Resolution.SECOND)
 	public Date getPublicationDate() {
 		return publicationDate;
 	}

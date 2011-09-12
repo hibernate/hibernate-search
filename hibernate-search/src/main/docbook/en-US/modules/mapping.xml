@@ -42,11 +42,13 @@
 
     <note>
       <para>There is no XML configuration available for Hibernate Search but
-        we provide a powerful programmatic mapping API that elegantly replaces
-        this kind of deployment form (see <xref
-        linkend="hsearch-mapping-programmaticapi" /> for more
-        information).</para>
-      <para>If you want to contribute the XML mapping implementation, see <ulink
+      we provide a powerful programmatic mapping API that elegantly replaces
+      this kind of deployment form (see <xref
+      linkend="hsearch-mapping-programmaticapi" /> for more
+      information).</para>
+
+      <para>If you want to contribute the XML mapping implementation, see
+      <ulink
       url="https://hibernate.onjira.com/browse/HSEARCH-210">HSEARCH-210</ulink>.</para>
     </note>
 
@@ -113,28 +115,52 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para>index: describe how the element is indexed and the type of
-            information store. The different values are
-            <literal>Index.NO</literal> (no indexing, ie cannot be found by a
-            query), <literal>Index.TOKENIZED</literal> (use an analyzer to
-            process the property), <literal>Index.UN_TOKENIZED</literal> (no
-            analyzer pre-processing), <literal>Index.NO_NORMS</literal> (do
-            not store the normalization data). The default value is
-            <literal>TOKENIZED</literal>.<tip>
-                <para>Whether or not you want to tokenize a property depends
-                on whether you wish to search the element as is, or by the
-                words it contains. It make sense to tokenize a text field, but
+            <para>index: describe whether the property is indexed or not. The
+            different values are <literal>Index.NO</literal> (no indexing, ie
+            cannot be found by a query), <literal>Index.YES</literal> (the
+            element gets indexed and is searchable). The default value is
+            <literal>Index.YES</literal>. <literal>Index.NO</literal> can be
+            useful for cases where a property does is not required to be
+            searchable, but should be available for projection.</para>
+
+            <tip>
+              <para><literal>Index.NO</literal> in combination with
+              <literal>Analyze.YES</literal> or <literal>Norms.YES</literal>
+              is not useful, since <literal>analyze</literal> and
+              <literal>norms</literal> require the property to be
+              indexed</para>
+            </tip>
+          </listitem>
+
+          <listitem>
+            <para>analyze: determines whether the property is analyzed
+            (<literal>Analyze.YES</literal>) or not
+            (<literal>Analyze.NO</literal>). The default value is
+            <literal>Analyze.YES</literal>.<tip>
+                <para>Whether or not you want to analyze a property depends on
+                whether you wish to search the element as is, or by the words
+                it contains. It make sense to analyze a text field, but
                 probably not a date field.</para>
               </tip><tip>
-                <para>Fields used for sorting <emphasis>must not</emphasis> be analyzed.</para>
+                <para>Fields used for sorting <emphasis>must not</emphasis> be
+                analyzed.</para>
               </tip></para>
+          </listitem>
+
+          <listitem>
+            <para>norms: describes whether index time boosting information
+            should be stored (<literal>Norms.YES</literal>) or not
+            (<literal>Norms.NO</literal>). Not storing it can save a
+            considerable amount of memory, but there won't be any index time
+            boosting information available. The default value is
+            <literal>Norms.YES</literal>.</para>
           </listitem>
 
           <listitem>
             <para>termVector: describes collections of term-frequency pairs.
             This attribute enables the storing of the term vectors within the
             documents during indexing. The default value is
-            TermVector.NO.</para>
+            <literal>TermVector.NO</literal>.</para>
 
             <para>The different values of this attribute are:</para>
 
@@ -214,8 +240,8 @@ public class Essay {
                 used it is important to use the same token in the search query
                 (see <xref linkend="search-query" />) to search for
                 <constant>null</constant> values. It is also advisable to use
-                this feature only with un-tokenized fields
-                (<literal>Index.UN_TOKENIZED</literal>).</para>
+                this feature only with un-analyzed fields
+                (<literal><literal>analyze=</literal>Analyze.NO</literal>).</para>
               </note><warning>
                 <para>When implementing a custom
                 <classname>FieldBridge</classname> or
@@ -307,11 +333,11 @@ public class Essay {
     <emphasis role="bold">@DocumentId</emphasis>
     public Long getId() { return id; }
 
-    <emphasis role="bold">@Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES)</emphasis>
+    <emphasis role="bold">@Field(name="Abstract", store=Store.YES)</emphasis>
     public String getSummary() { return summary; }
 
     @Lob
-    <emphasis role="bold">@Field(index=Index.TOKENIZED)</emphasis>
+    <emphasis role="bold">@Field</emphasis>
     public String getText() { return text; }
 
     <emphasis role="bold">@Field 
@@ -334,10 +360,10 @@ public class Essay {
 
       <para>Sometimes one has to map a property multiple times per index, with
       slightly different indexing strategies. For example, sorting a query by
-      field requires the field to be <literal>UN_TOKENIZED</literal>. If one
-      wants to search by words in this property and still sort it, one need to
-      index it twice - once tokenized and once untokenized. @Fields allows to
-      achieve this goal.</para>
+      field requires the field to be un-analyzed. If one wants to search by
+      words in this property and still sort it, one need to index it twice -
+      once analyzed and once un-analyzed. @Fields allows to achieve this
+      goal.</para>
 
       <example id="example-fields-annotation">
         <title>Using @Fields to map a property multiple times</title>
@@ -346,8 +372,8 @@ public class Essay {
 @Indexed(index = "Book" )
 public class Book {
     <emphasis role="bold">@Fields( {</emphasis>
-            @Field(index = Index.TOKENIZED),
-            @Field(name = "summary_forSort", index = Index.UN_TOKENIZED, store = Store.YES)
+            @Field,
+            @Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
             <emphasis role="bold">} )</emphasis>
     public String getSummary() {
         return summary;
@@ -405,7 +431,7 @@ public class Place {
     @DocumentId
     private Long id;
 
-    @Field( index = Index.TOKENIZED )
+    @Field
     private String name;
 
     @OneToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
@@ -420,10 +446,10 @@ public class Address {
     @GeneratedValue
     private Long id;
 
-    @Field(index=Index.TOKENIZED)
+    @Field
     private String street;
 
-    @Field(index=Index.TOKENIZED)
+    @Field
     private String city;
 
     <emphasis role="bold">@ContainedIn</emphasis>
@@ -464,7 +490,7 @@ public class Place {
     @DocumentId
     private Long id;
 
-    @Field( index = Index.TOKENIZED )
+    @Field
     private String name;
 
     @OneToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
@@ -479,10 +505,10 @@ public class Address {
     @GeneratedValue
     private Long id;
 
-    @Field(index=Index.TOKENIZED)
+    @Field
     private String street;
 
-    @Field(index=Index.TOKENIZED)
+    @Field
     private String city;
 
     <emphasis role="bold">@IndexedEmbedded(depth = 1, prefix = "ownedBy_")</emphasis>
@@ -496,7 +522,7 @@ public class Address {
 
 @Embeddable
 public class Owner {
-    @Field(index = Index.TOKENIZED)
+    @Field
     private String name;
    ...
 }</programlisting>
@@ -610,7 +636,7 @@ public class Address {
     @DocumentId
     private Long id;
 
-    @Field(index= Index.TOKENIZED)
+    @Field
     private String street;
 
     @IndexedEmbedded(depth = 1, prefix = "ownedBy_", <emphasis role="bold">targetElement = Owner.class</emphasis>)
@@ -657,13 +683,12 @@ public class Essay {
     @DocumentId
     public Long getId() { return id; }
 
-    @Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES, boost=<emphasis
-            role="bold">@Boost(2f)</emphasis>)
+    @Field(name="Abstract", store=Store.YES, boost=<emphasis role="bold">@Boost(2f)</emphasis>)
     <emphasis role="bold">@Boost(1.5f)</emphasis>
     public String getSummary() { return summary; }
 
     @Lob
-    @Field(index=Index.TOKENIZED, boost=<emphasis role="bold">@Boost(1.2f)</emphasis>)
+    @Field(boost=<emphasis role="bold">@Boost(1.2f)</emphasis>)
     public String getText() { return text; }
 
     @Field
@@ -781,14 +806,14 @@ public class MyEntity {
     @DocumentId
     private Integer id;
 
-    @Field(index = Index.TOKENIZED)
+    @Field
     private String name;
 
-    @Field(index = Index.TOKENIZED)
+    @Field
     <emphasis role="bold">@Analyzer(impl = PropertyAnalyzer.class)</emphasis>
     private String summary;
 
-    @Field(index = Index.TOKENIZED, <emphasis><emphasis role="bold">analyzer = @Analyzer(impl = FieldAnalyzer.class</emphasis>)</emphasis>
+    @Field(<emphasis><emphasis role="bold">analyzer = @Analyzer(impl = FieldAnalyzer.class</emphasis></emphasis>)
     private String body;
 
     ...
@@ -1464,7 +1489,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
             <programlisting language="JAVA" role="JAVA">@Entity 
 @Indexed
 public class Meeting {
-    @Field(index=Index.UN_TOKENIZED)
+    @Field(analyze=Analyze.NO)
     <emphasis role="bold">@DateBridge(resolution=Resolution.MINUTE)</emphasis>
     private Date date;
     ...                 </programlisting>
@@ -1787,7 +1812,6 @@ private Date date;                </programlisting>
           <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 <emphasis role="bold">@ClassBridge</emphasis>(name="branchnetwork",
-             index=Index.TOKENIZED,
              store=Store.YES,
              impl = <emphasis role="bold">CatFieldsClassBridge.class</emphasis>,
              params = @Parameter( name="sepChar", value=" " ) )
@@ -2230,8 +2254,7 @@ public class Address {
  pubblic Long getAddressId() {...};
 
  @Fields({
-      @Field(index=Index.TOKENIZED, store=Store.YES, 
-             analyzer=@Analyzer(definition="en")),
+      @Field(store=Store.YES, analyzer=@Analyzer(definition="en")),
       @Field(name="address_data", analyzer=@Analyzer(definition="en"))
  })
  public String getAddress1() {...};
@@ -2270,7 +2293,6 @@ mapping
             <emphasis role="bold">.field()
                 .analyzer("en")
                 .store(Store.YES)
-                .index(Index.TOKENIZED) //no useful here as it's the default
             .field()
                 .name("address_data")
                 .analyzer("en");</emphasis>
@@ -2303,8 +2325,7 @@ public class Address {
  private Long getAddressId() {...};
 
  @Fields({
-      @Field(index=Index.TOKENIZED, store=Store.YES, 
-             analyzer=@Analyzer(definition="en")),
+      @Field(store=Store.YES, analyzer=@Analyzer(definition="en")),
       @Field(name="address_data", analyzer=@Analyzer(definition="en"))
  })
  public String getAddress1() {...}
@@ -2338,11 +2359,11 @@ mappping
                 .name("id")
         .property("title", ElementType.METHOD)
             .field()
-                .index(Index.TOKENIZED)
+                .index(Index.YES)
                 .store(Store.NO)
         .property("description", ElementType.METHOD)
              .field()
-                 .index(Index.TOKENIZED)
+                 .index(Index.YES)
                  .store(Store.NO)
         .property("items", ElementType.METHOD)
             <emphasis role="bold">.indexEmbedded()
@@ -2365,10 +2386,10 @@ public class ProductCatalog {
  @DocumentId(name="id")
  public Long getCatalogId() {...}
  
- @Field(store=Store.NO, index=Index.TOKENIZED)
+ @Field
  public String getTitle() {...}
 
- @Field(store=Store.NO, index=Index.TOKENIZED)
+ @Field
  public String getDescription();
  
  @OneToMany(fetch = FetchType.LAZY)
@@ -2600,12 +2621,12 @@ mapping
     .entity(Departments.class)
 <emphasis>       .classBridge(CatDeptsFieldsClassBridge.class)
          .name("branchnetwork")
-         .index(Index.TOKENIZED)
+         .index(Index.YES)
          .store(Store.YES)
          .param("sepChar", " ")
       .classBridge(EquipmentType.class)
          .name("equiptype")
-         .index(Index.TOKENIZED)
+         .index(Index.YES)
          .store(Store.YES)
          .param("C", "Cisco")
          .param("D", "D-Link")
@@ -2628,12 +2649,10 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
 @Indexed
 @ClassBridges ( {
   @ClassBridge(name="branchnetwork",
-     index= Index.TOKENIZED,
      store= Store.YES,
      impl = CatDeptsFieldsClassBridge.class,
      params = @Parameter( name="sepChar", value=" " ) ),
   @ClassBridge(name="equiptype",
-     index= Index.TOKENIZED,
      store= Store.YES,
      impl = EquipmentType.class,
      params = {@Parameter( name="C", value="Cisco" ),

@@ -48,6 +48,7 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
@@ -59,19 +60,20 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.bridge.builtin.impl.DefaultStringBridge;
-import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
-import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
-import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.DefaultStringBridge;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
+import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
+import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
@@ -92,7 +94,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private static final Log log = LoggerFactory.make();
-
 	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = new DefaultStringBridge();
 
 	private final XClass beanXClass;
@@ -115,12 +116,13 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private boolean stateInspectionOptimizationsEnabled = true;
 
 	/**
-	 * Constructor used on contained entities not annotated with {@code @Indexed} themselves.
+	 * Constructor.
 	 *
-	 * @param xClass The class for which to build a {@code}DocumentBuilderContainedEntity}
+	 * @param xClass The class for which to build a document builder
 	 * @param context Handle to default configuration settings
 	 * @param similarity The index level similarity
 	 * @param reflectionManager Reflection manager to use for processing the annotations
+	 * @param optimizationBlackList keeps track of types on which we need to disable collection events optimizations
 	 */
 	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity, ReflectionManager reflectionManager, Set<XClass> optimizationBlackList) {
 
@@ -232,14 +234,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		return getAnalyzer( analyzerAnn, context );
 	}
 
-	protected void addToScopedAnalyzer(String fieldName, Analyzer analyzer, Index index) {
-		if ( index == Index.TOKENIZED ) {
+	protected void addToScopedAnalyzer(String fieldName, Analyzer analyzer, Field.Index index) {
+		if ( Field.Index.ANALYZED.equals( index ) || Field.Index.ANALYZED_NO_NORMS.equals( index ) ) {
 			if ( analyzer != null ) {
 				this.analyzer.addScopedAnalyzer( fieldName, analyzer );
 			}
 		}
 		else {
-			//no analyzer is used, add a fake one for queries
+			// no analyzer is used, add a fake one for queries
 			this.analyzer.addScopedAnalyzer( fieldName, passThroughAnalyzer );
 		}
 	}
@@ -292,23 +294,44 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	protected Field.Index getIndex(Index index) {
-		switch ( index ) {
-			case NO:
-				return Field.Index.NO;
-			case NO_NORMS:
-				return Field.Index.NOT_ANALYZED_NO_NORMS;
-			case TOKENIZED:
-				return Field.Index.ANALYZED;
-			case UN_TOKENIZED:
-				return Field.Index.NOT_ANALYZED;
-			default:
-				throw new AssertionFailure( "Unexpected Index: " + index );
+	/**
+	 * Using the passed field (or class bridge) settings determines the Lucene {@link Field.Index}
+	 *
+	 * @param index is the field indexed or not
+	 * @param analyze should the field be analyzed
+	 * @param norms are norms to be added to index
+	 *
+	 * @return Returns the Lucene {@link Field.Index} value for a given field
+	 */
+	protected Field.Index getIndex(Index index, Analyze analyze, Norms norms) {
+		if ( Index.YES.equals( index ) ) {
+			if ( Analyze.YES.equals( analyze ) ) {
+				if ( Norms.YES.equals( norms ) ) {
+					return Field.Index.ANALYZED;
+				}
+				else {
+					return Field.Index.ANALYZED_NO_NORMS;
+				}
+			}
+			else {
+				if ( Norms.YES.equals( norms ) ) {
+					return Field.Index.NOT_ANALYZED;
+				}
+				else {
+					return Field.Index.NOT_ANALYZED_NO_NORMS;
+				}
+			}
+		}
+		else {
+			return Field.Index.NO;
 		}
 	}
 
 	/**
 	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
+	 *
+	 * @param instance the instance to be indexed
+	 * @param workplan the current work plan
 	 */
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
@@ -358,7 +381,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
 								 Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizationsArg) {
 		List<XClass> hierarchy = new LinkedList<XClass>();
-		XClass next = null;
+		XClass next;
 		for ( XClass previousClass = clazz; previousClass != null; previousClass = next ) {
 			next = previousClass.getSuperclass();
 			if ( next != null ) {
@@ -370,12 +393,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		for ( XClass currentClass : hierarchy ) {
 			initializeClassLevelAnnotations( currentClass, propertiesMetadata, isRoot, prefix, context );
 		}
-		
+
 		// if optimizations are enabled, we allow for state in indexedEmbedded objects which are not
 		// explicitly indexed (Field or indexedembedded) to skip index update triggering.
 		// we don't allow this if the reference is reachable via a custom fieldbridge or classbridge,
 		// as state changes from values out of our control could affect the index.
-		boolean disableOptimizations = disableOptimizationsArg || ! stateInspectionOptimizationsEnabled();
+		boolean disableOptimizations = disableOptimizationsArg || !stateInspectionOptimizationsEnabled();
 
 		// iterate again for the properties and fields
 		for ( XClass currentClass : hierarchy ) {
@@ -384,14 +407,30 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			List<XProperty> methods = currentClass.getDeclaredProperties( XClass.ACCESS_PROPERTY );
 			for ( XProperty method : methods ) {
 				initializeMemberLevelAnnotations(
-						currentClass, method, propertiesMetadata, isRoot, prefix, processedClasses, context, optimizationBlackList, disableOptimizations
+						currentClass,
+						method,
+						propertiesMetadata,
+						isRoot,
+						prefix,
+						processedClasses,
+						context,
+						optimizationBlackList,
+						disableOptimizations
 				);
 			}
 
 			List<XProperty> fields = currentClass.getDeclaredProperties( XClass.ACCESS_FIELD );
 			for ( XProperty field : fields ) {
 				initializeMemberLevelAnnotations(
-						currentClass, field, propertiesMetadata, isRoot, prefix, processedClasses, context, optimizationBlackList, disableOptimizations
+						currentClass,
+						field,
+						propertiesMetadata,
+						isRoot,
+						prefix,
+						processedClasses,
+						context,
+						optimizationBlackList,
+						disableOptimizations
 				);
 			}
 		}
@@ -442,12 +481,21 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	private void initializeMemberLevelAnnotations(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
-					String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
+												  String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
 		checkForField( member, propertiesMetadata, prefix, context );
 		checkForFields( member, propertiesMetadata, prefix, context );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
-		checkForIndexedEmbedded( classHostingMember, member, propertiesMetadata, prefix, processedClasses, context, optimizationBlackList, disableOptimizations );
+		checkForIndexedEmbedded(
+				classHostingMember,
+				member,
+				propertiesMetadata,
+				prefix,
+				processedClasses,
+				context,
+				optimizationBlackList,
+				disableOptimizations
+		);
 		checkForContainedIn( classHostingMember, member, propertiesMetadata );
 		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context );
 	}
@@ -561,7 +609,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				similarity = (Similarity) similarityClass.newInstance();
 			}
 			catch ( Exception e ) {
-				log.similarityInstantiationException(similarityClass.getName(), beanXClass.getName());
+				log.similarityInstantiationException( similarityClass.getName(), beanXClass.getName() );
 			}
 		}
 	}
@@ -585,16 +633,18 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			ReflectionHelper.setAccessible( member );
 			propertiesMetadata.containedInGetters.add( member );
 			//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
-			this.containedInCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
+			this.containedInCollectionRoles
+					.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 		}
 	}
 
 	private void checkForIndexedEmbedded(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix,
-			Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
+										 Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
 			//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
-			this.indexedEmbeddedCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
+			this.indexedEmbeddedCollectionRoles
+					.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 			int oldMaxLevel = maxLevel;
 			int potentialLevel = embeddedAnn.depth() + level;
 			if ( potentialLevel < 0 ) {
@@ -610,7 +660,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			else {
 				elementClass = reflectionManager.toXClass( embeddedAnn.targetElement() );
 			}
-			
+
 			if ( maxLevel == Integer.MAX_VALUE //infinite
 					&& processedClasses.contains( elementClass ) ) {
 				throw new SearchException(
@@ -632,12 +682,21 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				Analyzer analyzer = getAnalyzer( member, context );
 				metadata.analyzer = analyzer != null ? analyzer : propertiesMetadata.analyzer;
 				String localPrefix = buildEmbeddedPrefix( prefix, embeddedAnn, member );
-				
+
 				if ( disableOptimizations ) {
 					optimizationBlackList.add( elementClass );
 				}
-				
-				initializeClass( elementClass, metadata, false, localPrefix, processedClasses, context, optimizationBlackList, disableOptimizations );
+
+				initializeClass(
+						elementClass,
+						metadata,
+						false,
+						localPrefix,
+						processedClasses,
+						context,
+						optimizationBlackList,
+						disableOptimizations
+				);
 				/**
 				 * We will only index the "expected" type but that's OK, HQL cannot do down-casting either
 				 */
@@ -658,10 +717,12 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 				}
 
 				final String indexNullAs = embeddedNullToken( context, embeddedAnn );
-				PropertiesMetadata.Container container = propertiesMetadata.embeddedContainers.get( propertiesMetadata.embeddedContainers.size() - 1 );
+				PropertiesMetadata.Container container = propertiesMetadata.embeddedContainers
+						.get( propertiesMetadata.embeddedContainers.size() - 1 );
 				propertiesMetadata.embeddedNullTokens.add( indexNullAs );
-				propertiesMetadata.embeddedNullFields.add( embeddedNullField( localPrefix, embeddedAnn ) );
-				propertiesMetadata.embeddedNullFieldBridges.add( guessNullEmbeddedBridge( member, container, indexNullAs ) );
+				propertiesMetadata.embeddedNullFields.add( embeddedNullField( localPrefix ) );
+				propertiesMetadata.embeddedNullFieldBridges
+						.add( guessNullEmbeddedBridge( member, container, indexNullAs ) );
 				processedClasses.remove( elementClass ); //pop
 			}
 			else if ( log.isTraceEnabled() ) {
@@ -675,8 +736,9 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	}
 
 	private FieldBridge guessNullEmbeddedBridge(XProperty member, PropertiesMetadata.Container container, final String indexNullAs) {
-		if ( indexNullAs == null )
+		if ( indexNullAs == null ) {
 			return null;
+		}
 
 		if ( PropertiesMetadata.Container.OBJECT == container ) {
 			return new NullEncodingFieldBridge( NULL_EMBEDDED_STRING_BRIDGE, indexNullAs );
@@ -695,7 +757,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		String fieldName = prefix + ann.name();
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( ann.store() );
-		propertiesMetadata.classIndexes.add( getIndex( ann.index() ) );
+		Field.Index index = getIndex( ann.index(), ann.analyze(), ann.norms() );
+		propertiesMetadata.classIndexes.add( index );
 		propertiesMetadata.classTermVectors.add( getTermVector( ann.termVector() ) );
 		propertiesMetadata.classBridges.add( BridgeFactory.extractType( ann, clazz ) );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
@@ -707,7 +770,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( analyzer == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
 		}
-		addToScopedAnalyzer( fieldName, analyzer, ann.index() );
+		addToScopedAnalyzer( fieldName, analyzer, index );
 	}
 
 	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, NumericField numericFieldAnn, ConfigContext context) {
@@ -716,10 +779,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
 		propertiesMetadata.fieldNames.add( fieldName );
 		propertiesMetadata.fieldNameToPositionMap.put(
-				member.getName(), Integer.valueOf( propertiesMetadata.fieldNames.size() )
+				member.getName(), propertiesMetadata.fieldNames.size()
 		);
 		propertiesMetadata.fieldStore.add( fieldAnn.store() );
-		propertiesMetadata.fieldIndex.add( getIndex( fieldAnn.index() ) );
+		Field.Index index = getIndex( fieldAnn.index(), fieldAnn.analyze(), fieldAnn.norms() );
+		propertiesMetadata.fieldIndex.add( index );
 		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
 		propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
 		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
@@ -746,7 +810,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( analyzer == null ) {
 			analyzer = getAnalyzer( member, context );
 		}
-		addToScopedAnalyzer( fieldName, analyzer, fieldAnn.index() );
+		addToScopedAnalyzer( fieldName, analyzer, index );
 	}
 
 	protected Integer getPrecisionStep(NumericField numericFieldAnn) {
@@ -765,10 +829,10 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		return localPrefix;
 	}
 
-	private String embeddedNullField(String localPrefix, IndexedEmbedded embeddedAnn) {
-		if ( localPrefix.endsWith( "." ))
+	private String embeddedNullField(String localPrefix) {
+		if ( localPrefix.endsWith( "." ) ) {
 			return localPrefix.substring( 0, localPrefix.length() - 1 );
-
+		}
 		return localPrefix;
 	}
 
@@ -826,18 +890,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	 *
 	 * @return The {@code value} cast to collection or in case of {@code value} being a map the map values as collection.
 	 */
+	@SuppressWarnings("unchecked")
 	private <T> Collection<T> getActualCollection(XMember member, Object value) {
 		Collection<T> collection;
 		if ( Map.class.equals( member.getCollectionClass() ) ) {
-			//hum
-			@SuppressWarnings("unchecked")
-			Collection<T> tmpCollection = ( (Map<?, T>) value ).values();
-			collection = tmpCollection;
+			collection = ( (Map<?, T>) value ).values();
 		}
 		else {
-			@SuppressWarnings("unchecked")
-			Collection<T> tmpCollection = (Collection<T>) value;
-			collection = tmpCollection;
+			collection = (Collection<T>) value;
 		}
 		return collection;
 	}
@@ -861,7 +921,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		if ( dirtyPropertyNames == null || dirtyPropertyNames.length == 0 ) {
 			return true; // it appears some collection work has no oldState -> reindex
 		}
-		if ( ! stateInspectionOptimizationsEnabled() ) {
+		if ( !stateInspectionOptimizationsEnabled() ) {
 			return true;
 		}
 
@@ -870,7 +930,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			// so it looks like we can rely on reference equality comparisons, or at least that seems a safe way:
 			Integer propertyIndexInteger = metadata.fieldNameToPositionMap.get( dirtyPropertyName );
 			if ( propertyIndexInteger != null ) {
-				int propertyIndex = propertyIndexInteger.intValue() - 1;
+				int propertyIndex = propertyIndexInteger - 1;
 
 				// take care of indexed fields:
 				if ( metadata.fieldIndex.get( propertyIndex ).isIndexed() ) {
@@ -990,8 +1050,11 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	/**
 	 * Returns true if the collection event is not going to affect the index state,
 	 * so that the indexing event can be skipped.
+	 *
 	 * @param collectionRole
+	 *
 	 * @return true if the collection Role does not affect index state
+	 *
 	 * @since 3.4
 	 */
 	public boolean isCollectionRoleExcluded(String collectionRole) {
@@ -1004,7 +1067,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			// to be reachable. The evaluation of stateInspectionOptimizationsEnabled() was
 			// actually stored in stateInspectionOptimizationsEnabled, but limiting to depth recursion.
 			if ( stateInspectionOptimizationsEnabled ) {
-				return ! ( this.indexedEmbeddedCollectionRoles.contains( collectionRole )
+				return !( this.indexedEmbeddedCollectionRoles.contains( collectionRole )
 						|| this.containedInCollectionRoles.contains( collectionRole ) );
 			}
 			else {
@@ -1012,30 +1075,38 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			}
 		}
 	}
-	
+
 	/**
 	 * Verifies entity level preconditions to know if it's safe to skip index updates based
 	 * on specific field or collection updates.
+	 *
 	 * @return true if it seems safe to apply such optimizations
 	 */
 	boolean stateInspectionOptimizationsEnabled() {
-		if ( ! stateInspectionOptimizationsEnabled ) {
+		if ( !stateInspectionOptimizationsEnabled ) {
 			return false;
 		}
 		if ( metadata.classBridges.size() > 0 ) {
-			log.tracef( "State inspection optimization disabled as ClassBridges are enabled on entity %s", this.beanXClassName );
+			log.tracef(
+					"State inspection optimization disabled as ClassBridges are enabled on entity %s",
+					this.beanXClassName
+			);
 			return false; // can't know what a classBridge is going to look at -> reindex //TODO nice new feature to have?
 		}
 		if ( !( metadata.classBoostStrategy instanceof DefaultBoostStrategy ) ) {
-			log.tracef( "State inspection optimization disabled as DynamicBoost is enabled on entity %s", this.beanXClassName );
+			log.tracef(
+					"State inspection optimization disabled as DynamicBoost is enabled on entity %s",
+					this.beanXClassName
+			);
 			return false; // as with classbridge: might be affected by any field //TODO nice new feature to have?
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Makes sure isCollectionRoleExcluded will always return false, so that
 	 * collection update events are always processed.
+	 *
 	 * @see #isCollectionRoleExcluded(String)
 	 */
 	public void forceStateInspectionOptimizationsDisabled() {

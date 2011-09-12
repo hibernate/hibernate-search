@@ -31,9 +31,7 @@ import javax.persistence.Lob;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
 
 /**
  * @author Richard Hallier
@@ -42,19 +40,19 @@ import org.hibernate.search.annotations.Store;
 @Indexed(index = "DocumentField")
 public class Document {
 	@Id
-    @GeneratedValue
-    @DocumentId
+	@GeneratedValue
+	@DocumentId
 	private Long id;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	@Boost(2)
 	private String title;
 
-	@Field(name="Abstract", index=Index.TOKENIZED, store= Store.NO)
+	@Field(name = "Abstract")
 	private String summary;
 
 	@Lob
-    @Field(index=Index.TOKENIZED, store=Store.NO)
+	@Field
 	private String text;
 
 	Document() {
