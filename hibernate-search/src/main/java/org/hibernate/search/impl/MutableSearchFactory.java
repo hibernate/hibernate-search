@@ -30,7 +30,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
@@ -42,6 +41,7 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.ReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -219,18 +219,13 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	}
 
 	@Override
-	public IndexReader openIndexReader(Class<?>... entities) {
-		return delegate.openIndexReader( entities );
-	}
-
-	@Override
-	public void closeIndexReader(IndexReader indexReader) {
-		delegate.closeIndexReader( indexReader );
-	}
-
-	@Override
 	public ErrorHandler getErrorHandler() {
 		return delegate.getErrorHandler();
+	}
+
+	@Override
+	public ReaderAccessor getIndexReaders() {
+		return delegate.getIndexReaders();
 	}
 
 }
