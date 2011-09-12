@@ -91,12 +91,12 @@ public class NumericFieldTest extends SearchTestCase {
 	private int countSizeForType(Class<?> type) {
 		SearchFactory searchFactory = fullTextSession.getSearchFactory();
 		int numDocs = -1; //to have it fail in case of errors
-		IndexReader locationIndexReader = searchFactory.openIndexReader( type );
+		IndexReader locationIndexReader = searchFactory.getIndexReaders().openIndexReader( type );
 		try {
 			numDocs = locationIndexReader.numDocs();
 		}
 		finally {
-			searchFactory.closeIndexReader( locationIndexReader );
+			searchFactory.getIndexReaders().closeIndexReader( locationIndexReader );
 		}
 		return numDocs;
 	}
