@@ -21,12 +21,16 @@
 package org.hibernate.search.impl;
 
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.ReaderAccessor;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Provides access to IndexReaders.
@@ -35,6 +39,8 @@ import org.hibernate.search.reader.impl.MultiReaderFactory;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class IndexReaderAccessor implements ReaderAccessor {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final ImmutableSearchFactory searchFactory;
 
@@ -60,6 +66,29 @@ public class IndexReaderAccessor implements ReaderAccessor {
 		}
 		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()] );
 		return MultiReaderFactory.openReader( uniqueIndexManagers );
+	}
+
+	@Override
+	public IndexReader openIndexReader(String... indexNames) {
+		TreeSet<String> names = new TreeSet<String>();
+		for ( String indexName : indexNames ) {
+			names.add( indexName );
+		}
+		final int size = names.size();
+		if ( size == 0 ) {
+			throw log.needAtLeastOneIndexName();
+		}
+		String[] indexManagerNames = names.toArray( new String[size] );
+		IndexManagerHolder managerSource = searchFactory.getAllIndexesManager();
+		IndexManager[] managers = new IndexManager[size];
+		for ( int i = 0; i < size; i++ ) {
+			String indexName = indexManagerNames[i];
+			managers[i] = managerSource.getIndexManager( indexName );
+			if ( managers[i] == null ) {
+				throw log.requestedIndexNotDefined( indexName );
+			}
+		}
+		return MultiReaderFactory.openReader( managers );
 	}
 
 }

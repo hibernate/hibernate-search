@@ -463,4 +463,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 106, value = "Field %1$s looks like binary but couldn't be decompressed")
 	SearchException fieldLooksBinaryButDecompressionFailed(String fieldName);
+
+	@Message(id = 107, value = "Index names %1$s is not defined")
+	SearchException requestedIndexNotDefined(String indexName);
+
+	@Message(id = 108, value = "At least one index name should be provided: can't open an IndexReader on nothing")
+	SearchException needAtLeastOneIndexName();
 }
