@@ -31,6 +31,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.test.util.LeakingLuceneBackend;
 
 /**
  * @author Sanne Grinovero

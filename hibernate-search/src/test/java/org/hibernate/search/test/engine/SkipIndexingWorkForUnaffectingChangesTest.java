@@ -31,7 +31,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.embedded.depth.LeakingLuceneBackend;
+import org.hibernate.search.test.util.LeakingLuceneBackend;
 
 /**
  * See HSEARCH-361 and HSEARCH-5 : avoid reindexing objects for which
@@ -108,7 +108,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 		cfg.setProperty(
 				"hibernate.search.default.worker.backend",
-				org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName()
+				LeakingLuceneBackend.class.getName()
 		);
 	}
 
