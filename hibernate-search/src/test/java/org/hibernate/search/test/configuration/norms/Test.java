@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Norms;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Hardy Ferentschik
@@ -18,13 +19,13 @@ public class Test {
 	@GeneratedValue
 	private int id;
 
-	@Field
+	@Field(store = Store.YES)
 	private String withNormsImplicit;
 
-	@Field(norms = Norms.YES)
+	@Field(norms = Norms.YES, store = Store.YES)
 	private String withNormsExplicit;
 
-	@Field(norms = Norms.NO)
+	@Field(norms = Norms.NO, store = Store.YES)
 	private String withoutNorms;
 
 	public String getWithNormsImplicit() {

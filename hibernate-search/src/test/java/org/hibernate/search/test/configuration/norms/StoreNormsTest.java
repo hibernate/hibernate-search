@@ -18,18 +18,20 @@
  */
 package org.hibernate.search.test.configuration.norms;
 
+import java.util.List;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.queryParser.QueryParser;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.search.FullTextQuery;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.LeakingLuceneBackend;
 
 /**
  * Test storing and omitting index time norms
@@ -49,32 +51,28 @@ public class StoreNormsTest extends SearchTestCase {
 		fullTextSession.save( test );
 		tx.commit();
 
-// querying works
-//		QueryParser parser = new QueryParser(
-//				getTargetLuceneVersion(),
-//				"withNormsImplicit",
-//				fullTextSession.getSearchFactory().getAnalyzer( Test.class )
-//		);
-//		org.apache.lucene.search.Query luceneQuery = parser.parse( "withNormsImplicit:hello" );
-//		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Test.class );
-//		assertEquals( 1, query.getResultSize() );
+		List<LuceneWork> processedQueue = LeakingLuceneBackend.getLastProcessedQueue();
+		assertTrue( processedQueue.size() == 1 );
+		AddLuceneWork addLuceneWork = (AddLuceneWork) processedQueue.get( 0 );
+		Document doc = addLuceneWork.getDocument();
 
-		// get a index reader to the underlying index to verify using the Lucene API
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( "test" );
-		org.apache.lucene.index.IndexReader indexReader = indexManager.getIndexReaderManager().openIndexReader();
-		try {
-			Document document = indexReader.document( 0 );
-			Fieldable implicitNormField = document.getFieldable( "withNormsImplicit" );
-			assertTrue( "norms should be stored for this field", implicitNormField.getOmitNorms() );
-		}
-		finally {
-			indexManager.getIndexReaderManager().closeIndexReader( indexReader );
-		}
+		Fieldable implicitNormField = doc.getFieldable( "withNormsImplicit" );
+		assertFalse( "norms should be stored for this field", implicitNormField.getOmitNorms() );
+
+		Fieldable explicitNormField = doc.getFieldable( "withNormsExplicit" );
+		assertFalse( "norms should be stored for this field", explicitNormField.getOmitNorms() );
+
+		Fieldable withoutNormField = doc.getFieldable( "withoutNorms" );
+		assertTrue( "norms should not be stored for this field", withoutNormField.getOmitNorms() );
 	}
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { Test.class };
+	}
+
+	protected void configure(Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
 	}
 }
