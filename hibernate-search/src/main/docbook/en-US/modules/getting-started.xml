@@ -50,9 +50,10 @@
             <entry>A JDK or JRE version <emphasis>6</emphasis> or greater. You
             can download a Java Runtime for Windows/Linux/Solaris <ulink
             url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</ulink>.
-            If using Java version <emphasis>7</emphasis> make sure you avoid builds 0 and 1: those versions
-            contained an optimisation bug which would be triggered by Lucene.
-            Hibernate Search 3.x was compatible with Java version <emphasis>5</emphasis> too.</entry>
+            If using Java version <emphasis>7</emphasis> make sure you avoid
+            builds 0 and 1: those versions contained an optimisation bug which
+            would be triggered by Lucene. Hibernate Search 3.x was compatible
+            with Java version <emphasis>5</emphasis> too.</entry>
           </row>
 
           <row>
@@ -89,8 +90,8 @@
             also be expressed in xml or code. <para>Hibernate Search, however,
             has itself its own set of annotations (<emphasis>@Indexed,
             @DocumentId, @Field,...</emphasis>) for which there exists so far
-            no XML based alternative; a better option is to use
-            <xref linkend="hsearch-mapping-programmaticapi" />.</para></entry>
+            no XML based alternative; a better option is to use <xref
+            linkend="hsearch-mapping-programmaticapi" />.</para></entry>
           </row>
         </tbody>
       </tgroup>
@@ -100,10 +101,13 @@
   <section>
     <title>Using Maven</title>
 
-    <para>The Hibernate Search artifacts can be found in Maven's central repository but are
-    released first in the <ulink url="http://repository.jboss.org/nexus/content/groups/public-jboss/ ">JBoss
-    maven repository</ulink>. So it's not a requirement but we recommend to add this repository to your
-    <filename>settings.xml file</filename> (see also <ulink url="http://community.jboss.org/wiki/MavenGettingStarted-Users">Maven
+    <para>The Hibernate Search artifacts can be found in Maven's central
+    repository but are released first in the <ulink
+    url="http://repository.jboss.org/nexus/content/groups/public-jboss/ ">JBoss
+    maven repository</ulink>. So it's not a requirement but we recommend to
+    add this repository to your <filename>settings.xml file</filename> (see
+    also <ulink
+    url="http://community.jboss.org/wiki/MavenGettingStarted-Users">Maven
     Getting Started</ulink> for more details).</para>
 
     <para>This is all you need to add to your pom.xml to get started:</para>
@@ -143,33 +147,37 @@
     </example>
 
     <para>Only the <emphasis>hibernate-search</emphasis> dependency is
-    mandatory.<emphasis> hibernate-entitymanager</emphasis> is only required if
-    you want to use Hibernate Search in conjunction with JPA.</para>
-    <para>To use <emphasis>hibernate-search-infinispan</emphasis>, adding the JBoss
-    Maven repository is no longer optional, it's mandatory as it contains the needed
-    Infinispan dependencies and these are currently not mirrored by <literal>central</literal>.</para>
+    mandatory.<emphasis> hibernate-entitymanager</emphasis> is only required
+    if you want to use Hibernate Search in conjunction with JPA.</para>
 
-      <section>
-        <title>Using a Maven Archetype</title>
-        <para>Using a Maven Archetype it is possible to generate a Maven project from
-        scratch, already containing the basic configuration files and some sample code
-        and tests. Most development environments integrating maven support a graphical
-        option to do this; the <literal>groupId</literal> is <literal>org.hibernate</literal>
-        and the <literal>artifactId</literal> is <literal>hibernate-search-quickstart</literal>
-        </para>
+    <para>To use <emphasis>hibernate-search-infinispan</emphasis>, adding the
+    JBoss Maven repository is no longer optional, it's mandatory as it
+    contains the needed Infinispan dependencies and these are currently not
+    mirrored by <literal>central</literal>.</para>
 
-        <example>
-      <title>generating a new project from commandline using the Maven Archetype</title>
-      <programlisting>
+    <section>
+      <title>Using a Maven Archetype</title>
+
+      <para>Using a Maven Archetype it is possible to generate a Maven project
+      from scratch, already containing the basic configuration files and some
+      sample code and tests. Most development environments integrating maven
+      support a graphical option to do this; the <literal>groupId</literal> is
+      <literal>org.hibernate</literal> and the <literal>artifactId</literal>
+      is <literal>hibernate-search-quickstart</literal></para>
+
+      <example>
+        <title>generating a new project from commandline using the Maven
+        Archetype</title>
+
+        <programlisting>
 mvn archetype:generate                                 \
    -DarchetypeGroupId=org.hibernate                    \
    -DarchetypeArtifactId=hibernate-search-quickstart   \
    -DarchetypeVersion=&version;                      \
    -DarchetypeRepository=http://repository.jboss.org/nexus/content/groups/public-jboss/
 </programlisting>
-   </example>
-   </section>
-
+      </example>
+    </section>
   </section>
 
   <section>
@@ -281,18 +289,19 @@ public class Author {
     <para>Next you have to mark the fields you want to make searchable. Let's
     start with <literal>title</literal> and <literal>subtitle</literal> and
     annotate both with <literal>@Field</literal>. The parameter
-    <literal>index=Index.TOKENIZED</literal> will ensure that the text will be
-    tokenized using the default Lucene analyzer. Usually, tokenizing means
-    chunking a sentence into individual words and potentially excluding common
-    words like <literal>'a'</literal> or '<literal>the</literal>'. We will
-    talk more about analyzers a little later on. The second parameter we
-    specify within <literal>@Field</literal>,<literal>
-    store=Store.NO</literal>, ensures that the actual data will not be stored
-    in the index. Whether this data is stored in the index or not has nothing
-    to do with the ability to search for it. From Lucene's perspective it is
-    not necessary to keep the data once the index is created. The benefit of
-    storing it is the ability to retrieve it via projections ( see <xref
-    linkend="projections" />).</para>
+    <literal>index=Index.YES</literal> will ensure that the text will be
+    indexed, while <literal> analyze=analyze.YES</literal> ensures that the
+    text will be analyzed using the default Lucene analyzer. Usually,
+    analyzing means chunking a sentence into individual words and potentially
+    excluding common words like <literal>'a'</literal> or
+    '<literal>the</literal>'. We will talk more about analyzers a little later
+    on. The third parameter we specify within
+    <literal>@Field</literal>,<literal> store=Store.NO</literal>, ensures that
+    the actual data will not be stored in the index. Whether this data is
+    stored in the index or not has nothing to do with the ability to search
+    for it. From Lucene's perspective it is not necessary to keep the data
+    once the index is created. The benefit of storing it is the ability to
+    retrieve it via projections ( see <xref linkend="projections" />).</para>
 
     <para>Without projections, Hibernate Search will per default execute a
     Lucene query in order to find the database identifiers of the entities
@@ -301,6 +310,11 @@ public class Author {
     be made on a case to case basis. The default behaviour is recommended
     since it returns managed objects whereas projections only return object
     arrays.</para>
+
+    <para>Note that <literal>index=Index.YES</literal>,
+    <literal>analyze=analyze.YES</literal> and
+    <literal>store=Store.NO</literal> are the default values for these
+    paramters and could be ommited.</para>
 
     <para>After this short look under the hood let's go back to annotating the
     <classname>Book</classname> class. Another annotation we have not yet
@@ -317,13 +331,13 @@ public class Author {
     annotation is used to index associated entities
     (<literal>@ManyToMany</literal>, <literal>@*ToOne</literal>,
     <literal>@Embedded</literal> and <literal>@ElementCollection</literal>) as
-    part of the owning entity. This is needed since a Lucene index document
-    is a flat data structure which does not know anything about object relations.
-    To ensure that the authors' name will be searchable you have to make
-    sure that the names are indexed as part of the book itself.
-    On top of <literal>@IndexedEmbedded</literal> you will also
-    have to mark all fields of the associated entity you want to have included
-    in the index with <literal>@Indexed</literal>. For more details see <xref
+    part of the owning entity. This is needed since a Lucene index document is
+    a flat data structure which does not know anything about object relations.
+    To ensure that the authors' name will be searchable you have to make sure
+    that the names are indexed as part of the book itself. On top of
+    <literal>@IndexedEmbedded</literal> you will also have to mark all fields
+    of the associated entity you want to have included in the index with
+    <literal>@Indexed</literal>. For more details see <xref
     linkend="search-mapping-associated" />.</para>
 
     <para>These settings should be sufficient for now. For more details on
@@ -343,20 +357,20 @@ public class Book {
   @GeneratedValue
   private Integer id;
   
-  <emphasis role="bold">@Field(index=Index.TOKENIZED, store=Store.NO)</emphasis>
+  <emphasis role="bold">@Field(index=Index.YES, analyze=Analyze.YES, store=Store.NO)</emphasis>
   private String title;
   
-  <emphasis role="bold">@Field(index=Index.TOKENIZED, store=Store.NO)</emphasis>
+  <emphasis role="bold">@Field(index=Index.YES, analyze=Analyze.YES, store=Store.NO)</emphasis>
   private String subtitle; 
+
+<emphasis role="bold">  @Field(index = Index.YES, analyze=Analyze.NO, store = Store.YES)
+  @DateBridge(resolution = Resolution.DAY)</emphasis>
+  private Date publicationDate;
 
   <emphasis role="bold">@IndexedEmbedded</emphasis>
   @ManyToMany 
   private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
-
-<emphasis role="bold">  @Field(index = Index.UN_TOKENIZED, store = Store.YES)
-  @DateBridge(resolution = Resolution.DAY)</emphasis>
-  private Date publicationDate;
-  
+<emphasis role="bold"></emphasis>
   public Book() {
   } 
   
@@ -373,7 +387,7 @@ public class Author {
   @GeneratedValue
   private Integer id;
 
-  <emphasis role="bold">@Field(index=Index.TOKENIZED, store=Store.NO)</emphasis>
+  <emphasis role="bold">@Field</emphasis>
   private String name;
 
   public Author() {
@@ -564,11 +578,11 @@ public class Book {
   @DocumentId
   private Integer id;
   
-  @Field(index=Index.TOKENIZED, store=Store.NO)
+  @Field
   <emphasis role="bold">@Analyzer(definition = "customanalyzer")</emphasis>
   private String title;
   
-  @Field(index=Index.TOKENIZED, store=Store.NO)
+  @Field
   <emphasis role="bold">@Analyzer(definition = "customanalyzer")</emphasis>
   private String subtitle; 
 
@@ -576,7 +590,7 @@ public class Book {
   @ManyToMany 
   private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
 
-<emphasis role="bold"> </emphasis> @Field(index = Index.UN_TOKENIZED, store = Store.YES)
+<emphasis role="bold"> </emphasis> @Field(index = Index.YES, analyze = Analyze.NO, store = Store.YES)
   @DateBridge(resolution = Resolution.DAY)
   private Date publicationDate;
   
@@ -587,12 +601,15 @@ public class Book {
   ... 
 }</programlisting>
     </example>
+
     <para>Using <classname>@AnalyzerDef</classname> only defines an Analyzer,
     you still have to apply it to entities and or properties using
-    <classname>@Analyzer</classname>. Like in the above example the <literal>customanalyzer</literal>
-    is defined but not applied on the entity: it's applied on the <literal>title</literal>
-    and <literal>subtitle</literal> properties only. An analyzer definition is global, so you
-    can define it on any entity and reuse the definition on other entities.</para>
+    <classname>@Analyzer</classname>. Like in the above example the
+    <literal>customanalyzer</literal> is defined but not applied on the
+    entity: it's applied on the <literal>title</literal> and
+    <literal>subtitle</literal> properties only. An analyzer definition is
+    global, so you can define it on any entity and reuse the definition on
+    other entities.</para>
   </section>
 
   <section>

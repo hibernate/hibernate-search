@@ -278,7 +278,7 @@ List result = fullTextQuery.getResultList(); //return a list of managed objects 
         <programlisting language="JAVA" role="JAVA">@Entity 
 @Indexed 
 public class Myth {
-  @Field(index = Index.UN_TOKENIZED) 
+  @Field(analyze = Analyze.NO) 
   @DateBridge(resolution = Resolution.YEAR)
   public Date getCreationDate() { return creationDate; }
   public Date setCreationDate(Date creationDate) { this.creationDate = creationDate; }
@@ -1765,19 +1765,19 @@ public class Cd {
 
     @Fields( {
         @Field,
-        @Field(name = "name_un_analyzed", index = Index.UN_TOKENIZED)
+        @Field(name = "name_un_analyzed", analyze = Analyze.NO)
     })
     private String name;
 
-    @Field(index = Index.UN_TOKENIZED)
+    @Field(analyze = Analyze.NO)
     @NumericField
     private int price;
 
-    Field(index = Index.UN_TOKENIZED)
+    Field(analyze = Analyze.NO)
     @DateBridge(resolution = Resolution.YEAR)
     private Date releaseYear;
 
-    @Field(index = Index.UN_TOKENIZED)
+    @Field(analyze = Analyze.NO)
     private String label;
 
 
@@ -1839,9 +1839,8 @@ FacetingRequest labelFacetingRequest = builder.facet()
         <classname>Date</classname> or a subtype of
         <classname>Number</classname> and <constant>null</constant> values
         should be avoided. Furthermore the property has to be indexed with
-        <constant>Index.UN_TOKENIZED</constant> and in case of a numeric
-        property <classname>@NumericField</classname> needs to be
-        specified.</para>
+        <constant>Analyze.NO</constant> and in case of a numeric property
+        <classname>@NumericField</classname> needs to be specified.</para>
       </tip>
 
       <para>The creation of a range faceting request is quite similar except
