@@ -107,6 +107,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final String indexingStrategy;
 	private final ServiceManager serviceManager;
 	private final boolean enableDirtyChecks;
+	private final IndexReaderAccessor indexReaderAccessor;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -143,6 +144,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 					new StatisticsInfo( statistics ), StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME
 			);
 		}
+
+		this.indexReaderAccessor = new IndexReaderAccessor( this );
 	}
 
 	public Map<String, FilterDef> getFilterDefinitions() {
@@ -342,7 +345,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@Override
 	public ReaderAccessor getIndexReaders() {
-		return new IndexReaderAccessor( this );
+		return indexReaderAccessor;
 	}
 
 }
