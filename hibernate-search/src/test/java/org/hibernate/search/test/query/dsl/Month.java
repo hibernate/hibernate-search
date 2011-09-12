@@ -76,8 +76,9 @@ public class Month {
 	private Integer id;
 
 	@Fields({
-			@Field(norms = Norms.NO),
-			@Field(norms = Norms.NO,
+			@Field(analyze = Analyze.NO, norms = Norms.NO),
+			@Field(analyze = Analyze.NO,
+					norms = Norms.NO,
 					name = "monthRomanNumber",
 					bridge = @FieldBridge(impl = RomanNumberFieldBridge.class))
 	})

@@ -30,6 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -155,7 +156,7 @@ public class MapBridgeTestEntity {
 		this.numericNullNotIndexed.put( key, value );
 	}
 
-	@Field(store = Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
 	@DateBridge(resolution = Resolution.SECOND)

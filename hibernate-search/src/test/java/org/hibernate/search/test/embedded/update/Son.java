@@ -57,7 +57,7 @@ public class Son {
 		this.id = id;
 	}
 
-	@Field(analyze = Analyze.YES)
+	@Field(analyze = Analyze.NO)
 	public String getName() {
 		return name;
 	}

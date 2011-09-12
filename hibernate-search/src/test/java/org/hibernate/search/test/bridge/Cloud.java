@@ -304,7 +304,7 @@ public class Cloud {
 		this.dateMillisecond = dateMillisecond;
 	}
 
-	@Field(analyze = Analyze.NO, store = Store.YES)
+	@Field(store = Store.YES)
 	public CloudType getType() {
 		return type;
 	}
