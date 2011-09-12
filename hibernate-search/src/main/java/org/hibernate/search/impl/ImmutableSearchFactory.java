@@ -23,14 +23,12 @@
  */
 package org.hibernate.search.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
@@ -41,7 +39,6 @@ import org.hibernate.search.indexes.ReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -80,7 +77,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class ImmutableSearchFactory implements SearchFactoryImplementorWithShareableState, WorkerBuildContext, ReaderAccessor {
+public class ImmutableSearchFactory implements SearchFactoryImplementorWithShareableState, WorkerBuildContext {
 
 	static {
 		Version.touch();
@@ -327,26 +324,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return this.allIndexesManager;
 	}
 
-	@Override
-	public IndexReader openIndexReader(Class<?>... entities) {
-		HashMap<String,IndexManager> indexManagers = new HashMap<String,IndexManager>();
-		for ( Class<?> type : entities ) {
-			EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( type );
-			IndexManager[] indexManagersForAllShards = entityIndexBinding.getSelectionStrategy().getIndexManagersForAllShards();
-			for (IndexManager im : indexManagersForAllShards) {
-				indexManagers.put( im.getIndexName(), im );
-			}
-		}
-		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()]);
-		return MultiReaderFactory.openReader( uniqueIndexManagers );
-	}
-
-	@Override
-	public void closeIndexReader(IndexReader indexReader) {
-		MultiReaderFactory.closeReader( indexReader );
-	}
-
-	private EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
+	EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
 		if ( entityType == null ) {
 			throw new IllegalArgumentException( "Null is not a valid indexed entity type" );
 		}
@@ -364,7 +342,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@Override
 	public ReaderAccessor getIndexReaders() {
-		return this;
+		return new IndexReaderAccessor( this );
 	}
 
 }

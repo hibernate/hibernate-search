@@ -23,6 +23,13 @@ package org.hibernate.search.indexes;
 import org.apache.lucene.index.IndexReader;
 
 /**
+ * The ReaderAccessor exposes the IndexReaders directly, making it possible to query the Lucene
+ * indexes directly bypassing the helpers provided by Hibernate Search.
+ * This API is intended for power users intending to extract information directly.
+ *
+ * The returned IndexReader instances are always read-only, and it's expected that they are closed
+ * using the {@link #closeIndexReader(IndexReader)} method on this same instance.
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public interface ReaderAccessor {
