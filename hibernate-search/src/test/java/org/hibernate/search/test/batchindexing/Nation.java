@@ -25,7 +25,6 @@ package org.hibernate.search.test.batchindexing;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -34,8 +33,8 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 @Entity
@@ -45,19 +44,21 @@ public class Nation {
 	private String name;
 	private String code;
 	private Set<Book> librariesHave = new HashSet<Book>();
-	
-	public Nation() {}
-	
-	public Nation(String name, String code){
+
+	public Nation() {
+	}
+
+	public Nation(String name, String code) {
 		this.name = name;
 		this.code = code;
 	}
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	public Integer getId() {
 		return id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -66,30 +67,30 @@ public class Nation {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	@Field(index=Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	public String getCode() {
 		return code;
 	}
-	
+
 	public void setCode(String code) {
 		this.code = code;
 	}
 
 	@IndexedEmbedded
-	@OneToMany(fetch=FetchType.LAZY)
+	@OneToMany(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SELECT)
 	public Set<Book> getLibrariesHave() {
 		return librariesHave;
 	}
-	
+
 	public void setLibrariesHave(Set<Book> librariesHave) {
 		this.librariesHave = librariesHave;
 	}
-	
+
 }
 

@@ -28,8 +28,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 
@@ -46,7 +46,7 @@ public class Fruit {
 	@Field
 	private String name;
 
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	@NumericField
 	private Double price;
 

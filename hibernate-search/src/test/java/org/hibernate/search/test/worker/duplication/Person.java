@@ -23,22 +23,21 @@
  */
 package org.hibernate.search.test.worker.duplication;
 
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.Table;
-import javax.persistence.OneToOne;
 import javax.persistence.JoinColumn;
-import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 
 /**
  * Test entity for HSEARCH-257.
@@ -57,7 +56,7 @@ public class Person {
 	@DocumentId
 	private int id;
 
-	@Field(index = Index.TOKENIZED, name = "Content")
+	@Field(name = "Content")
 	private String name;
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = {

@@ -24,16 +24,15 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.test.bridge.DateSplitBridge;
@@ -43,7 +42,7 @@ import org.hibernate.search.test.bridge.PaddedIntegerBridge;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 @Entity
-@Indexed(index = "Day" )
+@Indexed(index = "Day")
 public class CalendarDay {
 
 	private Integer id;
@@ -61,7 +60,7 @@ public class CalendarDay {
 		this.id = id;
 	}
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	@FieldBridge(impl = DateSplitBridge.class)
 	public Date getDay() {
 		return day;

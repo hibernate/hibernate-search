@@ -35,7 +35,7 @@ import org.hibernate.annotations.Parent;
  */
 @Embeddable
 public class Owner implements Person {
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String name;
 
 	@Parent

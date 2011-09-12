@@ -28,7 +28,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -37,12 +36,12 @@ import org.hibernate.search.annotations.Store;
 @Indexed
 public class BusinessContact extends Contact {
 
-	@Column(name="P_BUSINESSNAME")
-	@Field(index=Index.TOKENIZED, store=Store.YES)
+	@Column(name = "P_BUSINESSNAME")
+	@Field(store = Store.YES)
 	private String businessName;
 
-	@Column(name="P_BUSINESSURL")
-	@Field(index=Index.TOKENIZED, store=Store.YES)
+	@Column(name = "P_BUSINESSURL")
+	@Field(store = Store.YES)
 	private String url;
 
 	public BusinessContact() {
@@ -57,7 +56,7 @@ public class BusinessContact extends Contact {
 	}
 
 	public String getUrl() {
-		if (null == this.url || "".equals(this.url)) {
+		if ( null == this.url || "".equals( this.url ) ) {
 			return "Not provided";
 		}
 		return url;
@@ -87,7 +86,4 @@ public class BusinessContact extends Contact {
 //		super.displayPhonesAndAddresses(buf);
 //		return buf.toString();
 //	}
-
-
-
 }

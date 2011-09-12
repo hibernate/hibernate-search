@@ -26,8 +26,8 @@ package org.hibernate.search.test.inheritance;
 import java.io.Serializable;
 import javax.persistence.Entity;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -37,9 +37,9 @@ import org.hibernate.search.annotations.Store;
 @Entity
 @Indexed
 public class Mammal extends Animal implements Serializable {
-    private boolean hasSweatGlands;
+	private boolean hasSweatGlands;
 
-    @Field(index= Index.UN_TOKENIZED, store= Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	public boolean isHasSweatGlands() {
 		return hasSweatGlands;
 	}

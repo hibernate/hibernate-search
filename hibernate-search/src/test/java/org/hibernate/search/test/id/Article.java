@@ -48,7 +48,7 @@ public class Article {
 	@DocumentId
 	int documentId;
 
-	@Field(index = Index.TOKENIZED, store = Store.NO)
+	@Field
 	String text;
 
 	public long getArticleId() {

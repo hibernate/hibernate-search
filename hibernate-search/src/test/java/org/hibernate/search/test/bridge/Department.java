@@ -27,6 +27,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -40,11 +41,11 @@ import org.hibernate.search.annotations.Store;
  */
 @Entity
 @Indexed
-@ClassBridge(name="branchnetwork",
-			 index=Index.TOKENIZED,
-			 store=Store.YES,
-			 impl = CatFieldsClassBridge.class,
-			 params = @Parameter( name="sepChar", value=" " ) )
+@ClassBridge(name = "branchnetwork",
+		index = Index.YES,
+		store = Store.YES,
+		impl = CatFieldsClassBridge.class,
+		params = @Parameter(name = "sepChar", value = " "))
 public class Department {
 	private int id;
 	private String network;
@@ -63,7 +64,7 @@ public class Department {
 		this.id = id;
 	}
 
-	@Field(index=Index.TOKENIZED, store=Store.YES)
+	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.YES)
 	public String getBranchHead() {
 		return branchHead;
 	}
@@ -72,7 +73,7 @@ public class Department {
 		this.branchHead = branchHead;
 	}
 
-	@Field(index=Index.TOKENIZED, store=Store.YES)
+	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.YES)
 	public String getNetwork() {
 		return network;
 	}
@@ -81,7 +82,7 @@ public class Department {
 		this.network = network;
 	}
 
-	@Field(index=Index.TOKENIZED, store=Store.YES)
+	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.YES)
 	public String getBranch() {
 		return branch;
 	}
@@ -90,7 +91,7 @@ public class Department {
 		this.branch = branch;
 	}
 
-	@Field(index=Index.UN_TOKENIZED, store=Store.YES)
+	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.YES)
 	public Integer getMaxEmployees() {
 		return maxEmployees;
 	}

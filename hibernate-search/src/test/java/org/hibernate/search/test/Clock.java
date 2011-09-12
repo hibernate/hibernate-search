@@ -28,7 +28,6 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -46,7 +45,8 @@ public class Clock {
 		this.brand = brand;
 	}
 
-	@Field(index= Index.TOKENIZED, store= Store.YES) public String getBrand() {
+	@Field(store = Store.YES)
+	public String getBrand() {
 		return brand;
 	}
 
@@ -54,7 +54,8 @@ public class Clock {
 		this.brand = brand;
 	}
 
-	@Id @DocumentId
+	@Id
+	@DocumentId
 	public Integer getId() {
 		return id;
 	}

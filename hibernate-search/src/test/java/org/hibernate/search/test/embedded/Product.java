@@ -50,7 +50,7 @@ public class Product {
 	@Id @GeneratedValue @DocumentId
 	private Integer id;
 	
-	@Field(index= Index.TOKENIZED)
+	@Field
 	private String name;
 	
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense

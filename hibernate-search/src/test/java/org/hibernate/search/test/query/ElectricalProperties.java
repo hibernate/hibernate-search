@@ -28,7 +28,6 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
@@ -51,7 +50,7 @@ public class ElectricalProperties {
 		this.content = content;
 	}
 
-	@Field( index = Index.TOKENIZED, store = Store.YES, termVector = TermVector.WITH_POSITION_OFFSETS )
+	@Field(store = Store.YES, termVector = TermVector.WITH_POSITION_OFFSETS)
 	public String getContent() {
 		return content;
 	}

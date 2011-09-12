@@ -36,7 +36,6 @@ import org.hibernate.annotations.Target;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
@@ -52,7 +51,7 @@ public class Address {
 	@DocumentId
 	private Long id;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String street;
 
 	@IndexedEmbedded(depth = 1, prefix = "ownedBy_", targetElement = Owner.class)

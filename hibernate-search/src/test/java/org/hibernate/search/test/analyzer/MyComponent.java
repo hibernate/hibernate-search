@@ -31,7 +31,7 @@ import org.hibernate.search.annotations.Analyzer;
  * @author Emmanuel Bernard
  */
 public class MyComponent {
-	@Field(index = Index.TOKENIZED)
+	@Field
 	@Analyzer(impl = AnalyzerForTests4.class)
 	private String componentProperty;
 

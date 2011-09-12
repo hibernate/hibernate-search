@@ -31,31 +31,31 @@ import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 
 @Entity
-@Indexed(index="idx1")
+@Indexed(index = "idx1")
 @Analyzer(impl = AnalyzerForTests1.class)
 public class AlarmEntity {
-	
+
 	@Id
 	@GeneratedValue
 	@DocumentId
 	private Integer id;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String property;
-	
+
 	@Fields({
-		@Field(name = "description_analyzer2", index = Index.TOKENIZED, analyzer = @Analyzer(impl = AnalyzerForTests2.class)),
-		@Field(name = "description_analyzer3", index = Index.TOKENIZED, analyzer = @Analyzer(impl = AnalyzerForTests3.class)) })
+			@Field(name = "description_analyzer2", analyzer = @Analyzer(impl = AnalyzerForTests2.class)),
+			@Field(name = "description_analyzer3", analyzer = @Analyzer(impl = AnalyzerForTests3.class))
+	})
 	private String alarmDescription;
 
 	public Integer getId() {
 		return id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -63,12 +63,15 @@ public class AlarmEntity {
 	public String getProperty() {
 		return property;
 	}
+
 	public void setProperty(String property) {
 		this.property = property;
 	}
+
 	public String getAlarmDescription() {
 		return alarmDescription;
 	}
+
 	public void setAlarmDescription(String alarmDescription) {
 		this.alarmDescription = alarmDescription;
 	}

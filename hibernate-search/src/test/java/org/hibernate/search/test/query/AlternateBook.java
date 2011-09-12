@@ -26,23 +26,23 @@ package org.hibernate.search.test.query;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed(index="Book")
+@Indexed(index = "Book")
 public class AlternateBook {
-	@Id @DocumentId
+	@Id
+	@DocumentId
 	@FieldBridge(impl = PaddedIntegerBridge.class)
 	private Integer id;
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String summary;
 
 

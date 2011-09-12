@@ -24,17 +24,17 @@
 package org.hibernate.search.test.bridge;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.ClassBridges;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.Store;
 
 /**
  * This is just a simple copy of the Department entity to allow
@@ -44,21 +44,20 @@ import org.hibernate.search.annotations.ClassBridges;
  */
 @Entity
 @Indexed
-@ClassBridges ( {
-	@ClassBridge(name="branchnetwork",
-				 index= Index.TOKENIZED,
-				 store= Store.YES,
-				 impl = CatDeptsFieldsClassBridge.class,
-				 params = @Parameter( name="sepChar", value=" " ) ),
-	@ClassBridge(name="equiptype",
-				 index= Index.TOKENIZED,
-				 store= Store.YES,
-				 impl = EquipmentType.class,
-				 params = {@Parameter( name="C", value="Cisco" ),
-						   @Parameter( name="D", value="D-Link" ),
-						   @Parameter( name="K", value="Kingston" ),
-						   @Parameter( name="3", value="3Com" )
-				 })
+@ClassBridges({
+		@ClassBridge(name = "branchnetwork",
+				store = Store.YES,
+				impl = CatDeptsFieldsClassBridge.class,
+				params = @Parameter(name = "sepChar", value = " ")),
+		@ClassBridge(name = "equiptype",
+				store = Store.YES,
+				impl = EquipmentType.class,
+				params = {
+						@Parameter(name = "C", value = "Cisco"),
+						@Parameter(name = "D", value = "D-Link"),
+						@Parameter(name = "K", value = "Kingston"),
+						@Parameter(name = "3", value = "3Com")
+				})
 })
 public class Departments {
 	private int id;
@@ -79,7 +78,7 @@ public class Departments {
 		this.id = id;
 	}
 
-	@Field(index=Index.TOKENIZED, store=Store.YES)
+	@Field(store = Store.YES)
 	public String getBranchHead() {
 		return branchHead;
 	}
@@ -88,7 +87,7 @@ public class Departments {
 		this.branchHead = branchHead;
 	}
 
-	@Field(index=Index.TOKENIZED, store=Store.YES)
+	@Field(store = Store.YES)
 	public String getNetwork() {
 		return network;
 	}
@@ -97,7 +96,7 @@ public class Departments {
 		this.network = network;
 	}
 
-	@Field(index=Index.TOKENIZED, store=Store.YES)
+	@Field(store = Store.YES)
 	public String getBranch() {
 		return branch;
 	}
@@ -106,7 +105,7 @@ public class Departments {
 		this.branch = branch;
 	}
 
-	@Field(index=Index.UN_TOKENIZED, store=Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	public Integer getMaxEmployees() {
 		return maxEmployees;
 	}

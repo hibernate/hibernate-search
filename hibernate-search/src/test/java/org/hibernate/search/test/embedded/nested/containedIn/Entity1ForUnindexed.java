@@ -25,14 +25,13 @@
 package org.hibernate.search.test.embedded.nested.containedIn;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 
 /**
  * Entite 1
@@ -49,8 +48,8 @@ public class Entity1ForUnindexed implements Serializable {
 
 	@Id
 	@GeneratedValue
-	@Field(index = Index.UN_TOKENIZED)
-	@Column(name="universalid")
+	@Field(analyze = Analyze.NO)
+	@Column(name = "universalid")
 	private long uid;
 
 	@Version
@@ -61,7 +60,7 @@ public class Entity1ForUnindexed implements Serializable {
 	@org.hibernate.annotations.Cache(usage = org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
 	private java.util.List<Entity2ForUnindexed> entities2 = new java.util.ArrayList<Entity2ForUnindexed>();
 
-	
+
 	public long getUid() {
 		return uid;
 	}

@@ -27,40 +27,50 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.DateBridge;
-import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
-import org.hibernate.search.annotations.FilterCacheModeType;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Resolution;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
 @Indexed
-@FullTextFilterDefs( {
-		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache = FilterCacheModeType.NONE), //actual Filter implementation
-		@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS), //Filter factory with parameters
-		@FullTextFilterDef(name = "cacheresultstest", impl = ExcludeAllFilterFactory.class, cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
-		@FullTextFilterDef(name = "cacheinstancetest", impl = InstanceBasedExcludeAllFilter.class, cache = FilterCacheModeType.INSTANCE_ONLY),
-		@FullTextFilterDef(name = "empty", impl = NullReturningEmptyFilter.class, cache = FilterCacheModeType.INSTANCE_ONLY)
+@FullTextFilterDefs({
+		@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache = FilterCacheModeType.NONE),
+		//actual Filter implementation
+		@FullTextFilterDef(name = "security",
+				impl = SecurityFilterFactory.class,
+				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
+		//Filter factory with parameters
+		@FullTextFilterDef(name = "cacheresultstest",
+				impl = ExcludeAllFilterFactory.class,
+				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
+		@FullTextFilterDef(name = "cacheinstancetest",
+				impl = InstanceBasedExcludeAllFilter.class,
+				cache = FilterCacheModeType.INSTANCE_ONLY),
+		@FullTextFilterDef(name = "empty",
+				impl = NullReturningEmptyFilter.class,
+				cache = FilterCacheModeType.INSTANCE_ONLY)
 })
 public class Driver {
 	@Id
 	@DocumentId
 	private int id;
-	@Field(index= Index.TOKENIZED)
+	@Field(analyze = Analyze.YES)
 	private String name;
-	@Field(index= Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	private String teacher;
-	@Field(index= Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	private int score;
-	@Field(index= Index.UN_TOKENIZED)
-	@DateBridge( resolution = Resolution.YEAR)
+	@Field(analyze = Analyze.NO)
+	@DateBridge(resolution = Resolution.YEAR)
 	private Date delivery;
 
 	public int getId() {
@@ -104,18 +114,30 @@ public class Driver {
 	}
 
 	public boolean equals(Object o) {
-		if ( this == o ) return true;
-		if ( o == null || getClass() != o.getClass() ) return false;
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
 
 		Driver driver = (Driver) o;
 
-		if ( id != driver.id ) return false;
-		if ( score != driver.score ) return false;
-		if ( delivery != null ? !delivery.equals( driver.delivery ) : driver.delivery != null ) return false;
-		if ( name != null ? !name.equals( driver.name ) : driver.name != null ) return false;
+		if ( id != driver.id ) {
+			return false;
+		}
+		if ( score != driver.score ) {
+			return false;
+		}
+		if ( delivery != null ? !delivery.equals( driver.delivery ) : driver.delivery != null ) {
+			return false;
+		}
+		if ( name != null ? !name.equals( driver.name ) : driver.name != null ) {
+			return false;
+		}
 		return !( teacher != null ? !teacher.equals( driver.teacher ) : driver.teacher != null );
 
-		}
+	}
 
 	public int hashCode() {
 		int result;

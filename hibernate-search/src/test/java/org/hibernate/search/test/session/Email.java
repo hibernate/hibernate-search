@@ -24,14 +24,13 @@
 package org.hibernate.search.test.session;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.FetchType;
 
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
@@ -44,15 +43,16 @@ public class Email {
 	@DocumentId
 	private Long id;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String title;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String body;
 
 	private String header;
 
-	@IndexedEmbedded @ManyToOne(fetch = FetchType.LAZY)
+	@IndexedEmbedded
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Domain domain;
 
 	public Domain getDomain() {

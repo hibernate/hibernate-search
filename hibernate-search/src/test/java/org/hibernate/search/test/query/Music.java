@@ -35,7 +35,6 @@ import javax.persistence.ManyToMany;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -61,10 +60,10 @@ public class Music {
 	/**
 	 * @return the singers
 	 */
-	@ManyToMany( cascade = CascadeType.ALL,
+	@ManyToMany(cascade = CascadeType.ALL,
 			fetch = FetchType.EAGER,
-			targetEntity = Author.class )
-	@IndexedEmbedded( depth = 1 )
+			targetEntity = Author.class)
+	@IndexedEmbedded(depth = 1)
 	public Set<Author> getAuthors() {
 		return authors;
 	}
@@ -83,12 +82,11 @@ public class Music {
 	/**
 	 * @return the title
 	 */
-	@Column( name = "title",
+	@Column(name = "title",
 			length = 255,
-			nullable = false )
-	@Field( name = "title",
-			index = Index.TOKENIZED,
-			store = Store.YES )
+			nullable = false)
+	@Field(name = "title",
+			store = Store.YES)
 	public String getTitle() {
 		return title;
 	}

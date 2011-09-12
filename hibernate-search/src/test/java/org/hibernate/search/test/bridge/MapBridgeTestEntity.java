@@ -21,7 +21,6 @@ package org.hibernate.search.test.bridge;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -33,7 +32,6 @@ import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.NumericField;
@@ -78,7 +76,7 @@ public class MapBridgeTestEntity {
 	}
 
 	@Column(name = "name")
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	public String getName() {
 		return name;
 	}
@@ -87,9 +85,9 @@ public class MapBridgeTestEntity {
 		this.name = name;
 	}
 
-	@Field( indexNullAs = NULL_TOKEN )
+	@Field(indexNullAs = NULL_TOKEN)
 	@ElementCollection
-	@IndexedEmbedded( indexNullAs = NULL_EMBEDDED )
+	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
 	public Map<Integer, Language> getNullIndexed() {
@@ -104,10 +102,10 @@ public class MapBridgeTestEntity {
 		this.nullIndexed.put( key, nullIndexed );
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN)
+	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN)
 	@NumericField
 	@ElementCollection
-	@IndexedEmbedded( prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC )
+	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
 	public Map<Integer, Integer> getNumericNullIndexed() {
@@ -122,7 +120,7 @@ public class MapBridgeTestEntity {
 		this.numericNullIndexed.put( key, number );
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
 	@CollectionTable(name = "NullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
@@ -139,7 +137,7 @@ public class MapBridgeTestEntity {
 		this.nullNotIndexed.put( key, value );
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
 	@NumericField
@@ -157,7 +155,7 @@ public class MapBridgeTestEntity {
 		this.numericNullNotIndexed.put( key, value );
 	}
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
 	@DateBridge(resolution = Resolution.SECOND)
@@ -179,5 +177,4 @@ public class MapBridgeTestEntity {
 	public String toString() {
 		return MapBridgeTestEntity.class.getSimpleName() + "[id=" + id + ", name=" + name + "]";
 	}
-
 }

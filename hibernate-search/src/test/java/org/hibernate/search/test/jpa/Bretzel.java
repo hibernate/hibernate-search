@@ -24,13 +24,13 @@
 package org.hibernate.search.test.jpa;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
@@ -43,10 +43,10 @@ public class Bretzel {
 	@DocumentId
 	private Integer id;
 
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	private float saltQty;
 
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	private float weight;
 
 

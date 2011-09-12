@@ -49,7 +49,7 @@ public abstract class AbstractProduct {
 	@Id @GeneratedValue @DocumentId
 	private Integer id;
 
-	@Field(index= Index.TOKENIZED)
+	@Field
 	private String name;
 
 	@ManyToMany(mappedBy="product", cascade=CascadeType.ALL) //just to make the test easier, cascade doesn't really make any business sense

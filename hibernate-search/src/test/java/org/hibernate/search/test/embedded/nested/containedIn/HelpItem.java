@@ -26,7 +26,6 @@ package org.hibernate.search.test.embedded.nested.containedIn;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,7 +37,6 @@ import javax.persistence.Version;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Store;
 
 /**
  * @author Emmanuel Bernard
@@ -51,10 +49,10 @@ public class HelpItem {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Version()
+	@Version
 	private Long version;
 
-	@Field(index = org.hibernate.search.annotations.Index.TOKENIZED, store = Store.NO)
+	@Field
 	private String title;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "helpItem")
