@@ -5,7 +5,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Store;
 
 @Entity
@@ -23,7 +22,7 @@ public class Author {
 		this.id = id;
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	public String getName() {
 		return name;
 	}

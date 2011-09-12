@@ -92,7 +92,7 @@ public class IndexAndSearchTest {
 	}
 
 	private void index() {
-		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( ( Session ) em.getDelegate() );
+		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( (Session) em.getDelegate() );
 		try {
 			ftSession.createIndexer().startAndWait();
 		}
@@ -102,7 +102,7 @@ public class IndexAndSearchTest {
 	}
 
 	private void purge() {
-		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( ( Session ) em.getDelegate() );
+		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( (Session) em.getDelegate() );
 		ftSession.purgeAll( Book.class );
 		ftSession.flushToIndexes();
 		ftSession.close();
@@ -126,10 +126,10 @@ public class IndexAndSearchTest {
 
 		//lucene part
 		Map<String, Float> boostPerField = new HashMap<String, Float>( 4 );
-		boostPerField.put( bookFields[0], ( float ) 4 );
-		boostPerField.put( bookFields[1], ( float ) 3 );
-		boostPerField.put( bookFields[2], ( float ) 4 );
-		boostPerField.put( bookFields[3], ( float ) .5 );
+		boostPerField.put( bookFields[0], (float) 4 );
+		boostPerField.put( bookFields[1], (float) 3 );
+		boostPerField.put( bookFields[2], (float) 4 );
+		boostPerField.put( bookFields[3], (float) .5 );
 
 		FullTextEntityManager ftEm = org.hibernate.search.jpa.Search.getFullTextEntityManager( em );
 		Analyzer customAnalyzer = ftEm.getSearchFactory().getAnalyzer( "customanalyzer" );
@@ -145,5 +145,4 @@ public class IndexAndSearchTest {
 
 		return query;
 	}
-
 }

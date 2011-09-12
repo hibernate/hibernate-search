@@ -29,7 +29,9 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
@@ -62,6 +64,16 @@ public class FieldMapping {
 
 	public FieldMapping index(Index index) {
 		field.put( "index", index );
+		return this;
+	}
+
+	public FieldMapping analyze(Analyze analyze) {
+		field.put( "analyze", analyze );
+		return this;
+	}
+
+	public FieldMapping norms(Norms norms) {
+		field.put( "norms", norms );
 		return this;
 	}
 
@@ -127,5 +139,4 @@ public class FieldMapping {
 	public CalendarBridgeMapping calendarBridge(Resolution resolution) {
 		return new CalendarBridgeMapping( mapping, entity, property, resolution );
 	}
-
 }
