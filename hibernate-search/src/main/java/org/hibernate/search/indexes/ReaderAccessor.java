@@ -52,6 +52,17 @@ public interface ReaderAccessor {
 	IndexReader openIndexReader(Class<?>... entities);
 
 	/**
+	 * Opens an IndexReader on all named indexes.
+	 * A single name can be provided, or multiple. In the case of multiple names it
+	 * still returns a single IndexReader instance, but this will make it possible to run
+	 * queries on the combination of each index.
+	 * @param indexNames At least one IndexManager name.
+	 * @return an IndexReader instance.
+	 * @throws SearchException for unstarted indexManager names which fail to start, or for an empty parameter list.
+	 */
+	IndexReader openIndexReader(String... indexNames);
+
+	/**
 	 * Closes IndexReader instances obtained using {@link #openIndexReader(Class...)}
 	 * @param indexReader the IndexReader to be closed
 	 */
