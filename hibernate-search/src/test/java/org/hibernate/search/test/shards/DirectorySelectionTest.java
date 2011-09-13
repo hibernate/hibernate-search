@@ -21,8 +21,8 @@
 package org.hibernate.search.test.shards;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.index.IndexReader;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -38,12 +38,67 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class DirectorySelectionTest extends SearchTestCase {
+	private IndexReaderAccessor indexReaderAccessor;
+
+	public void setUp() throws Exception {
+		super.setUp();
+		FullTextSession fts = indexData();
+		indexReaderAccessor = fts.getSearchFactory().getIndexReaderAccessor();
+	}
 
 	public void testDirectoryProviderForQuery() throws Exception {
+		IndexReader indexReader = indexReaderAccessor.open( Product.class );
+		try {
+			Assert.assertEquals( 2, indexReader.numDocs() );
+		}
+		finally {
+			indexReaderAccessor.close( indexReader );
+		}
 
-		Session s = openSession( );
+		indexReader = indexReaderAccessor.open( "Products.0" );
+		try {
+			Assert.assertEquals( 1, indexReader.numDocs() );
+		}
+		finally {
+			indexReaderAccessor.close( indexReader );
+		}
+
+		indexReader = indexReaderAccessor.open( "Products.1" );
+		try {
+			Assert.assertEquals( 1, indexReader.numDocs() );
+		}
+		finally {
+			indexReaderAccessor.close( indexReader );
+		}
+	}
+
+	public void testOpeningIndexReaderByUnknownNameThrowsException() throws Exception {
+		try {
+			indexReaderAccessor.open( "Products.1", "hoa?" );
+			Assert.fail( "should have failed" );
+		}
+		catch ( SearchException se ) {
+			Assert.assertEquals( "HSEARCH000107: Index names hoa? is not defined", se.getMessage() );
+		}
+	}
+
+	public void testOpeningIndexReaderByUnknownEntityThrowsException() throws Exception {
+		try {
+			indexReaderAccessor.open( this.getClass() );
+			Assert.fail( "should have failed" );
+		}
+		catch ( IllegalArgumentException e ) {
+			Assert.assertEquals(
+					"HSEARCH000109: org.hibernate.search.test.shards.DirectorySelectionTest is not an indexed type",
+					e.getMessage()
+			);
+		}
+	}
+
+	private FullTextSession indexData() {
+		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		
+
 		Product p1 = new Product();
 		p1.setName( "The Definitive ANTLR Reference: Building Domain-Specific Languages" );
 		p1.setAvailable( true );
@@ -53,51 +108,22 @@ public class DirectorySelectionTest extends SearchTestCase {
 		p2.setName( "Recipes for distributed cloud applications using Infinispan" );
 		p2.setAvailable( false );
 		s.persist( p2 );
-		
+
 		tx.commit();
 
 		s.clear();
 
 		FullTextSession fts = Search.getFullTextSession( s );
-		IndexReaderAccessor indexReaders = fts.getSearchFactory().getIndexReaderAccessor();
 		fts.close();
-
-		IndexReader indexReader = indexReaders.open( Product.class );
-		try {
-			Assert.assertEquals( 2, indexReader.numDocs() );
-		}
-		finally {
-			indexReaders.close( indexReader );
-		}
-
-		indexReader = indexReaders.open( "Products.0" );
-		try {
-			Assert.assertEquals( 1, indexReader.numDocs() );
-		}
-		finally {
-			indexReaders.close( indexReader );
-		}
-
-		indexReader = indexReaders.open( "Products.1" );
-		try {
-			Assert.assertEquals( 1, indexReader.numDocs() );
-		}
-		finally {
-			indexReaders.close( indexReader );
-		}
-
-		try {
-			indexReader = indexReaders.open( "Products.1", "hoa?" );
-			Assert.fail( "should have failed" );
-		}
-		catch (SearchException se) {
-			Assert.assertEquals( "HSEARCH000107: Index names hoa? is not defined", se.getMessage() );
-		}
+		return fts;
 	}
 
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.Products.sharding_strategy", ProductsAvailabilityShardingStrategy.class.getCanonicalName() );
+		cfg.setProperty(
+				"hibernate.search.Products.sharding_strategy",
+				ProductsAvailabilityShardingStrategy.class.getCanonicalName()
+		);
 		cfg.setProperty( "hibernate.search.Products.sharding_strategy.nbr_of_shards", "2" );
 	}
 
@@ -107,5 +133,4 @@ public class DirectorySelectionTest extends SearchTestCase {
 				Product.class
 		};
 	}
-
 }

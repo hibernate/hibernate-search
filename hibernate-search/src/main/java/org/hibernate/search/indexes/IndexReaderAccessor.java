@@ -23,12 +23,15 @@ package org.hibernate.search.indexes;
 import org.apache.lucene.index.IndexReader;
 
 /**
- * The ReaderAccessor exposes the IndexReaders directly, making it possible to query the Lucene
- * indexes directly bypassing the helpers provided by Hibernate Search.
- * This API is intended for power users intending to extract information directly.
- *
- * The returned IndexReader instances are always read-only, and it's expected that they are closed
+ * The {@code IndexReaderAccessor} exposes {@link IndexReader}s directly, making it possible to query the Lucene
+ * indexes directly bypassing Hibernate Search.
+ * <p>
+ * The returned IndexReader instances are always read-only and must be closed
  * using the {@link #close(IndexReader)} method on this same instance.
+ * </p>
+ * <P>
+ * <b>Note:</b> this API is intended for power users intending to extract information directly.
+ * </p>
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -41,13 +44,21 @@ public interface IndexReaderAccessor {
 	 * the single IndexReader will act as a MultiReader on the aggregate of these indexes.
 	 * This MultiReader is not filtered by Hibernate Search, so it might contain information
 	 * relevant to different types as well.
-	 * <p>The returned IndexReader is read only; writing directly to the index is discouraged, in need use the
-	 * {@link org.hibernate.search.spi.SearchFactoryIntegrator#getWorker()} to queue change operations to the backend.</p>
-	 * <p>The IndexReader should not be closed in other ways, but must be returned to this instance to
-	 * {@link #close(IndexReader)}.</p>
-	 * 
-	 * @param entities
+	 * <p>
+	 * The returned IndexReader is read only; writing directly to the index is discouraged. If you
+	 * need to write to the index use the
+	 * {@link org.hibernate.search.spi.SearchFactoryIntegrator#getWorker()} to queue change operations to the backend.
+	 * </p>
+	 * <p>
+	 * The IndexReader should not be closed in other ways except being returned to this instance via
+	 * {@link #close(IndexReader)}.
+	 * </p>
+	 *
+	 * @param entities the entity types for which to return a (multi)reader
+	 *
 	 * @return an IndexReader containing at least all listed entities
+	 *
+	 * @throws IllegalArgumentException if one of the specified classes is not indexed
 	 */
 	IndexReader open(Class<?>... entities);
 
@@ -56,16 +67,19 @@ public interface IndexReaderAccessor {
 	 * A single name can be provided, or multiple. In the case of multiple names it
 	 * still returns a single IndexReader instance, but this will make it possible to run
 	 * queries on the combination of each index.
+	 *
 	 * @param indexNames At least one IndexManager name.
+	 *
 	 * @return an IndexReader instance.
-	 * @throws SearchException for unstarted indexManager names which fail to start, or for an empty parameter list.
+	 *
+	 * @throws org.hibernate.search.SearchException if the index manager to which the named index belongs failed to start
 	 */
 	IndexReader open(String... indexNames);
 
 	/**
 	 * Closes IndexReader instances obtained using {@link #open(Class...)}
+	 *
 	 * @param indexReader the IndexReader to be closed
 	 */
 	void close(IndexReader indexReader);
-
 }

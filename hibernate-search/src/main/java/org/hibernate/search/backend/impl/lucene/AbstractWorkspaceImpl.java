@@ -107,7 +107,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	public abstract void afterTransactionApplied(boolean someFailureHappened);
 
 	public void shutDownNow() {
-		log.shuttindDownBackend( indexManager.getIndexName() );
+		log.shuttingDownBackend( indexManager.getIndexName() );
 		writerHolder.closeIndexWriter();
 	}
 

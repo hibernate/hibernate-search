@@ -327,13 +327,13 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return this.allIndexesManager;
 	}
 
-	EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
+	EntityIndexBinder getSafeIndexBindingForEntity(Class<?> entityType) {
 		if ( entityType == null ) {
-			throw new IllegalArgumentException( "Null is not a valid indexed entity type" );
+			throw log.nullIsInvalidIndexedType();
 		}
 		EntityIndexBinder entityIndexBinding = getIndexBindingForEntity( entityType );
 		if ( entityIndexBinding == null ) {
-			throw new IllegalArgumentException( "Entity is not an indexed type: " + entityType );
+			throw log.notAnIndexedType( entityType.getName() );
 		}
 		return entityIndexBinding;
 	}
@@ -347,5 +347,4 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	public IndexReaderAccessor getIndexReaderAccessor() {
 		return indexReaderAccessor;
 	}
-
 }

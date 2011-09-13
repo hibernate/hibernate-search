@@ -22,10 +22,6 @@
  */
 package org.hibernate.search.util.logging.impl;
 
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.WARN;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
@@ -40,8 +36,12 @@ import org.jboss.logging.MessageLogger;
 
 import org.hibernate.search.SearchException;
 
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.WARN;
+
 /**
- * Hibernate Search's log abstraction layer on top of JBoss Logging.
+ * Log abstraction layer for Hibernate Search on top of JBoss Logging.
  *
  * @author Davide D'Alto
  * @since 4.0
@@ -383,7 +383,8 @@ public interface Log extends BasicLogger {
 	void messageReceivedForUndefinedIndex(String indexName);
 
 	@LogMessage(level = WARN)
-	@Message(id = 81, value = "The index '%1$s' is using a non-recommended combination of backend and directoryProvider implementations")
+	@Message(id = 81,
+			value = "The index '%1$s' is using a non-recommended combination of backend and directoryProvider implementations")
 	void warnSuspiciousBackendDirectoryCombination(String indexName);
 
 	@Message(id = 82, value = "Unable to start serialization layer")
@@ -422,7 +423,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 93, value = "Unknown Field type: %1$s")
 	SearchException unknownFieldType(Class<?> fieldType);
 
-	@Message(id = 94, value = "Cannot serialize custom Fieldable '%1$s'. Must be NumericField, Field or a Serializable Fieldable implementation.")
+	@Message(id = 94,
+			value = "Cannot serialize custom Fieldable '%1$s'. Must be NumericField, Field or a Serializable Fieldable implementation.")
 	SearchException cannotSerializeCustomField(Class<?> fieldType);
 
 	@Message(id = 95, value = "Fail to serialize object of type %1$s")
@@ -435,7 +437,7 @@ public interface Log extends BasicLogger {
 	SearchException unableToReadFile(String filename, @Cause Throwable e);
 
 	@Message(id = 98, value = "Unable to parse message from protocol version %1$d.%2$d. "
-							+ "Current protocol version: %3$d.%4$d")
+			+ "Current protocol version: %3$d.%4$d")
 	SearchException incompatibleProtocolVersion(int messageMajor, int messageMinor, int currentMajor, int currentMinor);
 
 	@Message(id = 99, value = "Unable to deserialize Avro stream")
@@ -468,10 +470,13 @@ public interface Log extends BasicLogger {
 	@Message(id = 107, value = "Index names %1$s is not defined")
 	SearchException requestedIndexNotDefined(String indexName);
 
-	@Message(id = 108, value = "At least one index name should be provided: can't open an IndexReader on nothing")
-	SearchException needAtLeastOneIndexName();
-
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 109, value = "Shutting down backend for IndexManager '%1$s'")
-	void shuttindDownBackend(String indexName);
+	@Message(id = 108, value = "Shutting down backend for IndexManager '%1$s'")
+	void shuttingDownBackend(String indexName);
+
+	@Message(id = 109, value = "%1$s is not an indexed type")
+	IllegalArgumentException notAnIndexedType(String entityName);
+
+	@Message(id = 110, value = "'null' is not a valid indexed type")
+	IllegalArgumentException nullIsInvalidIndexedType();
 }

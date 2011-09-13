@@ -20,10 +20,12 @@
  */
 package org.hibernate.search.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.apache.lucene.index.IndexReader;
+
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -35,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Provides access to IndexReaders.
  * IndexReaders opened through this service need to be closed using this service.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
@@ -71,13 +73,8 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 	@Override
 	public IndexReader open(String... indexNames) {
 		TreeSet<String> names = new TreeSet<String>();
-		for ( String indexName : indexNames ) {
-			names.add( indexName );
-		}
+		Collections.addAll( names, indexNames );
 		final int size = names.size();
-		if ( size == 0 ) {
-			throw log.needAtLeastOneIndexName();
-		}
 		String[] indexManagerNames = names.toArray( new String[size] );
 		IndexManagerHolder managerSource = searchFactory.getAllIndexesManager();
 		IndexManager[] managers = new IndexManager[size];
@@ -90,5 +87,4 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 		}
 		return MultiReaderFactory.openReader( managers );
 	}
-
 }
