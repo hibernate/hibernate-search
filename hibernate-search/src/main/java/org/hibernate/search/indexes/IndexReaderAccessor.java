@@ -28,7 +28,7 @@ import org.apache.lucene.index.IndexReader;
  * This API is intended for power users intending to extract information directly.
  *
  * The returned IndexReader instances are always read-only, and it's expected that they are closed
- * using the {@link #closeIndexReader(IndexReader)} method on this same instance.
+ * using the {@link #close(IndexReader)} method on this same instance.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -44,12 +44,12 @@ public interface IndexReaderAccessor {
 	 * <p>The returned IndexReader is read only; writing directly to the index is discouraged, in need use the
 	 * {@link org.hibernate.search.spi.SearchFactoryIntegrator#getWorker()} to queue change operations to the backend.</p>
 	 * <p>The IndexReader should not be closed in other ways, but must be returned to this instance to
-	 * {@link #closeIndexReader(IndexReader)}.</p>
+	 * {@link #close(IndexReader)}.</p>
 	 * 
 	 * @param entities
 	 * @return an IndexReader containing at least all listed entities
 	 */
-	IndexReader openIndexReader(Class<?>... entities);
+	IndexReader open(Class<?>... entities);
 
 	/**
 	 * Opens an IndexReader on all named indexes.
@@ -60,12 +60,12 @@ public interface IndexReaderAccessor {
 	 * @return an IndexReader instance.
 	 * @throws SearchException for unstarted indexManager names which fail to start, or for an empty parameter list.
 	 */
-	IndexReader openIndexReader(String... indexNames);
+	IndexReader open(String... indexNames);
 
 	/**
-	 * Closes IndexReader instances obtained using {@link #openIndexReader(Class...)}
+	 * Closes IndexReader instances obtained using {@link #open(Class...)}
 	 * @param indexReader the IndexReader to be closed
 	 */
-	void closeIndexReader(IndexReader indexReader);
+	void close(IndexReader indexReader);
 
 }

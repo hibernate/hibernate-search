@@ -95,13 +95,13 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		IndexReader indexReader = sf.getIndexReaders().openIndexReader( A.class );
+		IndexReader indexReader = sf.getIndexReaders().open( A.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
-		sf.getIndexReaders().closeIndexReader( indexReader );
+		sf.getIndexReaders().close( indexReader );
 
 		sf = builder.currentFactory( sf )
 				.addClass( B.class )
@@ -115,13 +115,13 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		indexReader = sf.getIndexReaders().openIndexReader( B.class );
+		indexReader = sf.getIndexReaders().open( B.class );
 		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
-		sf.getIndexReaders().closeIndexReader( indexReader );
+		sf.getIndexReaders().close( indexReader );
 
 		sf.close();
 	}
@@ -142,13 +142,13 @@ public class MutableFactoryTest {
 		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		IndexReader indexReader = sf.getIndexReaders().openIndexReader( A.class );
+		IndexReader indexReader = sf.getIndexReaders().open( A.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
-		sf.getIndexReaders().closeIndexReader( indexReader );
+		sf.getIndexReaders().close( indexReader );
 
 		sf.addClasses( B.class, C.class );
 
@@ -161,22 +161,22 @@ public class MutableFactoryTest {
 
 		luceneQuery = parser.parse( "Noel" );
 
-		indexReader = sf.getIndexReaders().openIndexReader( B.class );
+		indexReader = sf.getIndexReaders().open( B.class );
 		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 		searcher.close();
-		sf.getIndexReaders().closeIndexReader( indexReader );
+		sf.getIndexReaders().close( indexReader );
 
 		luceneQuery = parser.parse( "Vincent" );
 		
-		indexReader = sf.getIndexReaders().openIndexReader( C.class );
+		indexReader = sf.getIndexReaders().open( C.class );
 		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
 		searcher.close();
-		sf.getIndexReaders().closeIndexReader( indexReader );
+		sf.getIndexReaders().close( indexReader );
 
 		sf.close();
 	}
@@ -223,12 +223,12 @@ public class MutableFactoryTest {
 		for (int i = 0 ; i < nbrOfThread*nbrOfClassesPerThread ; i++) {
 			Query luceneQuery = parser.parse( "Emmanuel" + i);
 			final Class<?> classByNumber = getClassAByNumber( i );
-			IndexReader indexReader = sf.getIndexReaders().openIndexReader( classByNumber );
+			IndexReader indexReader = sf.getIndexReaders().open( classByNumber );
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			TopDocs hits = searcher.search( luceneQuery, 1000 );
 			assertEquals( 1, hits.totalHits );
 			searcher.close();
-			sf.getIndexReaders().closeIndexReader( indexReader );
+			sf.getIndexReaders().close( indexReader );
 		}
 	}
 
@@ -289,7 +289,7 @@ public class MutableFactoryTest {
 					Assert.assertTrue( "Configuration lost: expected RAM directory", directoryProvider instanceof RAMDirectoryProvider );
 
 					Query luceneQuery = parser.parse( "Emmanuel" + i);
-					IndexReader indexReader = factory.getIndexReaders().openIndexReader( aClass );
+					IndexReader indexReader = factory.getIndexReaders().open( aClass );
 					IndexSearcher searcher = new IndexSearcher( indexReader );
 					TopDocs hits = searcher.search( luceneQuery, 1000 );
 					if ( hits.totalHits != 1 ) {
@@ -298,7 +298,7 @@ public class MutableFactoryTest {
 						return;
 					}
 					searcher.close();
-					factory.getIndexReaders().closeIndexReader( indexReader );
+					factory.getIndexReaders().close( indexReader );
 				}
 			}
 			catch ( Exception e ) {
