@@ -35,56 +35,63 @@ import java.lang.annotation.Target;
  * the user sees fit.
  *
  * @author John Griffin
+ * @author Hardy Ferentschik
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( ElementType.TYPE )
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
 @Documented
 public @interface ClassBridge {
 	/**
-	 * Field name, default to the JavaBean property name.
+	 * @return the field name (defaults to the JavaBean property name)
 	 */
 	String name() default "";
 
 	/**
-	 * Should the value be stored in the document.
-	 * defaults to no.
+	 * @return Returns an instance of the {@link Store} enum, indicating whether the value should be stored in the document.
+	 *         Defaults to {@code Store.NO}
 	 */
 	Store store() default Store.NO;
 
 	/**
-	 * Define an analyzer for the field, default to
-	 * the inherited analyzer.
+	 * @return Returns a {@code Index} enum defining whether the value should be indexed or not. Defaults to {@code Index.YES}
 	 */
-	Analyzer analyzer() default @Analyzer;
+	Index index() default Index.YES;
 
 	/**
-	 * Defines how the Field should be indexed
-	 * defaults to tokenized.
+	 * @return Returns a {@code Analyze} enum defining whether the value should be analyzed or not. Defaults to {@code Analyze.YES}
 	 */
-	Index index() default Index.TOKENIZED;
+	Analyze analyze() default Analyze.YES;
 
 	/**
-	 * Define term vector storage requirements,
-	 * default to NO.
+	 * @return Returns a {@code StoreNorm} enum defining whether the norms should be stored in the index or not. Defaults to {@code StoreNorm.YES}
+	 */
+	Norms norms() default Norms.YES;
+
+	/**
+	 * @return Returns an instance of the {@link TermVector} enum defining how and if term vectors should be stored.
+	 *         Default is {@code TermVector.NO}
 	 */
 	TermVector termVector() default TermVector.NO;
 
 	/**
-	 * A float value of the amount of Lucene defined
-	 * boost to apply to a field.
+	 * @return Returns a analyzer annotation defining the analyzer to be used. Defaults to
+	 *         the inherited analyzer
 	 */
-	Boost boost() default @Boost(value=1.0F);
+	Analyzer analyzer() default @Analyzer;
 
 	/**
-	 * User supplied class to manipulate document in
-	 * whatever mysterious ways they wish to.
+	 * @return Returns a {@code Boost} annotation defining a float index time boost value
+	 */
+	Boost boost() default @Boost(value = 1.0F);
+
+	/**
+	 * @return Custom implementation of class bridge
 	 */
 	public Class<?> impl();
 
 	/**
-	 * Array of fields to work with. The impl class
-	 * above will work on these fields.
+	 * @return Array of {@code Parameter} instances passed to the class specified by {@link #impl} to initialize the class
+	 *         bridge
 	 */
-	public Parameter[] params() default {};
-
+	public Parameter[] params() default { };
 }

@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -24,21 +24,18 @@
 package org.hibernate.search.annotations;
 
 /**
- * Defines how an {@link org.apache.lucene.document.Field} should be indexed.
+ * Defines whether the field content should be analyzed.
  *
- * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public enum Index {
+public enum Analyze {
 	/**
-	 * Index the field value.
+	 * Analyze the field content
 	 */
 	YES,
 
 	/**
-	 * Do not index the field value. This field can thus not be searched,
-	 * but one can still access its contents provided it is
-	 * {@link Store stored}.
+	 * Index field content as is (not analyzed)
 	 */
 	NO
 }
