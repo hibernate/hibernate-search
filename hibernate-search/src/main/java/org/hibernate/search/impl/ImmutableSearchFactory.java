@@ -36,6 +36,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.IndexReaderAccessor;
+import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
@@ -327,7 +328,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return this.allIndexesManager;
 	}
 
-	EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
+	public EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
 		if ( entityType == null ) {
 			throw new IllegalArgumentException( "Null is not a valid indexed entity type" );
 		}

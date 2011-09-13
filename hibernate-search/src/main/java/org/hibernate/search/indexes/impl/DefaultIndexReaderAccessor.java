@@ -18,15 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.impl;
+package org.hibernate.search.indexes.impl;
 
 import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.impl.ImmutableSearchFactory;
 import org.hibernate.search.indexes.IndexReaderAccessor;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.util.logging.impl.Log;
