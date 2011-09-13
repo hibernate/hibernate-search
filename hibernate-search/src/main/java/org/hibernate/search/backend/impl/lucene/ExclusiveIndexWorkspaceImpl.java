@@ -33,8 +33,13 @@ public class ExclusiveIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 	}
 
 	@Override
-	public void afterTransactionApplied() {
-		writerHolder.commitIndexWriter();
+	public void afterTransactionApplied(boolean someFailureHappened) {
+		if ( someFailureHappened ) {
+			writerHolder.forceLockRelease();
+		}
+		else {
+			writerHolder.commitIndexWriter();
+		}
 	}
 
 }

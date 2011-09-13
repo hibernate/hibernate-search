@@ -162,6 +162,7 @@ class IndexWriterHolder {
 				log.trace( "IndexWriter closed" );
 			}
 			catch ( IOException ioe ) {
+				forceLockRelease();
 				handleIOException( ioe, null );
 			}
 		}

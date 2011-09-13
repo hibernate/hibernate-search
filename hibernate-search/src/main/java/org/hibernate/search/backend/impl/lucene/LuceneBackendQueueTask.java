@@ -98,6 +98,7 @@ class LuceneBackendQueueTask implements Runnable {
 			log.cannotOpenIndexWriterCausePreviousError();
 			return;
 		}
+		boolean someFailureHappened = false;
 		try {
 			ExecutorService executor = resources.getWorkersExecutor();
 			int queueSize = queue.size();
@@ -108,7 +109,6 @@ class LuceneBackendQueueTask implements Runnable {
 			}
 			// now wait for all tasks being completed before releasing our lock
 			// (this thread waits even in async backend mode)
-			boolean someFailureHappened = false;
 			LinkedList<LuceneWork> failedUpdates = new LinkedList<LuceneWork>();
 			for ( int i = 0; i < queueSize; i++ ) {
 				Future task = submittedTasks[i];
@@ -128,7 +128,7 @@ class LuceneBackendQueueTask implements Runnable {
 			}
 		}
 		finally {
-			resources.getWorkspace().afterTransactionApplied();
+			resources.getWorkspace().afterTransactionApplied( someFailureHappened );
 		}
 	}
 

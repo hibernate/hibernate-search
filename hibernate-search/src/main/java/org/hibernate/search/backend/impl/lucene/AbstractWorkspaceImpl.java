@@ -100,10 +100,10 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public abstract void afterTransactionApplied();
+	public abstract void afterTransactionApplied(boolean someFailureHappened);
 
 	public void shutDownNow() {
-		writerHolder.forceLockRelease();
+		writerHolder.closeIndexWriter();
 	}
 
 	@Override
