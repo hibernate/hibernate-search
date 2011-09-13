@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.test.query.criteria;
 
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -45,7 +44,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class ResultSizeOnCriteriaTest extends SearchTestCase {
 
 	@Test
-	public void testResultSize() throws ParseException {
+	public void testResultSize() {
 		indexTestData();
 
 		// Search
