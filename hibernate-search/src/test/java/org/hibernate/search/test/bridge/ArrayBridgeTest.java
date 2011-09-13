@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -222,7 +221,7 @@ public class ArrayBridgeTest extends SearchTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<ArrayBridgeTestEntity> findEmbeddedNullResults(String fieldName, Object value) throws ParseException {
+	private List<ArrayBridgeTestEntity> findEmbeddedNullResults(String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
 				.forEntity( ArrayBridgeTestEntity.class ).get();
 		Query query = queryBuilder.keyword().onField( fieldName )
@@ -232,7 +231,7 @@ public class ArrayBridgeTest extends SearchTestCase {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<ArrayBridgeTestEntity> findResults(String fieldName, Object value) throws ParseException {
+	private List<ArrayBridgeTestEntity> findResults(String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
 				.forEntity( ArrayBridgeTestEntity.class ).get();
 		Query query = queryBuilder.keyword().onField( fieldName )
@@ -241,8 +240,7 @@ public class ArrayBridgeTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<ArrayBridgeTestEntity> findNumericResults(String fieldName, Object number)
-			throws ParseException {
+	private List<ArrayBridgeTestEntity> findNumericResults(String fieldName, Object number) {
 		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, number, number, true, true );
 		return fullTextSession.createFullTextQuery( query, ArrayBridgeTestEntity.class ).list();
 	}
@@ -278,12 +276,12 @@ public class ArrayBridgeTest extends SearchTestCase {
 	private int countSizeForType(Class<?> type) {
 		SearchFactory searchFactory = fullTextSession.getSearchFactory();
 		int numDocs = -1; // to have it fail in case of errors
-		IndexReader locationIndexReader = searchFactory.openIndexReader( type );
+		IndexReader locationIndexReader = searchFactory.getIndexReaderAccessor().open( type );
 		try {
 			numDocs = locationIndexReader.numDocs();
 		}
 		finally {
-			searchFactory.closeIndexReader( locationIndexReader );
+			searchFactory.getIndexReaderAccessor().close( locationIndexReader );
 		}
 		return numDocs;
 	}

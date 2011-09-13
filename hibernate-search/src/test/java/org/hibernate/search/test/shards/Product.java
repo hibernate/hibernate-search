@@ -1,6 +1,6 @@
-/*
+/* 
  * Hibernate, Relational Persistence for Idiomatic Java
- *
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -18,66 +18,51 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.query.criteria;
-
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+package org.hibernate.search.test.shards;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-/**
- * @author Julie Ingignoli
- */
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 @Entity
-@Indexed
-public class Tractor {
+@Indexed( index="Products" )
+public class Product {
+
+	private Long id;
+	private String name;
+	private boolean available;
 
 	@Id
 	@GeneratedValue
-	private Integer id;
-
-	@Field
-	private String kurztext;
-
-	private boolean hasColor = true;
-
-	@Field
-	private String owner;
-
-	protected Tractor() {
-	}
-
-	public Integer getId() {
+	@DocumentId
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public String getKurztext() {
-		return kurztext;
+	@Field
+	public String getName() {
+		return name;
 	}
 
-	public void setKurztext(final String kurztext) {
-		this.kurztext = kurztext;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public boolean isHasColor() {
-		return hasColor;
+	@Field
+	public boolean isAvailable() {
+		return available;
 	}
 
-	public String getOwner() {
-		return owner;
+	public void setAvailable(boolean available) {
+		this.available = available;
 	}
 
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-
-	public void removeColor() {
-		hasColor = false;
-	}
 }

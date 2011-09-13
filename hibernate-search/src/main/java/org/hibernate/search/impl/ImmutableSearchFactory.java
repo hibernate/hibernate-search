@@ -23,24 +23,23 @@
  */
 package org.hibernate.search.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.IndexReaderAccessor;
+import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -109,6 +108,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final String indexingStrategy;
 	private final ServiceManager serviceManager;
 	private final boolean enableDirtyChecks;
+	private final DefaultIndexReaderAccessor indexReaderAccessor;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -145,6 +145,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 					new StatisticsInfo( statistics ), StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME
 			);
 		}
+
+		this.indexReaderAccessor = new DefaultIndexReaderAccessor( this );
 	}
 
 	public Map<String, FilterDef> getFilterDefinitions() {
@@ -326,26 +328,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return this.allIndexesManager;
 	}
 
-	@Override
-	public IndexReader openIndexReader(Class<?>... entities) {
-		HashMap<String,IndexManager> indexManagers = new HashMap<String,IndexManager>();
-		for ( Class<?> type : entities ) {
-			EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( type );
-			IndexManager[] indexManagersForAllShards = entityIndexBinding.getSelectionStrategy().getIndexManagersForAllShards();
-			for (IndexManager im : indexManagersForAllShards) {
-				indexManagers.put( im.getIndexName(), im );
-			}
-		}
-		IndexManager[] uniqueIndexManagers = indexManagers.values().toArray( new IndexManager[indexManagers.size()]);
-		return MultiReaderFactory.openReader( uniqueIndexManagers );
-	}
-
-	@Override
-	public void closeIndexReader(IndexReader indexReader) {
-		MultiReaderFactory.closeReader( indexReader );
-	}
-
-	private EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
+	public EntityIndexBinder getSafeIndexBindingForEntity(Class entityType) {
 		if ( entityType == null ) {
 			throw new IllegalArgumentException( "Null is not a valid indexed entity type" );
 		}
@@ -359,6 +342,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public ErrorHandler getErrorHandler() {
 		return this.errorHandler;
+	}
+
+	@Override
+	public IndexReaderAccessor getIndexReaderAccessor() {
+		return indexReaderAccessor;
 	}
 
 }

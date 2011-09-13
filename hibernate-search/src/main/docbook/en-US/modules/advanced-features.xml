@@ -62,17 +62,17 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlistin
     <example>
       <title>Accessing an <classname>IndexReader</classname></title>
 
-      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.openIndexReader(Order.class);
+      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.getIndexReaderAccessor().open(Order.class);
 try {
-   //do read-only operations on the reader
+   //perform read-only operations on the reader
 }
 finally {
-   searchFactory.closeIndexReader(reader);
+   searchFactory.getIndexReaderAccessor().close(reader);
 }          </programlisting>
     </example>
 
     <para>In this example the <classname>SearchFactory</classname> figures out which indexes
-    are needed to query this entity (considering a Sharding strategy). Using
+    are needed to query this entity (considering a Sharding strategy). Using the configured
     <classname>ReaderProvider</classname> (described in<xref
     linkend="search-architecture-readerstrategy" />) on each index, it returns a compound
     <literal>IndexReader</literal> on top of all involved indexes. Because this
@@ -98,6 +98,17 @@ finally {
     <classname>IndexReader</classname> freely, especially to do native Lucene
     queries. Using the shared <classname>IndexReader</classname>s will make most
     queries more efficient than by opening one directly from - for example - the filesystem.</para>
+
+    <para>As an alternative to the method <methodname>open(Class... types)</methodname> you
+    can use <methodname>open(String... indexNames)</methodname>; in this case you pass in one
+    or more index names; using this strategy you can also select a subset of the indexes for any
+    indexed type if sharding is used.</para>
+
+    <example>
+      <title>Accessing an <classname>IndexReader by index names</classname></title>
+      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.getIndexReaderAccessor().open("Products.1", "Products.3");</programlisting>
+    </example>
+
   </section>
 
   <section>

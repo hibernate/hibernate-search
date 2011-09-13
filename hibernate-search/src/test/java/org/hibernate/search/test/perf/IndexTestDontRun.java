@@ -101,7 +101,7 @@ public class IndexTestDontRun extends SearchTestCase {
 
 	private IndexSearcher getNewSearcher() {
 		final org.hibernate.Session session = getSessions().openSession();
-		IndexReader indexReader = Search.getFullTextSession( session ).getSearchFactory().openIndexReader( Boat.class );
+		IndexReader indexReader = Search.getFullTextSession( session ).getSearchFactory().getIndexReaderAccessor().open( Boat.class );
 		IndexSearcher indexsearcher = new IndexSearcher( indexReader );
 		return indexsearcher;
 	}

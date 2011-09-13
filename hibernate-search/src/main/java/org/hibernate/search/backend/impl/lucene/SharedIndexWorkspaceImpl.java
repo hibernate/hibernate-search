@@ -38,14 +38,21 @@ public class SharedIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 	}
 
 	@Override
-	public void afterTransactionApplied() {
+	public void afterTransactionApplied(boolean someFailureHappened) {
 		synchronized ( lock ) {
 			openWriterUsers--;
 			if ( openWriterUsers == 0 ) {
-				writerHolder.closeIndexWriter();
+				if ( someFailureHappened ) {
+					writerHolder.forceLockRelease();
+				}
+				else {
+					writerHolder.closeIndexWriter();
+				}
 			}
 			else {
-				writerHolder.commitIndexWriter();
+				if ( ! someFailureHappened ) {
+					writerHolder.commitIndexWriter();
+				}
 			}
 		}
 	}

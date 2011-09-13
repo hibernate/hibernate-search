@@ -102,7 +102,7 @@ public class ProvidedIdTest {
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Search Query extension
 		//needs it. So we use plain Lucene
 
-		IndexReader indexReader = sf.openIndexReader( ProvidedIdPerson.class );
+		IndexReader indexReader = sf.getIndexReaderAccessor().open( ProvidedIdPerson.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 3, hits.totalHits );
@@ -140,6 +140,6 @@ public class ProvidedIdTest {
 		assertTrue( titles.contains( "Mini Goat" ) );
 		assertTrue( titles.contains( "Big Goat" ) );
 		searcher.close();
-		sf.closeIndexReader( indexReader );
+		sf.getIndexReaderAccessor().close( indexReader );
 	}
 }

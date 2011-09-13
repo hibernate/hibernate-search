@@ -213,7 +213,7 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 				}
 			}
 			else if (fieldable instanceof Serializable) { //Today Fieldable is Serializable but for how long?
-				serializer.addFieldWithSerializableFieldable( toByteArray( ( Serializable ) fieldable ) );
+				serializer.addFieldWithSerializableFieldable( toByteArray( fieldable ) );
 			}
 			else {
 				throw log.cannotSerializeCustomField( fieldable.getClass() );

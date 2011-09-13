@@ -210,7 +210,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
 	public int getNumberOfIndexedEntities(String entity) {
 		Class<?> clazz = getEntityClass( entity );
-		IndexReader indexReader = searchFactoryImplementor.openIndexReader( clazz );
+		IndexReader indexReader = searchFactoryImplementor.getIndexReaderAccessor().open( clazz );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			BooleanQuery boolQuery = new BooleanQuery();
@@ -227,7 +227,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 			}
 		}
 		finally {
-			searchFactoryImplementor.closeIndexReader( indexReader );
+			searchFactoryImplementor.getIndexReaderAccessor().close( indexReader );
 		}
 	}
 

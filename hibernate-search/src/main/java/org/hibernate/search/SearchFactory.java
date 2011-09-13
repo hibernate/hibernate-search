@@ -24,8 +24,8 @@
 package org.hibernate.search;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.IndexReader;
 
+import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.stat.Statistics;
 
@@ -84,25 +84,10 @@ public interface SearchFactory {
 	Statistics getStatistics();
 
 	/**
-	 * Opens an IndexReader on all indexes containing the entities passed as parameter.
-	 * In the simplest case passing a single entity will map to a single index; if the entity
-	 * uses a sharding strategy or if multiple entities using different index names are selected,
-	 * the single IndexReader will act as a MultiReader on the aggregate of these indexes.
-	 * This MultiReader is not filtered by Hibernate Search, so it might contain information
-	 * relevant to different types as well.
-	 * <p>The returned IndexReader is read only; writing directly to the index is discouraged, in need use the
-	 * {@link org.hibernate.search.spi.SearchFactoryIntegrator#getWorker()} to queue change operations to the backend.</p>
-	 * <p>The IndexReader should not be closed in other ways, but must be returned to this instance to
-	 * {@link #closeIndexReader(IndexReader)}.</p>
-	 * 
-	 * @param entities
-	 * @return an IndexReader containing at least all listed entities
+	 * Provides access to the IndexReader API
+	 *
+	 * @return the IndexReaderAccessor for this SearchFactory
 	 */
-	IndexReader openIndexReader(Class<?>... entities);
+	IndexReaderAccessor getIndexReaderAccessor();
 
-	/**
-	 * Closes IndexReader instances obtained using {@link #openIndexReader(Class...)}
-	 * @param indexReader the IndexReader to be closed
-	 */
-	void closeIndexReader(IndexReader indexReader);
 }

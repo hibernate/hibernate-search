@@ -95,7 +95,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 		tx = s.beginTransaction();
 
 		SearchFactory searchFactory = s.getSearchFactory();
-		IndexReader indexReader = searchFactory.openIndexReader( SpecialPerson.class );
+		IndexReader indexReader = searchFactory.getIndexReaderAccessor().open( SpecialPerson.class );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			// we have to test using Lucene directly since query loaders will ignore hits for which there is no
@@ -104,7 +104,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 			assertTrue( "We should have no hit", topDocs.totalHits == 0 );
 		}
 		finally {
-			searchFactory.closeIndexReader( indexReader );
+			searchFactory.getIndexReaderAccessor().close( indexReader );
 		}
 		tx.commit();
 		s.close();

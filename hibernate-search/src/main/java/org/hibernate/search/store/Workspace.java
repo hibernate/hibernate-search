@@ -72,8 +72,10 @@ public interface Workspace {
 	Set<Class<?>> getEntitiesInIndexManager();
 
 	/**
-	 * 
+	 * Invoked after all changes of a transaction are applied
+	 * @param someFailureHappened usually false, set to true if errors
+	 * where caught while using the IndexWriter
 	 */
-	void afterTransactionApplied();
+	void afterTransactionApplied(boolean someFailureHappened);
 
 }

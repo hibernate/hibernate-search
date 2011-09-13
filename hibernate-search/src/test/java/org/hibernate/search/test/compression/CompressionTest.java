@@ -58,7 +58,7 @@ public class CompressionTest extends SearchTestCase {
 	 * @throws Exception in case the test fails
 	 */
 	public void testFieldWasCompressed() throws Exception {
-		IndexReader indexReader = getSearchFactory().openIndexReader( LargeDocument.class );
+		IndexReader indexReader = getSearchFactory().getIndexReaderAccessor().open( LargeDocument.class );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), null, 10 );
@@ -97,7 +97,7 @@ public class CompressionTest extends SearchTestCase {
 			}
 		}
 		finally {
-			getSearchFactory().closeIndexReader( indexReader );
+			getSearchFactory().getIndexReaderAccessor().close( indexReader );
 		}
 	}
 

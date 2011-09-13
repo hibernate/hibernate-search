@@ -306,7 +306,7 @@
       <title>Near-Real-Time</title>
       <para>The <classname>NRTIndexManager</classname> is an extension of the default
       <classname>IndexManager</classname>, leveraging the Lucene NRT (Near Real Time) features
-      for extreme low latency index writes, but as a tradeoff it requires a non-clutered and non-shared
+      for extreme low latency index writes, but as a tradeoff it requires a non-clustered and non-shared
       index.
       In other words, it will ignore configuration settings for alternative back ends other than <literal>Lucene</literal>
       and will acquire exclusive write locks on the Directory.
