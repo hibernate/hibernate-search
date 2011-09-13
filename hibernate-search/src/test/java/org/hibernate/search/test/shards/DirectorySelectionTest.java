@@ -59,7 +59,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		s.clear();
 
 		FullTextSession fts = Search.getFullTextSession( s );
-		IndexReaderAccessor indexReaders = fts.getSearchFactory().getIndexReaders();
+		IndexReaderAccessor indexReaders = fts.getSearchFactory().getIndexReaderAccessor();
 		fts.close();
 
 		IndexReader indexReader = indexReaders.open( Product.class );

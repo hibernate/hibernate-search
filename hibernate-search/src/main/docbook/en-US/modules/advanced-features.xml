@@ -62,12 +62,12 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlistin
     <example>
       <title>Accessing an <classname>IndexReader</classname></title>
 
-      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.getIndexReaders().open(Order.class);
+      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.getIndexReaderAccessor().open(Order.class);
 try {
    //perform read-only operations on the reader
 }
 finally {
-   searchFactory.getIndexReaders().close(reader);
+   searchFactory.getIndexReaderAccessor().close(reader);
 }          </programlisting>
     </example>
 
@@ -106,7 +106,7 @@ finally {
 
     <example>
       <title>Accessing an <classname>IndexReader by index names</classname></title>
-      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.getIndexReaders().open("Products.1", "Products.3");</programlisting>
+      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.getIndexReaderAccessor().open("Products.1", "Products.3");</programlisting>
     </example>
 
   </section>
