@@ -82,6 +82,26 @@ public class DirectorySelectionTest extends SearchTestCase {
 		}
 	}
 
+	public void testOpeningIndexReaderUsingEmptyStringArrayThrowsException() throws Exception {
+		try {
+			indexReaderAccessor.open( new String[]{} );
+			Assert.fail( "should have failed" );
+		}
+		catch ( IllegalArgumentException e ) {
+			Assert.assertEquals( "HSEARCH000111: At least one index name must be provided: can't open an IndexReader on nothing", e.getMessage() );
+		}
+	}
+
+	public void testOpeningIndexReaderUsingNullAsNameThrowsException() throws Exception {
+		try {
+			indexReaderAccessor.open( (String) null );
+			Assert.fail( "should have failed" );
+		}
+		catch ( IllegalArgumentException e ) {
+			Assert.assertEquals( "HSEARCH000113: 'null' is not a valid index name", e.getMessage() );
+		}
+	}
+
 	public void testOpeningIndexReaderByUnknownEntityThrowsException() throws Exception {
 		try {
 			indexReaderAccessor.open( this.getClass() );
@@ -92,6 +112,26 @@ public class DirectorySelectionTest extends SearchTestCase {
 					"HSEARCH000109: org.hibernate.search.test.shards.DirectorySelectionTest is not an indexed type",
 					e.getMessage()
 			);
+		}
+	}
+
+	public void testOpeningIndexReaderUsingEmptyClassArrayThrowsException() throws Exception {
+		try {
+			indexReaderAccessor.open( new Class<?>[]{} );
+			Assert.fail( "should have failed" );
+		}
+		catch ( IllegalArgumentException e ) {
+			Assert.assertEquals( "HSEARCH000112: At least one entity type must be provided: can't open an IndexReader on nothing", e.getMessage() );
+		}
+	}
+
+	public void testOpeningIndexReaderUsingNullAsClassThrowsException() throws Exception {
+		try {
+			indexReaderAccessor.open( (Class<?>) null );
+			Assert.fail( "should have failed" );
+		}
+		catch ( IllegalArgumentException e ) {
+			Assert.assertEquals( "HSEARCH000110: 'null' is not a valid indexed type", e.getMessage() );
 		}
 	}
 

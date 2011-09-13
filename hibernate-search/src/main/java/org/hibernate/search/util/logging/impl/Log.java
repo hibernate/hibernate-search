@@ -479,4 +479,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 110, value = "'null' is not a valid indexed type")
 	IllegalArgumentException nullIsInvalidIndexedType();
+
+	@Message(id = 111, value = "At least one index name must be provided: can't open an IndexReader on nothing")
+	IllegalArgumentException needAtLeastOneIndexName();
+
+	@Message(id = 112, value = "At least one entity type must be provided: can't open an IndexReader on nothing")
+	IllegalArgumentException needAtLeastOneIndexedEntityType();
+
+	@Message(id = 113, value = "'null' is not a valid index name")
+	IllegalArgumentException nullIsInvalidIndexName();
 }

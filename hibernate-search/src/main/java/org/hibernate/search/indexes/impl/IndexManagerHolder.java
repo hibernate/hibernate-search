@@ -164,7 +164,7 @@ public class IndexManagerHolder {
 	
 	/**
 	 * Specifies a custom similarity on an index
-	 * @param similarityInstance
+	 * @param newSimilarity
 	 * @param manager
 	 */
 	private void setSimilarity(Similarity newSimilarity, IndexManager manager) {
@@ -305,7 +305,9 @@ public class IndexManagerHolder {
 	 * @return the IndexManager, or null if it doesn't exist
 	 */
 	public IndexManager getIndexManager(String targetIndexName) {
+		if(targetIndexName == null) {
+			throw log.nullIsInvalidIndexName();
+		}
 		return indexManagersRegistry.get( targetIndexName );
 	}
-
 }

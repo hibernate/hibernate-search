@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.impl;
+package org.hibernate.search.indexes.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,8 +27,8 @@ import java.util.TreeSet;
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.impl.ImmutableSearchFactory;
 import org.hibernate.search.indexes.IndexReaderAccessor;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.util.logging.impl.Log;
@@ -57,6 +57,10 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 
 	@Override
 	public IndexReader open(Class<?>... entities) {
+		if(entities.length == 0) {
+			throw log.needAtLeastOneIndexedEntityType();
+		}
+
 		HashMap<String, IndexManager> indexManagers = new HashMap<String, IndexManager>();
 		for ( Class<?> type : entities ) {
 			EntityIndexBinder entityIndexBinding = searchFactory.getSafeIndexBindingForEntity( type );
@@ -75,6 +79,9 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 		TreeSet<String> names = new TreeSet<String>();
 		Collections.addAll( names, indexNames );
 		final int size = names.size();
+		if ( size == 0 ) {
+			throw log.needAtLeastOneIndexName();
+		}
 		String[] indexManagerNames = names.toArray( new String[size] );
 		IndexManagerHolder managerSource = searchFactory.getAllIndexesManager();
 		IndexManager[] managers = new IndexManager[size];
