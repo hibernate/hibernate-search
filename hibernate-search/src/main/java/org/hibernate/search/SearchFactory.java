@@ -25,7 +25,7 @@ package org.hibernate.search;
 
 import org.apache.lucene.analysis.Analyzer;
 
-import org.hibernate.search.indexes.ReaderAccessor;
+import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.stat.Statistics;
 
@@ -86,6 +86,6 @@ public interface SearchFactory {
 	/**
 	 * Provides access to the IndexReader API
 	 */
-	ReaderAccessor getIndexReaders();
+	IndexReaderAccessor getIndexReaders();
 
 }

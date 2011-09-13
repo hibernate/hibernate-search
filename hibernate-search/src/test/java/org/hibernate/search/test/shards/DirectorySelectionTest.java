@@ -29,7 +29,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.ReaderAccessor;
+import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -59,7 +59,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		s.clear();
 
 		FullTextSession fts = Search.getFullTextSession( s );
-		ReaderAccessor indexReaders = fts.getSearchFactory().getIndexReaders();
+		IndexReaderAccessor indexReaders = fts.getSearchFactory().getIndexReaders();
 		fts.close();
 
 		IndexReader indexReader = indexReaders.openIndexReader( Product.class );
