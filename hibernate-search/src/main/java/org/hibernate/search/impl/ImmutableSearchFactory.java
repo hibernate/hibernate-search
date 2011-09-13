@@ -107,7 +107,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final String indexingStrategy;
 	private final ServiceManager serviceManager;
 	private final boolean enableDirtyChecks;
-	private final IndexReaderAccessor indexReaderAccessor;
+	private final DefaultIndexReaderAccessor indexReaderAccessor;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -145,7 +145,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			);
 		}
 
-		this.indexReaderAccessor = new IndexReaderAccessor( this );
+		this.indexReaderAccessor = new DefaultIndexReaderAccessor( this );
 	}
 
 	public Map<String, FilterDef> getFilterDefinitions() {
