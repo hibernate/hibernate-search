@@ -34,6 +34,8 @@ import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Lucene workspace for an IndexManager
@@ -43,6 +45,8 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Sanne Grinovero
  */
 public abstract class AbstractWorkspaceImpl implements Workspace {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final OptimizerStrategy optimizerStrategy;
 	private final Set<Class<?>> entitiesInIndexManager;
@@ -103,6 +107,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	public abstract void afterTransactionApplied(boolean someFailureHappened);
 
 	public void shutDownNow() {
+		log.shuttindDownBackend( indexManager.getIndexName() );
 		writerHolder.closeIndexWriter();
 	}
 
