@@ -29,7 +29,6 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -39,7 +38,9 @@ import org.hibernate.search.annotations.Store;
 @Entity
 @Indexed
 public class Author {
-	@Id @GeneratedValue @DocumentId
+	@Id
+	@GeneratedValue
+	@DocumentId
 	private Integer id;
 	private String name;
 
@@ -51,7 +52,7 @@ public class Author {
 		this.id = id;
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	public String getName() {
 		return name;
 	}

@@ -25,13 +25,12 @@ package org.hibernate.search.test.jms.slave;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 
 /**
@@ -44,12 +43,13 @@ public class TShirt {
 	@GeneratedValue
 	@DocumentId
 	private int id;
-	@Field(index= Index.TOKENIZED)
+	@Field
 	private String logo;
-	@Column(name="size_")
+	@Column(name = "size_")
 	private String size;
-	@Field @NumericField
-	@Column(name="length_")
+	@Field
+	@NumericField
+	@Column(name = "length_")
 	private double length;
 
 	public int getId() {

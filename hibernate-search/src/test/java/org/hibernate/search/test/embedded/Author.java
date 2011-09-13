@@ -40,7 +40,7 @@ public class Author {
 	@GeneratedValue
 	@DocumentId
 	private Integer id;
-	@Field(index= Index.TOKENIZED)
+	@Field
 	private String name;
 
 

@@ -24,16 +24,15 @@
 package org.hibernate.search.test.directoryProvider;
 
 import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 
@@ -48,12 +47,12 @@ public class SnowStorm {
 	@DocumentId
 	private Long id;
 
-	@Field(index = Index.UN_TOKENIZED)
-	@DateBridge( resolution = Resolution.DAY )
-	@Column(name="xdate")
+	@Field(analyze = Analyze.NO)
+	@DateBridge(resolution = Resolution.DAY)
+	@Column(name = "xdate")
 	private Date date;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String location;
 
 

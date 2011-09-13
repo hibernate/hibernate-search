@@ -27,9 +27,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 
 /**
@@ -42,11 +42,11 @@ public class Detective {
 	@GeneratedValue
 	@DocumentId
 	private Integer id;
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String name;
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String physicalDescription;
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	private String badge;
 
 

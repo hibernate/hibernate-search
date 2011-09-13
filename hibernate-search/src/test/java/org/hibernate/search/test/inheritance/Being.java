@@ -25,8 +25,8 @@ package org.hibernate.search.test.inheritance;
 
 import javax.persistence.MappedSuperclass;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
@@ -35,7 +35,7 @@ import org.hibernate.search.test.bridge.PaddedIntegerBridge;
  */
 @MappedSuperclass
 public class Being {
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	@FieldBridge(impl = PaddedIntegerBridge.class)
 	private int weight;
 

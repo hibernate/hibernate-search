@@ -24,14 +24,13 @@
 package org.hibernate.search.test.session;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Emmanuel Bernard
@@ -41,10 +40,11 @@ import org.hibernate.search.annotations.Indexed;
 public class Categorie {
 
 	@DocumentId
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private Integer id;
 
-	@Field( index = Index.TOKENIZED, store = Store.YES )
+	@Field(store = Store.YES)
 	private String nom;
 
 	public Categorie() {

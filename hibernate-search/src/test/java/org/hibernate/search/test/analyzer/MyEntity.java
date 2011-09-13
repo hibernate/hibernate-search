@@ -23,23 +23,23 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed(index="idx1")
+@Indexed(index = "idx1")
 @Analyzer(impl = AnalyzerForTests1.class)
 public class MyEntity {
 	@Id
@@ -47,18 +47,18 @@ public class MyEntity {
 	@DocumentId
 	private Integer id;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String entity;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	@Analyzer(impl = AnalyzerForTests2.class)
 	private String property;
 
-	@Field(index = Index.TOKENIZED, analyzer = @Analyzer(impl = AnalyzerForTests3.class) )
+	@Field(analyzer = @Analyzer(impl = AnalyzerForTests3.class))
 	@Analyzer(impl = AnalyzerForTests2.class)
 	private String field;
 
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	private String notAnalyzed;
 
 	public String getNotAnalyzed() {

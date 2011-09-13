@@ -46,7 +46,7 @@ public class Place {
 	@GeneratedValue
 	private Long id;
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String name;
 
 	@OneToOne(cascade = CascadeType.ALL)
@@ -71,7 +71,6 @@ public class Place {
 	}
 
 	public String getName() {
-
 		return name;
 	}
 

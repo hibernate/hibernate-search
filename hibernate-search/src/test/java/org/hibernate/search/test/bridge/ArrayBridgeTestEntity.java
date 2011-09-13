@@ -19,7 +19,6 @@
 package org.hibernate.search.test.bridge;
 
 import java.util.Date;
-
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -30,9 +29,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.NumericField;
@@ -51,7 +50,7 @@ public class ArrayBridgeTestEntity {
 	static final String NULL_NUMERIC_TOKEN = "NULL_NUMERIC_MARKER";
 	static final String NULL_EMBEDDED = "EMBEDDED_NULL";
 	static final String NULL_EMBEDDED_NUMERIC = "EMBEDDED_NUMERIC_NULL";
-	
+
 	private Long id;
 	private String name;
 	private Language[] nullIndexed = new Language[0];
@@ -77,7 +76,7 @@ public class ArrayBridgeTestEntity {
 	}
 
 	@Column(name = "name")
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	public String getName() {
 		return name;
 	}
@@ -86,9 +85,9 @@ public class ArrayBridgeTestEntity {
 		this.name = name;
 	}
 
-	@Field( indexNullAs = NULL_TOKEN )
+	@Field(indexNullAs = NULL_TOKEN)
 	@ElementCollection
-	@IndexedEmbedded( indexNullAs = NULL_EMBEDDED )
+	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@OrderColumn
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "array_id"))
 	@Column(name = "nullIndexed")
@@ -100,10 +99,10 @@ public class ArrayBridgeTestEntity {
 		this.nullIndexed = nullIndexed;
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN)
+	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN)
 	@NumericField
 	@ElementCollection
-	@IndexedEmbedded( prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC )
+	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@OrderColumn
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "array_id"))
 	@Column(name = "numericNullIndexed")
@@ -115,7 +114,7 @@ public class ArrayBridgeTestEntity {
 		this.numericNullIndexed = phoneNumbers;
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
 	@OrderColumn
@@ -129,7 +128,7 @@ public class ArrayBridgeTestEntity {
 		this.nullNotIndexed = skipNullCollection;
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
 	@NumericField
@@ -144,7 +143,7 @@ public class ArrayBridgeTestEntity {
 		this.numericNullNotIndexed = numericSkipNullCollection;
 	}
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
 	@DateBridge(resolution = Resolution.SECOND)

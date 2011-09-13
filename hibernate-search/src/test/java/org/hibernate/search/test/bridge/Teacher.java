@@ -24,11 +24,20 @@
 
 package org.hibernate.search.test.bridge;
 
-import org.hibernate.search.annotations.*;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Emmanuel Bernard
@@ -37,51 +46,51 @@ import java.util.List;
 @Indexed
 @Table(name = "teacher")
 @ClassBridge(
-        name = "amount_of_students",
-        index = Index.UN_TOKENIZED,
-        store = Store.YES,
-        impl = StudentsSizeBridge.class
+		name = "amount_of_students",
+		analyze = Analyze.NO,
+		store = Store.YES,
+		impl = StudentsSizeBridge.class
 )
 public class Teacher {
 
-    private Long id;
-    private String name;
-    private List<Student> students;
+	private Long id;
+	private String name;
+	private List<Student> students;
 
 
-    public Teacher() {
-        students = new ArrayList<Student>();
-    }
+	public Teacher() {
+		students = new ArrayList<Student>();
+	}
 
-    @Id
-    @GeneratedValue
-    @Column(name = "teacher_id")
-    public Long getId() {
-        return id;
-    }
+	@Id
+	@GeneratedValue
+	@Column(name = "teacher_id")
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    @Column(name = "name")
-    @Field(index = Index.TOKENIZED, store = Store.YES)
-    public String getName() {
-        return name;
-    }
+	@Column(name = "name")
+	@Field(store = Store.YES)
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @OneToMany(mappedBy = "teacher")
-    public List<Student> getStudents() {
-        return students;
-    }
+	@OneToMany(mappedBy = "teacher")
+	public List<Student> getStudents() {
+		return students;
+	}
 
-    public void setStudents(List<Student> students) {
-        this.students = students;
-    }
+	public void setStudents(List<Student> students) {
+		this.students = students;
+	}
 
 }
 

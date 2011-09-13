@@ -54,7 +54,7 @@ public class Tag {
 	private Long version;
 
 	@Column(nullable = false, length = 50)
-	@Field(index = org.hibernate.search.annotations.Index.TOKENIZED, store = Store.NO)
+	@Field
 	@Boost(1.5f)
 	private String name;
 
