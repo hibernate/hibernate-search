@@ -23,8 +23,6 @@
  */
 package org.hibernate.search.backend.impl.batch;
 
-import java.util.Properties;
-
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.LuceneWork;
