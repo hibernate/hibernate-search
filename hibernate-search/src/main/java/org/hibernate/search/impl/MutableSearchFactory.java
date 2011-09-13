@@ -224,8 +224,8 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	}
 
 	@Override
-	public IndexReaderAccessor getIndexReaders() {
-		return delegate.getIndexReaders();
+	public IndexReaderAccessor getIndexReaderAccessor() {
+		return delegate.getIndexReaderAccessor();
 	}
 
 }

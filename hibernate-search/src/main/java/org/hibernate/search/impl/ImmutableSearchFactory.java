@@ -344,7 +344,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	@Override
-	public IndexReaderAccessor getIndexReaders() {
+	public IndexReaderAccessor getIndexReaderAccessor() {
 		return indexReaderAccessor;
 	}
 

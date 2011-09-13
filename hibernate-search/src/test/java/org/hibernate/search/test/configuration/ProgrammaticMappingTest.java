@@ -371,11 +371,11 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
 		//needs it. So we use plain Lucene 
 
-		IndexReader indexReader = fullTextSession.getSearchFactory().getIndexReaders().open( ProvidedIdEntry.class );
+		IndexReader indexReader = fullTextSession.getSearchFactory().getIndexReaderAccessor().open( ProvidedIdEntry.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		searcher.close();
-		fullTextSession.getSearchFactory().getIndexReaders().close( indexReader );
+		fullTextSession.getSearchFactory().getIndexReaderAccessor().close( indexReader );
 		transaction.commit();
 		session.close();
 

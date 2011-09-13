@@ -85,7 +85,9 @@ public interface SearchFactory {
 
 	/**
 	 * Provides access to the IndexReader API
+	 *
+	 * @return the IndexReaderAccessor for this SearchFactory
 	 */
-	IndexReaderAccessor getIndexReaders();
+	IndexReaderAccessor getIndexReaderAccessor();
 
 }

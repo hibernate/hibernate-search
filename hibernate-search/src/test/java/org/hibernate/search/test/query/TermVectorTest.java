@@ -46,7 +46,7 @@ public class TermVectorTest extends SearchTestCase {
 
       // Here's how to get a reader from a FullTextSession
       SearchFactory searchFactory = s.getSearchFactory();
-      IndexReader reader = searchFactory.getIndexReaders().open( ElectricalProperties.class );
+      IndexReader reader = searchFactory.getIndexReaderAccessor().open( ElectricalProperties.class );
 
       /**
        * Since there are so many combinations of results here, we are only going
@@ -71,7 +71,7 @@ public class TermVectorTest extends SearchTestCase {
 
       //cleanup
       for (Object element : s.createQuery("from " + Employee.class.getName()).list()) s.delete(element);
-      searchFactory.getIndexReaders().close( reader );
+      searchFactory.getIndexReaderAccessor().close( reader );
       tx.commit();
       s.close();
    }
@@ -90,7 +90,7 @@ public class TermVectorTest extends SearchTestCase {
 
       // Here's how to get a reader from a FullTextSession
       SearchFactory searchFactory = s.getSearchFactory();
-      IndexReader reader = searchFactory.getIndexReaders().open( Employee.class );
+      IndexReader reader = searchFactory.getIndexReaderAccessor().open( Employee.class );
 
       TermPositionVector vector = (TermPositionVector) reader.getTermFreqVector(0, "dept");
       assertNull("should not find a term position vector", vector);
@@ -98,7 +98,7 @@ public class TermVectorTest extends SearchTestCase {
       //cleanup
       for (Object element : s.createQuery("from " + ElectricalProperties.class.getName()).list())
          s.delete(element);
-      searchFactory.getIndexReaders().close( reader );
+      searchFactory.getIndexReaderAccessor().close( reader );
       tx.commit();
       s.close();
    }
