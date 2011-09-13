@@ -30,7 +30,6 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 
 /**
@@ -43,11 +42,11 @@ public class Suspect {
 	@GeneratedValue
 	@DocumentId
 	private Integer id;
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String name;
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String physicalDescription;
-	@Field(index = Index.TOKENIZED)
+	@Field
 	@Column(length = 500)
 	private String suspectCharge;
 

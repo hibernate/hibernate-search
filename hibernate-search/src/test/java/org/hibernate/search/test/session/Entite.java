@@ -24,16 +24,15 @@
 package org.hibernate.search.test.session;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.ManyToOne;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -47,7 +46,7 @@ public class Entite {
 	@GeneratedValue
 	private Integer id;
 
-	@Field( index = Index.TOKENIZED, store = Store.YES )
+	@Field(store = Store.YES)
 	private String titre;
 
 	@IndexedEmbedded

@@ -31,9 +31,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.Proxy;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -79,7 +79,7 @@ public class Book implements IBook {
 		this.authors = authors;
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.NO)
+	@Field
 	public String getBody() {
 		return body;
 	}
@@ -89,8 +89,8 @@ public class Book implements IBook {
 	}
 
 	@Fields({
-			@Field(index = Index.TOKENIZED, store = Store.YES),
-			@Field(name = "summary_forSort", index = Index.UN_TOKENIZED, store = Store.YES)
+			@Field(store = Store.YES),
+			@Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
 	})
 	public String getSummary() {
 		return summary;

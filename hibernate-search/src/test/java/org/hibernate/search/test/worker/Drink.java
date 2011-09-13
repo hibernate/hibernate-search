@@ -24,13 +24,12 @@
 package org.hibernate.search.test.worker;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
@@ -43,9 +42,8 @@ public class Drink {
 	@DocumentId
 	private Integer id;
 
-	@Field(index = Index.TOKENIZED )
+	@Field
 	private String name;
-
 
 	public Integer getId() {
 		return id;

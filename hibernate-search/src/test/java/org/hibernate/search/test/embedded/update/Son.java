@@ -28,8 +28,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
@@ -57,7 +57,7 @@ public class Son {
 		this.id = id;
 	}
 
-	@Field(index = Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	public String getName() {
 		return name;
 	}

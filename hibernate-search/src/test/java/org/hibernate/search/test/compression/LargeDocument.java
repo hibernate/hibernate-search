@@ -30,14 +30,13 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
 @Entity
 @Indexed
 public class LargeDocument {
-	
+
 	private Long id;
 	private String title;
 	private String summary;
@@ -55,7 +54,7 @@ public class LargeDocument {
 
 	@Id
 	@GeneratedValue
-    @DocumentId
+	@DocumentId
 	public Long getId() {
 		return id;
 	}
@@ -64,7 +63,7 @@ public class LargeDocument {
 		this.id = id;
 	}
 
-    @Field( store = Store.YES, index = Index.TOKENIZED )
+	@Field(store = Store.YES)
 	public String getTitle() {
 		return title;
 	}
@@ -73,9 +72,8 @@ public class LargeDocument {
 		this.title = title;
 	}
 
-    @Field( name="abstract", store = Store.COMPRESS, index = Index.TOKENIZED,
-    		bridge = @FieldBridge( impl = HTMLBoldFieldBridge.class ) )
-    public String getSummary() {
+	@Field(name = "abstract", store = Store.COMPRESS, bridge = @FieldBridge(impl = HTMLBoldFieldBridge.class))
+	public String getSummary() {
 		return summary;
 	}
 
@@ -83,14 +81,13 @@ public class LargeDocument {
 		this.summary = summary;
 	}
 
-    @Field( store = Store.COMPRESS, index = Index.TOKENIZED )
-    public String getText() {
+	@Field(store = Store.COMPRESS)
+	public String getText() {
 		return text;
 	}
 
 	public void setText(String text) {
 		this.text = text;
 	}
-
 }
 

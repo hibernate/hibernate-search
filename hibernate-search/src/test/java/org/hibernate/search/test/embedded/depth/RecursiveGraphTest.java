@@ -38,6 +38,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.LeakingLuceneBackend;
 
 /**
  * Verify the engine respects the depth parameter {@link IndexedEmbedded#depth()} without indexing larger graphs than
@@ -192,7 +193,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 	
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.worker.backend", org.hibernate.search.test.embedded.depth.LeakingLuceneBackend.class.getName() );
+		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
 	}
 	
 }

@@ -23,14 +23,14 @@
  */
 package org.hibernate.search.test.embedded;
 
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
 
 /**
  * @author Emmanuel Bernard
@@ -42,9 +42,9 @@ public class Order {
 	@GeneratedValue
 	@DocumentId
 	private Integer id;
-	@Field(index= Index.UN_TOKENIZED)
+	@Field(analyze = Analyze.NO)
 	private String orderNumber;
-	
+
 
 	public Integer getId() {
 		return id;

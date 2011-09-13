@@ -26,10 +26,9 @@ package org.hibernate.search.test.shards;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
@@ -40,7 +39,7 @@ public class Animal {
 	@Id
 	@DocumentId
 	private Integer id;
-	@Field(index = Index.TOKENIZED)
+	@Field
 	private String name;
 
 

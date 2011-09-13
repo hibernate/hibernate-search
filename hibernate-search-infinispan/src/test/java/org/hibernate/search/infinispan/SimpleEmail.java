@@ -28,8 +28,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -44,8 +44,8 @@ public class SimpleEmail {
 	@GeneratedValue
 	public Long id;
 
-	@Field(index = Index.UN_TOKENIZED)
-	@Column(name="recipient")
+	@Field(analyze = Analyze.NO)
+	@Column(name = "recipient")
 	public String to = "";
 
 	@Field(store = Store.COMPRESS)

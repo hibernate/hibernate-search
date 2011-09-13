@@ -27,15 +27,15 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Boost;
 
 /**
  * Example of 2 entities mapped in the same index
+ *
  * @author Emmanuel Bernard
  */
 @Entity
@@ -67,7 +67,7 @@ public class AlternateDocument {
 		this.id = id;
 	}
 
-	@Field( name = "alt_title", store = Store.YES, index = Index.TOKENIZED )
+	@Field(name = "alt_title", store = Store.YES)
 	@Boost(2)
 	public String getTitle() {
 		return title;
@@ -77,7 +77,7 @@ public class AlternateDocument {
 		this.title = title;
 	}
 
-	@Field( name="Abstract", store = Store.NO, index = Index.TOKENIZED )
+	@Field(name = "Abstract", store = Store.NO)
 	public String getSummary() {
 		return summary;
 	}
@@ -87,7 +87,7 @@ public class AlternateDocument {
 	}
 
 	@Lob
-	@Field( store = Store.NO, index = Index.TOKENIZED )
+	@Field(store = Store.NO)
 	public String getText() {
 		return text;
 	}

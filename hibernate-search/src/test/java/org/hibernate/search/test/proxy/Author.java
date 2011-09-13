@@ -57,7 +57,7 @@ public class Author implements IAuthor {
 		this.id = id;
 	}
 
-	@Field(index = Index.TOKENIZED)
+	@Field
 	public String getName() {
 		return name;
 	}

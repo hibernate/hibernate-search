@@ -11,12 +11,12 @@ import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Parameter;
@@ -56,7 +56,7 @@ public class Book {
 	public Book() {
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.YES)
+	@Field(store = Store.YES)
 	@Analyzer(definition = "customanalyzer")
 	public String getTitle() {
 		return title;
@@ -76,7 +76,7 @@ public class Book {
 		this.id = id;
 	}
 
-	@Field(index = Index.TOKENIZED, store = Store.NO)
+	@Field(store = Store.NO)
 	@Analyzer(definition = "customanalyzer")
 	public String getSubtitle() {
 		return subtitle;
@@ -86,7 +86,7 @@ public class Book {
 		this.subtitle = subtitle;
 	}
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	@DateBridge(resolution = Resolution.DAY)
 	public Date getPublicationDate() {
 		return publicationDate;

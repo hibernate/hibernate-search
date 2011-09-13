@@ -58,7 +58,7 @@ public class RemoteEntity {
 	public void setId(Integer id) {  this.id = id; }
 	private Integer id;
 
-	@Field(store = Store.YES, index = Index.TOKENIZED, termVector = TermVector.WITH_POSITION_OFFSETS, boost = @Boost(23f) )
+	@Field(store = Store.YES, termVector = TermVector.WITH_POSITION_OFFSETS, boost = @Boost(23f) )
 	public String getName() { return name; }
 	public void setName(String name) {  this.name = name; }
 	private String name;

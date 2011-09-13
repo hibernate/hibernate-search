@@ -24,28 +24,26 @@
 package org.hibernate.search.test.worker;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed(index="employer")
+@Indexed(index = "employer")
 public class Employer {
 	@Id
 	@GeneratedValue
 	@DocumentId
 	private long id;
 
-	@Field(index = Index.TOKENIZED )
+	@Field
 	private String name;
-
 
 	public long getId() {
 		return id;

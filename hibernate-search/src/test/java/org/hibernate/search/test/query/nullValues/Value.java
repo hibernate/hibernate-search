@@ -28,9 +28,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 
@@ -44,17 +44,17 @@ public class Value {
 	@GeneratedValue
 	private int id;
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES, indexNullAs = "_custom_token_")
+	@Field(analyze = Analyze.NO, store = Store.YES, indexNullAs = "_custom_token_")
 	private String value;
 
-	@Field(index = Index.UN_TOKENIZED, store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
+	@Field(analyze = Analyze.NO, store = Store.YES, indexNullAs = Field.DEFAULT_NULL_TOKEN)
 	private String fallback;
 
-	@Field(index = Index.UN_TOKENIZED,
+	@Field(analyze = Analyze.NO,
 			store = Store.YES,
 			indexNullAs = "_dummy_",
 			bridge = @FieldBridge(impl = DummyStringBridge.class))
-	@Column(name="dummyvalue")
+	@Column(name = "dummyvalue")
 	private String dummy;
 
 	public Value() {

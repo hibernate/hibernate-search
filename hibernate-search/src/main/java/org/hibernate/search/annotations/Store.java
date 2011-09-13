@@ -29,10 +29,16 @@ package org.hibernate.search.annotations;
  * @author Emmanuel Bernard
  */
 public enum Store {
-	/** does not store the value in the index */
+	/**
+	 * does not store the value in the index
+	 */
 	NO,
-	/** stores the value in the index */
+	/**
+	 * stores the value in the index
+	 */
 	YES,
-	/** stores the value in the index in a compressed form */
+	/**
+	 * stores the value in the index in a compressed form
+	 */
 	COMPRESS
 }
