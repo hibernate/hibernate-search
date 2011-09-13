@@ -38,13 +38,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class IndexReaderAccessor implements ReaderAccessor {
+public class DefaultIndexReaderAccessor implements ReaderAccessor {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final ImmutableSearchFactory searchFactory;
 
-	public IndexReaderAccessor(ImmutableSearchFactory immutableSearchFactory) {
+	public DefaultIndexReaderAccessor(ImmutableSearchFactory immutableSearchFactory) {
 		this.searchFactory = immutableSearchFactory;
 	}
 
