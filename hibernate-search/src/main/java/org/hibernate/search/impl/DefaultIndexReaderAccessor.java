@@ -25,7 +25,7 @@ import java.util.TreeSet;
 
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
-import org.hibernate.search.indexes.ReaderAccessor;
+import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
@@ -38,7 +38,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class DefaultIndexReaderAccessor implements ReaderAccessor {
+public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 
 	private static final Log log = LoggerFactory.make();
 

@@ -32,7 +32,7 @@ import org.apache.lucene.index.IndexReader;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public interface ReaderAccessor {
+public interface IndexReaderAccessor {
 
 	/**
 	 * Opens an IndexReader on all indexes containing the entities passed as parameter.
