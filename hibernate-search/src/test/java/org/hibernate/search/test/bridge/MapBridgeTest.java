@@ -280,12 +280,12 @@ public class MapBridgeTest extends SearchTestCase {
 	private int countSizeForType(Class<?> type) {
 		SearchFactory searchFactory = fullTextSession.getSearchFactory();
 		int numDocs = -1; // to have it fail in case of errors
-		IndexReader locationIndexReader = searchFactory.getIndexReaders().openIndexReader( type );
+		IndexReader locationIndexReader = searchFactory.getIndexReaders().open( type );
 		try {
 			numDocs = locationIndexReader.numDocs();
 		}
 		finally {
-			searchFactory.getIndexReaders().closeIndexReader( locationIndexReader );
+			searchFactory.getIndexReaders().close( locationIndexReader );
 		}
 		return numDocs;
 	}

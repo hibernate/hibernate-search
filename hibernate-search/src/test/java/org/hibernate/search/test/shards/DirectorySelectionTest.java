@@ -62,32 +62,32 @@ public class DirectorySelectionTest extends SearchTestCase {
 		IndexReaderAccessor indexReaders = fts.getSearchFactory().getIndexReaders();
 		fts.close();
 
-		IndexReader indexReader = indexReaders.openIndexReader( Product.class );
+		IndexReader indexReader = indexReaders.open( Product.class );
 		try {
 			Assert.assertEquals( 2, indexReader.numDocs() );
 		}
 		finally {
-			indexReaders.closeIndexReader( indexReader );
+			indexReaders.close( indexReader );
 		}
 
-		indexReader = indexReaders.openIndexReader( "Products.0" );
+		indexReader = indexReaders.open( "Products.0" );
 		try {
 			Assert.assertEquals( 1, indexReader.numDocs() );
 		}
 		finally {
-			indexReaders.closeIndexReader( indexReader );
+			indexReaders.close( indexReader );
 		}
 
-		indexReader = indexReaders.openIndexReader( "Products.1" );
+		indexReader = indexReaders.open( "Products.1" );
 		try {
 			Assert.assertEquals( 1, indexReader.numDocs() );
 		}
 		finally {
-			indexReaders.closeIndexReader( indexReader );
+			indexReaders.close( indexReader );
 		}
 
 		try {
-			indexReader = indexReaders.openIndexReader( "Products.1", "hoa?" );
+			indexReader = indexReaders.open( "Products.1", "hoa?" );
 			Assert.fail( "should have failed" );
 		}
 		catch (SearchException se) {

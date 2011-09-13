@@ -49,12 +49,12 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 	}
 
 	@Override
-	public void closeIndexReader(IndexReader indexReader) {
+	public void close(IndexReader indexReader) {
 		MultiReaderFactory.closeReader( indexReader );
 	}
 
 	@Override
-	public IndexReader openIndexReader(Class<?>... entities) {
+	public IndexReader open(Class<?>... entities) {
 		HashMap<String, IndexManager> indexManagers = new HashMap<String, IndexManager>();
 		for ( Class<?> type : entities ) {
 			EntityIndexBinder entityIndexBinding = searchFactory.getSafeIndexBindingForEntity( type );
@@ -69,7 +69,7 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 	}
 
 	@Override
-	public IndexReader openIndexReader(String... indexNames) {
+	public IndexReader open(String... indexNames) {
 		TreeSet<String> names = new TreeSet<String>();
 		for ( String indexName : indexNames ) {
 			names.add( indexName );

@@ -126,14 +126,14 @@ public class WorkSequencesTest extends SearchTestCase {
 	//helper method to verify how many instances are found in the index by doing a simple FT query
 	private int countDomainsByFullText(String name) throws IOException {
 		Query luceneQuery = new TermQuery( new Term( "name", name ) );
-		IndexReader indexReader = searchFactory.getIndexReaders().openIndexReader( Domain.class );
+		IndexReader indexReader = searchFactory.getIndexReaders().open( Domain.class );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			TopDocs topDocs = searcher.search( luceneQuery, null, 100 );
 			return topDocs.totalHits;
 		}
 		finally {
-			searchFactory.getIndexReaders().closeIndexReader( indexReader );
+			searchFactory.getIndexReaders().close( indexReader );
 		}
 	}
 	
