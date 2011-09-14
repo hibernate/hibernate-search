@@ -25,17 +25,16 @@ package org.hibernate.search.test.embedded;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Store;
 
 /**
  * Abstract base class for products, having e.g. abstract getCode()
@@ -46,13 +45,15 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Entity
 public abstract class AbstractProduct {
 
-	@Id @GeneratedValue @DocumentId
+	@Id
+	@GeneratedValue
+	@DocumentId
 	private Integer id;
 
 	@Field
 	private String name;
 
-	@ManyToMany(mappedBy="product", cascade=CascadeType.ALL) //just to make the test easier, cascade doesn't really make any business sense
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
 	@IndexedEmbedded
 	private Set<ProductFeature> features = new HashSet<ProductFeature>();
 
@@ -76,8 +77,7 @@ public abstract class AbstractProduct {
 		return features;
 	}
 
-	public void setFeatures(Set<ProductFeature> authors) {
-		this.features = authors;
+	public void setFeatures(Set<ProductFeature> features) {
+		this.features = features;
 	}
-
 }

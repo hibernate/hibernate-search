@@ -10,7 +10,6 @@ import org.hibernate.search.annotations.Indexed;
  * @author Samppa Saarela
  */
 @Entity
-@Indexed(index="AbstractProduct") // Indexed in common index
+@Indexed(index = "AbstractProduct") // Indexed in common index
 public class Book extends AbstractProduct {
-
 }

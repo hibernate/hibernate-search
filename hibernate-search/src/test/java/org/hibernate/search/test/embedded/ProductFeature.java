@@ -44,7 +44,7 @@ public class ProductFeature {
 	@GeneratedValue
 	private Integer id;
 
-	@Field(analyze = Analyze.NO)
+	@Field
 	private String name;
 
 	@ManyToOne

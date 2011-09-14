@@ -32,6 +32,7 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -245,7 +246,11 @@ public class EmbeddedTest extends SearchTestCase {
 		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
 
-		QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), new String[] { "name", "authors.name" }, SearchTestCase.standardAnalyzer );
+		QueryParser parser = new MultiFieldQueryParser(
+				getTargetLuceneVersion(),
+				new String[] { "name", "authors.name" },
+				SearchTestCase.standardAnalyzer
+		);
 		Query query;
 		List<?> result;
 
@@ -284,7 +289,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 	/**
 	 * Tests that updating an indexed embedded object updates the Lucene index as well.
-	 * 
+	 *
 	 * @throws Exception in case the test fails
 	 */
 	public void testEmbeddedObjectUpdate() throws Exception {
@@ -305,7 +310,11 @@ public class EmbeddedTest extends SearchTestCase {
 		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
 
-		QueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), new String[] { "name", "state.name" }, SearchTestCase.standardAnalyzer );
+		QueryParser parser = new MultiFieldQueryParser(
+				getTargetLuceneVersion(),
+				new String[] { "name", "state.name" },
+				SearchTestCase.standardAnalyzer
+		);
 		Query query;
 		List<?> result;
 
@@ -314,13 +323,13 @@ public class EmbeddedTest extends SearchTestCase {
 		assertEquals( "IndexEmbedded ignored.", 1, result.size() );
 		tx.commit();
 		s.clear();
-		
+
 		tx = s.beginTransaction();
 		state.setName( "Hessen" );
-		state = (State) s.merge( state );
+		s.merge( state );
 		tx.commit();
 		s.clear();
-		
+
 		tx = s.beginTransaction();
 		session = Search.getFullTextSession( s );
 		query = parser.parse( "Hessen" );
@@ -330,61 +339,61 @@ public class EmbeddedTest extends SearchTestCase {
 		s.clear();
 		s.close();
 	}
-	
-	public void testEmbeddedToManyInSuperslass() throws ParseException {
-		ProductFeature f = new ProductFeature();
-		f.setName( "featurea" );
-		ProductFeature f2 = new ProductFeature();
-		f2.setName( "featureb" );
-		
-		AbstractProduct p = new Book();
-		p.setName( "A Book" );
-		f.setProduct(p);
-		p.getFeatures().add( f );
-		
+
+	public void testEmbeddedToManyInSuperclass() throws ParseException {
+		ProductFeature featureA = new ProductFeature();
+		featureA.setName( "featureA" );
+		ProductFeature featureB = new ProductFeature();
+		featureB.setName( "featureB" );
+
+		AbstractProduct book = new Book();
+		book.setName( "A Book" );
+		featureA.setProduct( book );
+		book.getFeatures().add( featureA );
+
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		s.persist( p ); // Feature cascaded
-//		s.persist(f);
+		s.persist( book );
 		tx.commit();
-		
+
 		s.clear();
-		
+
 		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
-		
+
 		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
 		Query query;
 		List<?> result;
-		
-		query = parser.parse( "features.name:featurea" );
+
+		query = parser.parse( "features.name:featureA" );
 		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
-		assertEquals( "collection of embedded ignored", 1, result.size() );
-		
+		assertEquals( "Feature A should be indexed", 1, result.size() );
+
 		// Add product features - product should be re-indexed
-		p = (AbstractProduct) result.get(0);
-		p.getFeatures().add(f2);
-		
+		book = (AbstractProduct) result.get( 0 );
+		book.getFeatures().add( featureB );
+
 		tx.commit();
 		s.clear();
-		
+
 		tx = s.beginTransaction();
 		tx.commit();
 		s.clear();
-		
-		query = parser.parse( "features.name:featureb" );
+
+		query = parser.parse( "features.name:featureB" );
 		result = session.createFullTextQuery( query, AbstractProduct.class ).list();
-		assertEquals( "collection of embedded ignored", 1, result.size() );
-		
+		assertEquals( "Feature B should be indexed now as well", 1, result.size() );
+
 		s.close();
 	}
 
-	protected void configure( org.hibernate.cfg.Configuration cfg ) {
+	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] { Tower.class, Address.class, Product.class, Order.class, Author.class, Country.class,
+		return new Class[] {
+				Tower.class, Address.class, Product.class, Order.class, Author.class, Country.class,
 				State.class, StateCandidate.class, NonIndexedEntity.class,
 				AbstractProduct.class, Book.class, ProductFeature.class
 		};
