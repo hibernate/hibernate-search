@@ -57,7 +57,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 
 	private static final int WARMUP_CYCLES = 6;
 
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		File baseIndexDir = getBaseIndexDir();
 		baseIndexDir.mkdir();
 		File[] files = baseIndexDir.listFiles();
@@ -94,7 +94,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		};
 	}
 
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		super.tearDown();
 		FileHelper.delete( getBaseIndexDir() );
 	}

@@ -46,7 +46,7 @@ import org.hibernate.search.util.impl.FileHelper;
  * @author Emmanuel Bernard
  */
 public class OptimizerPerfTest extends SearchTestCase {
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
 		sub.mkdir();
@@ -59,7 +59,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 		super.setUp();
 	}
 
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );

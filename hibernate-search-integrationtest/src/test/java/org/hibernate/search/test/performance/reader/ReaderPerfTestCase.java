@@ -55,7 +55,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 
 	private static final Log log = LoggerFactory.make();
 
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		File sub = getBaseIndexDir();
 		sub.mkdir();
 		File[] files = sub.listFiles();
@@ -75,7 +75,7 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 		};
 	}
 
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		super.tearDown();
 		if ( getSessions() != null ) {
 			getSessions().close();
