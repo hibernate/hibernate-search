@@ -112,7 +112,7 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	@Before
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		if ( cfg == null || lastTestClass != getClass() ) {
 			buildConfiguration();
 			lastTestClass = getClass();
@@ -182,7 +182,7 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	@After
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		//runSchemaDrop();
 		handleUnclosedResources();
 		closeResources();

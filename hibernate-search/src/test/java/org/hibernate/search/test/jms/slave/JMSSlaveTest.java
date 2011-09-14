@@ -119,13 +119,15 @@ public class JMSSlaveTest extends SearchTestCase {
 		s.close();
 	}
 
-	protected void setUp() throws Exception {
+	@Override
+	public void setUp() throws Exception {
 		// create and start the brokerService
 		brokerService = JMSMasterTest.createTestingBrokerService();
 		super.setUp();
 	}
 
-	protected void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws Exception {
 		super.tearDown();
 		if ( brokerService != null ) {
 			brokerService.stop();

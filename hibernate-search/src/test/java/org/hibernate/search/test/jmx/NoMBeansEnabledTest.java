@@ -56,6 +56,7 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 		);
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		File targetDir = getTargetDir();
@@ -70,7 +71,8 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 		// cfg.setProperty( Environment.JMX_ENABLED, "false" );
 	}
 
-	protected void setUp() throws Exception {
+	@Override
+	public void setUp() throws Exception {
 		// make sure that no MBean is registered before the test runs
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
 		ObjectName statisticsBeanObjectName = new ObjectName( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME );
@@ -87,7 +89,8 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 		super.setUp();
 	}
 
-	protected void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws Exception {
 		super.tearDown();
 	}
 

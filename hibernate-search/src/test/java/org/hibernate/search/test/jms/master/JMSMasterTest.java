@@ -208,7 +208,8 @@ public class JMSMasterTest extends SearchTestCase {
 		return ts;
 	}
 
-	protected void setUp() throws Exception {
+	@Override
+	public void setUp() throws Exception {
 		// create and start the brokerService
 		brokerService = createTestingBrokerService();
 		super.setUp();
@@ -228,19 +229,22 @@ public class JMSMasterTest extends SearchTestCase {
 		return brokerService;
 	}
 
-	protected void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws Exception {
 		super.tearDown();
 		if ( brokerService != null ) {
 			brokerService.stop();
 		}
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		// explicitly set the backend even though lucene is default.
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "lucene" );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class

@@ -185,13 +185,15 @@ public class CompressionTest extends SearchTestCase {
 		}
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				LargeDocument.class
 		};
 	}
 
-	protected void setUp() throws Exception {
+	@Override
+	public void setUp() throws Exception {
 		super.setUp();
 		Session s = openSession();
 		s.getTransaction().begin();

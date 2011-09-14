@@ -50,7 +50,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 	}
 
 	@Override
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();

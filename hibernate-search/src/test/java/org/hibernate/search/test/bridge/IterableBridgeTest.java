@@ -50,7 +50,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	private Date indexedDate;
 
 	@Override
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
 		fullTextSession = Search.getFullTextSession( session );
@@ -58,7 +58,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 
 	@Override
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		cleanData();
 		assertTrue( indexIsEmpty() );
 		super.tearDown();

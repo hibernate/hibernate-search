@@ -140,6 +140,18 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-generator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman-bmunit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman</artifactId>
+         </dependency>
+         <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman-install</artifactId>
+         </dependency>
     </dependencies>
 
     <build>
@@ -156,13 +168,17 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -javaagent:${settings.localRepository}/org/jboss/byteman/byteman/${bytemanVersion}/byteman-${bytemanVersion}.jar=script:${project.build.testOutputDirectory}/org/hibernate/search/test/errorhandling/ConcurrentMergeErrorTest.bytemanrules</argLine>
+                    <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</argLine>
                     <systemProperties>
                         <property>
                             <name>com.sun.management.jmxremote</name>
                             <value>true</value>
                         </property>
                     </systemProperties>
+                    <additionalClasspathElements>
+                        <!-- Needed by Byteman to load the agent on demand -->
+                        <additionalClasspathElement>${jdk16_home}/lib/tools.jar</additionalClasspathElement>
+                    </additionalClasspathElements>
                 </configuration>
             </plugin>
             <plugin>

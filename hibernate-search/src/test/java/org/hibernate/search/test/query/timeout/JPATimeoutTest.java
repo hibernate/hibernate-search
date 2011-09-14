@@ -12,12 +12,23 @@ import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.jpa.JPATestCase;
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Emmanuel Bernard
  */
+@RunWith(BMUnitRunner.class)
 public class JPATimeoutTest extends JPATestCase {
 
+	@Test
+	@BMRule(targetClass = "QueryHits",
+		targetMethod = "updateTopDocs",
+		helper = "org.hibernate.search.test.util.BytemanHelper",
+		action = "sleepASecond();",
+		name = "Enable QueryHits slow down")
 	public void testQueryTimeoutException() throws Exception {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
@@ -34,7 +45,7 @@ public class JPATimeoutTest extends JPATestCase {
 		Query query = builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery();
 		FullTextQuery hibernateQuery = em.createFullTextQuery( query, Clock.class );
 
-		hibernateQuery.setHint( "javax.persistence.query.timeout", 1 );
+		hibernateQuery.setHint( "javax.persistence.query.timeout", 100 ); //not too low or we can't reproduce it consistently
 		try {
 			hibernateQuery.getResultSize();
 			fail("timeout exception should happen");
@@ -55,9 +66,9 @@ public class JPATimeoutTest extends JPATestCase {
 		em.getTransaction().commit();
 
 		em.close();
-
 	}
 
+	@Test
 	public void testLimitFetchingTime() {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();

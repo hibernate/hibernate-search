@@ -118,7 +118,8 @@ public class IndexControlMBeanTest extends SearchTestCase {
 		assertNumberOfIndexedEntities( Counter.class.getName(), 0 );
 	}
 
-	protected void setUp() throws Exception {
+	@Override
+	public void setUp() throws Exception {
 		setCfg( null ); // force a rebuild of the configuration
 		super.setUp();
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
@@ -126,7 +127,8 @@ public class IndexControlMBeanTest extends SearchTestCase {
 		indexBeanObjectName = new ObjectName( IndexControlMBean.INDEX_CTRL_MBEAN_OBJECT_NAME );
 	}
 
-	protected void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws Exception {
 		super.tearDown();
 		if ( mbeanServer.isRegistered( statisticsBeanObjectName ) ) {
 			mbeanServer.unregisterMBean( statisticsBeanObjectName );
@@ -136,6 +138,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 		}
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		File targetDir = getTargetDir();

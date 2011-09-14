@@ -102,7 +102,7 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 	}
 
 	@Override
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		super.tearDown();
 		LeakingLuceneBackend.reset();
 	}

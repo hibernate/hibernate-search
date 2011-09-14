@@ -163,12 +163,14 @@ public class JGroupsMasterTest extends SearchTestCase {
 		return sessions.openSession();
 	}
 
-	protected void setUp() throws Exception {
+	@Override
+	public void setUp() throws Exception {
 		prepareJGroupsChannel();
 		super.setUp();
 	}
 
-	protected void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws Exception {
 		channel.close();
 		super.tearDown();
 	}
