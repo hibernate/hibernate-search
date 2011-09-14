@@ -36,6 +36,8 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
 import org.hibernate.search.test.SearchTestCase;
+import org.junit.After;
+import org.junit.Before;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.util.Version;
 
@@ -53,10 +55,12 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 		super( name );
 	}
 
+	@Before
 	public void setUp() {
 		factory = new HibernatePersistence().createEntityManagerFactory( getConfig() );
 	}
 
+	@After
 	public void tearDown() {
 		factory.close();
 	}
