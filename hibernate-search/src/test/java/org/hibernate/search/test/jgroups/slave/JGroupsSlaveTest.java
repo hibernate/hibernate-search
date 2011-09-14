@@ -113,22 +113,26 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		channel.setReceiver( new JGroupsReceiver(getSearchFactoryImpl()) );
 	}
 
-	protected void setUp() throws Exception {
+	@Override
+	public void setUp() throws Exception {
 		super.setUp();
 		prepareJGroupsChannel();
 	}
 
-	protected void tearDown() throws Exception {
+	@Override
+	public void tearDown() throws Exception {
 		channel.close();
 		super.tearDown();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class
 		};
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );

@@ -46,7 +46,7 @@ public class InheritanceTest extends SearchTestCase {
 
 	private static final Log log = LoggerFactory.make();
 
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 	}
 

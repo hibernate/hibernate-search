@@ -83,13 +83,13 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 	}
 
 	@Override
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		super.setUp();
 		buildCommonSessionFactory();
 	}
 
 	@Override
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		//close session factories
 		if ( slaveSessionFactory != null ) {
 			slaveSessionFactory.close();

@@ -270,6 +270,13 @@
                 <groupId>org.jboss.byteman</groupId>
                 <artifactId>byteman</artifactId>
                 <version>${bytemanVersion}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.byteman</groupId>
+                <artifactId>byteman-install</artifactId>
+                <version>${bytemanVersion}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.easytesting</groupId>
@@ -303,6 +310,12 @@
                 <artifactId>jboss-logging-generator</artifactId>
                 <version>${jbossLoggingProcessorVersion}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.byteman</groupId>
+                <artifactId>byteman-bmunit</artifactId>
+                <version>${bytemanVersion}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

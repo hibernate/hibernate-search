@@ -35,6 +35,10 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * This test uses Byteman. Byteman is activated at the invocation of the test
@@ -51,8 +55,14 @@ import org.hibernate.search.test.SearchTestCase;
  * @see Environment#ERROR_HANDLER
  * @author Sanne Grinovero
  */
+@RunWith(BMUnitRunner.class)
 public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
-	
+
+	@Test
+	@BMRule(targetClass = "org.apache.lucene.index.ConcurrentMergeScheduler",
+			targetMethod = "merge",
+			action = "throw new IOException(\"Byteman said: your disk is full!\")",
+			name = "testLuceneMergerErrorHandling")
 	public void testLuceneMergerErrorHandling() {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
@@ -61,27 +71,27 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 		Session session = openSession();
 		Transaction transaction = session.beginTransaction();
 		session.persist( new Document(
-				"Byteman Programmers Guider", "Version 1.5.0 Draft", "contains general guidelines to use Byteman" ) );
+				"Byteman Programmers Guider", "Version 1.5.2 Draft", "contains general guidelines to use Byteman" ) );
 		transaction.commit();
 		session.close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Assert.assertEquals( "Exception occurred java.io.IOException: Byteman said: your disk is full!\n", errorMessage );
 	}
-	
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class };
 	}
-	
+
 	protected SearchFactoryImplementor getSearchFactoryImpl() {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.close();
 		SearchFactory searchFactory = s.getSearchFactory();
 		return (SearchFactoryImplementor) searchFactory;
 	}
-	
+
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
-	
+
 }
