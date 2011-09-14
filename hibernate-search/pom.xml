@@ -168,7 +168,7 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -javaagent:${settings.localRepository}/org/jboss/byteman/byteman/${bytemanVersion}/byteman-${bytemanVersion}.jar=script:${project.build.testOutputDirectory}/org/hibernate/search/test/errorhandling/ConcurrentMergeErrorTest.bytemanrules</argLine>
+                    <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</argLine>
                     <systemProperties>
                         <property>
                             <name>com.sun.management.jmxremote</name>
@@ -176,7 +176,8 @@
                         </property>
                     </systemProperties>
                     <additionalClasspathElements>
-                        <additionalClasspathElement>${java.home}/lib/tools.jar</additionalClasspathElement>
+                        <!-- Needed by Byteman to load the agent on demand -->
+                        <additionalClasspathElement>${jdk16_home}/lib/tools.jar</additionalClasspathElement>
                     </additionalClasspathElements>
                 </configuration>
             </plugin>
