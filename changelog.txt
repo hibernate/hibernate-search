@@ -1,6 +1,38 @@
 Hibernate Search Changelog
 ==========================
 
+4.0.0.Beta1 (14-09-2011)
+-------------------------
+
+** Bug
+    * [HSEARCH-620] - Archetype does not deploy on JBoss Nexus repository due to missing pom fields
+    * [HSEARCH-876] - Extracted archetype does not compile
+    * [HSEARCH-901] - ClassCastException during creation of index: Hibernate (Search) assumes varchar entity field called "id" is an Integer but it isn't
+    * [HSEARCH-912] - JBoss Logger processor and generator is marked as a compile scope dependency
+    * [HSEARCH-913] - org.hibernate.search.test.embedded.EmbeddedTest#testEmbeddedToManyInSuperslass fails against MySQL with a constraint violation
+
+** Deprecation
+    * [HSEARCH-711] - Review of @org.hibernate.search.annotations.Field parameters
+
+** Improvement
+    * [HSEARCH-881] - @Fields annotation calling getter multiple times (Adam Brin)
+    * [HSEARCH-895] - Shorten documentation about configuring the JBoss Maven repository
+    * [HSEARCH-902] - Shutdown should not log a warning about forcing the index lock release
+    * [HSEARCH-903] - expose an IndexReader created by IndexManager names
+    * [HSEARCH-911] - Workspace implementors have to release IndexWriter on IO errors
+    * [HSEARCH-914] - Migrate Byteman tests to BMUnit tests
+    * [HSEARCH-915] - Use maven profiles to include tools.jar for BMUnit
+
+** New Feature
+    * [HSEARCH-710] - Add option to index fields using ANALYZED_NO_NORMS
+    * [HSEARCH-890] - Enable projection on unknown fields
+
+** Task
+    * [HSEARCH-898] - Introduce Nexus plugin and update some more build plugins
+    * [HSEARCH-906] - Revise warning about Java7 as the bugs where fixed in b2
+    * [HSEARCH-909] - Document Maven archetype usage
+
+
 4.0.0.Alpha2 (01-09-2011)
 -------------------------
 
