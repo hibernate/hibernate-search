@@ -29,6 +29,7 @@ import org.apache.lucene.search.DefaultSimilarity;
 import org.apache.lucene.search.Similarity;
 
 import org.hibernate.Session;
+import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
@@ -116,7 +117,7 @@ public class ClassLoaderHelperTest {
 	@Test
 	public void testLoadingAnalyzerWithVersionConstructor() {
 		Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass(
-				StandardAnalyzer.class, org.apache.lucene.util.Version.LUCENE_30
+				StandardAnalyzer.class,  Environment.DEFAULT_LUCENE_MATCH_VERSION
 		);
 		assertNotNull( "We should be able to instantiate an analyzer with a Lucene version parameter", analyzer );
 	}
@@ -124,7 +125,7 @@ public class ClassLoaderHelperTest {
 	@Test
 	public void testLoadingAnalyzerWithDefaultConstructor() {
 		Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass(
-				FooAnalyzer.class, org.apache.lucene.util.Version.LUCENE_30
+				FooAnalyzer.class, Environment.DEFAULT_LUCENE_MATCH_VERSION
 		);
 		assertNotNull( "We should be able to instantiate an analyzer which has only a default constructor", analyzer );
 	}
@@ -133,7 +134,7 @@ public class ClassLoaderHelperTest {
 	public void testLoadingAnalyzerWithNoVersionOrDefaultConstructor() {
 		try {
 			ClassLoaderHelper.analyzerInstanceFromClass(
-					BarAnalyzer.class, org.apache.lucene.util.Version.LUCENE_30
+					BarAnalyzer.class, Environment.DEFAULT_LUCENE_MATCH_VERSION
 			);
 			fail( "We should not be able to instantiate a analyzer with no default constructor or simple Version parameter." );
 		}

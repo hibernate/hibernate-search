@@ -127,8 +127,8 @@ public final class Environment {
 	 * Provide a programmatic mapping model to Hibernate Search configuration
 	 * Accepts a fully populated SearchMapping object or a fully qualified
 	 * class name of a SearchMapping factory. Such a factory must have:
-	 *  - a no-arg constructor
-	 *  - a method returning SearchMapping and annotated with @Factory
+	 * - a no-arg constructor
+	 * - a method returning SearchMapping and annotated with @Factory
 	 */
 	public static final String MODEL_MAPPING = "hibernate.search.model_mapping";
 
@@ -180,4 +180,12 @@ public final class Environment {
 	 * When the limit is reached work producers are blocked until some work has been processed.
 	 */
 	public static final String MAX_QUEUE_LENGTH = "max_queue_length";
+
+	/**
+	 * If nothing else is specified we use {@code Version.LUCENE_CURRENT} as the default Lucene version. This version
+	 * parameter was introduced by Lucene to attempt providing backwards compatibility when upgrading Lucene versions
+	 * and not wanting to rebuild the index from scratch. It's highly recommended to specify a version, so that you
+	 * can upgrade Hibernate Search and control when to eventually upgrade the Lucene format.
+	 */
+	public static final org.apache.lucene.util.Version DEFAULT_LUCENE_MATCH_VERSION = org.apache.lucene.util.Version.LUCENE_CURRENT;
 }

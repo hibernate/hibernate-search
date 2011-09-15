@@ -64,14 +64,6 @@ public final class ConfigContext {
 	private static final Log log = LoggerFactory.make();
 
 	/**
-	 * If nothing else is specified we use {@code Version.LUCENE_CURRENT} as the default Lucene version. This version
-	 * parameter was introduced by Lucene to attempt providing backwards compatibility when upgrading Lucene versions
-	 * and not wanting to rebuild the index from scratch. It's highly recommended to specify a version, so that you
-	 * can upgrade Hibernate Search and control when to eventually upgrade the Lucene format.
-	 */
-	private static final Version DEFAULT_LUCENE_MATCH_VERSION = Version.LUCENE_CURRENT;
-
-	/**
 	 * The default token for indexing null values. See {@link org.hibernate.search.annotations.Field#indexNullAs()}
 	 */
 	private static final String DEFAULT_NULL_INDEX_TOKEN = "_null_";
@@ -306,7 +298,7 @@ public final class ConfigContext {
 		String tmp = cfg.getProperty( Environment.LUCENE_MATCH_VERSION );
 		if ( StringHelper.isEmpty( tmp ) ) {
 			log.recommendConfiguringLuceneVersion();
-			version = DEFAULT_LUCENE_MATCH_VERSION;
+			version = Environment.DEFAULT_LUCENE_MATCH_VERSION;
 		}
 		else {
 			try {

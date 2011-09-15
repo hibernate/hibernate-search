@@ -132,7 +132,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <slf4jVersion>1.6.1</slf4jVersion>
-        <luceneVersion>3.3.0</luceneVersion>
+        <luceneVersion>3.4.0</luceneVersion>
         <infinispanVersion>5.0.0.FINAL</infinispanVersion>
         <hibernateVersion>4.0.0.CR2</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.0.CR2</hibernateCommonsAnnotationVersion>

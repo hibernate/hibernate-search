@@ -134,7 +134,7 @@ public class IndexAndSearchTest {
 		FullTextEntityManager ftEm = org.hibernate.search.jpa.Search.getFullTextEntityManager( em );
 		Analyzer customAnalyzer = ftEm.getSearchFactory().getAnalyzer( "customanalyzer" );
 		QueryParser parser = new MultiFieldQueryParser(
-				Version.LUCENE_33, bookFields,
+				Version.LUCENE_34, bookFields,
 				customAnalyzer, boostPerField
 		);
 
