@@ -440,7 +440,7 @@ Query luceneQuery =
         <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .phrase()
     .onField("history")
-    .matching("Thou shalt not kill")
+    .sentence("Thou shalt not kill")
     .createQuery();</programlisting>
 
         <para>You can search approximate sentences by adding a slop factor.
@@ -451,7 +451,7 @@ Query luceneQuery =
     .phrase()
       .withSlop(3)
     .onField("history")
-    .matching("Thou kill")
+    .sentence("Thou kill")
     .createQuery();</programlisting>
       </section>
 
@@ -533,7 +533,7 @@ Query luceneQuery = mythQB
     .all()
       .except( monthQb
         .keyword()
-        .onField( "description_stem" 
+        .onField( "description_stem" )
         .matching( "religion" )
         .createQuery() 
       )
