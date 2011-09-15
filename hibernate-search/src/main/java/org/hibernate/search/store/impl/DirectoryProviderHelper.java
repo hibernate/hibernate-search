@@ -46,6 +46,7 @@ import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
 import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.LockFactoryProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -79,13 +80,13 @@ public final class DirectoryProviderHelper {
 	 * Build a directory name out of a root and relative path, guessing the significant part
 	 * and checking for the file availability
 	 *
-	 * @param directoryProviderName
+	 * @param indexName the name of the index (directory) to create
 	 * @param properties the configuration properties
 	 * @param needWritePermissions when true the directory will be tested for read-write permissions.
 	 *
 	 * @return The file representing the source directory
 	 */
-	public static File getSourceDirectory(String directoryProviderName, Properties properties, boolean needWritePermissions) {
+	public static File getSourceDirectory(String indexName, Properties properties, boolean needWritePermissions) {
 		String root = properties.getProperty( ROOT_INDEX_PROP_NAME );
 		String relative = properties.getProperty( RELATIVE_INDEX_PROP_NAME );
 		File sourceDirectory;
@@ -99,7 +100,7 @@ public final class DirectoryProviderHelper {
 					);
 		}
 		if ( relative == null ) {
-			relative = directoryProviderName;
+			relative = indexName;
 		}
 		if ( StringHelper.isEmpty( root ) ) {
 			log.debug( "No root directory, go with relative " + relative );
@@ -111,9 +112,9 @@ public final class DirectoryProviderHelper {
 		}
 		else {
 			File rootDir = new File( root );
-			makeSanityCheckedDirectory( rootDir, directoryProviderName, needWritePermissions );
+			makeSanityCheckedDirectory( rootDir, indexName, needWritePermissions );
 			sourceDirectory = new File( root, relative );
-			makeSanityCheckedDirectory( sourceDirectory, directoryProviderName, needWritePermissions );
+			makeSanityCheckedDirectory( sourceDirectory, indexName, needWritePermissions );
 			log.debug( "Got directory from root + relative" );
 		}
 		return sourceDirectory;
@@ -150,7 +151,7 @@ public final class DirectoryProviderHelper {
 	 */
 	public static void initializeIndexIfNeeded(Directory directory) {
 		//version doesn't really matter as we won't use the Analyzer
-		Version version = Version.LUCENE_31;
+		Version version =  Environment.DEFAULT_LUCENE_MATCH_VERSION;
 		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
 		try {
 			if ( ! IndexReader.indexExists( directory ) ) {
@@ -318,12 +319,12 @@ public final class DirectoryProviderHelper {
 	 * "chunk size" for large file copy operations performed
 	 * by DirectoryProviders.
 	 *
-	 * @param directoryProviderName
+	 * @param indexName the index name
 	 * @param properties the configuration properties
 	 *
 	 * @return the number of Bytes to use as "chunk size" in file copy operations.
 	 */
-	public static long getCopyBufferSize(String directoryProviderName, Properties properties) {
+	public static long getCopyBufferSize(String indexName, Properties properties) {
 		String value = properties.getProperty( COPY_BUFFER_SIZE_PROP_NAME );
 		long size = FileHelper.DEFAULT_COPY_BUFFER_SIZE;
 		if ( value != null ) {
@@ -333,13 +334,13 @@ public final class DirectoryProviderHelper {
 			catch ( NumberFormatException nfe ) {
 				throw new SearchException(
 						"Unable to initialize index " +
-								directoryProviderName + "; " + COPY_BUFFER_SIZE_PROP_NAME + " is not numeric.", nfe
+								indexName + "; " + COPY_BUFFER_SIZE_PROP_NAME + " is not numeric.", nfe
 				);
 			}
 			if ( size <= 0 ) {
 				throw new SearchException(
 						"Unable to initialize index " +
-								directoryProviderName + "; " + COPY_BUFFER_SIZE_PROP_NAME + " needs to be greater than zero."
+								indexName + "; " + COPY_BUFFER_SIZE_PROP_NAME + " needs to be greater than zero."
 				);
 			}
 		}

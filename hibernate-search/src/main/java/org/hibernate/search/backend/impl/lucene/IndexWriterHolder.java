@@ -31,7 +31,8 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.Similarity;
-import org.apache.lucene.util.Version;
+
+import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters.ParameterSet;
@@ -52,12 +53,12 @@ class IndexWriterHolder {
 	private static final Log log = LoggerFactory.make();
 	
 	/**
-	 * This Analyzer is never used in practice: during Add operation it's overriden.
+	 * This Analyzer is never used in practice: during Add operation it's overridden.
 	 * So we don't care for the Version, using whatever Lucene thinks is safer.
 	 */
-	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer( Version.LUCENE_33 );
+	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer( Environment.DEFAULT_LUCENE_MATCH_VERSION );
 	
-	private final IndexWriterConfig writerConfig = new IndexWriterConfig( Version.LUCENE_33, SIMPLE_ANALYZER );
+	private final IndexWriterConfig writerConfig = new IndexWriterConfig( Environment.DEFAULT_LUCENE_MATCH_VERSION , SIMPLE_ANALYZER );
 	private final LuceneIndexingParameters luceneParameters;
 	private final ErrorHandler errorHandler;
 	private final ParameterSet indexParameters;
