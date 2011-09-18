@@ -174,7 +174,10 @@ public class FullTextSessionBuilder {
 		}
 		hibConfiguration.getProperties().putAll( cfg );
 
-		final ServiceRegistry serviceRegistry = new ServiceRegistryBuilder( hibConfiguration.getProperties() ).buildServiceRegistry();
+		ServiceRegistryBuilder registryBuilder = new ServiceRegistryBuilder();
+		registryBuilder.applySettings( hibConfiguration.getProperties() );
+
+		final ServiceRegistry serviceRegistry = registryBuilder.buildServiceRegistry();
 		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory( serviceRegistry );
 		ServiceRegistryImplementor serviceRegistryImplementor = sessionFactoryImpl.getServiceRegistry();
 		EventListenerRegistry registry = serviceRegistryImplementor.getService( EventListenerRegistry.class );

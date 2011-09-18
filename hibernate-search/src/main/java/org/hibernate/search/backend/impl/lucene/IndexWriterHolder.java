@@ -121,7 +121,7 @@ class IndexWriterHolder {
 	private IndexWriter createNewIndexWriter() throws IOException {
 		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO make it possible to configure a different policy?
 		writerConfig.setMergePolicy( newMergePolicy );
-		MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler );
+		MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler, this.indexName );
 		writerConfig.setMergeScheduler( mergeScheduler );
 		IndexWriter writer = new IndexWriter( directoryProvider.getDirectory(), writerConfig );
 		return writer;
