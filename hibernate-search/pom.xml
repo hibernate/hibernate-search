@@ -39,6 +39,10 @@
     <name>Hibernate Search</name>
     <description>Hibernate Search</description>
 
+    <properties>
+        <jdocbookSourceDirectory>${basedir}/src/main/docbook</jdocbookSourceDirectory>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -148,10 +152,6 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.byteman</groupId>
             <artifactId>byteman-install</artifactId>
         </dependency>
     </dependencies>
@@ -191,10 +191,11 @@
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-jdocbook-plugin</artifactId>
                 <configuration>
+                    <sourceDirectory>${jdocbookSourceDirectory}</sourceDirectory>
                     <sourceDocumentName>master.xml</sourceDocumentName>
                     <masterTranslation>en-US</masterTranslation>
                     <translations>
-                        <!--translation>zh-CN</translation--> <!-- Commented out since the existing pot files are currently empty -->
+                        <translation>de-DE</translation>
                     </translations>
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
