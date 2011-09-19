@@ -1,0 +1,40 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2011-09-17 19:35+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: further-reading.xml:31
+#, no-c-format
+msgid "Further reading"
+msgstr ""
+
+#. Tag: para
+#: further-reading.xml:33
+#, no-c-format
+msgid "Last but not least, a few pointers to further information. He highly recommend you to get a copy <ulink url=\"http://www.manning.com/bernard/\">Hibernate Search in Action</ulink>. This excellent book covers Hibernate Search in much more depth than this online documentation can and has a great range of additional examples. If you want to increase your knowledge in Lucene we recommend <ulink url=\"http://www.manning.com/hatcher3/\">Lucene in Action (Second Edition)</ulink>. Because Hibernate Search's functionality is tightly coupled to Hibernate Core is it a good idea to understand Hibernate in more detail. Start with the <ulink url=\"http://www.hibernate.org/docs\">online documentation</ulink> or get hold of a copy of <ulink url=\"http://www.manning.com/bauer2/\">Java Persistence with Hibernate</ulink>."
+msgstr ""
+
+#. Tag: para
+#: further-reading.xml:47
+#, no-c-format
+msgid "If you have any further questions regarding Hibernate Search or want to share some of your use cases have a look at the <ulink url=\"http://community.jboss.org/en/hibernate/search\">Hibernate Search Wiki</ulink> and the <ulink url=\"https://forum.hibernate.org/viewforum.php?f=9\">Hibernate Search Forum</ulink>. We are looking forward hearing from you."
+msgstr ""
+
+#. Tag: para
+#: further-reading.xml:54
+#, no-c-format
+msgid "In case you would like to report a bug use the <ulink url=\"https://hibernate.onjira.com/browse/HSEARCH\">Hibernate Search JIRA</ulink> instance. Feedback is always welcome!"
+msgstr ""
+
