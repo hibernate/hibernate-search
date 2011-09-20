@@ -91,11 +91,12 @@
     <classname>@Indexed</classname> annotation. If the
     <constant>index</constant> property is not specified the fully qualified
     name of the indexed class will be used as name (recommended).</para>
-    
-    <para>For each index, an <classname>IndexManager</classname> is created, which holds
-    references to <classname>ReaderProvider</classname> instances used by Hibernate Search
-    to perform queries (see <xref linkend="IndexReaders"/>) and to each backend,
-    used to apply updates to the index.</para>
+
+    <para>For each index, an <classname>IndexManager</classname> is created,
+    which holds references to <classname>ReaderProvider</classname> instances
+    used by Hibernate Search to perform queries (see <xref
+    linkend="IndexReaders" />) and to each backend, used to apply updates to
+    the index.</para>
 
     <para>Knowing the index name, you can configure the directory provider and
     any additional options by using the prefix
@@ -124,7 +125,7 @@
     <example>
       <title>Specifying the index name</title>
 
-      <programlisting  language="JAVA" role="JAVA">package org.hibernate.example;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.example;
 
 @Indexed
 public class Status { ... }
@@ -425,10 +426,10 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
     (<classname>IndexShardingStrategy.getIndexManagersForQuery</classname>)
     and thus speed up the query execution.</para>
 
-    <para>Each shard has an independent <classname>IndexManager</classname> and so
-    can be configured to use a different directory provider and backend configurations.
-    The <classname>IndexManager</classname> index names for the Animal entity
-    in <xref linkend="example-sharding-configuration" /> are
+    <para>Each shard has an independent <classname>IndexManager</classname>
+    and so can be configured to use a different directory provider and backend
+    configurations. The <classname>IndexManager</classname> index names for
+    the Animal entity in <xref linkend="example-sharding-configuration" /> are
     <literal>Animal.0</literal> to <literal>Animal.4</literal>. In other
     words, each shard has the name of it's owning index followed by
     <constant>.</constant> (dot) and its index number (see also <xref
@@ -598,10 +599,11 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     potential discrepancies between database and index states. Lets look at
     the configuration options shown in <xref
     linkend="table-work-execution-configuration" />.</para>
-    
-    <para>Please note that the following options can be different on each index;
-    in fact they need the indexName prefix or use <literal>default</literal>
-    to set the default value for all indexes.</para>
+
+    <para>Please note that the following options can be different on each
+    index; in fact they need the indexName prefix or use
+    <literal>default</literal> to set the default value for all
+    indexes.</para>
 
     <table id="table-work-execution-configuration">
       <title>Execution configuration</title>
@@ -625,9 +627,10 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
           <row>
             <entry><literal>hibernate.search.&lt;indexName&gt;.worker.thread_pool.size</literal></entry>
 
-            <entry>The backend can apply updates from the same transaction context (or batch)
-            in parallel, using a threadpool. The default value is 1. You can experiment with larger
-            values if you have many operations per transaction.</entry>
+            <entry>The backend can apply updates from the same transaction
+            context (or batch) in parallel, using a threadpool. The default
+            value is 1. You can experiment with larger values if you have many
+            operations per transaction.</entry>
           </row>
 
           <row>
@@ -647,8 +650,8 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     the single VM. Luckily there is a better approach, namely delegation. It
     is possible to send the indexing work to a different server by configuring
     hibernate.search.worker.backend - see <xref
-    linkend="table-backend-configuration" />. Again this option can be configured
-    differently for each index.</para>
+    linkend="table-backend-configuration" />. Again this option can be
+    configured differently for each index.</para>
 
     <table id="table-backend-configuration">
       <title>Backend configuration</title>
@@ -681,12 +684,11 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
             this setup.</para><para><literal>blackhole</literal>: Mainly a
             test/developer setting which ignores all indexing
             work</para><para>You can also specify the fully qualified name of
-            a class implementing
-            <classname>BackendQueueProcessor</classname>. This way you
-            can implement your own communication layer. The implementation is
-            responsilbe for returning a <classname>Runnable</classname>
-            instance which on execution will process the index
-            work.</para></entry>
+            a class implementing <classname>BackendQueueProcessor</classname>.
+            This way you can implement your own communication layer. The
+            implementation is responsilbe for returning a
+            <classname>Runnable</classname> instance which on execution will
+            process the index work.</para></entry>
           </row>
         </tbody>
       </tgroup>
@@ -780,8 +782,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
       is especially true for the case that you provide your own
       implementations of some of the shown interfaces. Make sure to study the
       existing code before you write your own <classname>Worker</classname> or
-      <classname>BackendQueueProcessor</classname>
-      implementation.</para>
+      <classname>BackendQueueProcessor</classname> implementation.</para>
     </warning>
   </section>
 
@@ -1099,8 +1100,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       <literal>infinispan-lucene-directory.jar</literal> and
       <literal>infinispan-core.jar</literal> to your application classpath.
       These last two jars are distributed by <ulink
-      url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>.
-      </para>
+      url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>.</para>
     </section>
 
     <section>
@@ -1170,7 +1170,6 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       <literal>default-hibernatesearch-infinispan.xml</literal> provided in
       the <literal>hibernate-search-infinispan.jar</literal>. Several indexes
       can share the same caches.</para>
-
     </section>
   </section>
 
@@ -1213,24 +1212,29 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
     <title>Overriding the Index Manager</title>
 
     <para>The role of the index manager component is described at <xref
-    linkend="search-architecture-indexmanager" />. Available implementations are:</para>
+    linkend="search-architecture-indexmanager" />. Available implementations
+    are:</para>
 
     <itemizedlist>
       <listitem>
-        <para><literal>transactional</literal>: the default implementation.</para>
+        <para><literal>transactional</literal>: the default
+        implementation.</para>
       </listitem>
 
       <listitem>
-        <para><literal>near-real-time</literal>: avoid flushing writes to disk at each commit.</para>
+        <para><literal>near-real-time</literal>: avoid flushing writes to disk
+        at each commit.</para>
       </listitem>
     </itemizedlist>
 
-    <para>The default implementation is <literal>transactional</literal>. To select an alternative:</para>
+    <para>The default implementation is <literal>transactional</literal>. To
+    select an alternative:</para>
 
     <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = near-real-time</programlisting>
 
-    <para>Alternatively to <literal>near-real-time</literal> you can mention the fully qualified class name of your custom
-    implementation, which shall have a no-arguments constructor:</para>
+    <para>Alternatively to <literal>near-real-time</literal> you can mention
+    the fully qualified class name of your custom implementation, which shall
+    have a no-arguments constructor:</para>
 
     <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = my.corp.myapp.CustomIndexManager</programlisting>
   </section>
@@ -1329,7 +1333,8 @@ exclusive_index_use</literallayout>
               performance when writing changes to the index.</para>
             </entry>
 
-            <entry><literal>true</literal> (improved performance, releases locks only at shutdown)</entry>
+            <entry><literal>true</literal> (improved performance, releases
+            locks only at shutdown)</entry>
           </row>
 
           <row>
@@ -1425,7 +1430,7 @@ indexwriter.merge_factor</literallayout>
 
             <entry>10</entry>
           </row>
-          
+
           <row>
             <entry>
               <literallayout>hibernate.search.
@@ -1438,15 +1443,18 @@ indexwriter.merge_min_size</literallayout>
 
               <para>Segments smaller than this size (in MB) are always
               considered for the next segment merge operation.</para>
-              <para>Setting this too large might result in expensive
-              merge operations, even tough they are less frequent.</para>
-              <para>See also <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+
+              <para>Setting this too large might result in expensive merge
+              operations, even tough they are less frequent.</para>
+
+              <para>See also
+              <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
               <literal>minMergeSize</literal>.</para>
             </entry>
 
             <entry>0 MB (actually ~1K)</entry>
           </row>
-          
+
           <row>
             <entry>
               <literallayout>hibernate.search.
@@ -1457,18 +1465,21 @@ indexwriter.merge_max_size</literallayout>
             <entry>
               <para>Controls segment merge frequency and size.</para>
 
-              <para>Segments larger than this size (in MB) are never
-              merged in bigger segments.</para>
-              <para>This helps reduce memory requirements and avoids
-              some merging operations at the cost of optimal search speed. When
+              <para>Segments larger than this size (in MB) are never merged in
+              bigger segments.</para>
+
+              <para>This helps reduce memory requirements and avoids some
+              merging operations at the cost of optimal search speed. When
               optimizing an index this value is ignored.</para>
-              <para>See also <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+
+              <para>See also
+              <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
               <literal>maxMergeSize</literal>.</para>
             </entry>
 
             <entry>Unlimited</entry>
           </row>
-          
+
           <row>
             <entry>
               <literallayout>hibernate.search.
@@ -1479,16 +1490,18 @@ indexwriter.merge_max_optimize_size</literallayout>
             <entry>
               <para>Controls segment merge frequency and size.</para>
 
-              <para>Segments larger than this size (in MB) are not
-              merged in bigger segments even when optimizing the index
-              (see <literal>merge_max_size</literal> setting as well).</para>
-              <para>Applied to <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
+              <para>Segments larger than this size (in MB) are not merged in
+              bigger segments even when optimizing the index (see
+              <literal>merge_max_size</literal> setting as well).</para>
+
+              <para>Applied to
+              <classname>org.apache.lucene.index.LogDocMergePolicy</classname>.
               <literal>maxMergeSizeForOptimize</literal>.</para>
             </entry>
 
             <entry>Unlimited</entry>
           </row>
-          
+
           <row>
             <entry>
               <literallayout>hibernate.search.
@@ -1499,13 +1512,17 @@ indexwriter.merge_calibrate_by_deletes</literallayout>
             <entry>
               <para>Controls segment merge frequency and size.</para>
 
-              <para>Set to <literal>false</literal> to not consider
-              deleted documents when estimating the merge policy.</para>
-              <para>Applied to <classname>org.apache.lucene.index.LogMergePolicy</classname>.
+              <para>Set to <literal>false</literal> to not consider deleted
+              documents when estimating the merge policy.</para>
+
+              <para>Applied to
+              <classname>org.apache.lucene.index.LogMergePolicy</classname>.
               <literal>calibrateSizeByDeletes</literal>.</para>
             </entry>
 
-            <entry><literal>true</literal></entry>
+            <entry>
+              <literal>true</literal>
+            </entry>
           </row>
 
           <row>
@@ -1629,33 +1646,39 @@ enable_dirty_check</literallayout>
       <para>The <literal>blackhole</literal> backend is not meant to be used
       in production, only as a tool to identify indexing bottlenecks.</para>
     </warning>
-    
-        <section id="lucene-segment-size" revision="1">
-        <title>Control segment size</title>
 
-        <para>The options <literal>merge_max_size</literal>, <literal>merge_max_optimize_size</literal>,
-         <literal>merge_calibrate_by_deletes</literal> give you control on the maximum size of the
-         segments being created, but you need to understand how they affect file sizes. If you
-         need to hard limit the size, consider that merging a segment is about adding it together
-         with another existing segment to form a larger one, so you might want to set the <literal>max_size</literal>
-         for merge operations to less than half of your hard limit. Also segments might
-         initially be generated larger than your expected size at first creation time: before they are
-         ever merged. A segment is never created much larger than <literal>ram_buffer_size</literal>,
-         but the threshold is checked as an estimate.</para>
-         
-         <para>Example:</para>
+    <section id="lucene-segment-size" revision="1">
+      <title>Control segment size</title>
 
-        <programlisting>//to be fairly confident no files grow above 15MB, use:
+      <para>The options <literal>merge_max_size</literal>,
+      <literal>merge_max_optimize_size</literal>,
+      <literal>merge_calibrate_by_deletes</literal> give you control on the
+      maximum size of the segments being created, but you need to understand
+      how they affect file sizes. If you need to hard limit the size, consider
+      that merging a segment is about adding it together with another existing
+      segment to form a larger one, so you might want to set the
+      <literal>max_size</literal> for merge operations to less than half of
+      your hard limit. Also segments might initially be generated larger than
+      your expected size at first creation time: before they are ever merged.
+      A segment is never created much larger than
+      <literal>ram_buffer_size</literal>, but the threshold is checked as an
+      estimate.</para>
+
+      <para>Example:</para>
+
+      <programlisting>//to be fairly confident no files grow above 15MB, use:
 hibernate.search.default.indexwriter.ram_buffer_size 10
 hibernate.search.default.indexwriter.merge_max_optimize_size 7
 hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
     </section>
-    
-    <tip><para>When using the Infinispan Directory to cluster indexes make sure that your segments
-        are smaller than the <literal>chunk_size</literal> so that you avoid fragmenting segments
-        in the grid. Note that the <literal>chunk_size</literal> of the Infinispan Directory is
-        expressed in bytes, while the index tuning options are in MB.</para></tip>
-    
+
+    <tip>
+      <para>When using the Infinispan Directory to cluster indexes make sure
+      that your segments are smaller than the <literal>chunk_size</literal> so
+      that you avoid fragmenting segments in the grid. Note that the
+      <literal>chunk_size</literal> of the Infinispan Directory is expressed
+      in bytes, while the index tuning options are in MB.</para>
+    </tip>
   </section>
 
   <section id="search-configuration-directory-lockfactories" revision="1">
@@ -1760,10 +1783,11 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
     exceptions are logged to the log output by default. It is possible to
     explicitly declare the exception logging mechanism as seen below:</para>
 
-    <para><programlisting>hibernate.search.error_handler log</programlisting>The
-    default exception handling occurs for both synchronous and asynchronous
-    indexing. Hibernate Search provides an easy mechanism to override the
-    default error handling implementation.</para>
+    <programlisting>hibernate.search.error_handler log</programlisting>
+
+    <para>The default exception handling occurs for both synchronous and
+    asynchronous indexing. Hibernate Search provides an easy mechanism to
+    override the default error handling implementation.</para>
 
     <para>In order to provide your own implementation you must implement the
     <classname>ErrorHandler</classname> interface, which provides the
@@ -1787,43 +1811,50 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
 
     <para><programlisting>hibernate.search.error_handler CustomerErrorHandler</programlisting></para>
   </section>
-  
-    <section>
+
+  <section>
     <title>Index format compatibility</title>
 
-    <para>While Hibernate Search strives to offer a backwards compatible API to
-    make it easy to port your application to newer versions, it delegates to
-    Apache Lucene to handle the index writing and searching. The Lucene developers too attempt
-    to keep a stable index format, but sometimes an update in the index format
-    can not be avoided; in those rare cases you either have to reindex all your
-    data, or use an index upgrade tool, or sometimes Lucene is able to read the old
-    format so you don't need to take specific actions (besides making backup of your index).</para>
+    <para>While Hibernate Search strives to offer a backwards compatible API
+    to make it easy to port your application to newer versions, it delegates
+    to Apache Lucene to handle the index writing and searching. The Lucene
+    developers too attempt to keep a stable index format, but sometimes an
+    update in the index format can not be avoided; in those rare cases you
+    either have to reindex all your data, or use an index upgrade tool, or
+    sometimes Lucene is able to read the old format so you don't need to take
+    specific actions (besides making backup of your index).</para>
 
-    <para>While an index format incompatibility is an exceptional event, more often
-    when upgrading Lucene the Analyzer implementations might slightly change behaviour, and
-    this could lead to a poor recall score, possibly missing many hits from the results.</para>
+    <para>While an index format incompatibility is an exceptional event, more
+    often when upgrading Lucene the Analyzer implementations might slightly
+    change behaviour, and this could lead to a poor recall score, possibly
+    missing many hits from the results.</para>
 
-    <para>Hibernate Search exposes a configuration property <literal>hibernate.search.lucene_version</literal>
-    which instructs the Analyzers and other Lucene classes to conform to their behaviour
-    as defined in an (older) specific version of Lucene.
-    See also <classname>org.apache.lucene.util.Version</classname> contained in the lucene-core.jar,
-    depending on the specific version of Lucene you're using you might have different options available.
-    When this option is not specified, Hibernate Search will instruct Lucene to use the default
-    of it's current version, which is usually the best option for new projects.
-    Still it's recommended to define the version you're using explicitly in the configuration so
-    that when you happen to upgrade Lucene the Analyzers will not change behaviour;
-    you can then choose to update this value in a second time, maybe
-    when you have the chance to rebuild the index from scratch.
-    </para>
+    <para>Hibernate Search exposes a configuration property
+    <literal>hibernate.search.lucene_version</literal> which instructs the
+    Analyzers and other Lucene classes to conform to their behaviour as
+    defined in an (older) specific version of Lucene. See also
+    <classname>org.apache.lucene.util.Version</classname> contained in the
+    lucene-core.jar, depending on the specific version of Lucene you're using
+    you might have different options available. When this option is not
+    specified, Hibernate Search will instruct Lucene to use the default of
+    it's current version, which is usually the best option for new projects.
+    Still it's recommended to define the version you're using explicitly in
+    the configuration so that when you happen to upgrade Lucene the Analyzers
+    will not change behaviour; you can then choose to update this value in a
+    second time, maybe when you have the chance to rebuild the index from
+    scratch.</para>
 
     <example>
-      <title>Force Analyzers to be compatible with a Lucene 3.0 created index</title>
+      <title>Force Analyzers to be compatible with a Lucene 3.0 created
+      index</title>
+
       <programlisting>hibernate.search.lucene_version LUCENE_30</programlisting>
     </example>
 
-    <para>This option is global for the configured <classname>SearchFactory</classname> and affects all Lucene APIs
-    having such a parameter, as this should be applied consistently. So if you are also making use of Lucene
-    bypassing Hibernate Search, make sure to apply the same value too.</para>
-
+    <para>This option is global for the configured
+    <classname>SearchFactory</classname> and affects all Lucene APIs having
+    such a parameter, as this should be applied consistently. So if you are
+    also making use of Lucene bypassing Hibernate Search, make sure to apply
+    the same value too.</para>
   </section>
 </chapter>
