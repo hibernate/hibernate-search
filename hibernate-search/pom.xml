@@ -179,7 +179,6 @@
                     <sourceDocumentName>master.xml</sourceDocumentName>
                     <masterTranslation>en-US</masterTranslation>
                     <translations>
-                        <translation>de-DE</translation>
                     </translations>
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
