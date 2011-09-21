@@ -191,7 +191,7 @@ public interface Log extends BasicLogger {
 	void version(String versionString);
 
 	@LogMessage(level = WARN)
-	@Message(id = 35, value = "could not close resource: ")
+	@Message(id = 35, value = "Could not close resource: ")
 	void couldNotCloseResource(@Cause Exception e);
 
 	@LogMessage(level = WARN)
@@ -488,4 +488,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 113, value = "'null' is not a valid index name")
 	IllegalArgumentException nullIsInvalidIndexName();
+
+	@Message(id = 114, value = "Could not load resource: ")
+	SearchException unableToLoadResource(String fileName);
 }
