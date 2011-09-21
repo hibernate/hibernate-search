@@ -33,7 +33,6 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -160,7 +159,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			}
 		}
 		if ( singleClassIfPossible == null && classTypeCollector == null ) {
-			fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD );
+			fields.put( ProjectionConstants.OBJECT_CLASS, FieldSelectorResult.LOAD );
 		}
 		if ( needId && idsCollector == null ) {
 			for ( String idFieldName : idFieldNames ) {
@@ -218,7 +217,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			}
 		}
 		else {
-			className = document.get( DocumentBuilder.CLASS_FIELDNAME );
+			className = document.get( ProjectionConstants.OBJECT_CLASS );
 		}
 		//and quite likely we can avoid the Reflect helper:
 		Class clazz = targetedClasses.get( className );
@@ -303,10 +302,10 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	 */
 	private String forceClassNameExtraction(int scoreDocIndex) throws IOException {
 		Map<String, FieldSelectorResult> fields = new HashMap<String, FieldSelectorResult>( 1 );
-		fields.put( DocumentBuilder.CLASS_FIELDNAME, FieldSelectorResult.LOAD_AND_BREAK );
+		fields.put( ProjectionConstants.OBJECT_CLASS, FieldSelectorResult.LOAD_AND_BREAK );
 		MapFieldSelector classOnly = new MapFieldSelector( fields );
 		Document doc = queryHits.doc( scoreDocIndex, classOnly );
-		return doc.get( DocumentBuilder.CLASS_FIELDNAME );
+		return doc.get( ProjectionConstants.OBJECT_CLASS );
 	}
 
 	@Override

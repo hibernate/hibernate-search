@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.impl.FileHelper;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 
@@ -45,10 +46,15 @@ public class ResourceLoadingTest {
 		assertFalse( resourceContent.isEmpty() );
 	}
 
-	@Test(expected = SearchException.class)
+	@Test
 	public void testUnKnownResource() throws Exception {
 		// using a known resource for testing
 		String resource = "foo";
-		FileHelper.readResourceAsString( resource );
+		try {
+			FileHelper.readResourceAsString( resource );
+		}
+		catch ( SearchException e ) {
+			assertEquals( "Wrong error message", "HSEARCH000114: Could not load resource: 'foo'", e.getMessage() );
+		}
 	}
 }

@@ -35,17 +35,16 @@ import org.apache.lucene.search.Query;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jgroups.BackendMessage;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
@@ -118,7 +117,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 	private List<LuceneWork> createDocumentAndWorkQueue(TShirt shirt) {
 		Document doc = new Document();
 		Field field = new Field(
-				DocumentBuilder.CLASS_FIELDNAME, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED
+				ProjectionConstants.OBJECT_CLASS, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED
 		);
 		doc.add( field );
 		field = new Field( "id", "1", Field.Store.YES, Field.Index.NOT_ANALYZED );
@@ -157,10 +156,6 @@ public class JGroupsMasterTest extends SearchTestCase {
 		fullTextSession.getTransaction().commit();
 		s.close();
 		return ts;
-	}
-
-	public static Session getSession() throws HibernateException {
-		return sessions.openSession();
 	}
 
 	@Override

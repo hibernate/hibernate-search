@@ -75,7 +75,6 @@ import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.BoostStrategy;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
@@ -92,7 +91,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Hardy Ferentschik
  */
-public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
+public abstract class AbstractDocumentBuilder<T> {
 	private static final Log log = LoggerFactory.make();
 	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = new DefaultStringBridge();
 

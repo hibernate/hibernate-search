@@ -51,10 +51,10 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -150,8 +150,7 @@ public class JMSMasterTest extends SearchTestCase {
 		props.setProperty( Context.PROVIDER_URL, "vm://localhost" );
 		props.setProperty( "connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
 		props.setProperty( "queue.queue/searchtest", "searchQueue" );
-		Context ctx = new javax.naming.InitialContext( props );
-		return ctx;
+		return new javax.naming.InitialContext( props );
 	}
 
 	/**
@@ -164,7 +163,7 @@ public class JMSMasterTest extends SearchTestCase {
 	private List<LuceneWork> createDocumentAndWorkQueue(TShirt shirt) {
 		Document doc = new Document();
 		Field field = new Field(
-				DocumentBuilder.CLASS_FIELDNAME, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED
+				ProjectionConstants.OBJECT_CLASS, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED
 		);
 		doc.add( field );
 		field = new Field( "id", "1", Field.Store.YES, Field.Index.NOT_ANALYZED );
