@@ -64,6 +64,7 @@ import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.impl.HSQueryImpl;
+import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -347,5 +348,10 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public IndexReaderAccessor getIndexReaderAccessor() {
 		return indexReaderAccessor;
+	}
+
+	@Override
+	public ClassHelper getClassHelper() {
+		return null;
 	}
 }

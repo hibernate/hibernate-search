@@ -49,7 +49,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
 	
 	private static final Log log = LoggerFactory.make();
-	public static final String INDEX_NAME_JMS_PROPERTY = "hibernate.search.jms.indexNameProperty";
 
 	/**
 	 * Return the current or give a new session
@@ -98,7 +97,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		Session session = getSession();
 		SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
 		try {
-			indexName = objectMessage.getStringProperty( INDEX_NAME_JMS_PROPERTY );
+			indexName = objectMessage.getStringProperty( JMSBackendQueueTask.INDEX_NAME_JMS_PROPERTY );
 			indexManager = factory.getAllIndexesManager().getIndexManager( indexName );
 			if ( indexManager == null ) {
 				log.messageReceivedForUndefinedIndex( indexName );

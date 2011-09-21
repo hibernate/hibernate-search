@@ -37,8 +37,9 @@
     <inceptionYear>2006</inceptionYear>
 
     <modules>
-        <module>hibernate-search-analyzers</module>
         <module>hibernate-search</module>
+        <module>hibernate-search-orm</module>
+        <module>hibernate-search-analyzers</module>
         <module>hibernate-search-testing</module>
         <module>hibernate-search-infinispan</module>
         <module>hibernate-search-archetype</module>

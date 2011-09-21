@@ -29,11 +29,11 @@ import javax.transaction.Synchronization;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
+import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.impl.WeakIdentityHashMap;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -58,11 +58,12 @@ public class TransactionalWorker implements Worker {
 	protected final WeakIdentityHashMap<Object, Synchronization> synchronizationPerTransaction = new WeakIdentityHashMap<Object, Synchronization>();
 	private QueueingProcessor queueingProcessor;
 	private SearchFactoryImplementor factory;
+	private ClassHelper classHelper;
 
 	private boolean transactionExpected;
 
 	public void performWork(Work<?> work, TransactionContext transactionContext) {
-		final Class<?> entityType = HibernateHelper.getClassFromWork( work );
+		final Class<?> entityType = classHelper.getClassFromWork( work );
 		if ( factory.getIndexBindingForEntity( entityType ) == null
 				&& factory.getDocumentBuilderContainedEntity( entityType ) == null ) {
 			throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityType );

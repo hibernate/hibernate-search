@@ -45,6 +45,7 @@ import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -226,6 +227,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public IndexReaderAccessor getIndexReaderAccessor() {
 		return delegate.getIndexReaderAccessor();
+	}
+
+	@Override
+	public ClassHelper getClassHelper() {
+		return delegate.getClassHelper();
 	}
 
 }

@@ -79,6 +79,7 @@ import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -98,6 +99,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	private final XClass beanXClass;
 	protected final String beanXClassName;
 	protected final Class<?> beanClass;
+	protected final ClassHelper classHelper;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;

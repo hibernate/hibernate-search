@@ -1,4 +1,6 @@
 /* 
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -16,19 +18,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-
-package org.hibernate.search.engine.spi;
+package org.hibernate.search.spi;
 
 import java.util.Collection;
 import java.util.Map;
 
+import org.hibernate.search.backend.spi.Work;
+
 /**
- * Used to deal with proxies or lazily-initialized objects.
- * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public interface EntityInitializer {
-	
+public interface ClassHelper {
+
+	<T> Class<T> getClassFromWork(Work<T> work);
+
 	/**
 	 * @param <T>
 	 * @param entity an instance or proxy of T
@@ -41,7 +44,7 @@ public interface EntityInitializer {
 	 * @return if value is a proxy, unwraps it, otherwise works as a pass-through function.
 	 */
 	public Object unproxy(Object value);
-	
+
 	/**
 	 * @param <T>
 	 * @param value

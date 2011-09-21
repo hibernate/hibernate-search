@@ -1,4 +1,6 @@
 /* 
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -16,52 +18,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-
-package org.hibernate.search.engine.impl;
+package org.hibernate.search.impl;
 
 import java.util.Collection;
 import java.util.Map;
 
-import org.hibernate.search.engine.spi.EntityInitializer;
-import org.hibernate.search.util.impl.HibernateHelper;
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.spi.ClassHelper;
 
 /**
- * To be used for Hibernate initializations which don't need a specific Session.
- * {@link #initializeCollection(Collection)} and {@link #initializeMap(Map)}
- * are not supported.
- * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class HibernateStatelessInitializer implements EntityInitializer {
-	
-	public static final HibernateStatelessInitializer INSTANCE = new HibernateStatelessInitializer();
-	
-	protected HibernateStatelessInitializer() {
-		// should not create instances, but allow for extension
+public class SimpleClassHelper implements ClassHelper {
+
+	@Override
+	public Object unproxy(Object entity) {
+		return null;
 	}
 
+	@Override
+	public <T> Class<T> getClassFromWork(Work<T> work) {
+		return null;
+	}
+
+	@Override
 	public <T> Class<T> getClass(T entity) {
-		return HibernateHelper.getClass( entity );
+		return null;
 	}
 
-	public Object unproxy(Object instance) {
-		return HibernateHelper.unproxy( instance );
-	}
-
+	@Override
 	public <T> Collection<T> initializeCollection(Collection<T> value) {
-		// supports pass-through only, would need HibernateSessionLoadingInitializer
-		return value;
+		return null;
 	}
 
+	@Override
 	public <K, V> Map<K, V> initializeMap(Map<K, V> value) {
-		// supports pass-through only, would need HibernateSessionLoadingInitializer
-		return value;
+		return null;
 	}
 
+	@Override
 	public Object[] initializeArray(Object[] value) {
-		// hibernate doesn't allow lazy initialization of arrays,
-		// so this must be initialized already.
-		return value;
+		return null;
 	}
 
 }

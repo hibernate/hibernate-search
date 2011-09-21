@@ -25,7 +25,7 @@ import java.util.Map;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
-import org.hibernate.search.engine.spi.EntityInitializer;
+import org.hibernate.search.spi.ClassHelper;
 
 /**
  * This EntityInitializer is relative to a specific Hibernate Session,
@@ -33,7 +33,7 @@ import org.hibernate.search.engine.spi.EntityInitializer;
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class HibernateSessionLoadingInitializer extends HibernateStatelessInitializer implements EntityInitializer {
+public class HibernateSessionLoadingInitializer extends HibernateStatelessInitializer implements ClassHelper {
 
 	private final SessionImplementor hibernateSession;
 
