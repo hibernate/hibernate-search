@@ -24,7 +24,6 @@
 package org.hibernate.search.util.impl;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,19 +33,14 @@ import java.util.List;
 
 import org.apache.solr.common.ResourceLoader;
 import org.apache.solr.util.plugin.ResourceLoaderAware;
-import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
-
-	private static final Log log = LoggerFactory.make();
-
 	private final String charset;
 
 	public HibernateSearchResourceLoader() {
@@ -58,7 +52,7 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 	}
 
 	public InputStream openResource(String resource) throws IOException {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream( resource );
+		return FileHelper.openResource( resource );
 	}
 
 	public List<String> getLines(String resource) throws IOException {
@@ -84,12 +78,12 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 				}
 			}
 			finally {
-				closeResource( reader );
+				FileHelper.closeResource( reader );
 			}
 			return Collections.unmodifiableList( results );
 		}
 		finally {
-			closeResource( stream );
+			FileHelper.closeResource( stream );
 		}
 	}
 
@@ -105,22 +99,5 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 			( (ResourceLoaderAware) instance ).inform( this );
 		}
 		return instance;
-	}
-
-	/**
-	 * Closes a resource without throwing IOExceptions
-	 *
-	 * @param resource the resource to close
-	 */
-	private void closeResource(Closeable resource) {
-		if ( resource != null ) {
-			try {
-				resource.close();
-			}
-			catch ( IOException e ) {
-				//we don't really care if we can't close
-				log.couldNotCloseResource( e );
-			}
-		}
 	}
 }

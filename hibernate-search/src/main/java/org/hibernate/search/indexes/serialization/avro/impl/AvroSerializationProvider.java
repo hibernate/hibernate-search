@@ -20,14 +20,6 @@
  */
 package org.hibernate.search.indexes.serialization.avro.impl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +28,7 @@ import org.apache.avro.Protocol;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
+import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -48,11 +41,15 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class AvroSerializationProvider implements SerializationProvider {
 
 	private static final Log log = LoggerFactory.make();
-	private Map<String, String> schemas = new HashMap<String,String>();
 	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1_0/";
-	public static byte MAJOR_VERSION = ( byte ) ( -128 + 1 );
-	public static byte MINOR_VERSION = ( byte ) ( -128 + 0 );
+	private static final String AVRO_SCHEMA_FILE_SUFFIX = ".avro";
+	private static final String AVRO_PROTOCOL_FILE_SUFFIX = ".avpr";
+
+	private Map<String, String> schemas = new HashMap<String, String>();
 	private Protocol protocol;
+
+	public static byte MAJOR_VERSION = (byte) ( -128 + 1 );
+	public static byte MINOR_VERSION = (byte) ( -128 + 0 );
 
 	public static int getMajorVersion() {
 		return MAJOR_VERSION + 128; //rebase to 0
@@ -107,47 +104,15 @@ public class AvroSerializationProvider implements SerializationProvider {
 	}
 
 	private void parseSchema(String filename) {
-		String fullFileName = V1_PATH + filename + ".avro";
-		fullFileName = fullFileName.replace( '/', File.separatorChar );
-		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( fullFileName );
-		String messageSchemaAsString;
-		try {
-			messageSchemaAsString = readInputStream( in, fullFileName );
-		}
-		finally {
-			try {
-				in.close();
-			}
-			catch ( IOException e ) {
-				//we don't care
-			}
-		}
+		String fullFileName = V1_PATH + filename + AVRO_SCHEMA_FILE_SUFFIX;
+		String messageSchemaAsString = FileHelper.readResourceAsString( fullFileName );
 		schemas.put( filename, messageSchemaAsString );
 	}
 
-	public String readInputStream(InputStream inputStream, String filename) {
-		try {
-			Writer writer = new StringWriter();
-			char[] buffer = new char[1000];
-			Reader reader = new BufferedReader( new InputStreamReader( inputStream, "UTF-8" ) );
-			int r = reader.read( buffer );
-			while ( r != -1 ) {
-				writer.write( buffer, 0, r );
-				r = reader.read( buffer );
-			}
-			return writer.toString();
-		}
-		catch ( IOException e ) {
-			throw log.unableToReadFile(filename, e);
-		}
-	}
-
 	public Protocol parseProtocol(String name) {
-		String filename = V1_PATH + name + ".avpr";
-		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream( filename );
-		String protocolSkeleton = readInputStream( in, filename );
+		String filename = V1_PATH + name + AVRO_PROTOCOL_FILE_SUFFIX;
+		String protocolSkeleton = FileHelper.readResourceAsString( filename );
 		String protocolString = inlineSchemas( protocolSkeleton );
-		//System.out.println("\n\n" + protocolString + "\n\n");
 		return Protocol.parse( protocolString );
 	}
 
@@ -156,7 +121,7 @@ public class AvroSerializationProvider implements SerializationProvider {
 		for ( Map.Entry<String, String> entry : schemas.entrySet() ) {
 			result = replace(
 					result, "`" + entry.getKey() + "`",
-					entry.getValue().toString()
+					entry.getValue()
 			);
 		}
 		return result;

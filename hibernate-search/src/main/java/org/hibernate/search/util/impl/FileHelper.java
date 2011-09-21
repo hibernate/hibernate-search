@@ -23,20 +23,27 @@
  */
 package org.hibernate.search.util.impl;
 
+import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Utility class for synchronizing files/directories.
+ * Utility class for file and directory operations, like synchronisation and reading from class path.
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
@@ -196,6 +203,70 @@ public abstract class FileHelper {
 		if ( file.exists() ) {
 			if ( !file.delete() ) {
 				log.notDeleted( file );
+			}
+		}
+	}
+
+	/**
+	 * Reads the provided input stream into a string
+	 *
+	 * @param inputStream the input stream to read from
+	 *
+	 * @return the content of the input stream as string
+	 * @throws IOException in case an error occurs reading from the input stream
+	 */
+	public static String readInputStream(InputStream inputStream) throws IOException {
+		Writer writer = new StringWriter();
+		try {
+			char[] buffer = new char[1000];
+			Reader reader = new BufferedReader( new InputStreamReader( inputStream, "UTF-8" ) );
+			int r = reader.read( buffer );
+			while ( r != -1 ) {
+				writer.write( buffer, 0, r );
+				r = reader.read( buffer );
+			}
+			return writer.toString();
+		}
+		finally {
+			closeResource( writer );
+		}
+	}
+
+	public static String readResourceAsString(String filename) {
+		InputStream in = openResource( filename );
+		if(in == null) {
+			throw log.unableToLoadResource( filename );
+		}
+		String s;
+		try {
+			s = FileHelper.readInputStream( in );
+		}
+		catch ( IOException e ) {
+			throw log.unableToReadFile( filename, e );
+		}
+		finally {
+			closeResource( in );
+		}
+		return s;
+	}
+
+	public static InputStream openResource(String resource) {
+		return Thread.currentThread().getContextClassLoader().getResourceAsStream( resource );
+	}
+
+	/**
+	 * Closes a resource without throwing IOExceptions
+	 *
+	 * @param resource the resource to close
+	 */
+	public static void closeResource(Closeable resource) {
+		if ( resource != null ) {
+			try {
+				resource.close();
+			}
+			catch ( IOException e ) {
+				//we don't really care if we can't close
+				log.couldNotCloseResource( e );
 			}
 		}
 	}
