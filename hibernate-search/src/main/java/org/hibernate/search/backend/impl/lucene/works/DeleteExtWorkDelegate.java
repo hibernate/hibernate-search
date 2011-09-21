@@ -55,7 +55,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 		super( workspace );
 		managedType = workspace.getEntitiesInIndexManager().iterator().next();
 		builder = workspace.getDocumentBuilder( managedType );
-		idIsNumeric = isIdNumeric( managedType, builder );
+		idIsNumeric = isIdNumeric( builder );
 	}
 
 	@Override

@@ -31,6 +31,8 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
@@ -41,7 +43,6 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -72,14 +73,14 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
 		Query idQueryTerm;
-		if ( isIdNumeric( entityType, builder ) ) {
+		if ( isIdNumeric( builder ) ) {
 			idQueryTerm = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
 		} else {
 			idQueryTerm = new TermQuery( builder.getTerm( id ) );
 		}
 		entityDeletionQuery.add( idQueryTerm, BooleanClause.Occur.MUST );
 
-		Term classNameQueryTerm =  new Term( DocumentBuilder.CLASS_FIELDNAME, entityType.getName() );
+		Term classNameQueryTerm =  new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
 		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.MUST );
 
@@ -92,7 +93,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		}
 	}
 
-	protected static boolean isIdNumeric(Class<?> entityType, DocumentBuilderIndexedEntity<?> documentBuilder) {
+	protected static boolean isIdNumeric(DocumentBuilderIndexedEntity<?> documentBuilder) {
 		TwoWayFieldBridge idBridge = documentBuilder.getIdBridge();
 		return idBridge instanceof NumericFieldBridge;
 	}
@@ -100,5 +101,4 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 	public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
 		// TODO Auto-generated method stub
 	}
-
 }

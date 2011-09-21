@@ -42,6 +42,7 @@ import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
@@ -424,7 +425,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// add the class name of the entity to the document
 		Field classField =
 				new Field(
-						CLASS_FIELDNAME,
+						ProjectionConstants.OBJECT_CLASS,
 						entityType.getName(),
 						Field.Store.YES,
 						Field.Index.NOT_ANALYZED_NO_NORMS,

@@ -43,9 +43,9 @@ import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
@@ -855,7 +855,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			//annihilate the scoring impact of DocumentBuilderIndexedEntity.CLASS_FIELDNAME
 			classFilter.setBoost( 0 );
 			for ( Class clazz : classesAndSubclasses ) {
-				Term t = new Term( DocumentBuilder.CLASS_FIELDNAME, clazz.getName() );
+				Term t = new Term( ProjectionConstants.OBJECT_CLASS, clazz.getName() );
 				TermQuery termQuery = new TermQuery( t );
 				classFilter.add( termQuery, BooleanClause.Occur.SHOULD );
 			}

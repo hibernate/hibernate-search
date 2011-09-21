@@ -25,12 +25,13 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -53,7 +54,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 		final Class<?> entityType = work.getEntityClass();
 		log.tracef( "purgeAll Lucene index using IndexWriter for type: %s", entityType );
 		try {
-			Term term = new Term( DocumentBuilder.CLASS_FIELDNAME, entityType.getName() );
+			Term term = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 			writer.deleteDocuments( term );
 		}
 		catch (Exception e) {
@@ -65,5 +66,4 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 		// TODO Auto-generated method stub
 		
 	}
-
 }

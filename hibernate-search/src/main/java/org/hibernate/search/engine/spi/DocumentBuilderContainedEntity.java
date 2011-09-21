@@ -31,7 +31,6 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.DocumentBuilder;
 import org.hibernate.search.impl.ConfigContext;
 
 /**
@@ -44,7 +43,7 @@ import org.hibernate.search.impl.ConfigContext;
  * @author Richard Hallier
  * @author Hardy Ferentschik
  */
-public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T> implements DocumentBuilder {
+public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T> {
 	/**
 	 * Constructor used on contained entities not annotated with {@code @Indexed} themselves.
 	 *
