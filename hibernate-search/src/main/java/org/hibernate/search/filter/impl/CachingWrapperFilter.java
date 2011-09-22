@@ -31,30 +31,29 @@ import org.apache.lucene.search.Filter;
 
 import org.hibernate.search.util.impl.SoftLimitMRUCache;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A slightly different version of Lucene's original <code>CachingWrapperFilter</code> which
- * uses <code>SoftReferences</code> instead of <code>WeakReferences</code> in order to cache 
+ * uses <code>SoftReferences</code> instead of <code>WeakReferences</code> in order to cache
  * the filter <code>BitSet</code>.
- * 
+ *
  * @author Hardy Ferentschik
  * @see org.apache.lucene.search.CachingWrapperFilter
  * @see <a href="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-174">HSEARCH-174</a>
  */
 @SuppressWarnings("serial")
 public class CachingWrapperFilter extends Filter {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	public static final int DEFAULT_SIZE = 5;
-	
+
 	/**
 	 * The cache using soft references in order to store the filter bit sets.
 	 */
 	private final SoftLimitMRUCache cache;
-	
+
 	private final Filter filter;
 
 	/**
@@ -67,18 +66,19 @@ public class CachingWrapperFilter extends Filter {
 	 * @param filter Filter to cache results of
 	 */
 	public CachingWrapperFilter(Filter filter) {
-		this(filter, DEFAULT_SIZE);
+		this( filter, DEFAULT_SIZE );
 	}
-	
+
 	/**
 	 * @param filter Filter to cache results of
+	 * @param size soft reference size (gets multiplied by {@link #HARD_TO_SOFT_RATIO}.
 	 */
 	public CachingWrapperFilter(Filter filter, int size) {
 		this.filter = filter;
 		final int softRefSize = size * HARD_TO_SOFT_RATIO;
 		log.debugf( "Initialising SoftLimitMRUCache with hard ref size of %d and a soft ref of %d", size, softRefSize );
 		this.cache = new SoftLimitMRUCache( size, softRefSize );
-	}	
+	}
 
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
@@ -86,7 +86,7 @@ public class CachingWrapperFilter extends Filter {
 		if ( cached != null ) {
 			return cached;
 		}
-		synchronized (cache) {
+		synchronized ( cache ) {
 			cached = (DocIdSet) cache.get( reader );
 			if ( cached != null ) {
 				return cached;
@@ -102,9 +102,10 @@ public class CachingWrapperFilter extends Filter {
 	}
 
 	public boolean equals(Object o) {
-		if (!(o instanceof CachingWrapperFilter))
+		if ( !( o instanceof CachingWrapperFilter ) ) {
 			return false;
-		return this.filter.equals(((CachingWrapperFilter) o).filter);
+		}
+		return this.filter.equals( ( (CachingWrapperFilter) o ).filter );
 	}
 
 	public int hashCode() {

@@ -67,6 +67,8 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInstance;
@@ -77,7 +79,7 @@ import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResu
  * @author Hardy Ferentschik <hardy@hibernate.org>
  */
 public class HSQueryImpl implements HSQuery, Serializable {
-
+	private static final Log log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
 	private transient SearchFactoryImplementor searchFactoryImplementor;
@@ -86,11 +88,20 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private transient TimeoutManagerImpl timeoutManager;
 	private Set<Class<?>> indexedTargetedEntities;
 	private boolean allowFieldSelectionInProjection = true;
+
 	/**
 	 * The  map of currently active/enabled filters.
 	 */
 	private final Map<String, FullTextFilterImpl> filterDefinitions = newHashMap();
+
+	/**
+	 * Combined chained filter to be applied to the query.
+	 */
 	private Filter filter;
+
+	/**
+	 * User specified filters. Will be combined into a single chained filter {@link #filter}.
+	 */
 	private Filter userFilter;
 	private Sort sort;
 	private String[] projectedFields;
@@ -351,7 +362,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		filterDefinition.setName( name );
 		FilterDef filterDef = searchFactoryImplementor.getFilterDefinition( name );
 		if ( filterDef == null ) {
-			throw new SearchException( "Unknown @FullTextFilter: " + name );
+			throw log.unknownFullTextFilter( name );
 		}
 		filterDefinitions.put( name, filterDefinition );
 		return filterDefinition;

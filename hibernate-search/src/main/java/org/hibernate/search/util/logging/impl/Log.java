@@ -491,4 +491,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 114, value = "Could not load resource: '%1$s'")
 	SearchException unableToLoadResource(String fileName);
+
+	@Message(id = 115, value = "Unknown @FullTextFilter: '%1$s'")
+	SearchException unknownFullTextFilter(String filterName);
 }

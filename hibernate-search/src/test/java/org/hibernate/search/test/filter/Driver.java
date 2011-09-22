@@ -48,6 +48,12 @@ import org.hibernate.search.annotations.Resolution;
 		@FullTextFilterDef(name = "security",
 				impl = SecurityFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
+		@FullTextFilterDef(name = "fieldConstraintFilter-1",
+				impl = FieldConstraintFilter.class,
+				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
+		@FullTextFilterDef(name = "fieldConstraintFilter-2",
+				impl = FieldConstraintFilter.class,
+				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		//Filter factory with parameters
 		@FullTextFilterDef(name = "cacheresultstest",
 				impl = ExcludeAllFilterFactory.class,
