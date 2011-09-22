@@ -28,7 +28,6 @@ import java.util.Properties;
 
 import org.jgroups.Address;
 import org.jgroups.Channel;
-import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 
 import org.hibernate.search.Environment;
@@ -80,11 +79,10 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 		log.jGroupsStartingChannel();
 		try {
 			buildChannel( props );
-			channel.setOpt( Channel.AUTO_RECONNECT, Boolean.TRUE );
 			channel.connect( clusterName );
 		}
-		catch ( ChannelException e ) {
-			throw new SearchException( "Unable to connect to: [" + clusterName + "] JGroups channel" );
+		catch ( Exception e ) {
+			throw new SearchException( "Unable to connect to: [" + clusterName + "] JGroups channel", e );
 		}
 		log.jGroupsConnectedToCluster(clusterName, getAddress() );
 
@@ -149,7 +147,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 					channel = new JChannel();
 				}
 			}
-			catch ( ChannelException e ) {
+			catch ( Exception e ) {
 				throw new SearchException( "Unable to start JGroups channel", e );
 			}
 		}
@@ -188,7 +186,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 	 */
 	public Address getAddress() {
 		if ( address == null && channel != null ) {
-			address = channel.getLocalAddress();
+			address = channel.getAddress();
 		}
 		return address;
 	}

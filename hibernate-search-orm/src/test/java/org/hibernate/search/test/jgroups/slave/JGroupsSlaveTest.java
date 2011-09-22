@@ -146,17 +146,16 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				"<PING timeout=\"100\" num_initial_members=\"2\"/>" +
 				"<MERGE2 max_interval=\"30000\" min_interval=\"10000\"/>" +
 				"<FD_SOCK/>" +
-				"<FD timeout=\"10000\" max_tries=\"5\" shun=\"true\"/>" +
+				"<FD timeout=\"10000\" max_tries=\"5\"/>" +
 				"<VERIFY_SUSPECT timeout=\"1500\"/>" +
 				"<pbcast.NAKACK " +
-				"            use_mcast_xmit=\"false\" gc_lag=\"0\"" +
+				"            use_mcast_xmit=\"false\"" +
 				"            retransmit_timeout=\"30,60,120,240,480\"" +
 				"            discard_delivered_msgs=\"false\"/>" +
 				"<UNICAST timeout=\"30,60,120,240,360\"/>" +
 				"<pbcast.STABLE stability_delay=\"1000\" desired_avg_gossip=\"50000\"" +
 				"            max_bytes=\"400000\"/>   " +
 				"<pbcast.GMS print_local_addr=\"true\" join_timeout=\"200\"" +
-				"            shun=\"false\"" +
 				"            view_bundling=\"true\"/>" +
 				"</config>";
 	}
