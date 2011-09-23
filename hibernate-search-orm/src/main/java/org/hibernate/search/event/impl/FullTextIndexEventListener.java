@@ -38,10 +38,13 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.jmx.IndexControl;
+import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Session;
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.EntityEntry;
@@ -62,6 +65,7 @@ import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
+import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
@@ -127,6 +131,11 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 					.buildSearchFactory();
 		}
 
+		String enableJMX = cfg.getProperty( Environment.JMX_ENABLED );
+		if ( "true".equalsIgnoreCase( enableJMX ) ) {
+			enableIndexControlBean( cfg );
+		}
+
 		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
 		if ( "event".equals( indexingStrategy ) ) {
 			used = searchFactoryImplementor.getIndexBindingForEntity().size() != 0;
@@ -139,6 +148,25 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 		skipDirtyChecks = !searchFactoryImplementor.isDirtyChecksEnabled();
 		log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
+	}
+
+	private void enableIndexControlBean(Configuration cfg) {
+
+		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
+		if ( StringHelper.isEmpty( cfg.getProperty( "hibernate.session_factory_name" ) ) ) {
+			log.debug(
+					"In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI"
+			);
+			return;
+		}
+
+		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
+		if ( JMXRegistrar.isNameRegistered( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME ) ) {
+			JMXRegistrar.unRegisterMBean( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		}
+
+		IndexControl indexCtrlBean = new IndexControl( cfg.getProperties() );
+		JMXRegistrar.registerMBean( indexCtrlBean, IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {

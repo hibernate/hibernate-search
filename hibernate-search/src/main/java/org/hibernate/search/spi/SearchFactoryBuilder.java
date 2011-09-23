@@ -52,7 +52,6 @@ import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -147,35 +146,7 @@ public class SearchFactoryBuilder {
 		else {
 			searchFactoryImplementor = buildIncrementalSearchFactory();
 		}
-
-		String enableJMX = factoryState.getConfigurationProperties().getProperty( Environment.JMX_ENABLED );
-		if ( "true".equalsIgnoreCase( enableJMX ) ) {
-			enableIndexControlBean( searchFactoryImplementor );
-		}
 		return searchFactoryImplementor;
-	}
-
-	private void enableIndexControlBean(SearchFactoryImplementor searchFactoryImplementor) {
-		if ( !searchFactoryImplementor.isJMXEnabled() ) {
-			return;
-		}
-		final Properties configurationProperties = factoryState.getConfigurationProperties();
-
-		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
-		if ( StringHelper.isEmpty( configurationProperties.getProperty( "hibernate.session_factory_name" ) ) ) {
-			log.debug(
-					"In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI"
-			);
-			return;
-		}
-
-		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
-		if ( JMXRegistrar.isNameRegistered( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME ) ) {
-			JMXRegistrar.unRegisterMBean( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
-		}
-
-		IndexControl indexCtrlBean = new IndexControl( configurationProperties );
-		JMXRegistrar.registerMBean( indexCtrlBean, IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
 	}
 
 	private SearchFactoryImplementor buildIncrementalSearchFactory() {
