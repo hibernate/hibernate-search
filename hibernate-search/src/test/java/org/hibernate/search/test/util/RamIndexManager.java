@@ -25,8 +25,10 @@ import java.util.Properties;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
+import org.hibernate.search.impl.SimpleClassHelper;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 
@@ -80,6 +82,11 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		@Override
 		public boolean isTransactionManagerExpected() {
 			return false;
+		}
+
+		@Override
+		public ClassHelper getClassHelper() {
+			return new SimpleClassHelper();
 		}
 	}
 

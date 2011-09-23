@@ -67,7 +67,7 @@ public class HibernateStatelessInitializer implements ClassHelper {
 
 	@Override
 	public <T> Class<T> getClassFromWork(Work<T> work) {
-		return null;
+		return HibernateHelper.getClassFromWork( work );
 	}
 
 }

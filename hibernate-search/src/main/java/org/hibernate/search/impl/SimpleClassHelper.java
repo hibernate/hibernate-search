@@ -33,32 +33,34 @@ public class SimpleClassHelper implements ClassHelper {
 
 	@Override
 	public Object unproxy(Object entity) {
-		return null;
+		return entity;
 	}
 
 	@Override
 	public <T> Class<T> getClassFromWork(Work<T> work) {
-		return null;
+		return work.getEntityClass() != null ?
+				work.getEntityClass() :
+				getClass( work.getEntity() );
 	}
 
 	@Override
 	public <T> Class<T> getClass(T entity) {
-		return null;
+		return (Class<T>) entity.getClass();
 	}
 
 	@Override
 	public <T> Collection<T> initializeCollection(Collection<T> value) {
-		return null;
+		return value;
 	}
 
 	@Override
 	public <K, V> Map<K, V> initializeMap(Map<K, V> value) {
-		return null;
+		return value;
 	}
 
 	@Override
 	public Object[] initializeArray(Object[] value) {
-		return null;
+		return value;
 	}
 
 }

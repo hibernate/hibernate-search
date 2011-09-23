@@ -160,7 +160,7 @@ public class SearchFactoryBuilder {
 		BuildContext buildContext = new BuildContext();
 
 		//TODO we don't keep the reflectionManager. Is that an issue?
-		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties );
+		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties, factoryState );
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
 
 		//TODO programmatic mapping support
@@ -203,7 +203,7 @@ public class SearchFactoryBuilder {
 	}
 
 	private SearchFactoryImplementor buildNewSearchFactory() {
-		createCleanFactoryState();
+		createCleanFactoryState( cfg );
 
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
 
@@ -303,7 +303,7 @@ public class SearchFactoryBuilder {
 		return filterCachingStrategy;
 	}
 
-	private void createCleanFactoryState() {
+	private void createCleanFactoryState(SearchConfiguration cfg) {
 		if ( rootFactory == null ) {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
@@ -315,6 +315,7 @@ public class SearchFactoryBuilder {
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
 			factoryState.setErrorHandler( createErrorHandler( cfg ) );
+			factoryState.setClassHelper( cfg.getClassHelper() );
 		}
 	}
 
@@ -613,6 +614,11 @@ public class SearchFactoryBuilder {
 		@Override
 		public ErrorHandler getErrorHandler() {
 			return factoryState.getErrorHandler();
+		}
+
+		@Override
+		public ClassHelper getClassHelper() {
+			return factoryState.getClassHelper();
 		}
 
 	}

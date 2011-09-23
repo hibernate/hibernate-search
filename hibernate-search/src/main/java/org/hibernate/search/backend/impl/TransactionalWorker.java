@@ -98,6 +98,7 @@ public class TransactionalWorker implements Worker {
 		this.queueingProcessor = queueingProcessor;
 		this.factory = context.getUninitializedSearchFactory();
 		this.transactionExpected = context.isTransactionManagerExpected();
+		this.classHelper = context.getClassHelper();
 	}
 
 	public void close() {

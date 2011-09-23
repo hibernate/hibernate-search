@@ -229,9 +229,17 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return classHelper;
 	}
 
+	public void setClassHelper(ClassHelper classHelper) {
+		this.classHelper = classHelper;
+	}
+
 	@Override
 	public TimeoutExceptionFactory getDefaultTimeoutExceptionFactory() {
 		return defaultTimeoutExceptionFactory;
+	}
+
+	public void setDefaultTimeoutExceptionFactory(TimeoutExceptionFactory defaultTimeoutExceptionFactory) {
+		this.defaultTimeoutExceptionFactory = defaultTimeoutExceptionFactory;
 	}
 
 }
