@@ -31,7 +31,7 @@ import javax.jms.JMSException;
 
 
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
+import org.hibernate.search.backend.impl.jms.JMSBackendQueueTask;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 
@@ -64,7 +64,7 @@ public class SearchQueueChecker implements MessageListener {
 
 		List<LuceneWork> queue;
 		try {
-			String indexName = objectMessage.getStringProperty( AbstractJMSHibernateSearchController.INDEX_NAME_JMS_PROPERTY );
+			String indexName = objectMessage.getStringProperty( JMSBackendQueueTask.INDEX_NAME_JMS_PROPERTY );
 			IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
 			queue = indexManager.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
 		}

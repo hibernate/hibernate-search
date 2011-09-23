@@ -30,7 +30,9 @@ import java.util.HashMap;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
@@ -91,5 +93,10 @@ public class ManualConfiguration implements SearchConfiguration {
 	@Override
 	public boolean isTransactionManagerExpected() {
 		return true;
+	}
+
+	@Override
+	public ClassHelper getClassHelper() {
+		return HibernateStatelessInitializer.INSTANCE;
 	}
 }

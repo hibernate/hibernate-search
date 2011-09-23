@@ -39,6 +39,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
+import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.test.SearchTestCase;
@@ -97,7 +98,8 @@ public class AnalyzerTest extends SearchTestCase {
 		Set<XClass> optimizationBlackList = new HashSet<XClass>();
 		ConfigContext context = new ConfigContext( searchConfig );
 		try {
-			new DocumentBuilderContainedEntity( xclass, context, reflectionManager, optimizationBlackList );
+			new DocumentBuilderContainedEntity( xclass, context, reflectionManager,
+					optimizationBlackList, HibernateStatelessInitializer.INSTANCE );
 			fail();
 		}
 		catch ( SearchException e ) {
