@@ -59,7 +59,6 @@ import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
-import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -111,9 +110,9 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
 	private Set<String> idFieldNames;
-	private transient TimeoutExceptionFactory timeoutExceptionFactory = QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY;
 	private boolean useFieldCacheOnClassTypes = false;
 	private transient FacetManagerImpl facetManager;
+	private transient TimeoutExceptionFactory timeoutExceptionFactory;
 
 	/**
 	 * The number of results for this query. This field gets populated once {@link #queryResultSize}, {@link #queryEntityInfos}
@@ -121,8 +120,10 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 */
 	private Integer resultSize;
 
+
 	public HSQueryImpl(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.timeoutExceptionFactory = searchFactoryImplementor.getDefaultTimeoutExceptionFactory();
 	}
 	
 	public void afterDeserialise(SearchFactoryImplementor searchFactoryImplementor) {
@@ -418,7 +419,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					getTimeoutManagerImpl(),
 					facetManager.getFacetRequests(),
 					useFieldCacheOnTypes(),
-					getAppropriateIdFieldCollectorFactory()
+					getAppropriateIdFieldCollectorFactory(),
+					this.timeoutExceptionFactory
 			);
 		}
 		else if ( 0 == n) {
@@ -431,7 +433,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					getTimeoutManagerImpl(),
 					null,
 					false,
-					null
+					null,
+					this.timeoutExceptionFactory
 			);
 		}
 		else {
@@ -444,7 +447,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					getTimeoutManagerImpl(),
 					facetManager.getFacetRequests(),
 					useFieldCacheOnTypes(),
-					getAppropriateIdFieldCollectorFactory()
+					getAppropriateIdFieldCollectorFactory(),
+					this.timeoutExceptionFactory
 			);
 		}
 		resultSize = queryHits.getTotalHits();

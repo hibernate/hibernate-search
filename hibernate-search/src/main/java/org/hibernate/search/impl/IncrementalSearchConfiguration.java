@@ -35,6 +35,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
@@ -84,5 +85,10 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	@Override
 	public boolean isTransactionManagerExpected() {
 		return false;
+	}
+
+	@Override
+	public ClassHelper getClassHelper() {
+		return null;
 	}
 }

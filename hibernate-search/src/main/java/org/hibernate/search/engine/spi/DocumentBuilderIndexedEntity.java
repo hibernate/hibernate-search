@@ -172,8 +172,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
 	 */
 	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, Similarity similarity,
-			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList) {
-		super( clazz, context, similarity, reflectionManager, optimizationBlackList );
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassHelper classHelper) {
+		super( clazz, context, similarity, reflectionManager, optimizationBlackList, classHelper );
 		// special case @ProvidedId
 		ProvidedId provided = findProvidedId( clazz, reflectionManager );
 		if ( provided != null ) {

@@ -125,12 +125,14 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList keeps track of types on which we need to disable collection events optimizations
 	 */
-	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity, ReflectionManager reflectionManager, Set<XClass> optimizationBlackList) {
+	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity,
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassHelper classHelper) {
 
 		if ( xClass == null ) {
 			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
 		}
 
+		this.classHelper = classHelper;
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanXClass = xClass;
 		this.beanXClassName = xClass.getName();

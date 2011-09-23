@@ -90,7 +90,6 @@ import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
@@ -385,7 +384,7 @@ public class SearchFactoryBuilder {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
 				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
-						mappedXClass, context, reflectionManager, optimizationBlackListedTypes
+						mappedXClass, context, reflectionManager, optimizationBlackListedTypes, cfg.getClassHelper()
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
@@ -413,7 +412,8 @@ public class SearchFactoryBuilder {
 							context,
 							mappedEntity.getSimilarity(),
 							reflectionManager,
-							optimizationBlackListedTypes
+							optimizationBlackListedTypes,
+							cfg.getClassHelper()
 					);
 			mappedEntity.setDocumentBuilderIndexedEntity( documentBuilder );
 

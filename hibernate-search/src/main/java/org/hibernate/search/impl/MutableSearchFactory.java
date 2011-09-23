@@ -45,6 +45,7 @@ import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
@@ -232,6 +233,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public ClassHelper getClassHelper() {
 		return delegate.getClassHelper();
+	}
+
+	@Override
+	public TimeoutExceptionFactory getDefaultTimeoutExceptionFactory() {
+		return delegate.getDefaultTimeoutExceptionFactory();
 	}
 
 }

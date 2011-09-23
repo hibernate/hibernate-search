@@ -63,6 +63,7 @@ import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.impl.HSQueryImpl;
 import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.ServiceProvider;
@@ -110,6 +111,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final ServiceManager serviceManager;
 	private final boolean enableDirtyChecks;
 	private final DefaultIndexReaderAccessor indexReaderAccessor;
+	private final ClassHelper classHelper;
+	private final TimeoutExceptionFactory timeoutExceptionFactory;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -127,6 +130,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
 		this.allIndexesManager = state.getAllIndexesManager();
 		this.errorHandler = state.getErrorHandler();
+		this.classHelper = state.getClassHelper();
+		this.timeoutExceptionFactory = state.getDefaultTimeoutExceptionFactory();
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false
@@ -352,6 +357,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@Override
 	public ClassHelper getClassHelper() {
-		return null;
+		return classHelper;
 	}
+
+	@Override
+	public TimeoutExceptionFactory getDefaultTimeoutExceptionFactory() {
+		return timeoutExceptionFactory;
+	}
+
 }

@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.spi.ClassHelper;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
@@ -107,4 +108,6 @@ public interface SearchConfiguration {
 	 * @return when returning {@code false} Search will avoid logging such warnings.
 	 */
 	boolean isTransactionManagerExpected();
+
+	ClassHelper getClassHelper();
 }
