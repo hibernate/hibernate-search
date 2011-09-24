@@ -34,14 +34,21 @@
 
     <artifactId>hibernate-search-orm</artifactId>
 
-    <name>Hibernate Search</name>
-    <description>Hibernate Search</description>
+    <name>Hibernate Search ORM</name>
+    <description>Hibernate Search integration with Hibernate core</description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -54,7 +61,12 @@
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -82,11 +94,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
             <scope>test</scope>
@@ -105,11 +112,11 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman-bmunit</artifactId>
+            <artifactId>byteman</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman</artifactId>
+            <artifactId>byteman-bmunit</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
