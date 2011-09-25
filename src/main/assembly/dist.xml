@@ -65,8 +65,6 @@
                         <outputDirectory>/dist/lib/required</outputDirectory>
                         <scope>runtime</scope>
                         <excludes>
-                            <exclude>org.slf4j:slf4j-api</exclude>
-                            <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>commons-lang:commons-lang</exclude>
                             <exclude>org.hibernate:hibernate-search</exclude>
@@ -81,15 +79,97 @@
                             <exclude>org.apache.lucene:lucene-smartcn</exclude>
                             <exclude>org.apache.lucene:lucene-stempel</exclude>
                             <exclude>org.apache.solr:*</exclude>
-                            <exclude>org.infinispan:*</exclude>
-                            <exclude>org.jboss.marshalling:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
-                            <exclude>org.jboss.logging:jboss-logging-processor</exclude>
-                            <exclude>org.jboss.logging:jboss-logging-generator</exclude>
-                            <exclude>org.rhq.helpers:*</exclude>
-                            <exclude>i18nlog:i18nlog</exclude>
                             <exclude>com.fasterxml:*</exclude>
                             <exclude>org.jboss:jandex</exclude>
+                            <exclude>org.infinispan:*</exclude>
+                            <exclude>org.rhq.helpers:*</exclude>
+                            <exclude>org.jboss.marshalling:*</exclude>
+                        </excludes>
+                    </dependencySet>
+
+                    <dependencySet>
+                        <outputDirectory>/dist/lib/optional</outputDirectory>
+                        <scope>runtime</scope>
+                        <excludes>
+                            <!-- Avro excludes -->
+                            <exclude>org.apache.avro:avro</exclude>
+                            <exclude>org.codehaus.jackson:*</exclude>
+                            <exclude>com.thoughtworks.paranamer:paranamer</exclude>
+                            <exclude>org.hibernate:hibernate-core</exclude>
+                            <exclude>org.xerial.snappy:snappy-java</exclude>
+                            <exclude>org.jboss:jandex</exclude>
+                            <exclude>org.jboss.logging:*</exclude>
+                            <exclude>com.fasterxml:classmate</exclude>
+                            <exclude>org.apache.lucene:lucene-core</exclude>
+                            <exclude>antlr:antlr</exclude>
+                            <exclude>commons-collections:commons-collections</exclude>
+                            <exclude>dom4j:dom4j</exclude>
+                            <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
+                            <exclude>org.hibernate:hibernate-search</exclude>
+                            <exclude>org.jgroups:jgroups</exclude>
+                            <exclude>xml-apis:xml-apis</exclude>
+                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.infinispan:*</exclude>
+                            <exclude>org.jboss.marshalling:*</exclude>
+                        </excludes>
+                    </dependencySet>
+
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>/dist/lib/provided</outputDirectory>
+                        <includes>
+                            <include>org.jboss.javaee:jboss-transaction-api</include>
+                        </includes>
+                    </dependencySet>
+                </dependencySets>
+            </binaries>
+        </moduleSet>
+        <moduleSet>
+            <includes>
+                <include>org.hibernate:hibernate-search-orm</include>
+            </includes>
+            <sources>
+                <includeModuleDirectory>false</includeModuleDirectory>
+                <fileSets>
+                    <fileSet>
+                        <directory>target/apidocs</directory>
+                        <outputDirectory>docs/api</outputDirectory>
+                    </fileSet>
+                    <fileSet>
+                        <directory>target/docbook/publish</directory>
+                        <outputDirectory>docs/reference</outputDirectory>
+                    </fileSet>
+                </fileSets>
+            </sources>
+            <binaries>
+                <outputDirectory>dist</outputDirectory>
+                <unpack>false</unpack>
+                <dependencySets>
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>/dist/lib/required</outputDirectory>
+                        <scope>runtime</scope>
+                        <excludes>
+                            <exclude>org.jgroups:jgroups</exclude>
+                            <exclude>commons-lang:commons-lang</exclude>
+                            <exclude>org.hibernate:hibernate-search</exclude>
+                            <exclude>org.hibernate:hibernate-search-analyzers</exclude>
+                            <exclude>org.apache.lucene:lucene-grouping</exclude>
+                            <exclude>org.apache.lucene:lucene-analyzers</exclude>
+                            <exclude>org.apache.lucene:lucene-highlighter</exclude>
+                            <exclude>org.apache.lucene:lucene-memory</exclude>
+                            <exclude>org.apache.lucene:lucene-misc</exclude>
+                            <exclude>org.apache.lucene:lucene-spatial</exclude>
+                            <exclude>org.apache.lucene:lucene-spellchecker</exclude>
+                            <exclude>org.apache.lucene:lucene-smartcn</exclude>
+                            <exclude>org.apache.lucene:lucene-stempel</exclude>
+                            <exclude>org.apache.solr:*</exclude>
+                            <exclude>org.jboss.marshalling:*</exclude>
+                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.jboss:jandex</exclude>
+                            <exclude>org.infinispan:*</exclude>
+                            <exclude>org.rhq.helpers:*</exclude>
                         </excludes>
                     </dependencySet>
 
@@ -102,9 +182,6 @@
                             <exclude>org.codehaus.jackson:*</exclude>
                             <exclude>com.thoughtworks.paranamer:paranamer</exclude>
                             <exclude>org.xerial.snappy:snappy-java</exclude>
-
-                            <exclude>org.slf4j:slf4j-api</exclude>
-                            <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
                             <exclude>org.jboss:jandex</exclude>
                             <exclude>org.jboss.logging:*</exclude>
                             <exclude>com.fasterxml:classmate</exclude>
@@ -118,22 +195,17 @@
                             <exclude>org.infinispan:*</exclude>
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>xml-apis:xml-apis</exclude>
-                            <exclude>org.jboss.marshalling:jboss-marshalling-river</exclude>
-                            <exclude>org.jboss.marshalling:jboss-marshalling</exclude>
+                            <exclude>org.jboss.marshalling:*</exclude>
                             <exclude>org.rhq.helpers:*</exclude>
-                            <exclude>i18nlog:i18nlog</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.infinispan:*</exclude>
                         </excludes>
                     </dependencySet>
 
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>/dist/lib/provided</outputDirectory>
-                        <includes>
-                            <include>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</include>
-                            <include>org.slf4j:slf4j-api</include>
-                            <include>org.jboss.javaee:jboss-transaction-api</include>
-                        </includes>
+                        <scope>provided</scope>
                     </dependencySet>
                 </dependencySets>
             </binaries>
@@ -161,11 +233,8 @@
                             <exclude>com.fasterxml:*</exclude>
                             <exclude>org.jboss.logging:*</exclude>
                             <exclude>org.jboss:jandex</exclude>
-                            <exclude>org.slf4j:*</exclude>
                             <exclude>commons-lang:*</exclude>
-                            <exclude>i18nlog:*</exclude>
                             <exclude>xml-apis:*</exclude>
-                            <exclude>org.hibernate.javax.persistence:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
                             <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
                             <!-- Avro excludes -->
