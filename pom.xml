@@ -268,18 +268,6 @@
                 <version>0.11.4.1</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.byteman</groupId>
-                <artifactId>byteman</artifactId>
-                <version>${bytemanVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.byteman</groupId>
-                <artifactId>byteman-install</artifactId>
-                <version>${bytemanVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.easytesting</groupId>
                 <artifactId>fest-assert</artifactId>
                 <version>1.4</version>
@@ -311,6 +299,18 @@
                 <artifactId>jboss-logging-generator</artifactId>
                 <version>${jbossLoggingProcessorVersion}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.byteman</groupId>
+                <artifactId>byteman</artifactId>
+                <version>${bytemanVersion}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.byteman</groupId>
+                <artifactId>byteman-install</artifactId>
+                <version>${bytemanVersion}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.byteman</groupId>

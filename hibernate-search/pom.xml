@@ -104,11 +104,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
             <scope>test</scope>
@@ -127,11 +122,11 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman-bmunit</artifactId>
+            <artifactId>byteman</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
-            <artifactId>byteman</artifactId>
+            <artifactId>byteman-bmunit</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.byteman</groupId>
