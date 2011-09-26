@@ -23,6 +23,7 @@ class Helper {
 		doMarkforJoined( transaction );
 		return transaction;
 	}
+
 	/**
 	 * if the transaction object is a JoinableCMTTransaction, call markForJoined()
 	 * This must be done prior to starting the transaction
@@ -42,4 +43,5 @@ class Helper {
 			markForJoined.invoke( transaction );
 		}
 	}
+
 }

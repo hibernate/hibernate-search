@@ -34,6 +34,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -121,6 +122,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	}
 
 	public void run() {
+		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		try {
 
 			//first start the consumers, then the producers (reverse order):
@@ -131,7 +133,7 @@ public class BatchIndexingWorkspace implements Runnable {
 						sessionFactory, producerEndSignal, searchFactory,
 						cacheMode, backend
 				);
-				execDocBuilding.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
+				execDocBuilding.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 			}
 			for ( int i = 0; i < objectLoadingThreadNum; i++ ) {
 				//from primary key to loaded entity:
@@ -139,7 +141,7 @@ public class BatchIndexingWorkspace implements Runnable {
 						fromIdentifierListToEntities, fromEntityToAddwork, monitor,
 						sessionFactory, cacheMode, indexedType, idNameOfIndexedType
 				);
-				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
+				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 			}
 			//from class definition to all primary keys:
 			final IdentifierProducer producer = new IdentifierProducer(
@@ -147,7 +149,7 @@ public class BatchIndexingWorkspace implements Runnable {
 					objectLoadingBatchSize, indexedType, monitor,
 					objectsLimit
 			);
-			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
+			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 
 			//shutdown all executors:
 			execIdentifiersLoader.shutdown();
@@ -166,7 +168,7 @@ public class BatchIndexingWorkspace implements Runnable {
 		catch ( RuntimeException re ) {
 			//being this an async thread we want to make sure everything is somehow reported
 			SingleErrorContext singleErrorContext = new SingleErrorContext( re );
-			searchFactory.getErrorHandler().handle( singleErrorContext );
+			errorHandler.handle( singleErrorContext );
 		}
 		finally {
 			endAllSignal.countDown();

@@ -494,4 +494,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 115, value = "Unknown @FullTextFilter: '%1$s'")
 	SearchException unknownFullTextFilter(String filterName);
+
+	/*
+	 * This is not an exception factory nor a logging statement.
+	 * The returned string is passed to the ErrorHandler,
+	 * which is not necessarily using a logger but we still
+	 * want to internationalize the message.
+	 */
+	@Message(id = 116, value = "Unexpected error")
+	String unexpectedErrorMessage();
+
 }
