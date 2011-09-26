@@ -1,0 +1,82 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2011-09-17 19:35+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: monitoring.xml:31
+#, no-c-format
+msgid "Monitoring"
+msgstr ""
+
+#. Tag: para
+#: monitoring.xml:33
+#, no-c-format
+msgid "Hibernate Search offers access to a <classname>Statistics</classname> object via <methodname>SearchFactory.getStatistics()</methodname>. It allows you for example to determine which classes are indexed and how many entities are in the index. This information is always available. However, by specifying the <literal>hibernate.search.generate_statistics</literal> property in your configuration you can also collect total and average Lucene query and object loading timings."
+msgstr ""
+
+#. Tag: title
+#: monitoring.xml:42
+#, no-c-format
+msgid "<title>JMX</title>"
+msgstr ""
+
+#. Tag: para
+#: monitoring.xml:44
+#, no-c-format
+msgid "You can also enable access to the statistics via JMX. Setting the property <literal>hibernate.search.jmx_enabled</literal> will automatically register the <classname>StatisticsInfoMBean</classname>. Depending on your the configuration the <classname>IndexControlMBean</classname> and <classname>IndexingProgressMonitorMBean</classname> will also be registered. Lets have a closer look at the different MBeans."
+msgstr ""
+
+#. Tag: para
+#: monitoring.xml:51
+#, no-c-format
+msgid "If you want to access your JMX beans remotely via JConsole make sure to set the system property <varname>com.sun.management.jmxremote</varname> to <constant>true</constant>."
+msgstr ""
+
+#. Tag: title
+#: monitoring.xml:58
+#, no-c-format
+msgid "StatisticsInfoMBean"
+msgstr ""
+
+#. Tag: para
+#: monitoring.xml:60
+#, no-c-format
+msgid "This MBean gives you access to <classname>Statistics</classname> object as desribed in the previous section."
+msgstr ""
+
+#. Tag: title
+#: monitoring.xml:65
+#, no-c-format
+msgid "IndexControlMBean"
+msgstr ""
+
+#. Tag: para
+#: monitoring.xml:67
+#, no-c-format
+msgid "This MBean allows to build, optimize and purge the index for a given entity. Indexing occurs via the mass indexing API (see<xref linkend=\"search-batchindex-massindexer\"/>). A requirement for this bean to be registered in JMX is, that the Hibernate <classname>SessionFactory</classname> is bound to JNDI via the <literal>hibernate.session_factory_name</literal> property. Refer to the Hibernate Core manual for more information on how to configure JNDI. The <classname>IndexControlMBean</classname> and its API are for now experimental."
+msgstr ""
+
+#. Tag: title
+#: monitoring.xml:79
+#, no-c-format
+msgid "IndexingProgressMonitorMBean"
+msgstr ""
+
+#. Tag: para
+#: monitoring.xml:81
+#, no-c-format
+msgid "This MBean is an implementation <classname>MassIndexerProgressMonitor</classname> interface. If <literal>hibernate.search.jmx_enabled</literal> is enabled and the mass indexer API is used the indexing progress can be followed via this bean. The bean will only be bound to JMX while indexing is in progress. Once indexing is completed the MBean is not longer available."
+msgstr ""
+
