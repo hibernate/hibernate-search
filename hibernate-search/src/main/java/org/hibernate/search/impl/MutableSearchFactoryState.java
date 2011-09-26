@@ -35,6 +35,8 @@ import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
@@ -65,6 +67,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private boolean transactionManagerExpected = true;
 	private IndexManagerHolder allIndexesManager;
 	private ErrorHandler errorHandler;
+	private TimeoutExceptionFactory defaultTimeoutExceptionFactory;
+	private ClassNavigator classHelper;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -82,6 +86,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		transactionManagerExpected = oldFactoryState.isTransactionManagerExpected();
 		allIndexesManager = oldFactoryState.getAllIndexesManager();
 		errorHandler = oldFactoryState.getErrorHandler();
+		defaultTimeoutExceptionFactory = oldFactoryState.getDefaultTimeoutExceptionFactory();
+		classHelper = oldFactoryState.getClassHelper();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -216,6 +222,24 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setErrorHandler(ErrorHandler errorHandler) {
 		this.errorHandler = errorHandler;
+	}
+
+	@Override
+	public ClassNavigator getClassHelper() {
+		return classHelper;
+	}
+
+	public void setClassHelper(ClassNavigator classHelper) {
+		this.classHelper = classHelper;
+	}
+
+	@Override
+	public TimeoutExceptionFactory getDefaultTimeoutExceptionFactory() {
+		return defaultTimeoutExceptionFactory;
+	}
+
+	public void setDefaultTimeoutExceptionFactory(TimeoutExceptionFactory defaultTimeoutExceptionFactory) {
+		this.defaultTimeoutExceptionFactory = defaultTimeoutExceptionFactory;
 	}
 
 }

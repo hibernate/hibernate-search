@@ -35,7 +35,9 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.spi.internals.SearchFactoryState;
 
 /**
  * @author Emmanuel Bernard
@@ -44,11 +46,13 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	private final ReflectionManager reflectionManager = new JavaReflectionManager();
 	private final List<Class<?>> classes;
 	private final Map<String, Class<?>> classesByName = new HashMap<String, Class<?>>();
+	private final SearchFactoryState cfg;
 	private Properties properties;
 
-	public IncrementalSearchConfiguration(List<Class<?>> classes, Properties properties) {
+	public IncrementalSearchConfiguration(List<Class<?>> classes, Properties properties, SearchFactoryState factoryState) {
 		this.properties = properties;
 		this.classes = classes;
+		this.cfg = factoryState;
 		for ( Class<?> entity : classes ) {
 			classesByName.put( entity.getName(), entity );
 		}
@@ -83,6 +87,11 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 
 	@Override
 	public boolean isTransactionManagerExpected() {
-		return false;
+		return cfg.isTransactionManagerExpected();
+	}
+
+	@Override
+	public ClassNavigator getClassHelper() {
+		return cfg.getClassHelper();
 	}
 }

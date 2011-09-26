@@ -28,6 +28,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 
 /**
  * This contract is considered experimental.
@@ -80,4 +81,7 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	 * @return the configured ErrorHandler, global to the SearchFactory
 	 */
 	ErrorHandler getErrorHandler();
+
+	TimeoutExceptionFactory getDefaultTimeoutExceptionFactory();
+
 }

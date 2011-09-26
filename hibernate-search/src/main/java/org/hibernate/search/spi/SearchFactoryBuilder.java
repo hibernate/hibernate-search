@@ -52,7 +52,6 @@ import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -90,7 +89,6 @@ import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
@@ -148,35 +146,7 @@ public class SearchFactoryBuilder {
 		else {
 			searchFactoryImplementor = buildIncrementalSearchFactory();
 		}
-
-		String enableJMX = factoryState.getConfigurationProperties().getProperty( Environment.JMX_ENABLED );
-		if ( "true".equalsIgnoreCase( enableJMX ) ) {
-			enableIndexControlBean( searchFactoryImplementor );
-		}
 		return searchFactoryImplementor;
-	}
-
-	private void enableIndexControlBean(SearchFactoryImplementor searchFactoryImplementor) {
-		if ( !searchFactoryImplementor.isJMXEnabled() ) {
-			return;
-		}
-		final Properties configurationProperties = factoryState.getConfigurationProperties();
-
-		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
-		if ( StringHelper.isEmpty( configurationProperties.getProperty( "hibernate.session_factory_name" ) ) ) {
-			log.debug(
-					"In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI"
-			);
-			return;
-		}
-
-		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
-		if ( JMXRegistrar.isNameRegistered( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME ) ) {
-			JMXRegistrar.unRegisterMBean( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
-		}
-
-		IndexControl indexCtrlBean = new IndexControl( configurationProperties );
-		JMXRegistrar.registerMBean( indexCtrlBean, IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
 	}
 
 	private SearchFactoryImplementor buildIncrementalSearchFactory() {
@@ -190,7 +160,7 @@ public class SearchFactoryBuilder {
 		BuildContext buildContext = new BuildContext();
 
 		//TODO we don't keep the reflectionManager. Is that an issue?
-		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties );
+		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties, factoryState );
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
 
 		//TODO programmatic mapping support
@@ -233,7 +203,7 @@ public class SearchFactoryBuilder {
 	}
 
 	private SearchFactoryImplementor buildNewSearchFactory() {
-		createCleanFactoryState();
+		createCleanFactoryState( cfg );
 
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
 
@@ -333,7 +303,7 @@ public class SearchFactoryBuilder {
 		return filterCachingStrategy;
 	}
 
-	private void createCleanFactoryState() {
+	private void createCleanFactoryState(SearchConfiguration cfg) {
 		if ( rootFactory == null ) {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
@@ -345,6 +315,7 @@ public class SearchFactoryBuilder {
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
 			factoryState.setErrorHandler( createErrorHandler( cfg ) );
+			factoryState.setClassHelper( cfg.getClassHelper() );
 		}
 	}
 
@@ -385,7 +356,7 @@ public class SearchFactoryBuilder {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
 				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
-						mappedXClass, context, reflectionManager, optimizationBlackListedTypes
+						mappedXClass, context, reflectionManager, optimizationBlackListedTypes, cfg.getClassHelper()
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
@@ -413,7 +384,8 @@ public class SearchFactoryBuilder {
 							context,
 							mappedEntity.getSimilarity(),
 							reflectionManager,
-							optimizationBlackListedTypes
+							optimizationBlackListedTypes,
+							cfg.getClassHelper()
 					);
 			mappedEntity.setDocumentBuilderIndexedEntity( documentBuilder );
 
@@ -642,6 +614,11 @@ public class SearchFactoryBuilder {
 		@Override
 		public ErrorHandler getErrorHandler() {
 			return factoryState.getErrorHandler();
+		}
+
+		@Override
+		public ClassNavigator getClassHelper() {
+			return factoryState.getClassHelper();
 		}
 
 	}

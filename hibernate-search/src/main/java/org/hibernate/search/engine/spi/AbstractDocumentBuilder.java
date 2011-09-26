@@ -79,6 +79,7 @@ import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -98,6 +99,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	private final XClass beanXClass;
 	protected final String beanXClassName;
 	protected final Class<?> beanClass;
+	protected final ClassNavigator classHelper;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
@@ -123,12 +125,14 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList keeps track of types on which we need to disable collection events optimizations
 	 */
-	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity, ReflectionManager reflectionManager, Set<XClass> optimizationBlackList) {
+	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity,
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassNavigator classHelper) {
 
 		if ( xClass == null ) {
 			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
 		}
 
+		this.classHelper = classHelper;
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanXClass = xClass;
 		this.beanXClassName = xClass.getName();

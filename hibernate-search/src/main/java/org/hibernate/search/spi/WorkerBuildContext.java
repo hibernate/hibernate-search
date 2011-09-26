@@ -35,4 +35,9 @@ public interface WorkerBuildContext extends BuildContext {
 	 * @see org.hibernate.search.cfg.spi.SearchConfiguration#isTransactionManagerExpected
 	 */
 	boolean isTransactionManagerExpected();
+
+	/**
+	 * @return
+	 */
+	ClassNavigator getClassHelper();
 }

@@ -24,7 +24,6 @@
 package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,12 +45,12 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.search.Weight;
 
-import org.hibernate.QueryTimeoutException;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.collector.impl.FacetCollector;
 import org.hibernate.search.query.collector.impl.FieldCacheCollector;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
+import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
 
@@ -91,6 +90,8 @@ public class QueryHits {
 	private final FieldCacheCollectorFactory idFieldCollectorFactory;
 	private FieldCacheCollector idFieldCollector;
 
+	private final TimeoutExceptionFactory timeoutExceptionFactory;
+
 	public QueryHits(IndexSearcherWithPayload searcher,
 					 org.apache.lucene.search.Query preparedQuery,
 					 Filter filter,
@@ -98,11 +99,12 @@ public class QueryHits {
 					 TimeoutManagerImpl timeoutManager,
 					 Map<String, FacetingRequestImpl> facetRequests,
 					 boolean enableFieldCacheOnTypes,
-					 FieldCacheCollectorFactory idFieldCollector)
+					 FieldCacheCollectorFactory idFieldCollector,
+					 TimeoutExceptionFactory timeoutExceptionFactory)
 			throws IOException {
 		this(
 				searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager, facetRequests,
-				enableFieldCacheOnTypes, idFieldCollector
+				enableFieldCacheOnTypes, idFieldCollector, timeoutExceptionFactory
 		);
 	}
 
@@ -114,7 +116,8 @@ public class QueryHits {
 					 TimeoutManagerImpl timeoutManager,
 					 Map<String, FacetingRequestImpl> facetRequests,
 					 boolean enableFieldCacheOnTypes,
-					 FieldCacheCollectorFactory idFieldCollector)
+					 FieldCacheCollectorFactory idFieldCollector,
+					 TimeoutExceptionFactory timeoutExceptionFactory)
 			throws IOException {
 		this.timeoutManager = timeoutManager;
 		this.preparedQuery = preparedQuery;
@@ -124,6 +127,7 @@ public class QueryHits {
 		this.facetRequests = facetRequests;
 		this.enableFieldCacheOnClassName = enableFieldCacheOnTypes;
 		this.idFieldCollectorFactory = idFieldCollector;
+		this.timeoutExceptionFactory = timeoutExceptionFactory;
 		updateTopDocs( n );
 	}
 
@@ -146,10 +150,9 @@ public class QueryHits {
 		}
 		//if the refresh timed out, raise an exception
 		if ( timeoutManager.isTimedOut() && index >= topDocs.scoreDocs.length ) {
-			throw new QueryTimeoutException(
+			throw timeoutExceptionFactory.createTimeoutException(
 					"Timeout period exceeded. Cannot load document: " + index,
-					(SQLException) null,
-					preparedQuery.toString()
+					preparedQuery
 			);
 		}
 		return topDocs.scoreDocs[index];

@@ -32,6 +32,7 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.spi.ClassNavigator;
 
 /**
  * Set up and provide a manager for classes which are indexed via {@code @IndexedEmbedded}, but themselves do not
@@ -53,8 +54,8 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
 	 */
 	public DocumentBuilderContainedEntity(XClass xClass, ConfigContext context,
-			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList) {
-		super( xClass, context, null, reflectionManager, optimizationBlackList );
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassNavigator classHelper) {
+		super( xClass, context, null, reflectionManager, optimizationBlackList, classHelper );
 		//done after init:
 		if ( metadata.containedInGetters.size() == 0 ) {
 			this.entityState = EntityState.NON_INDEXABLE;
