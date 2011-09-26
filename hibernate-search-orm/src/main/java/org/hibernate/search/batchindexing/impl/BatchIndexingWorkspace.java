@@ -34,6 +34,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -161,6 +162,11 @@ public class BatchIndexingWorkspace implements Runnable {
 				Thread.currentThread().interrupt();
 				throw new SearchException( "Interrupted on batch Indexing; index will be left in unknown state!", e );
 			}
+		}
+		catch ( RuntimeException re ) {
+			//being this an async thread we want to make sure everything is somehow reported
+			SingleErrorContext singleErrorContext = new SingleErrorContext( re );
+			searchFactory.getErrorHandler().handle( singleErrorContext );
 		}
 		finally {
 			endAllSignal.countDown();
