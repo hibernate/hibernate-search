@@ -46,7 +46,7 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
-import org.hibernate.search.spi.ClassHelper;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -172,7 +172,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
 	 */
 	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, Similarity similarity,
-			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassHelper classHelper) {
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassNavigator classHelper) {
 		super( clazz, context, similarity, reflectionManager, optimizationBlackList, classHelper );
 		// special case @ProvidedId
 		ProvidedId provided = findProvidedId( clazz, reflectionManager );
@@ -375,7 +375,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return contextualBridge.objectToString( value );
 	}
 
-	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, ClassHelper sessionInitializer) {
+	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, ClassNavigator sessionInitializer) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
 		final AddLuceneWork addWork;
@@ -388,7 +388,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return addWork;
 	}
 	
-	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, ClassHelper sessionInitializer) {
+	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, ClassNavigator sessionInitializer) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
 		final UpdateLuceneWork addWork;
@@ -412,7 +412,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
-	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, ClassHelper objectInitializer) {
+	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, ClassNavigator objectInitializer) {
 		if ( fieldToAnalyzerMap == null ) {
 			throw new IllegalArgumentException( "fieldToAnalyzerMap cannot be null" );
 		}
@@ -464,7 +464,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									 Map<String, String> fieldToAnalyzerMap,
 									 Set<String> processedFieldNames,
 									 ContextualExceptionBridge contextualBridge,
-									 ClassHelper objectInitializer) {
+									 ClassNavigator objectInitializer) {
 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
@@ -601,7 +601,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 	}
 
-	private Object unproxy(Object instance, ClassHelper objectInitializer) {
+	private Object unproxy(Object instance, ClassNavigator objectInitializer) {
 		if ( instance == null )
 			return null;
 			

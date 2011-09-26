@@ -35,7 +35,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
-import org.hibernate.search.spi.ClassHelper;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
@@ -135,7 +135,7 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 	}
 
 	@Override
-	public ClassHelper getClassHelper() {
+	public ClassNavigator getClassHelper() {
 		return HibernateStatelessInitializer.INSTANCE;
 	}
 

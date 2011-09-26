@@ -39,5 +39,5 @@ public interface WorkerBuildContext extends BuildContext {
 	/**
 	 * @return
 	 */
-	ClassHelper getClassHelper();
+	ClassNavigator getClassHelper();
 }

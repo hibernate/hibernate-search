@@ -35,7 +35,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
-import org.hibernate.search.spi.ClassHelper;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.store.DirectoryProvider;
 
 import java.util.Map;
@@ -77,7 +77,7 @@ public interface SearchFactoryState {
 
 	ErrorHandler getErrorHandler();
 
-	ClassHelper getClassHelper();
+	ClassNavigator getClassHelper();
 
 	TimeoutExceptionFactory getDefaultTimeoutExceptionFactory();
 

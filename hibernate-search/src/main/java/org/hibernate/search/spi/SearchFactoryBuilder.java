@@ -617,7 +617,7 @@ public class SearchFactoryBuilder {
 		}
 
 		@Override
-		public ClassHelper getClassHelper() {
+		public ClassNavigator getClassHelper() {
 			return factoryState.getClassHelper();
 		}
 

@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.spi.ClassHelper;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.util.impl.HibernateHelper;
 
 /**
@@ -33,7 +33,7 @@ import org.hibernate.search.util.impl.HibernateHelper;
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class HibernateStatelessInitializer implements ClassHelper {
+public class HibernateStatelessInitializer implements ClassNavigator {
 	
 	public static final HibernateStatelessInitializer INSTANCE = new HibernateStatelessInitializer();
 	

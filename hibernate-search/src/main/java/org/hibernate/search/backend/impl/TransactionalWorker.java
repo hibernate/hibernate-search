@@ -33,7 +33,7 @@ import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.spi.ClassHelper;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.impl.WeakIdentityHashMap;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -58,7 +58,7 @@ public class TransactionalWorker implements Worker {
 	protected final WeakIdentityHashMap<Object, Synchronization> synchronizationPerTransaction = new WeakIdentityHashMap<Object, Synchronization>();
 	private QueueingProcessor queueingProcessor;
 	private SearchFactoryImplementor factory;
-	private ClassHelper classHelper;
+	private ClassNavigator classHelper;
 
 	private boolean transactionExpected;
 

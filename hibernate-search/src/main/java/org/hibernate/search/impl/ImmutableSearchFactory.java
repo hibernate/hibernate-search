@@ -65,7 +65,7 @@ import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.impl.HSQueryImpl;
-import org.hibernate.search.spi.ClassHelper;
+import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -111,7 +111,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final ServiceManager serviceManager;
 	private final boolean enableDirtyChecks;
 	private final DefaultIndexReaderAccessor indexReaderAccessor;
-	private final ClassHelper classHelper;
+	private final ClassNavigator classHelper;
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
@@ -356,7 +356,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	@Override
-	public ClassHelper getClassHelper() {
+	public ClassNavigator getClassHelper() {
 		return classHelper;
 	}
 

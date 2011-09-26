@@ -18,49 +18,52 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.impl;
+package org.hibernate.search.spi;
 
 import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.spi.ClassHelper;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class SimpleClassHelper implements ClassHelper {
+public interface ClassNavigator {
 
-	@Override
-	public Object unproxy(Object entity) {
-		return entity;
-	}
+	<T> Class<T> getClassFromWork(Work<T> work);
 
-	@Override
-	public <T> Class<T> getClassFromWork(Work<T> work) {
-		return work.getEntityClass() != null ?
-				work.getEntityClass() :
-				getClass( work.getEntity() );
-	}
+	/**
+	 * @param <T>
+	 * @param entity an instance or proxy of T
+	 * @return the class from the instance, or the underlying class from a proxy.
+	 */
+	public <T> Class<T> getClass(T entity);
 
-	@Override
-	public <T> Class<T> getClass(T entity) {
-		return (Class<T>) entity.getClass();
-	}
+	/**
+	 * @param value
+	 * @return if value is a proxy, unwraps it, otherwise works as a pass-through function.
+	 */
+	public Object unproxy(Object value);
 
-	@Override
-	public <T> Collection<T> initializeCollection(Collection<T> value) {
-		return value;
-	}
+	/**
+	 * @param <T>
+	 * @param value
+	 * @return the initialized Collection, to be used on lazily-loading collections
+	 */
+	public <T> Collection<T> initializeCollection(Collection<T> value);
 
-	@Override
-	public <K, V> Map<K, V> initializeMap(Map<K, V> value) {
-		return value;
-	}
+	/**
+	 * @param <T>
+	 * @param value
+	 * @return the initialized Map, to be used on lazily-loading maps
+	 */
+	public <K,V> Map<K,V> initializeMap(Map<K,V> value);
 
-	@Override
-	public Object[] initializeArray(Object[] value) {
-		return value;
-	}
+	/**
+	 * @param <T>
+	 * @param value
+	 * @return the initialized array, to be used on lazily-loading arrays
+	 */
+	public Object[] initializeArray(Object[] value);
 
 }
