@@ -26,6 +26,12 @@ import java.util.Map;
 import org.hibernate.search.backend.spi.Work;
 
 /**
+ * When using the Hibernate Core integration (for example) we need to make sure that the
+ * entities and collections we're working on are initialized.
+ * Initialization strategies might vary according to the integrating framework;
+ * when integrating with Infinispan (as Infinispan Query) no initialization is needed.
+ *
+ * @see org.hibernate.search.impl.SimpleClassNavigator
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public interface ClassNavigator {

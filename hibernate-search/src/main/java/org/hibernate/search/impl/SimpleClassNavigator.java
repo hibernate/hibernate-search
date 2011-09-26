@@ -27,6 +27,8 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.spi.ClassNavigator;
 
 /**
+ * Simple pass-through implementation of ClassNavigator.
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class SimpleClassNavigator implements ClassNavigator {
