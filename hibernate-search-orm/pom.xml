@@ -35,7 +35,7 @@
     <artifactId>hibernate-search-orm</artifactId>
 
     <name>Hibernate Search ORM</name>
-    <description>Hibernate Search integration with Hibernate core</description>
+    <description>Hibernate Search integration with Hibernate Core</description>
 
     <dependencies>
         <dependency>
