@@ -151,14 +151,11 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				"     mcast_recv_buf_size=\"25000000\"" +
 				"     mcast_send_buf_size=\"640000\"" +
 				"     loopback=\"false\"\n" +
-				"     discard_incompatible_packets=\"true\"" +
 				"     max_bundle_size=\"64000\"" +
 				"     max_bundle_timeout=\"30\"" +
-				"     use_incoming_packet_handler=\"true\"" +
 				"     ip_ttl=\"2\"" +
 				"     enable_bundling=\"true\"" +
 				"     enable_diagnostics=\"true\"" +
-				"     use_concurrent_stack=\"true\"" +
 				"     thread_naming_pattern=\"pl\"" +
 				"     thread_pool.enabled=\"true\"" +
 				"     thread_pool.min_threads=\"1\"" +
@@ -177,21 +174,19 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				"<PING timeout=\"100\" num_initial_members=\"2\"/>" +
 				"<MERGE2 max_interval=\"30000\" min_interval=\"10000\"/>" +
 				"<FD_SOCK/>" +
-				"<FD timeout=\"10000\" max_tries=\"5\" shun=\"true\"/>" +
+				"<FD timeout=\"10000\" max_tries=\"5\"/>" +
 				"<VERIFY_SUSPECT timeout=\"1500\"/>" +
 				"<pbcast.NAKACK " +
-				"            use_mcast_xmit=\"false\" gc_lag=\"0\"" +
+				"            use_mcast_xmit=\"false\"" +
 				"            retransmit_timeout=\"30,60,120,240,480\"" +
 				"            discard_delivered_msgs=\"false\"/>" +
 				"<UNICAST timeout=\"30,60,120,240,360\"/>" +
 				"<pbcast.STABLE stability_delay=\"1000\" desired_avg_gossip=\"50000\"" +
 				"            max_bytes=\"400000\"/>   " +
 				"<pbcast.GMS print_local_addr=\"true\" join_timeout=\"200\"" +
-				"            shun=\"false\"" +
 				"            view_bundling=\"true\"/>" +
 				"<FC max_credits=\"20000000\" min_threshold=\"0.10\"/>" +
 				"<FRAG2 frag_size=\"60000\"/>" +
-				"<pbcast.STREAMING_STATE_TRANSFER />" +
 				"<pbcast.FLUSH timeout=\"0\"/>" +
 				"</config>";
 	}

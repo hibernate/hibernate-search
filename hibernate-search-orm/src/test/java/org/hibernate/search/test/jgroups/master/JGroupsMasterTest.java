@@ -185,11 +185,11 @@ public class JGroupsMasterTest extends SearchTestCase {
 				"PING(timeout=100;num_initial_members=2):" +
 				"FD(timeout=500):" +
 				"VERIFY_SUSPECT(timeout=500):" +
-				"pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):" +
+				"pbcast.NAKACK(retransmit_timeout=3000):" +
 				"UNICAST(timeout=5000):" +
 				"FRAG:" +
 				"pbcast.GMS(join_timeout=30;" +
-				"shun=false;print_local_addr=true)";
+				"print_local_addr=true)";
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {
