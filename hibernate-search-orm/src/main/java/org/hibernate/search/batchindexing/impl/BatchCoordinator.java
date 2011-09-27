@@ -108,7 +108,7 @@ public class BatchCoordinator implements Runnable {
 			// each batch processing stage is already supposed to properly handle any kind
 			// of exception, still since this is possibly an async operation we need a safety
 			// for the unexpected exceptions
-			errorHandler.handleException( log.unexpectedErrorMessage() , re );
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , re );
 		}
 	}
 

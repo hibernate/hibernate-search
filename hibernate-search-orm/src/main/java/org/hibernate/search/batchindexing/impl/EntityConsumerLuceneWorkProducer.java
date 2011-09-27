@@ -103,7 +103,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 			transaction.commit();
 		}
 		catch (Throwable e) {
-			errorHandler.handleException( log.unexpectedErrorMessage() , e );
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
 		finally {
 			producerEndSignal.countDown();

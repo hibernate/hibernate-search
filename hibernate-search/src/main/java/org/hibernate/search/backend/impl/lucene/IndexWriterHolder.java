@@ -245,7 +245,7 @@ class IndexWriterHolder {
 			this.errorHandler.handle( errorContext );
 		}
 		else {
-			errorHandler.handleException( log.unexpectedErrorMessage() , ioe );
+			errorHandler.handleException( log.ioExceptionOnIndexWriter() , ioe );
 		}
 	}
 

@@ -95,7 +95,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			transaction.commit();
 		}
 		catch ( Throwable e ) {
-			errorHandler.handleException( log.unexpectedErrorMessage() , e );
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
 		finally {
 			if ( upperSession == null ) {

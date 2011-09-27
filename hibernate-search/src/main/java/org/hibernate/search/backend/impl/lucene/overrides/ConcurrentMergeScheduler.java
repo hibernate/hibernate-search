@@ -61,7 +61,7 @@ public class ConcurrentMergeScheduler extends org.apache.lucene.index.Concurrent
 			Thread.currentThread().interrupt();
 		}
 		catch (Exception ex) {
-			errorHandler.handleException( log.unexpectedErrorMessage() , ex );
+			errorHandler.handleException( log.exceptionDuringIndexMergeOperation() , ex );
 		}
 	}
 

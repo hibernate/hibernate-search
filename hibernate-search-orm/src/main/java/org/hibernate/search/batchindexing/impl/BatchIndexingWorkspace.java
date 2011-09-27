@@ -166,7 +166,7 @@ public class BatchIndexingWorkspace implements Runnable {
 		}
 		catch ( RuntimeException re ) {
 			//being this an async thread we want to make sure everything is somehow reported
-			errorHandler.handleException( log.unexpectedErrorMessage() , re );
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , re );
 		}
 		finally {
 			endAllSignal.countDown();

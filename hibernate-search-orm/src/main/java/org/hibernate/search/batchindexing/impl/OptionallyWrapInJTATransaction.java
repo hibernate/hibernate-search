@@ -97,7 +97,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 					}
 				}
 				catch (Throwable e) {
-					errorHandler.handleException( log.unexpectedErrorMessage() , e);
+					errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e);
 					try {
 						transactionManager.rollback();
 					}
@@ -117,7 +117,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 			}
 		}
 		catch (Throwable e) {
-			errorHandler.handleException( log.unexpectedErrorMessage() , e);
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e);
 		}
 	}
 

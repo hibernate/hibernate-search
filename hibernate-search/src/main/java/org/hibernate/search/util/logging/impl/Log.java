@@ -501,7 +501,13 @@ public interface Log extends BasicLogger {
 	 * which is not necessarily using a logger but we still
 	 * want to internationalize the message.
 	 */
-	@Message(id = 116, value = "Unexpected error")
-	String unexpectedErrorMessage();
+	@Message(id = 116, value = "Unexpected error during MassIndexer operation")
+	String massIndexerUnexpectedErrorMessage();
+
+	@Message(id = 117, value = "IOException on the IndexWriter")
+	String ioExceptionOnIndexWriter();
+
+	@Message(id = 118, value = "Exception during index Merge operation")
+	String exceptionDuringIndexMergeOperation();
 
 }
