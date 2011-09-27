@@ -74,7 +74,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-orm</artifactId>
+            <artifactId>hibernate-search</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
