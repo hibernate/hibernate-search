@@ -36,6 +36,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -58,6 +59,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 	private final Class<?> type;
 	private final MassIndexerProgressMonitor monitor;
 	private final String idName;
+	private final ErrorHandler errorHandler;
 
 	public IdentifierConsumerEntityProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
@@ -65,7 +67,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CacheMode cacheMode, Class<?> type,
-			String idName) {
+			String idName, ErrorHandler errorHandler) {
 		this.source = fromIdentifierListToEntities;
 		this.destination = fromEntityToAddWork;
 		this.monitor = monitor;
@@ -73,6 +75,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 		this.cacheMode = cacheMode;
 		this.type = type;
 		this.idName = idName;
+		this.errorHandler = errorHandler;
 		log.trace( "created" );
 	}
 
@@ -92,7 +95,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			transaction.commit();
 		}
 		catch ( Throwable e ) {
-			log.errorDuringBatchIndexing( e );
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
 		finally {
 			if ( upperSession == null ) {

@@ -35,6 +35,7 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -59,8 +60,8 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final int batchSize;
 	private final Class<?> indexedType;
 	private final MassIndexerProgressMonitor monitor;
-
 	private final long objectsLimit;
+	private final ErrorHandler errorHandler;
 
 	/**
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
@@ -69,19 +70,21 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	 * @param indexedType the entity type to be loaded
 	 * @param monitor to monitor indexing progress
 	 * @param objectsLimit if not zero
+	 * @param errorHandler how to handle unexpected errors
 	 */
 	public IdentifierProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
 			Class<?> indexedType, MassIndexerProgressMonitor monitor,
-			long objectsLimit) {
+			long objectsLimit, ErrorHandler errorHandler) {
 				this.destination = fromIdentifierListToEntities;
 				this.sessionFactory = sessionFactory;
 				this.batchSize = objectLoadingBatchSize;
 				this.indexedType = indexedType;
 				this.monitor = monitor;
 				this.objectsLimit = objectsLimit;
+				this.errorHandler = errorHandler;
 				log.trace( "created" );
 	}
 	
@@ -91,7 +94,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			inTransactionWrapper(upperSession);
 		}
 		catch (Throwable e) {
-			log.errorDuringBatchIndexing( e );
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
 		finally{
 			destination.producerStopping();

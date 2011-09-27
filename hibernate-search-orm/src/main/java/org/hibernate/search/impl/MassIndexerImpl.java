@@ -76,9 +76,9 @@ public class MassIndexerImpl implements MassIndexer {
 		if ( searchFactoryImplementor.isJMXEnabled() ) {
 			monitor = new IndexingProgressMonitor();
 		}
-        else {
-            monitor = new SimpleIndexingProgressMonitor();
-        }
+		else {
+			monitor = new SimpleIndexingProgressMonitor();
+		}
 	}
 
 	/**
@@ -166,12 +166,12 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
-    public MassIndexer progressMonitor(MassIndexerProgressMonitor monitor) {
-        this.monitor = monitor;
-        return this;
-    }
+	public MassIndexer progressMonitor(MassIndexerProgressMonitor monitor) {
+		this.monitor = monitor;
+		return this;
+	}
 
-    public MassIndexer optimizeOnFinish(boolean optimize) {
+	public MassIndexer optimizeOnFinish(boolean optimize) {
 		this.optimizeAtEnd = optimize;
 		return this;
 	}

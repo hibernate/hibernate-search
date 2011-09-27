@@ -65,9 +65,9 @@ public class LogErrorHandler implements ErrorHandler {
 			}
 		}
 		
-		logError( errorMsg.toString(), exceptionThatOccurred );
+		handleException( errorMsg.toString(), exceptionThatOccurred );
 	}
-	
+
 	public static final void appendFailureMessage(StringBuilder message, LuceneWork workThatFailed) {
 		message.append( "\tEntity " )
 			.append( workThatFailed.getEntityClass().getName() )
@@ -77,9 +77,10 @@ public class LogErrorHandler implements ErrorHandler {
 			.append( " " ).append( workThatFailed.getClass().getName() )
 			.append( "\n" );
 	}
-	
-	protected void logError(String errorMsg, Throwable exceptionThatOccurred) {
-		log.exceptionOccured( errorMsg, exceptionThatOccurred );
+
+	@Override
+	public void handleException(String errorMsg, Throwable exception) {
+		log.exceptionOccured( errorMsg, exception );
 	}
-	
+
 }

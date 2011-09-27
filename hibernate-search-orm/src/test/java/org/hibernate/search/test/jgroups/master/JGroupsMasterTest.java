@@ -182,13 +182,13 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 	private String prepareJGroupsConfigurationString() {
 		return "UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):" +
-				"PING(timeout=100;num_initial_members=2):" +
-				"FD(timeout=500):" +
-				"VERIFY_SUSPECT(timeout=500):" +
+				"PING(timeout=500;num_initial_members=2):" +
+				"FD(timeout=2000):" +
+				"VERIFY_SUSPECT(timeout=2000):" +
 				"pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):" +
 				"UNICAST(timeout=5000):" +
 				"FRAG:" +
-				"pbcast.GMS(join_timeout=30;" +
+				"pbcast.GMS(join_timeout=300;" +
 				"shun=false;print_local_addr=true)";
 	}
 

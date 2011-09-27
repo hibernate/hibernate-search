@@ -34,6 +34,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -120,6 +121,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	}
 
 	public void run() {
+		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		try {
 
 			//first start the consumers, then the producers (reverse order):
@@ -128,25 +130,25 @@ public class BatchIndexingWorkspace implements Runnable {
 				final EntityConsumerLuceneWorkProducer producer = new EntityConsumerLuceneWorkProducer(
 						fromEntityToAddwork, monitor,
 						sessionFactory, producerEndSignal, searchFactory,
-						cacheMode, backend
+						cacheMode, backend, errorHandler
 				);
-				execDocBuilding.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
+				execDocBuilding.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 			}
 			for ( int i = 0; i < objectLoadingThreadNum; i++ ) {
 				//from primary key to loaded entity:
 				final IdentifierConsumerEntityProducer producer = new IdentifierConsumerEntityProducer(
 						fromIdentifierListToEntities, fromEntityToAddwork, monitor,
-						sessionFactory, cacheMode, indexedType, idNameOfIndexedType
+						sessionFactory, cacheMode, indexedType, idNameOfIndexedType, errorHandler
 				);
-				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
+				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 			}
 			//from class definition to all primary keys:
 			final IdentifierProducer producer = new IdentifierProducer(
 					fromIdentifierListToEntities, sessionFactory,
 					objectLoadingBatchSize, indexedType, monitor,
-					objectsLimit
+					objectsLimit, errorHandler
 			);
-			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, producer ) );
+			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 
 			//shutdown all executors:
 			execIdentifiersLoader.shutdown();
@@ -161,6 +163,10 @@ public class BatchIndexingWorkspace implements Runnable {
 				Thread.currentThread().interrupt();
 				throw new SearchException( "Interrupted on batch Indexing; index will be left in unknown state!", e );
 			}
+		}
+		catch ( RuntimeException re ) {
+			//being this an async thread we want to make sure everything is somehow reported
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , re );
 		}
 		finally {
 			endAllSignal.countDown();

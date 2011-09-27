@@ -44,6 +44,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -65,25 +66,25 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	private final SessionFactory sessionFactory;
 	private final Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders;
 	private final MassIndexerProgressMonitor monitor;
-	
 	private final CacheMode cacheMode;
-
 	private final CountDownLatch producerEndSignal;
-
 	private final BatchBackend backend;
+	private final ErrorHandler errorHandler;
 	
 	public EntityConsumerLuceneWorkProducer(
 			ProducerConsumerQueue<List<?>> entitySource,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CountDownLatch producerEndSignal,
-			SearchFactoryImplementor searchFactory, CacheMode cacheMode, BatchBackend backend) {
+			SearchFactoryImplementor searchFactory, CacheMode cacheMode,
+			BatchBackend backend, ErrorHandler errorHandler) {
 		this.source = entitySource;
 		this.monitor = monitor;
 		this.sessionFactory = sessionFactory;
 		this.producerEndSignal = producerEndSignal;
 		this.cacheMode = cacheMode;
 		this.backend = backend;
+		this.errorHandler = errorHandler;
 		this.entityIndexBinders = searchFactory.getIndexBindingForEntity();
 	}
 
@@ -102,7 +103,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 			transaction.commit();
 		}
 		catch (Throwable e) {
-			log.errorDuringBatchIndexing( e );
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
 		finally {
 			producerEndSignal.countDown();

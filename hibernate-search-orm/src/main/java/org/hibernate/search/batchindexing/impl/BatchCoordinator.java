@@ -28,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.CacheMode;
@@ -62,8 +63,7 @@ public class BatchCoordinator implements Runnable {
 	private final CountDownLatch endAllSignal;
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
-
-	private BatchBackend backend;
+	private final ErrorHandler errorHandler;
 
 	public BatchCoordinator(Set<Class<?>> rootEntities,
 							SearchFactoryImplementor searchFactoryImplementor,
@@ -86,31 +86,40 @@ public class BatchCoordinator implements Runnable {
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 		this.endAllSignal = new CountDownLatch( rootEntities.size() );
+		this.errorHandler = searchFactoryImplementor.getErrorHandler();
 	}
 
 	public void run() {
-		backend = searchFactoryImplementor.makeBatchBackend( monitor );
 		try {
-			beforeBatch(); // purgeAll and pre-optimize activities
-			doBatchWork();
-			afterBatch();
-		}
-		catch ( InterruptedException e ) {
-			log.interruptedBatchIndexing();
-			Thread.currentThread().interrupt();
-		}
-		finally {
-			monitor.indexingCompleted();
+			final BatchBackend backend = searchFactoryImplementor.makeBatchBackend( monitor );
+			try {
+				beforeBatch( backend ); // purgeAll and pre-optimize activities
+				doBatchWork( backend );
+				afterBatch( backend );
+			}
+			catch ( InterruptedException e ) {
+				log.interruptedBatchIndexing();
+				Thread.currentThread().interrupt();
+			}
+			finally {
+				monitor.indexingCompleted();
+			}
+		} catch (RuntimeException re) {
+			// each batch processing stage is already supposed to properly handle any kind
+			// of exception, still since this is possibly an async operation we need a safety
+			// for the unexpected exceptions
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , re );
 		}
 	}
 
 	/**
 	 * Will spawn a thread for each type in rootEntities, they will all re-join
 	 * on endAllSignal when finished.
+	 * @param backend
 	 *
 	 * @throws InterruptedException if interrupted while waiting for endAllSignal.
 	 */
-	private void doBatchWork() throws InterruptedException {
+	private void doBatchWork(BatchBackend backend) throws InterruptedException {
 		ExecutorService executor = Executors.newFixedThreadPool( rootEntities.length, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
 			executor.execute(
@@ -128,18 +137,20 @@ public class BatchCoordinator implements Runnable {
 
 	/**
 	 * Operations to do after all subthreads finished their work on index
+	 * @param backend
 	 */
-	private void afterBatch() {
+	private void afterBatch(BatchBackend backend) {
 		if ( this.optimizeAtEnd ) {
 			Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( rootEntities );
-			optimize( targetedClasses );
+			optimize( backend, targetedClasses );
 		}
 	}
 
 	/**
 	 * Optional operations to do before the multiple-threads start indexing
+	 * @param backend
 	 */
-	private void beforeBatch() {
+	private void beforeBatch(BatchBackend backend) {
 		if ( this.purgeAtStart ) {
 			//purgeAll for affected entities
 			Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( rootEntities );
@@ -148,12 +159,12 @@ public class BatchCoordinator implements Runnable {
 				backend.doWorkInSync( new PurgeAllLuceneWork( clazz ) );
 			}
 			if ( this.optimizeAfterPurge ) {
-				optimize( targetedClasses );
+				optimize( backend, targetedClasses );
 			}
 		}
 	}
 
-	private void optimize(Set<Class<?>> targetedClasses) {
+	private void optimize(BatchBackend backend, Set<Class<?>> targetedClasses) {
 		for ( Class<?> clazz : targetedClasses ) {
 			//TODO the backend should remove duplicate optimize work to the same DP (as entities might share indexes)
 			backend.doWorkInSync( new OptimizeLuceneWork( clazz ) );
