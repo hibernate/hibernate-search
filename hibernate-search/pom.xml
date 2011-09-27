@@ -32,20 +32,20 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-orm</artifactId>
+    <artifactId>hibernate-search</artifactId>
 
-    <name>Hibernate Search ORM</name>
-    <description>Hibernate Search integration with Hibernate Core</description>
+    <name>Hibernate Search</name>
+    <description>Hibernate Search</description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search</artifactId>
+            <artifactId>hibernate-search-engine</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search</artifactId>
+            <artifactId>hibernate-search-engine</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>

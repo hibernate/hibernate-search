@@ -124,7 +124,7 @@
         <!-- Hibernate -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search</artifactId>
+            <artifactId>hibernate-search-engine</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -136,13 +136,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-orm</artifactId>
+            <artifactId>hibernate-search</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-orm</artifactId>
+            <artifactId>hibernate-search</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
