@@ -34,7 +34,7 @@ public class BytemanHelper extends Helper {
 	}
 
 	public static final Log log = LoggerFactory.make();
-	
+
 	public void sleepASecond() {
 		try {
 			log.info( "Byteman rule triggered: sleeping a second" );
@@ -45,5 +45,10 @@ public class BytemanHelper extends Helper {
 			log.error( "unexpected interruption", e );
 		}
 	}
-	
+
+	public void throwNPE(String message) {
+		//Needed because of Bug BYTEMAN-173: can't simply inject a NPE from the rule
+		throw new NullPointerException( message );
+	}
+
 }
