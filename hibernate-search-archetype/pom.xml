@@ -68,7 +68,7 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search</artifactId>
+            <artifactId>hibernate-search-orm</artifactId>
             <!-- When removing the <parent> node you will have to explicitly set the hibernate-search version -->
             <version>${project.parent.version}</version>
         </dependency>

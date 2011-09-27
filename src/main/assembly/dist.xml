@@ -41,7 +41,7 @@
     <moduleSets>
         <moduleSet>
             <includes>
-                <include>org.hibernate:hibernate-search</include>
+                <include>org.hibernate:hibernate-search-engine</include>
             </includes>
             <sources>
                 <includeModuleDirectory>false</includeModuleDirectory>
@@ -67,7 +67,7 @@
                         <excludes>
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>commons-lang:commons-lang</exclude>
-                            <exclude>org.hibernate:hibernate-search</exclude>
+                            <exclude>org.hibernate:hibernate-search-engine</exclude>
                             <exclude>org.hibernate:hibernate-search-analyzers</exclude>
                             <exclude>org.apache.lucene:lucene-grouping</exclude>
                             <exclude>org.apache.lucene:lucene-analyzers</exclude>
@@ -106,7 +106,7 @@
                             <exclude>commons-collections:commons-collections</exclude>
                             <exclude>dom4j:dom4j</exclude>
                             <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
-                            <exclude>org.hibernate:hibernate-search</exclude>
+                            <exclude>org.hibernate:hibernate-search-engine</exclude>
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>xml-apis:xml-apis</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
@@ -153,7 +153,7 @@
                         <excludes>
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>commons-lang:commons-lang</exclude>
-                            <exclude>org.hibernate:hibernate-search</exclude>
+                            <exclude>org.hibernate:hibernate-search-engine</exclude>
                             <exclude>org.hibernate:hibernate-search-analyzers</exclude>
                             <exclude>org.apache.lucene:lucene-grouping</exclude>
                             <exclude>org.apache.lucene:lucene-analyzers</exclude>
@@ -191,7 +191,7 @@
                             <exclude>dom4j:dom4j</exclude>
                             <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
                             <exclude>org.hibernate:hibernate-core</exclude>
-                            <exclude>org.hibernate:hibernate-search</exclude>
+                            <exclude>org.hibernate:hibernate-search-engine</exclude>
                             <exclude>org.infinispan:*</exclude>
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>xml-apis:xml-apis</exclude>

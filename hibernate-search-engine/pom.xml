@@ -34,10 +34,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search</artifactId>
+    <artifactId>hibernate-search-engine</artifactId>
 
-    <name>Hibernate Search</name>
-    <description>Hibernate Search</description>
+    <name>Hibernate Search Engine</name>
+    <description>the core of the Object/Lucene mapper, query engine and index management</description>
 
     <properties>
         <jdocbookSourceDirectory>${basedir}/src/main/docbook</jdocbookSourceDirectory>
