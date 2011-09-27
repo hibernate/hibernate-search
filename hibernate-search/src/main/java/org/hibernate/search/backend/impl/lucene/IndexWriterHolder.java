@@ -39,7 +39,6 @@ import org.hibernate.search.backend.spi.LuceneIndexingParameters.ParameterSet;
 import org.hibernate.search.exception.ErrorContext;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
-import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
@@ -243,11 +242,11 @@ class IndexWriterHolder {
 		final ErrorContext errorContext;
 		if ( errorContextBuilder != null ) {
 			errorContext = errorContextBuilder.errorThatOccurred( ioe ).createErrorContext();
+			this.errorHandler.handle( errorContext );
 		}
 		else {
-			 errorContext = new SingleErrorContext( ioe );
+			errorHandler.handleException( log.unexpectedErrorMessage() , ioe );
 		}
-		this.errorHandler.handle( errorContext );
 	}
 
 }

@@ -35,7 +35,6 @@ import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -167,8 +166,7 @@ public class BatchIndexingWorkspace implements Runnable {
 		}
 		catch ( RuntimeException re ) {
 			//being this an async thread we want to make sure everything is somehow reported
-			SingleErrorContext singleErrorContext = new SingleErrorContext( re );
-			errorHandler.handle( singleErrorContext );
+			errorHandler.handleException( log.unexpectedErrorMessage() , re );
 		}
 		finally {
 			endAllSignal.countDown();

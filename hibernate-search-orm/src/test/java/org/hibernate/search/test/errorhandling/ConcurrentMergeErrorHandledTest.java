@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.test.errorhandling;
 
+import java.io.IOException;
+
 import junit.framework.Assert;
 
 import org.hibernate.Session;
@@ -75,7 +77,10 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 		transaction.commit();
 		session.close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
-		Assert.assertEquals( "Exception occurred java.io.IOException: Byteman said: your disk is full!\n", errorMessage );
+		Assert.assertEquals( "Unexpected error", errorMessage );
+		Throwable exception = mockErrorHandler.getLastException();
+		Assert.assertTrue( exception instanceof IOException );
+		Assert.assertEquals( "Byteman said: your disk is full!", exception.getMessage() );
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {

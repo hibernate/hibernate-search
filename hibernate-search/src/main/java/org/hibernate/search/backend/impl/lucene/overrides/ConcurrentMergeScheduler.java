@@ -29,7 +29,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.MergePolicy;
 import org.apache.lucene.util.ThreadInterruptedException;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.impl.SingleErrorContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * We customize Lucene's ConcurrentMergeScheduler to route eventual exceptions to our configurable errorhandler.
@@ -40,7 +41,9 @@ import org.hibernate.search.exception.impl.SingleErrorContext;
  */
 //TODO think about using an Executor instead of starting Threads directly
 public class ConcurrentMergeScheduler extends org.apache.lucene.index.ConcurrentMergeScheduler {
-	
+
+	private static final Log log = LoggerFactory.make();
+
 	private final ErrorHandler errorHandler;
 	private final String indexName;
 	
@@ -58,8 +61,7 @@ public class ConcurrentMergeScheduler extends org.apache.lucene.index.Concurrent
 			Thread.currentThread().interrupt();
 		}
 		catch (Exception ex) {
-			SingleErrorContext errorContext = new SingleErrorContext( ex );
-			errorHandler.handle( errorContext );
+			errorHandler.handleException( log.unexpectedErrorMessage() , ex );
 		}
 	}
 

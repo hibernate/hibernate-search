@@ -29,7 +29,6 @@ import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.impl.SingleErrorContext;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.CacheMode;
@@ -109,8 +108,7 @@ public class BatchCoordinator implements Runnable {
 			// each batch processing stage is already supposed to properly handle any kind
 			// of exception, still since this is possibly an async operation we need a safety
 			// for the unexpected exceptions
-			SingleErrorContext singleErrorContext = new SingleErrorContext( re );
-			errorHandler.handle( singleErrorContext );
+			errorHandler.handleException( log.unexpectedErrorMessage() , re );
 		}
 	}
 
