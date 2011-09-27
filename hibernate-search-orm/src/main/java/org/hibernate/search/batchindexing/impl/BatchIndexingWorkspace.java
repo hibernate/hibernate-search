@@ -130,7 +130,7 @@ public class BatchIndexingWorkspace implements Runnable {
 				final EntityConsumerLuceneWorkProducer producer = new EntityConsumerLuceneWorkProducer(
 						fromEntityToAddwork, monitor,
 						sessionFactory, producerEndSignal, searchFactory,
-						cacheMode, backend
+						cacheMode, backend, errorHandler
 				);
 				execDocBuilding.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 			}
@@ -138,7 +138,7 @@ public class BatchIndexingWorkspace implements Runnable {
 				//from primary key to loaded entity:
 				final IdentifierConsumerEntityProducer producer = new IdentifierConsumerEntityProducer(
 						fromIdentifierListToEntities, fromEntityToAddwork, monitor,
-						sessionFactory, cacheMode, indexedType, idNameOfIndexedType
+						sessionFactory, cacheMode, indexedType, idNameOfIndexedType, errorHandler
 				);
 				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 			}
@@ -146,7 +146,7 @@ public class BatchIndexingWorkspace implements Runnable {
 			final IdentifierProducer producer = new IdentifierProducer(
 					fromIdentifierListToEntities, sessionFactory,
 					objectLoadingBatchSize, indexedType, monitor,
-					objectsLimit
+					objectsLimit, errorHandler
 			);
 			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 
