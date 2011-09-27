@@ -39,7 +39,7 @@ public class MockErrorHandler extends LogErrorHandler {
 	private volatile Throwable lastException;
 
 	@Override
-	protected void logError(String errorMsg, Throwable exceptionThatOccurred) {
+	public void handleException(String errorMsg, Throwable exceptionThatOccurred) {
 		errorMessage = errorMsg;
 		lastException = exceptionThatOccurred;
 	}
