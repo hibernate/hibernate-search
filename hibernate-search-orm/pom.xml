@@ -143,6 +143,7 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <runOrder>alphabetical</runOrder>
                     <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</argLine>
                     <systemProperties>
                         <property>
