@@ -50,8 +50,8 @@ import org.hibernate.search.test.jgroups.master.TShirt;
  */
 public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
-	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "testing-flush-udp.xml";
-	public static final long NETWORK_TIMEOUT = 100;
+	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
+	public static final long NETWORK_TIMEOUT = 400;
 	
 	/**
 	 * Name of the JGroups channel used in test

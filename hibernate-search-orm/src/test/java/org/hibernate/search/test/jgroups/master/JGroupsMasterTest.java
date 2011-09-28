@@ -181,7 +181,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 	}
 
 	private String prepareJGroupsConfigurationString() {
-		return "UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):" +
+		return "SHARED_LOOPBACK:" +
 				"PING(timeout=500;num_initial_members=2):" +
 				"FD(timeout=2000):" +
 				"VERIFY_SUSPECT(timeout=2000):" +

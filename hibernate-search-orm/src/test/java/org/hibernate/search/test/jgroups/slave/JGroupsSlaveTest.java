@@ -142,38 +142,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 
 	private String prepareXmlJGroupsConfiguration() {
 		return "<config>" +
-				"<UDP" +
-				"     mcast_addr=\"228.10.10.10\"" +
-				"     mcast_port=\"45588\"" +
-				"     tos=\"8\"" +
-				"     ucast_recv_buf_size=\"20000000\"" +
-				"     ucast_send_buf_size=\"640000\"" +
-				"     mcast_recv_buf_size=\"25000000\"" +
-				"     mcast_send_buf_size=\"640000\"" +
-				"     loopback=\"false\"\n" +
-				"     discard_incompatible_packets=\"true\"" +
-				"     max_bundle_size=\"64000\"" +
-				"     max_bundle_timeout=\"30\"" +
-				"     use_incoming_packet_handler=\"true\"" +
-				"     ip_ttl=\"2\"" +
-				"     enable_bundling=\"true\"" +
-				"     enable_diagnostics=\"true\"" +
-				"     use_concurrent_stack=\"true\"" +
-				"     thread_naming_pattern=\"pl\"" +
-				"     thread_pool.enabled=\"true\"" +
-				"     thread_pool.min_threads=\"1\"" +
-				"     thread_pool.max_threads=\"5\"" +
-				"     thread_pool.keep_alive_time=\"500\"" +
-				"     thread_pool.queue_enabled=\"false\"" +
-				"     thread_pool.queue_max_size=\"100\"" +
-				"     thread_pool.rejection_policy=\"Run\"" +
-				"     oob_thread_pool.enabled=\"true\"" +
-				"     oob_thread_pool.min_threads=\"1\"" +
-				"     oob_thread_pool.max_threads=\"8\"" +
-				"     oob_thread_pool.keep_alive_time=\"500\"" +
-				"     oob_thread_pool.queue_enabled=\"false\"" +
-				"     oob_thread_pool.queue_max_size=\"100\"" +
-				"     oob_thread_pool.rejection_policy=\"Run\"/>" +
+				"<SHARED_LOOPBACK/>" +
 				"<PING timeout=\"100\" num_initial_members=\"2\"/>" +
 				"<MERGE2 max_interval=\"30000\" min_interval=\"10000\"/>" +
 				"<FD_SOCK/>" +
@@ -189,10 +158,6 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				"<pbcast.GMS print_local_addr=\"true\" join_timeout=\"200\"" +
 				"            shun=\"false\"" +
 				"            view_bundling=\"true\"/>" +
-				"<FC max_credits=\"20000000\" min_threshold=\"0.10\"/>" +
-				"<FRAG2 frag_size=\"60000\"/>" +
-				"<pbcast.STREAMING_STATE_TRANSFER />" +
-				"<pbcast.FLUSH timeout=\"0\"/>" +
 				"</config>";
 	}
 }
