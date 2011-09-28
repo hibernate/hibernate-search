@@ -20,6 +20,7 @@
 package org.hibernate.search.infinispan;
 
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.AssertionFailedError;
 
@@ -50,7 +51,7 @@ public class ClusterTestHelper {
 	 * join the existing nodes.
 	 * @return a started FullTextSessionBuilder
 	 */
-	public static FullTextSessionBuilder createClusterNode() {
+	public static FullTextSessionBuilder createClusterNode(Set<Class<?>> entityTypes) {
 		FullTextSessionBuilder node = new FullTextSessionBuilder()
 			.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
 			// fragment on every 7 bytes: don't use this on a real case!
@@ -65,15 +66,17 @@ public class ClusterTestHelper {
 			.setProperty(
 					Environment.CONNECTION_PROVIDER,
 					org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
-					)
-			.addAnnotatedClass( SimpleEmail.class );
+					);
+		for(Class<?> entityType : entityTypes){
+			node.addAnnotatedClass( entityType );
+		}
 		return node.build();
 	}
 
 	/**
 	 * Wait some time for the cluster to form
 	 */
-	public static void waitMembersCount(FullTextSessionBuilder node, int expectedSize) {
+	public static void waitMembersCount(FullTextSessionBuilder node, Class<?> entityType, int expectedSize) {
 		int currentSize = 0;
 		int loopCounter = 0;
 		while ( currentSize < expectedSize ) {
@@ -83,7 +86,7 @@ public class ClusterTestHelper {
 			catch ( InterruptedException e ) {
 				throw new AssertionFailedError( e.getMessage() );
 			}
-			currentSize = clusterSize( node );
+			currentSize = clusterSize( node, entityType);
 			if ( loopCounter > 200 ) {
 				throw new AssertionFailedError( "timeout while waiting for all nodes to join in cluster" );
 			}
@@ -95,10 +98,10 @@ public class ClusterTestHelper {
 	 * @param node the FullTextSessionBuilder representing the current node
 	 * @return the number of nodes as seen by the current node
 	 */
-	public static int clusterSize(FullTextSessionBuilder node) {
+	public static int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
-		EntityIndexBinder<SimpleEmail> mailIndexBinding = searchFactory.getIndexBindingForEntity( SimpleEmail.class );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) mailIndexBinding.getIndexManagers()[0];
+		EntityIndexBinder<?> indexBinding = searchFactory.getIndexBindingForEntity( entityType );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();
 		List<Address> members = cacheManager.getMembers();
