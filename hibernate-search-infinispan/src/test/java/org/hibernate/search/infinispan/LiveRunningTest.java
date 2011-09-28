@@ -24,6 +24,7 @@ import static org.hibernate.search.infinispan.ClusterTestHelper.clusterSize;
 import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
 import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,8 +53,9 @@ public class LiveRunningTest {
 	
 	private static final int TEST_RUNS = 17;
 	private static final int MAX_SLAVES = 5;
+	private static HashSet<Class<?>> entityTypes;
 	
-	private final FullTextSessionBuilder master = createClusterNode();
+	private final FullTextSessionBuilder master = createClusterNode(entityTypes);
 	private final List<FullTextSessionBuilder> slaves = new LinkedList<FullTextSessionBuilder>();
 	
 	private boolean growCluster = true;
@@ -85,7 +87,7 @@ public class LiveRunningTest {
 	}
 
 	private void assertView(FullTextSessionBuilder node) {
-		assertEquals( slaves.size() + 1 , clusterSize( node ) );
+		assertEquals( slaves.size() + 1 , clusterSize( node, SimpleEmail.class ) );
 		FullTextSession session = node.openFullTextSession();
 		try {
 			FullTextQuery fullTextQuery = session.createFullTextQuery( new MatchAllDocsQuery() );
@@ -103,7 +105,7 @@ public class LiveRunningTest {
 				growCluster = false;
 			}
 			else {
-				slaves.add( createClusterNode() );
+				slaves.add( createClusterNode(entityTypes) );
 			}
 		}
 		else {
@@ -136,14 +138,16 @@ public class LiveRunningTest {
 	
 	private void waitForAllJoinsCompleted() {
 		int expectedSize = slaves.size() + 1;
-		waitMembersCount( master, expectedSize );
+		waitMembersCount( master, SimpleEmail.class, expectedSize );
 		for (FullTextSessionBuilder slave : slaves) {
-			waitMembersCount( slave, expectedSize );
+			waitMembersCount( slave, SimpleEmail.class, expectedSize );
 		}
 	}
 
 	@BeforeClass
 	public static void prepareConnectionPool() {
+		entityTypes = new HashSet<Class<?>>();
+		entityTypes.add( SimpleEmail.class );
 		ClusterSharedConnectionProvider.realStart();
 	}
 	
