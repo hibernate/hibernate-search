@@ -38,6 +38,7 @@
 
     <modules>
         <module>hibernate-search</module>
+        <module>hibernate-search-engine</module>
         <module>hibernate-search-orm</module>
         <module>hibernate-search-analyzers</module>
         <module>hibernate-search-testing</module>

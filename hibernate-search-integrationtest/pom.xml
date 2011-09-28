@@ -124,7 +124,7 @@
         <!-- Hibernate -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search</artifactId>
+            <artifactId>hibernate-search-engine</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
