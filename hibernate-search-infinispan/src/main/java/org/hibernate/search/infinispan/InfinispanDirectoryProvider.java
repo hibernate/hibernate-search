@@ -113,4 +113,21 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		return cacheManager;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj == null || !( obj instanceof InfinispanDirectoryProvider ) ) {
+			return false;
+		}
+		return directoryProviderName.equals( ( (InfinispanDirectoryProvider) obj ).directoryProviderName );
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 11;
+		return 37 * hash + directoryProviderName.hashCode();
+	}
+
 }
