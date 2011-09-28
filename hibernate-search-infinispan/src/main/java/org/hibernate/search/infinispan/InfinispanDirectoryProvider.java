@@ -26,21 +26,20 @@ package org.hibernate.search.infinispan;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.infinispan.Cache;
-import org.infinispan.lucene.InfinispanDirectory;
-import org.infinispan.manager.EmbeddedCacheManager;
-import org.slf4j.Logger;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.ConfigurationParseHelper;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProviderHelper;
 import org.hibernate.search.util.LoggerFactory;
+import org.infinispan.Cache;
+import org.infinispan.lucene.InfinispanDirectory;
+import org.infinispan.manager.EmbeddedCacheManager;
+import org.slf4j.Logger;
 
 /**
  * A DirectoryProvider using Infinispan to store the Index. This depends on the
  * CacheManagerServiceProvider to get a reference to the Infinispan {@link EmbeddedCacheManager}.
- *
+ * 
  * @author Sanne Grinovero
  */
 public class InfinispanDirectoryProvider implements org.hibernate.search.store.DirectoryProvider<InfinispanDirectory> {
@@ -72,9 +71,8 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		metadataCacheName = properties.getProperty( "metadata_cachename", DEFAULT_INDEXESMETADATA_CACHENAME );
 		dataCacheName = properties.getProperty( "data_cachename", DEFAULT_INDEXESDATA_CACHENAME );
 		lockingCacheName = properties.getProperty( "locking_cachename", DEFAULT_LOCKING_CACHENAME );
-		chunkSize = ConfigurationParseHelper.getIntValue(
-				properties, "chunk_size", InfinispanDirectory.DEFAULT_BUFFER_SIZE
-		);
+		chunkSize = ConfigurationParseHelper.getIntValue( properties, "chunk_size",
+				InfinispanDirectory.DEFAULT_BUFFER_SIZE );
 	}
 
 	@Override
@@ -111,6 +109,23 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	public EmbeddedCacheManager getCacheManager() {
 		return cacheManager;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj == null || !( obj instanceof InfinispanDirectoryProvider ) ) {
+			return false;
+		}
+		return directoryProviderName.equals( ( (InfinispanDirectoryProvider) obj ).directoryProviderName );
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 11;
+		return 37 * hash + directoryProviderName.hashCode();
 	}
 
 }
