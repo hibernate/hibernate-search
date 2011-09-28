@@ -1,6 +1,31 @@
 Hibernate Search Changelog
 ==========================
 
+4.0.0.Beta2 (29-09-2011)
+-------------------------
+
+** Bug
+    * [HSEARCH-871] - Only the last enabled FullTextFilter is in effect if multiple FullTextFilters of the same type, different parameters are enabled
+    * [HSEARCH-916] - Fix query DSL documentation errors
+    * [HSEARCH-921] - NullPointerException in AvroSerializationProvider due to wrong resource path
+    * [HSEARCH-922] - Remove interface DocumentBuilder
+
+** Improvement
+    * [HSEARCH-849] - Simplify ErrorHandler interface
+    * [HSEARCH-905] - Upgrade to Lucene 3.4
+    * [HSEARCH-919] - Index Merging thread names should contain the index name
+
+** New Feature
+    * [HSEARCH-643] - Have the MassIndexer use the error handler to report exceptions
+    * [HSEARCH-677] - Isolate Hibernate Core dependency to make Hibernate Search fully standalone
+
+** Task
+    * [HSEARCH-666] - Get documentation onto translate.jboss.org
+    * [HSEARCH-920] - Upgrade to Hibernate core 4.0.0.CR3
+    * [HSEARCH-927] - Improve timeouts of JGroupsMasterTest
+    * [HSEARCH-929] - Introduce SHARED_LOOPBACK JGroups protocol to make the tests more reliable
+
+
 4.0.0.Beta1 (14-09-2011)
 -------------------------
 

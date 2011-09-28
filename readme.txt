@@ -1,6 +1,6 @@
 Hibernate Search
 ==================================================
-Version: 4.0.0.Beta1 14-09-2011
+Version: 4.0.0.Beta2 29-09-2011
 
 Description
 -----------
@@ -16,7 +16,7 @@ Hibernate Search is using Apache Lucene(tm) under the cover.
 
 This version of Hibernate Search requires:
  - Hibernate Core 4.0 and above
- - Apache Lucene 3.3
+ - Apache Lucene 3.4
 
 Instructions
 ------------
@@ -33,7 +33,7 @@ Latest Documentation:
 
 Bug Reports:
 
-   Hibernate JIRA (preferred): http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH
+   Hibernate JIRA (preferred): https://hibernate.onjira.com/browse/HSEARCH
    hibernate-dev@lists.jboss.org
 
 Free Technical Support:
