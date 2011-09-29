@@ -289,7 +289,7 @@ public abstract class SearchTestCase extends TestCase {
 		return targetDir;
 	}
 
-	public class RollbackWork implements Work {
+	private static class RollbackWork implements Work {
 
 		public void execute(Connection connection) throws SQLException {
 			connection.rollback();

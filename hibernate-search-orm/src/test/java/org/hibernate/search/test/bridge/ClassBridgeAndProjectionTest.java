@@ -86,7 +86,7 @@ public class ClassBridgeAndProjectionTest extends SearchTestCase {
 		assertTrue( results.size() == 1 );
 		Object[] firstResult = ( Object[] ) results.get( 0 );
 		Integer amountStudents = ( Integer ) firstResult[0];
-		assertEquals( new Integer( 2 ), amountStudents );
+		assertEquals( Integer.valueOf( 2 ), amountStudents );
 		tx.commit();
 		s.close();
 	}

@@ -235,8 +235,8 @@ public class AvroTest {
 				GenericRecord deleteOp = ( GenericRecord ) ops.get( 2 );
 				assertThat( deleteOp.getSchema().getName() ).isEqualTo( "Delete" );
 				Object actual = ( ( GenericRecord ) deleteOp.get( "id" ) ).get( "value" );
-				assertThat(actual).isInstanceOf( Long.class );
-				assertThat(actual).isEqualTo( new Long(30) );
+				assertThat( actual ).isInstanceOf( Long.class );
+				assertThat( actual ).isEqualTo( Long.valueOf( 30 ) );
 
 				//Add
 				assertThat( ops.get( 3 ) ).isInstanceOf( GenericRecord.class );

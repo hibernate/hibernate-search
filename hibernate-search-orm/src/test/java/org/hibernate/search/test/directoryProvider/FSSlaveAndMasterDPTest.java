@@ -247,7 +247,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 				"hibernate.search.default.directory_provider", "filesystem-slave"
 		);
 		cfg.setProperty(
-				"hibernate.search.default.retry_marker_lookup", new Integer(retries).toString()
+				"hibernate.search.default.retry_marker_lookup", String.valueOf( retries )
 		);
 		cfg.addAnnotatedClass( SnowStorm.class );
 		long start = System.nanoTime();

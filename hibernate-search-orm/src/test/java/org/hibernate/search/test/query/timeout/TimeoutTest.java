@@ -175,7 +175,7 @@ public class TimeoutTest extends SearchTestCase {
 	private void storeClocks(FullTextSession fts) {
 		Transaction tx = fts.beginTransaction();
 		for ( int i = 0; i < 1000; i++ ) {
-			Clock clock = new Clock( "Model cat A" + i, ( i % 2 == 0 ) ? "Seiko" : "Swatch", new Long( 2000 + i ) );
+			Clock clock = new Clock( "Model cat A" + i, ( i % 2 == 0 ) ? "Seiko" : "Swatch", Long.valueOf( 2000 + i ) );
 			fts.persist( clock );
 		}
 		tx.commit();

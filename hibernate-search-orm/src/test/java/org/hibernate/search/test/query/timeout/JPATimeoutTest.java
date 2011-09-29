@@ -33,7 +33,7 @@ public class JPATimeoutTest extends JPATestCase {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
 		for ( int i = 0 ; i < 1000 ; i++ ) {
-			Clock clock  = new Clock("Model cat A" + i, (i % 2 == 0) ? "Seiko" : "Swatch", new Long (2000 + i) ) ;
+			Clock clock  = new Clock("Model cat A" + i, (i % 2 == 0) ? "Seiko" : "Swatch", Long.valueOf( 2000 + i ) ) ;
 			em.persist( clock );
 		}
 		em.getTransaction().commit();
@@ -73,7 +73,7 @@ public class JPATimeoutTest extends JPATestCase {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
 		for ( int i = 0 ; i < 1000 ; i++ ) {
-			Clock clock  = new Clock("Model cat A" + i, (i % 2 == 0) ? "Seiko" : "Swatch", new Long (2000 + i) ) ;
+			Clock clock  = new Clock("Model cat A" + i, (i % 2 == 0) ? "Seiko" : "Swatch", Long.valueOf( 2000 + i ) ) ;
 			em.persist( clock );
 		}
 		em.getTransaction().commit();

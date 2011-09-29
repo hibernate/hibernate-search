@@ -36,6 +36,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -286,7 +287,11 @@ public class MutableFactoryTest {
 					assertEquals( 1, indexManagers.length );
 					DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 					DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();
-					Assert.assertTrue( "Configuration lost: expected RAM directory", directoryProvider instanceof RAMDirectoryProvider );
+
+					if ( ! ( directoryProvider instanceof RAMDirectoryProvider ) ) {
+						// can't use Assertion in a separate thread
+						throw new SearchException( "Configuration lost: expected RAM directory" );
+					}
 
 					Query luceneQuery = parser.parse( "Emmanuel" + i);
 					IndexReader indexReader = factory.getIndexReaderAccessor().open( aClass );

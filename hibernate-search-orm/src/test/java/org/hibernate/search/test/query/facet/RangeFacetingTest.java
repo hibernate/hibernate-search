@@ -41,9 +41,9 @@ import org.hibernate.search.query.facet.FacetingRequest;
  * @author Hardy Ferentschik
  */
 public class RangeFacetingTest extends AbstractFacetTest {
-	private static final DateFormat formatter = new SimpleDateFormat( "yyyy" );
-	private final String indexFieldName = "price";
-	private final String priceRange = "priceRange";
+
+	private static final String indexFieldName = "price";
+	private static final String priceRange = "priceRange";
 
 	public void testRangeQueryForInteger() {
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
@@ -274,6 +274,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	public void testDateRangeFaceting() throws Exception {
 		final String facetingName = "albumYearFaceting";
 		final String fieldName = "releaseYear";
+		final DateFormat formatter = new SimpleDateFormat( "yyyy" );
 		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
 				.name( facetingName )
 				.onField( fieldName )
