@@ -673,27 +673,6 @@
             ###################################################################
         -->
 
-        <!-- The MySQL 5 test envionment -->
-        <profile>
-            <id>mysql50</id>
-            <dependencies>
-                <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
-                    <version>5.0.5</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
-                <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:mysql://vmg08.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
-            </properties>
-        </profile>
-
         <!-- The MySQL 5.1 test envionment -->
         <profile>
             <id>mysql51</id>
@@ -701,7 +680,7 @@
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
-                    <version>5.0.5</version>
+                    <version>5.1.13</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -709,70 +688,6 @@
                 <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
                 <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
                 <jdbc.url>jdbc:mysql://vmg02.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
-            </properties>
-        </profile>
-
-        <!-- The MySQL 5.1 Cluster test envionment -->
-        <profile>
-            <id>mysql51-cluster</id>
-            <dependencies>
-                <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
-                    <version>5.0.5</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <db.dialect>org.hibernate.dialect.MySQL5Dialect</db.dialect>
-                <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:mysql:loadbalance://dev61.qa.atl2.redhat.com:3306,dev62.qa.atl2.redhat.com:3306/searctru
-                </jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
-            </properties>
-        </profile>
-
-        <!-- The PostgreSQL 8.2.4 test envionment -->
-        <profile>
-            <id>postgresql82</id>
-            <dependencies>
-                <dependency>
-                    <groupId>postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                    <version>8.4-701.jdbc4</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
-                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jdbc.url>jdbc:postgresql://vmg01.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
-            </properties>
-        </profile>
-
-        <!-- The PostgreSQL 8.3.7 test environment -->
-        <profile>
-            <id>postgresql83</id>
-            <dependencies>
-                <dependency>
-                    <groupId>postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                    <version>9.0-801.jdbc4</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <db.dialect>org.hibernate.dialect.PostgreSQLDialect</db.dialect>
-                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jdbc.url>jdbc:postgresql://vmg03.mw.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
                 <jdbc.isolation />
@@ -806,72 +721,14 @@
             ###################################################################
         -->
 
-        <!-- The DB2 8.x test envionment (using 9x drivers)-->
-        <profile>
-            <id>db2v82</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.ibm</groupId>
-                    <artifactId>db2jcc</artifactId>
-                    <version>3.1.57</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.ibm</groupId>
-                    <artifactId>db2jcc_license_cu</artifactId>
-                    <version>3.1.57</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <db.dialect>org.hibernate.dialect.DB2Dialect</db.dialect>
-                <jdbc.driver>com.ibm.db2.jcc.DB2Driver</jdbc.driver>
-                <jdbc.url>jdbc:db2://dev32.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
-            </properties>
-        </profile>
-
-        <!-- The DB2 9.1 test envionment (using 9x drivers)-->
-        <profile>
-            <id>db2-91</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.ibm</groupId>
-                    <artifactId>db2jcc</artifactId>
-                    <version>3.8.47</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.ibm</groupId>
-                    <artifactId>db2jcc_license_cu</artifactId>
-                    <version>3.8.47</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <db.dialect>org.hibernate.dialect.DB2Dialect</db.dialect>
-                <jdbc.driver>com.ibm.db2.jcc.DB2Driver</jdbc.driver>
-                <jdbc.url>jdbc:db2://dev67.qa.atl.jboss.com:50000/jbossqa</jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
-            </properties>
-        </profile>
-
         <!-- The DB2 9.7 test envionment (using 9x drivers)-->
         <profile>
             <id>db2-97</id>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm</groupId>
-                    <artifactId>db2jcc</artifactId>
-                    <version>3.57.86</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.ibm</groupId>
-                    <artifactId>db2jcc_license_cu</artifactId>
-                    <version>3.57.86</version>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>db2-97</artifactId>
+                    <version>4.11.77</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -885,58 +742,34 @@
             </properties>
         </profile>
 
-        <!-- The Oracle9i test envionment -->
+        <!-- The Oracle11g test envionment -->
         <profile>
-            <id>oracle9i</id>
+            <id>oracle11gR1</id>
             <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc14</artifactId>
-                    <!-- use the 10g drivers which are surprisingly largely bug free -->
-                    <version>10.0.2.0</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <properties>
-                <db.dialect>org.hibernate.dialect.Oracle9iDialect</db.dialect>
-                <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
-                <jdbc.url>jdbc:oracle:thin:@dev20.qa.atl.jboss.com:1521:qa</jdbc.url>
-                <jdbc.user>searctru</jdbc.user>
-                <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
-            </properties>
-        </profile>
-
-        <!-- The Oracle10g test envionment -->
-        <profile>
-            <id>oracle10g</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc14</artifactId>
-                    <!-- use the 10g drivers which are surprisingly largely bug free -->
-                    <version>10.0.2.0</version>
+              <dependency>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>oracle</artifactId>
+                    <version>11.2.0.2.0</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
             <properties>
                 <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
                 <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
-                <jdbc.url>jdbc:oracle:thin:@vmg05.mw.lab.eng.bos.redhat.com:1521:qaora10</jdbc.url>
+                <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
                 <jdbc.isolation />
             </properties>
         </profile>
 
-        <!-- The Oracle11g test envionment -->
         <profile>
-            <id>oracle11g</id>
+            <id>oracle11gR2</id>
             <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc5</artifactId>
-                    <version>11.1.0.7.0</version>
+              <dependency>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>oracle</artifactId>
+                    <version>11.2.0.2.0</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -952,12 +785,33 @@
 
         <!-- The Oracle11gRAC test envionment -->
         <profile>
-            <id>oracle11gRAC</id>
+            <id>oracle11gR1RAC</id>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc5</artifactId>
-                    <version>11.1.0.7.0</version>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>oracle</artifactId>
+                    <version>11.2.0.2.0</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
+                <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
+                <jdbc.url>
+                    jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=TCP)(HOST=vmg24-vip.mw.lab.eng.bos.redhat.com)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=vmg25-vip.mw.lab.eng.bos.redhat.com)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=qarac.jboss)))
+                </jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle11gR2RAC</id>
+            <dependencies>
+                <dependency>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>oracle</artifactId>
+                    <version>11.2.0.2.0</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -973,20 +827,20 @@
             </properties>
         </profile>
 
-        <!-- The Sybase 15 test envionment -->
+        <!-- The Sybase ASE 15.5 test envionment -->
         <profile>
-            <id>sybase15</id>
+            <id>sybase155</id>
             <dependencies>
                 <dependency>
-                    <groupId>com.sybase</groupId>
-                    <artifactId>jconnect</artifactId>
-                    <version>6.0.5</version>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>sybase</artifactId>
+                    <version>26502</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
             <properties>
                 <db.dialect>org.hibernate.dialect.SybaseASE15Dialect</db.dialect>
-                <jdbc.driver>com.sybase.jdbc3.jdbc.SybDriver</jdbc.driver>
+                <jdbc.driver>com.sybase.jdbc4.jdbc.SybDriver</jdbc.driver>
                 <jdbc.url>jdbc:sybase:Tds:vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
@@ -994,37 +848,35 @@
             </properties>
         </profile>
 
-        <!-- The SQLServer2005 (MS JDBC) test envionment -->
+        <!-- The SQLServer2008 R1 (MS JDBC) test envionment -->
         <profile>
-            <id>mssql2005</id>
+            <id>mssql2008R1</id>
             <dependencies>
                 <dependency>
-                    <groupId>com.microsoft.sqlserver</groupId>
-                    <artifactId>msjdbc</artifactId>
-                    <version>2.0.1008.2</version>
-                    <classifier>4</classifier>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>mssql</artifactId>
+                    <version>3.0.1301.101</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
             <properties>
                 <db.dialect>org.hibernate.dialect.SQLServerDialect</db.dialect>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jdbc.url>jdbc:sqlserver://dev30.qa.atl.jboss.com:3918</jdbc.url>
+                <jdbc.url>jdbc:sqlserver://vmg04.mw.lab.eng.bos.redhat.com:1433</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
         </profile>
 
-        <!-- The SQLServer2005 (MS JDBC) test envionment -->
+        <!-- The SQLServer2008 R2 (MS JDBC) test envionment -->
         <profile>
-            <id>mssql2008</id>
+            <id>mssql2008R2</id>
             <dependencies>
                 <dependency>
-                    <groupId>com.microsoft.sqlserver</groupId>
-                    <artifactId>msjdbc</artifactId>
-                    <version>2.0.1008.2</version>
-                    <classifier>4</classifier>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>mssql</artifactId>
+                    <version>3.0.1301.101</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
