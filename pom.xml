@@ -136,7 +136,7 @@
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.4.0</luceneVersion>
         <infinispanVersion>5.0.0.FINAL</infinispanVersion>
-        <hibernateVersion>4.0.0.CR3</hibernateVersion>
+        <hibernateVersion>4.0.0.CR4</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.0.CR2</hibernateCommonsAnnotationVersion>
         <bytemanVersion>1.5.2</bytemanVersion>
         <jbossLoggingVersion>3.0.0.GA</jbossLoggingVersion>
