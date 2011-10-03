@@ -67,7 +67,7 @@ public class ClusterTestHelper {
 					Environment.CONNECTION_PROVIDER,
 					org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
 					);
-		for(Class<?> entityType : entityTypes){
+		for ( Class<?> entityType : entityTypes ) {
 			node.addAnnotatedClass( entityType );
 		}
 		return node.build();
@@ -86,7 +86,7 @@ public class ClusterTestHelper {
 			catch ( InterruptedException e ) {
 				throw new AssertionFailedError( e.getMessage() );
 			}
-			currentSize = clusterSize( node, entityType);
+			currentSize = clusterSize( node, entityType );
 			if ( loopCounter > 200 ) {
 				throw new AssertionFailedError( "timeout while waiting for all nodes to join in cluster" );
 			}

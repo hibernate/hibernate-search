@@ -79,11 +79,11 @@ public class TwoNodesTest {
 		// verify nodeb is able to find it:
 		verifyNodeSeesUpdatedIndex( nodeb );
 		// now start a new node, it will join the cluster and receive the current index state:
-		FullTextSessionBuilder nodeC = createClusterNode(entityTypes);
+		FullTextSessionBuilder nodeC = createClusterNode( entityTypes );
 		assertEquals( 3, clusterSize( nodea, SimpleEmail.class ) );
 		try {
 			// verify the new node is able to perform the same searches:
-			verifyNodeSeesUpdatedIndex(nodeC);
+			verifyNodeSeesUpdatedIndex( nodeC );
 		}
 		finally {
 			nodeC.close();
@@ -120,8 +120,8 @@ public class TwoNodesTest {
 	public void setUp() throws Exception {
 		entityTypes = new HashSet<Class<?>>();
 		entityTypes.add( SimpleEmail.class );
-		nodea = createClusterNode(entityTypes);
-		nodeb = createClusterNode(entityTypes);
+		nodea = createClusterNode( entityTypes );
+		nodeb = createClusterNode( entityTypes );
 		waitMembersCount( nodea, SimpleEmail.class, 2 );
 	}
 

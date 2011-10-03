@@ -55,7 +55,7 @@ public class LiveRunningTest {
 	private static final int MAX_SLAVES = 5;
 	private static HashSet<Class<?>> entityTypes;
 	
-	private final FullTextSessionBuilder master = createClusterNode(entityTypes);
+	private final FullTextSessionBuilder master = createClusterNode( entityTypes );
 	private final List<FullTextSessionBuilder> slaves = new LinkedList<FullTextSessionBuilder>();
 	
 	private boolean growCluster = true;
@@ -105,7 +105,7 @@ public class LiveRunningTest {
 				growCluster = false;
 			}
 			else {
-				slaves.add( createClusterNode(entityTypes) );
+				slaves.add( createClusterNode( entityTypes ) );
 			}
 		}
 		else {
@@ -139,7 +139,7 @@ public class LiveRunningTest {
 	private void waitForAllJoinsCompleted() {
 		int expectedSize = slaves.size() + 1;
 		waitMembersCount( master, SimpleEmail.class, expectedSize );
-		for (FullTextSessionBuilder slave : slaves) {
+		for ( FullTextSessionBuilder slave : slaves ) {
 			waitMembersCount( slave, SimpleEmail.class, expectedSize );
 		}
 	}
@@ -150,7 +150,7 @@ public class LiveRunningTest {
 		entityTypes.add( SimpleEmail.class );
 		ClusterSharedConnectionProvider.realStart();
 	}
-	
+
 	@AfterClass
 	public static void shutdownConnectionPool() {
 		ClusterSharedConnectionProvider.realStop();
