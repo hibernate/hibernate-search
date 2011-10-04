@@ -83,7 +83,8 @@ public abstract class SearchTestCase extends TestCase {
 	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer( getTargetLuceneVersion() );
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
-	protected static final File indexDir;
+	private static final File indexDir;
+
 	protected static SessionFactory sessions;
 	protected Session session;
 
@@ -167,7 +168,7 @@ public abstract class SearchTestCase extends TestCase {
 	protected void configure(Configuration cfg) {
 		cfg.setProperty( "hibernate.search.lucene_version", getTargetLuceneVersion().name() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.setProperty( "hibernate.search.default.indexBase", indexDir.getAbsolutePath() );
+		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 
 		cfg.setProperty( "hibernate.search.default.indexwriter.merge_factor", "100" );
@@ -215,7 +216,7 @@ public abstract class SearchTestCase extends TestCase {
 			log.debug( "JMS based test. Skipping index emptying" );
 			return;
 		}
-		FileHelper.delete( indexDir );
+		FileHelper.delete( getBaseIndexDir() );
 	}
 
 	protected SearchFactory getSearchFactory() {
@@ -229,7 +230,9 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	protected File getBaseIndexDir() {
-		return indexDir;
+		String shortTestName = this.getClass().getSimpleName() + "." + this.getName();
+		File indexPath = new File( indexDir, shortTestName );
+		return indexPath;
 	}
 
 	protected void buildConfiguration() {
