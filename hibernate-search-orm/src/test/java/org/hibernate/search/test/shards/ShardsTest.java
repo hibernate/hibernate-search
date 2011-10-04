@@ -67,6 +67,8 @@ public class ShardsTest extends SearchTestCase {
 		shardingStrategy.initialize( null, dps );
 		assertTrue( dps[1] == shardingStrategy.getIndexManagerForAddition( Animal.class, 1, "1", null ) );
 		assertTrue( dps[0] == shardingStrategy.getIndexManagerForAddition( Animal.class, 2, "2", null ) );
+		dps[0].destroy();
+		dps[1].destroy();
 	}
 
 	public void testBehavior() throws Exception {
@@ -129,7 +131,7 @@ public class ShardsTest extends SearchTestCase {
 
 		FSDirectory animal00Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal00" ) );
 		try {
-			IndexReader reader = IndexReader.open( animal00Directory );
+			IndexReader reader = IndexReader.open( animal00Directory, true );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
