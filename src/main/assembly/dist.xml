@@ -50,10 +50,6 @@
                         <directory>target/apidocs</directory>
                         <outputDirectory>docs/api</outputDirectory>
                     </fileSet>
-                    <fileSet>
-                        <directory>target/docbook/publish</directory>
-                        <outputDirectory>docs/reference</outputDirectory>
-                    </fileSet>
                 </fileSets>
             </sources>
             <binaries>
@@ -246,6 +242,20 @@
                     </dependencySet>
                 </dependencySets>
             </binaries>
+        </moduleSet>
+        <moduleSet>
+            <includes>
+                <include>org.hibernate:hibernate-search-documentation</include>
+            </includes>
+            <sources>
+                <includeModuleDirectory>false</includeModuleDirectory>
+                <fileSets>
+                    <fileSet>
+                        <directory>target/docbook/publish</directory>
+                        <outputDirectory>docs/reference</outputDirectory>
+                    </fileSet>
+                </fileSets>
+            </sources>
         </moduleSet>
     </moduleSets>
 
