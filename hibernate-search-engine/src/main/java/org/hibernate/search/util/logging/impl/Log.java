@@ -178,7 +178,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 31, value = "Indexing speed: %1$f documents/second; progress: %2$f%%")
 	void indexingSpeed(float estimateSpeed, float estimatePercentileComplete);
 
-	@LogMessage(level = ERROR)
+	@LogMessage(level = WARN)
+	// It's WARN only as it should not be really critical, and it is quite frequent on Windows
 	@Message(id = 32, value = "Could not delete %1$s")
 	void notDeleted(File file);
 

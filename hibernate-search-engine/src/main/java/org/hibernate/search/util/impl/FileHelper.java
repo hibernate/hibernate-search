@@ -194,17 +194,26 @@ public abstract class FileHelper {
 		}
 	}
 
-	public static void delete(File file) {
+	/**
+	 * Attempts to delete a file, and if it is a directory recurse to all content.
+	 * @param file the file or Directory to be deleted
+	 * @return false if it wasn't possible to delete it or all of the contents. A common problem on Windows systems.
+	 */
+	public static boolean delete(File file) {
+		boolean allok = true;
 		if ( file.isDirectory() ) {
 			for ( File subFile : file.listFiles() ) {
-				delete( subFile );
+				boolean deleted = delete( subFile );
+				allok = allok && deleted;
 			}
 		}
-		if ( file.exists() ) {
+		if ( allok && file.exists() ) {
 			if ( !file.delete() ) {
 				log.notDeleted( file );
+				return false;
 			}
 		}
+		return allok;
 	}
 
 	/**
