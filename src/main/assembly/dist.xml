@@ -76,11 +76,13 @@
                             <exclude>org.apache.lucene:lucene-stempel</exclude>
                             <exclude>org.apache.solr:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                             <exclude>com.fasterxml:*</exclude>
                             <exclude>org.jboss:jandex</exclude>
                             <exclude>org.infinispan:*</exclude>
                             <exclude>org.rhq.helpers:*</exclude>
                             <exclude>org.jboss.marshalling:*</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                         </excludes>
                     </dependencySet>
 
@@ -106,6 +108,8 @@
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>xml-apis:xml-apis</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                             <exclude>org.infinispan:*</exclude>
                             <exclude>org.jboss.marshalling:*</exclude>
                         </excludes>
@@ -117,6 +121,9 @@
                         <includes>
                             <include>org.jboss.javaee:jboss-transaction-api</include>
                         </includes>
+                        <excludes>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
+                        </excludes>
                     </dependencySet>
                 </dependencySets>
             </binaries>
@@ -163,6 +170,7 @@
                             <exclude>org.apache.solr:*</exclude>
                             <exclude>org.jboss.marshalling:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                             <exclude>org.jboss:jandex</exclude>
                             <exclude>org.infinispan:*</exclude>
                             <exclude>org.rhq.helpers:*</exclude>
@@ -194,6 +202,7 @@
                             <exclude>org.jboss.marshalling:*</exclude>
                             <exclude>org.rhq.helpers:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                             <exclude>org.infinispan:*</exclude>
                         </excludes>
                     </dependencySet>
@@ -202,6 +211,9 @@
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>/dist/lib/provided</outputDirectory>
                         <scope>provided</scope>
+                        <excludes>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
+                        </excludes>
                     </dependencySet>
                 </dependencySets>
             </binaries>
@@ -232,6 +244,7 @@
                             <exclude>commons-lang:*</exclude>
                             <exclude>xml-apis:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                             <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
                             <!-- Avro excludes -->
                             <exclude>org.apache.avro:avro</exclude>
