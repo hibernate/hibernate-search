@@ -25,13 +25,13 @@ package org.hibernate.search.test.filter;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.SearchException;
-import org.hornetq.utils.ConcurrentHashSet;
 
 /**
  * @author Emmanuel Bernard
@@ -40,15 +40,15 @@ import org.hornetq.utils.ConcurrentHashSet;
 public class ExcludeAllFilter extends Filter implements Serializable {
 
 	// ugly but useful for test purposes
-	private static final Set<IndexReader> invokedOnReaders = new ConcurrentHashSet<IndexReader>();
+	private static final Map<IndexReader,IndexReader> invokedOnReaders = new ConcurrentHashMap<IndexReader,IndexReader>();
 
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 		verifyItsAReadOnlySegmentReader( reader );
-		if ( invokedOnReaders.contains( reader ) ) {
+		if ( invokedOnReaders.containsKey( reader ) ) {
 			throw new IllegalStateException( "Called twice" );
 		}
-		invokedOnReaders.add( reader );
+		invokedOnReaders.put( reader, reader );
 		return DocIdSet.EMPTY_DOCIDSET;
 	}
 	
