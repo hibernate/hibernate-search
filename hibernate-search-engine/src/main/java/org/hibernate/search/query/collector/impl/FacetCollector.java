@@ -25,6 +25,7 @@
 package org.hibernate.search.query.collector.impl;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -213,7 +214,7 @@ public class FacetCollector extends Collector {
 		}
 	}
 
-	static public class FacetEntryComparator implements Comparator<Entry<String, Integer>> {
+	static public class FacetEntryComparator implements Comparator<Entry<String, Integer>>, Serializable {
 		private final FacetSortOrder sortOder;
 
 		public FacetEntryComparator(FacetSortOrder sortOrder) {
@@ -233,7 +234,8 @@ public class FacetCollector extends Collector {
 		}
 	}
 
-	static public class RangeDefinitionOrderFacetComparator implements Comparator<Facet> {
+	static public class RangeDefinitionOrderFacetComparator implements Comparator<Facet>, Serializable {
+
 		public int compare(Facet facet1, Facet facet2) {
 			return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
 		}

@@ -35,7 +35,7 @@ import javax.persistence.Persistence;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.apache.lucene.analysis.StopAnalyzer;
@@ -128,13 +128,18 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 		//Search config
 		config.put( "hibernate.search.default.directory_provider", "ram" );
 		config.put( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+		configure( config );
 
 		return config;
 	}
 	
 	public static Version getTargetLuceneVersion() {
-		return SearchTestCase.getTargetLuceneVersion();
+		return TestConstants.getTargetLuceneVersion();
 	}
-	
+
+	protected void configure(Map cfg) {
+		// for extensions
+	}
+
 }
 

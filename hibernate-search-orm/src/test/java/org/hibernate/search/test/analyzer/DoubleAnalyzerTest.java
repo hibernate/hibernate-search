@@ -32,6 +32,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		{
 			Query luceneQuery =  new MatchAllDocsQuery();
 			FullTextQuery query = s.createFullTextQuery( luceneQuery );

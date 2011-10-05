@@ -37,7 +37,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -51,17 +51,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 	private static final Log log = LoggerFactory.make();
-
-	static File root;
-
-	static {
-		String buildDir = System.getProperty( "build.dir" );
-		if ( buildDir == null ) {
-			buildDir = ".";
-		}
-		root = new File( buildDir, "lucenedirs" );
-		log.debugf( "Using %s as test directory.", root.getAbsolutePath() );
-	}
 
 	/**
 	 * The lucene index directory which is shared between master and slave.
@@ -83,6 +72,8 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	 */
 	final static String slaveUnready = "/slaveUnready";
 
+	private File root;
+
 	/**
 	 * Verifies that copies of the master get properly copied to the slaves.
 	 *
@@ -93,7 +84,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		// assert that the slave index is empty
 		FullTextSession fullTextSession = Search.getFullTextSession( getSlaveSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		List result = fullTextSession.createFullTextQuery( parser.parse( "location:texas" ) ).list();
 		assertEquals( "No copy yet, fresh index expected", 0, result.size() );
 		tx.commit();
@@ -181,7 +172,11 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return getSessionFactories()[1].openSession();
 	}
 	
-	static void prepareDirectories() {
+	static File prepareDirectories(String testId) {
+
+		File superRoot = TestConstants.getIndexdir();
+		File root = new File( superRoot, testId );
+
 		if ( root.exists() ) {
 			FileHelper.delete( root );
 		}
@@ -209,19 +204,21 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		if ( !slaveUnreadyFile.mkdirs() ) {
 			throw new HibernateException( "Unable to setup slave directory" );
 		}
+		
+		return root;
 	}
 
 	protected void setUp() throws Exception {
-		prepareDirectories();
+		this.root = prepareDirectories( getClass().getSimpleName() + "." + this.getName() );
 		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		cleanupDirectories();
+		cleanupDirectories( root );
 	}
 
-	static void cleanupDirectories() {
+	static void cleanupDirectories( File root ) {
 		log.debugf( "Deleting test directory %s ", root.getAbsolutePath() );
 		FileHelper.delete( root );
 	}
@@ -247,7 +244,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 				"hibernate.search.default.directory_provider", "filesystem-slave"
 		);
 		cfg.setProperty(
-				"hibernate.search.default.retry_marker_lookup", new Integer(retries).toString()
+				"hibernate.search.default.retry_marker_lookup", String.valueOf( retries )
 		);
 		cfg.addAnnotatedClass( SnowStorm.class );
 		long start = System.nanoTime();

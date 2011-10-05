@@ -42,6 +42,7 @@ import org.hibernate.search.backend.impl.WorkQueue;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * Testcase for HSEARCH-257.
@@ -77,7 +78,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 		// search if the record made it into the index
 		tx = s.beginTransaction();
 		String searchQuery = "Joe";
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "Content", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "Content", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( searchQuery );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		List results = query.list();

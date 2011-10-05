@@ -37,6 +37,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author John Griffin
@@ -66,7 +67,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		// Departments entity after being massaged by passing it
 		// through the EquipmentType class. This field is in
 		// the Lucene document but not in the Department entity itself.
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "equipment", SearchTestCase.simpleAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "equipment", TestConstants.simpleAnalyzer );
 
 		// Check the second ClassBridge annotation
 		Query query = parser.parse( "equiptype:Cisco" );
@@ -86,7 +87,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertTrue( "problem with field cross-ups", result.size() == 0 );
 
 		// Non-ClassBridge field.
-		parser = new QueryParser( getTargetLuceneVersion(), "branchHead", SearchTestCase.simpleAnalyzer );
+		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "branchHead", TestConstants.simpleAnalyzer );
 		query = parser.parse( "branchHead:Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
@@ -95,7 +96,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertEquals("incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead());
 
 		// Check other ClassBridge annotation.
-		parser = new QueryParser( getTargetLuceneVersion(), "branchnetwork", SearchTestCase.simpleAnalyzer );
+		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "branchnetwork", TestConstants.simpleAnalyzer );
 		query = parser.parse( "branchnetwork:st. george 1D" );
 		hibQuery = session.createFullTextQuery( query, Departments.class );
 		result = hibQuery.list();
@@ -134,7 +135,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		// Departments entity after being massaged by passing it
 		// through the EquipmentType class. This field is in
 		// the Lucene document but not in the Department entity itself.
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "equipment", SearchTestCase.simpleAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "equipment", TestConstants.simpleAnalyzer );
 
 		// Check the second ClassBridge annotation
 		Query query = parser.parse( "equiptype:Cisco" );
@@ -200,7 +201,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		// the branch field and the network field of the Department
 		// class. This is in the Lucene document but not in the
 		// Department entity itself.
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "branchnetwork", SearchTestCase.simpleAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "branchnetwork", TestConstants.simpleAnalyzer );
 
 		Query query = parser.parse( "branchnetwork:layton 2B" );
 		org.hibernate.search.FullTextQuery hibQuery = session.createFullTextQuery( query, Department.class );
@@ -227,7 +228,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertTrue( "problem with field cross-ups", result.size() == 0 );
 
 		// Non-ClassBridge field.
-		parser = new QueryParser( getTargetLuceneVersion(), "branchHead", SearchTestCase.simpleAnalyzer );
+		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "branchHead", TestConstants.simpleAnalyzer );
 		query = parser.parse( "branchHead:Kent Lewin" );
 		hibQuery = session.createFullTextQuery( query, Department.class );
 		result = hibQuery.list();

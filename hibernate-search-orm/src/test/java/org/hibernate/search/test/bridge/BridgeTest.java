@@ -51,6 +51,7 @@ import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.builtin.CalendarBridge;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
@@ -83,7 +84,7 @@ public class BridgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		Query query;
 		List result;
 
@@ -147,7 +148,7 @@ public class BridgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.simpleAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.simpleAnalyzer );
 		Query query;
 		List result;
 
@@ -190,7 +191,7 @@ public class BridgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		Query query;
 		List result;
 
@@ -239,7 +240,7 @@ public class BridgeTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		Query query;
 		List result;
 

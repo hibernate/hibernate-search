@@ -35,6 +35,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Hardy Ferentschik
@@ -51,8 +52,8 @@ public class MixedCriteriaTest extends SearchTestCase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), 
-				new String[] { "kurztext" }, SearchTestCase.standardAnalyzer
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( TestConstants.getTargetLuceneVersion(),
+				new String[] { "kurztext" }, TestConstants.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );
 
@@ -75,8 +76,8 @@ public class MixedCriteriaTest extends SearchTestCase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(),
-				new String[] { "kurztext" }, SearchTestCase.standardAnalyzer
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( TestConstants.getTargetLuceneVersion(),
+				new String[] { "kurztext" }, TestConstants.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );
 
@@ -99,8 +100,8 @@ public class MixedCriteriaTest extends SearchTestCase {
 		Transaction tx = session.beginTransaction();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
-		MultiFieldQueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(),
-				new String[] { "kurztext" }, SearchTestCase.standardAnalyzer
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( TestConstants.getTargetLuceneVersion(),
+				new String[] { "kurztext" }, TestConstants.standardAnalyzer
 		);
 		Query query = parser.parse( "combi OR sport" );
 

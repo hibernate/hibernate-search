@@ -58,7 +58,7 @@ public class PurgeTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "brand", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "brand", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "brand:Seiko" );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
@@ -102,7 +102,7 @@ public class PurgeTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "brand", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "brand", TestConstants.stopAnalyzer );
 		s.purgeAll( Clock.class);
 		tx.commit();
 

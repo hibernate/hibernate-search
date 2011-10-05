@@ -518,7 +518,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
 
 			if ( value == null ) {
-				processEmbeddedNullValue( doc, propertiesMetadata, contextualBridge, i, member, value );
+				processEmbeddedNullValue( doc, propertiesMetadata, contextualBridge, i, member );
 				continue;
 			}
 
@@ -587,7 +587,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 	}
 
-	private void processEmbeddedNullValue(Document doc, PropertiesMetadata propertiesMetadata, ContextualExceptionBridge contextualBridge, int i, XMember member, Object value) {
+	private void processEmbeddedNullValue(Document doc, PropertiesMetadata propertiesMetadata, ContextualExceptionBridge contextualBridge, int i, XMember member) {
 		final String nullMarker = propertiesMetadata.embeddedNullTokens.get( i );
 		if ( nullMarker != null ) {
 			String fieldName = propertiesMetadata.embeddedNullFields.get( i );
@@ -596,7 +596,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				.setFieldBridge( fieldBridge )
 				.pushMethod( member )
 				.setFieldName( fieldName )
-				.set( fieldName, value, doc, NULL_EMBEDDED_MARKER_OPTIONS );
+				.set( fieldName, null, doc, NULL_EMBEDDED_MARKER_OPTIONS );
 			contextualBridge.popMethod();
 		}
 	}

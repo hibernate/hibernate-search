@@ -44,6 +44,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -149,9 +150,9 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				QueryParser parser = new MultiFieldQueryParser(
-						getTargetLuceneVersion(),
+						TestConstants.getTargetLuceneVersion(),
 						new String[] { "name", "physicalDescription", "suspectCharge" },
-						SearchTestCase.standardAnalyzer
+						TestConstants.standardAnalyzer
 				);
 				FullTextQuery query = getQuery( "John Doe", parser, s );
 				assertTrue( query.getResultSize() != 0 );
@@ -237,9 +238,9 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 			Session s = sf.openSession();
 			Transaction tx = s.beginTransaction();
 			QueryParser parser = new MultiFieldQueryParser(
-					getTargetLuceneVersion(),
+					TestConstants.getTargetLuceneVersion(),
 					new String[] { "name", "physicalDescription", "suspectCharge" },
-					SearchTestCase.standardAnalyzer
+					TestConstants.standardAnalyzer
 			);
 			FullTextQuery query = getQuery( "John Doe", parser, s );
 			assertTrue( query.getResultSize() != 0 );

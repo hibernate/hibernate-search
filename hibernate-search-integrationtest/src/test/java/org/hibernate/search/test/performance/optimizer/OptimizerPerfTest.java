@@ -40,6 +40,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 
 /**
@@ -124,7 +125,8 @@ public class OptimizerPerfTest extends SearchTestCase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				FullTextSession fts = new FullTextSessionImpl( s );
-				QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+				QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(),
+						"id", TestConstants.stopAnalyzer );
 				Query query;
 				try {
 					query = parser.parse( "name:Gavin" );

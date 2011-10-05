@@ -33,6 +33,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Hardy Ferentschik
@@ -59,7 +60,7 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		File targetDir = getTargetDir();
+		File targetDir = TestConstants.getTargetDir();
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 

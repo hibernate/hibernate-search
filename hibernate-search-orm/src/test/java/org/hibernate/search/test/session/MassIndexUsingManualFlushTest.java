@@ -33,6 +33,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.Environment;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.Transaction;
 import org.hibernate.ScrollableResults;
@@ -82,7 +83,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 14, result.size() );
 		for (Object object : result) {

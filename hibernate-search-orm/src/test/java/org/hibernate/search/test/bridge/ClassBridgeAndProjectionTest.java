@@ -34,6 +34,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
@@ -69,9 +70,9 @@ public class ClassBridgeAndProjectionTest extends SearchTestCase {
 		// test query without projection
 		FullTextSession ftSession = Search.getFullTextSession( s );
 		QueryParser parser = new QueryParser(
-				getTargetLuceneVersion(),
+				TestConstants.getTargetLuceneVersion(),
 				"name",
-				standardAnalyzer
+				TestConstants.standardAnalyzer
 		);
 		FullTextQuery query = ftSession.createFullTextQuery( parser.parse( "name:John" ), Teacher.class );
 		List results = query.list();
@@ -86,7 +87,7 @@ public class ClassBridgeAndProjectionTest extends SearchTestCase {
 		assertTrue( results.size() == 1 );
 		Object[] firstResult = ( Object[] ) results.get( 0 );
 		Integer amountStudents = ( Integer ) firstResult[0];
-		assertEquals( new Integer( 2 ), amountStudents );
+		assertEquals( Integer.valueOf( 2 ), amountStudents );
 		tx.commit();
 		s.close();
 	}

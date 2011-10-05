@@ -28,7 +28,6 @@ import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.DocumentId;
 
 /**

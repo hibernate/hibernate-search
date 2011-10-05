@@ -47,6 +47,7 @@ import org.hibernate.search.backend.impl.jgroups.BackendMessage;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.test.jms.master.TShirt;
 
@@ -82,7 +83,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 		FullTextSession ftSess = Search.getFullTextSession( openSession() );
 		ftSess.getTransaction().begin();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		Query luceneQuery = parser.parse( "logo:jboss" );
 		org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
 		List result = query.list();

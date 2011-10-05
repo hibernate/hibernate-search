@@ -44,6 +44,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
@@ -83,7 +84,7 @@ public class MassIndexTest extends SearchTestCase {
 		tx.commit(); // if you get a LazyInitializationException, that's because we clear() the session in the loop.. it only works with a batch size of 5 (the point of the test)
 		s.clear();
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 14, result.size() );
 		for (Object object : result) {
@@ -111,7 +112,7 @@ public class MassIndexTest extends SearchTestCase {
 		//check non created object does get found!!1
 		s = new FullTextSessionImpl( openSession() );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 0, result.size() );
 		tx.commit();
@@ -143,7 +144,7 @@ public class MassIndexTest extends SearchTestCase {
 
 		s = new FullTextSessionImpl( openSession() );
 		tx = s.beginTransaction();
-		parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
 		assertEquals( 0, result.size() );
 		result = s.createCriteria( Email.class ).list();

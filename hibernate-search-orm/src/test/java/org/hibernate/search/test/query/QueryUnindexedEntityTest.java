@@ -31,6 +31,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * HSEARCH-162 - trying to index an entity which is not marked with @Indexed
@@ -50,7 +51,7 @@ public class QueryUnindexedEntityTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer );
 		Query query = parser.parse( "name:foo" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query );
 		try {

@@ -109,7 +109,7 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 	 * - method {@link #document(int)}
 	 * - the last ones: can't delegate as the method is not visible
 	 */
-	class LeakingIndexReader extends IndexReader {
+	private static class LeakingIndexReader extends IndexReader {
 		
 		private final IndexReader delegate;
 

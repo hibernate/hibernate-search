@@ -170,7 +170,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 		transaction.commit();
 		session.close();
 		for ( int i = 1; i < 18; i++ ) {
-			assertEquals( 1, countWorksDoneOnPerson( new Long(i) ) );
+			assertEquals( 1, countWorksDoneOnPerson( Long.valueOf( i ) ) );
 		}
 	}
 	

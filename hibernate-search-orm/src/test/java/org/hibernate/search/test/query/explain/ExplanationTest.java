@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
@@ -53,8 +54,8 @@ public class ExplanationTest extends SearchTestCase {
 		Map<String, Float> boosts = new HashMap<String, Float>(2);
 		boosts.put( "title", new Float(4) );
 		boosts.put( "description", new Float(1) );
-		MultiFieldQueryParser parser = new MultiFieldQueryParser( getTargetLuceneVersion(), new String[] {"title", "description"},
-				SearchTestCase.standardAnalyzer, boosts );
+		MultiFieldQueryParser parser = new MultiFieldQueryParser( TestConstants.getTargetLuceneVersion(), new String[] {"title", "description"},
+				TestConstants.standardAnalyzer, boosts );
 		Query luceneQuery = parser.parse( "dark" );
 		FullTextQuery ftQuery = s.createFullTextQuery( luceneQuery, Dvd.class )
 				.setProjection( FullTextQuery.DOCUMENT_ID, FullTextQuery.EXPLANATION, FullTextQuery.THIS );

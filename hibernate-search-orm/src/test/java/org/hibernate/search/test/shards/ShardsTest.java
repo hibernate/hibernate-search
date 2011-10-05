@@ -42,6 +42,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.RamIndexManager;
 
 /**
@@ -67,6 +68,8 @@ public class ShardsTest extends SearchTestCase {
 		shardingStrategy.initialize( null, dps );
 		assertTrue( dps[1] == shardingStrategy.getIndexManagerForAddition( Animal.class, 1, "1", null ) );
 		assertTrue( dps[0] == shardingStrategy.getIndexManagerForAddition( Animal.class, 2, "2", null ) );
+		dps[0].destroy();
+		dps[1].destroy();
 	}
 
 	public void testBehavior() throws Exception {
@@ -96,7 +99,7 @@ public class ShardsTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 2, results.size() );
@@ -129,7 +132,7 @@ public class ShardsTest extends SearchTestCase {
 
 		FSDirectory animal00Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal00" ) );
 		try {
-			IndexReader reader = IndexReader.open( animal00Directory );
+			IndexReader reader = IndexReader.open( animal00Directory, true );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
@@ -185,7 +188,7 @@ public class ShardsTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 2, results.size() );

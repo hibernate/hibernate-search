@@ -86,6 +86,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 	@Override
 	public void initialize(DirectoryBasedIndexManager indexManager, Properties props) {
 		this.directoryProvider = indexManager.getDirectoryProvider();
+		this.indexName = indexManager.getIndexName();
 		// Initialize at least one, don't forget directoryProvider might return different Directory later
 		createReader( directoryProvider.getDirectory() );
 	}

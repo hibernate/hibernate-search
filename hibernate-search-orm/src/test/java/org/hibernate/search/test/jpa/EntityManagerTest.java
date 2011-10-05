@@ -25,7 +25,7 @@ package org.hibernate.search.test.jpa;
 
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.queryParser.QueryParser;
@@ -44,7 +44,7 @@ public class EntityManagerTest extends JPATestCase {
 		em.getTransaction().commit();
 		em.clear();
 		em.getTransaction().begin();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "saltQty:noword" );
 		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
 		query = new TermQuery( new Term("saltQty", "23.0") );

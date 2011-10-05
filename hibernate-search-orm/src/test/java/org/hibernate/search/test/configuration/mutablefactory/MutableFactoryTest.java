@@ -28,14 +28,13 @@ import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -49,7 +48,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
@@ -57,7 +56,6 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.junit.Test;
-import static org.hibernate.search.test.SearchTestCase.getTargetLuceneVersion;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -92,7 +90,7 @@ public class MutableFactoryTest {
 
 		tc.end();
 
-		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
 		IndexReader indexReader = sf.getIndexReaderAccessor().open( A.class );
@@ -139,7 +137,7 @@ public class MutableFactoryTest {
 
 		tc.end();
 
-		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
 		IndexReader indexReader = sf.getIndexReaderAccessor().open( A.class );
@@ -188,7 +186,7 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testMultiThreadedAddClasses() throws Exception {
-		QueryParser parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer );
 		ManualConfiguration configuration = getTestConfiguration();
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		List<DoAddClasses> runnables = new ArrayList<DoAddClasses>(10);
@@ -264,7 +262,7 @@ public class MutableFactoryTest {
 		public DoAddClasses(SearchFactoryIntegrator factory, int factorOfClassesPerThread, int nbrOfClassesPerThread) {
 			this.factory = factory;
 			this.factorOfClassesPerThread = factorOfClassesPerThread;
-			this.parser = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+			this.parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer );
 			this.nbrOfClassesPerThread = nbrOfClassesPerThread;
 		}
 
@@ -286,7 +284,11 @@ public class MutableFactoryTest {
 					assertEquals( 1, indexManagers.length );
 					DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 					DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();
-					Assert.assertTrue( "Configuration lost: expected RAM directory", directoryProvider instanceof RAMDirectoryProvider );
+
+					if ( ! ( directoryProvider instanceof RAMDirectoryProvider ) ) {
+						// can't use Assertion in a separate thread
+						throw new SearchException( "Configuration lost: expected RAM directory" );
+					}
 
 					Query luceneQuery = parser.parse( "Emmanuel" + i);
 					IndexReader indexReader = factory.getIndexReaderAccessor().open( aClass );
@@ -312,7 +314,7 @@ public class MutableFactoryTest {
 	private static ManualConfiguration getTestConfiguration() {
 		return new ManualConfiguration()
 			.addProperty( "hibernate.search.default.directory_provider", "ram" )
-			.addProperty( "hibernate.search.lucene_version", getTargetLuceneVersion().name() );
+			.addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 	}
 
 }

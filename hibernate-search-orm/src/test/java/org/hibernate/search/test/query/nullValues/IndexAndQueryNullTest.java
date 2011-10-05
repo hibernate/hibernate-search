@@ -42,6 +42,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
 
 /**
@@ -226,7 +227,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 	}
 
 	private Query createLuceneQuery() throws ParseException {
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		parser.setAllowLeadingWildcard( true );
 		return parser.parse( "*" );
 	}

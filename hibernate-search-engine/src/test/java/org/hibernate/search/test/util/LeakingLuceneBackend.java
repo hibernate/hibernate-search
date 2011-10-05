@@ -38,7 +38,7 @@ import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
  */
 public class LeakingLuceneBackend extends LuceneBackendQueueProcessor {
 	
-	private static List<LuceneWork> lastProcessedQueue = new ArrayList<LuceneWork>();
+	private static volatile List<LuceneWork> lastProcessedQueue = new ArrayList<LuceneWork>();
 	
 	@Override
 	public void close() {

@@ -48,7 +48,7 @@ import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
 
@@ -95,7 +95,7 @@ public class ProvidedIdTest {
 		tc.end();
 
 		QueryParser parser = new QueryParser(
-				SearchTestCase.getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer
+				TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer
 		);
 		Query luceneQuery = parser.parse( "Goat" );
 

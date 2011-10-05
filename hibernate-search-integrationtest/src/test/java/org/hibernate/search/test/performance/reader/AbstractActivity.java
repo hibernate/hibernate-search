@@ -37,7 +37,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Sanne Grinovero
@@ -48,9 +48,9 @@ public abstract class AbstractActivity implements Runnable {
 		@Override
 		protected QueryParser initialValue() {
 			return new MultiFieldQueryParser(
-					SearchTestCase.getTargetLuceneVersion(),
+					TestConstants.getTargetLuceneVersion(),
 					new String[] { "name", "physicalDescription", "suspectCharge" },
-					SearchTestCase.standardAnalyzer
+					TestConstants.standardAnalyzer
 			);
 		}
 	};

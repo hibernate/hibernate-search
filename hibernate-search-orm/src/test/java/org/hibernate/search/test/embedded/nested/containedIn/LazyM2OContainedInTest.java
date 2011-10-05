@@ -68,7 +68,7 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 		tx = fts.beginTransaction();
 
 		assertEquals( 1, fts.createFullTextQuery( new TermQuery( new Term("uid", new Long(uid1).toString() ) ), Entity1ForDoc0.class ).getResultSize() );
-		assertEquals( 1, fts.createFullTextQuery( new TermQuery( new Term("entities2.uid", new Long(uid2).toString() ) ), Entity1ForDoc0.class ).getResultSize() );
+		assertEquals( 1, fts.createFullTextQuery( new TermQuery( new Term("entities2.uid", String.valueOf( uid2 ) ) ), Entity1ForDoc0.class ).getResultSize() );
 
 
 		tx.commit();
@@ -128,7 +128,7 @@ public class LazyM2OContainedInTest extends SearchTestCase {
         fts.getTransaction().commit();
         fts.clear();
 
-		assertEquals( 0, fts.createFullTextQuery( new TermQuery( new Term("entity1.uid", new Long(otherId).toString() ) ), Entity2ForUnindexed.class ).getResultSize() );
+		assertEquals( 0, fts.createFullTextQuery( new TermQuery( new Term("entity1.uid", String.valueOf( otherId ) ) ), Entity2ForUnindexed.class ).getResultSize() );
 
 		tx = fts.beginTransaction();
 		for ( Entity2ForUnindexed e : (List<Entity2ForUnindexed>) fts.createCriteria( Entity2ForUnindexed.class ).list() ) {

@@ -26,6 +26,7 @@ package org.hibernate.search.test.fieldAccess;
 import java.util.List;
 
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.Session;
@@ -48,7 +49,7 @@ public class FieldAccessTest extends SearchTestCase {
 
         FullTextSession session = Search.getFullTextSession(s);
         tx = session.beginTransaction();
-        QueryParser p = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+        QueryParser p = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
         List result = session.createFullTextQuery( p.parse( "Abstract:Hibernate" ) ).list();
         assertEquals( "Query by field", 1, result.size() );
         s.delete( result.get( 0 ) );
@@ -72,7 +73,7 @@ public class FieldAccessTest extends SearchTestCase {
 
         FullTextSession session = Search.getFullTextSession(s);
         tx = session.beginTransaction();
-        QueryParser p = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+        QueryParser p = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
         List result = session.createFullTextQuery( p.parse( "title:Action OR Abstract:Action" ) ).list();
         assertEquals( "Query by field", 2, result.size() );
         assertEquals( "@Boost fails", "Hibernate in Action", ( (Document) result.get( 0 ) ).getTitle() );

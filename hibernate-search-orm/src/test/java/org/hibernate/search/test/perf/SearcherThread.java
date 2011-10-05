@@ -43,7 +43,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -129,7 +129,7 @@ public class SearcherThread implements Runnable {
 	}
 
 	private Query getQuery() throws ParseException {
-		QueryParser qp = new QueryParser( SearchTestCase.getTargetLuceneVersion(), "t", SearchTestCase.standardAnalyzer );
+		QueryParser qp = new QueryParser( TestConstants.getTargetLuceneVersion(), "t", TestConstants.standardAnalyzer );
 		qp.setLowercaseExpandedTerms( true );
 		// Parse the query
 		Query q = qp.parse( queryString );
