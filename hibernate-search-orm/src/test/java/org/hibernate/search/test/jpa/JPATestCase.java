@@ -35,7 +35,7 @@ import javax.persistence.Persistence;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.ejb.HibernatePersistence;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.apache.lucene.analysis.StopAnalyzer;
@@ -134,7 +134,7 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 	}
 	
 	public static Version getTargetLuceneVersion() {
-		return SearchTestCase.getTargetLuceneVersion();
+		return TestConstants.getTargetLuceneVersion();
 	}
 
 	protected void configure(Map cfg) {

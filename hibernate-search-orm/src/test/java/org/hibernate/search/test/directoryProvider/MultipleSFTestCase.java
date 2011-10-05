@@ -32,7 +32,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * Build multiple session factories from the same set of classes
@@ -132,7 +132,7 @@ public abstract class MultipleSFTestCase extends TestCase {
 	}
 	
 	public static Version getTargetLuceneVersion() {
-		return SearchTestCase.getTargetLuceneVersion();
+		return TestConstants.getTargetLuceneVersion();
 	}
 	
 }

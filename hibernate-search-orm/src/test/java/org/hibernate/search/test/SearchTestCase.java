@@ -34,13 +34,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import junit.framework.TestCase;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.KeywordAnalyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.Version;
 import org.junit.After;
 import org.junit.Before;
 
@@ -78,39 +73,13 @@ public abstract class SearchTestCase extends TestCase {
 
 	private static final Log log = LoggerFactory.make();
 
-	public static final Analyzer standardAnalyzer = new StandardAnalyzer( getTargetLuceneVersion() );
-	public static final Analyzer stopAnalyzer = new StopAnalyzer( getTargetLuceneVersion() );
-	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer( getTargetLuceneVersion() );
-	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
-
-	private static final File indexDir;
-
 	protected static SessionFactory sessions;
 	protected Session session;
 
-	private static File targetDir;
 	private SearchFactoryImplementor searchFactory;
 
 	protected static Configuration cfg;
 	private static Class<?> lastTestClass;
-
-	static {
-		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-		// get a URL reference to something we now is part of the classpath (us)
-		URL myUrl = contextClassLoader.getResource( SearchTestCase.class.getName().replace( '.', '/' ) + ".class" );
-		File myPath = new File( myUrl.getFile() );
-		// navigate back to '/target'
-		targetDir = myPath
-				.getParentFile()  // target/classes/org/hibernate/search/test
-				.getParentFile()  // target/classes/org/hibernate/search
-				.getParentFile()  // target/classes/org/hibernate/
-				.getParentFile()  // target/classes/org
-				.getParentFile()  // target/classes/
-				.getParentFile(); // target
-
-		indexDir = new File( targetDir, "indextemp" );
-		log.debugf( "Using %s as index directory.", indexDir.getAbsolutePath() );
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -166,7 +135,7 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	protected void configure(Configuration cfg) {
-		cfg.setProperty( "hibernate.search.lucene_version", getTargetLuceneVersion().name() );
+		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
@@ -231,7 +200,7 @@ public abstract class SearchTestCase extends TestCase {
 
 	protected File getBaseIndexDir() {
 		String shortTestName = this.getClass().getSimpleName() + "." + this.getName();
-		File indexPath = new File( indexDir, shortTestName );
+		File indexPath = new File( TestConstants.indexDir, shortTestName );
 		return indexPath;
 	}
 
@@ -272,24 +241,11 @@ public abstract class SearchTestCase extends TestCase {
 		return new String[] { };
 	}
 
-	public static Version getTargetLuceneVersion() {
-		return Version.LUCENE_CURRENT;
-	}
-	
 	protected SearchFactoryImplementor getSearchFactoryImpl() {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.close();
 		SearchFactory searchFactory = s.getSearchFactory();
 		return (SearchFactoryImplementor) searchFactory;
-	}
-
-	/**
-	 * Returns the target directory of the build.
-	 *
-	 * @return the target directory of the build
-	 */
-	public static File getTargetDir() {
-		return targetDir;
 	}
 
 	private static class RollbackWork implements Work {

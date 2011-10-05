@@ -38,6 +38,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
@@ -53,7 +54,7 @@ public class InheritanceTest extends SearchTestCase {
 	public void testSearchUnindexClass() throws Exception {
 		createTestData();
 
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -83,7 +84,7 @@ public class InheritanceTest extends SearchTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
 		assertItsTheElephant( hibQuery.list() );
@@ -120,7 +121,7 @@ public class InheritanceTest extends SearchTestCase {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant" );
 
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Mammal.class );
@@ -251,7 +252,7 @@ public class InheritanceTest extends SearchTestCase {
 	}
 
 	private void assertNumberOfAnimals(FullTextSession s, int count) throws Exception {
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "Elephant OR White Pointer OR Chimpanzee OR Dove or Eagle" );
 		List result = s.createFullTextQuery( query, Animal.class ).list();
 		assertNotNull( result );

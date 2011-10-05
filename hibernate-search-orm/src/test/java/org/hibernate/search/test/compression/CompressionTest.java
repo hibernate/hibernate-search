@@ -45,6 +45,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Sanne Grinovero
@@ -117,7 +118,7 @@ public class CompressionTest extends SearchTestCase {
 		openSession().beginTransaction();
 		try {
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			QueryParser queryParser = new QueryParser( getTargetLuceneVersion(), "", new SimpleAnalyzer( getTargetLuceneVersion() ) );
+			QueryParser queryParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "", new SimpleAnalyzer( TestConstants.getTargetLuceneVersion() ) );
 			Query query = queryParser.parse( queryString );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
 					query,

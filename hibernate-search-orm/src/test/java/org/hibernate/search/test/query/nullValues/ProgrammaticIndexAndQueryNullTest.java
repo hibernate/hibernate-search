@@ -41,6 +41,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
 
 /**
@@ -61,7 +62,7 @@ public class ProgrammaticIndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		parser.setAllowLeadingWildcard( true );
 		Query query = parser.parse( "*" );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, ProgrammaticConfiguredValue.class );

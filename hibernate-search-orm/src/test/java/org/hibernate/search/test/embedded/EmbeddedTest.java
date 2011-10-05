@@ -38,6 +38,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
@@ -66,7 +67,7 @@ public class EmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -132,7 +133,7 @@ public class EmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -169,7 +170,7 @@ public class EmbeddedTest extends SearchTestCase {
 		s.clear();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -247,9 +248,9 @@ public class EmbeddedTest extends SearchTestCase {
 		tx = session.beginTransaction();
 
 		QueryParser parser = new MultiFieldQueryParser(
-				getTargetLuceneVersion(),
+				TestConstants.getTargetLuceneVersion(),
 				new String[] { "name", "authors.name" },
-				SearchTestCase.standardAnalyzer
+				TestConstants.standardAnalyzer
 		);
 		Query query;
 		List<?> result;
@@ -311,9 +312,9 @@ public class EmbeddedTest extends SearchTestCase {
 		tx = session.beginTransaction();
 
 		QueryParser parser = new MultiFieldQueryParser(
-				getTargetLuceneVersion(),
+				TestConstants.getTargetLuceneVersion(),
 				new String[] { "name", "state.name" },
-				SearchTestCase.standardAnalyzer
+				TestConstants.standardAnalyzer
 		);
 		Query query;
 		List<?> result;
@@ -361,7 +362,7 @@ public class EmbeddedTest extends SearchTestCase {
 		FullTextSession session = Search.getFullTextSession( s );
 		tx = session.beginTransaction();
 
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "name", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "name", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 

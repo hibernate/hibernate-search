@@ -34,6 +34,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
@@ -63,7 +64,7 @@ public class OptimizeTest extends SearchTestCase {
 		//check non indexed object get indexed by s.index
 		s = new FullTextSessionImpl( openSession() );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		int result = s.createFullTextQuery( parser.parse( "body:wrote" ) ).getResultSize();
 		assertEquals( 2000, result );
 		s.createQuery( "delete " + Email.class.getName() ).executeUpdate();

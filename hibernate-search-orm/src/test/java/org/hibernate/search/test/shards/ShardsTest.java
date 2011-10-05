@@ -42,6 +42,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.RamIndexManager;
 
 /**
@@ -98,7 +99,7 @@ public class ShardsTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 2, results.size() );
@@ -187,7 +188,7 @@ public class ShardsTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 
 		List results = fts.createFullTextQuery( parser.parse( "name:mouse OR name:bear" ) ).list();
 		assertEquals( "Either double insert, single update, or query fails with shards", 2, results.size() );

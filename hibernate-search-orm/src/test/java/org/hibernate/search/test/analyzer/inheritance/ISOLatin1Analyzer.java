@@ -30,7 +30,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Hardy Ferentschik
@@ -38,7 +38,7 @@ import org.hibernate.search.test.SearchTestCase;
 public final class ISOLatin1Analyzer extends Analyzer {
 
 	public TokenStream tokenStream(String s, Reader reader) {
-		TokenStream result = new StandardTokenizer( SearchTestCase.getTargetLuceneVersion(), reader );
+		TokenStream result = new StandardTokenizer( TestConstants.getTargetLuceneVersion(), reader );
 		return new ASCIIFoldingFilter( result );
 	}
 }

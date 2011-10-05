@@ -37,7 +37,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -93,7 +93,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		// assert that the slave index is empty
 		FullTextSession fullTextSession = Search.getFullTextSession( getSlaveSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		List result = fullTextSession.createFullTextQuery( parser.parse( "location:texas" ) ).list();
 		assertEquals( "No copy yet, fresh index expected", 0, result.size() );
 		tx.commit();

@@ -35,6 +35,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 
 /**
@@ -51,7 +52,7 @@ public class LuceneQuerySortTest extends SearchTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		createTestBooks(s);
 		Transaction tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Book.class );

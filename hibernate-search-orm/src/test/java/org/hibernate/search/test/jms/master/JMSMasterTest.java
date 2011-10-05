@@ -58,6 +58,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueTask;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * Tests  that the Master node in a JMS cluster can properly process messages placed onto the queue.
@@ -98,7 +99,7 @@ public class JMSMasterTest extends SearchTestCase {
 
 		FullTextSession ftSess = Search.getFullTextSession( openSession() );
 		ftSess.getTransaction().begin();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		Query luceneQuery = parser.parse( "logo:jboss" );
 		org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
 		List result = query.list();

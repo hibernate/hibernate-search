@@ -42,6 +42,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
@@ -109,8 +110,8 @@ public class WorkerTestCase extends SearchTestCase {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				QueryParser parser = new QueryParser(
-						getTargetLuceneVersion(), "id",
-						SearchTestCase.stopAnalyzer
+						TestConstants.getTargetLuceneVersion(), "id",
+						TestConstants.stopAnalyzer
 				);
 				Query query;
 				try {

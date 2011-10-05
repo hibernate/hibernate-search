@@ -32,6 +32,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 
 /**
@@ -58,7 +59,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "attributes.values.value", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "attributes.values.value", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 
@@ -114,7 +115,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		FullTextSession session = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "placesVisited.address.city", SearchTestCase.standardAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "placesVisited.address.city", TestConstants.standardAnalyzer );
 		Query query;
 		List<?> result;
 

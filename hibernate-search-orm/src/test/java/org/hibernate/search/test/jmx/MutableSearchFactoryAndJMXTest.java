@@ -27,7 +27,7 @@ import java.io.File;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.ManualConfiguration;
 
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class MutableSearchFactoryAndJMXTest {
 	
 	@Test
 	public void testRebuildFactory() {
-		File targetDir = SearchTestCase.getTargetDir();
+		File targetDir = TestConstants.getTargetDir();
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 

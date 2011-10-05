@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
@@ -63,7 +64,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 		} );
 		FullTextSession s = Search.getFullTextSession( sess );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.keywordAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.keywordAnalyzer );
 		Query query = parser.parse( "name:moo" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Author.class, Music.class );
 		List result = hibQuery.list();
@@ -92,7 +93,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 
 		FullTextSession s = Search.getFullTextSession( sess );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.keywordAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.keywordAnalyzer );
 		Query query = parser.parse( "name:moo OR title:moo OR body:moo" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Music.class );
 		List result = hibQuery.list();

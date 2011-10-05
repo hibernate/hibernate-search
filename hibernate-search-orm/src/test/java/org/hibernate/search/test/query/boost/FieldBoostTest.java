@@ -34,6 +34,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -51,8 +52,8 @@ public class  FieldBoostTest extends SearchTestCase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( getTargetLuceneVersion(), "author", SearchTestCase.standardAnalyzer );
-		QueryParser descParser = new QueryParser( getTargetLuceneVersion(), "description", SearchTestCase.standardAnalyzer );
+		QueryParser authorParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "author", TestConstants.standardAnalyzer );
+		QueryParser descParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "description", TestConstants.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
@@ -89,8 +90,8 @@ public class  FieldBoostTest extends SearchTestCase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( getTargetLuceneVersion(), "author", SearchTestCase.standardAnalyzer );
-		QueryParser descParser = new QueryParser( getTargetLuceneVersion(), "description", SearchTestCase.standardAnalyzer );
+		QueryParser authorParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "author", TestConstants.standardAnalyzer );
+		QueryParser descParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "description", TestConstants.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
@@ -127,8 +128,8 @@ public class  FieldBoostTest extends SearchTestCase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( getTargetLuceneVersion(), "author", SearchTestCase.standardAnalyzer );
-		QueryParser descParser = new QueryParser( getTargetLuceneVersion(), "description", SearchTestCase.standardAnalyzer );
+		QueryParser authorParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "author", TestConstants.standardAnalyzer );
+		QueryParser descParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "description", TestConstants.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 

@@ -33,6 +33,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
@@ -86,7 +87,7 @@ public class QueryLoaderTest extends SearchTestCase {
 
 		FullTextSession s = Search.getFullTextSession( sess );
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", SearchTestCase.keywordAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.keywordAnalyzer );
 		Query query = parser.parse( "title:moo" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Music.class );
 		List result = hibQuery.list();

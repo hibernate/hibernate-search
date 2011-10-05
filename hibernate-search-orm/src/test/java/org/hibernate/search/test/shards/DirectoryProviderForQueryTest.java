@@ -33,6 +33,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Chase Seibert
@@ -70,7 +71,7 @@ public class DirectoryProviderForQueryTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.stopAnalyzer );
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 
 		FullTextQuery fullTextQuery = fts.createFullTextQuery( parser.parse( "body:message" ) );
 		List results = fullTextQuery.list();

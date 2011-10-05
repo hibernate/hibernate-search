@@ -144,7 +144,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		FSDirectory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
 		IndexSearcher searcher = new IndexSearcher( dir, true );
 		try {
-			QueryParser qp = new QueryParser( getTargetLuceneVersion(), "id", SearchTestCase.standardAnalyzer );
+			QueryParser qp = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 			Query query = qp.parse( "title:Action OR Abstract:Action" );
 			TopDocs hits = searcher.search( query, 1000 );
 			assertEquals( 2, hits.totalHits );
