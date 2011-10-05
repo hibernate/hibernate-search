@@ -47,7 +47,7 @@ public class TestConstants {
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static File targetDir;
-	static final File indexDir;
+	private static final File indexDir;
 
 	static {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -78,6 +78,15 @@ public class TestConstants {
 	 */
 	public static File getTargetDir() {
 		return targetDir;
+	}
+
+	/**
+	 * Return the root directory to store test indexes in. Tests should never use or delete this directly
+	 * but rather nest sub directories in it to avoid interferences across tests.
+	 * @return
+	 */
+	public static File getIndexdir() {
+		return indexDir;
 	}
 
 }

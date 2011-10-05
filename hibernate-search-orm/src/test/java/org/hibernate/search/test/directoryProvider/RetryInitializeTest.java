@@ -51,17 +51,18 @@ public class RetryInitializeTest {
 	
 	private FullTextSessionBuilder slave;
 	private FullTextSessionBuilder master;
+	private File root;
 	
 	@Before
 	public void setUp() throws Exception {
-		FSSlaveAndMasterDPTest.prepareDirectories();
+		root = FSSlaveAndMasterDPTest.prepareDirectories( getClass().getSimpleName() );
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		if ( slave != null ) slave.close();
 		if ( master != null ) master.close();
-		FSSlaveAndMasterDPTest.cleanupDirectories();
+		FSSlaveAndMasterDPTest.cleanupDirectories( root );
 	}
 	
 	@Test
@@ -106,7 +107,6 @@ public class RetryInitializeTest {
 	}
 	
 	private FullTextSessionBuilder createMasterNode() {
-		File root = FSSlaveAndMasterDPTest.root;
 		return new FullTextSessionBuilder()
 			.addAnnotatedClass( SnowStorm.class )
 			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
@@ -116,7 +116,6 @@ public class RetryInitializeTest {
 	}
 	
 	private FullTextSessionBuilder createSlaveNode(boolean enableRetryInitializePeriod) {
-		File root = FSSlaveAndMasterDPTest.root;
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( SnowStorm.class )
 			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )

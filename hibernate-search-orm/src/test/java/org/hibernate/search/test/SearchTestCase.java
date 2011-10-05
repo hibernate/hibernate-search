@@ -199,8 +199,11 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	protected File getBaseIndexDir() {
+		// Make sure no directory is ever reused across the testsuite as Windows might not be able
+		// to delete the files after usage. See also
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
 		String shortTestName = this.getClass().getSimpleName() + "." + this.getName();
-		File indexPath = new File( TestConstants.indexDir, shortTestName );
+		File indexPath = new File( TestConstants.getIndexdir(), shortTestName );
 		return indexPath;
 	}
 
