@@ -141,8 +141,8 @@
         <hibernateVersion>4.0.0.CR4</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.0.CR2</hibernateCommonsAnnotationVersion>
         <bytemanVersion>1.5.2</bytemanVersion>
-        <jbossLoggingVersion>3.0.0.GA</jbossLoggingVersion>
-        <jbossLoggingProcessorVersion>1.0.0.Beta7</jbossLoggingProcessorVersion>
+        <jbossLoggingVersion>3.0.1.GA</jbossLoggingVersion>
+        <jbossLoggingProcessorVersion>1.0.0.CR1</jbossLoggingProcessorVersion>
     </properties>
 
     <dependencies>
@@ -446,7 +446,7 @@
                             <phase>generate-sources</phase>
                             <configuration>
                                 <processors>
-                                    <processor>org.jboss.logging.LoggingToolsProcessor</processor>
+                                    <processor>org.jboss.logging.generator.apt.LoggingToolsProcessor</processor>
                                 </processors>
                             </configuration>
                         </execution>
@@ -459,7 +459,7 @@
                             <phase>generate-test-sources</phase>
                             <configuration>
                                 <processors>
-                                    <processor>org.jboss.logging.LoggingToolsProcessor</processor>
+                                    <processor>org.jboss.logging.generator.apt.LoggingToolsProcessor</processor>
                                 </processors>
                             </configuration>
                         </execution>

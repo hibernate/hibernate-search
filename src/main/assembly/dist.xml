@@ -81,6 +81,7 @@
                             <exclude>org.infinispan:*</exclude>
                             <exclude>org.rhq.helpers:*</exclude>
                             <exclude>org.jboss.marshalling:*</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                         </excludes>
                     </dependencySet>
 
@@ -106,6 +107,7 @@
                             <exclude>org.jgroups:jgroups</exclude>
                             <exclude>xml-apis:xml-apis</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                             <exclude>org.infinispan:*</exclude>
                             <exclude>org.jboss.marshalling:*</exclude>
                         </excludes>
@@ -117,6 +119,11 @@
                         <includes>
                             <include>org.jboss.javaee:jboss-transaction-api</include>
                         </includes>
+                        <excludes>
+                            <exclude>org.jboss.logging:jboss-logging-generator</exclude>
+                            <exclude>org.jboss.logging:jboss-logging-processor</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
+                        </excludes>
                     </dependencySet>
                 </dependencySets>
             </binaries>
@@ -202,6 +209,11 @@
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>/dist/lib/provided</outputDirectory>
                         <scope>provided</scope>
+                        <excludes>
+                            <exclude>org.jboss.logging:jboss-logging-generator</exclude>
+                            <exclude>org.jboss.logging:jboss-logging-processor</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
+                        </excludes>
                     </dependencySet>
                 </dependencySets>
             </binaries>
