@@ -47,7 +47,7 @@ public class TestConstants {
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static File targetDir;
-	private static final File indexDir;
+	private static final String indexDirPath;
 
 	static {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -63,8 +63,8 @@ public class TestConstants {
 				.getParentFile()  // target/classes/
 				.getParentFile(); // target
 
-		indexDir = new File( targetDir, "indextemp" );
-		log.debugf( "Using %s as index directory.", indexDir.getAbsolutePath() );
+		indexDirPath = targetDir.getAbsolutePath() + File.separator + "indextemp";
+		log.debugf( "Using %s as index directory.", indexDirPath );
 	}
 
 	public static Version getTargetLuceneVersion() {
@@ -85,8 +85,8 @@ public class TestConstants {
 	 * but rather nest sub directories in it to avoid interferences across tests.
 	 * @return
 	 */
-	public static File getIndexdir() {
-		return indexDir;
+	public static String getIndexdir() {
+		return indexDirPath;
 	}
 
 }

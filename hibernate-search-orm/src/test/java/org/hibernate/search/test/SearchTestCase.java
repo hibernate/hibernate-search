@@ -29,7 +29,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -203,6 +202,10 @@ public abstract class SearchTestCase extends TestCase {
 		// to delete the files after usage. See also
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
 		String shortTestName = this.getClass().getSimpleName() + "." + this.getName();
+
+		// the constructor File(File, String) is broken too, see :
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5066567
+		// So make sure to use File(String, String) in this case as TestConstants works with absolute paths!
 		File indexPath = new File( TestConstants.getIndexdir(), shortTestName );
 		return indexPath;
 	}
