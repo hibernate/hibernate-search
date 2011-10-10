@@ -47,24 +47,25 @@ public class TestConstants {
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static File targetDir;
-	private static final File indexDir;
+	private static final String indexDirPath;
 
 	static {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 		// get a URL reference to something we now is part of the classpath (us)
-		URL myUrl = contextClassLoader.getResource( TestConstants.class.getName().replace( '.', '/' ) + ".class" );
+		//The caller is SearchTestCase but the caller's caller is the actual test in the right directory
+		//This code is fragile as the above assumption is not guaranteed :(
+		String currentTestName = new RuntimeException().getStackTrace()[2].getClassName();
+		int hopsToRoot = currentTestName.split("\\.").length + 1;
+		URL myUrl = contextClassLoader.getResource( currentTestName.replace( '.', '/' ) + ".class" );
 		File myPath = new File( myUrl.getFile() );
 		// navigate back to '/target'
-		targetDir = myPath
-				.getParentFile()  // target/classes/org/hibernate/search/test
-				.getParentFile()  // target/classes/org/hibernate/search
-				.getParentFile()  // target/classes/org/hibernate/
-				.getParentFile()  // target/classes/org
-				.getParentFile()  // target/classes/
-				.getParentFile(); // target
+		targetDir = myPath;
+		for ( int i = 0; i < hopsToRoot + 2; i++ ) { // target/classes == +2
+			targetDir = myPath.getParentFile();
+		}
 
-		indexDir = new File( targetDir, "indextemp" );
-		log.debugf( "Using %s as index directory.", indexDir.getAbsolutePath() );
+		indexDirPath = targetDir.getAbsolutePath() + File.separator + "indextemp";
+		log.debugf( "Using %s as index directory.", indexDirPath );
 	}
 
 	public static Version getTargetLuceneVersion() {
@@ -85,8 +86,8 @@ public class TestConstants {
 	 * but rather nest sub directories in it to avoid interferences across tests.
 	 * @return
 	 */
-	public static File getIndexdir() {
-		return indexDir;
+	public static String getIndexdir() {
+		return indexDirPath;
 	}
 
 }
