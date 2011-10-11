@@ -27,6 +27,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -75,6 +77,7 @@ public class Cloud {
 	private Class clazz;
 	private URL url;
 	private URI uri;
+	private UUID uuid;
 	private Calendar myCalendar;
 	private Calendar calendarYear;
 	private Calendar calendarMonth;
@@ -100,6 +103,15 @@ public class Cloud {
 
 	public void setUri(URI uri) {
 		this.uri = uri;
+	}
+	
+	@Field(analyze = Analyze.NO, store = Store.YES)
+	public UUID getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
 	}
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
@@ -418,4 +430,5 @@ public class Cloud {
 	public void setCalendarSecond(Calendar calendarSecond) {
 		this.calendarSecond = calendarSecond;
 	}
+
 }
