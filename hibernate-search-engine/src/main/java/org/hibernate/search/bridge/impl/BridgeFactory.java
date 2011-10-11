@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.annotations.common.AssertionFailure;
@@ -73,6 +74,7 @@ import org.hibernate.search.bridge.builtin.LongNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
 import org.hibernate.search.bridge.builtin.StringBridge;
+import org.hibernate.search.bridge.builtin.UUIDBridge;
 import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
 
@@ -102,6 +104,7 @@ public final class BridgeFactory {
 	public static final TwoWayFieldBridge CLAZZ = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge() );
 	public static final TwoWayFieldBridge Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
 	public static final TwoWayFieldBridge Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
+	public static final TwoWayFieldBridge UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );
 
 	public static final FieldBridge DATE_YEAR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
 	public static final FieldBridge DATE_MONTH = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MONTH );
@@ -115,14 +118,14 @@ public final class BridgeFactory {
 	public static final FieldBridge ITERABLE_DATE_DAY = new BuiltinIterableBridge( DATE_DAY );
 	public static final FieldBridge ITERABLE_DATE_HOUR = new BuiltinIterableBridge( DATE_HOUR );
 	public static final FieldBridge ITERABLE_DATE_MINUTE = new BuiltinIterableBridge( DATE_MINUTE );
-	public static final FieldBridge ITERABLE_DATE_SECOND = new BuiltinIterableBridge(  DATE_SECOND );
+	public static final FieldBridge ITERABLE_DATE_SECOND = new BuiltinIterableBridge( DATE_SECOND );
 
 	public static final FieldBridge MAP_DATE_YEAR = new BuiltinMapBridge( DATE_YEAR );
 	public static final FieldBridge MAP_DATE_MONTH = new BuiltinMapBridge( DATE_MONTH );
 	public static final FieldBridge MAP_DATE_DAY = new BuiltinMapBridge( DATE_DAY );
 	public static final FieldBridge MAP_DATE_HOUR = new BuiltinMapBridge( DATE_HOUR );
 	public static final FieldBridge MAP_DATE_MINUTE = new BuiltinMapBridge( DATE_MINUTE );
-	public static final FieldBridge MAP_DATE_SECOND = new BuiltinMapBridge(  DATE_SECOND );
+	public static final FieldBridge MAP_DATE_SECOND = new BuiltinMapBridge( DATE_SECOND );
 
 	public static final FieldBridge ARRAY_DATE_YEAR = new BuiltinArrayBridge( DATE_YEAR );
 	public static final FieldBridge ARRAY_DATE_MONTH = new BuiltinArrayBridge( DATE_MONTH );
@@ -173,20 +176,19 @@ public final class BridgeFactory {
 	public static final NumericFieldBridge FLOAT_NUMERIC = new FloatNumericFieldBridge();
 	public static final NumericFieldBridge DOUBLE_NUMERIC = new DoubleNumericFieldBridge();
 
-	public static final TwoWayFieldBridge DATE_MILLISECOND =
-			new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MILLISECOND );
+	public static final TwoWayFieldBridge DATE_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(
+			DateBridge.DATE_MILLISECOND );
 
 	public static final FieldBridge ARRAY_DATE_MILLISECOND = new BuiltinArrayBridge( DATE_MILLISECOND );
 	public static final FieldBridge ITERABLE_DATE_MILLISECOND = new BuiltinIterableBridge( DATE_MILLISECOND );
 	public static final FieldBridge MAP_DATE_MILLISECOND = new BuiltinMapBridge( DATE_MILLISECOND );
 
-	public static final TwoWayFieldBridge CALENDAR_MILLISECOND =
-			new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MILLISECOND );
+	public static final TwoWayFieldBridge CALENDAR_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(
+			CalendarBridge.CALENDAR_MILLISECOND );
 
 	public static final FieldBridge ARRAY_CALENDAR_MILLISECOND = new BuiltinArrayBridge( CALENDAR_MILLISECOND );
 	public static final FieldBridge ITERABLE_CALENDAR_MILLISECOND = new BuiltinIterableBridge( CALENDAR_MILLISECOND );
 	public static final FieldBridge MAP_CALENDAR_MILLISECOND = new BuiltinMapBridge( CALENDAR_MILLISECOND );
-
 
 	static {
 		builtInBridges.put( Character.class.getName(), CHARACTER );
@@ -209,6 +211,7 @@ public final class BridgeFactory {
 		builtInBridges.put( Class.class.getName(), CLAZZ );
 		builtInBridges.put( URL.class.getName(), Url );
 		builtInBridges.put( URI.class.getName(), Uri );
+		builtInBridges.put( UUID.class.getName(), UUID );
 
 		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
 		builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND );
