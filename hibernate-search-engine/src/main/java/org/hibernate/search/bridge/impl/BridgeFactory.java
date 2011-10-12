@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.annotations.common.AssertionFailure;
@@ -73,6 +74,7 @@ import org.hibernate.search.bridge.builtin.LongNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
 import org.hibernate.search.bridge.builtin.StringBridge;
+import org.hibernate.search.bridge.builtin.UUIDBridge;
 import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
 
@@ -102,6 +104,7 @@ public final class BridgeFactory {
 	public static final TwoWayFieldBridge CLAZZ = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge() );
 	public static final TwoWayFieldBridge Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
 	public static final TwoWayFieldBridge Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
+	public static final TwoWayFieldBridge UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );	
 
 	public static final FieldBridge DATE_YEAR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
 	public static final FieldBridge DATE_MONTH = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MONTH );
@@ -209,6 +212,7 @@ public final class BridgeFactory {
 		builtInBridges.put( Class.class.getName(), CLAZZ );
 		builtInBridges.put( URL.class.getName(), Url );
 		builtInBridges.put( URI.class.getName(), Uri );
+		builtInBridges.put( UUID.class.getName(), UUID);
 
 		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
 		builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND );

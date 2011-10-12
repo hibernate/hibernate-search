@@ -31,6 +31,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.Term;
@@ -76,6 +77,7 @@ public class BridgeTest extends SearchTestCase {
 		cloud.setClazz( Cloud.class );
 		cloud.setUri( new URI( "http://www.hibernate.org" ) );
 		cloud.setUrl( new URL( "http://www.hibernate.org" ) );
+		cloud.setUuid(UUID.fromString("f49c6ba8-8d7f-417a-a255-d594dddf729f"));
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( cloud );
@@ -120,6 +122,12 @@ public class BridgeTest extends SearchTestCase {
 		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
 		assertEquals( "Clazz projection works", 1, result.size() );
 
+		bQuery = new BooleanQuery();
+		bQuery.add( new TermQuery( new Term( "uuid", "f49c6ba8-8d7f-417a-a255-d594dddf729f" ) ), BooleanClause.Occur.MUST );
+		
+		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
+		assertEquals( "Clazz projection works", 1, result.size() );
+		
 		query = parser.parse( "char1:[" + String.valueOf( Character.MIN_VALUE ) + " TO " + String.valueOf( Character.MAX_VALUE ) + "]" );
 		result = session.createFullTextQuery( query ).setProjection( "char1" ).list();
 		assertEquals( "Null elements should not be stored, CharacterBridge is not working", 0, result.size() );
