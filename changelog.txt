@@ -1,8 +1,34 @@
 Hibernate Search Changelog
 ==========================
 
+4.0.0.CR1 (13-10-2011)
+----------------------
+
+** Bug
+    * [HSEARCH-887] - Version conflict of dependency jackson-mapper-asl with the one included in JBoss AS7
+    * [HSEARCH-926] - Duplicate InfinispanDirectoryProviders created when multiple sub-classes share the same index directory (Zach Kurey)
+    * [HSEARCH-928] - Move documentation into its own maven module using the jdocbook packaging
+    * [HSEARCH-936] - Move service locator file to hibernate-search-orm (from hibernate-search-engine)
+    * [HSEARCH-945] - Arquillian integration test fails due to bug in Shrinkwrap
+
+** Improvement
+    * [HSEARCH-938] - Failure to delete a file should not be logged at error level
+
+** New Feature
+    * [HSEARCH-944] - default two way String bridge for type java.util.UUID (Gregory Beachy)
+
+** Task
+    * [HSEARCH-778] - Move Hibernate Search to new artifactId
+    * [HSEARCH-930] - Follow up Jenkins feedback on Hibernate Search build on Windows
+    * [HSEARCH-933] - update DB profiles used for testing
+    * [HSEARCH-934] - Upgrade to Hibernate Core 4.0.0.CR4
+    * [HSEARCH-935] - Upgrade to Infinispan 5.0.1.FINAL
+    * [HSEARCH-940] - Add an integration test with JBoss AS7 (Davide D'Alto)
+    * [HSEARCH-941] - Update JBoss Logger to 3.0.1.GA
+
+
 4.0.0.Beta2 (29-09-2011)
--------------------------
+------------------------
 
 ** Bug
     * [HSEARCH-871] - Only the last enabled FullTextFilter is in effect if multiple FullTextFilters of the same type, different parameters are enabled
@@ -27,7 +53,7 @@ Hibernate Search Changelog
 
 
 4.0.0.Beta1 (14-09-2011)
--------------------------
+------------------------
 
 ** Bug
     * [HSEARCH-620] - Archetype does not deploy on JBoss Nexus repository due to missing pom fields
