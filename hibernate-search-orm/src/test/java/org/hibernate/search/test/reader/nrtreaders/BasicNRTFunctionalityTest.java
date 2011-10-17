@@ -103,12 +103,12 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 	}
 
 	private int getDocumentNbrFromReaderProvider(NRTIndexManager indexManager) {
-		IndexReader reader = indexManager.getIndexReaderManager().openIndexReader();
+		IndexReader reader = indexManager.getReaderProvider().openIndexReader();
 		try {
 			return reader.numDocs();
 		}
 		finally {
-			indexManager.getIndexReaderManager().closeIndexReader( reader );
+			indexManager.getReaderProvider().closeIndexReader( reader );
 		}
 	}
 
