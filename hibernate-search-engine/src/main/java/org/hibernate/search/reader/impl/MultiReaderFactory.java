@@ -45,7 +45,7 @@ public class MultiReaderFactory {
 		IndexReader[] readers = new IndexReader[length];
 		ReaderProvider[] managers = new ReaderProvider[length];
 		for (int index = 0; index < length; index++) {
-			ReaderProvider indexReaderManager = indexManagers[index].getIndexReaderManager();
+			ReaderProvider indexReaderManager = indexManagers[index].getReaderProvider();
 			IndexReader openIndexReader = indexReaderManager.openIndexReader();
 			readers[index] = openIndexReader;
 			managers[index] = indexReaderManager;

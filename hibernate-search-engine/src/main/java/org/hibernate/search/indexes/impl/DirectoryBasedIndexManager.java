@@ -71,7 +71,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public ReaderProvider getIndexReaderManager() {
+	public ReaderProvider getReaderProvider() {
 		return readers;
 	}
 

@@ -32,14 +32,13 @@ import org.hibernate.search.backend.spi.Work;
  * when integrating with Infinispan (as Infinispan Query) no initialization is needed.
  *
  * @see org.hibernate.search.impl.SimpleClassNavigator
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero &lt;sanne@hibernate.org&gt; (C) 2011 Red Hat Inc.
  */
 public interface ClassNavigator {
 
 	<T> Class<T> getClassFromWork(Work<T> work);
 
 	/**
-	 * @param <T>
 	 * @param entity an instance or proxy of T
 	 * @return the class from the instance, or the underlying class from a proxy.
 	 */
@@ -52,21 +51,18 @@ public interface ClassNavigator {
 	public Object unproxy(Object value);
 
 	/**
-	 * @param <T>
 	 * @param value
 	 * @return the initialized Collection, to be used on lazily-loading collections
 	 */
 	public <T> Collection<T> initializeCollection(Collection<T> value);
 
 	/**
-	 * @param <T>
 	 * @param value
 	 * @return the initialized Map, to be used on lazily-loading maps
 	 */
 	public <K,V> Map<K,V> initializeMap(Map<K,V> value);
 
 	/**
-	 * @param <T>
 	 * @param value
 	 * @return the initialized array, to be used on lazily-loading arrays
 	 */

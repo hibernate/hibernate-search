@@ -31,12 +31,12 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 
 /**
- * Set up and provide a Lucene <code>Directory</code>
- * <code>equals()</code> and <code>hashCode()</code> must guaranty equality
+ * Set up and provide a Lucene {@code Directory}
+ * {@code equals()} and {@code hashCode()} must guaranty equality
  * between two providers pointing to the same underlying Lucene Store.
- * Besides that, hashCode ordering is used to avoid deadlock when locking a directory provider.
+ * Besides that, {@code hashCode} ordering is used to avoid deadlock when locking a directory provider.
  * 
- * This class must be thread safe regarding <code>getDirectory()</code> calls
+ * This class must be thread safe regarding {@code getDirectory()} calls
  *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
@@ -44,6 +44,10 @@ import org.hibernate.search.spi.BuildContext;
 public interface DirectoryProvider<TDirectory extends Directory> {
 
 	/**
+	 * @param directoryProviderName
+	 * @param properties
+	 * @param context
+	 *
 	 * get the information to initialize the directory and build its hashCode/equals method
 	 */
 	void initialize(String directoryProviderName, Properties properties, BuildContext context);
