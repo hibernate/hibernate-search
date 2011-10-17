@@ -55,8 +55,11 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Hardy Ferentschik
  */
 public class DSLTest extends SearchTestCase {
+	private final Calendar calendar = Calendar.getInstance();
 
-	FullTextSession fullTextSession;
+	private FullTextSession fullTextSession;
+	private Date january;
+	private Date february;
 
 	public void setUp() throws Exception {
 		super.setUp();
@@ -282,12 +285,11 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
-	public void testRangeQuery() throws Exception {
+	public void testRangeQueryFromTo() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
-		final Calendar calendar = Calendar.getInstance();
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
 		calendar.set( 0 + 1900, 2, 12, 0, 0, 0 );
 		Date from = calendar.getTime();
@@ -315,8 +317,19 @@ public class DSLTest extends SearchTestCase {
 				.to( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) ).excludeLimit()
 				.createQuery();
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+		transaction.commit();
+	}
 
-		query = monthQb.
+	public void testRangeQueryBelow() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		calendar.set( 10 + 1900, 2, 12, 0, 0, 0 );
+		Date to = calendar.getTime();
+
+		Query query = monthQb.
 				range()
 				.onField( "estimatedCreation" )
 				.andField( "justfortest" )
@@ -326,7 +339,7 @@ public class DSLTest extends SearchTestCase {
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
-		assertEquals( "January", ( ( Month ) hibQuery.list().get( 0 ) ).getName() );
+		assertEquals( "January", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
 		query = monthQb.
 				range()
@@ -339,30 +352,7 @@ public class DSLTest extends SearchTestCase {
 
 		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
-		assertEquals( "January", ( ( Month ) hibQuery.list().get( 0 ) ).getName() );
-
-		query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.above( to )
-				.createQuery();
-		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
-		assertEquals( 1, hibQuery.getResultSize() );
-		assertEquals( "February", ( ( Month ) hibQuery.list().get( 0 ) ).getName() );
-
-		query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.ignoreFieldBridge()
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.above( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
-				.createQuery();
-		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
-		assertEquals( 1, hibQuery.getResultSize() );
-		assertEquals( "February", ( ( Month ) hibQuery.list().get( 0 ) ).getName() );
+		assertEquals( "January", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
 		query = monthQb.range()
 				.onField( "raindropInMm" )
@@ -375,6 +365,64 @@ public class DSLTest extends SearchTestCase {
 
 		assertEquals( "test range numeric ", 1, results.size() );
 		assertEquals( "test range numeric ", "January", ( (Month) results.get( 0 ) ).getName() );
+
+		transaction.commit();
+	}
+
+	public void testRangeQueryAbove() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		calendar.set( 10 + 1900, 2, 12, 0, 0, 0 );
+		Date to = calendar.getTime();
+
+		Query query = monthQb.
+				range()
+				.onField( "estimatedCreation" )
+				.andField( "justfortest" )
+				.ignoreFieldBridge().ignoreAnalyzer()
+				.above( to )
+				.createQuery();
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		query = monthQb.
+				range()
+				.onField( "estimatedCreation" )
+				.ignoreFieldBridge()
+				.andField( "justfortest" )
+				.ignoreFieldBridge().ignoreAnalyzer()
+				.above( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+				.createQuery();
+		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		// test the limits, inclusive
+		query = monthQb.
+				range()
+				.onField( "estimatedCreation" )
+				.andField( "justfortest" )
+				.ignoreFieldBridge().ignoreAnalyzer()
+				.above( february )
+				.createQuery();
+		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 1, hibQuery.getResultSize() );
+		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		// test the limits, exclusive
+		query = monthQb.
+				range()
+				.onField( "estimatedCreation" )
+				.andField( "justfortest" )
+				.ignoreFieldBridge().ignoreAnalyzer()
+				.above( february ).excludeLimit()
+				.createQuery();
+		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( 0, hibQuery.getResultSize() );
 
 		transaction.commit();
 	}
@@ -443,16 +491,16 @@ public class DSLTest extends SearchTestCase {
 
 		Query query = monthQb.range()
 				.onField( "raindropInMm" )
-				.from(0.23d)
-				.to(0.24d)
+				.from( 0.23d )
+				.to( 0.24d )
 				.createQuery();
 
-		assertTrue(query.getClass().isAssignableFrom(NumericRangeQuery.class));
+		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
-		List results = fullTextSession.createFullTextQuery(query, Month.class).list();
+		List results = fullTextSession.createFullTextQuery( query, Month.class ).list();
 
-		assertEquals("test range numeric ", 1, results.size());
-		assertEquals("test range numeric ", "January", ((Month)results.get(0)).getName());
+		assertEquals( "test range numeric ", 1, results.size() );
+		assertEquals( "test range numeric ", "January", ( (Month) results.get( 0 ) ).getName() );
 
 
 		transaction.commit();
@@ -466,10 +514,10 @@ public class DSLTest extends SearchTestCase {
 
 		Query query = monthQb.keyword()
 				.onField( "raindropInMm" )
-				.matching(0.231d)
+				.matching( 0.231d )
 				.createQuery();
 
-		assertTrue(query.getClass().isAssignableFrom(NumericRangeQuery.class));
+		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
 		assertEquals(
 				"test term numeric ", 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize()
@@ -477,15 +525,15 @@ public class DSLTest extends SearchTestCase {
 
 		transaction.commit();
 	}
-	
+
 	public void testFieldBridge() {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 		Query query = monthQb.keyword()
-			.onField( "monthRomanNumber" )
-			.matching( 2 )
-			.createQuery();
+				.onField( "monthRomanNumber" )
+				.matching( 2 )
+				.createQuery();
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		List results = fullTextQuery.list();
 		assertEquals( 1, results.size() );
@@ -494,138 +542,31 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
-//	public void testTermQueryOnAnalyzer() throws Exception {
-//		FullTextSession fullTextSession = indexTestData();
-//
-//		Transaction transaction = fullTextSession.beginTransaction();
-//		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
-//				.buildQueryBuilder().forEntity( Month.class ).get();
-//		Query
-//		//regular term query
-//		query = monthQb.term().on( "mythology" ).matches( "cold" ).createQuery();
-//
-//		assertEquals( 0, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-//
-//		//term query based on several words
-//		query = monthQb.term().on( "mythology" ).matches( "colder darker" ).createQuery();
-//
-//		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-//
-//		//term query applying the analyzer and generating one term per word
-//		query = monthQb.term().on( "mythology_stem" ).matches( "snowboard" ).createQuery();
-//
-//		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-//
-//		//term query applying the analyzer and generating several terms per word
-//		query = monthQb.term().on( "mythology_ngram" ).matches( "snobored" ).createQuery();
-//
-//		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-//
-//		//term query not using analyzers
-//		query = monthQb.term().on( "mythology" ).matches( "Month" ).ignoreAnalyzer().createQuery();
-//
-//		assertEquals( 0, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-//
-//		query = monthQb.term().on( "mythology" ).matches( "Month" ).createQuery();
-//
-//		transaction.commit();
-//
-//		cleanUpTestData( fullTextSession );
-//	}
-//
-//	public void testFuzzyAndWildcardQuery() throws Exception {
-//		FullTextSession fullTextSession = indexTestData();
-//
-//		Transaction transaction = fullTextSession.beginTransaction();
-//		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
-//				.buildQueryBuilder().forEntity( Month.class ).get();
-//		Query
-//		//fuzzy search with custom threshold and prefix
-//		query = monthQb
-//				.term().on( "mythology" ).matches( "calder" )
-//					.fuzzy()
-//						.threshold( .8f )
-//						.prefixLength( 1 )
-//				.createQuery();
-//
-//		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-//
-//		//wildcard query
-//		query = monthQb
-//				.term().on( "mythology" ).matches( "mon*" )
-//					.wildcard()
-//				.createQuery();
-//		System.out.println(query.toString(  ));
-//		assertEquals( 2, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
-//
-//		transaction.commit();
-//
-//		cleanUpTestData( fullTextSession );
-//	}
-//
-//	public void testQueryCustomization() throws Exception {
-//		FullTextSession fullTextSession = indexTestData();
-//
-//		Transaction transaction = fullTextSession.beginTransaction();
-//		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
-//				.buildQueryBuilder().forEntity( Month.class ).get();
-//		Query
-//
-//		//combined query, January and february both contain whitening but February in a longer text
-//		query = monthQb
-//				.bool()
-//					.should( monthQb.term().on( "mythology" ).matches( "whitening" ).createQuery() )
-//					.should( monthQb.term().on( "history" ).matches( "whitening" ).createQuery() )
-//				.createQuery();
-//
-//		List<Month> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
-//		assertEquals( 2, results.size() );
-//		assertEquals( "January", results.get( 0 ).getName() );
-//
-//		//boosted query, January and february both contain whitening but February in a longer text
-//		//since history is boosted, February should come first though
-//		query = monthQb
-//				.bool()
-//					.should( monthQb.term().on( "mythology" ).matches( "whitening" ).createQuery() )
-//					.should( monthQb.term().on( "history" ).matches( "whitening" ).boostedTo( 30 ).createQuery() )
-//				.createQuery();
-//
-//		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
-//		assertEquals( 2, results.size() );
-//		assertEquals( "February", results.get( 0 ).getName() );
-//
-//		//FIXME add other method tests besides boostedTo
-//
-//		transaction.commit();
-//
-//		cleanUpTestData( fullTextSession );
-//	}
-
-	//FIXME add boolean tests
-
 	private void indexTestData() {
 		Transaction tx = fullTextSession.beginTransaction();
 		final Calendar calendar = Calendar.getInstance();
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
 		calendar.set( 0 + 1900, 2, 12, 0, 0, 0 );
+		january = calendar.getTime();
 		fullTextSession.persist(
 				new Month(
 						"January",
 						1,
 						"Month of colder and whitening",
 						"Historically colder than any other month in the northern hemisphere",
-						calendar.getTime(),
+						january,
 						0.231d
 				)
 		);
 		calendar.set( 100 + 1900, 2, 12, 0, 0, 0 );
+		february = calendar.getTime();
 		fullTextSession.persist(
 				new Month(
 						"February",
 						2,
 						"Month of snowboarding",
 						"Historically, the month where we make babies while watching the whitening landscape",
-						calendar.getTime(),
+						february,
 						0.435d
 				)
 		);
