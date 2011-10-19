@@ -33,33 +33,48 @@
   <section>
     <title>Overview</title>
 
-    <para>Hibernate Search consists of an indexing and an index search
-    component. Both are backed by Apache Lucene.</para>
+    <para>Hibernate Search consists of an indexing component as well as an
+    index search component. Both are backed by Apache Lucene.</para>
 
     <para>Each time an entity is inserted, updated or removed in/from the
     database, Hibernate Search keeps track of this event (through the
-    Hibernate event system) and schedules an index update. All the index
-    updates are handled without you having to use the Apache Lucene APIs (see
-    <xref linkend="search-configuration-event" />).</para>
+    Hibernate event system) and schedules an index update. All these updates
+    are handled without you having to interact with the Apache Lucene APIs
+    directly (see <xref linkend="search-configuration-event" />). Instead, the
+    interaction with the underlying Lucene indexes is handled via a so called
+    <classname>IndexManager</classname>. </para>
 
-    <para>To interact with Apache Lucene indexes, Hibernate Search has the
-    notion of <classname>IndexManager</classname>s.
-    Each index manager has a name and represents a Lucene index which can
-    be queried and will be updated by entity change events (fired by Hibernate Core).</para>
-    
-    <para>The default index manager implementation uses a <classname>DirectoryProvider</classname>
-    to manage a given Lucene <classname>Directory</classname>.
-    You can configure directory providers to adjust the directory target (see <xref
-    linkend="search-configuration-directory" />), or you can ovverride the whole
-    <classname>IndexManager</classname> implementation.</para>
+    <para>Each Lucene index has one index manager which can be uniquely
+    identified by name. In most cases there is a one to one relationship
+    between an indexed entity and an <classname>IndexManager</classname>. The
+    exceptions are the use cases of index sharding and index sharing. The
+    former can be applied when the index for a single entity becomes too big
+    and indexing operations are slowing down the application. In this case a
+    single entity is indexed into multiple indexes each with its own index
+    manager (see <xref linkend="search-configuration-directory-sharding" />).
+    The latter, index sharing, is the ability to index multiple entities into
+    the same Lucene index (see <xref linkend="section-sharing-indexes" />).
+    Since there is no immediate benefit in sharing indexes it is only
+    mentioned for completeness.</para>
 
-    <para>Hibernate Search uses the Lucene index to search an entity and
-    return a list of managed entities saving you the tedious object to Lucene
-    document mapping. The same persistence context is shared between Hibernate
-    and Hibernate Search. As a matter of fact, the
+    <para>The index manager holds a reference to the selected backend, the
+    configured reader strategy and the chosen
+    <classname>DirectoryProvider</classname>. These components will be
+    discussed in greater detail later on. It is recommended that you start
+    with the default implementation of the
+    <classname>IndexerManager</classname> interface which uses different
+    Lucene <classname>Directory</classname> types to manage the indexes. You
+    can, however, also provide your own implementation of the
+    <classname>IndexManager</classname> (see <xref
+    linkend="configuration-indexmanager" />),</para>
+
+    <para>Once the index is created, you can search for entities and return a
+    list of managed entities saving you the tedious object to Lucene
+    <classname>Document</classname> mapping. The same persistence context is
+    shared between Hibernate and Hibernate Search. As a matter of fact, the
     <classname>FullTextSession</classname> is built on top of the Hibernate
-    Session so that the application code can use the unified
-    <classname>org.hibernate.Query</classname> or
+    <classname>Session</classname> so that the application code can use the
+    unified <classname>org.hibernate.Query</classname> or
     <classname>javax.persistence.Query</classname> APIs exactly the same way a
     HQL, JPA-QL or native query would do.</para>
 
@@ -93,16 +108,12 @@
     mode is recommended. The scoping choice is made transparently. Hibernate
     Search detects the presence of a transaction and adjust the scoping.<tip>
         <para>It is recommended - for both your database and Hibernate Search
-        - to execute your operations in a transaction, be it JDBC or JTA.
-        </para>
+        - to execute your operations in a transaction, be it JDBC or
+        JTA.</para>
       </tip></para>
 
     <note>
-       Hibernate Search works perfectly fine in the Hibernate / EntityManager long conversation pattern aka. atomic conversation. 
-    </note>
-
-    <note>
-       Depending on user demand, additional scoping will be considered, the pluggability mechanism being already in place. 
+       Hibernate Search works perfectly fine in the Hibernate / EntityManager long conversation pattern aka. atomic conversation
     </note>
   </section>
 
@@ -110,125 +121,81 @@
     <title>Back end</title>
 
     <para>Hibernate Search offers the ability to let the batched work being
-    processed by different back ends. Several back ends are provided out of the
-    box and you have the option to plugin your own implementation.</para>
+    processed by different back ends. Several back ends are provided out of
+    the box and you have the option to plugin your own implementation.</para>
 
     <section>
-      <title>Back end types</title>
+      <title>Lucene</title>
 
-      <section>
-        <title>Lucene</title>
+      <para>In this mode, all index update operations applied on a given node
+      (JVM) will be executed to the Lucene directories (through the directory
+      providers) by the same node. This mode is typically used in non
+      clustered environment or in clustered environments where the directory
+      store is shared.</para>
 
-        <para>In this mode, all index update operations applied on a given
-        node (JVM) will be executed to the Lucene directories (through the
-        directory providers) by the same node. This mode is typically used in
-        non clustered environment or in clustered environments where the
-        directory store is shared.</para>
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center" fileref="lucene-backend.png" format="PNG" />
+        </imageobject>
 
-        <mediaobject>
-          <imageobject role="html">
-            <imagedata align="center" fileref="lucene-backend.png"
-                       format="PNG" />
-          </imageobject>
+        <imageobject role="fo">
+          <imagedata align="center" depth="" fileref="lucene-backend.png"
+                     format="PNG" scalefit="1" width="12cm" />
+        </imageobject>
 
-          <imageobject role="fo">
-            <imagedata align="center" depth="" fileref="lucene-backend.png"
-                       format="PNG" scalefit="1" width="12cm" />
-          </imageobject>
+        <caption><para>Lucene back end configuration.</para></caption>
+      </mediaobject>
 
-          <caption>
-            <para>Lucene back end configuration.</para>
-          </caption>
-        </mediaobject>
+      <para>This mode targets non clustered applications, or clustered
+      applications where the Directory is taking care of the locking
+      strategy.</para>
 
-        <para>This mode targets non clustered applications, or clustered
-        applications where the Directory is taking care of the locking
-        strategy.</para>
+      <para>The main advantage is simplicity and immediate visibility of the
+      changes in Lucene queries (a requirement in some applications).</para>
 
-        <para>The main advantage is simplicity and immediate visibility of the
-        changes in Lucene queries (a requirement in some applications).</para>
-
-        <para>An alternative back end viable for non-clustered and non-shared
-        index configurations is the near-real-time backend.</para>
-      </section>
-
-      <section>
-        <title>JMS</title>
-
-        <para>All index update operations applied on a given node are sent to
-        a JMS queue. A unique reader will then process the queue and update
-        the master index. The master index is then replicated on a regular
-        basis to the slave copies. This is known as the master/slaves pattern.
-        The master is the sole responsible for updating the Lucene index. The
-        slaves can accept read as well as write operations. However, they only
-        process the read operation on their local index copy and delegate the
-        update operations to the master.</para>
-
-        <mediaobject>
-          <imageobject role="html">
-            <imagedata align="center" fileref="jms-backend.png" format="PNG" />
-          </imageobject>
-
-          <imageobject role="fo">
-            <imagedata align="center" depth="" fileref="jms-backend.png"
-                       format="PNG" scalefit="1" width="12cm" />
-          </imageobject>
-
-          <caption>
-            <para>JMS back end configuration.</para>
-          </caption>
-        </mediaobject>
-
-        <para>This mode targets clustered environments where throughput is
-        critical, and index update delays are affordable. Reliability is
-        ensured by the JMS provider and by having the slaves working on a
-        local copy of the index.</para>
-      </section>
-
-      <section>
-        <title>JGroups</title>
-
-        <para>The JGroups based back end works similar to the JMS one and is
-        designed after the same master/slave pattern. However, instead of JMS
-        the JGroups toolkit is used as a replication mechanism. This back end
-        can be used as an alternative to JMS when response time is critical,
-        but i.e. JNDI service is not available.</para>
-      </section>
-
-      <note>Hibernate Search is an extensible architecture. Feel free to drop
-      ideas for additional back ends to <literal>hibernate-dev@lists.jboss.org</literal>.</note>
+      <para>An alternative back end viable for non-clustered and non-shared
+      index configurations is the near-real-time backend.</para>
     </section>
 
     <section>
-      <title>Work execution</title>
+      <title>JMS</title>
 
-      <para>The indexing work (done by the back end) can be executed
-      synchronously with the transaction commit (or update operation if out of
-      transaction), or asynchronously.</para>
+      <para>All index update operations applied on a given node are sent to a
+      JMS queue. A unique reader will then process the queue and update the
+      master index. The master index is then replicated on a regular basis to
+      the slave copies. This is known as the master/slaves pattern. The master
+      is the sole responsible for updating the Lucene index. The slaves can
+      accept read as well as write operations. However, they only process the
+      read operation on their local index copy and delegate the update
+      operations to the master.</para>
 
-      <section>
-        <title>Synchronous</title>
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center" fileref="jms-backend.png" format="PNG" />
+        </imageobject>
 
-        <para>This is the safe mode where the back end work is executed in
-        concert with the transaction commit. Under highly concurrent
-        environment, this can lead to throughput limitations and it can increase the system response
-        time if the backend is significantly slower than the transactional
-        process and if a lot of IO operations are involved.</para>
-      </section>
+        <imageobject role="fo">
+          <imagedata align="center" depth="" fileref="jms-backend.png"
+                     format="PNG" scalefit="1" width="12cm" />
+        </imageobject>
 
-      <section>
-        <title>Asynchronous</title>
+        <caption><para>JMS back end configuration.</para></caption>
+      </mediaobject>
 
-        <para>This mode delegates the work done by the back end to a different
-        thread. That way, throughput and response time are (to a certain
-        extend) decorrelated from the back end performance. The drawback is
-        that a small delay appears between the transaction commit and the
-        index update.</para>
+      <para>This mode targets clustered environments where throughput is
+      critical, and index update delays are affordable. Reliability is ensured
+      by the JMS provider and by having the slaves working on a local copy of
+      the index.</para>
+    </section>
 
-        <para>It is recommended to use synchronous execution first and
-        evaluate asynchronous execution if performance problems occur and
-        after having set up a proper benchmark.</para>
-      </section>
+    <section>
+      <title>JGroups</title>
+
+      <para>The JGroups based back end works similar to the JMS one and is
+      designed after the same master/slave pattern. However, instead of JMS
+      the JGroups toolkit is used as a replication mechanism. This back end
+      can be used as an alternative to JMS when response time is critical, but
+      i.e. JNDI service is not available.</para>
     </section>
   </section>
 
@@ -277,47 +244,6 @@
       needs by implementing
       <classname>org.hibernate.search.reader.ReaderProvider</classname>. The
       implementation must be thread safe.</para>
-    </section>
-  </section>
-
-  <section id="search-architecture-indexmanager" xreflabel="IndexManage customization">
-    <title>Index Manager customization</title>
-
-    <para>The Index Manager is the component which holds a reference to the
-    configured Reader strategy, the selected backend, the chosen Directory Provider for each
-    index, and uses the three to implement the methods listed on the <classname>IndexManager</classname>
-    interface.</para>
-
-    <para>It is possible to configure a custom <classname>IndexManager</classname> implementation,
-    and this doesn't need to use the same components. For example you can delegate to a remote
-    indexing service which doesn't necessarily expose a <classname>Directory</classname> interface.
-    For details see <xref linkend="configuration-indexmanager" />.
-    </para>
-
-    <section>
-      <title>Default: <literal>transactional</literal></title>
-      <para>The default <classname>IndexManager</classname> implementation is named transactional.
-      This is the one mostly referred to in this documentation, unless stated otherwise,
-      and is highly configurable as you can select different implementations for the reader strategy,
-      back ends and Directory Providers.</para>
-    </section>
-
-    <section>
-      <title>Near-Real-Time</title>
-      <para>The <classname>NRTIndexManager</classname> is an extension of the default
-      <classname>IndexManager</classname>, leveraging the Lucene NRT (Near Real Time) features
-      for extreme low latency index writes, but as a tradeoff it requires a non-clustered and non-shared
-      index.
-      In other words, it will ignore configuration settings for alternative back ends other than <literal>Lucene</literal>
-      and will acquire exclusive write locks on the Directory.
-      </para>
-      <para>
-      To achieve this low latency writes, the IndexWriter will not flush to disk each change and the queries
-      will be allowed to read updated state from the unflushed indexwriter buffers; the downside of this strategy is that
-      if the application crashes or the IndexWriter is otherwise killed you'll have to rebuild the indexes
-      as some updates might be lost.</para>
-      <para>Because of this downsides, and since a master node in cluster can be configured for good performance too,
-      this is the recommended configuration only for non clustered websites with a limited amount of data to reindex.</para>
     </section>
   </section>
 </chapter>
