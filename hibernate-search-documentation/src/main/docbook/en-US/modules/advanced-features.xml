@@ -53,11 +53,12 @@ SearchFactory searchFactory = fullTextSession.getSearchFactory();</programlistin
   <section id="IndexReaders">
     <title>Using an IndexReader</title>
 
-    <para>Queries in Lucene are executed on an <classname>IndexReader</classname>.
-    Hibernate Search might cache index readers to maximize performance, or provide
-    other efficient strategies to retrieve an updated <classname>IndexReader</classname>
-    minimizing IO operations. Your code can access these cached resources, but you
-    have to follow some "good citizen" rules.</para>
+    <para>Queries in Lucene are executed on an
+    <classname>IndexReader</classname>. Hibernate Search might cache index
+    readers to maximize performance, or provide other efficient strategies to
+    retrieve an updated <classname>IndexReader</classname> minimizing IO
+    operations. Your code can access these cached resources, but you have to
+    follow some "good citizen" rules.</para>
 
     <example>
       <title>Accessing an <classname>IndexReader</classname></title>
@@ -71,13 +72,14 @@ finally {
 }          </programlisting>
     </example>
 
-    <para>In this example the <classname>SearchFactory</classname> figures out which indexes
-    are needed to query this entity (considering a Sharding strategy). Using the configured
-    <classname>ReaderProvider</classname> (described in<xref
-    linkend="search-architecture-readerstrategy" />) on each index, it returns a compound
-    <literal>IndexReader</literal> on top of all involved indexes. Because this
-    <classname>IndexReader</classname> is shared amongst several clients,
-    you must adhere to the following rules:</para>
+    <para>In this example the <classname>SearchFactory</classname> figures out
+    which indexes are needed to query this entity (considering a Sharding
+    strategy). Using the configured <classname>ReaderProvider</classname>
+    (described in<xref linkend="search-architecture-readerstrategy" />) on
+    each index, it returns a compound <literal>IndexReader</literal> on top of
+    all involved indexes. Because this <classname>IndexReader</classname> is
+    shared amongst several clients, you must adhere to the following
+    rules:</para>
 
     <itemizedlist>
       <listitem>
@@ -88,55 +90,224 @@ finally {
 
       <listitem>
         <para>Don't use this <classname>IndexReader</classname> for
-        modification operations (it's a readonly <classname>IndexReader</classname>,
-        you would get an exception).
-        </para>
+        modification operations (it's a readonly
+        <classname>IndexReader</classname>, you would get an
+        exception).</para>
       </listitem>
     </itemizedlist>
 
     <para>Aside from those rules, you can use the
     <classname>IndexReader</classname> freely, especially to do native Lucene
-    queries. Using the shared <classname>IndexReader</classname>s will make most
-    queries more efficient than by opening one directly from - for example - the filesystem.</para>
+    queries. Using the shared <classname>IndexReader</classname>s will make
+    most queries more efficient than by opening one directly from - for
+    example - the filesystem.</para>
 
-    <para>As an alternative to the method <methodname>open(Class... types)</methodname> you
-    can use <methodname>open(String... indexNames)</methodname>; in this case you pass in one
-    or more index names; using this strategy you can also select a subset of the indexes for any
-    indexed type if sharding is used.</para>
+    <para>As an alternative to the method <methodname>open(Class...
+    types)</methodname> you can use <methodname>open(String...
+    indexNames)</methodname>; in this case you pass in one or more index
+    names; using this strategy you can also select a subset of the indexes for
+    any indexed type if sharding is used.</para>
 
     <example>
-      <title>Accessing an <classname>IndexReader by index names</classname></title>
+      <title>Accessing an <classname>IndexReader by index
+      names</classname></title>
+
       <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.getIndexReaderAccessor().open("Products.1", "Products.3");</programlisting>
     </example>
-
   </section>
 
   <section>
     <title>Accessing a Lucene Directory</title>
-    
-    <para>A <classname>Directory</classname> is the most common abstraction used by Lucene to
-    represent the index storage; Hibernate Search doesn't interact directly with a Lucene
-    <classname>Directory</classname> but abstracts these interactions via an
-    <classname>IndexManager</classname>: an index does not necessarily need to be implemented by a
-    <classname>Directory</classname>.</para>
-    
-    <para>If you know your index is represented as a <classname>Directory</classname> and need
-    to access it, you can get a reference to the <classname>Directory</classname> via
-    the <classname>IndexManager</classname>. Cast the <classname>IndexManager</classname>
-    to a <classname>DirectoryBasedIndexManager</classname> and then use
-    <literal>getDirectoryProvider().getDirectory()</literal> to get a reference to the underlying 
-    <classname>Directory</classname>. This is not recommended, we would encourage to use the
-    <classname>IndexReader</classname> instead.</para>
 
+    <para>A <classname>Directory</classname> is the most common abstraction
+    used by Lucene to represent the index storage; Hibernate Search doesn't
+    interact directly with a Lucene <classname>Directory</classname> but
+    abstracts these interactions via an <classname>IndexManager</classname>:
+    an index does not necessarily need to be implemented by a
+    <classname>Directory</classname>.</para>
+
+    <para>If you know your index is represented as a
+    <classname>Directory</classname> and need to access it, you can get a
+    reference to the <classname>Directory</classname> via the
+    <classname>IndexManager</classname>. Cast the
+    <classname>IndexManager</classname> to a
+    <classname>DirectoryBasedIndexManager</classname> and then use
+    <literal>getDirectoryProvider().getDirectory()</literal> to get a
+    reference to the underlying <classname>Directory</classname>. This is not
+    recommended, we would encourage to use the
+    <classname>IndexReader</classname> instead.</para>
+  </section>
+
+  <section id="search-configuration-directory-sharding" revision="1">
+    <title>Sharding indexes</title>
+
+    <para>In some cases it can be useful to split (shard) the indexed data of
+    a given entity into several Lucene indexes.</para>
+
+    <warning>
+      <para>This solution is not recommended unless there is a pressing need.
+      Searches will be slower as all shards have to be opened for a single
+      search. Don't do it until you have a real use case!</para>
+    </warning>
+
+    <para>Possible use cases for sharding are:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>A single index is so huge that index update times are slowing
+        the application down.</para>
+      </listitem>
+
+      <listitem>
+        <para>A typical search will only hit a sub-set of the index, such as
+        when data is naturally segmented by customer, region or
+        application.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>By default sharding is not enabled unless the number of shards is
+    configured. To do this use the
+    <constant>hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards</constant>
+    property as seen in <xref linkend="example-index-sharding" />. In this
+    example 5 shards are enabled.</para>
+
+    <example id="example-index-sharding">
+      <title>Enabling index sharding</title>
+
+      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards 5</programlisting>
+    </example>
+
+    <para>Responsible for splitting the data into sub-indexes is the
+    <classname>IndexShardingStrategy</classname>. The default sharding
+    strategy splits the data according to the hash value of the id string
+    representation (generated by the <classname>FieldBridge</classname>). This
+    ensures a fairly balanced sharding. You can replace the default strategy
+    by implementing a custom <classname>IndexShardingStrategy</classname>. To
+    use your custom strategy you have to set the
+    <constant>hibernate.search.&lt;indexName&gt;.sharding_strategy</constant>
+    property.</para>
+
+    <example>
+      <title>Specifying a custom sharding strategy</title>
+
+      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy.Implementation</programlisting>
+    </example>
+
+    <para>The <classname> IndexShardingStrategy</classname> also allows for
+    optimizing searches by selecting which shard to run the query against. By
+    activating a filter (see <xref linkend="query-filter-shard" />), a
+    sharding strategy can select a subset of the shards used to answer a query
+    (<classname>IndexShardingStrategy.getIndexManagersForQuery</classname>)
+    and thus speed up the query execution.</para>
+
+    <para>Each shard has an independent <classname>IndexManager</classname>
+    and so can be configured to use a different directory provider and backend
+    configurations. The <classname>IndexManager</classname> index names for
+    the Animal entity in <xref linkend="example-sharding-configuration" /> are
+    <literal>Animal.0</literal> to <literal>Animal.4</literal>. In other
+    words, each shard has the name of it's owning index followed by
+    <constant>.</constant> (dot) and its index number (see also <xref
+    linkend="search-configuration-directory" />).</para>
+
+    <example id="example-sharding-configuration">
+      <title>Sharding configuration for entity
+      <classname>Animal</classname></title>
+
+      <programlisting>hibernate.search.default.indexBase /usr/lucene/indexes
+
+hibernate.search.Animal.sharding_strategy.nbr_of_shards 5
+hibernate.search.Animal.directory_provider filesystem
+hibernate.search.Animal.0.indexName Animal00
+hibernate.search.Animal.3.indexBase /usr/lucene/sharded
+hibernate.search.Animal.3.indexName Animal03</programlisting>
+    </example>
+
+    <para>In <xref linkend="example-sharding-configuration" />, the
+    configuration uses the default id string hashing strategy and shards the
+    <classname>Animal</classname> index into 5 sub-indexes. All sub-indexes
+    are filesystem instances and the directory where each sub-index is stored
+    is as followed:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>for sub-index 0:
+        <filename>/usr/lucene/indexes/Animal00</filename> (shared indexBase
+        but overridden indexName)</para>
+      </listitem>
+
+      <listitem>
+        <para>for sub-index 1:
+        <filename>/usr/lucene/indexes/Animal.1</filename> (shared indexBase,
+        default indexName)</para>
+      </listitem>
+
+      <listitem>
+        <para>for sub-index 2:
+        <filename>/usr/lucene/indexes/Animal.2</filename> (shared indexBase,
+        default indexName)</para>
+      </listitem>
+
+      <listitem>
+        <para>for sub-index 3:
+        <filename>/usr/lucene/shared/Animal03</filename> (overridden
+        indexBase, overridden indexName)</para>
+      </listitem>
+
+      <listitem>
+        <para>for sub-index 4:
+        <filename>/usr/lucene/indexes/Animal.4</filename> (shared indexBase,
+        default indexName)</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section id="section-sharing-indexes">
+    <title>Sharing indexes</title>
+
+    <para>It is technically possible to store the information of more than one
+    entity into a single Lucene index. There are two ways to accomplish
+    this:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Configuring the underlying directory providers to point to the
+        same physical index directory. In practice, you set the property
+        <literal>hibernate.search.[fully qualified entity
+        name].indexName</literal> to the same value. As an example let’s use
+        the same index (directory) for the <classname>Furniture</classname>
+        and <classname>Animal</classname> entity. We just set
+        <literal>indexName</literal> for both entities to for example
+        “Animal”. Both entities will then be stored in the Animal
+        directory.</para>
+
+        <para><programlisting>hibernate.search.org.hibernate.search.test.shards.Furniture.indexName = Animal
+hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</programlisting></para>
+      </listitem>
+
+      <listitem>
+        <para>Setting the <code>@Indexed</code> annotation’s
+        <methodname>index</methodname> attribute of the entities you want to
+        merge to the same value. If we again wanted all
+        <classname>Furniture</classname> instances to be indexed in the
+        <classname>Animal</classname> index along with all instances of
+        <classname>Animal</classname> we would specify
+        <code>@Indexed(index="Animal")</code> on both
+        <classname>Animal</classname> and <classname>Furniture</classname>
+        classes.<note>
+            <para>This is only presented here so that you know the option is
+            available. There is really not much benefit in sharing
+            indexes.</para>
+          </note></para>
+      </listitem>
+    </itemizedlist>
   </section>
 
   <section>
-    <title>Use external services in Hibernate Search components
-    (experimental)</title>
+    <title>Using external services</title>
 
-    <para>By components, this section means any of the pluggable contracts -
-    <classname>DirectoryProvider</classname> being the most useful use
-    case:</para>
+    <para>Any of the pluggable contracts we have seen so far allows for the
+    injection of a service. The most notable example being the
+    <classname>DirectoryProvider</classname>. The full list is:</para>
 
     <itemizedlist>
       <listitem>
@@ -158,11 +329,11 @@ finally {
       <listitem>
         <para><classname>Worker</classname></para>
       </listitem>
-      
+
       <listitem>
         <para><classname>ErrorHandler</classname></para>
       </listitem>
-      
+
       <listitem>
         <para><classname>MassIndexerProgressMonitor</classname></para>
       </listitem>
@@ -174,8 +345,8 @@ finally {
     service to be shared amongst several instances of these contract. One
     example is the ability the share an Infinispan cache instance between
     several directory providers running in different <literal>JVM</literal>s
-    to store the various indexes using the same underlying infrastructure; this
-    provides real-time replication of indexes across nodes.</para>
+    to store the various indexes using the same underlying infrastructure;
+    this provides real-time replication of indexes across nodes.</para>
 
     <section>
       <title>Exposing a service</title>
