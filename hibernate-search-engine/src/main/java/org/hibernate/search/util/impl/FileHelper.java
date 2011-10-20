@@ -243,27 +243,27 @@ public abstract class FileHelper {
 
 	/**
 	 * Load a resource from a specific classLoader
-	 * @param filename the name of the resource
-	 * @param cl the classloader to use, or null to try the ContextClassloader first or the loading one second.
+	 * @param resourceName the name of the resource
+	 * @param classLoader the classloader to use, or null to try the ContextClassloader first or the loading one second.
 	 * @return the resource contents as a String
 	 */
-	public static String readResourceAsString(String filename, ClassLoader cl) {
+	public static String readResourceAsString(String resourceName, ClassLoader classLoader) {
 		InputStream in;
-		if ( cl != null ) {
-			in = openResource( filename, cl );
+		if ( classLoader != null ) {
+			in = classLoader.getResourceAsStream( resourceName );
 		}
 		else {
-			in = openResource( filename );
+			in = openResource( resourceName );
 		}
 		if ( in == null ) {
-			throw log.unableToLoadResource( filename );
+			throw log.unableToLoadResource( resourceName );
 		}
 		String s;
 		try {
 			s = FileHelper.readInputStream( in );
 		}
 		catch ( IOException e ) {
-			throw log.unableToReadFile( filename, e );
+			throw log.unableToReadFile( resourceName, e );
 		}
 		finally {
 			closeResource( in );
@@ -274,18 +274,14 @@ public abstract class FileHelper {
 	public static InputStream openResource(String resourceName) {
 		//try loading from application context first:
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		InputStream resource = openResource( resourceName, classLoader );
+		InputStream resource = classLoader.getResourceAsStream( resourceName );
 		if ( resource != null ) {
 			return resource;
 		}
 		else {
 			classLoader = FileHelper.class.getClassLoader();
-			return openResource( resourceName, classLoader );
+			return classLoader.getResourceAsStream( resourceName );
 		}
-	}
-
-	private static InputStream openResource(String resource, ClassLoader cl) {
-		return cl.getResourceAsStream( resource );
 	}
 
 	/**
