@@ -362,10 +362,142 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
       additional properties using the prefix
       <constant>hibernate.search.</constant><replaceable>&lt;indexname&gt;</replaceable>.</para>
     </tip>
+
+    <section id="infinispan-directories" revision="2">
+      <title>Infinispan Directory configuration</title>
+
+      <para>Infinispan is a distributed, scalable, highly available data grid
+      platform which supports autodiscovery of peer nodes. Using Infinispan
+      and Hibernate Search in combination, it is possible to store the Lucene
+      index in a distributed environment where index updates are quickly
+      available on all nodes.</para>
+
+      <para>This section describes in greater detail how to configure
+      Hibernate Search to use an Infinispan Lucene Directory.</para>
+
+      <para>When using an Infinispan Directory the index is stored in memory
+      and shared across multiple nodes. It is considered a single directory
+      across all participating nodes. If a node updates the index, all other
+      nodes are updated as well. Updates on one node can be immediately
+      searched for in the whole cluster.</para>
+
+      <para>The default configuration replicates all data defining the index
+      across all nodes, thus consuming a significant amount of memory. For
+      large indexes it's suggested to enable data distribution, so that each
+      piece of information is replicated to a subset of all cluster
+      members.</para>
+
+      <para>It is also possible to offload part or most information to a
+      <literal>CacheStore</literal>, such as plain filesystem, Amazon S3,
+      Cassandra, Berkley DB or standard relational databases. You can
+      configure it to have a <literal>CacheStore</literal> on each node or
+      have a single centralized one shared by each node.</para>
+
+      <para>See the <ulink url="http://www.jboss.org/infinispan/"> Infinispan
+      documentation</ulink> for all Infinispan configuration options.</para>
+
+      <section>
+        <title>Requirements</title>
+
+        <para>To use the Infinispan directory via Maven, add the following
+        dependencies:</para>
+
+        <example>
+          <title>Maven dependencies for Hibernate Search</title>
+
+          <programlisting language="XML" role="XML">&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search-infinispan&lt;/artifactId&gt;
+   &lt;version&gt;&version;&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+        </example>
+
+        <para>For the non-maven users, add
+        <literal>hibernate-search-infinispan.jar</literal>,
+        <literal>infinispan-lucene-directory.jar</literal> and
+        <literal>infinispan-core.jar</literal> to your application classpath.
+        These last two jars are distributed by <ulink
+        url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>.</para>
+      </section>
+
+      <section>
+        <title>Architecture</title>
+
+        <para>Even when using an Infinispan directory it's still recommended
+        to use the JMS Master/Slave or JGroups backend, because in Infinispan
+        all nodes will share the same index and it is likely that
+        <classname>IndexWriter</classname>s being active on different nodes
+        will try to acquire the lock on the same index. So instead of sending
+        updates directly to the index, send it to a JMS queue or JGroups
+        channel and have a single node apply all changes on behalf of all
+        other nodes.</para>
+
+        <para>Configuring a non-default backend is not a requirement but a
+        performance optimization as locks are enabled to have a single node
+        writing.</para>
+
+        <para>To configure a JMS slave only the backend must be replaced, the
+        directory provider must be set to <literal>infinispan</literal>; set
+        the same directory provider on the master, they will connect without
+        the need to setup the copy job across nodes. Using the JGroups backend
+        is very similar - just combine the backend configuration with the
+        <literal>infinispan</literal> directory provider.</para>
+      </section>
+
+      <section>
+        <title>Infinispan Configuration</title>
+
+        <para>The most simple configuration only requires to enable the
+        backend:</para>
+
+        <programlisting>hibernate.search.[default|&lt;indexname&gt;].directory_provider infinispan</programlisting>
+
+        <para>That's all what is needed to get a cluster-replicated index, but
+        the default configuration does not enable any form of permanent
+        persistence for the index; to enable such a feature an Infinispan
+        configuration file should be provided.</para>
+
+        <para>To use Infinispan, Hibernate Search requirest a
+        <classname>CacheManager</classname>; it can lookup and reuse an
+        existing <classname>CacheManager,</classname> via JNDI, or start and
+        manage a new one. In the latter case Hibernate Search will start and
+        stop it ( closing occurs when the Hibernate
+        <classname>SessionFactory</classname> is closed).</para>
+
+        <para>To use and existing <classname>CacheManager</classname> via JNDI
+        (optional parameter):</para>
+
+        <programlisting>hibernate.search.[default|&lt;indexname&gt;].infinispan.cachemanager_jndiname = [jndiname]</programlisting>
+
+        <para>To start a new <classname>CacheManager</classname> from a
+        configuration file (optional parameter):</para>
+
+        <programlisting>hibernate.search.[default|&lt;indexname&gt;].infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
+
+        <para>If both parameters are defined, JNDI will have priority. If none
+        of these is defined, Hibernate Search will use the default Infinispan
+        configuration included in
+        <literal>hibernate-search-infinispan.jar</literal>. This configuration
+        should work fine in most cases but does not store the index in a
+        persistent cache store.</para>
+
+        <para>As mentioned in <xref linkend="directory-provider-table" />,
+        each index makes use of three caches, so three different caches should
+        be configured as shown in the
+        <literal>default-hibernatesearch-infinispan.xml</literal> provided in
+        the <literal>hibernate-search-infinispan.jar</literal>. Several
+        indexes can share the same caches.</para>
+      </section>
+    </section>
   </section>
 
   <section>
-    <title>Worker configuration</title>
+    <title id="configuration-worker">Worker configuration</title>
 
     <para>It is possible to refine how Hibernate Search interacts with Lucene
     through the worker configuration. There exist several architectural
@@ -436,10 +568,11 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
     the configuration options shown in <xref
     linkend="table-work-execution-configuration" />.</para>
 
-    <para>Please note that the following options can be different on each
-    index; in fact they need the indexName prefix or use
-    <literal>default</literal> to set the default value for all
-    indexes.</para>
+    <note>
+      <para>The following options can be different on each index; in fact they
+      need the indexName prefix or use <literal>default</literal> to set the
+      default value for all indexes.</para>
+    </note>
 
     <table id="table-work-execution-configuration">
       <title>Execution configuration</title>
@@ -620,37 +753,36 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
       existing code before you write your own <classname>Worker</classname> or
       <classname>BackendQueueProcessor</classname> implementation.</para>
     </warning>
-  </section>
 
-  <section id="jms-backend">
-    <title>JMS Master/Slave configuration</title>
+    <section id="jms-backend">
+      <title>JMS Master/Slave back end</title>
 
-    <para>This section describes in greater detail how to configure the
-    Master/Slave Hibernate Search architecture.</para>
+      <para>This section describes in greater detail how to configure the
+      Master/Slave Hibernate Search architecture.</para>
 
-    <mediaobject>
-      <imageobject role="html">
-        <imagedata align="center" fileref="jms-backend.png" format="PNG" />
-      </imageobject>
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center" fileref="jms-backend.png" format="PNG" />
+        </imageobject>
 
-      <imageobject role="fo">
-        <imagedata align="center" depth="" fileref="jms-backend.png"
-                   format="PNG" scalefit="1" width="12cm" />
-      </imageobject>
+        <imageobject role="fo">
+          <imagedata align="center" depth="" fileref="jms-backend.png"
+                     format="PNG" scalefit="1" width="12cm" />
+        </imageobject>
 
-      <caption><para>JMS back end configuration.</para></caption>
-    </mediaobject>
+        <caption><para>JMS back end configuration.</para></caption>
+      </mediaobject>
 
-    <section>
-      <title>Slave nodes</title>
+      <section>
+        <title>Slave nodes</title>
 
-      <para>Every index update operation is sent to a JMS queue. Index
-      querying operations are executed on a local index copy.</para>
+        <para>Every index update operation is sent to a JMS queue. Index
+        querying operations are executed on a local index copy.</para>
 
-      <example>
-        <title>JMS Slave configuration</title>
+        <example>
+          <title>JMS Slave configuration</title>
 
-        <programlisting>### slave configuration
+          <programlisting>### slave configuration
 
 ## DirectoryProvider
 # (remote) master location
@@ -675,29 +807,29 @@ hibernate.search.default.worker.jms.queue = queue/hibernatesearch
 # hibernate.search.default.worker.execution = async
 # hibernate.search.default.worker.thread_pool.size = 2
 # hibernate.search.default.worker.buffer_queue.max = 50</programlisting>
-      </example>
+        </example>
 
-      <tip>
-        <para>A file system local copy is recommended for faster search
-        results.</para>
-      </tip>
+        <tip>
+          <para>A file system local copy is recommended for faster search
+          results.</para>
+        </tip>
 
-      <tip>
-        <para>The refresh period should be higher that the expected copy
-        time.</para>
-      </tip>
-    </section>
+        <tip>
+          <para>The refresh period should be higher that the expected copy
+          time.</para>
+        </tip>
+      </section>
 
-    <section>
-      <title>Master node</title>
+      <section>
+        <title>Master node</title>
 
-      <para>Every index update operation is taken from a JMS queue and
-      executed. The master index is copied on a regular basis.</para>
+        <para>Every index update operation is taken from a JMS queue and
+        executed. The master index is copied on a regular basis.</para>
 
-      <example>
-        <title>JMS Master configuration</title>
+        <example>
+          <title>JMS Master configuration</title>
 
-        <programlisting>### master configuration
+          <programlisting>### master configuration
 
 ## DirectoryProvider
 # (remote) master location where information is copied to
@@ -714,21 +846,21 @@ hibernate.search.default.directory_provider = filesystem-master
 
 ## Backend configuration
 #Backend is the default lucene one</programlisting>
-      </example>
+        </example>
 
-      <tip>
-        <para>The refresh period should be higher that the expected time
-        copy.</para>
-      </tip>
+        <tip>
+          <para>The refresh period should be higher that the expected time
+          copy.</para>
+        </tip>
 
-      <para>In addition to the Hibernate Search framework configuration, a
-      Message Driven Bean has to be written and set up to process the index
-      works queue through JMS.</para>
+        <para>In addition to the Hibernate Search framework configuration, a
+        Message Driven Bean has to be written and set up to process the index
+        works queue through JMS.</para>
 
-      <example>
-        <title>Message Driven Bean processing the indexing queue</title>
+        <example>
+          <title>Message Driven Bean processing the indexing queue</title>
 
-        <programlisting language="JAVA" role="JAVA">@MessageDriven(activationConfig = {
+          <programlisting language="JAVA" role="JAVA">@MessageDriven(activationConfig = {
       @ActivationConfigProperty(propertyName="destinationType", 
                                 propertyValue="javax.jms.Queue"),
       @ActivationConfigProperty(propertyName="destination", 
@@ -748,84 +880,84 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
     protected void cleanSessionIfNeeded(Session session) 
     }
 }</programlisting>
-      </example>
+        </example>
 
-      <para>This example inherits from the abstract JMS controller class
-      available in the Hibernate Search source code and implements a JavaEE
-      MDB. This implementation is given as an example and can be adjusted to
-      make use of non Java EE Message Driven Beans. For more information about
-      the <methodname>getSession()</methodname> and
-      <methodname>cleanSessionIfNeeded()</methodname>, please check
-      <classname>AbstractJMSHibernateSearchController</classname>'s
-      javadoc.</para>
+        <para>This example inherits from the abstract JMS controller class
+        available in the Hibernate Search source code and implements a JavaEE
+        MDB. This implementation is given as an example and can be adjusted to
+        make use of non Java EE Message Driven Beans. For more information
+        about the <methodname>getSession()</methodname> and
+        <methodname>cleanSessionIfNeeded()</methodname>, please check
+        <classname>AbstractJMSHibernateSearchController</classname>'s
+        javadoc.</para>
+      </section>
     </section>
-  </section>
 
-  <section id="jgroups-backend">
-    <title>JGroups Master/Slave configuration</title>
+    <section id="jgroups-backend">
+      <title>JGroups Master/Slave back end</title>
 
-    <para>This section describes how to configure the JGroups Master/Slave
-    back end. The configuration examples illustrated in <xref
-    linkend="jms-backend" /> also apply here, only a different backend
-    (<constant>hibernate.search.worker.backend</constant>) needs to be
-    set.</para>
+      <para>This section describes how to configure the JGroups Master/Slave
+      back end. The configuration examples illustrated in <xref
+      linkend="jms-backend" /> also apply here, only a different backend
+      (<constant>hibernate.search.worker.backend</constant>) needs to be
+      set.</para>
 
-    <section>
-      <title>Slave nodes</title>
+      <section>
+        <title>Slave nodes</title>
 
-      <para>Every index update operation is sent through a JGroups channel to
-      the master node. Index querying operations are executed on a local index
-      copy.</para>
+        <para>Every index update operation is sent through a JGroups channel
+        to the master node. Index querying operations are executed on a local
+        index copy.</para>
 
-      <example>
-        <title>JGroups Slave configuration</title>
+        <example>
+          <title>JGroups Slave configuration</title>
 
-        <programlisting>### slave configuration
+          <programlisting>### slave configuration
 hibernate.search.default.worker.backend = jgroupsSlave     </programlisting>
-      </example>
-    </section>
+        </example>
+      </section>
 
-    <section>
-      <title>Master node</title>
+      <section>
+        <title>Master node</title>
 
-      <para>Every index update operation is taken from a JGroups channel and
-      executed. The master index is copied on a regular basis.</para>
+        <para>Every index update operation is taken from a JGroups channel and
+        executed. The master index is copied on a regular basis.</para>
 
-      <example>
-        <title>JGroups Master configuration</title>
+        <example>
+          <title>JGroups Master configuration</title>
 
-        <programlisting>### master configuration
+          <programlisting>### master configuration
 hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
-      </example>
-    </section>
+        </example>
+      </section>
 
-    <section>
-      <title>JGroups channel configuration</title>
+      <section>
+        <title>JGroups channel configuration</title>
 
-      <para>Optionally the configuration for the JGroups transport protocols
-      and channel name can be defined and applied to master and slave nodes.
-      There are several ways to configure the JGroups transport details. You
-      can either set the
-      <constant>hibernate.search.default.worker.backend.jgroups.configurationFile</constant>
-      property and specify a file containing the JGroups configuration or you
-      can use the property
-      <constant>hibernate.search.default.worker.backend.jgroups.configurationXml</constant>
-      or
-      <constant>hibernate.search.default.worker.backend.jgroups.configurationString</constant>
-      to directly embed either the xml or string JGroups configuration into
-      your Hibernate configuration file. All three options are shown in <xref
-      linkend="example-jgroup-xml-configuration" />.</para>
+        <para>Optionally the configuration for the JGroups transport protocols
+        and channel name can be defined and applied to master and slave nodes.
+        There are several ways to configure the JGroups transport details. You
+        can either set the
+        <constant>hibernate.search.default.worker.backend.jgroups.configurationFile</constant>
+        property and specify a file containing the JGroups configuration or
+        you can use the property
+        <constant>hibernate.search.default.worker.backend.jgroups.configurationXml</constant>
+        or
+        <constant>hibernate.search.default.worker.backend.jgroups.configurationString</constant>
+        to directly embed either the xml or string JGroups configuration into
+        your Hibernate configuration file. All three options are shown in
+        <xref linkend="example-jgroup-xml-configuration" />.</para>
 
-      <tip>
-        <para>If no property is explicitly specified it is assumed that the
-        JGroups default configuration file <literal>flush-udp.xml</literal> is
-        used.</para>
-      </tip>
+        <tip>
+          <para>If no property is explicitly specified it is assumed that the
+          JGroups default configuration file <literal>flush-udp.xml</literal>
+          is used.</para>
+        </tip>
 
-      <example id="example-jgroup-xml-configuration">
-        <title>JGroups transport protocol configuration</title>
+        <example id="example-jgroup-xml-configuration">
+          <title>JGroups transport protocol configuration</title>
 
-        <programlisting language="XML" role="XML">## JGroups configuration options
+          <programlisting language="XML" role="XML">## JGroups configuration options
 # OPTION 1 - udp.xml file needs to be located in the classpath
 hibernate.search.default.worker.backend.jgroups.configurationFile = udp.xml
 
@@ -863,149 +995,19 @@ UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):PING(timeout=3000;
 num_initial_members=6):FD(timeout=5000):VERIFY_SUSPECT(timeout=1500):
 pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):UNICAST(timeout=5000):
 FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlisting>
-      </example>
+        </example>
 
-      <para>In this JGroups master/slave configuration nodes communicate over
-      a JGroups channel. The default channel name is
-      <literal>HSearchCluster</literal> which can be configured as seen in
-      <xref linkend="example-jgroups-channel-name" />.</para>
+        <para>In this JGroups master/slave configuration nodes communicate
+        over a JGroups channel. The default channel name is
+        <literal>HSearchCluster</literal> which can be configured as seen in
+        <xref linkend="example-jgroups-channel-name" />.</para>
 
-      <example id="example-jgroups-channel-name">
-        <title>JGroups channel name configuration</title>
+        <example id="example-jgroups-channel-name">
+          <title>JGroups channel name configuration</title>
 
-        <programlisting>hibernate.search.default.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster       </programlisting>
-      </example>
-    </section>
-  </section>
-
-  <section id="infinispan-directories" revision="2">
-    <title>Infinispan Directory configuration</title>
-
-    <para>Infinispan is a distributed, scalable, highly available data grid
-    platform which supports autodiscovery of peer nodes. Using Infinispan and
-    Hibernate Search in combination, it is possible to store the Lucene index
-    in a distributed environment where index updates are quickly available on
-    all nodes.</para>
-
-    <para>This section describes in greater detail how to configure Hibernate
-    Search to use an Infinispan Lucene Directory.</para>
-
-    <para>When using an Infinispan Directory the index is stored in memory and
-    shared across multiple nodes. It is considered a single directory across
-    all participating nodes. If a node updates the index, all other nodes are
-    updated as well. Updates on one node can be immediately searched for in
-    the whole cluster.</para>
-
-    <para>The default configuration replicates all data defining the index
-    across all nodes, thus consuming a significant amount of memory. For large
-    indexes it's suggested to enable data distribution, so that each piece of
-    information is replicated to a subset of all cluster members.</para>
-
-    <para>It is also possible to offload part or most information to a
-    <literal>CacheStore</literal>, such as plain filesystem, Amazon S3,
-    Cassandra, Berkley DB or standard relational databases. You can configure
-    it to have a <literal>CacheStore</literal> on each node or have a single
-    centralized one shared by each node.</para>
-
-    <para>See the <ulink url="http://www.jboss.org/infinispan/"> Infinispan
-    documentation</ulink> for all Infinispan configuration options.</para>
-
-    <section>
-      <title>Requirements</title>
-
-      <para>To use the Infinispan directory via Maven, add the following
-      dependencies:</para>
-
-      <example>
-        <title>Maven dependencies for Hibernate Search</title>
-
-        <programlisting language="XML" role="XML">&lt;dependency&gt;
-   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
-   &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
-   &lt;version&gt;&version;&lt;/version&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
-   &lt;artifactId&gt;hibernate-search-infinispan&lt;/artifactId&gt;
-   &lt;version&gt;&version;&lt;/version&gt;
-&lt;/dependency&gt;</programlisting>
-      </example>
-
-      <para>For the non-maven users, add
-      <literal>hibernate-search-infinispan.jar</literal>,
-      <literal>infinispan-lucene-directory.jar</literal> and
-      <literal>infinispan-core.jar</literal> to your application classpath.
-      These last two jars are distributed by <ulink
-      url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>.</para>
-    </section>
-
-    <section>
-      <title>Architecture</title>
-
-      <para>Even when using an Infinispan directory it's still recommended to
-      use the JMS Master/Slave or JGroups backend, because in Infinispan all
-      nodes will share the same index and it is likely that
-      <classname>IndexWriter</classname>s being active on different nodes will
-      try to acquire the lock on the same index. So instead of sending updates
-      directly to the index, send it to a JMS queue or JGroups channel and
-      have a single node apply all changes on behalf of all other
-      nodes.</para>
-
-      <para>Configuring a non-default backend is not a requirement but a
-      performance optimization as locks are enabled to have a single node
-      writing.</para>
-
-      <para>To configure a JMS slave only the backend must be replaced, the
-      directory provider must be set to <literal>infinispan</literal>; set the
-      same directory provider on the master, they will connect without the
-      need to setup the copy job across nodes. Using the JGroups backend is
-      very similar - just combine the backend configuration with the
-      <literal>infinispan</literal> directory provider.</para>
-    </section>
-
-    <section>
-      <title>Infinispan Configuration</title>
-
-      <para>The most simple configuration only requires to enable the
-      backend:</para>
-
-      <programlisting>hibernate.search.[default|&lt;indexname&gt;].directory_provider infinispan</programlisting>
-
-      <para>That's all what is needed to get a cluster-replicated index, but
-      the default configuration does not enable any form of permanent
-      persistence for the index; to enable such a feature an Infinispan
-      configuration file should be provided.</para>
-
-      <para>To use Infinispan, Hibernate Search requirest a
-      <classname>CacheManager</classname>; it can lookup and reuse an existing
-      <classname>CacheManager,</classname> via JNDI, or start and manage a new
-      one. In the latter case Hibernate Search will start and stop it (
-      closing occurs when the Hibernate <classname>SessionFactory</classname>
-      is closed).</para>
-
-      <para>To use and existing <classname>CacheManager</classname> via JNDI
-      (optional parameter):</para>
-
-      <programlisting>hibernate.search.[default|&lt;indexname&gt;].infinispan.cachemanager_jndiname = [jndiname]</programlisting>
-
-      <para>To start a new <classname>CacheManager</classname> from a
-      configuration file (optional parameter):</para>
-
-      <programlisting>hibernate.search.[default|&lt;indexname&gt;].infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
-
-      <para>If both parameters are defined, JNDI will have priority. If none
-      of these is defined, Hibernate Search will use the default Infinispan
-      configuration included in
-      <literal>hibernate-search-infinispan.jar</literal>. This configuration
-      should work fine in most cases but does not store the index in a
-      persistent cache store.</para>
-
-      <para>As mentioned in <xref linkend="directory-provider-table" />, each
-      index makes use of three caches, so three different caches should be
-      configured as shown in the
-      <literal>default-hibernatesearch-infinispan.xml</literal> provided in
-      the <literal>hibernate-search-infinispan.jar</literal>. Several indexes
-      can share the same caches.</para>
+          <programlisting>hibernate.search.default.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster       </programlisting>
+        </example>
+      </section>
     </section>
   </section>
 
@@ -1050,7 +1052,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
 
     <para>The role of the index manager component is described in <xref
     linkend="search-architecture" />. Hibernate Search provides two possible
-    implementations for this interface to choose from. </para>
+    implementations for this interface to choose from.</para>
 
     <itemizedlist>
       <listitem>
@@ -1074,7 +1076,7 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
       <para>The default <classname>IndexManager</classname> implementation.
       This is the one mostly referred to in this documentation. It is highly
       configurable and allows you to select different implementations for the
-      reader strategy, back ends and directory providers. </para>
+      reader strategy, back ends and directory providers.</para>
     </section>
 
     <section>
