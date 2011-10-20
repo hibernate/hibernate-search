@@ -105,13 +105,13 @@ public class AvroSerializationProvider implements SerializationProvider {
 
 	private void parseSchema(String filename) {
 		String fullFileName = V1_PATH + filename + AVRO_SCHEMA_FILE_SUFFIX;
-		String messageSchemaAsString = FileHelper.readResourceAsString( fullFileName );
+		String messageSchemaAsString = FileHelper.readResourceAsString( fullFileName, AvroSerializationProvider.class.getClassLoader() );
 		schemas.put( filename, messageSchemaAsString );
 	}
 
 	public Protocol parseProtocol(String name) {
 		String filename = V1_PATH + name + AVRO_PROTOCOL_FILE_SUFFIX;
-		String protocolSkeleton = FileHelper.readResourceAsString( filename );
+		String protocolSkeleton = FileHelper.readResourceAsString( filename, AvroSerializationProvider.class.getClassLoader() );
 		String protocolString = inlineSchemas( protocolSkeleton );
 		return Protocol.parse( protocolString );
 	}

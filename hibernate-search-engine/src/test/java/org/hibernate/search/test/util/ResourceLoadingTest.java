@@ -26,6 +26,7 @@ package org.hibernate.search.test.util;
 import org.junit.Test;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.util.impl.FileHelper;
 
 import static junit.framework.Assert.assertEquals;
@@ -41,7 +42,7 @@ public class ResourceLoadingTest {
 	public void testOpenKnownResource() throws Exception {
 		// using a known resource for testing
 		String resource = "org/hibernate/search/remote/codex/avro/v1_0/Message.avro";
-		String resourceContent = FileHelper.readResourceAsString( resource );
+		String resourceContent = FileHelper.readResourceAsString( resource, AvroSerializationProvider.class.getClassLoader() );
 		assertNotNull( resourceContent );
 		assertFalse( resourceContent.isEmpty() );
 	}
@@ -51,7 +52,7 @@ public class ResourceLoadingTest {
 		// using a known resource for testing
 		String resource = "foo";
 		try {
-			FileHelper.readResourceAsString( resource );
+			FileHelper.readResourceAsString( resource, AvroSerializationProvider.class.getClassLoader() );
 		}
 		catch ( SearchException e ) {
 			assertEquals( "Wrong error message", "HSEARCH000114: Could not load resource: 'foo'", e.getMessage() );
