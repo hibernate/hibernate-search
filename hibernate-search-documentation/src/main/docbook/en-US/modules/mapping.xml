@@ -1255,7 +1255,7 @@ public class Team {
     </section>
 
     <section>
-      <title>Dynamic analyzer selection (experimental)</title>
+      <title>Dynamic analyzer selection</title>
 
       <para>So far all the introduced ways to specify an analyzer were static.
       However, there are use cases where it is useful to select an analyzer
