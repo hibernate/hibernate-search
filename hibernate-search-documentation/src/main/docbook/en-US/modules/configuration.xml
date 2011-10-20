@@ -33,8 +33,8 @@
   <section id="search-configuration-event" revision="2">
     <title>Enabling Hibernate Search and automatic indexing</title>
 
-    <para>Let's start with the most basic configuration question - how to
-    enable Hibernate Search in your system.</para>
+    <para>Let's start with the most basic configuration question - how do I
+    enable Hibernate Search?</para>
 
     <section>
       <title>Enabling Hibernate Search</title>
