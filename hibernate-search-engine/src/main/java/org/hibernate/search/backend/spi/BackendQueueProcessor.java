@@ -23,8 +23,8 @@
  */
 package org.hibernate.search.backend.spi;
 
-import java.util.Properties;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -41,6 +41,7 @@ public interface BackendQueueProcessor {
 
 	/**
 	 * Used at startup, called once as first method.
+	 *
 	 * @param props all configuration properties
 	 * @param context context giving access to required meta data
 	 * @param indexManager the index it is related to.
@@ -58,14 +59,16 @@ public interface BackendQueueProcessor {
 	 * elements in parallel threads, but no work should be started on a new workList until the previous
 	 * one was fully processed.
 	 * Work could be applied asynchronously according to capabilities and configuration of implementor.
-	 * @param workList
+	 *
+	 * @param workList list of Lucene work instance which need to be applied to the index
 	 */
 	void applyWork(List<LuceneWork> workList);
 
 	/**
 	 * Applies a single operation on the index, and different operations can be applied in parallel,
 	 * even in parallel to a workList instance being processed by {@link #applyWork(List)}
-	 * @param singleOperation
+	 *
+	 * @param singleOperation single Lucene work instance to be applied to the index
 	 */
 	void applyStreamWork(LuceneWork singleOperation);
 

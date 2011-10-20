@@ -41,12 +41,12 @@
     Hibernate event system) and schedules an index update. All these updates
     are handled without you having to interact with the Apache Lucene APIs
     directly (see <xref linkend="search-configuration-event" />). Instead, the
-    interaction with the underlying Lucene indexes is handled via a so called
-    <classname>IndexManager</classname>.</para>
+    interaction with the underlying Lucene indexes is handled via so called
+    <classname>IndexManager</classname>s.</para>
 
-    <para>Each Lucene index is managed by one index manager which can be
-    uniquely identified by name. In most cases there is a one to one
-    relationship between an indexed entity and an
+    <para>Each Lucene index is managed by one index manager which is uniquely
+    identified by name. In most cases there is also a one to one relationship
+    between an indexed entity and a single
     <classname>IndexManager</classname>. The exceptions are the use cases of
     index sharding and index sharing. The former can be applied when the index
     for a single entity becomes too big and indexing operations are slowing
@@ -57,17 +57,18 @@
     index (see <xref linkend="section-sharing-indexes" />).</para>
 
     <para>The index manager abstracts from the specific index configuration.
-    This includes the selected backend, the configured reader strategy and the
-    chosen <classname>DirectoryProvider</classname>. These components will be
+    In the case of the default index manager this includes details about the
+    selected backend, the configured reader strategy and the chosen
+    <classname>DirectoryProvider</classname>. These components will be
     discussed in greater detail later on. It is recommended that you start
-    with the default implementation of the
-    <classname>IndexerManager</classname> interface which uses different
-    Lucene <classname>Directory</classname> types to manage the indexes. You
-    can, however, also provide your own <classname>IndexManager</classname>
-    implementation (see <xref linkend="configuration-indexmanager" />).</para>
+    with the default index manager which uses different Lucene
+    <classname>Directory</classname> types to manage the indexes (see <xref
+    linkend="search-configuration-directory" />). You can, however, also
+    provide your own <classname>IndexManager</classname> implementation (see
+    <xref linkend="configuration-indexmanager" />).</para>
 
-    <para>Once the index is created, you can search for entities and return a
-    list of managed entities saving you the tedious object to Lucene
+    <para>Once the index is created, you can search for entities and return
+    lists of managed entities saving you the tedious object to Lucene
     <classname>Document</classname> mapping. The same persistence context is
     shared between Hibernate and Hibernate Search. As a matter of fact, the
     <classname>FullTextSession</classname> is built on top of the Hibernate
@@ -77,12 +78,13 @@
     HQL, JPA-QL or native query would do.</para>
 
     <para>To be more efficient Hibernate Search batches the write interactions
-    with the Lucene index. There are currently two types of batching. Outside
-    a transaction, the index update operation is executed right after the
-    actual database operation. This is really a no batching setup. In the case
-    of an ongoing transaction, the index update operation is scheduled for the
-    transaction commit phase and discarded in case of transaction rollback.
-    The batching scope is the transaction. There are two immediate
+    with the Lucene index. This batching is the responsibility of the
+    <classname>Worker</classname>. There are currently two types of batching.
+    Outside a transaction, the index update operation is executed right after
+    the actual database operation. This is really a no batching setup. In the
+    case of an ongoing transaction, the index update operation is scheduled
+    for the transaction commit phase and discarded in case of transaction
+    rollback. The batching scope is the transaction. There are two immediate
     benefits:</para>
 
     <itemizedlist>
@@ -104,7 +106,8 @@
     as the equivalent of the (infamous) autocommit vs transactional behavior.
     From a performance perspective, the <emphasis>in transaction</emphasis>
     mode is recommended. The scoping choice is made transparently. Hibernate
-    Search detects the presence of a transaction and adjust the scoping.<tip>
+    Search detects the presence of a transaction and adjust the scoping (see
+    <xref linkend="configuration-worker" />).<tip>
         <para>It is recommended - for both your database and Hibernate Search
         - to execute your operations in a transaction, be it JDBC or
         JTA.</para>
@@ -120,7 +123,15 @@
 
     <para>Hibernate Search offers the ability to let the batched work being
     processed by different back ends. Several back ends are provided out of
-    the box and you have the option to plugin your own implementation.</para>
+    the box and you have the option to plugin your own. It is important to
+    understand that in this context back end encompasses more than just the
+    configuration option
+    <literal>hibernate.search.default.worker.backend</literal>. This property
+    just specifies a implementation of the
+    <classname>BackendQueueProcessor</classname> interface which is a part of
+    a back end configuration. In most cases, however, additional configuration
+    settings are needed to successfully configure a specific backend setup,
+    like for example the JMS back end.</para>
 
     <section>
       <title>Lucene</title>
@@ -145,8 +156,8 @@
       </mediaobject>
 
       <para>This mode targets non clustered applications, or clustered
-      applications where the Directory is taking care of the locking
-      strategy.</para>
+      applications where the <classname>Directory</classname> is taking care
+      of the locking strategy.</para>
 
       <para>The main advantage is simplicity and immediate visibility of the
       changes in Lucene queries (a requirement in some applications).</para>
@@ -207,7 +218,7 @@
     linkend="configuration-reader-strategy" /></para>
 
     <section>
-      <title>Shared</title>
+      <title><literal>shared</literal></title>
 
       <para>With this strategy, Hibernate Search will share the same
       <classname>IndexReader</classname>, for a given Lucene index, across
@@ -224,7 +235,7 @@
     </section>
 
     <section>
-      <title>Not-shared</title>
+      <title><literal>not-shared</literal></title>
 
       <para>Every time a query is executed, a Lucene
       <classname>IndexReader</classname> is opened. This strategy is not the
