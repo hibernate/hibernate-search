@@ -64,7 +64,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	
 	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
-	private final Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders;
+	private final Map<Class<?>, EntityIndexBinder> entityIndexBinders;
 	private final MassIndexerProgressMonitor monitor;
 	private final CacheMode cacheMode;
 	private final CountDownLatch producerEndSignal;

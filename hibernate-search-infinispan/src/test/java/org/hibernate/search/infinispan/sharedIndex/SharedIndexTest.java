@@ -127,7 +127,7 @@ public class SharedIndexTest {
 	 */
 	protected int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
-		EntityIndexBinder<Toaster> indexBinding = searchFactory.getIndexBindingForEntity( Toaster.class );
+		EntityIndexBinder indexBinding = searchFactory.getIndexBindingForEntity( Toaster.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();

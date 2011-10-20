@@ -79,11 +79,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getFilterDefinitions();
 	}
 
-	public Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity() {
+	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
 		return delegate.getIndexBindingForEntity();
 	}
 
-	public <T> EntityIndexBinder<T> getIndexBindingForEntity(Class<T> entityType) {
+	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
 		return delegate.getIndexBindingForEntity( entityType );
 	}
 

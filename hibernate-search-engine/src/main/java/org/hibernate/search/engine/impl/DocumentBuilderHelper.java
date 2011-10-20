@@ -242,7 +242,7 @@ public final class DocumentBuilderHelper {
 	}
 	
 	private static DocumentBuilderIndexedEntity<?> getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		EntityIndexBinder<?> entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity(
+		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity(
 				clazz
 		);
 		if ( entityIndexBinding == null ) {

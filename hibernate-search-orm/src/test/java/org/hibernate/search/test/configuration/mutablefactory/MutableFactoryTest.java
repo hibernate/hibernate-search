@@ -278,7 +278,7 @@ public class MutableFactoryTest {
 					MutableFactoryTest.doIndexWork(entity, i, factory, context );
 					context.end();
 					
-					EntityIndexBinder<?> indexBindingForEntity = factory.getIndexBindingForEntity( aClass );
+					EntityIndexBinder indexBindingForEntity = factory.getIndexBindingForEntity( aClass );
 					assertNotNull( indexBindingForEntity );
 					IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 					assertEquals( 1, indexManagers.length );

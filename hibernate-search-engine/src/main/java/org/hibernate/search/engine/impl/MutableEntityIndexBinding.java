@@ -32,7 +32,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class MutableEntityIndexBinding<T> implements EntityIndexBinder<T> {
+public class MutableEntityIndexBinding<T> implements EntityIndexBinder {
 
 	private final IndexShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;

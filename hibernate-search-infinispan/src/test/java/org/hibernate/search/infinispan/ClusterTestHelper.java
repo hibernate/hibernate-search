@@ -100,7 +100,7 @@ public class ClusterTestHelper {
 	 */
 	public static int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
-		EntityIndexBinder<?> indexBinding = searchFactory.getIndexBindingForEntity( entityType );
+		EntityIndexBinder indexBinding = searchFactory.getIndexBindingForEntity( entityType );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();

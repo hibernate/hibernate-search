@@ -49,7 +49,7 @@ import java.util.Properties;
 public interface SearchFactoryState {
 	Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities();
 
-	Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity();
+	Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity();
 
 	String getIndexingStrategy();
 

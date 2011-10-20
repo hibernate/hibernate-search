@@ -28,12 +28,12 @@ import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * Specifies the relation and options from an indexed entity and it's index(es).
+ * Specifies the relation and options from an indexed entity to its index(es).
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @since 4.0
  */
-public interface EntityIndexBinder<T> {
+public interface EntityIndexBinder {
 
 	/**
 	 * @return the Similarity used to search and index this entity

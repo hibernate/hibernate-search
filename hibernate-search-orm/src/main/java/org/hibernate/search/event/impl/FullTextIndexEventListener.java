@@ -347,7 +347,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	private AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
 		Class<?> clazz = entity.getClass();
-		EntityIndexBinder<?> entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( clazz );
+		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( clazz );
 		if ( entityIndexBinding != null ) {
 			return entityIndexBinding.getDocumentBuilder();
 		}
