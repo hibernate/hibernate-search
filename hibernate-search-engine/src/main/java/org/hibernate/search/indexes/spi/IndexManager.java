@@ -33,13 +33,13 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
- * An IndexManager abstracts the specific configuration and implementations being used on a single Index.
+ * An IndexManager abstracts the specific configuration and implementations being used on a single index.
  * For each index a different implementation can be used, or different configurations.
  *
- * While in previous versions of Hibernate Search the backend could be sync or async, this is now
- * considered a detail of different IndexManager implementations, making it possible for them to be configured
- * in different ways, or to support only some modes of operation: configuration properties might be ignored
- * by some implementations, or look for additional properties.
+ * While in previous versions of Hibernate Search the backend could be sync or async, this fact is now
+ * considered a detail of the concrete IndexManager implementations. This makes it possible to configure each index
+ * manager (and hence index) differently. A concrete implementation can also decide to only support a specific mode
+ * of operation. It can ignore some configuration properties or expect additional properties.
  *
  * @author Sanne Grinovero &lt;sanne@hibernate.org&gt; (C) 2011 Red Hat Inc.
  */
@@ -53,7 +53,7 @@ public interface IndexManager {
 	String getIndexName();
 
 	/**
-	 * Exposes a service to provide {@code IndexReader}s and close them
+	 * Provide access to {@code IndexReader}s.
 	 *
 	 * @return a {@code ReaderProvider} instance for the index managed by this instance
 	 */
@@ -95,7 +95,7 @@ public interface IndexManager {
 	void destroy();
 
 	/**
-	 * @return the set of classes being indexed in this Index
+	 * @return the set of classes being indexed in this manager
 	 */
 	Set<Class<?>> getContainedTypes();
 

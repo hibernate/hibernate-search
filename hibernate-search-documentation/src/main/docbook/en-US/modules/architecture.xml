@@ -42,31 +42,29 @@
     are handled without you having to interact with the Apache Lucene APIs
     directly (see <xref linkend="search-configuration-event" />). Instead, the
     interaction with the underlying Lucene indexes is handled via a so called
-    <classname>IndexManager</classname>. </para>
+    <classname>IndexManager</classname>.</para>
 
-    <para>Each Lucene index has one index manager which can be uniquely
-    identified by name. In most cases there is a one to one relationship
-    between an indexed entity and an <classname>IndexManager</classname>. The
-    exceptions are the use cases of index sharding and index sharing. The
-    former can be applied when the index for a single entity becomes too big
-    and indexing operations are slowing down the application. In this case a
-    single entity is indexed into multiple indexes each with its own index
-    manager (see <xref linkend="search-configuration-directory-sharding" />).
-    The latter, index sharing, is the ability to index multiple entities into
-    the same Lucene index (see <xref linkend="section-sharing-indexes" />).
-    Since there is no immediate benefit in sharing indexes it is only
-    mentioned for completeness.</para>
+    <para>Each Lucene index is managed by one index manager which can be
+    uniquely identified by name. In most cases there is a one to one
+    relationship between an indexed entity and an
+    <classname>IndexManager</classname>. The exceptions are the use cases of
+    index sharding and index sharing. The former can be applied when the index
+    for a single entity becomes too big and indexing operations are slowing
+    down the application. In this case a single entity is indexed into
+    multiple indexes each with its own index manager (see <xref
+    linkend="search-configuration-directory-sharding" />). The latter, index
+    sharing, is the ability to index multiple entities into the same Lucene
+    index (see <xref linkend="section-sharing-indexes" />).</para>
 
-    <para>The index manager holds a reference to the selected backend, the
-    configured reader strategy and the chosen
-    <classname>DirectoryProvider</classname>. These components will be
+    <para>The index manager abstracts from the specific index configuration.
+    This includes the selected backend, the configured reader strategy and the
+    chosen <classname>DirectoryProvider</classname>. These components will be
     discussed in greater detail later on. It is recommended that you start
     with the default implementation of the
     <classname>IndexerManager</classname> interface which uses different
     Lucene <classname>Directory</classname> types to manage the indexes. You
-    can, however, also provide your own implementation of the
-    <classname>IndexManager</classname> (see <xref
-    linkend="configuration-indexmanager" />),</para>
+    can, however, also provide your own <classname>IndexManager</classname>
+    implementation (see <xref linkend="configuration-indexmanager" />).</para>
 
     <para>Once the index is created, you can search for entities and return a
     list of managed entities saving you the tedious object to Lucene
