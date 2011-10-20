@@ -58,7 +58,7 @@ public class DefaultBatchBackend implements BatchBackend {
 	
 	private void sendWorkToShards(LuceneWork work, boolean forceAsync) {
 		final Class<?> entityType = work.getEntityClass();
-		EntityIndexBinder<?> entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
+		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		if ( forceAsync ) {
 			work.getWorkDelegate( StreamingSelectionVisitor.INSTANCE ).performStreamOperation( work, shardingStrategy, forceAsync );

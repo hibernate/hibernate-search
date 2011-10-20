@@ -33,14 +33,14 @@ import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
 /**
- * Interface which gives access to the metadata. Intended to be used by Search components
+ * Interface which gives access to the metadata. Intended to be used by Search components.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	
-	Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity();
+	Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity();
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
 
@@ -75,8 +75,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	IndexManagerHolder getAllIndexesManager();
 
 	/**
-	 * @return
+	 * @return returns an instance of {@code ClassNavigator} for class/object traversal.
 	 */
 	ClassNavigator getClassHelper();
-
 }

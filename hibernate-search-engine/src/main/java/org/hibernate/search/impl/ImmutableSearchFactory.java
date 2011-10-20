@@ -88,7 +88,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Map<Class<?>, EntityIndexBinder<?>> indexBindingForEntities;
+	private final Map<Class<?>, EntityIndexBinder> indexBindingForEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
@@ -186,13 +186,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return documentBuildersContainedEntities;
 	}
 
-	public Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity() {
+	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
 		return indexBindingForEntities;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> EntityIndexBinder<T> getIndexBindingForEntity(Class<T> entityType) {
-		return (EntityIndexBinder<T>) indexBindingForEntities.get( entityType );
+	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
+		return indexBindingForEntities.get( entityType );
 	}
 
 	@SuppressWarnings("unchecked")

@@ -503,7 +503,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
-		Map<Class<?>, EntityIndexBinder<?>> builders = searchFactoryImplementor.getIndexBindingForEntity();
+		Map<Class<?>, EntityIndexBinder> builders = searchFactoryImplementor.getIndexBindingForEntity();
 		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 
@@ -535,7 +535,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities.size() );
 			involvedClasses.addAll( indexedTargetedEntities );
 			for ( Class<?> clazz : indexedTargetedEntities ) {
-				EntityIndexBinder<?> indexBinder = builders.get( clazz );
+				EntityIndexBinder indexBinder = builders.get( clazz );
 				if ( indexBinder != null ) {
 					DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 					involvedClasses.addAll( builder.getMappedSubclasses() );
@@ -583,7 +583,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 		}
 		else {
-			Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = searchFactoryImplementor.getIndexBindingForEntity();
+			Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = searchFactoryImplementor.getIndexBindingForEntity();
 			this.classesAndSubclasses = documentBuildersIndexedEntities.keySet();
 		}
 
@@ -908,12 +908,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
 	 */
 	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
-		Map<Class<?>, EntityIndexBinder<?>> builders = searchFactoryImplementor.getIndexBindingForEntity();
+		Map<Class<?>, EntityIndexBinder> builders = searchFactoryImplementor.getIndexBindingForEntity();
 		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
 		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
 		FieldCacheCollectorFactory anyImplementation = null;
 		for ( Class<?> clazz : classesAndSubclasses ) {
-			EntityIndexBinder<?> docBuilder = builders.get( clazz );
+			EntityIndexBinder docBuilder = builders.get( clazz );
 			FieldCacheCollectorFactory fieldCacheCollectionFactory = docBuilder.getIdFieldCacheCollectionFactory();
 			if ( fieldCacheCollectionFactory == null ) {
 				// some implementation disable it, so we won't use it

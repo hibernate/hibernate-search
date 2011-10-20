@@ -100,7 +100,7 @@ class Helper {
 	static DocumentBuilderIndexedEntity<?> getDocumentBuilder(QueryBuildingContext queryContext) {
 		final SearchFactoryImplementor factory = queryContext.getFactory();
 		final Class<?> type = queryContext.getEntityType();
-		EntityIndexBinder<?> indexBinding = factory.getIndexBindingForEntity( type );
+		EntityIndexBinder indexBinding = factory.getIndexBindingForEntity( type );
 		if ( indexBinding == null ) {
 			throw new AssertionFailure( "Class in not indexed: " + type );
 		}

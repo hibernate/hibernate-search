@@ -52,7 +52,7 @@ import java.util.Properties;
  */
 public class MutableSearchFactoryState implements SearchFactoryState {
 	private Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
-	private Map<Class<?>, EntityIndexBinder<?>> indexBindingsPerEntity;
+	private Map<Class<?>, EntityIndexBinder> indexBindingsPerEntity;
 	private String indexingStrategy;
 	private Worker worker;
 	private BackendQueueProcessor backendQueueProcessor;
@@ -102,7 +102,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return documentBuildersContainedEntities;
 	}
 
-	public Map<Class<?>, EntityIndexBinder<?>> getIndexBindingForEntity() {
+	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
 		return indexBindingsPerEntity;
 	}
 
@@ -150,7 +150,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.documentBuildersContainedEntities = documentBuildersContainedEntities;
 	}
 
-	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities) {
+	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities) {
 		this.indexBindingsPerEntity = documentBuildersIndexedEntities;
 	}
 

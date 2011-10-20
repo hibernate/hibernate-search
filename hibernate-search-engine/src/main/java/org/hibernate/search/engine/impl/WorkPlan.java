@@ -510,7 +510,7 @@ public class WorkPlan {
 			}
 		}
 		else {
-			return entityIndexBinding.getDocumentBuilder();
+			return (AbstractDocumentBuilder<T>) entityIndexBinding.getDocumentBuilder();
 		}
 	}
 }

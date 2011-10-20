@@ -70,11 +70,11 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 
 	public void testCorrectNumberOfShardsDetected() {
-		EntityIndexBinder<Document> indexBindingForDocument = getSearchFactory().getIndexBindingForEntity( Document.class );
+		EntityIndexBinder indexBindingForDocument = getSearchFactory().getIndexBindingForEntity( Document.class );
 		IndexManager[] documentManagers = indexBindingForDocument.getIndexManagers();
 		assertNotNull( documentManagers);
 		assertEquals( 4, documentManagers.length );
-		EntityIndexBinder<Book> indexBindingForBooks = getSearchFactory().getIndexBindingForEntity( Book.class );
+		EntityIndexBinder indexBindingForBooks = getSearchFactory().getIndexBindingForEntity( Book.class );
 		IndexManager[] bookManagers = indexBindingForBooks.getIndexManagers();
 		assertNotNull( bookManagers );
 		assertEquals( 2, bookManagers.length );

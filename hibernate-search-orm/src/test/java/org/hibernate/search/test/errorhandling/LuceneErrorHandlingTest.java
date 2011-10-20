@@ -61,7 +61,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	
 	public void testErrorHandling() {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		EntityIndexBinder<Document> mappingForEntity = searchFactory.getIndexBindingForEntity( Document.class );
+		EntityIndexBinder mappingForEntity = searchFactory.getIndexBindingForEntity( Document.class );
 		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );

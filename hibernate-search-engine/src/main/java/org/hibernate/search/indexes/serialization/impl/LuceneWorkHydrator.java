@@ -392,7 +392,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	private String objectIdInString(Class<?> entityClass, Serializable id) {
-		EntityIndexBinder<?> indexBindingForEntity = searchFactory.getIndexBindingForEntity( entityClass );
+		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( entityClass );
 		if ( indexBindingForEntity == null ) {
 			throw new SearchException( "Unable to find entity type metadata while deserializing: " + entityClass );
 		}

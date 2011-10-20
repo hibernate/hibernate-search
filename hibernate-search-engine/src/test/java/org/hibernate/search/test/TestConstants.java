@@ -84,9 +84,10 @@ public class TestConstants {
 	/**
 	 * Return the root directory to store test indexes in. Tests should never use or delete this directly
 	 * but rather nest sub directories in it to avoid interferences across tests.
-	 * @return
+	 *
+	 * @return Return the root directory to store test indexes
 	 */
-	public static String getIndexdir() {
+	public static String getIndexDirectory() {
 		return indexDirPath;
 	}
 

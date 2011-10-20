@@ -161,7 +161,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 	
 	//Not exposed on the IndexManager interface
-	public EntityIndexBinder<?> getIndexBindingForEntity(Class<?> entityType) {
+	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
 		return boundSearchFactory.getIndexBindingForEntity( entityType );
 	}
 	

@@ -42,7 +42,7 @@ import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest
 
 /**
  * Verifies basic behavior of FSSlaveDirectoryProvider around
- * {@link org.hibernate.search.store.impl.DirectoryProviderHelper#getRetryInitializePeriod(Properties, String)}
+ * {@link org.hibernate.search.store.impl.DirectoryProviderHelper#getRetryInitializePeriod(java.util.Properties, String)}
  * (HSEARCH-323)
  * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -87,7 +87,7 @@ public class RetryInitializeTest {
 		
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) slave.getSearchFactory();
 		
-		EntityIndexBinder<?> snowIndexBinder = searchFactory.getIndexBindingForEntity( SnowStorm.class );
+		EntityIndexBinder snowIndexBinder = searchFactory.getIndexBindingForEntity( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];

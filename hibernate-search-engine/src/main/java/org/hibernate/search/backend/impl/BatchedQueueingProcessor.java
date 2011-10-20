@@ -49,9 +49,9 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 
 	private final int batchSize;
 
-	private final Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders;
+	private final Map<Class<?>, EntityIndexBinder> entityIndexBinders;
 
-	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexBinder<?>> entityIndexBinders, Properties properties) {
+	public BatchedQueueingProcessor(Map<Class<?>, EntityIndexBinder> entityIndexBinders, Properties properties) {
 		this.entityIndexBinders = entityIndexBinders;
 		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
 	}
@@ -88,7 +88,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		WorkQueuePerIndexSplitter context = new WorkQueuePerIndexSplitter();
 		for ( LuceneWork work : sealedQueue ) {
 			final Class<?> entityType = work.getEntityClass();
-			EntityIndexBinder<?> entityIndexBinding = entityIndexBinders.get( entityType );
+			EntityIndexBinder entityIndexBinding = entityIndexBinders.get( entityType );
 			IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE )
 				.performOperation( work, shardingStrategy, context );

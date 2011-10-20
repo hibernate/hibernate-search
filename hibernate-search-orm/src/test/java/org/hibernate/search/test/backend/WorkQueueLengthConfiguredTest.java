@@ -44,7 +44,7 @@ public class WorkQueueLengthConfiguredTest extends SearchTestCase {
 	@Test
 	public void testNothingTest() {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		EntityIndexBinder<Clock> indexBindingForEntity = searchFactory.getIndexBindingForEntity( Clock.class );
+		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( Clock.class );
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];

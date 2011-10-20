@@ -166,7 +166,7 @@ public class SearchFactoryBuilder {
 		//TODO programmatic mapping support
 		//FIXME The current initDocumentBuilders
 		initDocumentBuilders( cfg, reflectionManager, buildContext );
-		final Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
+		final Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
 		for ( EntityIndexBinder builder : documentBuildersIndexedEntities.values() ) {
 			//FIXME improve this algorithm to deal with adding new classes to the class hierarchy.
@@ -191,7 +191,7 @@ public class SearchFactoryBuilder {
 	private void removeClassesAlreadyManaged() {
 		Set<Class<?>> remove = new HashSet<Class<?>>();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> containedEntities = rootFactory.getDocumentBuildersContainedEntities();
-		final Map<Class<?>, EntityIndexBinder<?>> indexedEntities = rootFactory.getIndexBindingForEntity();
+		final Map<Class<?>, EntityIndexBinder> indexedEntities = rootFactory.getIndexBindingForEntity();
 		for ( Class<?> entity : classes ) {
 			if ( indexedEntities.containsKey( entity ) || containedEntities.containsKey( entity ) ) {
 				remove.add( entity );
@@ -226,7 +226,7 @@ public class SearchFactoryBuilder {
 		factoryState.setDirectoryProviderIndexingParams( new HashMap<DirectoryProvider, LuceneIndexingParameters>() );
 		initDocumentBuilders( cfg, reflectionManager, buildContext );
 
-		final Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
+		final Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
 		for ( EntityIndexBinder builder : documentBuildersIndexedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
@@ -255,10 +255,10 @@ public class SearchFactoryBuilder {
 
 	private void fillSimilarityMapping() {
 		//TODO cleanup: this logic to select the Similarity is too complex, should likely be done in a previous phase
-		final Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
-		for ( Entry<Class<?>, EntityIndexBinder<?>> entry : documentBuildersIndexedEntities.entrySet() ) {
+		final Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
+		for ( Entry<Class<?>, EntityIndexBinder> entry : documentBuildersIndexedEntities.entrySet() ) {
 			Class<?> clazz = entry.getKey();
-			EntityIndexBinder<?> entityMapping = entry.getValue();
+			EntityIndexBinder entityMapping = entry.getValue();
 			Similarity entitySimilarity = entityMapping.getSimilarity();
 			if ( entitySimilarity == null ) {
 				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
@@ -307,7 +307,7 @@ public class SearchFactoryBuilder {
 		if ( rootFactory == null ) {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
-			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinder<?>>() );
+			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinder>() );
 			factoryState.setDocumentBuildersContainedEntities( new ConcurrentHashMap<Class<?>, DocumentBuilderContainedEntity<?>>() );
 			factoryState.setFilterDefinitions( new ConcurrentHashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
@@ -329,7 +329,7 @@ public class SearchFactoryBuilder {
 		initProgrammaticAnalyzers( context, reflectionManager );
 		initProgrammaticallyDefinedFilterDef( reflectionManager );
 		final PolymorphicIndexHierarchy indexingHierarchy = factoryState.getIndexHierarchy();
-		final Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
+		final Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
 		final Map<XClass, Class> classMappings = initializeClassMappings( cfg, reflectionManager );
@@ -404,12 +404,12 @@ public class SearchFactoryBuilder {
 	 */
 	private void disableBlackListedTypesOptimization(Map<XClass, Class> classMappings,
 			Set<XClass> optimizationBlackListX,
-			Map<Class<?>, EntityIndexBinder<?>> documentBuildersIndexedEntities,
+			Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities,
 			Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities) {
 		for ( XClass xClass : optimizationBlackListX ) {
 			Class type = classMappings.get( xClass );
 			if ( type != null ) {
-				EntityIndexBinder<?> entityIndexBinding = documentBuildersIndexedEntities.get( type );
+				EntityIndexBinder entityIndexBinding = documentBuildersIndexedEntities.get( type );
 				if ( entityIndexBinding != null ) {
 					log.tracef( "Dirty checking optimizations disabled for class %s", type );
 					entityIndexBinding.getDocumentBuilder().forceStateInspectionOptimizationsDisabled();
