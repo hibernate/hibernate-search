@@ -36,16 +36,6 @@
     <subtitle>Reference Guide</subtitle>
 
     <releaseinfo>&version;</releaseinfo>
-
-    <mediaobject>
-      <imageobject role="fo">
-        <imagedata align="center" fileref="hibernate_logo_a.png" />
-      </imageobject>
-
-      <imageobject role="html">
-        <imagedata depth="3cm" fileref="hibernate_logo_a.png" />
-      </imageobject>
-    </mediaobject>
   </bookinfo>
 
   <toc></toc>

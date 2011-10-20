@@ -53,7 +53,7 @@
             If using Java version <emphasis>7</emphasis> make sure you avoid
             builds 0 and 1: those versions contained an optimisation bug which
             would be triggered by Lucene. Hibernate Search 3.x was compatible
-            with Java version <emphasis>5</emphasis> too.</entry>
+            with Java version <emphasis>5</emphasis>.</entry>
           </row>
 
           <row>
@@ -88,9 +88,9 @@
             entity configuration (<emphasis>@Entity, @Id,
             @OneToMany,...</emphasis>). This part of the configuration could
             also be expressed in xml or code. <para>Hibernate Search, however,
-            has itself its own set of annotations (<emphasis>@Indexed,
+            has also its own set of annotations (<emphasis>@Indexed,
             @DocumentId, @Field,...</emphasis>) for which there exists so far
-            no XML based alternative; a better option is to use <xref
+            no XML based alternative; a better option is the <xref
             linkend="hsearch-mapping-programmaticapi" />.</para></entry>
           </row>
         </tbody>
@@ -151,9 +151,9 @@
     if you want to use Hibernate Search in conjunction with JPA.</para>
 
     <para>To use <emphasis>hibernate-search-infinispan</emphasis>, adding the
-    JBoss Maven repository is no longer optional, it's mandatory as it
-    contains the needed Infinispan dependencies and these are currently not
-    mirrored by <literal>central</literal>.</para>
+    JBoss Maven repository is mandatory, because it contains the needed
+    Infinispan dependencies which are currently not mirrored by
+    <literal>central</literal>.</para>
 
     <section>
       <title>Using a Maven Archetype</title>
@@ -166,8 +166,7 @@
       is <literal>hibernate-search-quickstart</literal></para>
 
       <example>
-        <title>generating a new project from commandline using the Maven
-        Archetype</title>
+        <title>Generating a sample project using the Maven Archetype</title>
 
         <programlisting>
 mvn archetype:generate                                 \
