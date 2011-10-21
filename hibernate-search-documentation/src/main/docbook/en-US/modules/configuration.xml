@@ -173,12 +173,6 @@
     <constant>index</constant> property is not specified the fully qualified
     name of the indexed class will be used as name (recommended).</para>
 
-    <para>For each index, an <classname>IndexManager</classname> is created,
-    which holds references to <classname>ReaderProvider</classname> instances
-    used by Hibernate Search to perform queries (see <xref
-    linkend="IndexReaders" />) and to each backend, used to apply updates to
-    the index.</para>
-
     <para>Knowing the index name, you can configure the directory provider and
     any additional options by using the prefix
     <constant>hibernate.search.</constant><replaceable>&lt;indexname&gt;</replaceable>.
@@ -234,15 +228,12 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
     </tip>
 
     <table id="directory-provider-table">
-      <title>List of built-in
-      <classname>DirectoryProvider</classname>s</title>
+      <title>List of built-in <classname>DirectoryProvider</classname></title>
 
-      <tgroup cols="3">
+      <tgroup cols="2">
         <thead>
           <row>
-            <entry align="center">Class or shortcut name</entry>
-
-            <entry align="center">Description</entry>
+            <entry align="center">Name and description</entry>
 
             <entry align="center">Properties</entry>
           </row>
@@ -250,20 +241,17 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
 
         <tbody>
           <row>
-            <entry>ram</entry>
-
-            <entry>Memory based directory, the directory will be uniquely
-            identified (in the same deployment unit) by the
-            <literal>@Indexed.index</literal> element</entry>
+            <entry><literal>ram</literal>: Memory based directory, the
+            directory will be uniquely identified (in the same deployment
+            unit) by the <literal>@Indexed.index</literal> element</entry>
 
             <entry>none</entry>
           </row>
 
           <row>
-            <entry>filesystem</entry>
-
-            <entry>File system based directory. The directory used will be
-            &lt;indexBase&gt;/&lt; indexName &gt;</entry>
+            <entry><literal>filesystem</literal>: File system based directory.
+            The directory used will be &lt;indexBase&gt;/&lt; indexName
+            &gt;</entry>
 
             <entry><para><literal>indexBase</literal> : Base
             directory</para><para><literal>indexName</literal>: override
@@ -290,20 +278,18 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry>filesystem-master</entry>
-
-            <entry><para>File system based directory. Like
-            <literal>filesystem</literal>. It also copies the index to a
-            source directory (aka copy directory) on a regular basis.
-            </para><para>The recommended value for the refresh period is (at
-            least) 50% higher that the time to copy the information (default
-            3600 seconds - 60 minutes).</para><para>Note that the copy is
-            based on an incremental copy mechanism reducing the average copy
-            time.</para><para>DirectoryProvider typically used on the master
-            node in a JMS back end cluster.</para><para>The <literal>
-            buffer_size_on_copy</literal> optimum depends on your operating
-            system and available RAM; most people reported good results using
-            values between 16 and 64MB.</para></entry>
+            <entry><para><literal>filesystem-master</literal>: File system
+            based directory. Like <literal>filesystem</literal>. It also
+            copies the index to a source directory (aka copy directory) on a
+            regular basis.</para><para>The recommended value for the refresh
+            period is (at least) 50% higher that the time to copy the
+            information (default 3600 seconds - 60 minutes).</para><para>Note
+            that the copy is based on an incremental copy mechanism reducing
+            the average copy time.</para><para>DirectoryProvider typically
+            used on the master node in a JMS back end cluster.</para><para>The
+            <literal> buffer_size_on_copy</literal> optimum depends on your
+            operating system and available RAM; most people reported good
+            results using values between 16 and 64MB.</para></entry>
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
@@ -340,18 +326,16 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry>filesystem-slave</entry>
-
-            <entry><para>File system based directory. Like
-            <literal>filesystem</literal>, but retrieves a master version
-            (source) on a regular basis. To avoid locking and inconsistent
-            search results, 2 local copies are kept. </para><para>The
-            recommended value for the refresh period is (at least) 50% higher
-            that the time to copy the information (default 3600 seconds - 60
-            minutes).</para><para>Note that the copy is based on an
-            incremental copy mechanism reducing the average copy
-            time.</para><para>DirectoryProvider typically used on slave nodes
-            using a JMS back end.</para><para>The <literal>
+            <entry><para><literal>filesystem-slave</literal>: File system
+            based directory. Like <literal>filesystem</literal>, but retrieves
+            a master version (source) on a regular basis. To avoid locking and
+            inconsistent search results, 2 local copies are
+            kept.</para><para>The recommended value for the refresh period is
+            (at least) 50% higher that the time to copy the information
+            (default 3600 seconds - 60 minutes).</para><para>Note that the
+            copy is based on an incremental copy mechanism reducing the
+            average copy time.</para><para>DirectoryProvider typically used on
+            slave nodes using a JMS back end.</para><para>The <literal>
             buffer_size_on_copy</literal> optimum depends on your operating
             system and available RAM; most people reported good results using
             values between 16 and 64MB.</para></entry>
@@ -405,13 +389,11 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry>infinispan</entry>
-
-            <entry><para>Infinispan based directory. Use it to store the index
-            in a distributed grid, making index changes visible to all
-            elements of the cluster very quickly. Also see <xref
-            linkend="infinispan-directories" /> for additional requirements
-            and configuration settings. Infinispan needs a global
+            <entry><para><literal>infinispan</literal>: Infinispan based
+            directory. Use it to store the index in a distributed grid, making
+            index changes visible to all elements of the cluster very quickly.
+            Also see <xref linkend="infinispan-directories" /> for additional
+            requirements and configuration settings. Infinispan needs a global
             configuration and additional dependencies; the settings defined
             here apply to each different index.</para></entry>
 
@@ -445,7 +427,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
     </tip>
 
     <section id="infinispan-directories" revision="2">
-      <title>Infinispan Directory configuration</title>
+      <title role="bold">Infinispan Directory configuration</title>
 
       <para>Infinispan is a distributed, scalable, highly available data grid
       platform which supports autodiscovery of peer nodes. Using Infinispan
@@ -458,9 +440,9 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
 
       <para>When using an Infinispan Directory the index is stored in memory
       and shared across multiple nodes. It is considered a single directory
-      across all participating nodes. If a node updates the index, all other
-      nodes are updated as well. Updates on one node can be immediately
-      searched for in the whole cluster.</para>
+      distributed across all participating nodes. If a node updates the index,
+      all other nodes are updated as well. Updates on one node can be
+      immediately searched for in the whole cluster.</para>
 
       <para>The default configuration replicates all data defining the index
       across all nodes, thus consuming a significant amount of memory. For
@@ -474,7 +456,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
       configure it to have a <literal>CacheStore</literal> on each node or
       have a single centralized one shared by each node.</para>
 
-      <para>See the <ulink url="http://www.jboss.org/infinispan/"> Infinispan
+      <para>See the <ulink url="http://www.jboss.org/infinispan/">Infinispan
       documentation</ulink> for all Infinispan configuration options.</para>
 
       <section>
