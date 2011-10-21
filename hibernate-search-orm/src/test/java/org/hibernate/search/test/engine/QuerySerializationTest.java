@@ -42,7 +42,7 @@ import org.junit.Test;
 /**
  * This test is meant to verify that HSQuery implementation is able to
  * be serialized, deserialized and then still perform the query.
- * a
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class QuerySerializationTest extends SearchTestCase {
