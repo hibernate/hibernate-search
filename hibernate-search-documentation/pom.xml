@@ -94,7 +94,7 @@
                     <execution>
                         <!--
                             here we are attaching the translate goal so that the translations are processed
-                            before compilation so that the transated XML is also transformed during
+                            before compilation so that the translated XML is also transformed during
                             generation
                         -->
                         <phase>process-resources</phase>
