@@ -241,17 +241,29 @@ public abstract class FileHelper {
 		}
 	}
 
-	public static String readResourceAsString(String filename) {
-		InputStream in = openResource( filename );
-		if(in == null) {
-			throw log.unableToLoadResource( filename );
+	/**
+	 * Load a resource from a specific classLoader
+	 * @param resourceName the name of the resource
+	 * @param classLoader the classloader to use, or null to try the ContextClassloader first or the loading one second.
+	 * @return the resource contents as a String
+	 */
+	public static String readResourceAsString(String resourceName, ClassLoader classLoader) {
+		InputStream in;
+		if ( classLoader != null ) {
+			in = classLoader.getResourceAsStream( resourceName );
+		}
+		else {
+			in = openResource( resourceName );
+		}
+		if ( in == null ) {
+			throw log.unableToLoadResource( resourceName );
 		}
 		String s;
 		try {
 			s = FileHelper.readInputStream( in );
 		}
 		catch ( IOException e ) {
-			throw log.unableToReadFile( filename, e );
+			throw log.unableToReadFile( resourceName, e );
 		}
 		finally {
 			closeResource( in );
@@ -259,8 +271,17 @@ public abstract class FileHelper {
 		return s;
 	}
 
-	public static InputStream openResource(String resource) {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream( resource );
+	public static InputStream openResource(String resourceName) {
+		//try loading from application context first:
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream resource = classLoader.getResourceAsStream( resourceName );
+		if ( resource != null ) {
+			return resource;
+		}
+		else {
+			classLoader = FileHelper.class.getClassLoader();
+			return classLoader.getResourceAsStream( resourceName );
+		}
 	}
 
 	/**
