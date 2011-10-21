@@ -42,9 +42,10 @@
       <para>The good news is that Hibernate Search is enabled out of the box
       when detected on the classpath by Hibernate Core. If, for some reason
       you need to disable it, set
-      <literal>hibernate.search.autoregister_listeners</literal> to false.
-      Note that there is no performance penalty when the listeners are enabled
-      but no entities are annotated as indexed.</para>
+      <literal>hibernate.search.autoregister_listeners</literal> to
+      <constant>false</constant>. Note that there is no performance penalty
+      when the listeners are enabled but no entities are annotated as
+      indexed.</para>
     </section>
 
     <section>
@@ -69,19 +70,99 @@
     </section>
   </section>
 
+  <section id="configuration-indexmanager">
+    <title>Configuring the <classname>IndexManager</classname></title>
+
+    <para>The role of the index manager component is described in <xref
+    linkend="search-architecture" />. Hibernate Search provides two possible
+    implementations for this interface to choose from.</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><literal>directory-based</literal>: the default implementation
+        which uses the Lucene <classname>Directory</classname> abstraction to
+        mange index files.</para>
+      </listitem>
+
+      <listitem>
+        <para><literal>near-real-time</literal>: avoid flushing writes to disk
+        at each commit. This index manager is also
+        <classname>Directory</classname> based, but also makes uses of
+        Lucene's NRT functionallity.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>To select an alternative you specify the property:</para>
+
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = near-real-time</programlisting>
+
+    <section>
+      <title><literal>directory-based</literal></title>
+
+      <para>The default <classname>IndexManager</classname> implementation.
+      This is the one mostly referred to in this documentation. It is highly
+      configurable and allows you to select different settings for the reader
+      strategy, back ends and directory providers. Refer to <xref
+      linkend="search-configuration-directory" />, <xref
+      linkend="configuration-worker" /> and <xref
+      linkend="configuration-reader-strategy" /> for more details. </para>
+    </section>
+
+    <section>
+      <title><literal>near-real-time</literal></title>
+
+      <para>The <classname>NRTIndexManager</classname> is an extension of the
+      default <classname>IndexManager</classname>, leveraging the Lucene NRT
+      (Near Real Time) features for extreme low latency index writes. As a
+      tradeoff it requires a non-clustered and non-shared index. In other
+      words, it will ignore configuration settings for alternative back ends
+      other than <literal>lucene</literal> and will acquire exclusive write
+      locks on the <classname>Directory</classname>.</para>
+
+      <para>To achieve this low latency writes, the
+      <classname>IndexWriter</classname> will not flush every change to disk.
+      Queries will be allowed to read updated state from the unflushed index
+      writer buffers; the downside of this strategy is that if the application
+      crashes or the <classname>IndexWriter</classname> is otherwise killed
+      you'll have to rebuild the indexes as some updates might be lost.</para>
+
+      <para>Because of these downsides, and because a master node in cluster
+      can be configured for good performance as well, the NRT configuration is
+      only recommended for non clustered websites with a limited amount of
+      data.</para>
+    </section>
+
+    <section>
+      <title>Custom</title>
+
+      <para>It is also possible to configure a custom
+      <classname>IndexManager</classname> implementation by specifying the
+      fully qualified class name of your custom implementation. This
+      implementation must have a no-argument constructor:<programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = my.corp.myapp.CustomIndexManager</programlisting></para>
+
+      <tip>
+        <para>Your custom index manager implementation doesn't need to use the
+        same components as the default implementations. For example, you can
+        delegate to a remote indexing service which doesn't expose a
+        <classname>Directory</classname> interface.</para>
+      </tip>
+    </section>
+  </section>
+
   <section id="search-configuration-directory" revision="1">
     <title>Directory configuration</title>
 
-    <para>Apache Lucene has a notion of a <classname>Directory</classname> to
-    store the index files. The <classname>Directory</classname> implementation
-    can be customized and Lucene comes bundled with a file system and an
-    in-memory implementation. <classname>DirectoryProvider</classname> is the
-    Hibernate Search abstraction around a Lucene
-    <classname>Directory</classname> and handles the configuration and the
-    initialization of the underlying Lucene resources. <xref
-    linkend="directory-provider-table" /> shows the list of the directory
-    providers available in Hibernate Search together with their corresponding
-    options.</para>
+    <para>As we have seen in <xref linkend="configuration-indexmanager" /> the
+    default index manager uses Lucene's notion of a
+    <classname>Directory</classname> to store the index files. The
+    <classname>Directory</classname> implementation can be customized and
+    Lucene comes bundled with a file system and an in-memory implementation.
+    <classname>DirectoryProvider</classname> is the Hibernate Search
+    abstraction around a Lucene <classname>Directory</classname> and handles
+    the configuration and the initialization of the underlying Lucene
+    resources. <xref linkend="directory-provider-table" /> shows the list of
+    the directory providers available in Hibernate Search together with their
+    corresponding options.</para>
 
     <para>To configure your <classname>DirectoryProvider</classname> you have
     to understand that each indexed entity is associated to a Lucene index
@@ -1044,80 +1125,6 @@ FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlis
 
     <para>where <classname>my.corp.myapp.CustomReaderProvider</classname> is
     the custom strategy implementation.</para>
-  </section>
-
-  <section id="configuration-indexmanager">
-    <title>Selecting or overriding the
-    <classname>IndexManager</classname></title>
-
-    <para>The role of the index manager component is described in <xref
-    linkend="search-architecture" />. Hibernate Search provides two possible
-    implementations for this interface to choose from.</para>
-
-    <itemizedlist>
-      <listitem>
-        <para><literal>transactional</literal>: the default
-        implementation.</para>
-      </listitem>
-
-      <listitem>
-        <para><literal>near-real-time</literal>: avoid flushing writes to disk
-        at each commit.</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>To select an alternative you specify the property:</para>
-
-    <programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = near-real-time</programlisting>
-
-    <section>
-      <title><literal>transactional</literal></title>
-
-      <para>The default <classname>IndexManager</classname> implementation.
-      This is the one mostly referred to in this documentation. It is highly
-      configurable and allows you to select different implementations for the
-      reader strategy, back ends and directory providers.</para>
-    </section>
-
-    <section>
-      <title><literal>near-real-time</literal></title>
-
-      <para>The <classname>NRTIndexManager</classname> is an extension of the
-      default <classname>IndexManager</classname>, leveraging the Lucene NRT
-      (Near Real Time) features for extreme low latency index writes. As a
-      tradeoff it requires a non-clustered and non-shared index. In other
-      words, it will ignore configuration settings for alternative back ends
-      other than <literal>lucene</literal> and will acquire exclusive write
-      locks on the <classname>Directory</classname>.</para>
-
-      <para>To achieve this low latency writes, the
-      <classname>IndexWriter</classname> will not flush every change to disk.
-      Queries will be allowed to read updated state from the unflushed index
-      writer buffers; the downside of this strategy is that if the application
-      crashes or the <classname>IndexWriter</classname> is otherwise killed
-      you'll have to rebuild the indexes as some updates might be lost.</para>
-
-      <para>Because of these downsides, and because a master node in cluster
-      can be configured for good performance as well, the NRT configuration is
-      only recommended for non clustered websites with a limited amount of
-      data.</para>
-    </section>
-
-    <section>
-      <title>Custom</title>
-
-      <para>It is also possible to configure a custom
-      <classname>IndexManager</classname> implementation by specifying the
-      fully qualified class name of your custom implementation. This
-      implementation must have a no-argument constructor:<programlisting>hibernate.search.[default|&lt;indexname&gt;].indexmanager = my.corp.myapp.CustomIndexManager</programlisting></para>
-
-      <tip>
-        <para>Your custom index manager implementation doesn't need to use the
-        same components as the default implementations. For example, you can
-        delegate to a remote indexing service which doesn't expose a
-        <classname>Directory</classname> interface.</para>
-      </tip>
-    </section>
   </section>
 
   <section id="lucene-indexing-performance" revision="3">
