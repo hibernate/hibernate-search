@@ -373,7 +373,7 @@ public class SearchFactoryBuilder {
 		for ( XClass mappedXClass : rootIndexedEntities ) {
 			
 			Class mappedClass = classMappings.get( mappedXClass );
-			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext, reflectionManager );
+			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
 		
 			// Create all DocumentBuilderIndexedEntity
 			//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly

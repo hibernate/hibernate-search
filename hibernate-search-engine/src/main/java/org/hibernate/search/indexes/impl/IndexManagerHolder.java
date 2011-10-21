@@ -64,23 +64,22 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class IndexManagerHolder {
 	
-	public static final String INDEXMANAGER_IMPL_NAME = "indexmanager";
+	public static final String INDEX_MANAGER_IMPL_NAME = "indexmanager";
 
 	private static final Log log = LoggerFactory.make();
-
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
-
-	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
+	private static final String DEFAULT_INDEX_MANAGER_NAME = "directory-based";
 
 	private static final Map<String, String> defaultIndexManagerClasses;
-
 	static {
 		defaultIndexManagerClasses = new HashMap<String, String>( 3 );
 		defaultIndexManagerClasses.put( "", DirectoryBasedIndexManager.class.getName() );
-		defaultIndexManagerClasses.put( "transactional", DirectoryBasedIndexManager.class.getName() );
+		defaultIndexManagerClasses.put( DEFAULT_INDEX_MANAGER_NAME, DirectoryBasedIndexManager.class.getName() );
 		defaultIndexManagerClasses.put( "near-real-time", NRTIndexManager.class.getName() );
 	}
+
+	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
 
 	/**
 	 * Multiple IndexManager might be built for the same entity to implement Sharding.
@@ -94,13 +93,16 @@ public class IndexManagerHolder {
 	//#getReader() will always return a single "naive" IndexReader.
 	//So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
 	//(for both fieldCaches and cached filters)
-	public synchronized MutableEntityIndexBinding buildEntityIndexBinding(XClass entity, Class mappedClass, SearchConfiguration cfg,
-				WorkerBuildContext context,
-				ReflectionManager reflectionManager) {
+	public synchronized MutableEntityIndexBinding buildEntityIndexBinding(
+			XClass entity,
+			Class mappedClass,
+			SearchConfiguration cfg,
+			WorkerBuildContext context
+	) {
 		// read the properties
 		String directoryProviderName = getDirectoryProviderName( entity, cfg );
 		Properties[] indexProps = getDirectoryProperties( cfg, directoryProviderName );
-		
+
 		//set up the IndexManagers
 		int nbrOfProviders = indexProps.length;
 		IndexManager[] providers = new IndexManager[nbrOfProviders];
@@ -110,17 +112,13 @@ public class IndexManagerHolder {
 					directoryProviderName;
 			IndexManager indexManager = indexManagersRegistry.get( providerName );
 			if ( indexManager == null ) {
-				indexManager = createDirectoryManager(
-					providerName, indexProps[index],
-					reflectionManager.toClass( entity ),
-					context
-						);
+				indexManager = createDirectoryManager( providerName, indexProps[index], context );
 				indexManagersRegistry.put( providerName, indexManager );
 			}
 			indexManager.addContainedEntity( mappedClass );
 			providers[index] = indexManager;
 		}
-		
+
 		//define sharding strategy for this entity:
 		IndexShardingStrategy shardingStrategy;
 		//any indexProperty will do, the indexProps[0] surely exists.
@@ -142,7 +140,7 @@ public class IndexManagerHolder {
 		shardingStrategy.initialize(
 				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers
 		);
-		
+
 		//define the Similarity implementation:
 		// warning: it can also be set by an annotation at class level
 		final String similarityClassName = indexProps[0].getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
@@ -158,7 +156,7 @@ public class IndexManagerHolder {
 				setSimilarity( similarityInstance, manager );
 			}
 		}
-		
+
 		return new MutableEntityIndexBinding( shardingStrategy, similarityInstance, providers );
 	}
 	
@@ -179,8 +177,8 @@ public class IndexManagerHolder {
 		manager.setSimilarity( newSimilarity );
 	}
 
-	private IndexManager createDirectoryManager(String indexName, Properties indexProps, Class<?> entity, WorkerBuildContext context) {
-		String indexManagerName = indexProps.getProperty( INDEXMANAGER_IMPL_NAME, "transactional" );
+	private IndexManager createDirectoryManager(String indexName, Properties indexProps, WorkerBuildContext context) {
+		String indexManagerName = indexProps.getProperty( INDEX_MANAGER_IMPL_NAME, DEFAULT_INDEX_MANAGER_NAME);
 		final IndexManager manager;
 		if ( StringHelper.isEmpty( indexManagerName ) ) {
 			manager = new DirectoryBasedIndexManager();
