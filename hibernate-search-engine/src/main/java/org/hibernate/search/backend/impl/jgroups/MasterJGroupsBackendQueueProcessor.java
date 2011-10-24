@@ -84,6 +84,9 @@ public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProce
 
 	@Override
 	public void applyWork(List<LuceneWork> workList) {
+		if ( workList == null ) {
+			throw new IllegalArgumentException( "workList should not be null" );
+		}
 		luceneBackendQueueProcessor.applyWork( workList );
 	}
 

@@ -58,6 +58,7 @@ public interface BackendQueueProcessor {
 	 * elements in parallel threads, but no work should be started on a new workList until the previous
 	 * one was fully processed.
 	 * Work could be applied asynchronously according to capabilities and configuration of implementor.
+	 * A null parameter is not acceptable, implementations should throw an IllegalArgumentException.
 	 * @param workList
 	 */
 	void applyWork(List<LuceneWork> workList);
