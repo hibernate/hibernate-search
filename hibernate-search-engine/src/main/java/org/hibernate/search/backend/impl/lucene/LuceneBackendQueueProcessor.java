@@ -72,6 +72,9 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void applyWork(List<LuceneWork> workList) {
+		if ( workList == null ) {
+			throw new IllegalArgumentException( "workList should not be null" );
+		}
 		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask( workList, resources );
 		if ( sync ) {
 			Future<?> future = resources.getQueueingExecutor().submit( luceneBackendQueueProcessor );

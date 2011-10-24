@@ -52,6 +52,9 @@ public class SlaveJGroupsBackendQueueProcessor extends JGroupsBackendQueueProces
 
 	@Override
 	public void applyWork(List<LuceneWork> workList) {
+		if ( workList == null ) {
+			throw new IllegalArgumentException( "workList should not be null" );
+		}
 		jgroupsProcessor.sendLuceneWorkList( workList );
 	}
 
