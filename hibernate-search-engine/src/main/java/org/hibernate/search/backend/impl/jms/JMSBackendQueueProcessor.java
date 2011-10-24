@@ -125,6 +125,9 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void applyWork(List<LuceneWork> workList) {
+		if ( workList == null ) {
+			throw new IllegalArgumentException( "workList should not be null" );
+		}
 		//TODO review this integration with the old Runnable-style execution
 		Runnable operation = new JMSBackendQueueTask( indexName, workList, indexManager, this );
 		operation.run();
