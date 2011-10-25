@@ -60,7 +60,7 @@ public interface BackendQueueProcessor {
 	 * one was fully processed.
 	 * Work could be applied asynchronously according to capabilities and configuration of implementor.
 	 * A null parameter is not acceptable, implementations should throw an IllegalArgumentException.
-	 * @param workList
+	 * @param workList list of Lucene work instance which need to be applied to the index
 	 */
 	void applyWork(List<LuceneWork> workList);
 
