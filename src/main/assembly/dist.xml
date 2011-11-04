@@ -39,6 +39,13 @@
 
     <!-- Configure the module artifacts which make it into the distribution bundle -->
     <moduleSets>
+
+
+        <!--
+                #######################################################################
+                #  hibernate-search-engine
+                #######################################################################
+        -->
         <moduleSet>
             <includes>
                 <include>org.hibernate:hibernate-search-engine</include>
@@ -60,59 +67,25 @@
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>/dist/lib/required</outputDirectory>
                         <scope>runtime</scope>
-                        <excludes>
-                            <exclude>org.jgroups:jgroups</exclude>
-                            <exclude>commons-lang:commons-lang</exclude>
-                            <exclude>org.hibernate:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate:hibernate-search-analyzers</exclude>
-                            <exclude>org.apache.lucene:lucene-grouping</exclude>
-                            <exclude>org.apache.lucene:lucene-analyzers</exclude>
-                            <exclude>org.apache.lucene:lucene-highlighter</exclude>
-                            <exclude>org.apache.lucene:lucene-memory</exclude>
-                            <exclude>org.apache.lucene:lucene-misc</exclude>
-                            <exclude>org.apache.lucene:lucene-spatial</exclude>
-                            <exclude>org.apache.lucene:lucene-spellchecker</exclude>
-                            <exclude>org.apache.lucene:lucene-smartcn</exclude>
-                            <exclude>org.apache.lucene:lucene-stempel</exclude>
-                            <exclude>org.apache.solr:*</exclude>
-                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
-                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
-                            <exclude>com.fasterxml:*</exclude>
-                            <exclude>org.jboss:jandex</exclude>
-                            <exclude>org.infinispan:*</exclude>
-                            <exclude>org.rhq.helpers:*</exclude>
-                            <exclude>org.jboss.marshalling:*</exclude>
-                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
-                        </excludes>
+                        <useTransitiveDependencies>true</useTransitiveDependencies>
+                        <useTransitiveFiltering>true</useTransitiveFiltering>
+                        <includes>
+                            <include>org.apache.lucene:lucene-core</include>
+                            <include>org.hibernate.common:hibernate-commons-annotations</include>
+                            <include>org.jboss.logging:jboss-logging</include>
+                            <include>org.apache.avro:avro</include>
+                        </includes>
                     </dependencySet>
 
                     <dependencySet>
                         <outputDirectory>/dist/lib/optional</outputDirectory>
                         <scope>runtime</scope>
-                        <excludes>
-                            <!-- Avro excludes -->
-                            <exclude>org.apache.avro:avro</exclude>
-                            <exclude>org.codehaus.jackson:*</exclude>
-                            <exclude>com.thoughtworks.paranamer:paranamer</exclude>
-                            <exclude>org.hibernate:hibernate-core</exclude>
-                            <exclude>org.xerial.snappy:snappy-java</exclude>
-                            <exclude>org.jboss:jandex</exclude>
-                            <exclude>org.jboss.logging:*</exclude>
-                            <exclude>com.fasterxml:classmate</exclude>
-                            <exclude>org.apache.lucene:lucene-core</exclude>
-                            <exclude>antlr:antlr</exclude>
-                            <exclude>commons-collections:commons-collections</exclude>
-                            <exclude>dom4j:dom4j</exclude>
-                            <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
-                            <exclude>org.hibernate:hibernate-search-engine</exclude>
-                            <exclude>org.jgroups:jgroups</exclude>
-                            <exclude>xml-apis:xml-apis</exclude>
-                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
-                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
-                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
-                            <exclude>org.infinispan:*</exclude>
-                            <exclude>org.jboss.marshalling:*</exclude>
-                        </excludes>
+                        <useTransitiveDependencies>true</useTransitiveDependencies>
+                        <useTransitiveFiltering>true</useTransitiveFiltering>
+                        <includes>
+                            <include>org.hibernate:hibernate-search-analyzers</include>
+                            <include>org.apache.lucene:lucene-analyzers</include>
+                        </includes>
                     </dependencySet>
 
                     <dependencySet>
@@ -128,6 +101,12 @@
                 </dependencySets>
             </binaries>
         </moduleSet>
+
+        <!--
+                #######################################################################
+                #  hibernate-search-orm
+                #######################################################################
+        -->
         <moduleSet>
             <includes>
                 <include>org.hibernate:hibernate-search-orm</include>
@@ -153,58 +132,23 @@
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>/dist/lib/required</outputDirectory>
                         <scope>runtime</scope>
+                        <useTransitiveDependencies>true</useTransitiveDependencies>
+                        <useTransitiveFiltering>true</useTransitiveFiltering>
+                        <includes>
+                            <include>org.hibernate:hibernate-core</include>
+                        </includes>
                         <excludes>
-                            <exclude>org.jgroups:jgroups</exclude>
-                            <exclude>commons-lang:commons-lang</exclude>
-                            <exclude>org.hibernate:hibernate-search-engine</exclude>
-                            <exclude>org.hibernate:hibernate-search-analyzers</exclude>
-                            <exclude>org.apache.lucene:lucene-grouping</exclude>
-                            <exclude>org.apache.lucene:lucene-analyzers</exclude>
-                            <exclude>org.apache.lucene:lucene-highlighter</exclude>
-                            <exclude>org.apache.lucene:lucene-memory</exclude>
-                            <exclude>org.apache.lucene:lucene-misc</exclude>
-                            <exclude>org.apache.lucene:lucene-spatial</exclude>
-                            <exclude>org.apache.lucene:lucene-spellchecker</exclude>
-                            <exclude>org.apache.lucene:lucene-smartcn</exclude>
-                            <exclude>org.apache.lucene:lucene-stempel</exclude>
-                            <exclude>org.apache.solr:*</exclude>
-                            <exclude>org.jboss.marshalling:*</exclude>
-                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
-                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                             <exclude>org.jboss:jandex</exclude>
-                            <exclude>org.infinispan:*</exclude>
-                            <exclude>org.rhq.helpers:*</exclude>
+                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
                         </excludes>
                     </dependencySet>
 
                     <dependencySet>
                         <outputDirectory>/dist/lib/optional</outputDirectory>
                         <scope>runtime</scope>
-                        <excludes>
-                            <!-- Avro excludes -->
-                            <exclude>org.apache.avro:avro</exclude>
-                            <exclude>org.codehaus.jackson:*</exclude>
-                            <exclude>com.thoughtworks.paranamer:paranamer</exclude>
-                            <exclude>org.xerial.snappy:snappy-java</exclude>
-                            <exclude>org.jboss:jandex</exclude>
-                            <exclude>org.jboss.logging:*</exclude>
-                            <exclude>com.fasterxml:classmate</exclude>
-                            <exclude>org.apache.lucene:lucene-core</exclude>
-                            <exclude>antlr:antlr</exclude>
-                            <exclude>commons-collections:commons-collections</exclude>
-                            <exclude>dom4j:dom4j</exclude>
-                            <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
-                            <exclude>org.hibernate:hibernate-core</exclude>
-                            <exclude>org.hibernate:hibernate-search-engine</exclude>
-                            <exclude>org.infinispan:*</exclude>
-                            <exclude>org.jgroups:jgroups</exclude>
-                            <exclude>xml-apis:xml-apis</exclude>
-                            <exclude>org.jboss.marshalling:*</exclude>
-                            <exclude>org.rhq.helpers:*</exclude>
-                            <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
-                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
-                            <exclude>org.infinispan:*</exclude>
-                        </excludes>
+                        <includes>
+                            <include>javassist:javassist</include>
+                        </includes>
                     </dependencySet>
 
                     <dependencySet>
@@ -215,9 +159,27 @@
                             <exclude>org.jboss.spec.javax.transaction:*</exclude>
                         </excludes>
                     </dependencySet>
+
+                    <dependencySet>
+                        <useProjectArtifact>false</useProjectArtifact>
+                        <outputDirectory>/dist/lib/optional</outputDirectory>
+                        <scope>test</scope>
+                        <includes>
+                            <include>org.hibernate:hibernate-entitymanager</include>
+                            <include>javassist:javassist</include>
+                        </includes>
+                    </dependencySet>
+
                 </dependencySets>
             </binaries>
         </moduleSet>
+
+
+        <!--
+                #######################################################################
+                #  hibernate-search-infinispan
+                #######################################################################
+        -->
         <moduleSet>
             <includes>
                 <include>org.hibernate:hibernate-search-infinispan</include>
@@ -230,32 +192,26 @@
                         <useProjectArtifact>false</useProjectArtifact>
                         <outputDirectory>/dist/lib/clustering</outputDirectory>
                         <scope>runtime</scope>
+                        <useTransitiveDependencies>true</useTransitiveDependencies>
+                        <useTransitiveFiltering>true</useTransitiveFiltering>
+                        <includes>
+                            <include>org.infinispan:infinispan-lucene-directory</include>
+                            <!-- no idea why I have to specify this explicitly -->
+                            <include>org.jgroups:jgroups</include>
+                        </includes>
                         <excludes>
-                            <exclude>org.hibernate:*</exclude>
-                            <exclude>org.apache.lucene:*</exclude>
-                            <exclude>org.apache.solr:*</exclude>
-                            <exclude>antlr:antlr</exclude>
-                            <exclude>commons-collections:*</exclude>
-                            <exclude>dom4j:*</exclude>
-                            <exclude>org.rhq.helpers:*</exclude>
-                            <exclude>com.fasterxml:*</exclude>
-                            <exclude>org.jboss.logging:*</exclude>
-                            <exclude>org.jboss:jandex</exclude>
-                            <exclude>commons-lang:*</exclude>
-                            <exclude>xml-apis:*</exclude>
                             <exclude>org.jboss.javaee:jboss-transaction-api</exclude>
-                            <exclude>org.jboss.spec.javax.transaction:*</exclude>
-                            <exclude>org.hibernate.common:hibernate-commons-annotations</exclude>
-                            <!-- Avro excludes -->
-                            <exclude>org.apache.avro:avro</exclude>
-                            <exclude>org.codehaus.jackson:*</exclude>
-                            <exclude>com.thoughtworks.paranamer:paranamer</exclude>
-                            <exclude>org.xerial.snappy:snappy-java</exclude>
                         </excludes>
                     </dependencySet>
                 </dependencySets>
             </binaries>
         </moduleSet>
+
+        <!--
+                #######################################################################
+                #  hibernate-search-documentation
+                #######################################################################
+        -->
         <moduleSet>
             <includes>
                 <include>org.hibernate:hibernate-search-documentation</include>

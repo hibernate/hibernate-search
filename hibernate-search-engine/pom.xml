@@ -37,10 +37,6 @@
     <name>Hibernate Search Engine</name>
     <description>the core of the Object/Lucene mapper, query engine and index management</description>
 
-    <properties>
-        <jdocbookSourceDirectory>${basedir}/src/main/docbook</jdocbookSourceDirectory>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>javax.transaction</groupId>
