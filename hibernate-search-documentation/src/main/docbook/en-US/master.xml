@@ -30,12 +30,10 @@
 <book>
   <bookinfo>
     <title>Hibernate Search</title>
-
     <subtitle>Apache <trademark>Lucene</trademark> Integration</subtitle>
-
     <subtitle>Reference Guide</subtitle>
-
     <releaseinfo>&version;</releaseinfo>
+    <xi:include href="author_group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   </bookinfo>
 
   <toc></toc>
