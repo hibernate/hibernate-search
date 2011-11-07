@@ -39,7 +39,7 @@ public class CollectionInitializeTest extends SearchTestCase {
 
 	public void testMassIndexing() throws InterruptedException {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		initializeDate(fullTextSession);
+		initializeData( fullTextSession );
 		try {
 			List list = fullTextSession.createCriteria( LegacyCarPlant.class ).list();
 			Assert.assertEquals( 1, list.size() );
@@ -65,7 +65,7 @@ public class CollectionInitializeTest extends SearchTestCase {
 		transaction.commit();
 	}
 
-	private void initializeDate(FullTextSession fullTextSession) {
+	private void initializeData(FullTextSession fullTextSession) {
 		final Transaction transaction = fullTextSession.beginTransaction();
 		LegacyCar[] cars = new LegacyCar[3];
 		for (int i = 1 ; i < 4 ; i++) {
@@ -88,12 +88,4 @@ public class CollectionInitializeTest extends SearchTestCase {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { LegacyCarPlant.class, LegacyCar.class, LegacyTire.class };
 	}
-
-	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.hbm2ddl.import_files",
-				"/org/hibernate/search/test/batchindexing/CollectionInitializeTest.sql" );
-	}
-
 }
