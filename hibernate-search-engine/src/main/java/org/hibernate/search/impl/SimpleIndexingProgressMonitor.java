@@ -26,9 +26,8 @@ package org.hibernate.search.impl;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -43,8 +42,8 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
 	private final AtomicLong totalCounter = new AtomicLong();
 	private volatile long startTime;
-	private final int loggingPeriod;
-	
+	private final int logAfterNumberOfDocuments;
+
 	/**
 	 * Logs progress of indexing job every 50 documents written.
 	 */
@@ -53,12 +52,13 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	}
 
 	/**
-	 * Logs progress of indexing job every <code>loggingPeriod</code>
+	 * Logs progress of indexing job every <code>logAfterNumberOfDocuments</code>
 	 * documents written.
-	 * @param loggingPeriod the logging period
+	 *
+	 * @param logAfterNumberOfDocuments log each time the specified number of documents has been added
 	 */
-	public SimpleIndexingProgressMonitor(int loggingPeriod) {
-		this.loggingPeriod = loggingPeriod;
+	public SimpleIndexingProgressMonitor(int logAfterNumberOfDocuments) {
+		this.logAfterNumberOfDocuments = logAfterNumberOfDocuments;
 	}
 
 	public void entitiesLoaded(int size) {
@@ -89,11 +89,11 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	}
 
 	protected int getStatusMessagePeriod() {
-		return loggingPeriod;
+		return logAfterNumberOfDocuments;
 	}
 
-	protected void printStatusMessage(long starttime, long totalTodoCount, long doneCount) {
-		long elapsedMs = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - starttime );
+	protected void printStatusMessage(long startTime, long totalTodoCount, long doneCount) {
+		long elapsedMs = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - startTime );
 		log.indexingDocumentsCompleted( doneCount, elapsedMs );
 		float estimateSpeed = doneCount * 1000f / elapsedMs;
 		float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
