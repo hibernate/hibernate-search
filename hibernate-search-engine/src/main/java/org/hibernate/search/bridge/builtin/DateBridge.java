@@ -32,22 +32,23 @@ import org.apache.lucene.document.DateTools;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 
 /**
- * Bridge a java.util.Date to a String, truncated to the resolution
- * Date are stored GMT based
+ * Bridge a {@code java.util.Date} to a {@code String}, truncated to the specified resolution.
+ * GMT is used as time zone.
  * <p/>
- * ie
- * Resolution.YEAR: yyyy
- * Resolution.MONTH: yyyyMM
- * Resolution.DAY: yyyyMMdd
- * Resolution.HOUR: yyyyMMddHH
- * Resolution.MINUTE: yyyyMMddHHmm
- * Resolution.SECOND: yyyyMMddHHmmss
- * Resolution.MILLISECOND: yyyyMMddHHmmssSSS
+ * <ul>
+ * <li>Resolution.YEAR: yyyy</li>
+ * <li>Resolution.MONTH: yyyyMM</li>
+ * <li>Resolution.DAY: yyyyMMdd</li>
+ * <li>Resolution.HOUR: yyyyMMddHH</li>
+ * <li>Resolution.MINUTE: yyyyMMddHHmm</li>
+ * <li>Resolution.SECOND: yyyyMMddHHmmss</li>
+ * <li>Resolution.MILLISECOND: yyyyMMddHHmmssSSS</li>
+ * </ul>
  *
  * @author Emmanuel Bernard
  */
@@ -68,15 +69,17 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 	}
 
 	public DateBridge(Resolution resolution) {
-		this.resolution = DateResolutionUtil.getLuceneResolution(resolution);
+		this.resolution = DateResolutionUtil.getLuceneResolution( resolution );
 	}
 
 	public Object stringToObject(String stringValue) {
-		if ( StringHelper.isEmpty( stringValue ) ) return null;
+		if ( StringHelper.isEmpty( stringValue ) ) {
+			return null;
+		}
 		try {
 			return DateTools.stringToDate( stringValue );
 		}
-		catch (ParseException e) {
+		catch ( ParseException e ) {
 			throw new SearchException( "Unable to parse into date: " + stringValue, e );
 		}
 	}
@@ -98,5 +101,4 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 		}
 		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
 	}
-	
 }
