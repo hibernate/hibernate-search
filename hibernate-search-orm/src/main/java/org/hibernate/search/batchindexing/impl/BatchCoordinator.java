@@ -67,12 +67,17 @@ public class BatchCoordinator implements Runnable {
 
 	public BatchCoordinator(Set<Class<?>> rootEntities,
 							SearchFactoryImplementor searchFactoryImplementor,
-							SessionFactory sessionFactory, int objectLoadingThreads,
-							int collectionLoadingThreads, CacheMode cacheMode,
-							int objectLoadingBatchSize, long objectsLimit,
+							SessionFactory sessionFactory,
+							int objectLoadingThreads,
+							int collectionLoadingThreads,
+							CacheMode cacheMode,
+							int objectLoadingBatchSize,
+							long objectsLimit,
 							boolean optimizeAtEnd,
-							boolean purgeAtStart, boolean optimizeAfterPurge,
-							MassIndexerProgressMonitor monitor, Integer writerThreads) {
+							boolean purgeAtStart,
+							boolean optimizeAfterPurge,
+							MassIndexerProgressMonitor monitor,
+							Integer writerThreads) {
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.sessionFactory = sessionFactory;
