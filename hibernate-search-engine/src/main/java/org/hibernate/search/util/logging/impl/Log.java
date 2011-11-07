@@ -175,7 +175,7 @@ public interface Log extends BasicLogger {
 	void indexingDocumentsCompleted(long doneCount, long elapsedMs);
 
 	@LogMessage(level = INFO)
-	@Message(id = 31, value = "Indexing speed: %1$f documents/second; progress: %2$f%%")
+	@Message(id = 31, value = "Indexing speed: %1$f documents/second; progress: %2$.2f%%")
 	void indexingSpeed(float estimateSpeed, float estimatePercentileComplete);
 
 	@LogMessage(level = WARN)
