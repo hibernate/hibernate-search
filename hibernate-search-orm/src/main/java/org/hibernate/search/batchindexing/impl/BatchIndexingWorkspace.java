@@ -78,12 +78,16 @@ public class BatchIndexingWorkspace implements Runnable {
 
 	private final long objectsLimit;
 
-	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor, SessionFactory sessionFactory,
+	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor,
+								  SessionFactory sessionFactory,
 								  Class<?> entityType,
-								  int objectLoadingThreads, int collectionLoadingThreads,
-								  CacheMode cacheMode, int objectLoadingBatchSize,
+								  int objectLoadingThreads,
+								  int collectionLoadingThreads,
+								  CacheMode cacheMode,
+								  int objectLoadingBatchSize,
 								  CountDownLatch endAllSignal,
-								  MassIndexerProgressMonitor monitor, BatchBackend backend,
+								  MassIndexerProgressMonitor monitor,
+								  BatchBackend backend,
 								  long objectsLimit) {
 
 		this.indexedType = entityType;
