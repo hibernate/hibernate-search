@@ -20,8 +20,8 @@
 package org.hibernate.search.backend.impl.lucene.works;
 
 import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.store.Workspace;
 
 /**
@@ -36,16 +36,12 @@ public class UpdateWorkDelegate extends AddWorkDelegate implements LuceneWorkDel
 		this.deleteDelegate = deleteDelegate;
 	}
 	
-	public void performWork(LuceneWork work, IndexWriter writer) {
+	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		//TODO optimize this operation:
 		// - make use of update API when possible
 		// - avoid possibility of an IW flush between remove and add
-		this.deleteDelegate.performWork(work, writer);
-		super.performWork(work, writer);
-	}
-	
-	public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
-		monitor.documentsAdded( 1 );
+		this.deleteDelegate.performWork(work, writer, monitor);
+		super.performWork(work, writer, monitor);
 	}
 
 }

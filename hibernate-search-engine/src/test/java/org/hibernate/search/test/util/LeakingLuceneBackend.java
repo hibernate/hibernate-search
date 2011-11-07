@@ -26,6 +26,7 @@ package org.hibernate.search.test.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 
@@ -55,8 +56,8 @@ public class LeakingLuceneBackend extends LuceneBackendQueueProcessor {
 	}
 	
 	@Override
-	public void applyWork(List<LuceneWork> workList) {
-		super.applyWork( workList );
+	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
+		super.applyWork( workList, monitor );
 		lastProcessedQueue = workList;
 	}
 

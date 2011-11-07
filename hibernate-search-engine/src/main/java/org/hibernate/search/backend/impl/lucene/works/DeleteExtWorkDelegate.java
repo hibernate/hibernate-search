@@ -29,6 +29,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -59,7 +60,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 	}
 
 	@Override
-	public void performWork(LuceneWork work, IndexWriter writer) {
+	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		checkType( work );
 		Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by id using an IndexWriter.", managedType, id );

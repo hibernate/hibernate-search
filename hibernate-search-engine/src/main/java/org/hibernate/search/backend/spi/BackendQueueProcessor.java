@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -62,7 +63,7 @@ public interface BackendQueueProcessor {
 	 * A null parameter is not acceptable, implementations should throw an IllegalArgumentException.
 	 * @param workList list of Lucene work instance which need to be applied to the index
 	 */
-	void applyWork(List<LuceneWork> workList);
+	void applyWork(List<LuceneWork> workList, IndexingMonitor monitor);
 
 	/**
 	 * Applies a single operation on the index, and different operations can be applied in parallel,
@@ -70,7 +71,7 @@ public interface BackendQueueProcessor {
 	 *
 	 * @param singleOperation single Lucene work instance to be applied to the index
 	 */
-	void applyStreamWork(LuceneWork singleOperation);
+	void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor);
 
 	/**
 	 * @return a Lock instance which will block index modifications when acquired

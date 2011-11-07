@@ -33,6 +33,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.WorkVisitor;
@@ -70,7 +71,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		queue.add( new HarmlessWork( "firstWork" ) );
 		queue.add( new HarmlessWork( "secondWork" ) );
 		workcounter.set( 0 ); // reset work counter
-		indexManager.performOperations( queue );
+		indexManager.performOperations( queue, null );
 		Assert.assertEquals( 2, workcounter.get() );
 		
 		workcounter.set( 0 ); // reset work counter
@@ -80,7 +81,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		queue.add( thirdWork );
 		final HarmlessWork fourthWork = new HarmlessWork( "fourthWork" );
 		queue.add( fourthWork );
-		indexManager.performOperations( queue );
+		indexManager.performOperations( queue, null );
 		Assert.assertEquals( 4, workcounter.get() );
 
 		String errorMessage = mockErrorHandler.getErrorMessage();
@@ -144,7 +145,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
 		}
 
-		public void performWork(LuceneWork work, IndexWriter writer) {
+		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 			workcounter.incrementAndGet();
 		}
 		
@@ -184,7 +185,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
 		}
 
-		public void performWork(LuceneWork work, IndexWriter writer) {
+		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 			throw new SearchException( "failed work message" );
 		}
 		

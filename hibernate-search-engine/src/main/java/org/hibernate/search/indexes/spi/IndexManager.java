@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Similarity;
 
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
@@ -63,9 +64,10 @@ public interface IndexManager {
 	 * Used to apply update operations to the index.
 	 * Operations can be applied in sync or async, depending on the IndexManager implementation and configuration.
 	 *
+	 * @param monitor no be notified of indexing events
 	 * @param queue the list of write operations to apply.
 	 */
-	void performOperations(List<LuceneWork> queue);
+	void performOperations(List<LuceneWork> queue, IndexingMonitor monitor);
 
 	/**
 	 * Perform a single non-transactional operation, best to stream large amounts of operations.
@@ -74,10 +76,11 @@ public interface IndexManager {
 	 * all streaming operations first, and be applied before subsequent streaming operations.
 	 *
 	 * @param singleOperation the operation to perform
+	 * @param monitor no be notified of indexing events
 	 * @param forceAsync if true, the invocation will not block to wait for it being applied.
 	 * When false this will depend on the backend configuration.
 	 */
-	void performStreamOperation(LuceneWork singleOperation, boolean forceAsync);
+	void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync);
 
 	/**
 	 * Initialize the IndexManager before its use.

@@ -104,7 +104,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 				return;
 			}
 			queue = indexManager.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
-			indexManager.performOperations( queue );
+			indexManager.performOperations( queue, null );
 		}
 		catch (JMSException e) {
 			log.unableToRetrieveObjectFromMessage( message.getClass(), e );
