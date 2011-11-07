@@ -102,7 +102,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 	private void perform(String indexName, List<LuceneWork> queue) {
 		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
 		IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
-		indexManager.performOperations( queue );
+		indexManager.performOperations( queue, null );
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------

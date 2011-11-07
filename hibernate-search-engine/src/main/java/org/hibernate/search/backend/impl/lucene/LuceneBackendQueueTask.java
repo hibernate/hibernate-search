@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
@@ -51,10 +52,12 @@ class LuceneBackendQueueTask implements Runnable {
 	private final Lock modificationLock;
 	private final LuceneBackendResources resources;
 	private final List<LuceneWork> queue;
+	private final IndexingMonitor monitor;
 
-	LuceneBackendQueueTask(List<LuceneWork> queue, LuceneBackendResources resources) {
+	LuceneBackendQueueTask(List<LuceneWork> queue, LuceneBackendResources resources, IndexingMonitor monitor) {
 		this.queue = queue;
 		this.resources = resources;
+		this.monitor = monitor;
 		this.modificationLock = resources.getParallelModificationLock();
 	}
 
@@ -104,7 +107,7 @@ class LuceneBackendQueueTask implements Runnable {
 			int queueSize = queue.size();
 			Future[] submittedTasks = new Future[ queueSize ];
 			for ( int i = 0; i < queueSize; i++ ) {
-				SingleTaskRunnable task = new SingleTaskRunnable( queue.get( i ), resources, indexWriter );
+				SingleTaskRunnable task = new SingleTaskRunnable( queue.get( i ), resources, indexWriter, monitor );
 				submittedTasks[i] = executor.submit( task );
 			}
 			// now wait for all tasks being completed before releasing our lock

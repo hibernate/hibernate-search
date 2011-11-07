@@ -116,7 +116,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
 			for (IndexManager indexManager : indexManagers) {
-				indexManager.performStreamOperation( work, false );
+				indexManager.performStreamOperation( work, null, false );
 			}
 		}
 

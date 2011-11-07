@@ -93,7 +93,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE )
 				.performOperation( work, shardingStrategy, context );
 		}
-		context.commitOperations();
+		context.commitOperations( null );
 	}
 
 	public void cancelWorks(WorkQueue workQueue) {

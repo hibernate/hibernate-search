@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
 
@@ -54,10 +55,10 @@ public class WorkQueuePerIndexSplitter {
 	 * Send all operations stored so far to the backend to be performed, atomically and/or transactionally
 	 * if supported/enabled by each specific backend.
 	 */
-	public void commitOperations() {
+	public void commitOperations(IndexingMonitor monitor) {
 		// move executor here to // work - optionally?
 		for ( Entry<IndexManager,List<LuceneWork>> entry : queues.entrySet() ) {
-			entry.getKey().performOperations( entry.getValue() );
+			entry.getKey().performOperations( entry.getValue(), monitor );
 		}
 	}
 

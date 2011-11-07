@@ -30,8 +30,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -57,7 +57,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		this.workspace = workspace;
 	}
 
-	public void performWork(LuceneWork work, IndexWriter writer) {
+	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		DocumentBuilderIndexedEntity<?> documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
@@ -75,6 +75,9 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 					"Unable to add to Lucene index: "
 							+ entityType + "#" + work.getId(), e
 			);
+		}
+		if ( monitor != null ) {
+			monitor.documentsAdded( 1l );
 		}
 	}
 
@@ -108,7 +111,4 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		return analyzerClone;
 	}
 
-	public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
-		monitor.documentsAdded( 1 );
-	}
 }

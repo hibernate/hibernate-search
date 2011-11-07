@@ -36,6 +36,7 @@ import javax.naming.NamingException;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -124,7 +125,7 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
-	public void applyWork(List<LuceneWork> workList) {
+	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
@@ -134,8 +135,8 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
-	public void applyStreamWork(LuceneWork singleOperation) {
-		applyWork( Collections.singletonList( singleOperation ) );
+	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
+		applyWork( Collections.singletonList( singleOperation ), monitor );
 	}
 
 	@Override
