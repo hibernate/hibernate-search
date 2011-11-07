@@ -26,11 +26,11 @@ package org.hibernate.search.backend;
 public interface IndexingMonitor {
 
 	/**
-	 * The number of documents sent to the backend;
-	 * This is invoked several times during
-	 * the indexing process.
+	 * Notify the IndexingMonitor of the number of documents added to the index.
+	 * This can be invoked several times during the indexing process, and could
+	 * be invoked concurrently by different threads.
 	 *
-	 * @param increment number of documents sent to backend
+	 * @param increment number of documents add operations performed
 	 */
 	void documentsAdded(long increment);
 
