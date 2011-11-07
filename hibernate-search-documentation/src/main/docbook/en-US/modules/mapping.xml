@@ -1470,15 +1470,14 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
             <para>Dates are stored as yyyyMMddHHmmssSSS in GMT time
             (200611072203012 for Nov 7th of 2006 4:03PM and 12ms EST). You
             shouldn't really bother with the internal format. What is
-            important is that when using a DateRange Query, you should know
+            important is that when using a TermRangeQuery, you should know
             that the dates have to be expressed in GMT time.</para>
 
             <para>Usually, storing the date up to the millisecond is not
             necessary. <literal>@DateBridge</literal> defines the appropriate
-            resolution you are willing to store in the index ( <literal>
-            <literal>@DateBridge(resolution=Resolution.DAY)</literal>
-            </literal> ). The date pattern will then be truncated
-            accordingly.</para>
+            resolution you are willing to store in the index
+            (<literal>@DateBridge(resolution=Resolution.DAY)</literal>). The
+            date pattern will then be truncated accordingly.</para>
 
             <programlisting language="JAVA" role="JAVA">@Entity 
 @Indexed
@@ -1493,6 +1492,16 @@ public class Meeting {
               <literal>MILLISECOND</literal> cannot be a
               <literal>@DocumentId</literal></para>
             </warning>
+
+            <important>
+              <para>The default <classname>Date</classname> bridge uses
+              Lucene's <classname>DateTools</classname> to convert from and to
+              <classname>String</classname>. This means that all dates are
+              expressed in GMT time. If your requirements are to store dates
+              in a fixed time zone you have to implement a custom date bridge.
+              Make sure you understand the requirements of your applications
+              regarding to date indexing and searching. </para>
+            </important>
           </listitem>
         </varlistentry>
 
