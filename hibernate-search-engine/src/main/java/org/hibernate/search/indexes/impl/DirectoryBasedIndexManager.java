@@ -30,6 +30,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
@@ -115,14 +116,14 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void performStreamOperation(LuceneWork singleOperation, boolean forceAsync) {
+	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor,  boolean forceAsync) {
 		//TODO implement async
-		backend.applyStreamWork( singleOperation );
+		backend.applyStreamWork( singleOperation, monitor );
 	}
 
 	@Override
-	public void performOperations(List<LuceneWork> workList) {
-		backend.applyWork( workList );
+	public void performOperations(List<LuceneWork> workList, IndexingMonitor monitor) {
+		backend.applyWork( workList, monitor );
 	}
 
 	@Override
@@ -147,7 +148,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void optimize() {
-		performStreamOperation( new OptimizeLuceneWork(), false );
+		performStreamOperation( new OptimizeLuceneWork(), null, false );
 	}
 
 	//Not exposed on the IndexManager interface

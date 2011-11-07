@@ -41,6 +41,7 @@ import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -64,7 +65,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		this.workspace = workspace;
 	}
 
-	public void performWork(LuceneWork work, IndexWriter writer) {
+	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		final Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by query.", entityType, id );
@@ -98,7 +99,4 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		return idBridge instanceof NumericFieldBridge;
 	}
 
-	public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-	}
 }

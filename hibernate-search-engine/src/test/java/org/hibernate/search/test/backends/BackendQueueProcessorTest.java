@@ -44,7 +44,7 @@ public class BackendQueueProcessorTest {
 
 	private void checkBackendBehaviour(BackendQueueProcessor backend) {
 		try {
-			backend.applyWork( null );
+			backend.applyWork( null, null );
 		}
 		catch (IllegalArgumentException e) {
 			// this is ok, we just want to avoid other exceptions or NPEs

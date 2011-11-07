@@ -22,6 +22,7 @@ package org.hibernate.search.test.batchindexing;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 import java.util.HashSet;
@@ -37,6 +38,7 @@ import javax.persistence.Table;
  * @author Bayo Erinle
  */
 @Entity
+@Indexed
 @Table(name = "Z_LEG_CAR")
 public class LegacyCar {
 

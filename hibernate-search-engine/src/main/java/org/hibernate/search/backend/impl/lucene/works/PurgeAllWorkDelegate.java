@@ -30,8 +30,8 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -50,7 +50,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 	PurgeAllWorkDelegate() {
 	}
 
-	public void performWork(LuceneWork work, IndexWriter writer) {
+	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		log.tracef( "purgeAll Lucene index using IndexWriter for type: %s", entityType );
 		try {
@@ -62,8 +62,4 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 		}
 	}
 
-	public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		
-	}
 }

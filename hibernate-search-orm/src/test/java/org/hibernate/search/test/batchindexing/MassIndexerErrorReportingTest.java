@@ -1,6 +1,10 @@
 package org.hibernate.search.test.batchindexing;
 
 import junit.framework.Assert;
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -9,10 +13,6 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
-import org.jboss.byteman.contrib.bmunit.BMRule;
-import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 @RunWith(BMUnitRunner.class)
 public class MassIndexerErrorReportingTest extends SearchTestCase {
@@ -27,8 +27,8 @@ public class MassIndexerErrorReportingTest extends SearchTestCase {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
-		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
-		
+		MockErrorHandler mockErrorHandler = (MockErrorHandler) errorHandler;
+
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		fullTextSession.beginTransaction();
 		Nation france = new Nation( "France", "FR" );

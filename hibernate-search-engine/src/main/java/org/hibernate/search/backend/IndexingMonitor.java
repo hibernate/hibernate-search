@@ -18,34 +18,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.backend.impl.lucene;
-
-import org.apache.lucene.index.IndexWriter;
-import org.hibernate.search.backend.IndexingMonitor;
-import org.hibernate.search.backend.LuceneWork;
+package org.hibernate.search.backend;
 
 /**
- * Applies an update operation to the IndexWriter
- * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class SingleTaskRunnable implements Runnable {
-	
-	private final LuceneWork work;
-	private final LuceneBackendResources resources;
-	private final IndexWriter indexWriter;
-	private final IndexingMonitor monitor;
+public interface IndexingMonitor {
 
-	public SingleTaskRunnable(LuceneWork work, LuceneBackendResources resources, IndexWriter indexWriter, IndexingMonitor monitor) {
-		this.work = work;
-		this.resources = resources;
-		this.indexWriter = indexWriter;
-		this.monitor = monitor;
-	}
-
-	@Override
-	public void run() {
-		work.getWorkDelegate( resources.getVisitor() ).performWork( work, indexWriter, monitor );
-	}
+	/**
+	 * Notify the IndexingMonitor of the number of documents added to the index.
+	 * This can be invoked several times during the indexing process, and could
+	 * be invoked concurrently by different threads.
+	 *
+	 * @param increment number of documents add operations performed
+	 */
+	void documentsAdded(long increment);
 
 }

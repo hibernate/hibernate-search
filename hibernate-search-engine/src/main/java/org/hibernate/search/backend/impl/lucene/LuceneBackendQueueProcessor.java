@@ -37,6 +37,7 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 
 /**
@@ -71,11 +72,11 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
-	public void applyWork(List<LuceneWork> workList) {
+	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
-		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask( workList, resources );
+		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask( workList, resources, monitor );
 		if ( sync ) {
 			Future<?> future = resources.getQueueingExecutor().submit( luceneBackendQueueProcessor );
 			try {
@@ -95,9 +96,9 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
-	public void applyStreamWork(LuceneWork singleOperation) {
+	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		List<LuceneWork> singletonList = Collections.singletonList( singleOperation );
-		applyWork( singletonList );
+		applyWork( singletonList, monitor );
 	}
 
 	@Override

@@ -33,6 +33,7 @@ import org.jgroups.Receiver;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -83,16 +84,16 @@ public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProce
 	}
 
 	@Override
-	public void applyWork(List<LuceneWork> workList) {
+	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
-		luceneBackendQueueProcessor.applyWork( workList );
+		luceneBackendQueueProcessor.applyWork( workList, monitor );
 	}
 
 	@Override
-	public void applyStreamWork(LuceneWork singleOperation) {
-		luceneBackendQueueProcessor.applyStreamWork( singleOperation );
+	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
+		luceneBackendQueueProcessor.applyStreamWork( singleOperation, monitor );
 	}
 
 	@Override

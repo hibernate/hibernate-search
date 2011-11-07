@@ -29,6 +29,7 @@ import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -51,7 +52,7 @@ public class SlaveJGroupsBackendQueueProcessor extends JGroupsBackendQueueProces
 	}
 
 	@Override
-	public void applyWork(List<LuceneWork> workList) {
+	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
@@ -59,7 +60,7 @@ public class SlaveJGroupsBackendQueueProcessor extends JGroupsBackendQueueProces
 	}
 
 	@Override
-	public void applyStreamWork(LuceneWork singleOperation) {
+	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		//TODO optimize for single operation?
 		jgroupsProcessor.sendLuceneWorkList( Collections.singletonList( singleOperation ) );
 	}

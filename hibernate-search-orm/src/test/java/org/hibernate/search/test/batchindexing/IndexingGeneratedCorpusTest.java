@@ -29,6 +29,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import junit.framework.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -38,19 +41,19 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.textbuilder.SentenceInventor;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the fullTextSession.createIndexer() API
- * for basic functionality.
+ * Tests the fullTextSession.createIndexer() API for basic functionality.
  *
  * @author Sanne Grinovero
  */
 public class IndexingGeneratedCorpusTest {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final int BOOK_NUM = 140;
 	private final int ANCIENTBOOK_NUM = 120;
@@ -96,7 +99,7 @@ public class IndexingGeneratedCorpusTest {
 				TitleAble instance = entityType.newInstance();
 				instance.setTitle( sentenceInventor.nextSentence() );
 				//to test for HSEARCH-512 we make all entities share some proxy
-				Nation country = ( Nation ) fullTextSession.load( Nation.class, 1 );
+				Nation country = (Nation) fullTextSession.load( Nation.class, 1 );
 				instance.setFirstPublishedIn( country );
 				fullTextSession.persist( instance );
 				totalEntitiesInDB++;
@@ -123,7 +126,7 @@ public class IndexingGeneratedCorpusTest {
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
 			List<Book> allBooks = fullTextSession.createCriteria( Book.class ).list();
-			Nation italy = ( Nation ) fullTextSession.load( Nation.class, 1 );
+			Nation italy = (Nation) fullTextSession.load( Nation.class, 1 );
 			italy.getLibrariesHave().addAll( allBooks );
 			tx.commit();
 		}
@@ -231,7 +234,7 @@ public class IndexingGeneratedCorpusTest {
 		assertEquals( bySize, byResultSize );
 		return bySize;
 	}
-	
+
 	private long countByDatabaseCriteria(Class<? extends TitleAble> type) {
 		Session session = builder.openFullTextSession();
 		try {
@@ -245,11 +248,11 @@ public class IndexingGeneratedCorpusTest {
 			session.close();
 		}
 	}
-	
+
 	private static class SilentProgressMonitor implements MassIndexerProgressMonitor {
-		
+
 		final AtomicLong objectsCounter = new AtomicLong();
-		
+
 		volatile boolean finished = false;
 
 		public void documentsAdded(long increment) {
@@ -267,9 +270,7 @@ public class IndexingGeneratedCorpusTest {
 
 		public void indexingCompleted() {
 			finished = true;
-			System.out.println( "Finished indexing " + objectsCounter.get() + " entities" );
+			log.debug( "Finished indexing " + objectsCounter.get() + " entities" );
 		}
-		
 	}
-
 }

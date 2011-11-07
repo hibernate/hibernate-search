@@ -43,9 +43,11 @@ import org.hibernate.search.store.IndexShardingStrategy;
 public class DefaultBatchBackend implements BatchBackend {
 	
 	private final SearchFactoryIntegrator searchFactoryImplementor;
+	private final MassIndexerProgressMonitor progressMonitor;
 
 	public DefaultBatchBackend(SearchFactoryIntegrator searchFactoryImplementor, MassIndexerProgressMonitor progressMonitor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.progressMonitor = progressMonitor;
 	}
 
 	public void enqueueAsyncWork(LuceneWork work) throws InterruptedException {
@@ -61,12 +63,12 @@ public class DefaultBatchBackend implements BatchBackend {
 		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		if ( forceAsync ) {
-			work.getWorkDelegate( StreamingSelectionVisitor.INSTANCE ).performStreamOperation( work, shardingStrategy, forceAsync );
+			work.getWorkDelegate( StreamingSelectionVisitor.INSTANCE ).performStreamOperation( work, shardingStrategy, progressMonitor, forceAsync );
 		}
 		else {
 			WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
 			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE ).performOperation( work, shardingStrategy, workContext );
-			workContext.commitOperations(); //FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
+			workContext.commitOperations( progressMonitor ); //FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
 		}
 	}
 

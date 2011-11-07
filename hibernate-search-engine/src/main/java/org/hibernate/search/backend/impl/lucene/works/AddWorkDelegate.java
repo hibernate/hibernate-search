@@ -29,14 +29,13 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 
+import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
-
-import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -52,14 +51,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 class AddWorkDelegate implements LuceneWorkDelegate {
 
 	private static final Log log = LoggerFactory.make();
-
 	private final Workspace workspace;
 
 	AddWorkDelegate(Workspace workspace) {
 		this.workspace = workspace;
 	}
 
-	public void performWork(LuceneWork work, IndexWriter writer) {
+	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		DocumentBuilderIndexedEntity<?> documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
@@ -78,6 +76,9 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 							+ entityType + "#" + work.getId(), e
 			);
 		}
+		if ( monitor != null ) {
+			monitor.documentsAdded( 1l );
+		}
 	}
 
 	/**
@@ -87,8 +88,9 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 	 * @param fieldToAnalyzerMap A map of <code>Document</code> field names for analyzer names. This map gets creates
 	 * when the Lucene <code>Document</code> gets created and uses the state of the entity to index to determine analyzers
 	 * dynamically at index time.
+	 *
 	 * @return <code>scopedAnalyzer</code> in case <code>fieldToAnalyzerMap</code> is <code>null</code> or empty. Otherwise
-	 * a clone of <code>scopedAnalyzer</code> is created where the analyzers get overriden according to <code>fieldToAnalyzerMap</code>.
+	 *         a clone of <code>scopedAnalyzer</code> is created where the analyzers get overriden according to <code>fieldToAnalyzerMap</code>.
 	 */
 	private ScopedAnalyzer updateAnalyzerMappings(ScopedAnalyzer scopedAnalyzer, Map<String, String> fieldToAnalyzerMap) {
 		// for backwards compatibility
@@ -107,10 +109,6 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 			}
 		}
 		return analyzerClone;
-	}
-
-	public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
-		monitor.documentsAdded( 1 );
 	}
 
 }
