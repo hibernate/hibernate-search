@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.batchindexing;
 
+import org.hibernate.search.backend.IndexingMonitor;
+
 /**
  * As a MassIndexer can take some time to finish it's job,
  * a MassIndexerProgressMonitor can be defined in the configuration
@@ -38,16 +40,7 @@ package org.hibernate.search.batchindexing;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public interface MassIndexerProgressMonitor {
-
-	/**
-	 * The number of documents sent to the backend;
-	 * This is invoked several times during
-	 * the indexing process.
-	 *
-	 * @param increment number of documents sent to backend
-	 */
-	void documentsAdded(long increment);
+public interface MassIndexerProgressMonitor extends IndexingMonitor {
 
 	/**
 	 * The number of Documents built;
