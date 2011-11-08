@@ -86,7 +86,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public void optimize() {
+	public void optimizationPerformed() {
 		//Needs to ensure the optimizerStrategy is accessed in threadsafe way
 		synchronized ( optimizerStrategy ) {
 			optimizerStrategy.optimizationForced();

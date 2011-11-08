@@ -50,7 +50,7 @@ public interface Workspace {
 	 * @see SearchFactory#optimize()
 	 * @see SearchFactory#optimize(Class)
 	 */
-	void optimize();
+	void optimizationPerformed();
 
 	/**
 	 * Gets the IndexWriter, opening one if needed.

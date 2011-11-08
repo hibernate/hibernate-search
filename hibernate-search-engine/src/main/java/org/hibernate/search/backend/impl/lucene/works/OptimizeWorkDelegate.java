@@ -59,7 +59,7 @@ class OptimizeWorkDelegate implements LuceneWorkDelegate {
 		log.tracef( "optimize Lucene index: %s", entityType );
 		try {
 			writer.optimize();
-			workspace.optimize();
+			workspace.optimizationPerformed();
 		}
 		catch ( IOException e ) {
 			throw new SearchException( "Unable to optimize Lucene index: " + entityType, e );
