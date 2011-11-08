@@ -50,12 +50,12 @@ public class ProgressMonitorTest extends SearchTestCase {
 		fullTextSession.createIndexer( LegacyCar.class )
 				.progressMonitor( monitor )
 				.startAndWait();
-		int resultSize = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), LegacyCar.class )
+		fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), LegacyCar.class )
 				.getResultSize();
 		monitor.assertProgress();
 	}
 
-	private void initializeData(FullTextSession fullTextSession) {
+	private static void initializeData(FullTextSession fullTextSession) {
 		final Transaction transaction = fullTextSession.beginTransaction();
 		LegacyCar[] cars = new LegacyCar[10];
 		for ( int i = 0; i < cars.length; i++ ) {
