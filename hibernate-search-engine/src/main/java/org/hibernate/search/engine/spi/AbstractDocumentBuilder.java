@@ -1115,4 +1115,11 @@ public abstract class AbstractDocumentBuilder<T> {
 	public void forceStateInspectionOptimizationsDisabled() {
 		this.stateInspectionOptimizationsEnabled = false;
 	}
+
+	/**
+	 * Closes any resource
+	 */
+	public void close() {
+		analyzer.close();
+	}
 }
