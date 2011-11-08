@@ -26,7 +26,6 @@ package org.hibernate.search.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -40,7 +39,6 @@ import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
-import org.hibernate.search.store.DirectoryProvider;
 
 import java.util.Map;
 import java.util.Properties;
@@ -62,7 +60,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private int cacheBitResultsSize;
 	private Properties configurationProperties;
 	private PolymorphicIndexHierarchy indexHierarchy;
-	private Map<DirectoryProvider, LuceneIndexingParameters> directoryProviderIndexingParams;
 	private ServiceManager serviceManager;
 	private boolean transactionManagerExpected = true;
 	private IndexManagerHolder allIndexesManager;
@@ -81,7 +78,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		cacheBitResultsSize = oldFactoryState.getCacheBitResultsSize();
 		configurationProperties = oldFactoryState.getConfigurationProperties();
 		indexHierarchy = oldFactoryState.getIndexHierarchy();
-		directoryProviderIndexingParams = oldFactoryState.getDirectoryProviderIndexingParams();
 		serviceManager = oldFactoryState.getServiceManager();
 		transactionManagerExpected = oldFactoryState.isTransactionManagerExpected();
 		allIndexesManager = oldFactoryState.getAllIndexesManager();
@@ -142,10 +138,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return indexHierarchy;
 	}
 
-	public Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams() {
-		return directoryProviderIndexingParams;
-	}
-
 	public void setDocumentBuildersContainedEntities(Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities) {
 		this.documentBuildersContainedEntities = documentBuildersContainedEntities;
 	}
@@ -188,10 +180,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setIndexHierarchy(PolymorphicIndexHierarchy indexHierarchy) {
 		this.indexHierarchy = indexHierarchy;
-	}
-
-	public void setDirectoryProviderIndexingParams(Map<DirectoryProvider, LuceneIndexingParameters> directoryProviderIndexingParams) {
-		this.directoryProviderIndexingParams = directoryProviderIndexingParams;
 	}
 
 	public boolean isTransactionManagerExpected() {

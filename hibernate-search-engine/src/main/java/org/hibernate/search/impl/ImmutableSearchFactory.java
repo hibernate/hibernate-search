@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -72,7 +71,6 @@ import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -102,11 +100,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final boolean transactionManagerExpected;
 	private final IndexManagerHolder allIndexesManager;
 	private final ErrorHandler errorHandler;
-
-	/**
-	 * Each directory provider (index) can have its own performance settings.
-	 */
-	private final Map<DirectoryProvider, LuceneIndexingParameters> dirProviderIndexingParams;
 	private final String indexingStrategy;
 	private final ServiceManager serviceManager;
 	private final boolean enableDirtyChecks;
@@ -118,7 +111,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.analyzers = state.getAnalyzers();
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
-		this.dirProviderIndexingParams = state.getDirectoryProviderIndexingParams();
 		this.indexBindingForEntities = state.getIndexBindingForEntity();
 		this.documentBuildersContainedEntities = state.getDocumentBuildersContainedEntities();
 		this.filterCachingStrategy = state.getFilterCachingStrategy();
@@ -211,10 +203,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called" );
 	}
 
-	public LuceneIndexingParameters getIndexingParameters(DirectoryProvider<?> provider) {
-		return dirProviderIndexingParams.get( provider );
-	}
-
 	public void optimize() {
 		for ( IndexManager im : this.allIndexesManager.getIndexManagers() ) {
 			im.optimize();
@@ -296,10 +284,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
 		return indexHierarchy;
-	}
-
-	public Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams() {
-		return dirProviderIndexingParams;
 	}
 
 	public ServiceManager getServiceManager() {
