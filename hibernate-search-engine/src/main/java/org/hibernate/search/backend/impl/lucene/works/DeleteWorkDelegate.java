@@ -43,7 +43,6 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -59,7 +58,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 class DeleteWorkDelegate implements LuceneWorkDelegate {
 
 	private static final Log log = LoggerFactory.make();	
-	private final Workspace workspace;
+	protected final Workspace workspace;
 
 	DeleteWorkDelegate(Workspace workspace) {
 		this.workspace = workspace;
@@ -92,6 +91,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 			String message = "Unable to remove " + entityType + "#" + id + " from index.";
 			throw new SearchException( message, e );
 		}
+		workspace.incrementModificationCounter( 1 );
 	}
 
 	protected static boolean isIdNumeric(DocumentBuilderIndexedEntity<?> documentBuilder) {

@@ -28,20 +28,21 @@ import org.hibernate.search.store.Workspace;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class UpdateWorkDelegate extends AddWorkDelegate implements LuceneWorkDelegate {
-	
+
 	private final DeleteWorkDelegate deleteDelegate;
 
 	UpdateWorkDelegate(Workspace workspace, DeleteWorkDelegate deleteDelegate) {
 		super(workspace);
 		this.deleteDelegate = deleteDelegate;
 	}
-	
+
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		//TODO optimize this operation:
 		// - make use of update API when possible
 		// - avoid possibility of an IW flush between remove and add
 		this.deleteDelegate.performWork(work, writer, monitor);
 		super.performWork(work, writer, monitor);
+		workspace.incrementModificationCounter( 1 );
 	}
 
 }

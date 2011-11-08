@@ -27,6 +27,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
@@ -44,10 +45,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 * @author Sanne Grinovero
 */
 class PurgeAllWorkDelegate implements LuceneWorkDelegate {
-	
-	private static final Log log = LoggerFactory.make();
 
-	PurgeAllWorkDelegate() {
+	private static final Log log = LoggerFactory.make();
+	protected final Workspace workspace;
+
+	PurgeAllWorkDelegate(Workspace workspace) {
+		this.workspace = workspace;
 	}
 
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
@@ -60,6 +63,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 		catch (Exception e) {
 			throw new SearchException( "Unable to purge all from Lucene index: " + entityType, e );
 		}
+		workspace.incrementModificationCounter( 1 );
 	}
 
 }

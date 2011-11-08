@@ -71,6 +71,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 				Term idTerm = builder.getTerm( id );
 				writer.deleteDocuments( idTerm );
 			}
+			workspace.incrementModificationCounter( 1 );
 		}
 		catch ( Exception e ) {
 			String message = "Unable to remove " + managedType + "#" + id + " from index.";
