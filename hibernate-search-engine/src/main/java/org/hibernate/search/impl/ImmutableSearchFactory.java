@@ -51,6 +51,7 @@ import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -167,6 +168,16 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			this.allIndexesManager.stop();
 
 			serviceManager.stopServices();
+
+			for ( Analyzer an : this.analyzers.values() ) {
+				an.close();
+			}
+			for ( AbstractDocumentBuilder<?> documentBuilder : this.documentBuildersContainedEntities.values() ) {
+				documentBuilder.close();
+			}
+			for ( EntityIndexBinder entityBinder : this.indexBindingForEntities.values() ) {
+				entityBinder.getDocumentBuilder().close();
+			}
 		}
 	}
 
