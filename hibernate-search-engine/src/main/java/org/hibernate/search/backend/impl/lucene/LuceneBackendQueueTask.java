@@ -129,6 +129,9 @@ class LuceneBackendQueueTask implements Runnable {
 				errorContextBuilder.addAllWorkThatFailed( failedUpdates );
 				resources.getErrorHandler().handle( errorContextBuilder.createErrorContext() );
 			}
+			else {
+				workspace.optimizerPhase();
+			}
 		}
 		finally {
 			resources.getWorkspace().afterTransactionApplied( someFailureHappened );
