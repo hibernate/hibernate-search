@@ -42,7 +42,6 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -92,7 +91,6 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
-import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -223,7 +221,6 @@ public class SearchFactoryBuilder {
 		}
 
 		factoryState.setIndexingStrategy( defineIndexingStrategy( cfg ) );//need to be done before the document builds
-		factoryState.setDirectoryProviderIndexingParams( new HashMap<DirectoryProvider, LuceneIndexingParameters>() );
 		initDocumentBuilders( cfg, reflectionManager, buildContext );
 
 		final Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
