@@ -135,7 +135,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.4.0</luceneVersion>
         <infinispanVersion>5.0.1.FINAL</infinispanVersion>
         <hibernateVersion>4.0.0.CR4</hibernateVersion>
@@ -275,15 +274,9 @@
                 <version>3.12.1.GA</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4jVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4jVersion}</version>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.16</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
