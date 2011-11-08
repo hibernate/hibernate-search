@@ -53,11 +53,13 @@ class LuceneBackendQueueTask implements Runnable {
 	private final LuceneBackendResources resources;
 	private final List<LuceneWork> queue;
 	private final IndexingMonitor monitor;
+	private final boolean streaming;
 
-	LuceneBackendQueueTask(List<LuceneWork> queue, LuceneBackendResources resources, IndexingMonitor monitor) {
+	LuceneBackendQueueTask(List<LuceneWork> queue, LuceneBackendResources resources, IndexingMonitor monitor, boolean streaming) {
 		this.queue = queue;
 		this.resources = resources;
 		this.monitor = monitor;
+		this.streaming = streaming;
 		this.modificationLock = resources.getParallelModificationLock();
 	}
 
@@ -128,6 +130,11 @@ class LuceneBackendQueueTask implements Runnable {
 			if ( someFailureHappened ) {
 				errorContextBuilder.addAllWorkThatFailed( failedUpdates );
 				resources.getErrorHandler().handle( errorContextBuilder.createErrorContext() );
+			}
+			else {
+				if ( !streaming ) {
+					workspace.optimizerPhase();
+				}
 			}
 		}
 		finally {

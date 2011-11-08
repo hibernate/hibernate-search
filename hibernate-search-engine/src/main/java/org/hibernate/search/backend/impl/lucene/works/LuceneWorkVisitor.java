@@ -49,7 +49,7 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 		else {
 			this.deleteDelegate = new DeleteWorkDelegate( workspace );
 		}
-		this.purgeAllDelegate = new PurgeAllWorkDelegate();
+		this.purgeAllDelegate = new PurgeAllWorkDelegate( workspace );
 		this.addDelegate = new AddWorkDelegate( workspace );
 		this.optimizeDelegate = new OptimizeWorkDelegate( workspace );
 		this.updateDelegate = new UpdateWorkDelegate( workspace, deleteDelegate );
