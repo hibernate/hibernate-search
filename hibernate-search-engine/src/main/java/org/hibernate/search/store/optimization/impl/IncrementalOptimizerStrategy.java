@@ -49,11 +49,13 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 	private int transactionMax = -1;
 	private long operations = 0;
 	private long transactions = 0;
+	private long optimizationsPerformed = 0;
 	private IndexManager indexManager;
 
 	public void optimizationForced() {
 		operations = 0;
 		transactions = 0;
+		optimizationsPerformed++;
 	}
 
 	public boolean needOptimization() {
@@ -89,4 +91,9 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
 		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );
 	}
+
+	public long getOptimizationsPerformed() {
+		return optimizationsPerformed;
+	}
+
 }
