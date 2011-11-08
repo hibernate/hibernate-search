@@ -76,7 +76,20 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
-		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask( workList, resources, monitor );
+		applyWorkPrivate( workList, monitor, false );
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
+		if ( singleOperation == null ) {
+			throw new IllegalArgumentException( "singleOperation should not be null" );
+		}
+		List<LuceneWork> singletonList = Collections.singletonList( singleOperation );
+		applyWorkPrivate( singletonList, monitor, true );
+	}
+
+	private void applyWorkPrivate(List<LuceneWork> workList, IndexingMonitor monitor, boolean streaming) {
+		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask( workList, resources, monitor, streaming );
 		if ( sync ) {
 			Future<?> future = resources.getQueueingExecutor().submit( luceneBackendQueueProcessor );
 			try {
@@ -93,12 +106,6 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		else {
 			resources.getQueueingExecutor().execute( luceneBackendQueueProcessor );
 		}
-	}
-
-	@Override
-	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
-		List<LuceneWork> singletonList = Collections.singletonList( singleOperation );
-		applyWork( singletonList, monitor );
 	}
 
 	@Override
