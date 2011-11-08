@@ -20,13 +20,14 @@
  */
 package org.hibernate.search.test.backends;
 
+import org.junit.Test;
+
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.junit.Test;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -46,9 +47,8 @@ public class BackendQueueProcessorTest {
 		try {
 			backend.applyWork( null, null );
 		}
-		catch (IllegalArgumentException e) {
+		catch ( IllegalArgumentException e ) {
 			// this is ok, we just want to avoid other exceptions or NPEs
 		}
 	}
-
 }
