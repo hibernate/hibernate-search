@@ -44,7 +44,7 @@ import org.junit.Test;
 public class OptimizationTriggerTest extends SearchTestCase {
 
 	@Test
-	public void testOptimizationIsTriggered() {
+	public void testOptimizationIsTriggered() throws InterruptedException {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
 		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( Clock.class );
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
@@ -56,6 +56,7 @@ public class OptimizationTriggerTest extends SearchTestCase {
 		assertEquals( 0, strategy.getOptimizationsPerformed() );
 
 		Session session = openSession();
+		//check that optimization is triggered periodically as configured
 		long optimizationsPerformed = 0l;
 		for ( int i = 0; i < 20; i++ ) {
 			Clock c = new Clock( i, "hwd" + i );
@@ -73,11 +74,20 @@ public class OptimizationTriggerTest extends SearchTestCase {
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Clock.class );
 		int resultSize = fullTextQuery.getResultSize();
 		assertEquals( 20, resultSize );
-		session.createQuery( "delete " + Clock.class.getName() );
 
+		//an explicit invocation of #optimize() should trigger it as well
 		assertEquals( optimizationsPerformed, strategy.getOptimizationsPerformed() );
 		fullTextSession.getSearchFactory().optimize( Clock.class );
 		assertEquals( optimizationsPerformed + 1, strategy.getOptimizationsPerformed() );
+
+		//the massIndexer should optimize only before and after (not during the process)
+		fullTextSession.createIndexer( Clock.class )
+			.optimizeAfterPurge( true )
+			.optimizeOnFinish( true )
+			.startAndWait();
+
+		assertEquals( optimizationsPerformed + 3, strategy.getOptimizationsPerformed() );
+
 		session.close();
 	}
 
