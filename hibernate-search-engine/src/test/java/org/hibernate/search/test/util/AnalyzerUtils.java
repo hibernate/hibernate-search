@@ -32,7 +32,7 @@ import junit.framework.Assert;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -48,10 +48,12 @@ public class AnalyzerUtils {
 
 	public static Token[] tokensFromAnalysis(Analyzer analyzer, String field, String text) throws IOException {
 		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
-		TermAttribute term = stream.addAttribute( TermAttribute.class );
+		CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
 		List<Token> tokenList = new ArrayList<Token>();
 		while ( stream.incrementToken() ) {
-			tokenList.add( new Token( term.term(), 0, 0 ) );
+			Token token = new Token();
+			token.copyBuffer( term.buffer(), 0, term.length() );
+			tokenList.add( token );
 		}
 
 		return tokenList.toArray( new Token[tokenList.size()] );
@@ -120,6 +122,6 @@ public class AnalyzerUtils {
 	}
 
 	public static String getTermText(Token token) {
-		return new String( token.termBuffer(), 0, token.termLength() );
+		return token.term();
 	}
 }

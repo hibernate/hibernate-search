@@ -31,7 +31,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -53,7 +52,6 @@ import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
-import org.hibernate.search.store.DirectoryProvider;
 
 /**
  * Factory delegating to a concrete implementation of another factory,
@@ -149,10 +147,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
 		return delegate.getIndexHierarchy();
-	}
-
-	public Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams() {
-		return delegate.getDirectoryProviderIndexingParams();
 	}
 
 	public ServiceManager getServiceManager() {

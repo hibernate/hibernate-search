@@ -25,7 +25,6 @@
 package org.hibernate.search.spi.internals;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -36,7 +35,6 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.ClassNavigator;
-import org.hibernate.search.store.DirectoryProvider;
 
 import java.util.Map;
 import java.util.Properties;
@@ -66,8 +64,6 @@ public interface SearchFactoryState {
 	Properties getConfigurationProperties();
 
 	PolymorphicIndexHierarchy getIndexHierarchy();
-
-	Map<DirectoryProvider, LuceneIndexingParameters> getDirectoryProviderIndexingParams();
 
 	ServiceManager getServiceManager();
 	
