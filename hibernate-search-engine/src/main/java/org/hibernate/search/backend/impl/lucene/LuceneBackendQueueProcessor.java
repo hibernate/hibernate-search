@@ -24,21 +24,21 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.util.Collections;
-import java.util.Properties;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.backend.BackendFactory;
-import org.hibernate.search.backend.IndexingMonitor;
-import org.hibernate.search.backend.LuceneWork;
 
 /**
  * This will actually contain the Workspace and LuceneWork visitor implementation,
@@ -46,7 +46,7 @@ import org.hibernate.search.backend.LuceneWork;
  * Both Workspace(s) and LuceneWorkVisitor(s) lifecycle are linked to the backend
  * lifecycle (reused and shared by all transactions).
  * The LuceneWorkVisitor(s) are stateless, the Workspace(s) are threadsafe.
- * 
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
@@ -61,8 +61,10 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
 		if ( workspaceOverride == null ) {
-			workspaceOverride = WorkspaceFactory.createWorkspace( indexManager,
-					context.getErrorHandler(), props );
+			workspaceOverride = WorkspaceFactory.createWorkspace(
+					indexManager,
+					context.getErrorHandler(), props
+			);
 		}
 		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );
 	}
@@ -76,7 +78,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
-		applyWorkPrivate( workList, monitor, false );
+		doWork( workList, monitor, false );
 	}
 
 	@Override
@@ -85,11 +87,16 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 			throw new IllegalArgumentException( "singleOperation should not be null" );
 		}
 		List<LuceneWork> singletonList = Collections.singletonList( singleOperation );
-		applyWorkPrivate( singletonList, monitor, true );
+		doWork( singletonList, monitor, true );
 	}
 
-	private void applyWorkPrivate(List<LuceneWork> workList, IndexingMonitor monitor, boolean streaming) {
-		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask( workList, resources, monitor, streaming );
+	private void doWork(List<LuceneWork> workList, IndexingMonitor monitor, boolean streaming) {
+		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask(
+				workList,
+				resources,
+				monitor,
+				streaming
+		);
 		if ( sync ) {
 			Future<?> future = resources.getQueueingExecutor().submit( luceneBackendQueueProcessor );
 			try {
@@ -120,7 +127,8 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	/**
 	 * If invoked before {@link #initialize(Properties, WorkerBuildContext, DirectoryBasedIndexManager)}
 	 * it can set a customized Workspace instance to be used by this backend.
-	 * @param workspace
+	 *
+	 * @param workspace the new workspace
 	 */
 	public void setCustomWorkspace(AbstractWorkspaceImpl workspace) {
 		this.workspaceOverride = workspace;
