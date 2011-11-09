@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.store.optimization.impl;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
@@ -31,7 +30,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -41,7 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class IncrementalOptimizerStrategy implements OptimizerStrategy {
+public class IncrementalOptimizerStrategy extends NoOpOptimizerStrategy implements OptimizerStrategy {
 	
 	private static final Log log = LoggerFactory.make();	
 
@@ -50,20 +48,16 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 	private long operations = 0;
 	private long transactions = 0;
 	private long optimizationsPerformed = 0;
-	private String indexName;
 
 	@Override
-	public void performOptimization(IndexWriter writer) {
-		operations = 0;
-		transactions = 0;
-		optimizationsPerformed++;
-		try {
-			writer.optimize();
+	public boolean performOptimization(IndexWriter writer) {
+		boolean done = super.performOptimization( writer );
+		if ( done ) {
+			operations = 0;
+			transactions = 0;
+			optimizationsPerformed++;
 		}
-		catch (IOException e) {
-			throw new SearchException( "Unable to optimize directoryProvider: "
-					+ indexName, e );
-		}
+		return done;
 	}
 
 	private boolean needOptimization() {
@@ -89,7 +83,7 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 
 	@Override
 	public void initialize(IndexManager indexManager, Properties indexProperties) {
-		indexName = indexManager.getIndexName();
+		super.initialize( indexManager, indexProperties );
 		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
 		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );
 	}
