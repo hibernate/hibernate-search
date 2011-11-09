@@ -274,6 +274,11 @@
                 <artifactId>javassist</artifactId>
                 <version>3.12.1.GA</version>
             </dependency>
+            <!--
+            We need to keep the slf4j dependencies listed here even though we are not using slf4j anymore.
+            Listing them within dependencyManagement will ensure that ${slf4jVersion} is used as slf4j version
+            for transitive dependencies
+            -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -286,6 +291,10 @@
                 <version>${slf4jVersion}</version>
                 <scope>test</scope>
             </dependency>
+            <!--
+            Defining log4j here, but due to a bug in Shrinkwrap we still need to define the version explicitly
+            in the sub modules. See HSEARCH-970
+            -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
