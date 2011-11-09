@@ -21,8 +21,9 @@
 package org.hibernate.search.test.backend;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.junit.Test;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -36,7 +37,6 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
 import org.hibernate.search.test.Clock;
 import org.hibernate.search.test.SearchTestCase;
-import org.junit.Test;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -45,15 +45,14 @@ public class OptimizationTriggerTest extends SearchTestCase {
 
 	@Test
 	public void testOptimizationIsTriggered() throws InterruptedException {
-		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( Clock.class );
-		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
-		assertEquals( 1, indexManagers.length );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
+		DirectoryBasedIndexManager indexManager = getSingleIndexManager( Clock.class );
+
 		OptimizerStrategy optimizerStrategy = indexManager.getOptimizerStrategy();
-		Assert.assertTrue( optimizerStrategy instanceof IncrementalOptimizerStrategy );
+		Assert.assertTrue( "Unexpected optimizer strategy", optimizerStrategy instanceof IncrementalOptimizerStrategy );
+
+		// let's start the actual test
 		IncrementalOptimizerStrategy strategy = (IncrementalOptimizerStrategy) optimizerStrategy;
-		assertEquals( 0, strategy.getOptimizationsPerformed() );
+		assertEquals( "Initially no optimisation should have been performed", 0, strategy.getOptimizationsPerformed() );
 
 		Session session = openSession();
 		//check that optimization is triggered periodically as configured
@@ -65,7 +64,11 @@ public class OptimizationTriggerTest extends SearchTestCase {
 			transaction.commit();
 			session.clear();
 			optimizationsPerformed = strategy.getOptimizationsPerformed();
-			assertEquals( (i+1)/3, optimizationsPerformed );
+			assertEquals(
+					"Optimization should be triggered every three inserts",
+					( i + 1 ) / 3,
+					optimizationsPerformed
+			);
 		}
 		session.close();
 
@@ -73,22 +76,42 @@ public class OptimizationTriggerTest extends SearchTestCase {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Clock.class );
 		int resultSize = fullTextQuery.getResultSize();
-		assertEquals( 20, resultSize );
+		assertEquals( "Wrong number of indexed entities", 20, resultSize );
 
 		//an explicit invocation of #optimize() should trigger it as well
-		assertEquals( optimizationsPerformed, strategy.getOptimizationsPerformed() );
+		assertEquals(
+				"Optimization should not have changed",
+				optimizationsPerformed,
+				strategy.getOptimizationsPerformed()
+		);
 		fullTextSession.getSearchFactory().optimize( Clock.class );
-		assertEquals( optimizationsPerformed + 1, strategy.getOptimizationsPerformed() );
+		assertEquals(
+				"Optimize should have been incremented",
+				optimizationsPerformed + 1,
+				strategy.getOptimizationsPerformed()
+		);
 
 		//the massIndexer should optimize only before and after (not during the process)
 		fullTextSession.createIndexer( Clock.class )
-			.optimizeAfterPurge( true )
-			.optimizeOnFinish( true )
-			.startAndWait();
+				.optimizeAfterPurge( true )
+				.optimizeOnFinish( true )
+				.startAndWait();
 
-		assertEquals( optimizationsPerformed + 3, strategy.getOptimizationsPerformed() );
+		assertEquals(
+				"The mass indexer should trigger optimize as well ",
+				optimizationsPerformed + 3,
+				strategy.getOptimizationsPerformed()
+		);
 
 		session.close();
+	}
+
+	private DirectoryBasedIndexManager getSingleIndexManager(Class<?> clazz) {
+		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
+		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( clazz );
+		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
+		assertEquals( 1, indexManagers.length );
+		return (DirectoryBasedIndexManager) indexManagers[0];
 	}
 
 	@Override
