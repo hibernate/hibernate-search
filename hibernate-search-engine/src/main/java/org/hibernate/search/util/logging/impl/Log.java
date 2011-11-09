@@ -511,4 +511,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 118, value = "Exception during index Merge operation")
 	String exceptionDuringIndexMergeOperation();
 
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 119, value = "Skipping optimization on index %1$s as it is already being optimized")
+	void optimizationSkippedStillBusy(String indexName);
+
 }

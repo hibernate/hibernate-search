@@ -25,6 +25,7 @@ package org.hibernate.search.store.optimization.impl;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.SearchException;
@@ -32,6 +33,8 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This OptimizerStrategy will only optimize the index when forced to,
@@ -43,15 +46,27 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  */
 public class NoOpOptimizerStrategy implements OptimizerStrategy {
 
+	private static final Log log = LoggerFactory.make();
+
 	private String indexName;
+	private final AtomicBoolean optimizerBusy = new AtomicBoolean();
 
 	@Override
 	public void performOptimization(IndexWriter writer) {
-		try {
-			writer.optimize();
+		boolean acquired = optimizerBusy.compareAndSet( false, true );
+		if ( acquired ) {
+			try {
+				writer.optimize();
+			}
+			catch (IOException e) {
+				throw new SearchException( "Unable to optimize directoryProvider: " + indexName, e );
+			}
+			finally {
+				optimizerBusy.set( false );
+			}
 		}
-		catch (IOException e) {
-			throw new SearchException( "Unable to optimize directoryProvider: " + indexName, e );
+		else {
+			log.optimizationSkippedStillBusy( indexName );
 		}
 	}
 
