@@ -31,6 +31,9 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 
 /**
+ * Controls how and when the indexes are optimized.
+ * Implementations need to be threadsafe.
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */

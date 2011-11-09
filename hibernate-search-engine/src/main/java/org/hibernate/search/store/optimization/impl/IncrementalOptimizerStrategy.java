@@ -45,17 +45,20 @@ public class IncrementalOptimizerStrategy extends NoOpOptimizerStrategy implemen
 
 	private int operationMax = -1;
 	private int transactionMax = -1;
-	private long operations = 0;
-	private long transactions = 0;
-	private long optimizationsPerformed = 0;
+	private volatile long operations = 0;
+	private volatile long transactions = 0;
+	private volatile long optimizationsPerformed = 0;
+	private final Object lockOnCounters = new Object();
 
 	@Override
 	public boolean performOptimization(IndexWriter writer) {
 		boolean done = super.performOptimization( writer );
 		if ( done ) {
-			operations = 0;
-			transactions = 0;
-			optimizationsPerformed++;
+			synchronized ( lockOnCounters ) {
+				operations = 0;
+				transactions = 0;
+				optimizationsPerformed++;
+			}
 		}
 		return done;
 	}
@@ -67,8 +70,10 @@ public class IncrementalOptimizerStrategy extends NoOpOptimizerStrategy implemen
 
 	@Override
 	public void addTransaction(long operations) {
-		this.operations += operations;
-		this.transactions++;
+		synchronized ( lockOnCounters ) {
+			this.operations += operations;
+			this.transactions++;
+		}
 	}
 
 	@Override
