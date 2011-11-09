@@ -77,7 +77,7 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 		transaction.commit();
 		session.close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
-		Assert.assertEquals( "IOException on the IndexWriter", errorMessage );
+		Assert.assertEquals( "HSEARCH000117: IOException on the IndexWriter", errorMessage );
 		Throwable exception = mockErrorHandler.getLastException();
 		Assert.assertTrue( exception instanceof IOException );
 		Assert.assertEquals( "Byteman said: your disk is full!", exception.getMessage() );

@@ -43,7 +43,7 @@ public class MassIndexerErrorReportingTest extends SearchTestCase {
 
 		session.close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
-		Assert.assertEquals( "Unexpected error during MassIndexer operation", errorMessage );
+		Assert.assertEquals( "HSEARCH000116: Unexpected error during MassIndexer operation", errorMessage );
 		Throwable exception = mockErrorHandler.getLastException();
 		Assert.assertTrue( exception instanceof org.jboss.byteman.rule.exception.ExecuteException );
 	}
