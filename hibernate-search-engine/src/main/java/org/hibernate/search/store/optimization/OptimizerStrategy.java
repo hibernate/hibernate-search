@@ -26,6 +26,7 @@ package org.hibernate.search.store.optimization;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 
@@ -35,10 +36,26 @@ import org.hibernate.search.store.Workspace;
  */
 public interface OptimizerStrategy {
 
-	void performOptimization(IndexWriter writer);
+	/**
+	 * Invokes optimize on the IndexWriter;
+	 * @param writer
+	 * @return true if it was done, false if it wasn't possible
+	 * @throws SearchException in case of IO errors on the index
+	 */
+	boolean performOptimization(IndexWriter writer);
 
-	void addTransaction(long operations);
+	/**
+	 * To count the amount of operations which where applied to the index.
+	 * Invoked once per transaction.
+	 * @param increment
+	 */
+	void addTransaction(long increment);
 
+	/**
+	 * Means it's an appropriate time to invoke the optimization,
+	 * if the OptimizerStrategy implementation deems it appropriate.
+	 * @param workspace
+	 */
 	void optimize(Workspace workspace);
 
 	void initialize(IndexManager callback, Properties indexProps);
