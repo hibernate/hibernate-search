@@ -131,6 +131,7 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <scope>test</scope>
+            <version>1.2.16</version>
         </dependency>
     </dependencies>
 
