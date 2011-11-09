@@ -22,9 +22,11 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <artifactId>hibernate-search-parent</artifactId>
         <groupId>org.hibernate</groupId>
@@ -36,7 +38,7 @@
 
     <name>Hibernate Search Infinispan Backend</name>
     <description>Hibernate Search Infinispan Backend</description>
-    
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -54,14 +56,14 @@
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
-       </dependency>
-       <dependency>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-orm</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-orm</artifactId>
             <version>${project.version}</version>
@@ -72,8 +74,8 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-testing</artifactId>
             <scope>test</scope>
-       </dependency>
-       <dependency>
+        </dependency>
+        <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
             <scope>test</scope>
