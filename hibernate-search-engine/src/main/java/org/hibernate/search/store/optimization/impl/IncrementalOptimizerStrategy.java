@@ -50,44 +50,46 @@ public class IncrementalOptimizerStrategy implements OptimizerStrategy {
 	private long operations = 0;
 	private long transactions = 0;
 	private long optimizationsPerformed = 0;
-	private IndexManager indexManager;
+	private String indexName;
 
-	public void optimizationForced() {
+	@Override
+	public void performOptimization(IndexWriter writer) {
 		operations = 0;
 		transactions = 0;
 		optimizationsPerformed++;
+		try {
+			writer.optimize();
+		}
+		catch (IOException e) {
+			throw new SearchException( "Unable to optimize directoryProvider: "
+					+ indexName, e );
+		}
 	}
 
-	public boolean needOptimization() {
+	private boolean needOptimization() {
 		return (operationMax != -1 && operations >= operationMax)
 				|| (transactionMax != -1 && transactions >= transactionMax);
 	}
 
+	@Override
 	public void addTransaction(long operations) {
 		this.operations += operations;
 		this.transactions++;
 	}
 
+	@Override
 	public void optimize(Workspace workspace) {
 		if ( needOptimization() ) {
-			if ( log.isDebugEnabled() )
-				log.debugv( "Optimize {0} after {1} operations and {2} transactions",
-						indexManager.getIndexName(), operations, transactions );
+			log.debugv( "Optimize {0} after {1} operations and {2} transactions",
+						indexName, operations, transactions );
 			IndexWriter writer = workspace.getIndexWriter();
-			try {
-				writer.optimize();
-			}
-			catch (IOException e) {
-				throw new SearchException( "Unable to optimize directoryProvider: "
-						+ indexManager.getIndexName(), e );
-			}
-			optimizationForced();
+			performOptimization( writer );
 		}
 	}
 
 	@Override
 	public void initialize(IndexManager indexManager, Properties indexProperties) {
-		this.indexManager = indexManager;
+		indexName = indexManager.getIndexName();
 		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
 		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );
 	}

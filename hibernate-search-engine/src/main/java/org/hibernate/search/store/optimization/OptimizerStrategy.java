@@ -25,38 +25,22 @@ package org.hibernate.search.store.optimization;
 
 import java.util.Properties;
 
+import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public interface OptimizerStrategy {
 
-	/**
-	 * has to be called in a thread safe way
-	 */
-	void optimizationForced();
+	void performOptimization(IndexWriter writer);
 
-	/**
-	 * has to be called in a thread safe way
-	 */
-	boolean needOptimization();
+	void addTransaction(long operations);
 
-	/**
-	 * has to be called in a thread safe way
-	 */
-	public void addTransaction(long operations);
-
-	/**
-	 * has to be called in a thread safe way
-	 */
 	void optimize(Workspace workspace);
 
-	/**
-	 * @param callback
-	 * @param indexProps
-	 */
-	public void initialize(IndexManager callback, Properties indexProps);
+	void initialize(IndexManager callback, Properties indexProps);
 
 }

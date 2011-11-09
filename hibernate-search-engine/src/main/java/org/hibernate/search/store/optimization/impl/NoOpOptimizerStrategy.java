@@ -23,30 +23,48 @@
  */
 package org.hibernate.search.store.optimization.impl;
 
+import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 
 /**
+ * This OptimizerStrategy will only optimize the index when forced to,
+ * using an explicit invocation to {@link SearchFactory#optimize()} or
+ * {@link SearchFactory#optimize(Class)}
+ * 
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class NoOpOptimizerStrategy implements OptimizerStrategy {
 
-	public void optimizationForced() {
+	private String indexName;
+
+	@Override
+	public void performOptimization(IndexWriter writer) {
+		try {
+			writer.optimize();
+		}
+		catch (IOException e) {
+			throw new SearchException( "Unable to optimize directoryProvider: " + indexName, e );
+		}
 	}
 
-	public boolean needOptimization() {
-		return false;
-	}
-
+	@Override
 	public void addTransaction(long operations) {
 	}
 
+	@Override
 	public void optimize(Workspace workspace) {
 	}
 
+	@Override
 	public void initialize(IndexManager callback, Properties indexProps) {
+		this.indexName = callback.getIndexName();
 	}
 }
