@@ -56,7 +56,10 @@ public interface IndexShardingStrategy {
 
 	/**
 	 * return the IndexManager(s) where the given entity is stored and where the deletion operation needs to be applied
-	 * id and idInString can be null. If null, all the IndexManagers containing entity types should be returned
+	 * id and idInString could be null. If null, all the IndexManagers containing entity types should be returned
+	 * @param entity the type of the deleted entity
+	 * @param id the id in object form
+	 * @param idInString the id as transformed by the used TwoWayStringBridge
 	 */
 	IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString);
 

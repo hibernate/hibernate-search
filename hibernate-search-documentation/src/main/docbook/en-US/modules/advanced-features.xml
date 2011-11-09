@@ -259,6 +259,15 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
         default indexName)</para>
       </listitem>
     </itemizedlist>
+
+   <para>When implementing a <classname>IndexShardingStrategy</classname> any field
+    can be used to determine the sharding selection. Consider that to handle deletions,
+    <literal>purge</literal> and <literal>purgeAll</literal> operations, the implementation
+    might need to return one or more indexes without being able to read all the field
+    values or the primary identifier; in case the information is not enough to pick a single
+    index, all indexes should be returned, so that the delete operation will be propagated
+    to all indexes potentially containing the documents to be deleted.</para>
+
   </section>
 
   <section id="section-sharing-indexes">
