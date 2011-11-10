@@ -24,13 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
+import org.hibernate.engine.EntityKey;
+import org.hibernate.engine.PersistenceContext;
+import org.hibernate.engine.SessionImplementor;
+import org.hibernate.persister.entity.EntityPersister;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.util.HibernateHelper;
 import org.hibernate.search.util.LoggerFactory;
 
 /**
@@ -56,15 +59,17 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 			return;
 		}
 
+		SessionImplementor sessionImplementor = (SessionImplementor) session;
+		String entityName = session.getSessionFactory().getClassMetadata( entityType ).getEntityName();
+		EntityPersister persister = sessionImplementor.getFactory().getEntityPersister( entityName );
+		PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
+
 		//check the persistence context
 		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( entityInfos.length );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
-				final boolean isInitialized = HibernateHelper.isInitialized(
-						session.load(
-								entityInfo.getClazz(), entityInfo.getId()
-						)
-				);
+				EntityKey entityKey = new EntityKey( entityInfo.getId(), persister, session.getEntityMode() );
+				final boolean isInitialized = persistenceContext.containsEntity( entityKey );
 				if ( !isInitialized ) {
 					remainingEntityInfos.add( entityInfo );
 				}
