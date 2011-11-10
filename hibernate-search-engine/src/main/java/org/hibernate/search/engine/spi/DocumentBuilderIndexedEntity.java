@@ -170,6 +170,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param similarity the Similarity implementation set at the related index level
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
+	 * @param classHelper helper class for class object graph navigation
 	 */
 	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, Similarity similarity,
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassNavigator classHelper) {

@@ -45,25 +45,25 @@ public interface ClassNavigator {
 	public <T> Class<T> getClass(T entity);
 
 	/**
-	 * @param value
+	 * @param value the object to unproxy
 	 * @return if value is a proxy, unwraps it, otherwise works as a pass-through function.
 	 */
 	public Object unproxy(Object value);
 
 	/**
-	 * @param value
+	 * @param value the collection to initialize
 	 * @return the initialized Collection, to be used on lazily-loading collections
 	 */
 	public <T> Collection<T> initializeCollection(Collection<T> value);
 
 	/**
-	 * @param value
+	 * @param value the map to initialize
 	 * @return the initialized Map, to be used on lazily-loading maps
 	 */
 	public <K,V> Map<K,V> initializeMap(Map<K,V> value);
 
 	/**
-	 * @param value
+	 * @param value the array to initialize
 	 * @return the initialized array, to be used on lazily-loading arrays
 	 */
 	public Object[] initializeArray(Object[] value);
