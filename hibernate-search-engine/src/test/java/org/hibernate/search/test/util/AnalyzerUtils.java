@@ -46,6 +46,17 @@ public class AnalyzerUtils {
 
 	public static final Log log = LoggerFactory.make();
 
+	public static List<String> tokenizedTermValues(Analyzer analyzer, String field, String text) throws IOException {
+		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
+		CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
+		List<String> tokenList = new ArrayList<String>();
+		while ( stream.incrementToken() ) {
+			String s = new String( term.buffer(), 0, term.length() );
+			tokenList.add( s );
+		}
+		return tokenList;
+	}
+
 	public static Token[] tokensFromAnalysis(Analyzer analyzer, String field, String text) throws IOException {
 		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
 		CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
