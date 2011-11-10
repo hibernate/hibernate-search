@@ -23,8 +23,11 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.PersistenceContext;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Criteria;
@@ -56,15 +59,17 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 			return;
 		}
 
+		SessionImplementor sessionImplementor = (SessionImplementor) session;
+		String entityName = session.getSessionFactory().getClassMetadata( entityType ).getEntityName();
+		EntityPersister persister = sessionImplementor.getFactory().getEntityPersister( entityName );
+		PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
+
 		//check the persistence context
 		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( maxResults );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
-				final boolean isInitialized = HibernateHelper.isInitialized(
-						session.load(
-								entityInfo.getClazz(), entityInfo.getId()
-						)
-				);
+				EntityKey entityKey = new EntityKey( entityInfo.getId(), persister, session.getTenantIdentifier() );
+				final boolean isInitialized = persistenceContext.containsEntity( entityKey );
 				if ( !isInitialized ) {
 					remainingEntityInfos.add( entityInfo );
 				}
