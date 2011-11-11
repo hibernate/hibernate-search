@@ -77,7 +77,11 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 	@Override
 	public IndexReader open(String... indexNames) {
 		TreeSet<String> names = new TreeSet<String>();
-		Collections.addAll( names, indexNames );
+		for ( String name : indexNames ) {
+			if ( name != null ) {
+				names.add( name );
+			}
+		}
 		final int size = names.size();
 		if ( size == 0 ) {
 			throw log.needAtLeastOneIndexName();
@@ -94,4 +98,5 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 		}
 		return MultiReaderFactory.openReader( managers );
 	}
+
 }
