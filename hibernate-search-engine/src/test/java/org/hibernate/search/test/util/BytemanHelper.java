@@ -19,28 +19,33 @@
 
 package org.hibernate.search.test.util;
 
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.jboss.byteman.rule.Rule;
 import org.jboss.byteman.rule.helper.Helper;
 
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Hardy Ferentschik
  */
 public class BytemanHelper extends Helper {
-	
+	public static final Log log = LoggerFactory.make();
+
+	public static final AtomicInteger counter = new AtomicInteger();
+
 	protected BytemanHelper(Rule rule) {
 		super( rule );
 	}
-
-	public static final Log log = LoggerFactory.make();
 
 	public void sleepASecond() {
 		try {
 			log.info( "Byteman rule triggered: sleeping a second" );
 			Thread.sleep( 1000 );
 		}
-		catch (InterruptedException e) {
+		catch ( InterruptedException e ) {
 			Thread.currentThread().interrupt();
 			log.error( "unexpected interruption", e );
 		}
@@ -51,4 +56,12 @@ public class BytemanHelper extends Helper {
 		throw new NullPointerException( message );
 	}
 
+	public void countInvocation() {
+		log.debug( "Increment call count" );
+		counter.incrementAndGet();
+	}
+
+	public static int getAndResetInvocationCount() {
+		return counter.getAndSet( 0 );
+	}
 }
