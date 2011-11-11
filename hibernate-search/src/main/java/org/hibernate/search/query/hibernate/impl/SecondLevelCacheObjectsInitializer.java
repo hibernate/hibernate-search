@@ -26,6 +26,7 @@ import java.util.List;
 import org.slf4j.Logger;
 
 import org.hibernate.Criteria;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.engine.SearchFactoryImplementor;
@@ -64,8 +65,14 @@ public class SecondLevelCacheObjectsInitializer implements ObjectsInitializer {
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
 				final boolean isIn2LCache = session.getSessionFactory().getCache().containsEntity( entityInfo.getClazz(), entityInfo.getId() );
 				if ( isIn2LCache ) {
-					//load the object from the second level cache
-					session.get( entityInfo.getClazz(), entityInfo.getId() );
+					try {
+						//load the object from the second level cache
+						session.get( entityInfo.getClazz(), entityInfo.getId() );
+					}
+					catch (ObjectNotFoundException onfe) {
+						// Unlikely but needed: an index might be out of sync, and the cache might be as well
+						remainingEntityInfos.add( entityInfo );
+					}
 				}
 				else {
 					remainingEntityInfos.add( entityInfo );

@@ -22,6 +22,7 @@ package org.hibernate.search.test.query.initandlookup;
 
 import java.util.List;
 
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.fest.assertions.Condition;
 
@@ -37,6 +38,7 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.GatedLuceneBackend;
 import org.hibernate.stat.Statistics;
 import static org.fest.assertions.Assertions.*;
 
@@ -180,6 +182,30 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		session.close();
 	}
 
+	public void testStaleCacheWithAsyncIndexer() {
+		Session session = openSession();
+		final Statistics statistics = session.getSessionFactory().getStatistics();
+		statistics.clear();
+		statistics.setStatisticsEnabled( true );
+		setData( session, statistics );
+
+		GatedLuceneBackend.open.set( false ); // disable processing of index updates
+		Transaction tx = session.beginTransaction();
+		List list = session.createCriteria( Kernel.class ).list();
+		assertThat( list ).hasSize( 2 );
+		session.delete( list.get( 0 ) );
+		tx.commit();
+		session.clear();
+		GatedLuceneBackend.open.set( true );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		FullTextQuery allKernelsQuery = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() )
+				.initializeObjectsWith( ObjectLookupMethod.SECOND_LEVEL_CACHE, DatabaseRetrievalMethod.QUERY );
+
+		assertThat( allKernelsQuery.list() ).hasSize( 1 );
+		assertThat( statistics.getSecondLevelCacheHitCount() ).isEqualTo( 1 );
+	}
+
 	public void testQueryUsingFindByIdInitialization() throws Exception {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
@@ -272,6 +298,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		super.configure( cfg );
 		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
 		cfg.setProperty( Environment.CACHE_PROVIDER, "org.hibernate.cache.HashtableCacheProvider" );
+		cfg.setProperty( "hibernate.search.default.worker.backend", org.hibernate.search.test.util.GatedLuceneBackend.class.getName() );
 	}
 
 	@Override
