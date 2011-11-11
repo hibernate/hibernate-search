@@ -139,7 +139,7 @@
         <luceneVersion>3.4.0</luceneVersion>
         <infinispanVersion>5.0.1.FINAL</infinispanVersion>
         <hibernateVersion>4.0.0.CR4</hibernateVersion>
-        <hibernateCommonsAnnotationVersion>4.0.0.CR2</hibernateCommonsAnnotationVersion>
+        <hibernateCommonsAnnotationVersion>4.0.0.Final</hibernateCommonsAnnotationVersion>
         <bytemanVersion>1.5.2</bytemanVersion>
         <jbossLoggingVersion>3.0.1.GA</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.0.CR2</jbossLoggingProcessorVersion>
