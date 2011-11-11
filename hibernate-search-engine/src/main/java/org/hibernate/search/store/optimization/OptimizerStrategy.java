@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 
@@ -40,7 +41,11 @@ import org.hibernate.search.store.Workspace;
 public interface OptimizerStrategy {
 
 	/**
-	 * Invokes optimize on the IndexWriter;
+	 * Invokes optimize on the IndexWriter; This is invoked when
+	 * an optimization has been explicitly requested by the user API
+	 * using {@link SearchFactory#optimize()} or {@link SearchFactory#optimize(Class)},
+	 * or at the start or end of a MassIndexer's work.
+	 *
 	 * @param writer
 	 * @return true if it was done, false if it wasn't possible
 	 * @throws SearchException in case of IO errors on the index
@@ -55,8 +60,12 @@ public interface OptimizerStrategy {
 	void addTransaction(long increment);
 
 	/**
-	 * Means it's an appropriate time to invoke the optimization,
-	 * if the OptimizerStrategy implementation deems it appropriate.
+	 * Allows the implementation to start an optimization process;
+	 * The decision of optimizing or not is up to the implementor.
+	 * This is invoked after all changes of a transaction are applied,
+	 * but never invoked during stream operation such as those used by
+	 * the MassIndexer.
+	 *
 	 * @param workspace
 	 */
 	void optimize(Workspace workspace);
