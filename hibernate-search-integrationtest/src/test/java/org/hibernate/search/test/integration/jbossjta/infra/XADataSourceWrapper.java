@@ -24,6 +24,8 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Logger;
+
 import javax.sql.DataSource;
 import javax.sql.XAConnection;
 import javax.sql.XADataSource;
@@ -188,5 +190,12 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 
 	public int getLoginTimeout() throws SQLException {
 		return _theXADataSource.getLoginTimeout();
+	}
+
+	public Logger getParentLogger() {
+		// getParentLogger() was introduced in Java 7:
+		// don't use @Override nor invoke super.getParenLogger() or it breaks on Java 6
+		// Method must be defined to compile on Java 7.
+		return null;
 	}
 }
