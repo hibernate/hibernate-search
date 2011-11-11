@@ -45,6 +45,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Norms;
+import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.spi.ClassNavigator;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -191,9 +192,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 		else {
 			EnumSet<org.hibernate.search.annotations.FieldCacheType> enabledTypes = EnumSet.noneOf( org.hibernate.search.annotations.FieldCacheType.class );
-			for ( org.hibernate.search.annotations.FieldCacheType t : fieldCacheOptions.value() ) {
-				enabledTypes.add( t );
-			}
+			Collections.addAll( enabledTypes, fieldCacheOptions.value() );
 			if ( enabledTypes.size() != 1 && enabledTypes.contains( org.hibernate.search.annotations.FieldCacheType.NOTHING ) ) {
 				throw new SearchException( "CacheFromIndex configured with conflicting parameters:" +
 						" if FieldCacheType.NOTHING is enabled, no other options can be added" );
@@ -261,7 +260,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName()
 					);
 				}
-				idBoost = getBoost( member, null );
+				idBoost = AnnotationProcessingHelper.getBoost( member, null );
 				ReflectionHelper.setAccessible( member );
 				idGetter = member;
 			}
@@ -272,16 +271,16 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				String fieldName = prefix + attributeName;
 				propertiesMetadata.fieldNames.add( fieldName );
 				propertiesMetadata.fieldStore.add( Store.YES );
-				Field.Index index =  getIndex( Index.YES, Analyze.NO, Norms.YES );
+				Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 				propertiesMetadata.fieldIndex.add( index );
-				propertiesMetadata.fieldTermVectors.add( getTermVector( TermVector.NO ) );
+				propertiesMetadata.fieldTermVectors.add( AnnotationProcessingHelper.getTermVector( TermVector.NO ) );
 				propertiesMetadata.fieldNullTokens.add( null );
 				propertiesMetadata.fieldBridges.add( BridgeFactory.guessType( null, null, member, reflectionManager ) );
-				propertiesMetadata.fieldBoosts.add( getBoost( member, null ) );
+				propertiesMetadata.fieldBoosts.add( AnnotationProcessingHelper.getBoost( member, null ) );
 				propertiesMetadata.precisionSteps.add( getPrecisionStep( null ) );
-				propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
+				propertiesMetadata.dynamicFieldBoosts.add( AnnotationProcessingHelper.getDynamicBoost( member ) );
 				// property > entity analyzer (no field analyzer)
-				Analyzer analyzer = getAnalyzer( member, context );
+				Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer( member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ), context );
 				if ( analyzer == null ) {
 					analyzer = propertiesMetadata.analyzer;
 				}
@@ -409,7 +408,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param id the entity id.
 	 * @param fieldToAnalyzerMap this maps gets populated while generating the <code>Document</code>.
 	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
-	 * @param objectInitializer 
+	 * @param objectInitializer used to ensure that all objects are initalized
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */

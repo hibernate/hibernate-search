@@ -48,7 +48,6 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
-import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
@@ -58,29 +57,25 @@ import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.DynamicBoost;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
-import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.DefaultStringBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
-import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
+import org.hibernate.search.engine.impl.FieldMetadata;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.spi.ClassNavigator;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -231,12 +226,6 @@ public abstract class AbstractDocumentBuilder<T> {
 		this.reflectionManager = null;
 	}
 
-	protected Analyzer getAnalyzer(XAnnotatedElement annotatedElement, ConfigContext context) {
-		org.hibernate.search.annotations.Analyzer analyzerAnn =
-				annotatedElement.getAnnotation( org.hibernate.search.annotations.Analyzer.class );
-		return getAnalyzer( analyzerAnn, context );
-	}
-
 	protected void addToScopedAnalyzer(String fieldName, Analyzer analyzer, Field.Index index) {
 		if ( Field.Index.ANALYZED.equals( index ) || Field.Index.ANALYZED_NO_NORMS.equals( index ) ) {
 			if ( analyzer != null ) {
@@ -246,87 +235,6 @@ public abstract class AbstractDocumentBuilder<T> {
 		else {
 			// no analyzer is used, add a fake one for queries
 			this.analyzer.addScopedAnalyzer( fieldName, passThroughAnalyzer );
-		}
-	}
-
-	protected Float getBoost(XProperty member, org.hibernate.search.annotations.Field fieldAnn) {
-		float computedBoost = 1.0f;
-		Boost boostAnn = member.getAnnotation( Boost.class );
-		if ( boostAnn != null ) {
-			computedBoost = boostAnn.value();
-		}
-		if ( fieldAnn != null ) {
-			computedBoost *= fieldAnn.boost().value();
-		}
-		return computedBoost;
-	}
-
-	protected BoostStrategy getDynamicBoost(XProperty member) {
-		DynamicBoost boostAnnotation = member.getAnnotation( DynamicBoost.class );
-		if ( boostAnnotation == null ) {
-			return new DefaultBoostStrategy();
-		}
-
-		Class<? extends BoostStrategy> boostStrategyClass = boostAnnotation.impl();
-		BoostStrategy strategy;
-		try {
-			strategy = boostStrategyClass.newInstance();
-		}
-		catch ( Exception e ) {
-			throw new SearchException(
-					"Unable to instantiate boost strategy implementation: " + boostStrategyClass.getName()
-			);
-		}
-		return strategy;
-	}
-
-	protected Field.TermVector getTermVector(TermVector vector) {
-		switch ( vector ) {
-			case NO:
-				return Field.TermVector.NO;
-			case YES:
-				return Field.TermVector.YES;
-			case WITH_OFFSETS:
-				return Field.TermVector.WITH_OFFSETS;
-			case WITH_POSITIONS:
-				return Field.TermVector.WITH_POSITIONS;
-			case WITH_POSITION_OFFSETS:
-				return Field.TermVector.WITH_POSITIONS_OFFSETS;
-			default:
-				throw new AssertionFailure( "Unexpected TermVector: " + vector );
-		}
-	}
-
-	/**
-	 * Using the passed field (or class bridge) settings determines the Lucene {@link Field.Index}
-	 *
-	 * @param index is the field indexed or not
-	 * @param analyze should the field be analyzed
-	 * @param norms are norms to be added to index
-	 *
-	 * @return Returns the Lucene {@link Field.Index} value for a given field
-	 */
-	protected Field.Index getIndex(Index index, Analyze analyze, Norms norms) {
-		if ( Index.YES.equals( index ) ) {
-			if ( Analyze.YES.equals( analyze ) ) {
-				if ( Norms.YES.equals( norms ) ) {
-					return Field.Index.ANALYZED;
-				}
-				else {
-					return Field.Index.ANALYZED_NO_NORMS;
-				}
-			}
-			else {
-				if ( Norms.YES.equals( norms ) ) {
-					return Field.Index.NOT_ANALYZED;
-				}
-				else {
-					return Field.Index.NOT_ANALYZED_NO_NORMS;
-				}
-			}
-		}
-		else {
-			return Field.Index.NO;
 		}
 	}
 
@@ -452,7 +360,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	private void initializeClassLevelAnnotations(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
 
 		// check for a class level specified analyzer
-		Analyzer analyzer = getAnalyzer( clazz, context );
+		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer( clazz.getAnnotation( org.hibernate.search.annotations.Analyzer.class ), context );
 		if ( analyzer != null ) {
 			propertiesMetadata.analyzer = analyzer;
 		}
@@ -501,35 +409,6 @@ public abstract class AbstractDocumentBuilder<T> {
 		);
 		checkForContainedIn( classHostingMember, member, propertiesMetadata );
 		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context );
-	}
-
-	private Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext context) {
-		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
-		if ( analyzerClass == void.class ) {
-			String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
-			if ( StringHelper.isEmpty( definition ) ) {
-				return null;
-			}
-			else {
-				return context.buildLazyAnalyzer( definition );
-			}
-		}
-		else {
-			try {
-				return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, context.getLuceneMatchVersion() );
-			}
-			catch ( ClassCastException e ) {
-				throw new SearchException(
-						"Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(),
-						e
-				);
-			}
-			catch ( Exception e ) {
-				throw new SearchException(
-						"Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e
-				);
-			}
-		}
 	}
 
 	private void checkForAnalyzerDefs(XAnnotatedElement annotatedElement, ConfigContext context) {
@@ -680,9 +559,10 @@ public abstract class AbstractDocumentBuilder<T> {
 				propertiesMetadata.embeddedGetters.add( member );
 				PropertiesMetadata metadata = new PropertiesMetadata();
 				propertiesMetadata.embeddedPropertiesMetadata.add( metadata );
-				metadata.boost = getBoost( member, null );
+				metadata.boost = AnnotationProcessingHelper.getBoost( member, null );
 				//property > entity analyzer
-				Analyzer analyzer = getAnalyzer( member, context );
+				Analyzer analyzer = AnnotationProcessingHelper.
+						getAnalyzer( member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ), context );
 				metadata.analyzer = analyzer != null ? analyzer : propertiesMetadata.analyzer;
 				String localPrefix = buildEmbeddedPrefix( prefix, embeddedAnn, member );
 
@@ -760,13 +640,13 @@ public abstract class AbstractDocumentBuilder<T> {
 		String fieldName = prefix + ann.name();
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( ann.store() );
-		Field.Index index = getIndex( ann.index(), ann.analyze(), ann.norms() );
+		Field.Index index = AnnotationProcessingHelper.getIndex( ann.index(), ann.analyze(), ann.norms() );
 		propertiesMetadata.classIndexes.add( index );
-		propertiesMetadata.classTermVectors.add( getTermVector( ann.termVector() ) );
+		propertiesMetadata.classTermVectors.add( AnnotationProcessingHelper.getTermVector( ann.termVector() ) );
 		propertiesMetadata.classBridges.add( BridgeFactory.extractType( ann, clazz ) );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
 
-		Analyzer analyzer = getAnalyzer( ann.analyzer(), context );
+		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer( ann.analyzer(), context );
 		if ( analyzer == null ) {
 			analyzer = propertiesMetadata.analyzer;
 		}
@@ -776,44 +656,15 @@ public abstract class AbstractDocumentBuilder<T> {
 		addToScopedAnalyzer( fieldName, analyzer, index );
 	}
 
-	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, NumericField numericFieldAnn, ConfigContext context) {
-		ReflectionHelper.setAccessible( member );
-		propertiesMetadata.fieldGetters.add( member );
-		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
-		propertiesMetadata.fieldNames.add( fieldName );
-		propertiesMetadata.fieldNameToPositionMap.put(
-				member.getName(), propertiesMetadata.fieldNames.size()
-		);
-		propertiesMetadata.fieldStore.add( fieldAnn.store() );
-		Field.Index index = getIndex( fieldAnn.index(), fieldAnn.analyze(), fieldAnn.norms() );
-		propertiesMetadata.fieldIndex.add( index );
-		propertiesMetadata.fieldBoosts.add( getBoost( member, fieldAnn ) );
-		propertiesMetadata.dynamicFieldBoosts.add( getDynamicBoost( member ) );
-		propertiesMetadata.fieldTermVectors.add( getTermVector( fieldAnn.termVector() ) );
-		propertiesMetadata.precisionSteps.add( getPrecisionStep( numericFieldAnn ) );
-
-		// null token
-		String indexNullAs = fieldAnn.indexNullAs();
-		if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL ) ) {
-			indexNullAs = null;
-		}
-		else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
-			indexNullAs = context.getDefaultNullToken();
-		}
-		propertiesMetadata.fieldNullTokens.add( indexNullAs );
-
-		FieldBridge fieldBridge = BridgeFactory.guessType( fieldAnn, numericFieldAnn, member, reflectionManager );
-		if ( indexNullAs != null && fieldBridge instanceof TwoWayFieldBridge ) {
-			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, indexNullAs );
-		}
-		propertiesMetadata.fieldBridges.add( fieldBridge );
-
-		// Field > property > entity analyzer
-		Analyzer analyzer = getAnalyzer( fieldAnn.analyzer(), context );
-		if ( analyzer == null ) {
-			analyzer = getAnalyzer( member, context );
-		}
-		addToScopedAnalyzer( fieldName, analyzer, index );
+	private void bindFieldAnnotation(XProperty member,
+									 PropertiesMetadata propertiesMetadata,
+									 String prefix,
+									 org.hibernate.search.annotations.Field fieldAnnotation,
+									 NumericField numericFieldAnnotation,
+									 ConfigContext context) {
+		FieldMetadata fieldMetadata = new FieldMetadata(  prefix, member, fieldAnnotation, numericFieldAnnotation, context, reflectionManager );
+		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
+		addToScopedAnalyzer( fieldMetadata.getFieldName(), fieldMetadata.getAnalyzer(), fieldMetadata.getIndex() );
 	}
 
 	protected Integer getPrecisionStep(NumericField numericFieldAnn) {
@@ -960,79 +811,6 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	/**
-	 * Wrapper class containing all the meta data extracted out of a single entity.
-	 * All field/property related properties are kept in lists. Retrieving all metadata for a given
-	 * property/field means accessing all the lists with the same index.
-	 */
-	public static class PropertiesMetadata {
-		public float boost;
-		public Analyzer analyzer;
-		public Discriminator discriminator;
-		public XMember discriminatorGetter;
-		public BoostStrategy classBoostStrategy;
-		public final Map<String, Integer> fieldNameToPositionMap = new HashMap<String, Integer>();
-
-		public final List<String> fieldNames = new ArrayList<String>();
-		public final List<XMember> fieldGetters = new ArrayList<XMember>();
-		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
-		public final List<Store> fieldStore = new ArrayList<Store>();
-		public final List<Field.Index> fieldIndex = new ArrayList<Field.Index>();
-		public final List<Float> fieldBoosts = new ArrayList<Float>();
-		public final List<BoostStrategy> dynamicFieldBoosts = new ArrayList<BoostStrategy>();
-		public final List<Integer> precisionSteps = new ArrayList<Integer>();
-		public final List<String> fieldNullTokens = new LinkedList<String>();
-
-		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
-		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
-		public final List<String> embeddedNullTokens = new ArrayList<String>();
-		public final List<String> embeddedNullFields = new ArrayList<String>();
-		public final List<FieldBridge> embeddedNullFieldBridges = new ArrayList<FieldBridge>();
-		public final List<PropertiesMetadata> embeddedPropertiesMetadata = new ArrayList<PropertiesMetadata>();
-		public final List<Container> embeddedContainers = new ArrayList<Container>();
-		public final List<XMember> containedInGetters = new ArrayList<XMember>();
-
-		public final List<String> classNames = new ArrayList<String>();
-		public final List<Store> classStores = new ArrayList<Store>();
-		public final List<Field.Index> classIndexes = new ArrayList<Field.Index>();
-		public final List<FieldBridge> classBridges = new ArrayList<FieldBridge>();
-		public final List<Field.TermVector> classTermVectors = new ArrayList<Field.TermVector>();
-		public final List<Float> classBoosts = new ArrayList<Float>();
-
-		public enum Container {
-			OBJECT,
-			COLLECTION,
-			MAP,
-			ARRAY
-		}
-
-		protected LuceneOptions getClassLuceneOptions(int i) {
-			return new LuceneOptionsImpl(
-					classStores.get( i ),
-					classIndexes.get( i ),
-					classTermVectors.get( i ),
-					classBoosts.get( i )
-			);
-		}
-
-		protected LuceneOptions getFieldLuceneOptions(int i, Object value) {
-			LuceneOptions options;
-			options = new LuceneOptionsImpl(
-					fieldStore.get( i ),
-					fieldIndex.get( i ),
-					fieldTermVectors.get( i ),
-					fieldBoosts.get( i ) * dynamicFieldBoosts.get( i ).defineBoost( value ),
-					fieldNullTokens.get( i ),
-					precisionSteps.get( i )
-			);
-			return options;
-		}
-
-		protected float getClassBoost(Object value) {
-			return boost * classBoostStrategy.defineBoost( value );
-		}
-	}
-
-	/**
 	 * To be removed, see org.hibernate.search.engine.DocumentBuilderIndexedEntity.isIdMatchingJpaId()
 	 *
 	 * @return true if a providedId needs to be provided for indexing
@@ -1122,4 +900,78 @@ public abstract class AbstractDocumentBuilder<T> {
 	public void close() {
 		analyzer.close();
 	}
+
+	/**
+	 * Wrapper class containing all the meta data extracted out of a single entity.
+	 * All field/property related properties are kept in lists. Retrieving all metadata for a given
+	 * property/field means accessing all the lists with the same index.
+	 */
+	public static class PropertiesMetadata {
+		public float boost;
+		public Analyzer analyzer;
+		public Discriminator discriminator;
+		public XMember discriminatorGetter;
+		public BoostStrategy classBoostStrategy;
+		public final Map<String, Integer> fieldNameToPositionMap = new HashMap<String, Integer>();
+
+		public final List<String> fieldNames = new ArrayList<String>();
+		public final List<XMember> fieldGetters = new ArrayList<XMember>();
+		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
+		public final List<Store> fieldStore = new ArrayList<Store>();
+		public final List<Field.Index> fieldIndex = new ArrayList<Field.Index>();
+		public final List<Float> fieldBoosts = new ArrayList<Float>();
+		public final List<BoostStrategy> dynamicFieldBoosts = new ArrayList<BoostStrategy>();
+		public final List<Integer> precisionSteps = new ArrayList<Integer>();
+		public final List<String> fieldNullTokens = new LinkedList<String>();
+
+		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
+		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
+		public final List<String> embeddedNullTokens = new ArrayList<String>();
+		public final List<String> embeddedNullFields = new ArrayList<String>();
+		public final List<FieldBridge> embeddedNullFieldBridges = new ArrayList<FieldBridge>();
+		public final List<PropertiesMetadata> embeddedPropertiesMetadata = new ArrayList<PropertiesMetadata>();
+		public final List<Container> embeddedContainers = new ArrayList<Container>();
+		public final List<XMember> containedInGetters = new ArrayList<XMember>();
+
+		public final List<String> classNames = new ArrayList<String>();
+		public final List<Store> classStores = new ArrayList<Store>();
+		public final List<Field.Index> classIndexes = new ArrayList<Field.Index>();
+		public final List<FieldBridge> classBridges = new ArrayList<FieldBridge>();
+		public final List<Field.TermVector> classTermVectors = new ArrayList<Field.TermVector>();
+		public final List<Float> classBoosts = new ArrayList<Float>();
+
+		public enum Container {
+			OBJECT,
+			COLLECTION,
+			MAP,
+			ARRAY
+		}
+
+		protected LuceneOptions getClassLuceneOptions(int i) {
+			return new LuceneOptionsImpl(
+					classStores.get( i ),
+					classIndexes.get( i ),
+					classTermVectors.get( i ),
+					classBoosts.get( i )
+			);
+		}
+
+		protected LuceneOptions getFieldLuceneOptions(int i, Object value) {
+			LuceneOptions options;
+			options = new LuceneOptionsImpl(
+					fieldStore.get( i ),
+					fieldIndex.get( i ),
+					fieldTermVectors.get( i ),
+					fieldBoosts.get( i ) * dynamicFieldBoosts.get( i ).defineBoost( value ),
+					fieldNullTokens.get( i ),
+					precisionSteps.get( i )
+			);
+			return options;
+		}
+
+		protected float getClassBoost(Object value) {
+			return boost * classBoostStrategy.defineBoost( value );
+		}
+	}
 }
+
