@@ -515,4 +515,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 119, value = "Skipping optimization on index %1$s as it is already being optimized")
 	void optimizationSkippedStillBusy(String indexName);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 120, value = "There are multiple properties indexed against the same field name '%1$s', but with different indexing settings. The behaviour is undefined.")
+	void inconsistentFieldConfiguration(String fieldName);
 }
