@@ -73,7 +73,7 @@ public class ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 	}
 
 	@Override
-	public void addTransaction(long operations) {
+	public void addOperationWithinTransactionCount(long operations) {
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 	}
 
 	@Override
-	public void initialize(IndexManager callback, Properties indexProps) {
-		this.indexName = callback.getIndexName();
+	public void initialize(IndexManager indexManager, Properties indexProperties) {
+		this.indexName = indexManager.getIndexName();
 	}
 }

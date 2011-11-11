@@ -26,6 +26,7 @@ package org.hibernate.search.store.optimization;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
+
 import org.hibernate.search.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -46,8 +47,10 @@ public interface OptimizerStrategy {
 	 * using {@link SearchFactory#optimize()} or {@link SearchFactory#optimize(Class)},
 	 * or at the start or end of a MassIndexer's work.
 	 *
-	 * @param writer
-	 * @return true if it was done, false if it wasn't possible
+	 * @param writer the index writer
+	 *
+	 * @return {@code true} if optimisation occurred, {@code false} otherwise
+	 *
 	 * @throws SearchException in case of IO errors on the index
 	 */
 	boolean performOptimization(IndexWriter writer);
@@ -55,21 +58,27 @@ public interface OptimizerStrategy {
 	/**
 	 * To count the amount of operations which where applied to the index.
 	 * Invoked once per transaction.
-	 * @param increment
+	 *
+	 * @param increment operation count
 	 */
-	void addTransaction(long increment);
+	void addOperationWithinTransactionCount(long increment);
 
 	/**
-	 * Allows the implementation to start an optimization process;
+	 * Allows the implementation to start an optimization process.
 	 * The decision of optimizing or not is up to the implementor.
 	 * This is invoked after all changes of a transaction are applied,
-	 * but never invoked during stream operation such as those used by
+	 * but never during stream operation such as those used by
 	 * the MassIndexer.
 	 *
-	 * @param workspace
+	 * @param workspace the current work space
 	 */
 	void optimize(Workspace workspace);
 
-	void initialize(IndexManager callback, Properties indexProps);
-
+	/**
+	 * Initializes the {@code OptimizerStrategy}. Is called once at the initialisation of the strategy.
+	 *
+	 * @param indexManager the index manager for which this strategy applies
+	 * @param indexProperties the configuration properties
+	 */
+	void initialize(IndexManager indexManager, Properties indexProperties);
 }

@@ -78,7 +78,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 
 	@Override
 	public void optimizerPhase() {
-		optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
+		optimizerStrategy.addOperationWithinTransactionCount( operations.getAndSet( 0L ) );
 		optimizerStrategy.optimize( this );
 	}
 

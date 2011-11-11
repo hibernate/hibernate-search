@@ -69,7 +69,7 @@ public class IncrementalOptimizerStrategy extends ExplicitOnlyOptimizerStrategy 
 	}
 
 	@Override
-	public void addTransaction(long operations) {
+	public void addOperationWithinTransactionCount(long operations) {
 		synchronized ( lockOnCounters ) {
 			this.operations += operations;
 			this.transactions++;
