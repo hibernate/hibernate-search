@@ -26,17 +26,10 @@ package org.hibernate.search.engine.impl;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 
-import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.annotations.common.util.StringHelper;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.annotations.Boost;
-import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
@@ -44,8 +37,9 @@ import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.impl.ConfigContext;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Encapsulating the metadata for a single {@code @Field} annotation.
@@ -53,6 +47,8 @@ import org.hibernate.search.util.impl.ReflectionHelper;
  * @author Hardy Ferentschik
  */
 public class FieldMetadata {
+	private static final Log log = LoggerFactory.make();
+
 	private final XProperty fieldGetter;
 	private final String fieldName;
 	private final Store store;
@@ -100,7 +96,10 @@ public class FieldMetadata {
 		// Field > property > entity analyzer
 		Analyzer tmpAnalyzer = AnnotationProcessingHelper.getAnalyzer( fieldAnn.analyzer(), context );
 		if ( tmpAnalyzer == null ) {
-			tmpAnalyzer = AnnotationProcessingHelper.getAnalyzer( member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ), context );
+			tmpAnalyzer = AnnotationProcessingHelper.getAnalyzer(
+					member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
+					context
+			);
 		}
 		analyzer = tmpAnalyzer;
 	}
@@ -118,6 +117,8 @@ public class FieldMetadata {
 	}
 
 	public void appendToPropertiesMetadata(AbstractDocumentBuilder.PropertiesMetadata propertiesMetadata) {
+		sanityCheckFieldConfiguration( propertiesMetadata );
+
 		propertiesMetadata.fieldGetters.add( fieldGetter );
 		propertiesMetadata.fieldNames.add( fieldName );
 		propertiesMetadata.fieldNameToPositionMap.put( fieldGetter.getName(), propertiesMetadata.fieldNames.size() );
@@ -129,6 +130,15 @@ public class FieldMetadata {
 		propertiesMetadata.precisionSteps.add( precisionStep );
 		propertiesMetadata.fieldNullTokens.add( nullToken );
 		propertiesMetadata.fieldBridges.add( fieldBridge );
+	}
+
+	private void sanityCheckFieldConfiguration(AbstractDocumentBuilder.PropertiesMetadata propertiesMetadata) {
+		int indexOfFieldWithSameName = propertiesMetadata.fieldNames.lastIndexOf( fieldName );
+		if ( indexOfFieldWithSameName != -1 ) {
+			if ( !propertiesMetadata.fieldIndex.get( indexOfFieldWithSameName ).equals( index ) ) {
+				log.inconsistentFieldConfiguration( fieldName );
+			}
+		}
 	}
 }
 
