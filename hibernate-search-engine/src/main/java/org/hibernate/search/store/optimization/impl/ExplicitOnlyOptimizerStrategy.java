@@ -23,30 +23,65 @@
  */
 package org.hibernate.search.store.optimization.impl;
 
+import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * This OptimizerStrategy will only optimize the index when forced to,
+ * using an explicit invocation to {@link SearchFactory#optimize()} or
+ * {@link SearchFactory#optimize(Class)}
+ * 
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-public class NoOpOptimizerStrategy implements OptimizerStrategy {
+public class ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 
-	public void optimizationForced() {
+	private static final Log log = LoggerFactory.make();
+
+	protected String indexName;
+	private final AtomicBoolean optimizerIsBusy = new AtomicBoolean();
+
+	@Override
+	public boolean performOptimization(IndexWriter writer) {
+		boolean acquired = optimizerIsBusy.compareAndSet( false, true );
+		if ( acquired ) {
+			try {
+				writer.optimize();
+			}
+			catch (IOException e) {
+				throw new SearchException( "Unable to optimize directoryProvider: " + indexName, e );
+			}
+			finally {
+				optimizerIsBusy.set( false );
+			}
+			return true;
+		}
+		else {
+			log.optimizationSkippedStillBusy( indexName );
+			return false;
+		}
 	}
 
-	public boolean needOptimization() {
-		return false;
-	}
-
+	@Override
 	public void addTransaction(long operations) {
 	}
 
+	@Override
 	public void optimize(Workspace workspace) {
 	}
 
+	@Override
 	public void initialize(IndexManager callback, Properties indexProps) {
+		this.indexName = callback.getIndexName();
 	}
 }

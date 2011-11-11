@@ -44,13 +44,13 @@ public interface Workspace {
 	void optimizerPhase();
 
 	/**
-	 * Used by OptimizeLuceneWork after index optimization to flag that
-	 * optimization has been forced.
+	 * Used by OptimizeLuceneWork to start an optimization process of the index.
+	 * @param writer the IndexWriter to use for optimization
 	 * @see OptimizeLuceneWork
 	 * @see SearchFactory#optimize()
 	 * @see SearchFactory#optimize(Class)
 	 */
-	void optimizationPerformed();
+	void performOptimization(IndexWriter writer);
 
 	/**
 	 * Gets the IndexWriter, opening one if needed.

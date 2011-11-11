@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.store.optimization.impl;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
@@ -31,7 +30,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -41,53 +39,56 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class IncrementalOptimizerStrategy implements OptimizerStrategy {
+public class IncrementalOptimizerStrategy extends ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 	
-	private static final Log log = LoggerFactory.make();	
+	private static final Log log = LoggerFactory.make();
 
 	private int operationMax = -1;
 	private int transactionMax = -1;
-	private long operations = 0;
-	private long transactions = 0;
-	private long optimizationsPerformed = 0;
-	private IndexManager indexManager;
+	private volatile long operations = 0;
+	private volatile long transactions = 0;
+	private volatile long optimizationsPerformed = 0;
+	private final Object lockOnCounters = new Object();
 
-	public void optimizationForced() {
-		operations = 0;
-		transactions = 0;
-		optimizationsPerformed++;
+	@Override
+	public boolean performOptimization(IndexWriter writer) {
+		boolean done = super.performOptimization( writer );
+		if ( done ) {
+			synchronized ( lockOnCounters ) {
+				operations = 0;
+				transactions = 0;
+				optimizationsPerformed++;
+			}
+		}
+		return done;
 	}
 
-	public boolean needOptimization() {
+	private boolean needOptimization() {
 		return (operationMax != -1 && operations >= operationMax)
 				|| (transactionMax != -1 && transactions >= transactionMax);
 	}
 
+	@Override
 	public void addTransaction(long operations) {
-		this.operations += operations;
-		this.transactions++;
+		synchronized ( lockOnCounters ) {
+			this.operations += operations;
+			this.transactions++;
+		}
 	}
 
+	@Override
 	public void optimize(Workspace workspace) {
 		if ( needOptimization() ) {
-			if ( log.isDebugEnabled() )
-				log.debugv( "Optimize {0} after {1} operations and {2} transactions",
-						indexManager.getIndexName(), operations, transactions );
+			log.debugv( "Optimize {0} after {1} operations and {2} transactions",
+						indexName, operations, transactions );
 			IndexWriter writer = workspace.getIndexWriter();
-			try {
-				writer.optimize();
-			}
-			catch (IOException e) {
-				throw new SearchException( "Unable to optimize directoryProvider: "
-						+ indexManager.getIndexName(), e );
-			}
-			optimizationForced();
+			performOptimization( writer );
 		}
 	}
 
 	@Override
 	public void initialize(IndexManager indexManager, Properties indexProperties) {
-		this.indexManager = indexManager;
+		super.initialize( indexManager, indexProperties );
 		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
 		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );
 	}

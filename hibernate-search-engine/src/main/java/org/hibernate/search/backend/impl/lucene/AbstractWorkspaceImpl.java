@@ -78,19 +78,13 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 
 	@Override
 	public void optimizerPhase() {
-		// used getAndSet(0) because Workspace is going to be reused by next transaction.
-		synchronized ( optimizerStrategy ) {
-			optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
-			optimizerStrategy.optimize( this );
-		}
+		optimizerStrategy.addTransaction( operations.getAndSet( 0L ) );
+		optimizerStrategy.optimize( this );
 	}
 
 	@Override
-	public void optimizationPerformed() {
-		//Needs to ensure the optimizerStrategy is accessed in threadsafe way
-		synchronized ( optimizerStrategy ) {
-			optimizerStrategy.optimizationForced();
-		}
+	public void performOptimization(IndexWriter writer) {
+		optimizerStrategy.performOptimization( writer );
 	}
 
 	@Override

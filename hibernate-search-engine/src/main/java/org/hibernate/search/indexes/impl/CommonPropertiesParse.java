@@ -31,7 +31,7 @@ import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
-import org.hibernate.search.store.optimization.impl.NoOpOptimizerStrategy;
+import org.hibernate.search.store.optimization.impl.ExplicitOnlyOptimizerStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -85,7 +85,7 @@ public class CommonPropertiesParse {
 			optimizerStrategy.initialize( callback, indexProps );
 		}
 		else {
-			optimizerStrategy = new NoOpOptimizerStrategy();
+			optimizerStrategy = new ExplicitOnlyOptimizerStrategy();
 		}
 		return optimizerStrategy;
 	}

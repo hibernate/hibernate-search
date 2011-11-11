@@ -25,38 +25,51 @@ package org.hibernate.search.store.optimization;
 
 import java.util.Properties;
 
+import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 
 /**
+ * Controls how and when the indexes are optimized.
+ * Implementations need to be threadsafe.
+ *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public interface OptimizerStrategy {
 
 	/**
-	 * has to be called in a thread safe way
+	 * Invokes optimize on the IndexWriter; This is invoked when
+	 * an optimization has been explicitly requested by the user API
+	 * using {@link SearchFactory#optimize()} or {@link SearchFactory#optimize(Class)},
+	 * or at the start or end of a MassIndexer's work.
+	 *
+	 * @param writer
+	 * @return true if it was done, false if it wasn't possible
+	 * @throws SearchException in case of IO errors on the index
 	 */
-	void optimizationForced();
+	boolean performOptimization(IndexWriter writer);
 
 	/**
-	 * has to be called in a thread safe way
+	 * To count the amount of operations which where applied to the index.
+	 * Invoked once per transaction.
+	 * @param increment
 	 */
-	boolean needOptimization();
+	void addTransaction(long increment);
 
 	/**
-	 * has to be called in a thread safe way
-	 */
-	public void addTransaction(long operations);
-
-	/**
-	 * has to be called in a thread safe way
+	 * Allows the implementation to start an optimization process;
+	 * The decision of optimizing or not is up to the implementor.
+	 * This is invoked after all changes of a transaction are applied,
+	 * but never invoked during stream operation such as those used by
+	 * the MassIndexer.
+	 *
+	 * @param workspace
 	 */
 	void optimize(Workspace workspace);
 
-	/**
-	 * @param callback
-	 * @param indexProps
-	 */
-	public void initialize(IndexManager callback, Properties indexProps);
+	void initialize(IndexManager callback, Properties indexProps);
 
 }
