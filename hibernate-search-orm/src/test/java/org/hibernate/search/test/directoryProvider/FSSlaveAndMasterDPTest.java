@@ -181,7 +181,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 			FileHelper.delete( root );
 		}
 
-		if ( !root.mkdir() ) {
+		if ( !root.mkdirs() ) {
 			throw new HibernateException( "Unable to setup test directories" );
 		}
 
