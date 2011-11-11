@@ -32,12 +32,6 @@ import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
 
-import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
@@ -45,6 +39,11 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -68,7 +67,10 @@ public final class DocumentBuilderHelper {
 	}
 
 	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document) {
-		final DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder( searchFactoryImplementor, clazz );
+		final DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder(
+				searchFactoryImplementor,
+				clazz
+		);
 		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
 		final String fieldName = builderIndexedEntity.getIdKeywordName();
 		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
@@ -110,7 +112,7 @@ public final class DocumentBuilderHelper {
 							document,
 							contextualBridge,
 							matchingPosition
-							);
+					);
 				}
 				finally {
 					if ( member != null ) {
@@ -125,8 +127,14 @@ public final class DocumentBuilderHelper {
 		return result;
 	}
 
-	public static void populateResult(String fieldName, FieldBridge fieldBridge, Store store,
-									  String[] fields, Object[] result, Document document, ContextualException2WayBridge contextualBridge, int matchingPosition) {
+	public static void populateResult(String fieldName,
+									  FieldBridge fieldBridge,
+									  Store store,
+									  String[] fields,
+									  Object[] result,
+									  Document document,
+									  ContextualException2WayBridge contextualBridge,
+									  int matchingPosition) {
 		//TODO make use of an isTwoWay() method
 		if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 			contextualBridge.setFieldName( fieldName ).setFieldBridge( (TwoWayFieldBridge) fieldBridge );
@@ -163,8 +171,9 @@ public final class DocumentBuilderHelper {
 							document,
 							contextualBridge,
 							matchingPosition
-							);
-				} finally {
+					);
+				}
+				finally {
 					contextualBridge.popMethod();
 				}
 			}
@@ -222,7 +231,7 @@ public final class DocumentBuilderHelper {
 			try {
 				return CompressionTools.decompressString( field.getBinaryValue() );
 			}
-			catch (DataFormatException e) {
+			catch ( DataFormatException e ) {
 				throw log.fieldLooksBinaryButDecompressionFailed( field.name() );
 			}
 		}
@@ -240,7 +249,7 @@ public final class DocumentBuilderHelper {
 		}
 		return -1;
 	}
-	
+
 	private static DocumentBuilderIndexedEntity<?> getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
 		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity(
 				clazz
