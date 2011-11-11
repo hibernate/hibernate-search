@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -44,8 +44,8 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * A helper classes dealing with the processing of annotation. It is there to share some annotation processing
- * between the document builder and other metadata classes, eg {@code FieldMetadata}. In the long run this class
- * this class might become obsolete
+ * between the document builder and other metadata classes, eg {@code FieldMetadata}. In the long run
+ * this class might become obsolete.
  *
  * @author Hardy Ferentschik
  */
