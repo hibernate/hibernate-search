@@ -44,7 +44,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class NoOpOptimizerStrategy implements OptimizerStrategy {
+public class ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 
 	private static final Log log = LoggerFactory.make();
 
