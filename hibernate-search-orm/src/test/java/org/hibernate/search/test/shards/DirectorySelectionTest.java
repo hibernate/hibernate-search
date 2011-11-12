@@ -98,7 +98,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 			Assert.fail( "should have failed" );
 		}
 		catch ( IllegalArgumentException e ) {
-			Assert.assertEquals( "HSEARCH000113: 'null' is not a valid index name", e.getMessage() );
+			Assert.assertEquals( "HSEARCH000111: At least one index name must be provided: can't open an IndexReader on nothing", e.getMessage() );
 		}
 	}
 

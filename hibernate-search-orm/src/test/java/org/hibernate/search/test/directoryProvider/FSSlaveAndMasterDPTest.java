@@ -181,7 +181,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 			FileHelper.delete( root );
 		}
 
-		if ( !root.mkdir() ) {
+		if ( !root.mkdirs() ) {
 			throw new HibernateException( "Unable to setup test directories" );
 		}
 
@@ -240,6 +240,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cfg.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy + "nooooot" );
 		cfg.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave );
 		cfg.setProperty( "hibernate.search.default.refresh", "1" ); //every second
+		cfg.setProperty( "hibernate.search.lucene_version", "LUCENE_CURRENT" );
 		cfg.setProperty(
 				"hibernate.search.default.directory_provider", "filesystem-slave"
 		);
@@ -262,6 +263,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cfg[0].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy );
 		cfg[0].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + masterMain );
 		cfg[0].setProperty( "hibernate.search.default.refresh", "1" ); //every second
+		cfg[0].setProperty( "hibernate.search.lucene_version", "LUCENE_CURRENT" );
 		cfg[0].setProperty(
 				"hibernate.search.default.directory_provider", "filesystem-master"
 		);
@@ -270,6 +272,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cfg[1].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy );
 		cfg[1].setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + slave );
 		cfg[1].setProperty( "hibernate.search.default.refresh", "1" ); //every second
+		cfg[1].setProperty( "hibernate.search.lucene_version", "LUCENE_CURRENT" );
 		//keep the fqcn to make sure non short cut solutions still work
 		cfg[1].setProperty(
 				"hibernate.search.default.directory_provider", "filesystem-slave"

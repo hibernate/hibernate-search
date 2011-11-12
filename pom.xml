@@ -529,10 +529,10 @@
                             </goals>
                             <phase>generate-sources</phase>
                             <configuration>
-                                <compilerArguments>-AloggingVersion=3.0</compilerArguments>
                                 <processors>
                                     <processor>org.jboss.logging.generator.apt.LoggingToolsProcessor</processor>
                                 </processors>
+                                <compilerArguments>-AloggingVersion=3.0 -AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.6 -target 1.6</compilerArguments>
                             </configuration>
                         </execution>
                         <!-- Run annotation processors on src/test/java sources -->
@@ -543,10 +543,10 @@
                             </goals>
                             <phase>generate-test-sources</phase>
                             <configuration>
-                                <compilerArguments>-AloggingVersion=3.0</compilerArguments>
                                 <processors>
                                     <processor>org.jboss.logging.generator.apt.LoggingToolsProcessor</processor>
                                 </processors>
+                                <compilerArguments>-AloggingVersion=3.0 -AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.6 -target 1.6</compilerArguments>
                             </configuration>
                         </execution>
                     </executions>

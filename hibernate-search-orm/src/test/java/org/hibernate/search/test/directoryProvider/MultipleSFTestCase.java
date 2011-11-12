@@ -91,10 +91,8 @@ public abstract class MultipleSFTestCase extends TestCase {
 	}
 
 	protected void setUp() throws Exception {
-		if ( sessionFactories == null || sessionFactories[0] == null || lastTestClass != getClass() ) {
-			buildSessionFactories( getAnnotatedClasses(), getAnnotatedPackages(), getXmlFiles() );
-			lastTestClass = getClass();
-		}
+		buildSessionFactories( getAnnotatedClasses(), getAnnotatedPackages(), getXmlFiles() );
+		lastTestClass = getClass();
 	}
 
 	protected void tearDown() throws Exception {
