@@ -45,7 +45,7 @@ import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -115,7 +115,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	}
 
 	private void indexAllQueue(Session session) {
-		final ClassNavigator sessionInitializer = new HibernateSessionLoadingInitializer(
+		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
 				(SessionImplementor) session );
 		try {
 			while ( true ) {
@@ -142,7 +142,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void index( Object entity, Session session, ClassNavigator sessionInitializer ) throws InterruptedException {
+	private void index( Object entity, Session session, InstanceInitializer sessionInitializer ) throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
 		EntityIndexBinder entityIndexBinding = entityIndexBinders.get( clazz );

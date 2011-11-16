@@ -31,10 +31,10 @@ import org.hibernate.search.backend.spi.Work;
  * Initialization strategies might vary according to the integrating framework;
  * when integrating with Infinispan (as Infinispan Query) no initialization is needed.
  *
- * @see org.hibernate.search.impl.SimpleClassNavigator
+ * @see org.hibernate.search.impl.SimpleInitializer
  * @author Sanne Grinovero &lt;sanne@hibernate.org&gt; (C) 2011 Red Hat Inc.
  */
-public interface ClassNavigator {
+public interface InstanceInitializer {
 
 	<T> Class<T> getClassFromWork(Work<T> work);
 

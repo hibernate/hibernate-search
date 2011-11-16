@@ -32,7 +32,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
@@ -96,7 +96,7 @@ public class ManualConfiguration implements SearchConfiguration {
 	}
 
 	@Override
-	public ClassNavigator getClassHelper() {
+	public InstanceInitializer getInstanceInitializer() {
 		return HibernateStatelessInitializer.INSTANCE;
 	}
 }

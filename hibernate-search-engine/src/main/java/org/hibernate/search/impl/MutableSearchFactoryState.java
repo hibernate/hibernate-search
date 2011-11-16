@@ -35,7 +35,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
@@ -65,7 +65,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private IndexManagerHolder allIndexesManager;
 	private ErrorHandler errorHandler;
 	private TimeoutExceptionFactory defaultTimeoutExceptionFactory;
-	private ClassNavigator classHelper;
+	private InstanceInitializer instanceInitializer;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -83,7 +83,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		allIndexesManager = oldFactoryState.getAllIndexesManager();
 		errorHandler = oldFactoryState.getErrorHandler();
 		defaultTimeoutExceptionFactory = oldFactoryState.getDefaultTimeoutExceptionFactory();
-		classHelper = oldFactoryState.getClassHelper();
+		instanceInitializer = oldFactoryState.getInstanceInitializer();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -213,12 +213,12 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	@Override
-	public ClassNavigator getClassHelper() {
-		return classHelper;
+	public InstanceInitializer getInstanceInitializer() {
+		return instanceInitializer;
 	}
 
-	public void setClassHelper(ClassNavigator classHelper) {
-		this.classHelper = classHelper;
+	public void setInstanceInitializer(InstanceInitializer instanceInitializer) {
+		this.instanceInitializer = instanceInitializer;
 	}
 
 	@Override

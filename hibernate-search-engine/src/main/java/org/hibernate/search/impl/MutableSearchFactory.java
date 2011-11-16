@@ -45,7 +45,7 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
@@ -225,8 +225,8 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	}
 
 	@Override
-	public ClassNavigator getClassHelper() {
-		return delegate.getClassHelper();
+	public InstanceInitializer getInstanceInitializer() {
+		return delegate.getInstanceInitializer();
 	}
 
 	@Override

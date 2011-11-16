@@ -40,7 +40,7 @@ import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -62,11 +62,11 @@ public class WorkPlan {
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
 
-	private final ClassNavigator classHelper;
+	private final InstanceInitializer instanceInitializer;
 
 	public WorkPlan(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
-		this.classHelper = searchFactoryImplementor.getClassHelper();
+		this.instanceInitializer = searchFactoryImplementor.getInstanceInitializer();
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class WorkPlan {
 	 */
 	public <T> void addWork(Work<T> work) {
 		approximateWorkQueueSize++;
-		Class<T> entityClass = classHelper.getClassFromWork( work );
+		Class<T> entityClass = instanceInitializer.getClassFromWork( work );
 		PerClassWork classWork = getClassWork( entityClass );
 		classWork.addWork( work );
 	}
@@ -145,7 +145,7 @@ public class WorkPlan {
 	 * @param value the entity to be processed
 	 */
 	public <T> void recurseContainedIn(T value) {
-		Class<T> entityClass = classHelper.getClass( value );
+		Class<T> entityClass = instanceInitializer.getClass( value );
 		PerClassWork classWork = getClassWork( entityClass );
 		classWork.recurseContainedIn( value );
 	}
@@ -299,7 +299,7 @@ public class WorkPlan {
 		 */
 		void recurseContainedIn(T value) {
 			if ( documentBuilder.requiresProvidedId() ) {
-				log.containedInPointsToProvidedId( classHelper.getClass( value ) );
+				log.containedInPointsToProvidedId( instanceInitializer.getClass( value ) );
 			}
 			else {
 				Serializable extractedId = documentBuilder.getId( value );

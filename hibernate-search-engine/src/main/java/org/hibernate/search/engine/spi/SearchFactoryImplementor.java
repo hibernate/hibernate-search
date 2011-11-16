@@ -28,7 +28,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
@@ -75,7 +75,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	IndexManagerHolder getAllIndexesManager();
 
 	/**
-	 * @return returns an instance of {@code ClassNavigator} for class/object traversal.
+	 * @return returns an instance of {@code InstanceInitializer} for class/object initialization.
 	 */
-	ClassNavigator getClassHelper();
+	InstanceInitializer getInstanceInitializer();
 }
