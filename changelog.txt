@@ -1,6 +1,48 @@
 Hibernate Search Changelog
 ==========================
 
+4.0.0.CR2 (16-11-2011)
+----------------------
+
+** Bug
+    * [HSEARCH-745] - Empty Index and FacetManagerImpl.getFacets() NullPointerException
+    * [HSEARCH-784] - Ensure all Analyzers are closed at shutdown
+    * [HSEARCH-832] - Use Log constant for logs and exceptions raised in the Serialization layer
+    * [HSEARCH-835] - Use more efficient serialization for simple types used as id in Avro serializer
+    * [HSEARCH-932] - Line numbers of debug log statements are wrong
+    * [HSEARCH-951] - excludeLimit() has no effect on QueryBuilder.range().above() queries
+    * [HSEARCH-953] - Remove unused type variable in EntityIndexBinder
+    * [HSEARCH-954] - BackendQueueProcessor should specify behaviour for the case of null passed to applyWork and applyStream work
+    * [HSEARCH-956] - Avro resources loaded via the wrong ClassLoader
+    * [HSEARCH-960] - Index.UN_TOKENIZED overrides other tokenized fields that share the same name
+    * [HSEARCH-961] - ObjectNotFoundException not caught in FullTextSession for deleted objects
+    * [HSEARCH-966] - logWorkDone is not called anymore from Add- or UpdateWorkDelegate
+    * [HSEARCH-967] - Hibernate Search archetype resolver generated ${project.version} as org.hibernate:hibernate-search-analyzers version
+    * [HSEARCH-969] - Logging events are split across multiple lines
+
+** Improvement
+    * [HSEARCH-571] - MassIndexer eats lock Exception
+    * [HSEARCH-831] - Better serialize AttributeImpl
+    * [HSEARCH-853] - Review OptimizerStrategy API and Workspace interface
+    * [HSEARCH-884] - Revisit the architecture section to make it clearer for an Hibernate Search user
+    * [HSEARCH-957] - Rename default index manager name from 'transactional' to 'directory-based'
+    * [HSEARCH-963] - Add authorgroup to docbook sources
+    * [HSEARCH-971] - Make OptimizerStrategy threadsafe and skip excessive optimisation triggers
+    * [HSEARCH-974] - Rename ClassNavigator to InstanceInitalizer
+
+** Task
+    * [HSEARCH-680] - Clarify the documentation around date bridges and that they are using DateTools
+    * [HSEARCH-732] - Add hibernate-entitymanager and javassist as optional dependencies in the distribution
+    * [HSEARCH-829] - Example IdHashShardingStrategy doesn't handle PurgeAll properly
+    * [HSEARCH-854] - OptimizerStrategy should be invoked by the backend
+    * [HSEARCH-949] - Update online documentation
+    * [HSEARCH-958] - Move slf4j dependecies out of the root project
+    * [HSEARCH-964] - Upgrade to Hibernate Commons Annotations 4.0.0.Final
+    * [HSEARCH-965] - Upgrade JBoss Logging dependencies to 3.1.0.CR1
+    * [HSEARCH-973] - Make sure Hibernate Search builds against JDK 7
+    * [HSEARCH-978] - Upgrade to Hibernate Core 4.0.0.CR6 and Logging processor 1.0.0.CR5
+
+
 4.0.0.CR1 (13-10-2011)
 ----------------------
 
