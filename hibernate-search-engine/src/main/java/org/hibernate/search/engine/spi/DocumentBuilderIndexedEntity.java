@@ -47,7 +47,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -171,11 +171,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param similarity the Similarity implementation set at the related index level
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
-	 * @param classHelper helper class for class object graph navigation
+	 * @param instanceInitializer helper class for class object graph navigation
 	 */
 	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, Similarity similarity,
-			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassNavigator classHelper) {
-		super( clazz, context, similarity, reflectionManager, optimizationBlackList, classHelper );
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {
+		super( clazz, context, similarity, reflectionManager, optimizationBlackList, instanceInitializer );
 		// special case @ProvidedId
 		ProvidedId provided = findProvidedId( clazz, reflectionManager );
 		if ( provided != null ) {
@@ -352,10 +352,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		else if ( add && !delete) {
-			queue.add( createAddWork( entityClass, entity, id, idInString, this.classHelper ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, this.instanceInitalizer ) );
 		}
 		else if ( add && delete ) {
-			queue.add( createUpdateWork( entityClass, entity, id, idInString, this.classHelper ) );
+			queue.add( createUpdateWork( entityClass, entity, id, idInString, this.instanceInitalizer ) );
 		}
 	}
 	
@@ -375,7 +375,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return contextualBridge.objectToString( value );
 	}
 
-	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, ClassNavigator sessionInitializer) {
+	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
 		final AddLuceneWork addWork;
@@ -388,7 +388,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return addWork;
 	}
 	
-	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, ClassNavigator sessionInitializer) {
+	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
 		final UpdateLuceneWork addWork;
@@ -412,13 +412,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
-	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, ClassNavigator objectInitializer) {
+	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer) {
 		if ( fieldToAnalyzerMap == null ) {
 			throw new IllegalArgumentException( "fieldToAnalyzerMap cannot be null" );
 		}
 
 		Document doc = new Document();
-		this.classHelper.getClass( instance );
+		this.instanceInitalizer.getClass( instance );
 		final Class<?> entityType = objectInitializer.getClass( instance );
 		doc.setBoost( getMetadata().getClassBoost( instance ) );
 
@@ -464,7 +464,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									 Map<String, String> fieldToAnalyzerMap,
 									 Set<String> processedFieldNames,
 									 ContextualExceptionBridge contextualBridge,
-									 ClassNavigator objectInitializer) {
+									 InstanceInitializer objectInitializer) {
 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
@@ -601,7 +601,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 	}
 
-	private Object unproxy(Object instance, ClassNavigator objectInitializer) {
+	private Object unproxy(Object instance, InstanceInitializer objectInitializer) {
 		if ( instance == null )
 			return null;
 			
@@ -681,7 +681,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( entity == null || idGetter == null || idProvided ) {
 			throw new IllegalStateException( "Cannot guess id from entity" );
 		}
-		Object unproxiedEntity = this.classHelper.unproxy( entity );
+		Object unproxiedEntity = this.instanceInitalizer.unproxy( entity );
 		return (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, idGetter );
 	}
 	

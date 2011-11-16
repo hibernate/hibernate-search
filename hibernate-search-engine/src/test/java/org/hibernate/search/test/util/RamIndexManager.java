@@ -25,10 +25,10 @@ import java.util.Properties;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
-import org.hibernate.search.impl.SimpleClassNavigator;
+import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 
@@ -85,8 +85,8 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		}
 
 		@Override
-		public ClassNavigator getClassHelper() {
-			return new SimpleClassNavigator();
+		public InstanceInitializer getInstanceInitializer() {
+			return new SimpleInitializer();
 		}
 	}
 

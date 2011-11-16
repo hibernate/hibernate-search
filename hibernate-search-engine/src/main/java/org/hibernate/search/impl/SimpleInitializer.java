@@ -24,14 +24,14 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 
 /**
- * Simple pass-through implementation of ClassNavigator.
+ * Simple pass-through implementation of {@code InstanceInitializer}.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class SimpleClassNavigator implements ClassNavigator {
+public class SimpleInitializer implements InstanceInitializer {
 
 	@Override
 	public Object unproxy(Object entity) {
@@ -46,6 +46,7 @@ public class SimpleClassNavigator implements ClassNavigator {
 	}
 
 	@Override
+	@SuppressWarnings( "unchecked" )
 	public <T> Class<T> getClass(T entity) {
 		return (Class<T>) entity.getClass();
 	}

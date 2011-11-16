@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
@@ -109,5 +109,5 @@ public interface SearchConfiguration {
 	 */
 	boolean isTransactionManagerExpected();
 
-	ClassNavigator getClassHelper();
+	InstanceInitializer getInstanceInitializer();
 }

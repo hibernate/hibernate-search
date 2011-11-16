@@ -35,7 +35,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 
@@ -91,7 +91,7 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	}
 
 	@Override
-	public ClassNavigator getClassHelper() {
-		return cfg.getClassHelper();
+	public InstanceInitializer getInstanceInitializer() {
+		return cfg.getInstanceInitializer();
 	}
 }

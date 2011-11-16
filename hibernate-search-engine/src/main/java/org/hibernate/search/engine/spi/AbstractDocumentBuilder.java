@@ -75,7 +75,7 @@ import org.hibernate.search.engine.impl.FieldMetadata;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
-import org.hibernate.search.spi.ClassNavigator;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -94,7 +94,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	private final XClass beanXClass;
 	protected final String beanXClassName;
 	protected final Class<?> beanClass;
-	protected final ClassNavigator classHelper;
+	protected final InstanceInitializer instanceInitalizer;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
@@ -121,13 +121,13 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * @param optimizationBlackList keeps track of types on which we need to disable collection events optimizations
 	 */
 	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity,
-			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, ClassNavigator classHelper) {
+			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {
 
 		if ( xClass == null ) {
 			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
 		}
 
-		this.classHelper = classHelper;
+		this.instanceInitalizer = instanceInitializer;
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanXClass = xClass;
 		this.beanXClassName = xClass.getName();

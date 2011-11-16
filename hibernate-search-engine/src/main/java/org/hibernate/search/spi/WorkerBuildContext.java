@@ -32,14 +32,14 @@ package org.hibernate.search.spi;
 public interface WorkerBuildContext extends BuildContext {
 
 	/**
-	 * @return
+	 * @return {@code true} if a transaction manager is expected, {@code false} otherwise.
 	 *
 	 * @see org.hibernate.search.cfg.spi.SearchConfiguration#isTransactionManagerExpected
 	 */
 	boolean isTransactionManagerExpected();
 
 	/**
-	 * @return An instance of the {@code ClassNavigator} interface.
+	 * @return An instance of the {@code InstanceInitializer} interface.
 	 */
-	ClassNavigator getClassHelper();
+	InstanceInitializer getInstanceInitializer();
 }

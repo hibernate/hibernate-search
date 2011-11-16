@@ -312,7 +312,7 @@ public class SearchFactoryBuilder {
 			factoryState.setServiceManager( new ServiceManager( cfg ) );
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
 			factoryState.setErrorHandler( createErrorHandler( cfg ) );
-			factoryState.setClassHelper( cfg.getClassHelper() );
+			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
 		}
 	}
 
@@ -353,7 +353,7 @@ public class SearchFactoryBuilder {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
 				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
-						mappedXClass, context, reflectionManager, optimizationBlackListedTypes, cfg.getClassHelper()
+						mappedXClass, context, reflectionManager, optimizationBlackListedTypes, cfg.getInstanceInitializer()
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
@@ -382,7 +382,7 @@ public class SearchFactoryBuilder {
 							mappedEntity.getSimilarity(),
 							reflectionManager,
 							optimizationBlackListedTypes,
-							cfg.getClassHelper()
+							cfg.getInstanceInitializer()
 					);
 			mappedEntity.setDocumentBuilderIndexedEntity( documentBuilder );
 
@@ -614,8 +614,8 @@ public class SearchFactoryBuilder {
 		}
 
 		@Override
-		public ClassNavigator getClassHelper() {
-			return factoryState.getClassHelper();
+		public InstanceInitializer getInstanceInitializer() {
+			return factoryState.getInstanceInitializer();
 		}
 
 	}
