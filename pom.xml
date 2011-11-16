@@ -138,11 +138,11 @@
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.4.0</luceneVersion>
         <infinispanVersion>5.0.1.FINAL</infinispanVersion>
-        <hibernateVersion>4.0.0.CR4</hibernateVersion>
+        <hibernateVersion>4.0.0.CR6</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.0.Final</hibernateCommonsAnnotationVersion>
         <bytemanVersion>1.5.2</bytemanVersion>
         <jbossLoggingVersion>3.1.0.CR1</jbossLoggingVersion>
-        <jbossLoggingProcessorVersion>1.0.0.CR4</jbossLoggingProcessorVersion>
+        <jbossLoggingProcessorVersion>1.0.0.CR5</jbossLoggingProcessorVersion>
         <jbossJTAVersion>4.15.3.Final</jbossJTAVersion>
     </properties>
 
