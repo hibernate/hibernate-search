@@ -173,6 +173,45 @@ public class SearchIndexerTest {
 		ftsb.close();
 	}
 
+	@Test
+	public void testExtendedIdentifierNaming() throws InterruptedException {
+		//disable automatic indexing, to test manual index creation.
+		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+				.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
+				.addAnnotatedClass( ExtendedIssueEntity.class )
+				.addAnnotatedClass( IssueEntity.class )
+				.setProperty( Environment.INDEXING_STRATEGY, "manual" )
+				.build();
+		{
+			//creating the test data in database only:
+			FullTextSession fullTextSession = ftsb.openFullTextSession();
+			Transaction transaction = fullTextSession.beginTransaction();
+			ExtendedIssueEntity issue = new ExtendedIssueEntity();
+			issue.jiraCode = "HSEARCH-977";
+			issue.jiraDescription = "MassIndexer freezes when there is an indexed 'id' filed, which is not document's id";
+			issue.id = 1l;
+			fullTextSession.persist( issue );
+			transaction.commit();
+			fullTextSession.close();
+		}
+		{
+			//verify index is still empty:
+			assertEquals( 0, countResults( new Term( "jiraDescription", "freezes" ), ftsb, ExtendedIssueEntity.class ) );
+			assertEquals( 0, countResults( new Term( "jiraCode", "HSEARCH" ), ftsb, ExtendedIssueEntity.class ) );
+		}
+		{
+			FullTextSession fullTextSession = ftsb.openFullTextSession();
+			fullTextSession.createIndexer( ExtendedIssueEntity.class )
+					.startAndWait();
+			fullTextSession.close();
+		}
+		{
+			//verify index via term readers:
+			assertEquals( 1, countResults( new Term( "jiraDescription", "freezes" ), ftsb, ExtendedIssueEntity.class ) );
+			assertEquals( 1, countResults( new Term( "id", "1" ), ftsb, ExtendedIssueEntity.class ) );
+		}
+	}
+
 	//helper method
 	private int countResults(Term termForQuery, FullTextSessionBuilder ftSessionBuilder, Class<?> type) {
 		TermQuery fullTextQuery = new TermQuery( termForQuery );
