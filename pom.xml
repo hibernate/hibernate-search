@@ -49,7 +49,7 @@
 
     <issueManagement>
         <system>JIRA</system>
-        <url>http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH</url>
+        <url>https://hibernate.onjira.com/browse/HSEARCH</url>
     </issueManagement>
 
     <scm>
@@ -72,7 +72,7 @@
 
     <ciManagement>
         <system>Hudson</system>
-        <url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-trunk/</url>
+        <url>http://hudson.jboss.org/hudson/view/hibernate/job/hibernate-search-master/</url>
     </ciManagement>
 
     <developers>
