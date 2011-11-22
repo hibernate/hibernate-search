@@ -281,13 +281,11 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4jVersion}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4jVersion}</version>
-                <scope>test</scope>
             </dependency>
             <!--
             Defining log4j here, but due to a bug in Shrinkwrap we still need to define the version explicitly
@@ -297,7 +295,6 @@
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.16</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
@@ -308,25 +305,21 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>1.3.154</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.byteman</groupId>
                 <artifactId>byteman</artifactId>
                 <version>${bytemanVersion}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.byteman</groupId>
                 <artifactId>byteman-install</artifactId>
                 <version>${bytemanVersion}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.byteman</groupId>
                 <artifactId>byteman-bmunit</artifactId>
                 <version>${bytemanVersion}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.jbossts</groupId>
