@@ -49,7 +49,7 @@ public class JMSBackendQueueTask implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
 
-	public static final String INDEX_NAME_JMS_PROPERTY = "hibernate.search.jms.indexNameProperty";
+	public static final String INDEX_NAME_JMS_PROPERTY = "HSearchIndexName";
 
 	private final Collection<LuceneWork> queue;
 	private final JMSBackendQueueProcessor processor;
