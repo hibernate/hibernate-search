@@ -28,6 +28,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.Analyze;
@@ -91,6 +92,7 @@ public class MapBridgeTestEntity {
 	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullIndexed")
+	@MapKeyColumn(nullable = false)
 	public Map<Integer, Language> getNullIndexed() {
 		return nullIndexed;
 	}
@@ -109,6 +111,7 @@ public class MapBridgeTestEntity {
 	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullIndexed")
+	@MapKeyColumn(nullable = false)
 	public Map<Integer, Integer> getNumericNullIndexed() {
 		return numericNullIndexed;
 	}
@@ -126,6 +129,7 @@ public class MapBridgeTestEntity {
 	@IndexedEmbedded
 	@CollectionTable(name = "NullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "nullNotIndexed")
+	@MapKeyColumn(nullable = false)
 	public Map<Integer, String> getNullNotIndexed() {
 		return nullNotIndexed;
 	}
@@ -144,6 +148,7 @@ public class MapBridgeTestEntity {
 	@NumericField
 	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullNotIndexed")
+	@MapKeyColumn(nullable = false)
 	public Map<Integer, Long> getNumericNullNotIndexed() {
 		return numericNullNotIndexed;
 	}
@@ -162,6 +167,7 @@ public class MapBridgeTestEntity {
 	@DateBridge(resolution = Resolution.SECOND)
 	@CollectionTable(name = "Dates", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "dates")
+	@MapKeyColumn(nullable = false)
 	public Map<Integer, Date> getDates() {
 		return dates;
 	}
