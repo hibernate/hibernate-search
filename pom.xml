@@ -958,7 +958,7 @@
                 </dependency>
             </dependencies>
             <properties>
-                <db.dialect>org.hibernate.dialect.SQLServerDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.SQLServer2008Dialect</db.dialect>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
                 <jdbc.url>jdbc:sqlserver://vmg04.mw.lab.eng.bos.redhat.com:1433</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
@@ -979,7 +979,7 @@
                 </dependency>
             </dependencies>
             <properties>
-                <db.dialect>org.hibernate.dialect.SQLServerDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.SQLServer2008Dialect</db.dialect>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
                 <jdbc.url>jdbc:sqlserver://vmg04.mw.lab.eng.bos.redhat.com:1433</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
