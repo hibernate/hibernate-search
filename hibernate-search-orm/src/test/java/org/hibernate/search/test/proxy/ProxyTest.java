@@ -63,7 +63,7 @@ public class ProxyTest extends SearchTestCase {
 		session.close();
 	}
 
-	public void testDeteleProxy() throws Exception {
+	public void testDeleteProxy() throws Exception {
 		createTestData();
 
 		Session s = openSession();
