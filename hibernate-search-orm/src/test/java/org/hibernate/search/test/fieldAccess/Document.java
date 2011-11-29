@@ -51,7 +51,6 @@ public class Document {
 	@Field(name = "Abstract")
 	private String summary;
 
-	@Lob
 	@Field
 	private String text;
 
