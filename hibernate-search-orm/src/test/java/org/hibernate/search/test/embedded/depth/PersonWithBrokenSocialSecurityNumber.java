@@ -25,6 +25,7 @@ package org.hibernate.search.test.embedded.depth;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -34,6 +35,7 @@ import org.hibernate.search.annotations.Indexed;
  * @author Sanne Grinovero
  */
 @Entity
+@Table(name = "PERSON_BROKEN_SSN")
 @Indexed
 public class PersonWithBrokenSocialSecurityNumber {
 	
@@ -67,12 +69,12 @@ public class PersonWithBrokenSocialSecurityNumber {
 	}
 	
 	@DocumentId
-	public String getSocialSecurityNumber() {
+	public String getSSN() {
 		// returning a constant to have changes overwrite each other in the test
 		return "100";
 	}
 	
-	public void setSocialSecurityNumber(String securityNumber) {
+	public void setSSN(String securityNumber) {
 	}
 	
 }

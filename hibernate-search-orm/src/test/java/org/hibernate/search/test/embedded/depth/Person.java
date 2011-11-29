@@ -56,12 +56,12 @@ public class Person {
 
 	public Set<Person> parents = new HashSet<Person>();
 
-	public Set<Person> childs = new HashSet<Person>();
+	public Set<Person> children = new HashSet<Person>();
 
 	public void addParents(Person... persons) {
 		for ( Person p : persons ) {
 			parents.add( p );
-			p.childs.add( this );
+			p.children.add( this );
 		}
 	}
 
@@ -95,12 +95,12 @@ public class Person {
 
 	@ContainedIn
 	@ManyToMany(mappedBy = "parents")
-	public Set<Person> getChilds() {
-		return childs;
+	public Set<Person> getChildren() {
+		return children;
 	}
 
-	public void setChilds(Set<Person> childs) {
-		this.childs = childs;
+	public void setChildren(Set<Person> children) {
+		this.children = children;
 	}
 
 }
