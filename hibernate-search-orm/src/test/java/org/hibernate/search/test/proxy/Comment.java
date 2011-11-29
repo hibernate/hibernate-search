@@ -22,7 +22,7 @@ import java.util.List;
  * @author Tom Kuo
  */
 @Entity
-@Table(name = "comment")
+@Table(name = "comments")
 @Proxy(proxyClass = IComment.class)
 public class Comment implements IComment {
 
