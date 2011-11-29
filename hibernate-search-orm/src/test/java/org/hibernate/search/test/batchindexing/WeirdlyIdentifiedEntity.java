@@ -38,7 +38,7 @@ import org.hibernate.search.annotations.Indexed;
 public class WeirdlyIdentifiedEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue
 	private int testsID;
 
 	private String id;
