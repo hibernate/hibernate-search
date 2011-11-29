@@ -86,7 +86,6 @@ public class AlternateDocument {
 		this.summary = summary;
 	}
 
-	@Lob
 	@Field(store = Store.NO)
 	public String getText() {
 		return text;
