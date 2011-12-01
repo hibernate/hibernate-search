@@ -231,7 +231,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 			}
 		}
 		else {
-			pe = new OptimisticLockException( e );
+			pe = new OptimisticLockException( e.getMessage(), e );
 		}
 		return pe;
 	}
