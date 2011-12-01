@@ -43,7 +43,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.fwk.SkipForDialect;
+import org.hibernate.testing.SkipForDialect;
 import org.hibernate.testing.TestForIssue;
 
 /**

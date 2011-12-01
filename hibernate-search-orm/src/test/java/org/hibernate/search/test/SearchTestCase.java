@@ -53,13 +53,13 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.fwk.FailureExpected;
-import org.hibernate.search.test.fwk.SkipForDialect;
 import org.hibernate.search.test.fwk.SkipLog;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.testing.FailureExpected;
+import org.hibernate.testing.SkipForDialect;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 /**

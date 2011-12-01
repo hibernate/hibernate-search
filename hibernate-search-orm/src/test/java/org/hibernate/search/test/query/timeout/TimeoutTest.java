@@ -13,7 +13,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.fwk.SkipForDialect;
+import org.hibernate.testing.SkipForDialect;
 
 /**
  * @author Emmanuel Bernard
