@@ -136,7 +136,7 @@
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.4.0</luceneVersion>
         <infinispanVersion>5.0.1.FINAL</infinispanVersion>
-        <hibernateVersion>4.0.0.CR6</hibernateVersion>
+        <hibernateVersion>4.0.0.CR7</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.1.Final</hibernateCommonsAnnotationVersion>
         <bytemanVersion>1.5.2</bytemanVersion>
         <jbossLoggingVersion>3.1.0.CR2</jbossLoggingVersion>
@@ -653,6 +653,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-help-plugin</artifactId>
                     <version>2.1.1</version>
                 </plugin>
@@ -685,6 +690,19 @@
                                         <goals>
                                             <goal>process-test</goal>
                                             <goal>process</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[2.1,)</versionRange>
+                                        <goals>
+                                            <goal>unpack</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
