@@ -139,7 +139,7 @@
         <hibernateVersion>4.0.0.CR6</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.1.Final</hibernateCommonsAnnotationVersion>
         <bytemanVersion>1.5.2</bytemanVersion>
-        <jbossLoggingVersion>3.1.0.CR1</jbossLoggingVersion>
+        <jbossLoggingVersion>3.1.0.CR2</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.0.CR5</jbossLoggingProcessorVersion>
         <jbossJTAVersion>4.15.3.Final</jbossJTAVersion>
     </properties>
