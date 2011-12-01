@@ -215,25 +215,22 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	public PersistenceException wrapLockException(HibernateException e, LockOptions lockOptions) {
-		PersistenceException pe;
-		if ( e instanceof org.hibernate.OptimisticLockException ) {
-			org.hibernate.OptimisticLockException ole = (org.hibernate.OptimisticLockException) e;
-			pe = new OptimisticLockException( ole.getMessage(), ole, ole.getEntity() );
+		if ( OptimisticLockingCompatibilityHelper.isOptimisticLockException( e ) ) {
+			throw OptimisticLockingCompatibilityHelper.convertToLockException( e );
 		}
 		else if ( e instanceof org.hibernate.PessimisticLockException ) {
 			org.hibernate.PessimisticLockException ple = (org.hibernate.PessimisticLockException) e;
 			if ( lockOptions != null && lockOptions.getTimeOut() > -1 ) {
 				// assume lock timeout occurred if a timeout or NO WAIT was specified
-				pe = new LockTimeoutException( ple.getMessage(), ple, ple.getEntity() );
+				return new LockTimeoutException( ple.getMessage(), ple );
 			}
 			else {
-				pe = new PessimisticLockException( ple.getMessage(), ple, ple.getEntity() );
+				return new PessimisticLockException( ple.getMessage(), ple );
 			}
 		}
 		else {
-			pe = new OptimisticLockException( e.getMessage(), e );
+			return new OptimisticLockException( e.getMessage(), e );
 		}
-		return pe;
 	}
 
 	void throwPersistenceException(PersistenceException e) {
@@ -245,7 +242,6 @@ public class FullTextQueryImpl implements FullTextQuery {
 
 	@SuppressWarnings( { "ThrowableInstanceNeverThrown" })
 	PersistenceException wrapStaleStateException(StaleStateException e) {
-		PersistenceException pe;
 		if ( e instanceof StaleObjectStateException ) {
 			StaleObjectStateException sose = (StaleObjectStateException) e;
 			Serializable identifier = sose.getIdentifier();
@@ -253,20 +249,19 @@ public class FullTextQueryImpl implements FullTextQuery {
 				Object entity = session.load( sose.getEntityName(), identifier );
 				if ( entity instanceof Serializable ) {
 					//avoid some user errors regarding boundary crossing
-					pe = new OptimisticLockException( null, e, entity );
+					return new OptimisticLockException( null, e, entity );
 				}
 				else {
-					pe = new OptimisticLockException( e );
+					return new OptimisticLockException( e );
 				}
 			}
 			else {
-				pe = new OptimisticLockException( e );
+				return new OptimisticLockException( e );
 			}
 		}
 		else {
-			pe = new OptimisticLockException( e );
+			return new OptimisticLockException( e );
 		}
-		return pe;
 	}
 
 	@SuppressWarnings( { "ThrowableInstanceNeverThrown", "unchecked" })
@@ -498,4 +493,5 @@ public class FullTextQueryImpl implements FullTextQuery {
 		//as I see this as an implementation detail that should not be exposed.
 		return query.unwrap( type );
 	}
+
 }
