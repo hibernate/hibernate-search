@@ -653,6 +653,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-help-plugin</artifactId>
                     <version>2.1.1</version>
                 </plugin>
@@ -685,6 +690,19 @@
                                         <goals>
                                             <goal>process-test</goal>
                                             <goal>process</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[2.1,)</versionRange>
+                                        <goals>
+                                            <goal>unpack</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
