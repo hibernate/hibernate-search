@@ -24,6 +24,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 
+/**
+ * Hibernate Search spatial : Benchmarks with {@link http://www.geonames.org} as data source (nearly 8M points)
+ *
+ * Test many queries types :
+ *
+ * - pure distance post filtering
+ * - double numeric range
+ * - grid
+ * - double range + distance
+ * - grid + distance
+ *
+ * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ */
 public class BenchWithGeonames {
 	public static void main(String args[]) {
 		Session session = null;

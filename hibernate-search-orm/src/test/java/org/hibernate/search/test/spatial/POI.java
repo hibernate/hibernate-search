@@ -16,6 +16,11 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+/**
+ * Hibernate Search spatial : Point Of Interest test entity
+ *
+ * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ */
 @Entity
 @Indexed
 public class POI {

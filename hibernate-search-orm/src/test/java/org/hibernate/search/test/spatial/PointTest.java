@@ -5,6 +5,11 @@ import org.junit.Test;
 
 import org.hibernate.search.spatial.impl.Point;
 
+/**
+ * Unit tests for Hibernate Search Spatial point implementation
+ *
+ * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ */
 public class PointTest {
 	@Test
 	public void normalizeTest() {
