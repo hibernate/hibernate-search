@@ -31,7 +31,7 @@ import org.hibernate.search.spatial.impl.Point;
 import java.util.Map;
 
 /**
- * Hibernate Search field bridge, binding a SpatialIndexable to Grid field in the index
+ * Hibernate Search field bridge, binding a Coordinates to Grid field in the index
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
@@ -55,9 +55,9 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
 
-			SpatialIndexable spatialIndexable = ( SpatialIndexable ) value;
+			Coordinates coordinates = (Coordinates) value;
 
-			Point point = Point.fromDegrees( spatialIndexable.getLatitude(), spatialIndexable.getLongitude() );
+			Point point = Point.fromDegrees( coordinates.getLatitude(), coordinates.getLongitude() );
 
 			Map<Integer, String> cellIds = GridHelper.getGridCellsIds( point, min_grid_level, max_grid_level );
 
