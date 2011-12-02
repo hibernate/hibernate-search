@@ -299,7 +299,41 @@ public class Essay {
                 </row>
               </tbody>
             </tgroup>
-          </informaltable></para>
+          </informaltable>
+          <classname>@NumericField</classname> supports only <classname>Double</classname>,
+          <classname>Long</classname>, <classname>Integer</classname> and
+          <classname>Float</classname>. It is not possible to take any advantage
+          from a similar functionality in Lucene for the other numeric types, so
+          remaining types should use the string encoding via the default or
+          custom <classname>TwoWayFieldBridge</classname>.</para>
+
+        <para>It is possible to use a custom <classname>NumericFieldBridge</classname>
+        assuming you can deal with the approximation during type transformation:</para>
+
+        <example id="example-custom-numericfieldbridge">
+        <title>Defining a custom <classname>NumericFieldBridge</classname></title>
+        <programlisting language="JAVA" role="JAVA">
+public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
+   private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
+
+   @Override
+   public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+      if ( value != null ) {
+         BigDecimal decimalValue = (BigDecimal) value;
+         Long indexedValue = Long.valueOf( decimalValue.multiply( storeFactor ).longValue() );
+         luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
+      }
+   }
+
+    @Override
+    public Object get(String name, Document document) {
+        String fromLucene = document.get( name );
+        BigDecimal storedBigDecimal = new BigDecimal( fromLucene );
+        return storedBigDecimal.divide( storeFactor );
+    }
+
+}
+</programlisting></example>
 
         <note>
           <para>Lucene marks the numeric field API still as experimental and

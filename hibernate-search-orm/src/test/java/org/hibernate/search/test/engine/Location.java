@@ -1,24 +1,27 @@
 package org.hibernate.search.test.engine;
 
+import static org.hibernate.search.annotations.FieldCacheType.CLASS;
+import static org.hibernate.search.annotations.FieldCacheType.ID;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
 import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Store;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import static org.hibernate.search.annotations.FieldCacheType.CLASS;
-import static org.hibernate.search.annotations.FieldCacheType.ID;
 
 /**
  * @author: Gustavo Fernandes
@@ -53,6 +56,10 @@ public class Location {
 	@Field @NumericField
 	private Integer ranking;
 
+	@Field @NumericField
+	@FieldBridge(impl = BigDecimalNumericFieldBridge.class)
+	private BigDecimal visibleStars;
+
 	@Field
 	private String description;
 
@@ -72,7 +79,7 @@ public class Location {
 	}
 
 	public Location(int id, Long counter, double latitude, Double longitude,
-					Integer ranking, String description, Double multiple, Country country) {
+					Integer ranking, String description, Double multiple, Country country, BigDecimal visibleStars) {
 		this.id = id;
 		this.counter = counter;
 		this.longitude = longitude;
@@ -81,6 +88,7 @@ public class Location {
 		this.description = description;
 		this.multiple = multiple;
 		this.country = country;
+		this.visibleStars = visibleStars;
 	}
 
 	public void addPinPoints(PinPoint...pinPoints) {
