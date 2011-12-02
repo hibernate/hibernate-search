@@ -64,6 +64,7 @@ public class BatchCoordinator implements Runnable {
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
 	private final ErrorHandler errorHandler;
+	private final int idFetchSize;
 
 	public BatchCoordinator(Set<Class<?>> rootEntities,
 							SearchFactoryImplementor searchFactoryImplementor,
@@ -77,7 +78,9 @@ public class BatchCoordinator implements Runnable {
 							boolean purgeAtStart,
 							boolean optimizeAfterPurge,
 							MassIndexerProgressMonitor monitor,
-							Integer writerThreads) {
+							Integer writerThreads,
+							int idFetchSize) {
+		this.idFetchSize = idFetchSize;
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.sessionFactory = sessionFactory;
@@ -131,8 +134,8 @@ public class BatchCoordinator implements Runnable {
 					new BatchIndexingWorkspace(
 							searchFactoryImplementor, sessionFactory, type,
 							objectLoadingThreads, collectionLoadingThreads,
-							cacheMode, objectLoadingBatchSize,
-							endAllSignal, monitor, backend, objectsLimit
+							cacheMode, objectLoadingBatchSize, endAllSignal,
+							monitor, backend, objectsLimit, idFetchSize
 					)
 			);
 		}

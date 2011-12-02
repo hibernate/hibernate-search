@@ -123,7 +123,7 @@ public interface MassIndexer {
 	 * As a results the index will not be consistent
 	 * with the database: use only for testing on an (undefined) subset of database data.
 	 * @param maximum
-	 * @return
+	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer limitIndexedObjectsTo(long maximum);
 
@@ -143,5 +143,15 @@ public interface MassIndexer {
 	 * while waiting.
 	 */
 	void startAndWait() throws InterruptedException;
+
+	/**
+	 * Specifies the fetch size to be used when loading primary keys
+	 * if objects to be indexed. Some databases accept special values,
+	 * for example MySQL might benefit from using {@link Integer#MIN_VALUE}
+	 * otherwise it will attempt to preload everything in memory.
+	 * @param idFetchSize
+	 * @return <tt>this</tt> for method chaining
+	 */
+	public MassIndexer idFetchSize(int idFetchSize);
 
 }

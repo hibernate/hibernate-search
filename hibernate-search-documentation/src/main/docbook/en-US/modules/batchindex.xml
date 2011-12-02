@@ -241,6 +241,7 @@ transaction.commit();</programlisting>
  .cacheMode( CacheMode.NORMAL )
  .threadsToLoadObjects( 5 )
  .threadsForIndexWriter( 3 )
+ .idFetchSize( 150 )
  .threadsForSubsequentFetching( 20 )
  .progressMonitor( monitor ) //a MassIndexerProgressMonitor implementation
  .startAndWait();</programlisting>
@@ -331,6 +332,11 @@ transaction.commit();</programlisting>
     <para>All <literal>.indexwriter</literal> parameters are Lucene specific
     and Hibernate Search is just passing these parameters through - see <xref
     linkend="lucene-indexing-performance" /> for more details.</para>
+
+    <para>The <classname>MassIndexer</classname> uses a forward only scrollable result to iterate
+    on the primary keys to be loaded, but MySQL's JDBC driver will load all values in memory;
+    to avoid this "optimisation" set <literal>idFetchSize</literal> to
+    <literal>Integer.MIN_VALUE</literal>.</para>
 
   </section>
 </chapter>
