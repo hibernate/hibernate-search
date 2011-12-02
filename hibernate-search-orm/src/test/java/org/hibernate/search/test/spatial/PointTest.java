@@ -3,7 +3,7 @@ package org.hibernate.search.test.spatial;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.hibernate.search.spatial.Point;
+import org.hibernate.search.spatial.impl.Point;
 
 public class PointTest {
 	@Test

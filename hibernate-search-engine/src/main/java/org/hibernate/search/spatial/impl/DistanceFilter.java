@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.spatial;
+package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
 
@@ -35,10 +35,10 @@ import org.apache.lucene.search.QueryWrapperFilter;
  * Use double lat,long field ine the index from a SpatialIndexable field declaration
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see SpatialFieldBridge
- * @see SpatialIndexable
+ * @see org.hibernate.search.spatial.SpatialFieldBridge
+ * @see org.hibernate.search.spatial.SpatialIndexable
  */
-final class DistanceFilter extends Filter {
+public final class DistanceFilter extends Filter {
 
 	private Filter previousFilter;
 	private Point center;
@@ -54,7 +54,7 @@ final class DistanceFilter extends Filter {
 	 * @param radius radius of the search perimeter
 	 * @param fieldName name of the field implementing SpatialIndexable
 	 *
-	 * @see SpatialIndexable
+	 * @see org.hibernate.search.spatial.SpatialIndexable
 	 */
 	public DistanceFilter(Filter previousFilter, Point center, double radius, String fieldName) {
 		if ( previousFilter != null ) {

@@ -25,6 +25,8 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
+import org.hibernate.search.spatial.impl.GridHelper;
+import org.hibernate.search.spatial.impl.Point;
 
 import java.util.Map;
 

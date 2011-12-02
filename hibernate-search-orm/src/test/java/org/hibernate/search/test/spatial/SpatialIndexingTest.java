@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.spatial.Point;
+import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
