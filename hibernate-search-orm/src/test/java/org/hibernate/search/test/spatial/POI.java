@@ -8,9 +8,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.SpatialFieldBridge;
-import org.hibernate.search.spatial.SpatialIndexable;
-import org.hibernate.search.spatial.SpatialFieldBridge;
-import org.hibernate.search.spatial.SpatialIndexable;
+import org.hibernate.search.spatial.Coordinates;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -43,8 +41,8 @@ public class POI {
 	@Field(store = Store.YES, index = Index.YES, analyze = Analyze.NO)
 	@FieldBridge(impl = SpatialFieldBridge.class)
 	@Embedded
-	public SpatialIndexable getLocation() {
-		return new SpatialIndexable() {
+	public Coordinates getLocation() {
+		return new Coordinates() {
 			@Override
 			public double getLatitude() {
 				return latitude;

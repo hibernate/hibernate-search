@@ -45,12 +45,12 @@ public abstract class SpatialQueryBuilder {
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene filter to be used in a Query
 	 *
 	 * @see	Query
-	 * @see	SpatialIndexable
+	 * @see	Coordinates
 	 * @see Filter
 	 */
 	public static Filter buildGridFilter(Point center, double radius, String fieldName) {
@@ -67,7 +67,7 @@ public abstract class SpatialQueryBuilder {
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene filter to be used in a Query
 	 *
@@ -75,7 +75,7 @@ public abstract class SpatialQueryBuilder {
 	 * Warning if passed null DistanceFilter constructor use a
 	 * filter wrapped match all query (time/ressource consuming !)
 	 * @see	Query
-	 * @see	SpatialIndexable
+	 * @see	Coordinates
 	 * @see	DistanceFilter
 	 * @see Filter
 	 */
@@ -90,12 +90,12 @@ public abstract class SpatialQueryBuilder {
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
-	 * @see	SpatialIndexable
+	 * @see	Coordinates
 	 * @see ConstantScoreQuery
 	 */
 	public static Query buildGridQuery(Point center, double radius, String fieldName) {
@@ -110,12 +110,12 @@ public abstract class SpatialQueryBuilder {
 	 * @param latitude WGS84 latitude of the center of the search 
 	 * @param longitude WGS84 longitude of the center of the search 
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
-	 * @see	SpatialIndexable
+	 * @see	Coordinates
 	 * @see ConstantScoreQuery
 	 */
 	public static Query buildGridQuery(double latitude, double longitude, double radius, String fieldName) {
@@ -128,12 +128,12 @@ public abstract class SpatialQueryBuilder {
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
-	 * @see	SpatialIndexable
+	 * @see	Coordinates
 	 */
 	public static Query buildDistanceQuery(Point center, double radius, String fieldName) {
 		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
@@ -147,12 +147,12 @@ public abstract class SpatialQueryBuilder {
 	 * @param latitude WGS84 latitude of the center of the search 
 	 * @param longitude WGS84 longitude of the center of the search 
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
-	 * @see	SpatialIndexable
+	 * @see	Coordinates
 	 */
 	public static Query buildDistanceQuery(double latitude, double longitude, double radius, String fieldName) {
 		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
@@ -166,12 +166,12 @@ public abstract class SpatialQueryBuilder {
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
-	 * @see	SpatialIndexable
+	 * @see	Coordinates
 	 */
 	public static Query buildSpatialQuery(Point center, double radius, String fieldName) {
 		return new ConstantScoreQuery(
@@ -192,12 +192,12 @@ public abstract class SpatialQueryBuilder {
 	 * @param latitude WGS84 latitude of the center of the search 
 	 * @param longitude WGS84 longitude of the center of the search 
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
-	 * @see	SpatialIndexable
+	 * @see	Coordinates
 	 */
 	public static Query buildSpatialQuery(double latitude, double longitude, double radius, String fieldName) {
 		return buildSpatialQuery( Point.fromDegrees( latitude, longitude), radius, fieldName );

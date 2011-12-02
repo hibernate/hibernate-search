@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.spatial.impl;
 
-import org.hibernate.search.spatial.SpatialIndexable;
+import org.hibernate.search.spatial.Coordinates;
 
 /**
  * Normalized latitude,longitude holder (in [-90;90],[-180,180]) with distance and destination computations methods
@@ -28,7 +28,7 @@ import org.hibernate.search.spatial.SpatialIndexable;
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  * @author Mathieu Perez <mathieu.perez@novacodex.net>
  */
-public final class Point implements SpatialIndexable {
+public final class Point implements Coordinates {
 
 	private final double latitude;
 	private final double longitude;

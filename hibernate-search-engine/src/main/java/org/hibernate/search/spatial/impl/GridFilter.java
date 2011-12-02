@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  * @see org.hibernate.search.spatial.SpatialFieldBridge
- * @see org.hibernate.search.spatial.SpatialIndexable
+ * @see org.hibernate.search.spatial.Coordinates
  */
 public final class GridFilter extends Filter {
 
