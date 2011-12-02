@@ -32,11 +32,11 @@ import org.apache.lucene.search.QueryWrapperFilter;
 
 /**
  * Lucene Filter for filtering documents which have been indexed with Hibernate Search Spatial SpatialFieldBridge
- * Use double lat,long field ine the index from a SpatialIndexable field declaration
+ * Use double lat,long field ine the index from a Coordinates field declaration
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  * @see org.hibernate.search.spatial.SpatialFieldBridge
- * @see org.hibernate.search.spatial.SpatialIndexable
+ * @see org.hibernate.search.spatial.Coordinates
  */
 public final class DistanceFilter extends Filter {
 
@@ -52,9 +52,9 @@ public final class DistanceFilter extends Filter {
 	 * it is better to use it last
 	 * @param center center of the search perimeter
 	 * @param radius radius of the search perimeter
-	 * @param fieldName name of the field implementing SpatialIndexable
+	 * @param fieldName name of the field implementing Coordinates
 	 *
-	 * @see org.hibernate.search.spatial.SpatialIndexable
+	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public DistanceFilter(Filter previousFilter, Point center, double radius, String fieldName) {
 		if ( previousFilter != null ) {

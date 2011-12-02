@@ -25,7 +25,7 @@ package org.hibernate.search.spatial;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public interface SpatialIndexable {
+public interface Coordinates {
 	/**
 	 * @return the latitude in degrees
 	 */
