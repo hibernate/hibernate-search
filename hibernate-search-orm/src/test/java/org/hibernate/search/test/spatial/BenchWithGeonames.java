@@ -206,7 +206,7 @@ public class BenchWithGeonames {
 		}
 	}
 
-	@Test
+	//@Test
 	public void LoadGeonames() {
 		Session session = null;
 		FullTextSession fullTextSession = null;
@@ -258,7 +258,7 @@ public class BenchWithGeonames {
 		}
 	}
 
-	@Test
+	//@Test
 	public void FacetTest() {
 		Session session = null;
 		FullTextSession fullTextSession = null;
