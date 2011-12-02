@@ -19,6 +19,7 @@
 
 package org.hibernate.search.test.query.fieldcache;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -78,7 +79,8 @@ public class CachedNumericIdTest extends SearchTestCase {
 		Transaction transaction = fullTextSession.beginTransaction();
 		Country italy = new Country( "Italy", 39d );
 		for (int i = 0; i < NUM_LOCATIONS; i++) {
-			session.persist( new Location( i, Long.valueOf(i), 7*i, Double.valueOf( 9*i ), Integer.valueOf( 100 - i), String.valueOf(i) + "42", null, italy ) );
+			session.persist( new Location( i, Long.valueOf(i), 7*i, Double.valueOf( 9*i ), Integer.valueOf( 100 - i),
+					String.valueOf(i) + "42", null, italy, BigDecimal.ONE ) );
 		}
 		transaction.commit();
 		session.close();
