@@ -28,6 +28,11 @@ import org.apache.lucene.search.QueryWrapperFilter;
 
 import java.util.List;
 
+import org.hibernate.search.spatial.impl.DistanceFilter;
+import org.hibernate.search.spatial.impl.GridFilter;
+import org.hibernate.search.spatial.impl.GridHelper;
+import org.hibernate.search.spatial.impl.Point;
+
 /**
  * The SpatialQueryBuilder hold builder methods for Grid, Distance and Spatial (Grid+Distance) filters and queries
  *

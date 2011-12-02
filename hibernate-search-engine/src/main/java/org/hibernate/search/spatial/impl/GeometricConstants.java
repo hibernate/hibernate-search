@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.spatial;
+package org.hibernate.search.spatial.impl;
 
 /**
  * Geometric constants to use in GridHelper calculation
@@ -27,7 +27,7 @@ package org.hibernate.search.spatial;
  * @author Mathieu Perez <mathieu.perez@novacodex.net>
  * @see GridHelper
  */
-interface GeometricConstants {
+public interface GeometricConstants {
 
 	int LONGITUDE_DEGREE_RANGE = 360;
 	int LONGITUDE_DEGREE_MIN = -LONGITUDE_DEGREE_RANGE / 2;

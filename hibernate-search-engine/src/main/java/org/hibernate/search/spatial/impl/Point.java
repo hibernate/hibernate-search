@@ -18,7 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.spatial;
+package org.hibernate.search.spatial.impl;
+
+import org.hibernate.search.spatial.SpatialIndexable;
 
 /**
  * Normalized latitude,longitude holder (in [-90;90],[-180,180]) with distance and destination computations methods

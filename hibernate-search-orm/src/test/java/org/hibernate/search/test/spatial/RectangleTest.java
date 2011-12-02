@@ -2,8 +2,8 @@ package org.hibernate.search.test.spatial;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.hibernate.search.spatial.Point;
-import org.hibernate.search.spatial.Rectangle;
+import org.hibernate.search.spatial.impl.Point;
+import org.hibernate.search.spatial.impl.Rectangle;
 
 public class RectangleTest {
 	@Test

@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.spatial;
+package org.hibernate.search.spatial.impl;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -35,10 +35,10 @@ import java.util.List;
  * Use denormalized Grid Cell Ids to return a sub set of documents near the center
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see SpatialFieldBridge
- * @see SpatialIndexable
+ * @see org.hibernate.search.spatial.SpatialFieldBridge
+ * @see org.hibernate.search.spatial.SpatialIndexable
  */
-final class GridFilter extends Filter {
+public final class GridFilter extends Filter {
 
 	private final List<String> gridCellsIds;
 	private final String fieldName;
