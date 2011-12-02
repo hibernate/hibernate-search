@@ -68,6 +68,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private boolean purgeAtStart = true;
 	private boolean optimizeAfterPurge = true;
 	private MassIndexerProgressMonitor monitor;
+	private int idFetchSize = 100; //reasonable default as we only load IDs
 
 	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory, Class<?>... entities) {
 		this.searchFactoryImplementor = searchFactory;
@@ -212,12 +213,20 @@ public class MassIndexerImpl implements MassIndexer {
 				objectLoadingThreads, collectionLoadingThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor, writerThreads
+				monitor, writerThreads, idFetchSize
 		);
 	}
 
 	public MassIndexer limitIndexedObjectsTo(long maximum) {
 		this.objectsLimit = maximum;
+		return this;
+	}
+
+	@Override
+	public MassIndexer idFetchSize(int idFetchSize) {
+		// don't check for positive/zero values as it's actually used by some databases
+		// as special values which might be useful.
+		this.idFetchSize = idFetchSize;
 		return this;
 	}
 }

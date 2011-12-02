@@ -62,6 +62,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
 	private final ErrorHandler errorHandler;
+	private final int idFetchSize;
 
 	/**
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
@@ -77,7 +78,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
 			Class<?> indexedType, MassIndexerProgressMonitor monitor,
-			long objectsLimit, ErrorHandler errorHandler) {
+			long objectsLimit, ErrorHandler errorHandler, int idFetchSize) {
 				this.destination = fromIdentifierListToEntities;
 				this.sessionFactory = sessionFactory;
 				this.batchSize = objectLoadingBatchSize;
@@ -85,6 +86,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 				this.monitor = monitor;
 				this.objectsLimit = objectsLimit;
 				this.errorHandler = errorHandler;
+				this.idFetchSize = idFetchSize;
 				log.trace( "created" );
 	}
 	
@@ -140,7 +142,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			.createCriteria( indexedType )
 			.setProjection( Projections.id() )
 			.setCacheable( false )
-			.setFetchSize( 100 );
+			.setFetchSize( idFetchSize );
 		
 		ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY );
 		ArrayList<Serializable> destinationList = new ArrayList<Serializable>( batchSize );

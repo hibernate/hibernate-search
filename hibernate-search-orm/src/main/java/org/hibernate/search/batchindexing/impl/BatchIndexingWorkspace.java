@@ -78,6 +78,8 @@ public class BatchIndexingWorkspace implements Runnable {
 
 	private final long objectsLimit;
 
+	private final int idFetchSize;
+
 	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor,
 								  SessionFactory sessionFactory,
 								  Class<?> entityType,
@@ -88,9 +90,11 @@ public class BatchIndexingWorkspace implements Runnable {
 								  CountDownLatch endAllSignal,
 								  MassIndexerProgressMonitor monitor,
 								  BatchBackend backend,
-								  long objectsLimit) {
+								  long objectsLimit,
+								  int idFetchSize) {
 
 		this.indexedType = entityType;
+		this.idFetchSize = idFetchSize;
 		this.idNameOfIndexedType = searchFactoryImplementor.getIndexBindingForEntity( entityType )
 				.getDocumentBuilder()
 				.getIdentifierName();
@@ -150,7 +154,7 @@ public class BatchIndexingWorkspace implements Runnable {
 			final IdentifierProducer producer = new IdentifierProducer(
 					fromIdentifierListToEntities, sessionFactory,
 					objectLoadingBatchSize, indexedType, monitor,
-					objectsLimit, errorHandler
+					objectsLimit, errorHandler, idFetchSize
 			);
 			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
 
