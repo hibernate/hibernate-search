@@ -22,20 +22,23 @@ public class SpatialIndexingTest extends SearchTestCase {
 		tx.commit();
 
 		tx = fullTextSession.beginTransaction();
-		Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildGridQuery( center, 50, "location" );
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildGridQuery( centerLatitude, centerLongitude, 50, "location" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 1, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildGridQuery( center, 1, "location" );
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildGridQuery( centerLatitude, centerLongitude, 1, "location" );
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, POI.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 0, results2.size() );
 
 		org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildDistanceQuery(
-				center,
+				centerLatitude,
+				centerLongitude,
 				50,
 				"location"
 		);
@@ -44,7 +47,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 0, results3.size() );
 
 		org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSpatialQuery(
-				center,
+				centerLatitude,
+				centerLongitude,
 				50,
 				"location"
 		);
@@ -53,7 +57,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 0, results4.size() );
 
 		org.apache.lucene.search.Query luceneQuery5 = SpatialQueryBuilder.buildSpatialQuery(
-				center,
+				centerLatitude,
+				centerLongitude,
 				51,
 				"location"
 		);
