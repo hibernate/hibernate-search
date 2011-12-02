@@ -64,8 +64,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class IndexManagerHolder {
 	
-	public static final String INDEX_MANAGER_IMPL_NAME = "indexmanager";
-
 	private static final Log log = LoggerFactory.make();
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
@@ -178,7 +176,7 @@ public class IndexManagerHolder {
 	}
 
 	private IndexManager createDirectoryManager(String indexName, Properties indexProps, WorkerBuildContext context) {
-		String indexManagerName = indexProps.getProperty( INDEX_MANAGER_IMPL_NAME, DEFAULT_INDEX_MANAGER_NAME);
+		String indexManagerName = indexProps.getProperty( Environment.INDEX_MANAGER_IMPL_NAME, DEFAULT_INDEX_MANAGER_NAME);
 		final IndexManager manager;
 		if ( StringHelper.isEmpty( indexManagerName ) ) {
 			manager = new DirectoryBasedIndexManager();
