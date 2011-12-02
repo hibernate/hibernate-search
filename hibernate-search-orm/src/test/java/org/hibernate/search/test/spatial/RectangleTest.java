@@ -5,6 +5,11 @@ import org.junit.Test;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.Rectangle;
 
+/**
+ * Unit tests for Hibernate Search spatial rectangle implementation
+ *
+ * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ */
 public class RectangleTest {
 	@Test
 	public void boundingBoxTest() {

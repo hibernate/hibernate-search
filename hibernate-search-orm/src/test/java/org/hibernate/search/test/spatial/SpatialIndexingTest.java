@@ -11,6 +11,11 @@ import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
+/**
+ * Hibernate Search spatial : unit tests on indexing POIs in with Grid and Grid+Distance
+ *
+ * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ */
 public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testIndexing() throws Exception {
