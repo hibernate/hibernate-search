@@ -33,7 +33,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.AnalyzerUtils;
+import org.hibernate.search.util.AnalyzerUtils;
 
 /**
  * Tests the Solr analyzer creation framework.
