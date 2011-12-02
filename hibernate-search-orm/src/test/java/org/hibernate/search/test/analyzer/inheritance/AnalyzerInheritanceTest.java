@@ -37,6 +37,8 @@ import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
+
 /**
  * Test to verify HSEARCH-267.
  *
@@ -94,7 +96,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 		Analyzer analyzer = s.getSearchFactory().getAnalyzer( SubClass.class );
 
 		Token[] tokens = AnalyzerUtils.tokensFromAnalysis(analyzer, "name", "Proca\u00EFne");
-		AnalyzerUtils.assertTokensEqual( tokens, new String[]{"Procaine"});
+		assertTokensEqual( tokens, new String[]{"Procaine"});
 
 		s.close();
 	}

@@ -35,6 +35,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.AnalyzerUtils;
 
+import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
+
 /**
  * Tests the Solr analyzer creation framework.
  * This test might be affected by the version of the Analyzers being used. If it was to fail
@@ -103,52 +105,52 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		Analyzer analyzer = fts.getSearchFactory().getAnalyzer( "standard_analyzer" );
 		String text = "This is just FOOBAR's";
 		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "This", "is", "just", "FOOBAR" } );
+		assertTokensEqual( tokens, new String[] { "This", "is", "just", "FOOBAR" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "html_standard_analyzer" );
 		text = "This is <b>foo</b><i>bar's</i>";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "This", "is", "foo", "bar" } );
+		assertTokensEqual( tokens, new String[] { "This", "is", "foo", "bar" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "html_whitespace_analyzer" );
 		text = "This is <b>foo</b><i>bar's</i>";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "This", "is", "foo", "bar's" } );
+		assertTokensEqual( tokens, new String[] { "This", "is", "foo", "bar's" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "trim_analyzer" );
 		text = " Kittens!   ";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "kittens" } );
+		assertTokensEqual( tokens, new String[] { "kittens" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "length_analyzer" );
 		text = "ab abc abcd abcde abcdef";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "abc", "abcd", "abcde" } );
+		assertTokensEqual( tokens, new String[] { "abc", "abcd", "abcde" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "length_analyzer" );
 		text = "ab abc abcd abcde abcdef";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "abc", "abcd", "abcde" } );
+		assertTokensEqual( tokens, new String[] { "abc", "abcd", "abcde" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "porter_analyzer" );
 		text = "bikes bikes biking";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "bike", "bike", "bike" } );
+		assertTokensEqual( tokens, new String[] { "bike", "bike", "bike" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "word_analyzer" );
 		text = "CamelCase";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "Camel", "Case" } );
+		assertTokensEqual( tokens, new String[] { "Camel", "Case" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "synonym_analyzer" );
 		text = "ipod cosmos";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "ipod", "i-pod", "universe", "cosmos" } );
+		assertTokensEqual( tokens, new String[] { "ipod", "i-pod", "universe", "cosmos" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "shingle_analyzer" );
 		text = "please divide this sentence into shingles";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual(
+		assertTokensEqual(
 				tokens,
 				new String[] {
 						"please",
@@ -169,20 +171,20 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		text = "The quick brown fox jumped over the lazy dogs";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
 		AnalyzerUtils.displayTokens( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual(
+		assertTokensEqual(
 				tokens, new String[] { "0", "KK", "BRN", "FKS", "JMPT", "OFR", "0", "LS", "TKS" }
 		);
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "pattern_analyzer" );
 		text = "foo,bar";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "foo", "bar" } );
+		assertTokensEqual( tokens, new String[] { "foo", "bar" } );
 
 		// CharStreamFactories test
 		analyzer = fts.getSearchFactory().getAnalyzer( "mapping_char_analyzer" );
 		text = "CORA\u00C7\u00C3O DE MEL\u00C3O";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "CORACAO", "DE", "MELAO" } );
+		assertTokensEqual( tokens, new String[] { "CORACAO", "DE", "MELAO" } );
 
 		fts.close();
 	}
