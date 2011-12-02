@@ -188,4 +188,14 @@ public final class Environment {
 	 * can upgrade Hibernate Search and control when to eventually upgrade the Lucene format.
 	 */
 	public static final org.apache.lucene.util.Version DEFAULT_LUCENE_MATCH_VERSION = org.apache.lucene.util.Version.LUCENE_CURRENT;
+
+	/**
+	 * Used to specify an alternative IndexManager implementation for a specific index.
+	 * This is an index scoped property, so it needs to be prefixed by default or the index name, for example:
+	 * <ul>
+	 * <li>hibernate.search.default.indexmanager</li>
+	 * <li>hibernate.search.Books.indexmanager</li>
+	 * </ul>
+	 */
+	public static final String INDEX_MANAGER_IMPL_NAME = "indexmanager";
 }
