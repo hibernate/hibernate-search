@@ -26,6 +26,8 @@ package org.hibernate.search.test.analyzer;
 import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.Assert;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.queryParser.QueryParser;
@@ -153,16 +155,16 @@ public class AnalyzerTest extends SearchTestCase {
 		// returning the same tokens all the time. We just want to make sure that
 		// the right analyzers are used.
 		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "entity", "" );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "alarm", "dog", "performance" } );
+		assertTokensEqual( tokens, new String[] { "alarm", "dog", "performance" } );
 
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "property", "" );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "sound", "cat", "speed" } );
+		assertTokensEqual( tokens, new String[] { "sound", "cat", "speed" } );
 
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "field", "" );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "music", "elephant", "energy" } );
+		assertTokensEqual( tokens, new String[] { "music", "elephant", "energy" } );
 
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "component.componentProperty", "" );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "noise", "mouse", "light" } );
+		assertTokensEqual( tokens, new String[] { "noise", "mouse", "light" } );
 
 		// test border cases
 		try {
@@ -191,9 +193,17 @@ public class AnalyzerTest extends SearchTestCase {
 		// returning the same tokens all the time. We just want to make sure that
 		// the right analyzers are used.
 		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "notAnalyzed", "pass through" );
-		AnalyzerUtils.assertTokensEqual( tokens, new String[] { "pass through" } );
+		assertTokensEqual( tokens, new String[] { "pass through" } );
 
 		session.close();
+	}
+
+	public static void assertTokensEqual(Token[] tokens, String[] strings) {
+		Assert.assertEquals( strings.length, tokens.length );
+
+		for ( int i = 0; i < tokens.length; i++ ) {
+			Assert.assertEquals( "index " + i, strings[i], AnalyzerUtils.getTermText( tokens[i] ) );
+		}
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {

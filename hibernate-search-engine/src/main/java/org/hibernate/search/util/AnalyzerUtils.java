@@ -28,7 +28,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
@@ -121,14 +120,6 @@ public class AnalyzerUtils {
 					.append( token.type() )
 					.append( "] " );
 			log.debug( builder.toString() );
-		}
-	}
-
-	public static void assertTokensEqual(Token[] tokens, String[] strings) {
-		Assert.assertEquals( strings.length, tokens.length );
-
-		for ( int i = 0; i < tokens.length; i++ ) {
-			Assert.assertEquals( "index " + i, strings[i], getTermText( tokens[i] ) );
 		}
 	}
 
