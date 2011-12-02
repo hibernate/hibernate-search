@@ -44,7 +44,7 @@ public abstract class SpatialQueryBuilder {
 	 * grid indexation to filter document at radius
 	 *
 	 * @param center center of the search discus
-	 * @param radius distance max to center
+	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
 	 * @return Lucene filter to be used in a Query
@@ -66,7 +66,7 @@ public abstract class SpatialQueryBuilder {
 	 * Returns a Lucene filter to fine filter document by distance
 	 *
 	 * @param center center of the search discus
-	 * @param radius distance max to center
+	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
 	 * @return Lucene filter to be used in a Query
@@ -89,7 +89,7 @@ public abstract class SpatialQueryBuilder {
 	 * GridFilter into a ConstantScoreQuery
 	 *
 	 * @param center center of the search discus
-	 * @param radius distance max to center
+	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
 	 * @return Lucene Query to be used in a search
@@ -101,13 +101,33 @@ public abstract class SpatialQueryBuilder {
 	public static Query buildGridQuery(Point center, double radius, String fieldName) {
 		return new ConstantScoreQuery( buildGridFilter( center, radius, fieldName ) );
 	}
+	
+	/**
+	 * Returns a Lucene Query which rely on Hibernate Search Spatial
+	 * grid indexation to filter document at radius by wrapping a
+	 * GridFilter into a ConstantScoreQuery
+	 *
+	 * @param latitude WGS84 latitude of the center of the search 
+	 * @param longitude WGS84 longitude of the center of the search 
+	 * @param radius distance max to center in km
+	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 *
+	 * @return Lucene Query to be used in a search
+	 *
+	 * @see	Query
+	 * @see	SpatialIndexable
+	 * @see ConstantScoreQuery
+	 */
+	public static Query buildGridQuery(double latitude, double longitude, double radius, String fieldName) {
+		return buildGridQuery( Point.fromDegrees( latitude, longitude ), radius, fieldName);
+	}
 
 	/**
 	 * Returns a Lucene Query searching directly by conmputing distance against
 	 * all docs in the index (costly !)
 	 *
 	 * @param center center of the search discus
-	 * @param radius distance max to center
+	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
 	 * @return Lucene Query to be used in a search
@@ -119,6 +139,25 @@ public abstract class SpatialQueryBuilder {
 		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
 		return new ConstantScoreQuery( buildDistanceFilter( allFilter, center, radius, fieldName ) );
 	}
+	
+	/**
+	 * Returns a Lucene Query searching directly by conmputing distance against
+	 * all docs in the index (costly !)
+	 *
+	 * @param latitude WGS84 latitude of the center of the search 
+	 * @param longitude WGS84 longitude of the center of the search 
+	 * @param radius distance max to center in km
+	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 *
+	 * @return Lucene Query to be used in a search
+	 *
+	 * @see	Query
+	 * @see	SpatialIndexable
+	 */
+	public static Query buildDistanceQuery(double latitude, double longitude, double radius, String fieldName) {
+		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
+		return buildDistanceQuery( Point.fromDegrees( latitude, longitude ), radius, fieldName );
+	}
 
 	/**
 	 * Returns a Lucene Query which rely on Hibernate Search Spatial
@@ -126,7 +165,7 @@ public abstract class SpatialQueryBuilder {
 	 * by a fine DistanceFilter
 	 *
 	 * @param center center of the search discus
-	 * @param radius distance max to center
+	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
 	 * @return Lucene Query to be used in a search
@@ -143,5 +182,24 @@ public abstract class SpatialQueryBuilder {
 						fieldName
 				)
 		);
+	}
+	
+	/**
+	 * Returns a Lucene Query which rely on Hibernate Search Spatial
+	 * grid indexation to filter document at radius and filter its results
+	 * by a fine DistanceFilter
+	 *
+	 * @param latitude WGS84 latitude of the center of the search 
+	 * @param longitude WGS84 longitude of the center of the search 
+	 * @param radius distance max to center in km
+	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
+	 *
+	 * @return Lucene Query to be used in a search
+	 *
+	 * @see	Query
+	 * @see	SpatialIndexable
+	 */
+	public static Query buildSpatialQuery(double latitude, double longitude, double radius, String fieldName) {
+		return buildSpatialQuery( Point.fromDegrees( latitude, longitude), radius, fieldName );
 	}
 }
