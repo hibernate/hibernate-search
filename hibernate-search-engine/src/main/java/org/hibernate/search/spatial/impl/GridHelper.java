@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.spatial;
+package org.hibernate.search.spatial.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  * @author Mathieu Perez <mathieu.perez@novacodex.net>
- * @see SpatialFieldBridge
+ * @see org.hibernate.search.spatial.SpatialFieldBridge
  */
 public abstract class GridHelper {
 

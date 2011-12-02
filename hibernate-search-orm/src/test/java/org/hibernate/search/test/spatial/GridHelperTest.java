@@ -5,8 +5,8 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import org.hibernate.search.spatial.GridHelper;
-import org.hibernate.search.spatial.Point;
+import org.hibernate.search.spatial.impl.GridHelper;
+import org.hibernate.search.spatial.impl.Point;
 
 public class GridHelperTest {
 

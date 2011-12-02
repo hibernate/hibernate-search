@@ -2,7 +2,6 @@ package org.hibernate.search.test.spatial;
 
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
-import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -16,8 +15,8 @@ import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.spatial.Point;
-import org.hibernate.search.spatial.Rectangle;
+import org.hibernate.search.spatial.impl.Point;
+import org.hibernate.search.spatial.impl.Rectangle;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
 
 import java.io.BufferedReader;
