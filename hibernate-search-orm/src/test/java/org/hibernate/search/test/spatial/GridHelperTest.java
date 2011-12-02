@@ -7,7 +7,11 @@ import java.util.Map;
 
 import org.hibernate.search.spatial.impl.GridHelper;
 import org.hibernate.search.spatial.impl.Point;
-
+/**
+ * Hibernate Search spatial : helper class to compute grid indexes, ids, and optimal level for search
+ *
+ * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ */
 public class GridHelperTest {
 
 	@Test
