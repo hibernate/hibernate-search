@@ -948,6 +948,25 @@
             <id>sybase155</id>
             <dependencies>
                 <dependency>
+                    <groupId>jdbcdrivers</groupId>
+                    <artifactId>sybase</artifactId>
+                    <version>26502</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <db.dialect>org.hibernate.dialect.SybaseASE15Dialect</db.dialect>
+                <jdbc.driver>com.sybase.jdbc4.jdbc.SybDriver</jdbc.driver>
+                <jdbc.url>jdbc:sybase:Tds:vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+        <profile>
+            <id>sybase155-jtds</id>
+            <dependencies>
+                <dependency>
                     <groupId>net.sourceforge.jtds</groupId>
                     <artifactId>jtds</artifactId>
                     <version>1.2.4</version>
@@ -960,7 +979,7 @@
                 <jdbc.url>jdbc:jtds:sybase://vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation />
+                <jdbc.isolation/>
             </properties>
         </profile>
 
