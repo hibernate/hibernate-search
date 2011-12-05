@@ -24,6 +24,10 @@
 package org.hibernate.search.engine.spi;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.management.MemoryManagerMXBean;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,6 +94,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public abstract class AbstractDocumentBuilder<T> {
 	private static final Log log = LoggerFactory.make();
 	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = new DefaultStringBridge();
+	private static final String EMPTY = "";
 
 	private final XClass beanXClass;
 	protected final String beanXClassName;
@@ -243,10 +248,18 @@ public abstract class AbstractDocumentBuilder<T> {
 	 *
 	 * @param instance the instance to be indexed
 	 * @param workplan the current work plan
+	 * @param currentDepth the current {@link DepthValidator} object used to check the graph traversal
 	 */
-	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan) {
+	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan, DepthValidator currentDepth) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
+
+			DepthValidator depth = updateDepth( instance, member, currentDepth );
+			depth.increaseDepth();
+			
+			if (depth.isMaxDepthReached())
+				return;
+
 			Object value = ReflectionHelper.getMemberValue( instance, member );
 
 			if ( value == null ) {
@@ -257,7 +270,7 @@ public abstract class AbstractDocumentBuilder<T> {
 				@SuppressWarnings("unchecked")
 				T[] array = (T[]) value;
 				for ( T arrayValue : array ) {
-					processSingleContainedInInstance( workplan, arrayValue );
+					processSingleContainedInInstance( workplan, arrayValue, depth );
 				}
 			}
 			else if ( member.isCollection() ) {
@@ -279,14 +292,29 @@ public abstract class AbstractDocumentBuilder<T> {
 				}
 				if ( collection != null ) {
 					for ( T collectionValue : collection ) {
-						processSingleContainedInInstance( workplan, collectionValue );
+						processSingleContainedInInstance( workplan, collectionValue, depth );
 					}
 				}
 			}
 			else {
-				processSingleContainedInInstance( workplan, value );
+				processSingleContainedInInstance( workplan, value, depth );
 			}
 		}
+	}
+
+	private DepthValidator updateDepth(Object instance, XMember member, DepthValidator currentDepth) {
+		if ( currentDepth != null )
+			return currentDepth;
+
+		if ( instance == null )
+			return new DepthValidator( Integer.MAX_VALUE );
+
+		Map<String, Integer> maxDepths = metadata.containedInDepths;
+		String key = depthKey( instance.getClass(), member.getName() );
+		if ( maxDepths.containsKey( key ) )
+			return new DepthValidator( maxDepths.get( key ) );
+
+		return new DepthValidator( Integer.MAX_VALUE );
 	}
 
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
@@ -512,12 +540,102 @@ public abstract class AbstractDocumentBuilder<T> {
 	private void checkForContainedIn(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata) {
 		ContainedIn containedAnn = member.getAnnotation( ContainedIn.class );
 		if ( containedAnn != null ) {
+			updateContainedInMaxDepths( member, propertiesMetadata);
 			ReflectionHelper.setAccessible( member );
 			propertiesMetadata.containedInGetters.add( member );
 			//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
 			this.containedInCollectionRoles
 					.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 		}
+	}
+
+	private void updateContainedInMaxDepths(XProperty member, PropertiesMetadata propertiesMetadata) {
+		updateContainedInMaxDepth( member, propertiesMetadata, XClass.ACCESS_FIELD );
+		updateContainedInMaxDepth( member, propertiesMetadata, XClass.ACCESS_PROPERTY );
+	}
+
+	private String mappedBy(XMember member) {
+		Annotation[] annotations = member.getAnnotations();
+		for ( Annotation annotation : annotations ) {
+			String mappedBy = mappedBy( annotation );
+			if ( isSet( mappedBy ) )
+				return mappedBy;
+		}
+		return EMPTY;
+	}
+
+	private String mappedBy(Annotation annotation) {
+		try {
+			Method declaredMethod = annotation.annotationType().getDeclaredMethod( "mappedBy" );
+			return (String) declaredMethod.invoke( annotation );
+		}
+		catch ( SecurityException e ) {
+			return EMPTY;
+		}
+		catch ( NoSuchMethodException e ) {
+			return EMPTY;
+		}
+		catch ( IllegalArgumentException e ) {
+			return EMPTY;
+		}
+		catch ( IllegalAccessException e ) {
+			return EMPTY;
+		}
+		catch ( InvocationTargetException e ) {
+			return EMPTY;
+		}
+	}
+
+	private boolean isSet(String mappedBy) {
+		if ( mappedBy == null )
+			return false;
+
+		if ( mappedBy.trim().isEmpty() )
+			return false;
+
+		return true;
+	}
+
+	private void updateContainedInMaxDepth(XMember memberWithContainedIn, PropertiesMetadata propertiesMetadata, String accessType) {
+		XClass memberReturnedType = memberWithContainedIn.getElementClass();
+		String mappedBy = mappedBy( memberWithContainedIn );
+		List<XProperty> returnedTypeProperties = memberReturnedType.getDeclaredProperties( accessType );
+		for ( XProperty property : returnedTypeProperties ) {
+			if ( isCorrespondingIndexedEmbedded( mappedBy, property ) ) {
+					updateDepthProperties( memberWithContainedIn, propertiesMetadata, memberReturnedType, property );
+					break;
+				}
+			}
+		}
+
+	private boolean isCorrespondingIndexedEmbedded(String mappedBy, XProperty property) {
+		if ( !property.isAnnotationPresent( IndexedEmbedded.class ) )
+			return false;
+
+		if ( mappedBy.isEmpty() )
+			return true;
+
+		if ( mappedBy.equals( property.getName() ) )
+			return true;
+
+		return false;
+	}
+
+	private void updateDepthProperties(XMember memberWithContainedIn, PropertiesMetadata propertiesMetadata, XClass memberReturnedType, XProperty property) {
+		int depth = property.getAnnotation( IndexedEmbedded.class ).depth();
+		propertiesMetadata.containedInDepths.put( depthKey( memberReturnedType, memberWithContainedIn.getName() ), depth );
+	}
+
+	private String depthKey(XClass clazz, String mappedBy) {
+		return key( clazz.getName(), mappedBy );
+	}
+
+	private String depthKey(Class<?> clazz, String mappedBy) {
+		return key( clazz.getName(), mappedBy );
+	}
+
+	private String key(String className, String mappedBy) {
+		return className + "#" + mappedBy;
 	}
 
 	private void checkForIndexedEmbedded(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix,
@@ -756,8 +874,8 @@ public abstract class AbstractDocumentBuilder<T> {
 		return collection;
 	}
 
-	private <T> void processSingleContainedInInstance(WorkPlan workplan, T value) {
-		workplan.recurseContainedIn( value );
+	private <T> void processSingleContainedInInstance(WorkPlan workplan, T value, DepthValidator depth) {
+		workplan.recurseContainedIn( value, depth );
 	}
 
 	/**
@@ -932,6 +1050,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		public final List<PropertiesMetadata> embeddedPropertiesMetadata = new ArrayList<PropertiesMetadata>();
 		public final List<Container> embeddedContainers = new ArrayList<Container>();
 		public final List<XMember> containedInGetters = new ArrayList<XMember>();
+		public final Map<String, Integer> containedInDepths = new HashMap<String, Integer>();
 
 		public final List<String> classNames = new ArrayList<String>();
 		public final List<Store> classStores = new ArrayList<Store>();
