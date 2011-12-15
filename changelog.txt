@@ -1,6 +1,37 @@
 Hibernate Search Changelog
 ==========================
 
+4.0.0.Final (15-12-2011)
+------------------------
+
+** Bug
+    * [HSEARCH-678] - Document type limitations of @NumericField
+    * [HSEARCH-955] - Property name for index manager selection should be defined in Environment
+    * [HSEARCH-980] - Byteman dependency is not properly scoped
+    * [HSEARCH-984] - Hibernate Search 4 violates javax.jms.Message contract, incompatible with HornetQ
+    * [HSEARCH-986] - DB matrix test failures against Oracle
+    * [HSEARCH-988] - DB matrix test failures against DB2
+    * [HSEARCH-989] - DB matrix test org.hibernate.search.test.RamDirectoryTest against Sybase
+    * [HSEARCH-990] - DB matrix test failures against SQLServer
+    * [HSEARCH-992] - DB matrix test org.hibernate.search.test.bridge.BridgeTest fails against DB2
+    * [HSEARCH-999] - TimeoutTest and JPATimeoutTest fail against Sybase
+
+** Improvement
+    * [HSEARCH-983] - Improve compatibility of the MassIndexer with MySQL
+    * [HSEARCH-987] - Expose option to set JDBC FetchSize in MassIndexer
+
+** New Feature
+    * [HSEARCH-749] - Add AnalyzerUtils to src/main/java and distribute it in the main jar
+
+** Task
+    * [HSEARCH-947] - Update to Hibernate Core 4.0.0.Final
+    * [HSEARCH-991] - Upgrade to Hibernate Commons Annotations 4.0.1
+    * [HSEARCH-993] - Create a test for @Lob fields
+    * [HSEARCH-994] - Update JBoss Logger to 3.1.0.CR2
+    * [HSEARCH-995] - Eclipse import fails as maven-dependency-plugin needs m2 exclusion
+    * [HSEARCH-996] - Upgrade to Hibernate Core 4.0.0.CR7
+
+
 4.0.0.CR2 (16-11-2011)
 ----------------------
 
@@ -906,7 +937,6 @@ Hibernate Search Changelog
     * [HSEARCH-217] - Proper errors on parsing of all numeric configuration parameters
     * [HSEARCH-227] - Criteria based fetching is not used when objects are loaded one by one (iterate())
 
-
 ** Improvement
     * [HSEARCH-19] - Do not filter classes on queries when we know that all Directories only contains the targeted classes
     * [HSEARCH-156] - Retrofit FieldBridge.set lucene parameters into a LuceneOptions class
@@ -943,7 +973,6 @@ Hibernate Search Changelog
     * [HSEARCH-200] - Expose IndexWriter setting MAX_FIELD_LENGTH via IndexWriterSetting
     * [HSEARCH-212] - Added ReaderProvider strategy reusing unchanged segments (using reader.reopen())
     * [HSEARCH-220] - introduce session.flushToIndexes API and deprecate batch_size
-
 
 ** Task
     * [HSEARCH-169] - Migrate to Lucene 2.3.1 (index corruption possiblity in 2.3.0)
@@ -998,7 +1027,6 @@ Hibernate Search Changelog
 
 ** New Feature
     * [HSEARCH-81] - Create a @ClassBridge Annotation (John Griffin)
-
 
 ** Task
     * [HSEARCH-98] - Add a Getting started section to the reference documentation
@@ -1057,7 +1085,6 @@ Hibernate Search Changelog
     * [HSEARCH-89] - FullText wrapper for JPA APIs
     * [HSEARCH-103] - Ability to override the indexName in the FSDirectoryProviders family
 
-
 ** Task
     * [HSEARCH-94] - Deprecate ContextHelper
 
@@ -1108,7 +1135,6 @@ Hibernate Search Changelog
     * [HSEARCH-53] - Add support for projection (ie read the data from the index only)
     * [HSEARCH-61] - Move from MultiSearcher to MultiReader
     * [HSEARCH-62] - Support pluggable ReaderProvider strategies
-    
 
 ** Task
     * [HSEARCH-65] - Update to JBoss Embedded beta2
@@ -1129,7 +1155,6 @@ Release Notes - Hibernate Search - Version 3.0.0.beta1
     * [HSEARCH-24] - Potential deadlock when using multiple DirectoryProviders in a highly concurrent index update
     * [HSEARCH-25] - Class cast exception in org.hibernate.search.impl.FullTextSessionImpl<init>(FullTextSessionImpl.java:54)
     * [HSEARCH-28] - Wrong indexDir property in Apache Lucene Integration
-
 
 ** Improvement
     * [HSEARCH-29] - Share the initialization state across all Search event listeners instance
