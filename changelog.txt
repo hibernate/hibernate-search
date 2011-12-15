@@ -15,6 +15,7 @@ Hibernate Search Changelog
     * [HSEARCH-990] - DB matrix test failures against SQLServer
     * [HSEARCH-992] - DB matrix test org.hibernate.search.test.bridge.BridgeTest fails against DB2
     * [HSEARCH-999] - TimeoutTest and JPATimeoutTest fail against Sybase
+    * [HSEARCH-1005] - Create properly aggregated javadocs
 
 ** Improvement
     * [HSEARCH-983] - Improve compatibility of the MassIndexer with MySQL

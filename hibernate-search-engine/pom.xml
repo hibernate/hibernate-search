@@ -172,40 +172,6 @@
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <tags>
-                        <tag>
-                            <name>experimental</name>
-                            <placement>a</placement>
-                            <head>Experimental</head>
-                        </tag>
-                    </tags>
-                    <docfilessubdirs>true</docfilessubdirs>
-                    <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-                    <links>
-                        <link>http://download.oracle.com/javase/6/docs/api/</link>
-                        <link>http://docs.jboss.org/hibernate/stable/core/javadocs/</link>
-                        <link>http://lucene.apache.org/java/3_4_0/api/all</link>
-                    </links>
-                    <packagesheader>Hibernate Search Packages</packagesheader>
-                    <doctitle>Hibernate Search ${project.version}</doctitle>
-                    <windowtitle>Hibernate Search ${project.version}</windowtitle>
-                    <bottom>
-                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-injection-plugin</artifactId>
                 <executions>

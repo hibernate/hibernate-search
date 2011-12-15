@@ -50,15 +50,6 @@
             <includes>
                 <include>org.hibernate:hibernate-search-engine</include>
             </includes>
-            <sources>
-                <includeModuleDirectory>false</includeModuleDirectory>
-                <fileSets>
-                    <fileSet>
-                        <directory>target/apidocs</directory>
-                        <outputDirectory>docs/api</outputDirectory>
-                    </fileSet>
-                </fileSets>
-            </sources>
             <binaries>
                 <outputDirectory>dist</outputDirectory>
                 <unpack>false</unpack>
@@ -111,19 +102,6 @@
             <includes>
                 <include>org.hibernate:hibernate-search-orm</include>
             </includes>
-            <sources>
-                <includeModuleDirectory>false</includeModuleDirectory>
-                <fileSets>
-                    <fileSet>
-                        <directory>target/apidocs</directory>
-                        <outputDirectory>docs/api</outputDirectory>
-                    </fileSet>
-                    <fileSet>
-                        <directory>target/docbook/publish</directory>
-                        <outputDirectory>docs/reference</outputDirectory>
-                    </fileSet>
-                </fileSets>
-            </sources>
             <binaries>
                 <outputDirectory>dist</outputDirectory>
                 <unpack>false</unpack>
@@ -222,6 +200,10 @@
                     <fileSet>
                         <directory>target/docbook/publish</directory>
                         <outputDirectory>docs/reference</outputDirectory>
+                    </fileSet>
+                    <fileSet>
+                        <directory>target/site/apidocs</directory>
+                        <outputDirectory>docs/api</outputDirectory>
                     </fileSet>
                 </fileSets>
             </sources>
