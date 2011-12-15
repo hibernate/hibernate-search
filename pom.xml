@@ -27,7 +27,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0.Final</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>
@@ -979,7 +979,7 @@
                 <jdbc.url>jdbc:jtds:sybase://vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation/>
+                <jdbc.isolation />
             </properties>
         </profile>
 
