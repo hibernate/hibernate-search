@@ -345,7 +345,14 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		f.set( this, flushSynch );
 	}
 
-	private AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
+	/**
+	 * It is not suggested to extend FullTextIndexEventListener, but when needed to implement special
+	 * use cases implementors might need this method. If you have to extent this, please report
+	 * your use case so that better long term solutions can be discussed.
+	 * @param entity
+	 * @return the DocumentBuilder for the specified entity
+	 */
+	protected AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
 		Class<?> clazz = entity.getClass();
 		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( clazz );
 		if ( entityIndexBinding != null ) {
