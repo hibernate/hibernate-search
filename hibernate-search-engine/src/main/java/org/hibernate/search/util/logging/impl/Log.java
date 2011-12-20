@@ -551,15 +551,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 130, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
 			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
-
-	@Message(id = 131, value = "The query string '%2$s' applied on field '%1$s' has no meaningfull tokens to be matched. Validate the query input " +
-			"against the Analyzer applied on this field.")
-	EmptyQueryException queryWithNoTermsAfterAnalysis(String field, String searchTerm);
-
-	@Message(id = 132, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '" + JGroupsChannelProvider.MUX_ID + "'.")
-	SearchException missingJGroupsMuxId();
-
-	@Message(id = 133, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
-	SearchException jGroupsMuxIdAlreadyTaken(short n);
+	
+	@Message(id = 131, value = "The field used for the spatial query is not using SpatialFieldBridge: %1$s.%2$s")
+	SearchException targetedFieldNotSpatial(String className, String fieldName);
 
 }
