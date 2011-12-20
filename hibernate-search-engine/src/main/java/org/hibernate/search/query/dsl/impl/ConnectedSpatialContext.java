@@ -33,25 +33,27 @@ public class ConnectedSpatialContext implements SpatialContext {
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final SpatialQueryContext spatialContext;
+	private final ConnectedQueryBuilder queryBuilder;
 
-	public ConnectedSpatialContext(QueryBuildingContext context) {
+	public ConnectedSpatialContext(QueryBuildingContext context, ConnectedQueryBuilder queryBuilder) {
 		this.queryContext = context;
 		this.queryCustomizer = new QueryCustomizer();
 		//today we only do constant score for spatial queries
 		queryCustomizer.withConstantScore();
 		spatialContext = new SpatialQueryContext();
+		this.queryBuilder = queryBuilder;
 	}
 
 	@Override
 	public SpatialMatchingContext onCoordinates(String field) {
 		spatialContext.setCoordinatesField(field);
-		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext );
+		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext, queryBuilder );
 	}
 
 	@Override
 	public LatitudeFieldContext onLatitudeField(String latitudeField) {
 		spatialContext.setLatitudeField( latitudeField );
-		return new ConnectedLatitudeFieldContext(queryContext, queryCustomizer, spatialContext);
+		return new ConnectedLatitudeFieldContext(this);
 	}
 
 	@Override
@@ -72,23 +74,17 @@ public class ConnectedSpatialContext implements SpatialContext {
 		return this;
 	}
 
-
-	//tODO find the actual field type to make sure it's ok
 	private static final class ConnectedLatitudeFieldContext implements LatitudeFieldContext {
-		private final QueryBuildingContext queryContext;
-		private final QueryCustomizer queryCustomizer;
-		private final SpatialQueryContext spatialContext;
+		private final ConnectedSpatialContext mother;
 
-		public ConnectedLatitudeFieldContext(QueryBuildingContext queryContext, QueryCustomizer queryCustomizer, SpatialQueryContext spatialContext) {
-			this.queryContext = queryContext;
-			this.queryCustomizer = queryCustomizer;
-			this.spatialContext = spatialContext;
+		public ConnectedLatitudeFieldContext(ConnectedSpatialContext mother) {
+			this.mother = mother;
 		}
 
 		@Override
 		public SpatialMatchingContext onLongitudeField(String longitudeField) {
-			spatialContext.setLongitudeField( longitudeField );
-			return new ConnectedSpatialMatchingContext(queryContext, queryCustomizer, spatialContext);
+			mother.spatialContext.setLongitudeField( longitudeField );
+			return new ConnectedSpatialMatchingContext(mother.queryContext, mother.queryCustomizer, mother.spatialContext, mother.queryBuilder);
 		}
 	}
 }

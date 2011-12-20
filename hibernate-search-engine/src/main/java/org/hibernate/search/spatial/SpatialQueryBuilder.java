@@ -67,7 +67,7 @@ public abstract class SpatialQueryBuilder {
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
-	 * @param fieldName name of the Lucene Field implementing Coordinates
+	 * @param coordinatesField name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene filter to be used in a Query
 	 *
@@ -79,8 +79,30 @@ public abstract class SpatialQueryBuilder {
 	 * @see	DistanceFilter
 	 * @see Filter
 	 */
-	public static Filter buildDistanceFilter(Filter previousFilter, Point center, double radius, String fieldName) {
-		return new DistanceFilter( previousFilter, center, radius, fieldName );
+	public static Filter buildDistanceFilter(Filter previousFilter, Point center, double radius, String coordinatesField) {
+		return new DistanceFilter( previousFilter, center, radius, coordinatesField );
+	}
+
+	/**
+	 * Returns a Lucene filter to fine filter document by distance
+	 *
+	 * @param center center of the search discus
+	 * @param radius distance max to center in km
+	 * @param latitudeField name of the Lucene Field hosting latitude
+	 * @param longitudeField name of the Lucene Field hosting longitude
+	 *
+	 * @return Lucene filter to be used in a Query
+	 *
+	 * @param	previousFilter	preceding filter in filter chain
+	 * Warning if passed null DistanceFilter constructor use a
+	 * filter wrapped match all query (time/ressource consuming !)
+	 * @see	Query
+	 * @see	Coordinates
+	 * @see	DistanceFilter
+	 * @see Filter
+	 */
+	public static Filter buildDistanceFilter(Filter previousFilter, Point center, double radius, String latitudeField, String longitudeField) {
+		return new DistanceFilter( previousFilter, center, radius, latitudeField, longitudeField );
 	}
 
 	/**

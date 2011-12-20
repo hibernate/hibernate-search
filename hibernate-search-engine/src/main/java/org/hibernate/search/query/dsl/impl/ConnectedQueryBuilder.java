@@ -72,6 +72,6 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 
 	@Override
 	public SpatialContext spatial() {
-		return new ConnectedSpatialContext( context );
+		return new ConnectedSpatialContext( context, this );
 	}
 }
