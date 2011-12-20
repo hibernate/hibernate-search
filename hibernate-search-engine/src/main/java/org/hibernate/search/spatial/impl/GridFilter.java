@@ -79,4 +79,14 @@ public final class GridFilter extends Filter {
 			return null;
 		}
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "GridFilter" );
+		sb.append( "{gridCellsIds=" ).append( gridCellsIds );
+		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }

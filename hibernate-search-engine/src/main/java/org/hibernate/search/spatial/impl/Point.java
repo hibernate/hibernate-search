@@ -136,4 +136,14 @@ public final class Point implements Coordinates {
 	public double getLongitudeRad() {
 		return Math.toRadians( longitude );
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "Point" );
+		sb.append( "{latitude=" ).append( latitude );
+		sb.append( ", longitude=" ).append( longitude );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
