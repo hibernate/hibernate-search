@@ -105,4 +105,16 @@ public final class DistanceFilter extends Filter {
 			}
 		};
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "DistanceFilter" );
+		sb.append( "{previousFilter=" ).append( previousFilter );
+		sb.append( ", center=" ).append( center );
+		sb.append( ", radius=" ).append( radius );
+		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
