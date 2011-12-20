@@ -30,6 +30,7 @@ import org.hibernate.search.query.dsl.FacetContext;
 import org.hibernate.search.query.dsl.PhraseContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.RangeContext;
+import org.hibernate.search.query.dsl.SpatialContext;
 import org.hibernate.search.query.dsl.TermContext;
 
 /**
@@ -67,5 +68,10 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 
 	public FacetContext facet() {
 		return new ConnectedFacetContext( new FacetBuildingContext( context.getFactory(), context.getEntityType() ) );
+	}
+
+	@Override
+	public SpatialContext spatial() {
+		return new ConnectedSpatialContext( context );
 	}
 }

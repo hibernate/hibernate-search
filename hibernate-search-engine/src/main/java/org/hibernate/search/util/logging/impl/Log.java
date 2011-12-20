@@ -550,4 +550,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 130, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
 			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
+	
+	@Message(id = 131, value = "The field used for the spatial query is not using SpatialFieldBridge: %1$s.%2$s")
+	SearchException targetedFieldNotSpatial(String className, String fieldName);
+
+
 }
