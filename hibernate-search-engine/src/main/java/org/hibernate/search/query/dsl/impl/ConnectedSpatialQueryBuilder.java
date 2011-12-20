@@ -20,7 +20,9 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
+import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
@@ -28,6 +30,8 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.SpatialTermination;
 import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
+import org.hibernate.search.spatial.impl.Point;
+import org.hibernate.search.spatial.impl.Rectangle;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -40,11 +44,13 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 	private final SpatialQueryContext spatialContext;
 	private final QueryCustomizer queryCustomizer;
 	private final QueryBuildingContext queryContext;
+	private final ConnectedQueryBuilder queryBuilder;
 
-	public ConnectedSpatialQueryBuilder(SpatialQueryContext spatialContext, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
+	public ConnectedSpatialQueryBuilder(SpatialQueryContext spatialContext, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext, ConnectedQueryBuilder queryBuilder) {
 		this.spatialContext = spatialContext;
 		this.queryCustomizer = queryCustomizer;
 		this.queryContext = queryContext;
+		this.queryBuilder = queryBuilder;
 	}
 
 	@Override
@@ -54,21 +60,58 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 
 	private Query createSpatialQuery() {
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
-		if ( spatialContext.getLatitudeField() != null || spatialContext.getLongitudeField() != null) {
-			throw new SearchException( "latitude and longitude fields support is not implemented yet" );
-		}
+		//FIXME that will have to change probably but today, if someone uses latitude / longitude
+		//      we use boolean style spatial queries
+		//      and on coordinates field, use grid query
+		// FIXME in the future we will likely react to some state stored in SpatialFieldBridge (for the indexing strategy)
 		String coordinatesField = spatialContext.getCoordinatesField();
-		FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
-		if ( fieldBridge instanceof SpatialFieldBridge ) {
-			return SpatialQueryBuilder.buildSpatialQuery(
+		if ( coordinatesField == null ) {
+			Point center = Point.fromDegrees(
 					spatialContext.getCoordinates().getLatitude(),
-					spatialContext.getCoordinates().getLongitude(),
-					spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
-					coordinatesField
+					spatialContext.getCoordinates().getLongitude()
 			);
+			Rectangle boundingBox = Rectangle.fromBoundingCircle(center, spatialContext.getRadiusDistance() /* no conversion needed as we have one unit */ );
+
+			org.apache.lucene.search.Query query = queryBuilder.bool()
+				.must(
+					queryBuilder.range()
+							.onField( spatialContext.getLatitudeField() )
+							.from( boundingBox.getLowerLeft().getLatitude() )
+							.to( boundingBox.getUpperRight().getLatitude() )
+							.createQuery()
+				)
+				.must(
+					queryBuilder.range()
+							.onField( spatialContext.getLongitudeField() )
+							.from( boundingBox.getLowerLeft().getLongitude() )
+							.to( boundingBox.getUpperRight().getLongitude() )
+							.createQuery()
+				)
+				.createQuery();
+			org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery(
+					SpatialQueryBuilder.buildDistanceFilter(
+							new QueryWrapperFilter( query ),
+							center,
+							spatialContext.getRadiusDistance(),
+							spatialContext.getLatitudeField(),
+							spatialContext.getLongitudeField()
+					)
+			);
+			return filteredQuery;
 		}
 		else {
-			throw LOG.targetedFieldNotSpatial( queryContext.getEntityType().getName(), coordinatesField );
+			FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
+			if ( fieldBridge instanceof SpatialFieldBridge ) {
+				return SpatialQueryBuilder.buildSpatialQuery(
+						spatialContext.getCoordinates().getLatitude(),
+						spatialContext.getCoordinates().getLongitude(),
+						spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
+						coordinatesField
+				);
+			}
+			else {
+				throw LOG.targetedFieldNotSpatial( queryContext.getEntityType().getName(), coordinatesField );
+			}
 		}
 	}
 }

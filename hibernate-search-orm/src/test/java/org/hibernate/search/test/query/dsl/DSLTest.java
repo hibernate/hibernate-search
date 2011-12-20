@@ -605,6 +605,18 @@ public class DSLTest extends SearchTestCase {
 
 		query = builder
 				.spatial()
+					.onLatitudeField( "latitude" ).onLongitudeField( "longitude" )
+					.within( 51, Unit.KM )
+						.of().latitude( 24d ).longitude( 31.5d )
+					.createQuery();
+
+		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
+
+		assertEquals( "test boolean based spatial query", 1, results.size() );
+		assertEquals( "test boolean based spatial query", "Bozo", ( (POI) results.get( 0 ) ).getName() );
+
+		query = builder
+				.spatial()
 					.onCoordinates( "location" )
 					.within( 500, Unit.KM )
 						.of().latitude(48.858333d).longitude(2.294444d)
@@ -612,8 +624,8 @@ public class DSLTest extends SearchTestCase {
 		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 
 		//FIXME Niko, it fails not sure why for me it should work.
-//		assertEquals( "test boolean based spatial query", 1, results.size() );
-//		assertEquals( "test boolean based spatial  query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
+//		assertEquals( "test grid based spatial query", 1, results.size() );
+//		assertEquals( "test grid based spatial  query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
 
 
 		transaction.commit();

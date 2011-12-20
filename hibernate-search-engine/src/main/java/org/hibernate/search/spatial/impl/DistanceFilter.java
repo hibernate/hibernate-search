@@ -43,7 +43,9 @@ public final class DistanceFilter extends Filter {
 	private Filter previousFilter;
 	private Point center;
 	private double radius;
-	private String fieldName;
+	private String coordinatesField;
+	private String latitudeField;
+	private String longitudeField;
 
 	/**
 	 * Construct a Distance Filter to match document distant at most of radius from center Point
@@ -52,11 +54,11 @@ public final class DistanceFilter extends Filter {
 	 * it is better to use it last
 	 * @param center center of the search perimeter
 	 * @param radius radius of the search perimeter
-	 * @param fieldName name of the field implementing Coordinates
+	 * @param coordinatesField name of the field implementing Coordinates
 	 *
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public DistanceFilter(Filter previousFilter, Point center, double radius, String fieldName) {
+	public DistanceFilter(Filter previousFilter, Point center, double radius, String coordinatesField) {
 		if ( previousFilter != null ) {
 			this.previousFilter = previousFilter;
 		}
@@ -65,7 +67,33 @@ public final class DistanceFilter extends Filter {
 		}
 		this.center = center;
 		this.radius = radius;
-		this.fieldName = fieldName;
+		this.coordinatesField = coordinatesField;
+	}
+	
+	/**
+	 * Construct a Distance Filter to match document distant at most of radius from center Point
+	 *
+	 * @param previousFilter previous Filter in the chain. As Distance is costly by retrieving the lat and long field
+	 * it is better to use it last
+	 * @param center center of the search perimeter
+	 * @param radius radius of the search perimeter
+	 * @param latitudeField name of the field hosting latitude
+	 * @param longitudeField name of the field hosting longitude
+	 *
+	 * @see org.hibernate.search.spatial.Coordinates
+	 */
+	public DistanceFilter(Filter previousFilter, Point center, double radius, String latitudeField, String longitudeField) {
+		if ( previousFilter != null ) {
+			this.previousFilter = previousFilter;
+		}
+		else {
+			this.previousFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
+		}
+		this.center = center;
+		this.radius = radius;
+		this.coordinatesField = null;
+		this.latitudeField = latitudeField;
+		this.longitudeField = longitudeField;
 	}
 
 	/**
@@ -76,9 +104,8 @@ public final class DistanceFilter extends Filter {
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 
-		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, GridHelper.formatLatitude( fieldName ) );
-		final double[] longitudeValues = FieldCache.DEFAULT
-				.getDoubles( reader, GridHelper.formatLongitude( fieldName ) );
+		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, getLatitudeField() );
+		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( reader, getLongitudeField() );
 
 		DocIdSet docs = previousFilter.getDocIdSet( reader );
 
@@ -106,6 +133,24 @@ public final class DistanceFilter extends Filter {
 		};
 	}
 
+	private String getLatitudeField() {
+		if (latitudeField != null) {
+			return latitudeField;
+		}
+		else {
+			return GridHelper.formatLatitude( coordinatesField );
+		}
+	}
+
+	private String getLongitudeField() {
+		if (longitudeField != null) {
+			return longitudeField;
+		}
+		else {
+			return GridHelper.formatLongitude( coordinatesField );
+		}
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -113,7 +158,13 @@ public final class DistanceFilter extends Filter {
 		sb.append( "{previousFilter=" ).append( previousFilter );
 		sb.append( ", center=" ).append( center );
 		sb.append( ", radius=" ).append( radius );
-		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
+		if ( coordinatesField != null) {
+			sb.append( ", coordinatesField='" ).append( coordinatesField ).append( '\'' );
+		}
+		else {
+			sb.append( ", latitudeField=" ).append( latitudeField );
+			sb.append( ", longitudeField=" ).append( longitudeField ).append( '\'' );
+		}
 		sb.append( '}' );
 		return sb.toString();
 	}
