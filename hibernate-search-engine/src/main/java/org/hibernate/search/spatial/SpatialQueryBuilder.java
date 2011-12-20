@@ -123,7 +123,7 @@ public abstract class SpatialQueryBuilder {
 	}
 
 	/**
-	 * Returns a Lucene Query searching directly by conmputing distance against
+	 * Returns a Lucene Query searching directly by computing distance against
 	 * all docs in the index (costly !)
 	 *
 	 * @param center center of the search discus
@@ -155,7 +155,6 @@ public abstract class SpatialQueryBuilder {
 	 * @see	Coordinates
 	 */
 	public static Query buildDistanceQuery(double latitude, double longitude, double radius, String fieldName) {
-		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
 		return buildDistanceQuery( Point.fromDegrees( latitude, longitude ), radius, fieldName );
 	}
 
