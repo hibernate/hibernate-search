@@ -109,14 +109,15 @@ public final class Point implements Coordinates {
 	 *
 	 * @return
 	 *
-	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Spherical Law of Cosines</a>
+	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
 	public double getDistanceTo(Point other) {
-		return Math.acos(
-				Math.sin( getLatitudeRad() ) * Math.sin( other.getLatitudeRad() ) + Math.cos( getLatitudeRad() ) * Math.cos(
-						other.getLatitudeRad()
-				) * Math.cos( other.getLongitudeRad() - getLongitudeRad() )
-		) * GeometricConstants.EARTH_MEAN_RADIUS_KM;
+		final double dLat= (other.getLatitudeRad()-getLatitudeRad())/2.0d;
+		final double dLon= (other.getLongitudeRad()-getLongitudeRad())/2.0d;
+		final double a= Math.pow( Math.sin( dLat ), 2) +
+						Math.pow( Math.sin( dLon ), 2) * Math.cos( getLatitudeRad()) * Math.cos( other.getLatitudeRad() );
+		final double c= 2.0d * Math.atan2(Math.sqrt( a ), Math.sqrt( 1.0d - a ));
+		return c * GeometricConstants.EARTH_MEAN_RADIUS_KM;
 	}
 
 	@Override
