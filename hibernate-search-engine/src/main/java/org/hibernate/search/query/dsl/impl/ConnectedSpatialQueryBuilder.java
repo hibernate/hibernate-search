@@ -24,14 +24,13 @@ import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.SpatialTermination;
 import org.hibernate.search.spatial.SpatialFieldBridge;
-import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.Rectangle;
+import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -89,7 +88,7 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 				)
 				.createQuery();
 			org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery(
-					SpatialQueryBuilder.buildDistanceFilter(
+					SpatialQueryBuilderFromPoint.buildDistanceFilter(
 							new QueryWrapperFilter( query ),
 							center,
 							spatialContext.getRadiusDistance(),
@@ -102,9 +101,11 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 		else {
 			FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
 			if ( fieldBridge instanceof SpatialFieldBridge ) {
-				return SpatialQueryBuilder.buildSpatialQuery(
-						spatialContext.getCoordinates().getLatitude(),
-						spatialContext.getCoordinates().getLongitude(),
+				return SpatialQueryBuilderFromPoint.buildSpatialQuery(
+						Point.fromDegrees(
+								spatialContext.getCoordinates().getLatitude(),
+								spatialContext.getCoordinates().getLongitude()
+						),
 						spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
 						coordinatesField
 				);

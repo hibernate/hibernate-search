@@ -18,6 +18,7 @@ import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.Rectangle;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
+import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -116,7 +117,7 @@ public class BenchWithGeonames {
 						)
 						.createQuery();
 				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery(
-						SpatialQueryBuilder.buildDistanceFilter(
+						SpatialQueryBuilderFromPoint.buildDistanceFilter(
 								new QueryWrapperFilter( query ),
 								center,
 								radius,
@@ -138,7 +139,7 @@ public class BenchWithGeonames {
 				}
 				session.clear();
 
-				luceneQuery = SpatialQueryBuilder.buildGridQuery( center, radius, "location" );
+				luceneQuery = SpatialQueryBuilderFromPoint.buildGridQuery( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
@@ -155,7 +156,7 @@ public class BenchWithGeonames {
 				}
 				session.clear();
 
-				luceneQuery = SpatialQueryBuilder.buildSpatialQuery( center, radius, "location" );
+				luceneQuery = SpatialQueryBuilderFromPoint.buildSpatialQuery( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
@@ -288,7 +289,7 @@ public class BenchWithGeonames {
 		Point center = Point.fromDegrees( 46, 4 );
 		double radius = 50.0d;
 
-		luceneQuery = SpatialQueryBuilder.buildSpatialQuery( center, radius, "location" );
+		luceneQuery = SpatialQueryBuilderFromPoint.buildSpatialQuery( center, radius, "location" );
 		hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		hibQuery.setProjection( "id", "name", "type" );
 
