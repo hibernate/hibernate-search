@@ -49,7 +49,7 @@ public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 		return new ConnectedWithinContext( this );
 	}
 
-	private static final class ConnectedWithinContext implements WithinContext, WithinContext.LatitudeContext, WithinContext.LongitudeContext {
+	private static final class ConnectedWithinContext implements WithinContext, WithinContext.LongitudeContext {
 		private final ConnectedSpatialMatchingContext mother;
 		private double latitude;
 
@@ -58,24 +58,19 @@ public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 		}
 
 		@Override
-		public SpatialTermination of(Coordinates coordinates) {
+		public SpatialTermination ofCoordinates(Coordinates coordinates) {
 			mother.spatialContext.setCoordinates(coordinates);
 			return new ConnectedSpatialQueryBuilder(mother.spatialContext, mother.queryCustomizer, mother.queryContext, mother.queryBuilder);
 		}
 
 		@Override
-		public LatitudeContext of() {
-			return this;
-		}
-
-		@Override
-		public LongitudeContext latitude(double latitude) {
+		public LongitudeContext ofLatitude(double latitude) {
 			this.latitude = latitude;
 			return this;
 		}
 
 		@Override
-		public SpatialTermination longitude(double longitude) {
+		public SpatialTermination andLongitude(double longitude) {
 			mother.spatialContext.setCoordinates( Point.fromDegrees(latitude, longitude) );
 			return new ConnectedSpatialQueryBuilder(mother.spatialContext, mother.queryCustomizer, mother.queryContext, mother.queryBuilder);
 		}
