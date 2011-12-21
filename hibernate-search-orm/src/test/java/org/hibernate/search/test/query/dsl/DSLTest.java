@@ -623,10 +623,8 @@ public class DSLTest extends SearchTestCase {
 					.createQuery();
 		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 
-		//FIXME Niko, it fails not sure why for me it should work.
-//		assertEquals( "test grid based spatial query", 1, results.size() );
-//		assertEquals( "test grid based spatial  query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
-
+		assertEquals( "test grid based spatial query", 1, results.size() );
+		assertEquals( "test grid based spatial  query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
 
 		transaction.commit();
 	}
