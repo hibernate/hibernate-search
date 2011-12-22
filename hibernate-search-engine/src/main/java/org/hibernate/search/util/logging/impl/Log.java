@@ -37,6 +37,7 @@ import org.jboss.logging.MessageLogger;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.spatial.impl.GeometricConstants;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
@@ -555,4 +556,7 @@ public interface Log extends BasicLogger {
 	SearchException targetedFieldNotSpatial(String className, String fieldName);
 
 
+	@Message(id = 130, value = "Illegal latitude value for Point creation. Must be between "
+			+ GeometricConstants.LATITUDE_DEGREE_MIN + " and " + GeometricConstants.LATITUDE_DEGREE_MAX + ".")
+	IllegalArgumentException illegalLatitude();
 }

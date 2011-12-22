@@ -21,6 +21,8 @@
 package org.hibernate.search.spatial.impl;
 
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Normalized latitude,longitude holder (in [-90;90],[-180,180]) with distance and destination computations methods
@@ -29,6 +31,7 @@ import org.hibernate.search.spatial.Coordinates;
  * @author Mathieu Perez <mathieu.perez@novacodex.net>
  */
 public final class Point implements Coordinates {
+	private static final Log LOG = LoggerFactory.make();
 
 	private final double latitude;
 	private final double longitude;
@@ -44,7 +47,7 @@ public final class Point implements Coordinates {
 		longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE ) - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 
 		if ( latitude > GeometricConstants.LATITUDE_DEGREE_MAX || latitude < GeometricConstants.LATITUDE_DEGREE_MIN ) {
-			throw new IllegalArgumentException( "Illegal latitude value for Point creation" );
+			throw LOG.illegalLatitude();
 		}
 
 		return new Point( latitude, longitude );
