@@ -37,12 +37,12 @@ public final class Rectangle {
 	}
 
 	/**
-	 * Compute appropriate bouding box on Earth with pole and prime meridian crossing checks
+	 * Compute appropriate bounding box on Earth with pole and prime meridian crossing checks
 	 *
 	 * @param center of the search area
 	 * @param radius of the search area
 	 *
-	 * @return a bouding box for the area
+	 * @return a bounding box for the area
 	 *
 	 * @see <a href="http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates">Bouding box on Earth calculation</a>
 	 */

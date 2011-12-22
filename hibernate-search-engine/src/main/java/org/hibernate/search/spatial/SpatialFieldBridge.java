@@ -48,7 +48,7 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 	 *
 	 * @param name of the field
 	 * @param value of the field
-	 * @param document document beeing indexed
+	 * @param document document being indexed
 	 * @param luceneOptions current indexing options and accessors
 	 */
 	@Override
