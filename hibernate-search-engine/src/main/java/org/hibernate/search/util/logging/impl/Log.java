@@ -37,7 +37,11 @@ import org.jboss.logging.MessageLogger;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
+<<<<<<< HEAD
 import org.hibernate.search.errors.EmptyQueryException;
+=======
+import org.hibernate.search.spatial.impl.GeometricConstants;
+>>>>>>> HSEARCH-1016 Move spatial code to use i18n logs and exceptions
 
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
@@ -555,4 +559,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 131, value = "The field used for the spatial query is not using SpatialFieldBridge: %1$s.%2$s")
 	SearchException targetedFieldNotSpatial(String className, String fieldName);
 
+
+	@Message(id = 130, value = "Illegal latitude value for Point creation. Must be between "
+			+ GeometricConstants.LATITUDE_DEGREE_MIN + " and " + GeometricConstants.LATITUDE_DEGREE_MAX + ".")
+	IllegalArgumentException illegalLatitude();
 }
