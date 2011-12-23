@@ -294,13 +294,13 @@ public final class BridgeFactory {
 		SpatialFieldBridge bridge = null;
 		if( spatial != null )  {
 			try {
-				bridge= new SpatialFieldBridge( spatial.highGridLevel(), spatial.lowGridLevel() );
+				bridge = new SpatialFieldBridge( spatial.highGridLevel(), spatial.lowGridLevel() );
 			}
 			catch ( Exception e ) {
 				throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
 			}
 		}
-		if( bridge == null) {
+		if (bridge == null) {
 			throw LOG.unableToInstantiateSpatial( clazz.getName(), null);
 		}
 
