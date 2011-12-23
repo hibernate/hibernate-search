@@ -33,11 +33,7 @@ public class Hotel implements Coordinates {
 	@Field(store = Store.YES, index = Index.YES)
 	String type;
 
-	@Field(store = Store.YES, index = Index.YES)
-	@NumericField
 	double latitude;
-	@Field(store = Store.YES, index = Index.YES)
-	@NumericField
 	double longitude;
 
 	public Hotel( Integer id, String name, double latitude, double longitude, String type ) {
