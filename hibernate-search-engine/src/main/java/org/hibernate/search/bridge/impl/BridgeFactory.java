@@ -43,6 +43,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
@@ -277,6 +278,33 @@ public final class BridgeFactory {
 		}
 		if ( bridge == null ) {
 			throw new SearchException( "Unable to guess FieldBridge for " + ClassBridge.class.getName() );
+		}
+
+		return bridge;
+	}
+
+	/**
+	 * This instantiates the SpacialFieldBridge from a {@code Spatial} annotation.
+	 *
+	 * @param spatial the {@code Spatial} annotation
+	 * @param clazz the {@code XClass} on which the annotation is defined on
+	 *
+	 * @return Returns the {@code SpacialFieldBridge} instance
+	 */
+	public static SpatialFieldBridge buildSpatialBridge( Spatial spatial, XClass clazz ) {
+		SpatialFieldBridge bridge = null;
+		if( spatial != null )  {
+			try {
+				bridge= new SpatialFieldBridge( spatial.min_grid_level(), spatial.max_grid_level() );
+			}
+			catch ( Exception e ) {
+				final String msg = "Unable to instantiate Spatial defined on "
+						+ clazz.getName();
+				throw new SearchException( msg, e );
+			}
+		}
+		if( bridge == null) {
+			throw new SearchException( "Unable to instantiate Spatial defined on " + clazz.getName() );
 		}
 
 		return bridge;
