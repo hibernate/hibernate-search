@@ -43,6 +43,16 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 	private int min_grid_level = MIN_GRID_LEVEL;
 	private int max_grid_level = MAX_GRID_LEVEL;
 
+	private boolean grid_index = true;
+	private boolean numeric_fields_index = true;
+
+	public SpatialFieldBridge() {}
+
+	public SpatialFieldBridge( int min_grid_level, int max_grid_level ) {
+		this.min_grid_level= min_grid_level;
+		this.max_grid_level= max_grid_level;
+	}
+
 	/**
 	 * Actual overridden method that does the indexing
 	 *
@@ -57,22 +67,29 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 
 			Coordinates coordinates = (Coordinates) value;
 
-			Point point = Point.fromDegrees( coordinates.getLatitude(), coordinates.getLongitude() );
+			if( grid_index ) {
+				Point point = Point.fromDegrees( coordinates.getLatitude(), coordinates.getLongitude() );
 
-			Map<Integer, String> cellIds = GridHelper.getGridCellsIds( point, min_grid_level, max_grid_level );
+				Map<Integer, String> cellIds = GridHelper.getGridCellsIds( point, min_grid_level, max_grid_level );
 
-			for ( int i = min_grid_level; i <= max_grid_level; i++ ) {
-				luceneOptions.addFieldToDocument( GridHelper.formatFieldName( i, name ), cellIds.get( i ), document );
+				for ( int i = min_grid_level; i <= max_grid_level; i++ ) {
+					luceneOptions.addFieldToDocument( GridHelper.formatFieldName( i, name ), cellIds.get( i ), document );
+				}
 			}
 
-			luceneOptions.addNumericFieldToDocument( GridHelper.formatLatitude( name ), point.getLatitude(), document );
+			if( numeric_fields_index ) {
+				luceneOptions.addNumericFieldToDocument(
+						GridHelper.formatLatitude( name ),
+						coordinates.getLatitude(),
+						document
+				);
 
-			luceneOptions.addNumericFieldToDocument(
-					GridHelper.formatLongitude( name ),
-					point.getLongitude(),
-					document
-			);
-
+				luceneOptions.addNumericFieldToDocument(
+						GridHelper.formatLongitude( name ),
+						coordinates.getLongitude(),
+						document
+				);
+			}
 		}
 	}
 
@@ -90,6 +107,14 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 		Object max_grid_level = parameters.get( "min_grid_level" );
 		if ( max_grid_level instanceof Integer ) {
 			this.max_grid_level = ( Integer ) max_grid_level;
+		}
+		Object grid_index = parameters.get( "grid_index" );
+		if ( grid_index instanceof Boolean ) {
+			this.grid_index = ( Boolean ) grid_index;
+		}
+		Object numeric_fields_index = parameters.get( "numeric_fields_index" );
+		if ( numeric_fields_index instanceof Boolean ) {
+			this.numeric_fields_index = ( Boolean ) numeric_fields_index;
 		}
 	}
 }
