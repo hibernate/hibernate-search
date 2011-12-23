@@ -39,11 +39,11 @@ public @interface Spatial {
 	/**
 	 * @return minimum grid level for spatial indexing
 	 */
-	int min_grid_level() default SpatialFieldBridge.MIN_GRID_LEVEL;
+	int highGridLevel() default SpatialFieldBridge.MIN_GRID_LEVEL;
 
 	/**
 	 * @return minimum grid level for spatial indexing
 	 */
-	int max_grid_level() default SpatialFieldBridge.MAX_GRID_LEVEL;
+	int lowGridLevel() default SpatialFieldBridge.MAX_GRID_LEVEL;
 }
 
