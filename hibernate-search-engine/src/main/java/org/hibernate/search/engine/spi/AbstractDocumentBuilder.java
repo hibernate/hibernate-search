@@ -50,6 +50,7 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
@@ -59,10 +60,14 @@ import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.DynamicBoost;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -430,6 +435,12 @@ public abstract class AbstractDocumentBuilder<T> {
 		ClassBridge classBridgeAnn = clazz.getAnnotation( ClassBridge.class );
 		if ( classBridgeAnn != null ) {
 			bindClassBridgeAnnotation( prefix, propertiesMetadata, classBridgeAnn, clazz, context );
+		}
+		
+		//Check for Spatial annotation on class level
+		Spatial spatiaAnn= clazz.getAnnotation( Spatial.class );
+		if ( spatiaAnn != null ) {
+			bindSpatialAnnotation( prefix, propertiesMetadata, spatiaAnn, clazz, context );
 		}
 
 		checkForAnalyzerDiscriminator( clazz, propertiesMetadata );
@@ -886,6 +897,29 @@ public abstract class AbstractDocumentBuilder<T> {
 		if ( analyzer == null ) {
 			analyzer = propertiesMetadata.analyzer;
 		}
+		if ( analyzer == null ) {
+			throw new AssertionFailure( "Analyzer should not be undefined" );
+		}
+		addToScopedAnalyzer( fieldName, analyzer, index );
+	}
+
+	private void bindSpatialAnnotation(String prefix, PropertiesMetadata propertiesMetadata, Spatial ann, XClass clazz, ConfigContext context) {
+		String fieldName = null;
+		if( !ann.name().isEmpty() ){
+			fieldName= prefix + ann.name();
+		} else {
+			fieldName= clazz.getName();
+		}
+		propertiesMetadata.classNames.add( fieldName );
+		propertiesMetadata.classStores.add( ann.store() );
+		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
+		propertiesMetadata.classIndexes.add( index );
+		propertiesMetadata.classTermVectors.add( AnnotationProcessingHelper.getTermVector( TermVector.NO ) );
+		propertiesMetadata.classBridges.add( BridgeFactory.buildSpatialBridge( ann, clazz ) );
+		propertiesMetadata.classBoosts.add( ann.boost().value() );
+
+
+		Analyzer analyzer = propertiesMetadata.analyzer;
 		if ( analyzer == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
 		}
