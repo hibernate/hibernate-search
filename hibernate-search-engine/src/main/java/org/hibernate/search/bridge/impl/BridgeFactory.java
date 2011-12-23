@@ -77,6 +77,7 @@ import org.hibernate.search.bridge.builtin.StringBridge;
 import org.hibernate.search.bridge.builtin.UUIDBridge;
 import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
+import org.hibernate.search.spatial.SpatialFieldBridge;
 
 /**
  * This factory is responsible for creating and initializing build-in and custom <i>FieldBridges</i>.
@@ -306,6 +307,10 @@ public final class BridgeFactory {
 		}
 		else if ( numericField != null ) {
 			bridge = guessNumericFieldBridge( member, reflectionManager );
+		}
+		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
+			bridge= new SpatialFieldBridge( member.getAnnotation( org.hibernate.search.annotations.Spatial.class ).min_grid_level(),
+					member.getAnnotation( org.hibernate.search.annotations.Spatial.class ).max_grid_level() );
 		}
 		else {
 			//find in built-ins
