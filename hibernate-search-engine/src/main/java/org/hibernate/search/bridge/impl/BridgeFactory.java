@@ -295,7 +295,7 @@ public final class BridgeFactory {
 		SpatialFieldBridge bridge = null;
 		if( spatial != null )  {
 			try {
-				bridge= new SpatialFieldBridge( spatial.min_grid_level(), spatial.max_grid_level() );
+				bridge= new SpatialFieldBridge( spatial.highGridLevel(), spatial.lowGridLevel() );
 			}
 			catch ( Exception e ) {
 				final String msg = "Unable to instantiate Spatial defined on "
@@ -337,8 +337,9 @@ public final class BridgeFactory {
 			bridge = guessNumericFieldBridge( member, reflectionManager );
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
-			bridge= new SpatialFieldBridge( member.getAnnotation( org.hibernate.search.annotations.Spatial.class ).min_grid_level(),
-					member.getAnnotation( org.hibernate.search.annotations.Spatial.class ).max_grid_level() );
+			Spatial spatialAnn = member.getAnnotation( org.hibernate.search.annotations.Spatial.class );
+			bridge= new SpatialFieldBridge( spatialAnn.highGridLevel(),
+					spatialAnn.lowGridLevel() );
 		}
 		else {
 			//find in built-ins
