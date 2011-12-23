@@ -438,7 +438,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 		
 		//Check for Spatial annotation on class level
-		Spatial spatiaAnn= clazz.getAnnotation( Spatial.class );
+		Spatial spatiaAnn = clazz.getAnnotation( Spatial.class );
 		if ( spatiaAnn != null ) {
 			bindSpatialAnnotation( prefix, propertiesMetadata, spatiaAnn, clazz, context );
 		}
@@ -906,9 +906,9 @@ public abstract class AbstractDocumentBuilder<T> {
 	private void bindSpatialAnnotation(String prefix, PropertiesMetadata propertiesMetadata, Spatial ann, XClass clazz, ConfigContext context) {
 		String fieldName = null;
 		if( !ann.name().isEmpty() ){
-			fieldName= prefix + ann.name();
+			fieldName = prefix + ann.name();
 		} else {
-			fieldName= clazz.getName();
+			fieldName = clazz.getName();
 		}
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( ann.store() );
