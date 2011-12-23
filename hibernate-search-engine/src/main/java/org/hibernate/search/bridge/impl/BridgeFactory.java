@@ -284,12 +284,12 @@ public final class BridgeFactory {
 	}
 
 	/**
-	 * This instantiates the SpacialFieldBridge from a {@code Spatial} annotation.
+	 * This instantiates the SpatialFieldBridge from a {@code Spatial} annotation.
 	 *
 	 * @param spatial the {@code Spatial} annotation
 	 * @param clazz the {@code XClass} on which the annotation is defined on
 	 *
-	 * @return Returns the {@code SpacialFieldBridge} instance
+	 * @return Returns the {@code SpatialFieldBridge} instance
 	 */
 	public static SpatialFieldBridge buildSpatialBridge( Spatial spatial, XClass clazz ) {
 		SpatialFieldBridge bridge = null;
