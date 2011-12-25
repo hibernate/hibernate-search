@@ -509,7 +509,7 @@ public class Address {
       </tip>
 
       <para>Let's make <xref linkend="example-indexing-associations" /> a bit
-      more complex by nesting @IndexEmbedded as seen in <xref
+      more complex by nesting @IndexedEmbedded as seen in <xref
       linkend="example-nested-index-embedded" />.</para>
 
       <example id="example-nested-index-embedded">
@@ -2377,7 +2377,7 @@ public class Address {
 
       <para>In this section you will see how to programmatically define
       entities to be embedded into the indexed entity similar to using the
-      <classname>@IndexEmbedded</classname> model. In order to define this you
+      <classname>@IndexedEmbedded</classname> model. In order to define this you
       must mark the property as <methodname>indexEmbedded.</methodname>There
       is the option to add a prefix to the embedded entity definition which
       can be done by calling <methodname>prefix</methodname> as seen in the
@@ -2410,10 +2410,10 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       </example>
 
       <para>The next example shows the same definition using annotation
-      (<classname>@IndexEmbedded</classname>):</para>
+      (<classname>@IndexedEmbedded</classname>):</para>
 
       <example>
-        <title>Using @IndexEmbedded</title>
+        <title>Using @IndexedEmbedded</title>
 
         <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
@@ -2432,7 +2432,7 @@ public class ProductCatalog {
  @OneToMany(fetch = FetchType.LAZY)
  @IndexColumn(name = "list_position")
  @Cascade(org.hibernate.annotations.CascadeType.ALL)
- @IndexEmbedded(prefix="catalog.items")
+ @IndexedEmbedded(prefix="catalog.items")
  public List&lt;Item&gt; getItems() {...}
 
  ...
@@ -2497,7 +2497,7 @@ public class ProductCatalog {
  @OneToMany(fetch = FetchType.LAZY)
  @IndexColumn(name = "list_position")
  @Cascade(org.hibernate.annotations.CascadeType.ALL)
- @IndexEmbedded
+ @IndexedEmbedded
  private List&lt;Item&gt; getItems() {...}
 
  ...
