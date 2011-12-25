@@ -2388,7 +2388,7 @@ public class Address {
 
         <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
-mappping
+mapping
     .entity(ProductCatalog.class)
         .indexed()
         .property("catalogId", ElementType.METHOD)
@@ -2452,7 +2452,7 @@ public class ProductCatalog {
 
         <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
-mappping
+mapping
     .entity(ProductCatalog.class)
         .indexed()
         .property("catalogId", ElementType.METHOD)
