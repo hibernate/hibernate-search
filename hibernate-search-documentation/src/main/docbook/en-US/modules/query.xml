@@ -1816,20 +1816,20 @@ FacetingRequest labelFacetingRequest = builder.facet()
       </example>
 
       <para>When executing this faceting request a
-      <classname>Facet</classname> instace will be created for each discrete
+      <classname>Facet</classname> instance will be created for each discrete
       value for the indexed field <constant>label</constant>. The
       <classname>Facet</classname> instance will record the actual field value
       including how often this particular field value occurs within the
-      orginial query results. <methodname>orderedBy</methodname>,
+      original query results. <methodname>orderedBy</methodname>,
       <methodname>includeZeroCounts</methodname> and
       <methodname>maxFacetCount</methodname> are optional parameters which can
-      be applied on any faceting request. orderedBy allows to specify in which
+      be applied on any faceting request. <methodname>orderedBy</methodname> allows to specify in which
       order the created facets will be returned. The default is
       <constant>FacetSortOrder.COUNT_DESC</constant>, but you can also sort on
       the field value or the order in which ranges were specified.
-      <constant>includeZeroCount</constant> determines whether facets with a
+      <methodname>includeZeroCount</methodname> determines whether facets with a
       count of 0 will be included in the result (per default they are) and
-      <constant>maxFacetCount</constant> allows to limit the maximum amount of
+      <methodname>maxFacetCount</methodname> allows to limit the maximum amount of
       facets returned.</para>
 
       <tip>
@@ -1861,7 +1861,7 @@ FacetingRequest labelFacetingRequest = builder.facet()
     .buildQueryBuilder()
         .forEntity( Cd.class )
             .get();
-FacetingRequest priceacetingRequest = queryBuilder( Cd.class ).facet()
+FacetingRequest priceFacetingRequest = builder.facet()
     .name( "priceFaceting" )
     .onField( "price" )
     .range()
@@ -1885,12 +1885,11 @@ FacetingRequest priceacetingRequest = queryBuilder( Cd.class ).facet()
         <title>Applying a faceting request</title>
 
         <programlisting language="JAVA" role="JAVA">// create a fulltext query
-QueryBuilder builder = queryBuilder( Cd.class );
 Query luceneQuery = builder.all().createQuery(); // match all query
 FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Cd.class );
 
 // retrieve facet manager and apply faceting request
-FacetManager facetManager = query.getFacetManager();
+FacetManager facetManager = fullTextQuery.getFacetManager();
 facetManager.enableFaceting( priceFacetingRequest );
 
 // get the list of Cds 
@@ -1916,7 +1915,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets( "priceFaceting" );
       <classname>Facet</classname>s as additional criteria on your original
       query in order to implement a "drill-down" functionality. For this
       purpose <classname>FacetSelection</classname> can be utilized.
-      <classname>FacetSelections</classname> are available via the
+      <classname>FacetSelection</classname>s are available via the
       <classname>FacetManager</classname> and allow you to select a facet as
       query criteria (<methodname>selectFacets</methodname>), remove a facet
       restriction (<methodname>deselectFacets</methodname>), remove all facet
@@ -1930,12 +1929,11 @@ List&lt;Facet&gt; facets = facetManager.getFacets( "priceFaceting" );
         <classname>FacetSelection</classname></title>
 
         <programlisting language="JAVA" role="JAVA">// create a fulltext query
-QueryBuilder builder = queryBuilder( Cd.class );
 Query luceneQuery = builder.all().createQuery(); // match all query
 FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, clazz );
 
 // retrieve facet manager and apply faceting request
-FacetManager facetManager = query.getFacetManager();
+FacetManager facetManager = fullTextQuery.getFacetManager();
 facetManager.enableFaceting( priceFacetingRequest );
 
 // get the list of Cd 
