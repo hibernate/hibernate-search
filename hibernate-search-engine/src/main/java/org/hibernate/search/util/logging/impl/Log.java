@@ -597,5 +597,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 134, value = "FieldBridge passed in is not an instance of %1$s")
 	SearchException fieldBridgeNotAnInstanceof(String className);
 
+	@Message(id = 135, value = "Spatial field name not defined for class level annotation on class %1$s")
+	SearchException spatialFieldNameNotDefined( String className );
 
 }

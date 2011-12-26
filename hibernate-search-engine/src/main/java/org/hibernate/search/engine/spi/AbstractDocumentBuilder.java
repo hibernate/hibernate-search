@@ -908,7 +908,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		if( !ann.name().isEmpty() ){
 			fieldName = prefix + ann.name();
 		} else {
-			fieldName = clazz.getName();
+			throw log.spatialFieldNameNotDefined( clazz.getName() );
 		}
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( ann.store() );
