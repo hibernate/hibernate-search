@@ -158,12 +158,12 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildGridQuery( centerLatitude, centerLongitude, 50, Hotel.class.getName() );
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildGridQuery( centerLatitude, centerLongitude, 50, "location" );
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Hotel.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 1, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildGridQuery( centerLatitude, centerLongitude, 1, Hotel.class.getName() );
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildGridQuery( centerLatitude, centerLongitude, 1, "location" );
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Hotel.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 0, results2.size() );
@@ -172,7 +172,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				centerLatitude,
 				centerLongitude,
 				50,
-				Hotel.class.getName()
+				"location"
 		);
 		org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, Hotel.class );
 		List results3 = hibQuery3.list();
@@ -182,7 +182,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				centerLatitude,
 				centerLongitude,
 				50,
-				Hotel.class.getName()
+				"location"
 		);
 		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, Hotel.class );
 		List results4 = hibQuery4.list();
@@ -192,7 +192,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				centerLatitude,
 				centerLongitude,
 				51,
-				Hotel.class.getName()
+				"location"
 		);
 		org.hibernate.Query hibQuery5 = fullTextSession.createFullTextQuery( luceneQuery5, Hotel.class );
 		List results5 = hibQuery5.list();
