@@ -19,11 +19,17 @@
 package org.hibernate.search.test.embedded.fieldoncollection;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
@@ -33,6 +39,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 @Entity
 @Indexed
@@ -61,6 +68,12 @@ public class IndexedEntity {
 			@Field(name = FIELD2_FIELD_NAME, bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO)
 	})
 	private List<CollectionItem> itemsWithFieldsAnnotation = new ArrayList<CollectionItem>();
+	
+	@ElementCollection
+	@Column(name="keyword")
+	@CollectionTable(name="indexedentity_keyword", joinColumns = { @JoinColumn( name = "indexedentity" ) })
+	@Field(bridge = @FieldBridge(impl = CollectionOfStringsFieldBridge.class), analyze = Analyze.NO, store = Store.YES)
+	private Set<String> keywords = new HashSet<String>();
 
 	public IndexedEntity() {
 	}
@@ -119,5 +132,21 @@ public class IndexedEntity {
 		if ( !this.itemsWithFieldsAnnotation.contains( item ) ) {
 			this.itemsWithFieldsAnnotation.add( item );
 		}
+	}
+
+	public Set<String> getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(Set<String> keywords) {
+		this.keywords.clear();
+		
+		for (String keyword : keywords) {
+			this.addKeyword( keyword );
+		}
+	}
+	
+	public void addKeyword(String keyword) {
+		this.keywords.add(keyword);
 	}
 }
