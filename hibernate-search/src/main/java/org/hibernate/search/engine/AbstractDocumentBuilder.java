@@ -95,6 +95,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 	private Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	private boolean isRoot;
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
+	protected final Set<String> fieldCollectionRoles = new TreeSet<String>();
 	protected final Set<String> indexedEmbeddedCollectionRoles = new TreeSet<String>();
 	protected final Set<String> containedInCollectionRoles = new TreeSet<String>();
 
@@ -433,8 +434,8 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 
 	private void initializeMemberLevelAnnotations(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
 					String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
-		checkForField( member, propertiesMetadata, prefix, context );
-		checkForFields( member, propertiesMetadata, prefix, context );
+		checkForField( classHostingMember, member, propertiesMetadata, prefix, context );
+		checkForFields( classHostingMember, member, propertiesMetadata, prefix, context );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
 		checkForIndexedEmbedded( classHostingMember, member, propertiesMetadata, prefix, processedClasses, context, optimizationBlackList, disableOptimizations );
@@ -507,13 +508,15 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void checkForFields(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context) {
+	private void checkForFields(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata,
+			String prefix, ConfigContext context) {
 		org.hibernate.search.annotations.Fields fieldsAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Fields.class );
 		NumericFields numericAnns = member.getAnnotation( NumericFields.class );
 		if ( fieldsAnn != null ) {
 			for ( org.hibernate.search.annotations.Field fieldAnn : fieldsAnn.value() ) {
 				bindFieldAnnotation(
+						classHostingMember,
 						member,
 						propertiesMetadata,
 						prefix,
@@ -559,13 +562,14 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		}
 	}
 
-	private void checkForField(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context) {
+	private void checkForField(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata,
+			String prefix, ConfigContext context) {
 		org.hibernate.search.annotations.Field fieldAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Field.class );
 		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
 		DocumentId idAnn = member.getAnnotation( DocumentId.class );
 		if ( fieldAnn != null ) {
-			bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, numericFieldAnn, context );
+			bindFieldAnnotation( classHostingMember, member, propertiesMetadata, prefix, fieldAnn, numericFieldAnn, context );
 		}
 		if ( ( fieldAnn == null && idAnn == null ) && numericFieldAnn != null ) {
 			throw new SearchException( "@NumericField without a @Field on property '" + member.getName() + "'" );
@@ -681,7 +685,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 		addToScopedAnalyzer( fieldName, analyzer, ann.index() );
 	}
 
-	private void bindFieldAnnotation(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, NumericField numericFieldAnn, ConfigContext context) {
+	private void bindFieldAnnotation(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix, org.hibernate.search.annotations.Field fieldAnn, NumericField numericFieldAnn, ConfigContext context) {
 		ReflectionHelper.setAccessible( member );
 		propertiesMetadata.fieldGetters.add( member );
 		String fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
@@ -718,6 +722,9 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			analyzer = getAnalyzer( member, context );
 		}
 		addToScopedAnalyzer( fieldName, analyzer, fieldAnn.index() );
+		if ( member.isCollection() ) {
+			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
+		}
 	}
 
 	protected Integer getPrecisionStep(NumericField numericFieldAnn) {
@@ -955,6 +962,7 @@ public abstract class AbstractDocumentBuilder<T> implements DocumentBuilder {
 			// actually stored in stateInspectionOptimizationsEnabled, but limiting to depth recursion.
 			if ( stateInspectionOptimizationsEnabled ) {
 				return ! ( this.indexedEmbeddedCollectionRoles.contains( collectionRole )
+						|| this.fieldCollectionRoles.contains( collectionRole )
 						|| this.containedInCollectionRoles.contains( collectionRole ) );
 			}
 			else {
