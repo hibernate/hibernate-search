@@ -187,6 +187,66 @@ public class FieldOnCollectionReindexationTest extends SearchTestCase {
 
 		hibernateSession.close();
 	}
+	
+	// see HSEARCH-1004
+	public void testUpdatingElementCollectionWithFieldAnnotationReindexesEntity() {
+		Session hibernateSession = openSession();
+
+		IndexedEntity indexedEntity = new IndexedEntity( "child" );
+		indexedEntity.addKeyword( "test1" );
+		indexedEntity.addKeyword( "test3" );
+
+		// Saving entities
+		Transaction tx = hibernateSession.beginTransaction();
+		hibernateSession.save( indexedEntity );
+		tx.commit();
+
+		List<IndexedEntity> searchResult;
+
+		// Check that everything got indexed correctly
+		tx = hibernateSession.beginTransaction();
+
+		searchResult = searchByKeyword( hibernateSession, "test1" );
+		assertEquals( 1, searchResult.size() );
+		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+
+		searchResult = searchByKeyword( hibernateSession, "test2" );
+		assertEquals( 0, searchResult.size() );
+
+		searchResult = searchByKeyword( hibernateSession, "test3" );
+		assertEquals( 1, searchResult.size() );
+		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+
+		tx.commit();
+
+		// Update the collection of the entity and its name
+		indexedEntity.addKeyword( "test4" );
+		indexedEntity.setName( "new name" );
+
+		tx = hibernateSession.beginTransaction();
+		hibernateSession.update( indexedEntity );
+		tx.commit();
+
+		// Everything is OK: the index is correctly updated
+		searchResult = searchByKeyword( hibernateSession, "test4" );
+		assertEquals( 1, searchResult.size() );
+		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+
+		// Now, let's update only the collection
+		indexedEntity.addKeyword( "test5" );
+
+		tx = hibernateSession.beginTransaction();
+		hibernateSession.update( indexedEntity );
+		tx.commit();
+
+		// The collection hasn't been indexed correctly
+		// The following tests fail
+		searchResult = searchByKeyword( hibernateSession, "test5" );
+		assertEquals( 1, searchResult.size() );
+		assertEquals( searchResult.iterator().next().getId(), indexedEntity.getId() );
+
+		hibernateSession.close();
+	}
 
 	@SuppressWarnings("unchecked")
 	private List<IndexedEntity> searchByItemWithFieldAnnotation(Session session, CollectionItem item) {
@@ -211,6 +271,20 @@ public class FieldOnCollectionReindexationTest extends SearchTestCase {
 
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
 				queryBuilder.keyword().onField( IndexedEntity.FIELD1_FIELD_NAME ).matching( item ).createQuery(),
+				IndexedEntity.class );
+
+		return (List<IndexedEntity>) fullTextQuery.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<IndexedEntity> searchByKeyword(Session session, String keyword) {
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
+				.forEntity( IndexedEntity.class ).get();
+
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
+				queryBuilder.keyword().onField( "keywords" ).matching( keyword ).createQuery(),
 				IndexedEntity.class );
 
 		return (List<IndexedEntity>) fullTextQuery.list();
