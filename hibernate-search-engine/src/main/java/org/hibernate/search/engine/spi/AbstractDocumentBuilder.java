@@ -102,6 +102,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	private Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	private boolean isRoot;
 	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
+	protected final Set<String> fieldCollectionRoles = new TreeSet<String>();
 	protected final Set<String> indexedEmbeddedCollectionRoles = new TreeSet<String>();
 	protected final Set<String> containedInCollectionRoles = new TreeSet<String>();
 
@@ -393,8 +394,8 @@ public abstract class AbstractDocumentBuilder<T> {
 
 	private void initializeMemberLevelAnnotations(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
 												  String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList, boolean disableOptimizations) {
-		checkForField( member, propertiesMetadata, prefix, context );
-		checkForFields( member, propertiesMetadata, prefix, context );
+		checkForField( classHostingMember, member, propertiesMetadata, prefix, context );
+		checkForFields( classHostingMember, member, propertiesMetadata, prefix, context );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
 		checkForIndexedEmbedded(
@@ -447,13 +448,15 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 	}
 
-	private void checkForFields(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context) {
+	private void checkForFields(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata,
+			String prefix, ConfigContext context) {
 		org.hibernate.search.annotations.Fields fieldsAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Fields.class );
 		NumericFields numericAnns = member.getAnnotation( NumericFields.class );
 		if ( fieldsAnn != null ) {
 			for ( org.hibernate.search.annotations.Field fieldAnn : fieldsAnn.value() ) {
 				bindFieldAnnotation(
+						classHostingMember,
 						member,
 						propertiesMetadata,
 						prefix,
@@ -496,13 +499,14 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 	}
 
-	private void checkForField(XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context) {
+	private void checkForField(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata,
+			String prefix, ConfigContext context) {
 		org.hibernate.search.annotations.Field fieldAnn =
 				member.getAnnotation( org.hibernate.search.annotations.Field.class );
 		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
 		DocumentId idAnn = member.getAnnotation( DocumentId.class );
 		if ( fieldAnn != null ) {
-			bindFieldAnnotation( member, propertiesMetadata, prefix, fieldAnn, numericFieldAnn, context );
+			bindFieldAnnotation( classHostingMember, member, propertiesMetadata, prefix, fieldAnn, numericFieldAnn, context );
 		}
 		if ( ( fieldAnn == null && idAnn == null ) && numericFieldAnn != null ) {
 			throw new SearchException( "@NumericField without a @Field on property '" + member.getName() + "'" );
@@ -656,7 +660,8 @@ public abstract class AbstractDocumentBuilder<T> {
 		addToScopedAnalyzer( fieldName, analyzer, index );
 	}
 
-	private void bindFieldAnnotation(XProperty member,
+	private void bindFieldAnnotation(XClass classHostingMember,
+									 XProperty member,
 									 PropertiesMetadata propertiesMetadata,
 									 String prefix,
 									 org.hibernate.search.annotations.Field fieldAnnotation,
@@ -665,6 +670,10 @@ public abstract class AbstractDocumentBuilder<T> {
 		FieldMetadata fieldMetadata = new FieldMetadata(  prefix, member, fieldAnnotation, numericFieldAnnotation, context, reflectionManager );
 		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		addToScopedAnalyzer( fieldMetadata.getFieldName(), fieldMetadata.getAnalyzer(), fieldMetadata.getIndex() );
+		
+		if ( member.isCollection() ) {
+			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
+		}
 	}
 
 	protected Integer getPrecisionStep(NumericField numericFieldAnn) {
@@ -848,7 +857,8 @@ public abstract class AbstractDocumentBuilder<T> {
 			// to be reachable. The evaluation of stateInspectionOptimizationsEnabled() was
 			// actually stored in stateInspectionOptimizationsEnabled, but limiting to depth recursion.
 			if ( stateInspectionOptimizationsEnabled ) {
-				return !( this.indexedEmbeddedCollectionRoles.contains( collectionRole )
+				return !( this.fieldCollectionRoles.contains( collectionRole )
+						|| this.indexedEmbeddedCollectionRoles.contains( collectionRole )
 						|| this.containedInCollectionRoles.contains( collectionRole ) );
 			}
 			else {
