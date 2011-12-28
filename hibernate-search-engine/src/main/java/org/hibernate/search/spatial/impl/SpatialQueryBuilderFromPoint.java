@@ -51,8 +51,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 */
 	public static Filter buildGridFilter(Point center, double radius, String fieldName) {
 		int bestGridLevel = GridHelper.findBestGridLevelForSearchRange( 2.0d * radius );
-		if ( bestGridLevel > SpatialFieldBridge.MAX_GRID_LEVEL ) {
-			bestGridLevel = SpatialFieldBridge.MAX_GRID_LEVEL;
+		if ( bestGridLevel > SpatialFieldBridge.DEFAULT_BOTTOM_GRID_LEVEL ) {
+			bestGridLevel = SpatialFieldBridge.DEFAULT_BOTTOM_GRID_LEVEL;
 		}
 		List<String> gridCellsIds = GridHelper.getGridCellsIds( center, radius, bestGridLevel );
 		return new GridFilter( gridCellsIds, GridHelper.formatFieldName( bestGridLevel, fieldName ) );

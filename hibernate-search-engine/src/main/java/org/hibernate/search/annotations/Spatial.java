@@ -37,13 +37,13 @@ public @interface Spatial {
 	Boost boost() default @Boost(value = 1.0F);
 
 	/**
-	 * @return minimum grid level for spatial indexing
+	 * @return top range grid level for spatial indexing
 	 */
-	int highGridLevel() default SpatialFieldBridge.MIN_GRID_LEVEL;
+	int topGridLevel() default SpatialFieldBridge.DEFAULT_TOP_GRID_LEVEL;
 
 	/**
-	 * @return minimum grid level for spatial indexing
+	 * @return bottom grid level for spatial indexing
 	 */
-	int lowGridLevel() default SpatialFieldBridge.MAX_GRID_LEVEL;
+	int bottomGridLevel() default SpatialFieldBridge.DEFAULT_BOTTOM_GRID_LEVEL;
 }
 
