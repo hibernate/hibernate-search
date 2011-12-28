@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -294,7 +293,7 @@ public final class BridgeFactory {
 		SpatialFieldBridge bridge = null;
 		if( spatial != null )  {
 			try {
-				bridge = new SpatialFieldBridge( spatial.highGridLevel(), spatial.lowGridLevel() );
+				bridge = new SpatialFieldBridge( spatial.topGridLevel(), spatial.bottomGridLevel() );
 			}
 			catch ( Exception e ) {
 				throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
@@ -335,8 +334,8 @@ public final class BridgeFactory {
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
 			Spatial spatialAnn = member.getAnnotation( org.hibernate.search.annotations.Spatial.class );
-			bridge= new SpatialFieldBridge( spatialAnn.highGridLevel(),
-					spatialAnn.lowGridLevel() );
+			bridge= new SpatialFieldBridge( spatialAnn.topGridLevel(),
+					spatialAnn.bottomGridLevel() );
 		}
 		else {
 			//find in built-ins
