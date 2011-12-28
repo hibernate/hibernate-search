@@ -42,6 +42,8 @@ public abstract class GridHelper {
 	 * @param coordinate position to compute the Index for
 	 * @param range range of the axis (-pi,pi)/(-90,90) => 2*pi/180 e.g
 	 * @param gridLevel Hox many time the range has been split in two
+	 *                  
+	 * @return the cell index on the axis
 	 */
 	public static int getCellIndex(double coordinate, double range, int gridLevel) {
 		return ( int ) Math.floor( Math.pow( 2, gridLevel ) * coordinate / range );
@@ -52,6 +54,8 @@ public abstract class GridHelper {
 	 *
 	 * @param point position to compute the Grid Cell Id for
 	 * @param gridLevel Hox many time the dimensions have been split in two
+	 *                  
+	 * @return the cell id for the point at the given grid level
 	 */
 	public static String getGridCellId(Point point, int gridLevel) {
 		double[] indexablesCoordinates = projectToIndexSpace( point );
@@ -72,17 +76,19 @@ public abstract class GridHelper {
 	 * Generate a Grid Cell Ids List for a position on all level between min and max
 	 *
 	 * @param point point position to compute the Grid Cell Ids for
-	 * @param minGridLevel minimum level of Grid to compute the Grid Cell Id for
-	 * @param maxGridLevel maximum level of Grid to compute the Grid Cell Id for
+	 * @param topGridLevel top level of Grid to compute the Grid Cell Id for
+	 * @param bottomGridLevel bottom level of Grid to compute the Grid Cell Id for
+	 *                        
+	 * @return Map containing grid level => Cell Id
 	 */
-	public static Map<Integer, String> getGridCellsIds(Point point, int minGridLevel, int maxGridLevel) {
-		if ( minGridLevel < 0 || maxGridLevel < minGridLevel ) {
+	public static Map<Integer, String> getGridCellsIds(Point point, int topGridLevel, int bottomGridLevel) {
+		if ( topGridLevel < 0 || bottomGridLevel < topGridLevel ) {
 			return null;
 		}
 
 		Map<Integer, String> gridCellIds = new HashMap<Integer, String>();
 
-		for ( int i = minGridLevel; i <= maxGridLevel; i++ ) {
+		for ( int i = topGridLevel; i <= bottomGridLevel; i++ ) {
 			gridCellIds.put( i, getGridCellId( point, i ) );
 		}
 
@@ -95,6 +101,8 @@ public abstract class GridHelper {
 	 * @param lowerLeft lower left corner of the bounding box
 	 * @param upperRight upper right corner of the bouding box
 	 * @param gridLevel grid level of the wanted cell ids
+	 *                  
+	 * @return List of ids of the cells containing the point
 	 */
 	public static List<String> getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel) {
 		double[] projectedLowerLeft = projectToIndexSpace( lowerLeft );
@@ -158,6 +166,8 @@ public abstract class GridHelper {
 	 * @param center center of the search area
 	 * @param radius radius of the search area
 	 * @param gridLevel grid level of the wanted cell ids
+	 *                  
+	 * @return List of the ids of the cells covering the bounding box of the given search discus
 	 */
 	public static List<String> getGridCellsIds(Point center, double radius, int gridLevel) {
 
@@ -195,13 +205,14 @@ public abstract class GridHelper {
 	}
 
 	/**
-	 * Return the best Grid level for a given search radius.
 	 * If point are searched at d distance from a point, a certain grid cell level will problem grid cell that are
 	 * big enough to contain the search area but the smallest possible. By returning this level we ensure 4 Grid Cell
 	 * maximum will be needed to coverd the search area (2 max on each axis because of search area crossing fixed bonds
 	 * of the grid cells)
 	 *
 	 * @param searchRange search range to be covered by the grid cells
+	 *                    
+	 * @return Return the best Grid level for a given search radius.
 	 */
 	public static int findBestGridLevelForSearchRange(double searchRange) {
 

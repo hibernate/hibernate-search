@@ -37,20 +37,20 @@ import java.util.Map;
  */
 public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 
-	public static final int MIN_GRID_LEVEL = 0;
-	public static final int MAX_GRID_LEVEL = 16;
+	public static final int DEFAULT_TOP_GRID_LEVEL = 0;
+	public static final int DEFAULT_BOTTOM_GRID_LEVEL = 16;
 
-	private int highGridLevel = MIN_GRID_LEVEL;
-	private int lowGridLevel = MAX_GRID_LEVEL;
+	private int topGridLevel = DEFAULT_TOP_GRID_LEVEL;
+	private int bottomGridLevel = DEFAULT_BOTTOM_GRID_LEVEL;
 
 	private boolean gridIndex = true;
 	private boolean numericFieldsIndex = true;
 
 	public SpatialFieldBridge() {}
 
-	public SpatialFieldBridge( int highGridLevel, int lowGridLevel ) {
-		this.highGridLevel = highGridLevel;
-		this.lowGridLevel = lowGridLevel;
+	public SpatialFieldBridge( int topGridLevel, int bottomGridLevel ) {
+		this.topGridLevel = topGridLevel;
+		this.bottomGridLevel = bottomGridLevel;
 	}
 
 	/**
@@ -70,9 +70,9 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 			if( gridIndex ) {
 				Point point = Point.fromDegrees( coordinates.getLatitude(), coordinates.getLongitude() );
 
-				Map<Integer, String> cellIds = GridHelper.getGridCellsIds( point, highGridLevel, lowGridLevel );
+				Map<Integer, String> cellIds = GridHelper.getGridCellsIds( point, topGridLevel, bottomGridLevel );
 
-				for ( int i = highGridLevel; i <= lowGridLevel; i++ ) {
+				for ( int i = topGridLevel; i <= bottomGridLevel; i++ ) {
 					luceneOptions.addFieldToDocument( GridHelper.formatFieldName( i, name ), cellIds.get( i ), document );
 				}
 			}
@@ -96,17 +96,17 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 	/**
 	 * Override method for default min and max grid level
 	 *
-	 * @param parameters Map containing the highGridLevel and lowGridLevel values
+	 * @param parameters Map containing the topGridLevel and bottomGridLevel values
 	 */
 	@Override
 	public void setParameterValues(Map parameters) {
-		Object highGridLevel = parameters.get( "highGridLevel" );
-		if ( highGridLevel instanceof Integer ) {
-			this.highGridLevel = ( Integer ) highGridLevel;
+		Object topGridLevel = parameters.get( "topGridLevel" );
+		if ( topGridLevel instanceof Integer ) {
+			this.topGridLevel = ( Integer ) topGridLevel;
 		}
-		Object lowGridLevel = parameters.get( "highGridLevel" );
-		if ( lowGridLevel instanceof Integer ) {
-			this.lowGridLevel = ( Integer ) lowGridLevel;
+		Object bottomGridLevel = parameters.get( "bottomGridLevel" );
+		if ( bottomGridLevel instanceof Integer ) {
+			this.bottomGridLevel = ( Integer ) bottomGridLevel;
 		}
 		Object gridIndex = parameters.get( "gridIndex" );
 		if ( gridIndex instanceof Boolean ) {
