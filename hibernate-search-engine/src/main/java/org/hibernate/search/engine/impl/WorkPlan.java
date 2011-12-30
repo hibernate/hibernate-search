@@ -37,6 +37,7 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
+import org.hibernate.search.engine.spi.DepthValidator;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -144,10 +145,10 @@ public class WorkPlan {
 	 *
 	 * @param value the entity to be processed
 	 */
-	public <T> void recurseContainedIn(T value) {
+	public <T> void recurseContainedIn(T value, DepthValidator depth) {
 		Class<T> entityClass = instanceInitializer.getClass( value );
 		PerClassWork classWork = getClassWork( entityClass );
-		classWork.recurseContainedIn( value );
+		classWork.recurseContainedIn( value, depth );
 	}
 
 	/**
@@ -297,7 +298,7 @@ public class WorkPlan {
 		 *
 		 * @param value the instance to be processed
 		 */
-		void recurseContainedIn(T value) {
+		void recurseContainedIn(T value, DepthValidator depth) {
 			if ( documentBuilder.requiresProvidedId() ) {
 				log.containedInPointsToProvidedId( instanceInitializer.getClass( value ) );
 			}
@@ -309,14 +310,14 @@ public class WorkPlan {
 						entityWork = new PerEntityWork( value );
 						entityById.put( extractedId, entityWork );
 						// recursion starts
-						documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this );
+						documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, depth );
 					}
 					// else nothing to do as it's being processed already
 				}
 				else {
 					// this branch for @ContainedIn recursive work of non-indexed entities
 					// as they don't have an indexingId
-					documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this );
+					documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, depth );
 				}
 			}
 		}
@@ -478,7 +479,7 @@ public class WorkPlan {
 			if ( !containedInProcessed ) {
 				containedInProcessed = true;
 				if ( add || delete ) {
-					entityBuilder.appendContainedInWorkForInstance( entity, workplan );
+					entityBuilder.appendContainedInWorkForInstance( entity, workplan, null );
 				}
 			}
 		}
