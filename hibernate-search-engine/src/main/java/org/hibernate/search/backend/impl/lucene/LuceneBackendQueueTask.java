@@ -138,7 +138,7 @@ class LuceneBackendQueueTask implements Runnable {
 			}
 		}
 		finally {
-			resources.getWorkspace().afterTransactionApplied( someFailureHappened );
+			resources.getWorkspace().afterTransactionApplied( someFailureHappened, streaming );
 		}
 	}
 
