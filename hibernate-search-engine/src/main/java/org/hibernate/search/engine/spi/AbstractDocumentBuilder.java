@@ -312,10 +312,12 @@ public abstract class AbstractDocumentBuilder<T> {
 
 		Map<String, Integer> maxDepths = metadata.containedInDepths;
 		String key = depthKey( instance.getClass(), member.getName() );
-		if ( maxDepths.containsKey( key ) )
+		if ( maxDepths.containsKey( key ) ) {
 			return new DepthValidator( maxDepths.get( key ) );
-
-		return new DepthValidator( Integer.MAX_VALUE );
+		}
+		else {
+			return new DepthValidator( Integer.MAX_VALUE );
+		}
 	}
 
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
