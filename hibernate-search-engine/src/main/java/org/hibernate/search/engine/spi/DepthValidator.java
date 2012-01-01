@@ -31,7 +31,7 @@ package org.hibernate.search.engine.spi;
  */
 public class DepthValidator {
 
-	private int maxDepth;
+	private final int maxDepth;
 	private int depth;
 
 	public DepthValidator(int maxDepth) {
@@ -48,14 +48,6 @@ public class DepthValidator {
 
 	public boolean isMaxDepthInfinite() {
 		return maxDepth == Integer.MAX_VALUE;
-	}
-
-	public int getMaxDepth() {
-		return maxDepth;
-	}
-
-	public void setMaxDepth(int maxDepth) {
-		this.maxDepth = maxDepth;
 	}
 
 	@Override
