@@ -89,6 +89,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Abstract base class for the document builders.
  *
  * @author Hardy Ferentschik
+ * @author Davide D'Alto
+ * @author Sanne Grinovero
  */
 public abstract class AbstractDocumentBuilder<T> {
 	private static final Log log = LoggerFactory.make();
@@ -303,20 +305,33 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private DepthValidator updateDepth(Object instance, XMember member, DepthValidator currentDepth) {
-		if ( currentDepth != null )
-			return currentDepth;
-
-		if ( instance == null )
-			return new DepthValidator( Integer.MAX_VALUE );
-
-		Map<String, Integer> maxDepths = metadata.containedInDepths;
-		String key = depthKey( instance.getClass(), member.getName() );
-		Integer maxDepth = maxDepths.get( key );
+		Integer maxDepth = null;
+		if ( instance != null ) {
+			Map<String, Integer> maxDepths = metadata.containedInDepths;
+			String key = depthKey( instance.getClass(), member.getName() );
+			maxDepth = maxDepths.get( key );
+		}
 		if ( maxDepth != null ) {
-			return new DepthValidator( maxDepth );
+			if ( currentDepth == null ) {
+				return new DepthValidator( maxDepth );
+			}
+			else {
+				int depth = currentDepth.getDepth();
+				if ( depth <= maxDepth ) {
+					return currentDepth;
+				}
+				else {
+					return new DepthValidator( maxDepth );
+				}
+			}
 		}
 		else {
-			return new DepthValidator( Integer.MAX_VALUE );
+			if ( currentDepth != null ) {
+				return currentDepth;
+			}
+			else {
+				return new DepthValidator( Integer.MAX_VALUE );
+			}
 		}
 	}
 

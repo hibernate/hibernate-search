@@ -38,6 +38,10 @@ public class DepthValidator {
 		this.maxDepth = maxDepth;
 	}
 
+	public int getDepth() {
+		return depth;
+	}
+
 	public void increaseDepth() {
 		depth++;
 	}
