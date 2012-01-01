@@ -25,7 +25,6 @@ package org.hibernate.search.engine.spi;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.management.MemoryManagerMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -565,7 +564,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		Annotation[] annotations = member.getAnnotations();
 		for ( Annotation annotation : annotations ) {
 			String mappedBy = mappedBy( annotation );
-			if ( isSet( mappedBy ) )
+			if ( StringHelper.isNotEmpty( mappedBy ) )
 				return mappedBy;
 		}
 		return EMPTY;
@@ -591,16 +590,6 @@ public abstract class AbstractDocumentBuilder<T> {
 		catch ( InvocationTargetException e ) {
 			return EMPTY;
 		}
-	}
-
-	private boolean isSet(String mappedBy) {
-		if ( mappedBy == null )
-			return false;
-
-		if ( mappedBy.trim().isEmpty() )
-			return false;
-
-		return true;
 	}
 
 	private void updateContainedInMaxDepth(XMember memberWithContainedIn, PropertiesMetadata propertiesMetadata, String accessType) {
