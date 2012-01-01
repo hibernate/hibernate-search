@@ -312,8 +312,9 @@ public abstract class AbstractDocumentBuilder<T> {
 
 		Map<String, Integer> maxDepths = metadata.containedInDepths;
 		String key = depthKey( instance.getClass(), member.getName() );
-		if ( maxDepths.containsKey( key ) ) {
-			return new DepthValidator( maxDepths.get( key ) );
+		Integer maxDepth = maxDepths.get( key );
+		if ( maxDepth != null ) {
+			return new DepthValidator( maxDepth );
 		}
 		else {
 			return new DepthValidator( Integer.MAX_VALUE );
