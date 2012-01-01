@@ -58,7 +58,7 @@ public class WorkingPerson {
 		joinColumns = @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID"),
 		inverseJoinColumns = @JoinColumn(name = "CHILD_ID", referencedColumnName = "ID")
 	)
-	@IndexedEmbedded(depth = 2)
+	@IndexedEmbedded(depth = 3)
 	public Set<WorkingPerson> parents = new HashSet<WorkingPerson>();
 
 	@ManyToMany(mappedBy = "parents")

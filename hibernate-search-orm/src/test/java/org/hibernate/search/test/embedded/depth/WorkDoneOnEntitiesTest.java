@@ -24,8 +24,13 @@
 package org.hibernate.search.test.embedded.depth;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
+import junit.framework.Assert;
+
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexReader.FieldOption;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -34,6 +39,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.LeakingLuceneBackend;
@@ -65,6 +71,8 @@ import org.hibernate.search.test.util.LeakingLuceneBackend;
  * 22 Financial Analyst ___________                           |-1 John of England
  * 23 Internal Audit Manager ______|-19 Financial Director ___|
  * </pre>
+ * @author Davide D'Alto
+ * @author Sanne Grinovero
  */
 public class WorkDoneOnEntitiesTest extends SearchTestCase {
 	
@@ -78,6 +86,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 			"Should be able to index field inside depth and in path",
 			"Real estate director", result.get( 0 ).name
 		);
+		checkRawIndexFields();
 	}
 
 	public void testParentsIndexingInDepth() throws Exception {
@@ -88,35 +97,56 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 			"Should be able to index field inside depth and in path",
 			"John of England", result.get( 0 ).name
 		);
+
+		result = search( session, "parents.parents.parents.name", "Ermengarde of Maine" );
+		assertEquals( "Unexpected number of results", 1, result.size() );
+		checkRawIndexFields();
 	}
 
 	public void testNoWorkShouldBeExecutedOnPerson() throws Exception {
 		renamePerson( session, 17, "Montford" );
+		checkRawIndexFields();
 		assertEquals( 0, countWorksDoneOnPersonId( 1 ) );
 	}
 
 	public void testWorkShouldBeExecutedOnPerson() throws Exception {
 		renamePerson( session, 6, "William" );
+		checkRawIndexFields();
 		assertEquals( 1, countWorksDoneOnPersonId( 1 ) );
 	}
 
 	public void testNoWorkShouldBeExecutedOnEmployee() throws Exception {
 		renamePerson( session, 23, "LM" );
+		checkRawIndexFields();
 		assertEquals( 0, countWorksDoneOnPersonId( 1 ) );
 	}
 
 	public void testWorkShouldBeExecutedOnEmployee() throws Exception {
 		renamePerson( session, 19, "FM" );
+		checkRawIndexFields();
 		assertEquals( 1, countWorksDoneOnPersonId( 1 ) );
 	}
 
 	public void testShouldNotIndexParentsBeyondDepth() throws Exception {
 		try {
-			search( session, "parents.parents.parents.name", "Bertrade de Montfort" );
+			// fails only if DSL fails:
+			search( session, "parents.parents.parents.parents.name", "Bertrade de Montfort" );
 			fail( "Should not index a field if it is beyond the depth threshold" );
 		}
 		catch ( SearchException e ) {
 		}
+		checkRawIndexFields();
+	}
+
+	public void testShouldNotIndexBeyondMixedPathDepth() throws Exception {
+		try {
+			// fails only if DSL fails:
+			search( session, "parents.employees.employees.name", "Techincal Manager" );
+			fail( "Should not index a field if it is beyond the depth threshold, considering minimum depth along paths" );
+		}
+		catch ( SearchException e ) {
+		}
+		checkRawIndexFields();
 	}
 
 	public void testShouldNotIndexEmployeesBeyondDepth() throws Exception {
@@ -126,6 +156,34 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		}
 		catch ( SearchException e ) {
 		}
+		checkRawIndexFields();
+	}
+
+	private void checkRawIndexFields() {
+		// check raw index as well:
+		Assert.assertTrue( indexContainsField( "name" ) );
+		Assert.assertTrue( indexContainsField( "employees.name" ) );
+		Assert.assertTrue( indexContainsField( "parents.name" ) );
+		Assert.assertTrue( indexContainsField( "parents.parents.name" ) );
+		Assert.assertTrue( indexContainsField( "parents.parents.parents.name" ) );
+		Assert.assertTrue( indexContainsField( "parents.employees.name" ) );
+		Assert.assertTrue( indexContainsField( "parents.parents.employees.name" ) );
+		Assert.assertFalse( indexContainsField( "employees.employees.name" ) );
+		Assert.assertFalse( indexContainsField( "employees.parents.name" ) );
+		Assert.assertFalse( indexContainsField( "parents.employees.employees.name" ) );
+		Assert.assertFalse( indexContainsField( "parents.parents.parents.employees.name" ) );
+	}
+
+	private boolean indexContainsField(String fieldName) {
+		IndexReaderAccessor indexReaderAccessor = getSearchFactory().getIndexReaderAccessor();
+		IndexReader indexReader = indexReaderAccessor.open( WorkingPerson.class );
+		try {
+			Collection<String> fieldNames = indexReader.getFieldNames(FieldOption.ALL);
+			return fieldNames.contains( fieldName );
+		}
+		finally {
+			indexReaderAccessor.close( indexReader );
+		}
 	}
 
 	@Override
@@ -133,7 +191,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		super.setUp();
 		session = openSession();
 		Transaction transaction = session.beginTransaction();
-		WorkingPerson[] ps = new WorkingPerson[24];
+		WorkingPerson[] ps = new WorkingPerson[27];
 		// array index starting from 1 to match ids of picture at http://en.wikipedia.org/wiki/John,_King_of_England
 		ps[1] = new WorkingPerson( 1, "John of England" );
 		ps[2] = new WorkingPerson( 2, "Henry II of England" );
@@ -159,6 +217,9 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		ps[21] = new WorkingPerson( 21, "Leasing Manager" );
 		ps[22] = new WorkingPerson( 22, "Financial Analyst" );
 		ps[23] = new WorkingPerson( 23, "Internal Audit Manager" );
+		ps[24] = new WorkingPerson( 24, "Slave of Henry II" );
+		ps[25] = new WorkingPerson( 25, "Slave of Geoffrey V" );
+		ps[26] = new WorkingPerson( 26, "Assistant of Slave of Geoffrey V" );
 
 		ps[1].addParents( ps[2], ps[3] );
 		ps[2].addParents( ps[4], ps[5] );
@@ -172,6 +233,9 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		ps[7].addParents( ps[14], ps[15] );
 
 		ps[1].addEmployees( ps[18], ps[19] );
+		ps[2].addEmployees( ps[24] );
+		ps[5].addEmployees( ps[25] );
+		ps[25].addEmployees( ps[26] );
 		
 		ps[18].addEmployees( ps[20], ps[21] );
 		ps[19].addEmployees( ps[22], ps[23] );
